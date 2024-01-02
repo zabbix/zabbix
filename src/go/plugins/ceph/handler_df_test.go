@@ -26,16 +26,53 @@ import (
 )
 
 func Test_dfHandler(t *testing.T) {
-	out := outDf{Pools: map[string]poolStat{
-		"device_health_metrics": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0,
-			StoredRaw: 0, MaxAvail: 1390298112},
-		"new_pool": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0,
-			StoredRaw: 0, MaxAvail: 695170880},
-		"test_zabbix": {PercentUsed: 0, Objects: 4, BytesUsed: 786432, Rd: 0, RdBytes: 0, Wr: 4, WrBytes: 24576,
-			StoredRaw: 66618, MaxAvail: 1390298112},
-		"zabbix": {PercentUsed: 0, Objects: 0, BytesUsed: 0, Rd: 0, RdBytes: 0, Wr: 0, WrBytes: 0,
-			StoredRaw: 0, MaxAvail: 1390298112},
-	},
+	out := outDf{
+		Pools: map[string]poolStat{
+			"device_health_metrics": {
+				PercentUsed: 0.3,
+				Objects:     0,
+				BytesUsed:   0,
+				Rd:          0,
+				RdBytes:     0,
+				Wr:          0,
+				WrBytes:     0,
+				StoredRaw:   0,
+				MaxAvail:    1390298112,
+			},
+			"new_pool": {
+				PercentUsed: 0.4,
+				Objects:     0,
+				BytesUsed:   0,
+				Rd:          0,
+				RdBytes:     0,
+				Wr:          0,
+				WrBytes:     0,
+				StoredRaw:   0,
+				MaxAvail:    695170880,
+			},
+			"test_zabbix": {
+				PercentUsed: 0.00018851681670639664,
+				Objects:     4,
+				BytesUsed:   786432,
+				Rd:          0,
+				RdBytes:     0,
+				Wr:          4,
+				WrBytes:     24576,
+				StoredRaw:   66618,
+				MaxAvail:    1390298112,
+			},
+			"zabbix": {
+				PercentUsed: 0,
+				Objects:     0,
+				BytesUsed:   0,
+				Rd:          0,
+				RdBytes:     0,
+				Wr:          0,
+				WrBytes:     0,
+				StoredRaw:   0,
+				MaxAvail:    1390298112,
+			},
+		},
 		Rd:              0,
 		RdBytes:         0,
 		Wr:              4,
@@ -55,6 +92,7 @@ func Test_dfHandler(t *testing.T) {
 	type args struct {
 		data map[command][]byte
 	}
+
 	tests := []struct {
 		name    string
 		args    args
@@ -79,8 +117,10 @@ func Test_dfHandler(t *testing.T) {
 			got, err := dfHandler(tt.args.data)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("dfHandler() error = %v, wantErr %v", err, tt.wantErr)
+
 				return
 			}
+
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("dfHandler() got = %v, want %v", got, tt.want)
 			}

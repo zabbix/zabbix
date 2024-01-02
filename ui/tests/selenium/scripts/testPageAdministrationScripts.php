@@ -21,25 +21,26 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup scripts
+ *
+ * @dataSource HostGroups
  *
  * @onBefore prepareScriptData
  */
 class testPageAdministrationScripts extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -157,6 +158,17 @@ class testPageAdministrationScripts extends CWebTest {
 						'User group' => 'Zabbix administrators',
 						'Host group' => 'Zabbix servers',
 						'Host access' => 'Write'
+					],
+					[
+						'Name' => 'Script for host group testing',
+						'Scope' => 'Action operation',
+						'Used in actions' => '',
+						'Type' => 'Webhook',
+						'Execute on' => '',
+						'Commands' => '',
+						'User group' => 'All',
+						'Host group' => 'Group for Script',
+						'Host access' => 'Read'
 					],
 					[
 						'Name' => self::$script_for_filter,
@@ -298,6 +310,7 @@ class testPageAdministrationScripts extends CWebTest {
 						self::$custom_script,
 						'Detect operating system',
 						self::$script_scope_event,
+						'Script for host group testing',
 						self::$script_for_filter,
 						'Selenium script'
 					]
@@ -354,6 +367,7 @@ class testPageAdministrationScripts extends CWebTest {
 					'expected' => [
 						self::$custom_script,
 						'Reboot',
+						'Script for host group testing',
 						'Selenium script'
 					]
 				]
@@ -432,6 +446,7 @@ class testPageAdministrationScripts extends CWebTest {
 						self::$script_scope_event,
 						'Ping',
 						'Reboot',
+						'Script for host group testing',
 						self::$script_for_filter,
 						'Selenium script',
 						'Traceroute'
@@ -469,6 +484,7 @@ class testPageAdministrationScripts extends CWebTest {
 						'Traceroute',
 						'Selenium script',
 						self::$script_for_filter,
+						'Script for host group testing',
 						'Reboot',
 						'Ping',
 						self::$script_scope_event,
@@ -486,6 +502,7 @@ class testPageAdministrationScripts extends CWebTest {
 						'/sbin/zabbix_server --runtime-control config_cache_reload',
 						'/usr/bin/traceroute {HOST.CONN}',
 						'ping -c 3 {HOST.CONN}; case $? in [01]) true;; *) false;; esac',
+						'',
 						'sudo /usr/bin/nmap -O {HOST.CONN}',
 						'test',
 						'test'

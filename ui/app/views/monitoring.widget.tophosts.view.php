@@ -66,7 +66,11 @@ foreach ($data['rows'] as $columns) {
 				&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
 				&& array_key_exists('thresholds', $column_config)) {
 			foreach ($column_config['thresholds'] as $threshold) {
-				if ($column['value'] < $threshold['threshold']) {
+				$threshold_value = $column['is_binary_units']
+					? $threshold['threshold_binary']
+					: $threshold['threshold'];
+
+				if ($column['value'] < $threshold_value) {
 					break;
 				}
 
@@ -110,8 +114,14 @@ foreach ($data['rows'] as $columns) {
 						? '#'.$column_config['base_color']
 						: ZBX_WIDGET_TOP_HOSTS_DEFAULT_FILL
 					)
-					->setAttribute('min', $column_config['min'])
-					->setAttribute('max', $column_config['max']);
+					->setAttribute('min', $column['is_binary_units']
+						? $column_config['min_binary']
+						: $column_config['min']
+					)
+					->setAttribute('max', $column['is_binary_units']
+						? $column_config['max_binary']
+						: $column_config['max']
+					);
 
 				if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_BAR) {
 					$bar_gauge->setAttribute('solid', 1);
@@ -119,7 +129,11 @@ foreach ($data['rows'] as $columns) {
 
 				if (array_key_exists('thresholds', $column_config)) {
 					foreach ($column_config['thresholds'] as $threshold) {
-						$bar_gauge->addThreshold($threshold['threshold'], '#'.$threshold['color']);
+						$threshold_value = $column['is_binary_units']
+							? $threshold['threshold_binary']
+							: $threshold['threshold'];
+
+						$bar_gauge->addThreshold($threshold_value, '#'.$threshold['color']);
 					}
 				}
 

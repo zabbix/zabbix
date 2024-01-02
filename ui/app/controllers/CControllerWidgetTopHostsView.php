@@ -77,9 +77,10 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$time_now = time();
 
 		$master_column = $configuration[$fields['column']];
-		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 
-		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+		$master_items = self::getItems($master_column['item'], self::isNumericOnlyColumn($master_column), $groupids,
+			$hostids
+		);
 		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
 
 		if (!$master_item_values) {
@@ -89,7 +90,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			];
 		}
 
-		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_items,
+		$master_items_only_numeric_present = !array_filter($master_items,
 			static function(array $item): bool {
 				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
@@ -127,7 +128,17 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			$master_hostids[$master_items[$itemid]['hostid']] = true;
 		}
 
-		$number_parser = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true]);
+		$number_parser = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => false
+		]);
+
+		$number_parser_binary = new CNumberParser([
+			'with_size_suffix' => true,
+			'with_time_suffix' => true,
+			'is_binary_size' => true
+		]);
 
 		$item_values = [];
 
@@ -139,54 +150,71 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			$calc_extremes = $column['display'] == CWidgetFieldColumnsList::DISPLAY_BAR
 				|| $column['display'] == CWidgetFieldColumnsList::DISPLAY_INDICATORS;
 
-			if ($calc_extremes) {
-				if ($column['min'] !== '' && $number_parser->parse($column['min']) == CParser::PARSE_SUCCESS) {
+			if ($column_index == $fields['column']) {
+				$column_items = $master_items;
+				$column_item_values = $master_item_values;
+			}
+			else {
+				$numeric_only = self::isNumericOnlyColumn($column);
+				$column_items = !$calc_extremes || ($column['min'] !== '' && $column['max'] !== '')
+					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
+					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
+
+				$column_item_values = self::getItemValues($column_items, $column, $time_now);
+			}
+
+			if ($calc_extremes && ($column['min'] !== '' || $column['max'] !== '')) {
+				if ($column['min'] !== '') {
+					$number_parser_binary->parse($column['min']);
+					$column['min_binary'] = $number_parser_binary->calcValue();
+
+					$number_parser->parse($column['min']);
 					$column['min'] = $number_parser->calcValue();
 				}
 
-				if ($column['max'] !== '' && $number_parser->parse($column['max']) == CParser::PARSE_SUCCESS) {
+				if ($column['max'] !== '') {
+					$number_parser_binary->parse($column['max']);
+					$column['max_binary'] = $number_parser_binary->calcValue();
+
+					$number_parser->parse($column['max']);
 					$column['max'] = $number_parser->calcValue();
 				}
 			}
 
 			if (array_key_exists('thresholds', $column)) {
 				foreach ($column['thresholds'] as &$threshold) {
-					if ($number_parser->parse($threshold['threshold']) == CParser::PARSE_SUCCESS) {
-						$threshold['threshold'] = $number_parser->calcValue();
-					}
+					$number_parser_binary->parse($threshold['threshold']);
+					$threshold['threshold_binary'] = $number_parser_binary->calcValue();
+
+					$number_parser->parse($threshold['threshold']);
+					$threshold['threshold'] = $number_parser->calcValue();
 				}
 				unset($threshold);
 			}
 
 			if ($column_index == $fields['column']) {
-				$column_items = $master_items;
-				$column_item_values = $master_item_values;
-
 				if ($calc_extremes) {
 					if ($column['min'] === '') {
 						$column['min'] = $master_items_min;
+						$column['min_binary'] = $column['min'];
 					}
 
 					if ($column['max'] === '') {
 						$column['max'] = $master_items_max;
+						$column['max_binary'] = $column['max'];
 					}
 				}
 			}
 			else {
-				$numeric_only = self::isNumericOnlyColumn($column);
-				$column_items = !$calc_extremes || $column['min'] !== '' && $column['max'] !== ''
-					? self::getItems($column['item'], $numeric_only, $groupids, array_keys($master_hostids))
-					: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
-
-				$column_item_values = self::getItemValues($column_items, $column, $time_now);
-
 				if ($calc_extremes && $column_item_values) {
 					if ($column['min'] === '') {
 						$column['min'] = min($column_item_values);
+						$column['min_binary'] = $column['min'];
 					}
 
 					if ($column['max'] === '') {
 						$column['max'] = max($column_item_values);
+						$column['max_binary'] = $column['max'];
 					}
 				}
 			}
@@ -197,7 +225,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 				if (array_key_exists($column_items[$itemid]['hostid'], $master_hostids)) {
 					$item_values[$column_index][$column_items[$itemid]['hostid']] = [
 						'value' => $column_item_value,
-						'item' => $column_items[$itemid]
+						'item' => $column_items[$itemid],
+						'is_binary_units' => isBinaryUnits($column_items[$itemid]['units'])
 					];
 				}
 			}
@@ -252,7 +281,8 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 						$row[] = array_key_exists($hostid, $item_values[$column_index])
 							? [
 								'value' => $item_values[$column_index][$hostid]['value'],
-								'item' => $item_values[$column_index][$hostid]['item']
+								'item' => $item_values[$column_index][$hostid]['item'],
+								'is_binary_units' => $item_values[$column_index][$hostid]['is_binary_units']
 							]
 							: null;
 
@@ -306,13 +336,17 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		]);
 
 		if ($items) {
-			$single_key = reset($items)['key_'];
+			$processed_hostids = [];
 
-			$items = array_filter($items,
-				static function ($item) use ($single_key): bool {
-					return $item['key_'] === $single_key;
+			$items = array_filter($items, static function ($item) use (&$processed_hostids) {
+				if (array_key_exists($item['hostid'], $processed_hostids)) {
+					return false;
 				}
-			);
+
+				$processed_hostids[$item['hostid']] = true;
+
+				return true;
+			});
 		}
 
 		return $items;

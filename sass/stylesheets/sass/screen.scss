@@ -48,7 +48,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/z-bar-gauge";
 @import "components/z-select";
 
-@import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
 
 .link-action {
@@ -341,7 +340,11 @@ form {
 		.icon-depend-up,
 		.icon-depend-down,
 		.icon-ackn {
-			margin: 0 4px -3px 0;
+			margin-bottom: -3px;
+
+			&:not(:first-of-type) {
+				margin-left: 4px;
+			}
 		}
 	}
 
@@ -619,8 +622,12 @@ form {
 			}
 		}
 
-		.vertical {
+		.text-vertical {
+			max-height: 150px;
+			overflow: hidden;
+			text-overflow: ellipsis;
 			writing-mode: vertical-lr;
+			line-height: 22px;
 			transform: rotate(180deg);
 		}
 
@@ -703,11 +710,6 @@ form {
 
 	tbody th {
 		text-align: left;
-	}
-
-	.vertical_rotation_inner {
-		transform: rotate(270deg);
-		white-space: nowrap;
 	}
 
 	.list-table-footer {
@@ -995,12 +997,6 @@ form {
 	word-break: break-word;
 }
 
-.overflow-table {
-	overflow-x: auto;
-	position: relative;
-	@extend %webkit-hor-scrollbar;
-}
-
 // Timeline in table view.
 .timeline-date {
 	text-align: right;
@@ -1076,11 +1072,11 @@ form {
 }
 
 .filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px;
-	padding: 10px 0;
-	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -1129,6 +1125,10 @@ form {
 
 		button {
 			margin: 0;
+		}
+
+		table {
+			width: auto;
 		}
 	}
 
@@ -1243,6 +1243,7 @@ form {
 		.subfilter-disable-btn {
 			background-color: $multiselect-item-disabled-bg-color;
 			color: $multiselect-item-disabled-color;
+			-webkit-text-fill-color: $multiselect-item-disabled-color;
 		}
 	}
 
@@ -1380,15 +1381,37 @@ form {
 			padding: 0 11px 0 0;
 			vertical-align: middle;
 		}
+	}
 
+	.drag-icon {
+		position: absolute;
+		top: 1px;
+		margin-right: 5px;
+	}
+
+	.list-vertical-accordion,
+	.table-forms-separator {
 		.drag-icon {
-			position: absolute;
 			top: 5px;
-			margin-right: 5px;
+		}
+	}
+
+	.httpconf-steps-dynamic-row,
+	.list-accordion-item-head,
+	.overrides-list-item {
+		.drag-icon {
+			top: 0;
+		}
+	}
+
+	.trigger-list {
+		.drag-icon {
+			top: 1px;
 		}
 	}
 
 	.table-forms-td-left {
+		position: relative;
 		display: table-cell;
 		padding: 5px 0;
 		text-align: right;
@@ -1400,6 +1423,12 @@ form {
 			display: block;
 			height: 24px;
 			line-height: 24px;
+		}
+
+		.checkbox-radio {
+			right: 0;
+			margin-right: 0;
+			margin-left: 0;
 		}
 	}
 
@@ -1462,6 +1491,11 @@ form {
 				margin-top: 5px;
 			}
 		}
+	}
+
+	.table-subforms {
+		margin-top: -5px;
+		margin-bottom: -5px;
 	}
 
 	h4 {
@@ -1627,8 +1661,7 @@ input {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 	}
 }
 
@@ -1639,9 +1672,7 @@ textarea {
 	}
 	padding: 4px 5px;
 	margin: 0;
-	min-height: 24px;
 	overflow: auto;
-	resize: vertical;
 	@extend %form-input-style;
 	@extend %webkit-scrollbar;
 
@@ -1650,8 +1681,7 @@ textarea {
 	}
 
 	&[readonly] {
-		color: $font-color !important;
-		@extend %form-disabled;
+		@extend %form-readonly;
 
 		&:focus {
 			border-color: $form-border-focus-color;
@@ -1865,6 +1895,12 @@ select {
 
 	&:focus {
 		border-color: $form-border-focus-color;
+	}
+
+	&::placeholder {
+		color: $input-placeholder-color;
+		-webkit-text-fill-color: $input-placeholder-color;
+		opacity: 1;
 	}
 }
 
@@ -2542,24 +2578,23 @@ $icon-widget-btn: (
 	}
 }
 
-%form-disabled {
-	color: $form-disabled-font-color;
-	background-color: $form-disabled-bg-color !important;
+%form-readonly {
+	color: $font-color;
+	-webkit-text-fill-color: $font-color;
+	background-color: $form-disabled-bg-color;
 	border-color: $form-disabled-border-color;
 }
 
-/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-.safari {
-	%form-disabled {
-		-webkit-text-fill-color: $form-disabled-font-color;
-	}
+%form-disabled {
+	color: $form-disabled-font-color;
+	-webkit-text-fill-color: $form-disabled-font-color;
+	background-color: $form-disabled-bg-color;
+	border-color: $form-disabled-border-color;
 
-	input,
-	textarea {
-		&[readonly] {
-			-webkit-text-fill-color: $font-color !important;
-			@extend %form-disabled;
-		}
+	&::placeholder {
+		color: $input-disabled-placeholder-color;
+		-webkit-text-fill-color: $input-disabled-placeholder-color;
+		opacity: 1;
 	}
 }
 
@@ -4112,6 +4147,10 @@ a.link-action {
 			border-top-right-radius: 2px;
 			border-bottom-right-radius: 2px;
 		}
+
+		&[data-hintbox='1'] {
+			cursor: pointer;
+		}
 	}
 
 	.status-na-bg,
@@ -4568,6 +4607,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar {
 		width: 9px;
+		height: 9px;
 	}
 
 	&::-webkit-scrollbar-track {
@@ -4578,15 +4618,6 @@ $browser-logos: (
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
-}
-
-// TODO: Legacy
-%webkit-hor-scrollbar {
-	&::-webkit-scrollbar {
-		height: 9px;
-	}
-
-	@extend %webkit-scrollbar;
 }
 
 %cursor-drag {
@@ -4786,6 +4817,10 @@ svg {
 	.overrides-list-item {
 		display: table-row;
 
+		.columns-wrapper {
+			position: relative;
+		}
+
 		.btn-remove {
 			position: relative;
 			right: -73px;
@@ -4874,6 +4909,10 @@ svg {
 			right: -10px;
 			top: 3px;
 		}
+	}
+
+	.list-accordion-item-head {
+		position: relative;
 	}
 
 	.list-accordion-item-head,
@@ -5345,18 +5384,6 @@ svg {
 	}
 }
 
-:-ms-input-placeholder {
-	color: $input-placeholder-color !important;
-}
-
-::-ms-input-placeholder {
-	color: $input-placeholder-color;
-}
-
-::placeholder {
-	color: $input-placeholder-color;
-}
-
 .icon-action-command,
 .icon-action-close,
 .icon-action-msg,
@@ -5398,7 +5425,7 @@ svg {
 	}
 }
 
-.icon-invisible {
+a.icon-invisible {
 	&:link,
 	&:hover,
 	&:focus {

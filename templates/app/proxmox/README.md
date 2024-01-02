@@ -19,19 +19,19 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
 Create an API token for the monitoring user. Important note: for security reasons, it is recommended to create a separate user (Datacenter - Permissions).
 
-For the created API token and user, provide the necessary access levels:
+Please provide the necessary access levels for both the User and the Token.
 
 * Check: ["perm","/",["Sys.Audit"]]
 
-* Check: ["perm","/nodes/{node}",["Sys.Audit"]]
+* Check: ["perm","/storage",["Datastore.Audit"]]
 
-* Check: ["perm","/vms/{vmid}",["VM.Audit"]]
+* Check: ["perm","/vms",["VM.Audit"]]
 
 Copy the resulting Token ID and Secret into host macros.
 

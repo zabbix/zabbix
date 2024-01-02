@@ -697,6 +697,8 @@ footer {
     line-height: 1.4; }
     .form-grid .table-forms-separator td {
       padding: 5px 5px 5px 0; }
+      .form-grid .table-forms-separator td .drag-icon {
+        top: 5px; }
 
 .btn-add,
 .btn-edit,
@@ -768,10 +770,13 @@ footer {
 .btn-add[disabled], .btn-add[disabled]:hover,
 .btn-edit[disabled],
 .btn-edit[disabled]:hover,
+.btn-import[disabled],
+.btn-import[disabled]:hover,
 .btn-remove[disabled],
 .btn-remove[disabled]:hover {
   background-color: transparent;
-  opacity: .25; }
+  opacity: .25;
+  cursor: default; }
 
 .overlay-close-btn {
   position: absolute;
@@ -961,14 +966,14 @@ footer {
 
 .dashboard-navigation {
   display: flex;
-  margin-top: 10px;
-  padding-bottom: 2px; }
+  margin-top: 2px;
+  margin-bottom: 6px; }
   .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.dashboard-previous-page, .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.dashboard-next-page {
     display: inline-block; }
 
 .dashboard-grid {
   position: relative;
-  margin: 0 -4px -4px -4px;
+  margin: -4px;
   z-index: 3;
   transition: margin-top .3s; }
   .dashboard-grid.reserve-header-lines-1 {
@@ -1613,6 +1618,8 @@ div.dashboard-grid-widget-item {
 div.dashboard-grid-widget-item a:link {
   border-bottom: none; }
 
+form.dashboard-grid-widget-tophosts #list_columns .drag-icon {
+  top: 1px; }
 form.dashboard-grid-widget-tophosts #list_columns .text {
   max-width: 150px; }
 form.dashboard-grid-widget-tophosts #column {
@@ -2256,6 +2263,7 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       z-index: 2; }
     .radio-list-control input[type="radio"]:checked + label {
       color: #000000 !important;
+      -webkit-text-fill-color: #000000 !important;
       border-color: #dddddd;
       background-color: #dddddd;
       position: relative;
@@ -2381,10 +2389,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .filter-container.tabfilter-container .form-buttons [name="filter_update"] {
     margin-right: 20px; }
   .filter-container.tabfilter-container .tabfilter-content-container {
-    border: 1px solid #444444;
-    background-color: #000000;
     padding: 10px 0;
-    margin-bottom: 6px; }
+    margin-bottom: 8px;
+    background-color: #000000;
+    border: 1px solid #444444; }
     .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed {
       padding: 0 0 10px 0; }
       .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
@@ -2394,7 +2402,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     display: flex;
     flex: 1;
     justify-content: space-between;
-    background-color: #111111;
     margin-top: -3px; }
   .filter-container.tabfilter-container nav > ul > li {
     margin: 0 3px 5px 0;
@@ -2424,6 +2431,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
+        .filter-container.tabfilter-container nav li button.btn-time-left:disabled, .filter-container.tabfilter-container nav li button.btn-time-right:disabled {
+          opacity: .25; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
     border-radius: 2px;
@@ -2442,6 +2451,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background-color: #000000;
       border: 1px solid #444444;
       border-bottom: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
       padding-bottom: 7px;
       vertical-align: baseline; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .tabfilter-item-link {
@@ -2449,7 +2460,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #414141; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #000000; }
+      background-color: #000000;
+      border-color: #444444; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {
@@ -2580,8 +2592,8 @@ z-select,
   z-select:focus,
   .z-select:focus {
     outline: none; }
-  z-select button.focusable,
-  .z-select button.focusable {
+  z-select .focusable,
+  .z-select .focusable {
     position: relative;
     width: 100%;
     height: 24px;
@@ -2595,8 +2607,8 @@ z-select,
     white-space: pre;
     cursor: default;
     border-radius: 0; }
-    z-select button.focusable::after,
-    .z-select button.focusable::after {
+    z-select .focusable::after,
+    .z-select .focusable::after {
       content: '';
       position: absolute;
       top: 6px;
@@ -2606,10 +2618,10 @@ z-select,
       border-right: 1.4px solid;
       border-bottom: 1.4px solid;
       transform: rotate(45deg); }
-    z-select button.focusable:active, z-select button.focusable:hover, z-select button.focusable:focus,
-    .z-select button.focusable:active,
-    .z-select button.focusable:hover,
-    .z-select button.focusable:focus {
+    z-select .focusable:active, z-select .focusable:hover, z-select .focusable:focus,
+    .z-select .focusable:active,
+    .z-select .focusable:hover,
+    .z-select .focusable:focus {
       color: #ffffff;
       background-color: #383838;
       border-color: #666666;
@@ -2619,6 +2631,9 @@ z-select,
     display: none;
     z-index: 20000;
     max-height: 362px;
+    max-width: 453px;
+    box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
     border: 1px solid;
     box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
@@ -2628,6 +2643,7 @@ z-select,
       height: inherit;
       box-sizing: border-box;
       min-height: 24px;
+      max-width: 453px;
       padding: 5px;
       line-height: normal;
       color: #ffffff;
@@ -2652,9 +2668,12 @@ z-select,
         font-weight: bold; }
     z-select .list > li > ul,
     .z-select .list > li > ul {
+      display: grid;
+      grid-template-columns: minmax(max-content, 1fr);
       margin: 5px -5px -5px; }
       z-select .list > li > ul li,
       .z-select .list > li > ul li {
+        padding-right: 15px;
         padding-left: 15px; }
     z-select .list.fall-upwards,
     .z-select .list.fall-upwards {
@@ -2663,19 +2682,9 @@ z-select,
   .z-select.is-expanded > ul {
     display: block;
     position: fixed; }
-  z-select[disabled] button,
-  .z-select[disabled] button {
+  z-select[disabled] .focusable,
+  .z-select[disabled] .focusable {
     pointer-events: none; }
-  z-select[readonly] button,
-  .z-select[readonly] button {
-    color: #ffffff !important; }
-    z-select[readonly] button:focus,
-    .z-select[readonly] button:focus {
-      border-color: #bbbbbb; }
-
-div.dashboard-grid-widget-slareport .date-vertical {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg); }
 
 .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
   border: 1px solid #444444; }
@@ -2874,7 +2883,11 @@ form.is-loading {
   .list-table td .icon-depend-up,
   .list-table td .icon-depend-down,
   .list-table td .icon-ackn {
-    margin: 0 4px -3px 0; }
+    margin-bottom: -3px; }
+    .list-table td .icon-depend-up:not(:first-of-type),
+    .list-table td .icon-depend-down:not(:first-of-type),
+    .list-table td .icon-ackn:not(:first-of-type) {
+      margin-left: 4px; }
   .list-table.compact-view .link-action {
     color: #ffffff; }
     .list-table.compact-view .link-action.red {
@@ -2988,8 +3001,12 @@ form.is-loading {
       border-top-color: #cacaca; }
     .list-table thead th .treeview span {
       margin: 0; }
-    .list-table thead th .vertical {
+    .list-table thead th .text-vertical {
+      max-height: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       writing-mode: vertical-lr;
+      line-height: 22px;
       transform: rotate(180deg); }
     .list-table thead th a {
       display: block;
@@ -3031,9 +3048,6 @@ form.is-loading {
       color: #cacaca; }
   .list-table tbody th {
     text-align: left; }
-  .list-table .vertical_rotation_inner {
-    transform: rotate(270deg);
-    white-space: nowrap; }
   .list-table .list-table-footer {
     border-bottom: 0;
     color: #cacaca;
@@ -3222,10 +3236,6 @@ form.is-loading {
   white-space: pre-wrap;
   word-break: break-word; }
 
-.overflow-table {
-  overflow-x: auto;
-  position: relative; }
-
 .timeline-date {
   text-align: right;
   white-space: nowrap;
@@ -3280,11 +3290,11 @@ form.is-loading {
   text-align: right; }
 
 .filter-container {
-  background-color: #000000;
-  border: 1px solid #444444;
-  margin: 0 0 10px;
+  position: relative;
   padding: 10px 0;
-  position: relative; }
+  margin-bottom: 8px;
+  background-color: #000000;
+  border: 1px solid #444444; }
   .filter-container .table {
     border-bottom: 1px solid #333333; }
   .filter-container .filter-forms {
@@ -3314,6 +3324,8 @@ form.is-loading {
       border-right: 0; }
     .filter-forms .cell button {
       margin: 0; }
+    .filter-forms .cell table {
+      width: auto; }
   .filter-forms button {
     margin: 10px 5px 0; }
   .filter-forms select {
@@ -3386,7 +3398,8 @@ form.is-loading {
     .multiselect .disabled .subfilter-enabled,
     .multiselect .disabled .subfilter-disable-btn {
       background-color: #383838;
-      color: #b5b5b5; }
+      color: #b5b5b5;
+      -webkit-text-fill-color: #b5b5b5; }
   .multiselect div[aria-live] {
     overflow: hidden;
     position: absolute;
@@ -3476,11 +3489,21 @@ form.is-loading {
     .table-forms td.td-drag-icon {
       padding: 0 11px 0 0;
       vertical-align: middle; }
-    .table-forms td .drag-icon {
-      position: absolute;
-      top: 5px;
-      margin-right: 5px; }
+  .table-forms .drag-icon {
+    position: absolute;
+    top: 1px;
+    margin-right: 5px; }
+  .table-forms .list-vertical-accordion .drag-icon,
+  .table-forms .table-forms-separator .drag-icon {
+    top: 5px; }
+  .table-forms .httpconf-steps-dynamic-row .drag-icon,
+  .table-forms .list-accordion-item-head .drag-icon,
+  .table-forms .overrides-list-item .drag-icon {
+    top: 0; }
+  .table-forms .trigger-list .drag-icon {
+    top: 1px; }
   .table-forms .table-forms-td-left {
+    position: relative;
     display: table-cell;
     padding: 5px 0;
     text-align: right;
@@ -3491,6 +3514,10 @@ form.is-loading {
       display: block;
       height: 24px;
       line-height: 24px; }
+    .table-forms .table-forms-td-left .checkbox-radio {
+      right: 0;
+      margin-right: 0;
+      margin-left: 0; }
   .table-forms .table-forms-td-right {
     display: table-cell;
     padding: 5px 0 5px 10px;
@@ -3522,6 +3549,9 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -3595,21 +3625,15 @@ input {
   font-size: 1em; }
   input[type="file"] {
     padding: 1px; }
-  input[readonly] {
-    color: #ffffff !important; }
 
 textarea {
   font-family: Arial, Tahoma, Verdana, sans-serif;
   font-size: 1em;
   padding: 4px 5px;
   margin: 0;
-  min-height: 24px;
-  overflow: auto;
-  resize: vertical; }
-  textarea[readonly] {
-    color: #ffffff !important; }
-    textarea[readonly]:focus {
-      border-color: #bbbbbb; }
+  overflow: auto; }
+  textarea[readonly]:focus {
+    border-color: #bbbbbb; }
 
 select {
   font-family: Arial, Tahoma, Verdana, sans-serif;
@@ -3722,8 +3746,8 @@ input[type="text"], input[type="password"], input[type="search"], input[type="nu
   padding: 0 5px;
   min-height: 24px; }
 
-z-select button.focusable,
-.z-select button.focusable, z-select .list,
+z-select .focusable,
+.z-select .focusable, z-select .list,
 .z-select .list, .multiselect, input[type="text"], input[type="password"], input[type="search"], input[type="number"], input[type="email"], input[type="time"], input[type="file"], textarea, select {
   background-color: #383838;
   border: 1px solid #666666;
@@ -3731,10 +3755,16 @@ z-select button.focusable,
   color: #ffffff;
   outline: 0;
   transition: border-color .2s ease-out, box-shadow .2s ease-out; }
-  z-select button.focusable:focus,
-  .z-select button.focusable:focus, z-select .list:focus,
+  z-select .focusable:focus,
+  .z-select .focusable:focus, z-select .list:focus,
   .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
     border-color: #bbbbbb; }
+  z-select .focusable::placeholder,
+  .z-select .focusable::placeholder, z-select .list::placeholder,
+  .z-select .list::placeholder, .multiselect::placeholder, input[type="text"]::placeholder, input[type="password"]::placeholder, input[type="search"]::placeholder, input[type="number"]::placeholder, input[type="email"]::placeholder, input[type="time"]::placeholder, input[type="file"]::placeholder, textarea::placeholder, select::placeholder {
+    color: #bbbbbb;
+    -webkit-text-fill-color: #bbbbbb;
+    opacity: 1; }
 
 button::-moz-focus-inner {
   padding: 0;
@@ -4207,25 +4237,24 @@ button[disabled], button[disabled]:hover, button[disabled]:active {
     opacity: .3;
     background-color: transparent; }
 
-.radio-list-control input[type="radio"][disabled] + label, z-select[disabled] button,
-.z-select[disabled] button, z-select[readonly] button,
-.z-select[readonly] button, .multiselect[aria-disabled], input[disabled], input[readonly], textarea[disabled], textarea[readonly], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .safari input[readonly],
-.safari textarea[readonly], .macro-input-group button.btn-dropdown-toggle:disabled {
-  color: #7d7d7d;
-  background-color: #000000 !important;
+z-select[readonly] .focusable,
+.z-select[readonly] .focusable, input[readonly], textarea[readonly] {
+  color: #ffffff;
+  -webkit-text-fill-color: #ffffff;
+  background-color: #000000;
   border-color: #5a5a5a; }
 
-/* This is a hack to define the color for disabled input elements on Safari. Other browsers uses 'color' instead. */
-.safari .radio-list-control input[type="radio"][disabled] + label, .radio-list-control .safari input[type="radio"][disabled] + label, .safari z-select[disabled] button, z-select[disabled] .safari button,
-.safari .z-select[disabled] button,
-.z-select[disabled] .safari button, .safari z-select[readonly] button, z-select[readonly] .safari button,
-.safari .z-select[readonly] button,
-.z-select[readonly] .safari button, .safari .multiselect[aria-disabled], .safari input[disabled], .safari textarea[disabled], .safari select option[disabled], select .safari option[disabled], .safari select[disabled], .safari select[readonly], .safari .checkbox-radio[readonly] span, .checkbox-radio[readonly] .safari span, .safari .checkbox-radio[readonly] + label span, .checkbox-radio[readonly] + label .safari span, .safari .checkbox-radio[disabled] + label span, .checkbox-radio[disabled] + label .safari span, .safari input[readonly],
-.safari textarea[readonly], .safari .macro-input-group button.btn-dropdown-toggle:disabled, .macro-input-group .safari button.btn-dropdown-toggle:disabled {
-  -webkit-text-fill-color: #7d7d7d; }
-.safari input[readonly],
-.safari textarea[readonly] {
-  -webkit-text-fill-color: #ffffff !important; }
+.radio-list-control input[type="radio"][disabled] + label, z-select[disabled] .focusable,
+.z-select[disabled] .focusable, .multiselect[aria-disabled], input[disabled], textarea[disabled], select option[disabled], select[disabled], select[readonly], .checkbox-radio[readonly] span, .checkbox-radio[readonly] + label span, .checkbox-radio[disabled] + label span, .macro-input-group button.btn-dropdown-toggle:disabled {
+  color: #7d7d7d;
+  -webkit-text-fill-color: #7d7d7d;
+  background-color: #000000;
+  border-color: #5a5a5a; }
+  .radio-list-control input[type="radio"][disabled] + label::placeholder, z-select[disabled] .focusable::placeholder,
+  .z-select[disabled] .focusable::placeholder, .multiselect[aria-disabled]::placeholder, input[disabled]::placeholder, textarea[disabled]::placeholder, select option[disabled]::placeholder, select[disabled]::placeholder, select[readonly]::placeholder, .checkbox-radio[readonly] span::placeholder, .checkbox-radio[readonly] + label span::placeholder, .checkbox-radio[disabled] + label span::placeholder, .macro-input-group button.btn-dropdown-toggle:disabled::placeholder {
+    color: #484848;
+    -webkit-text-fill-color: #484848;
+    opacity: 1; }
 
 .inaccessible .subfilter-enabled {
   color: #bfbfbf; }
@@ -5264,6 +5293,8 @@ a.link-action {
     .status-container span:last-of-type {
       border-top-right-radius: 2px;
       border-bottom-right-radius: 2px; }
+    .status-container span[data-hintbox='1'] {
+      cursor: pointer; }
   .status-container .status-na-bg,
   .status-container .status-info-bg,
   .status-container .status-warning-bg,
@@ -5618,30 +5649,28 @@ span.is-loading {
   padding: 10px 0 0;
   text-align: center; }
 
-.dashboard-grid-widget-content, div.dashboard-grid-widget-item, .msg-details ul, z-select button.focusable,
-.z-select button.focusable, z-select .list,
-.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
+.dashboard-grid-widget-content, div.dashboard-grid-widget-item, .msg-details ul, z-select .focusable,
+.z-select .focusable, z-select .list,
+.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
-  .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select button.focusable::-webkit-scrollbar,
-  .z-select button.focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
+  .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select .focusable::-webkit-scrollbar,
+  .z-select .focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
+  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
-    width: 9px; }
-  .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select button.focusable::-webkit-scrollbar-track,
-  .z-select button.focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
+    width: 9px;
+    height: 9px; }
+  .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select .focusable::-webkit-scrollbar-track,
+  .z-select .focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
+  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
-  .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select button.focusable::-webkit-scrollbar-thumb,
-  .z-select button.focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
+  .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select .focusable::-webkit-scrollbar-thumb,
+  .z-select .focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
+  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #999999;
     border: 1px solid #4d4d4d; }
-
-.overflow-table::-webkit-scrollbar {
-  height: 9px; }
 
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-head,
@@ -5781,6 +5810,8 @@ svg {
   padding-left: 15px; }
   .overrides-list .overrides-list-item {
     display: table-row; }
+    .overrides-list .overrides-list-item .columns-wrapper {
+      position: relative; }
     .overrides-list .overrides-list-item .btn-remove {
       position: relative;
       right: -73px;
@@ -5844,6 +5875,8 @@ svg {
       position: relative;
       right: -10px;
       top: 3px; }
+  .list-vertical-accordion .list-accordion-item-head {
+    position: relative; }
   .list-vertical-accordion .list-accordion-item-head,
   .list-vertical-accordion .list-accordion-item-body {
     padding-bottom: 2px; }
@@ -6191,15 +6224,6 @@ svg {
   .problem-icon-list .problem-icon-list-item:not(:last-of-type) {
     margin-right: 5px; }
 
-:-ms-input-placeholder {
-  color: #bbbbbb !important; }
-
-::-ms-input-placeholder {
-  color: #bbbbbb; }
-
-::placeholder {
-  color: #bbbbbb; }
-
 .icon-action-command,
 .icon-action-close,
 .icon-action-msg,
@@ -6256,9 +6280,9 @@ svg {
     background-image: url("../img/icon-sprite.svg?20211222");
     background-repeat: no-repeat; }
 
-.icon-invisible:link, .icon-invisible:hover, .icon-invisible:focus {
+a.icon-invisible:link, a.icon-invisible:hover, a.icon-invisible:focus {
   border-bottom: none; }
-.icon-invisible:focus {
+a.icon-invisible:focus {
   box-shadow: 0 0 0 2px #ffffff;
   border-radius: 2px; }
 
@@ -7362,8 +7386,8 @@ a.link-action {
   box-shadow: 0 0 0 1px #ffffff;
   transition: box-shadow .2s ease-out; }
 
-z-select button.focusable:focus,
-.z-select button.focusable:focus, z-select .list:focus,
+z-select .focusable:focus,
+.z-select .focusable:focus, z-select .list:focus,
 .z-select .list:focus, .multiselect:focus, input[type="text"]:focus, input[type="password"]:focus, input[type="search"]:focus, input[type="number"]:focus, input[type="email"]:focus, input[type="time"]:focus, input[type="file"]:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 1px #ffffff; }
 

@@ -20,7 +20,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -130,7 +130,7 @@ Create a Vault service token and set it to the macro `{$VAULT.TOKEN}`.
 |Vault: Runtime GC pause, total|<p>The total garbage collector pause time since Vault was last started.</p>|Dependent item|vault.metrics.total.gc.pause<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(vault_runtime_total_gc_pause_ns)`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Custom multiplier: `1e-09`</p></li></ul>|
 |Vault: Runtime GC runs, total|<p>Total number of garbage collection runs since Vault was last started.</p>|Dependent item|vault.metrics.runtime.total.gc.runs<p>**Preprocessing**</p><ul><li><p>Prometheus pattern: `VALUE(vault_runtime_total_gc_runs)`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |Vault: Token count, total|<p>Total number of service tokens available for use; counts all un-expired and un-revoked tokens in Vault's token store. This measurement is performed every 10 minutes.</p>|Dependent item|vault.metrics.token<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `vault_token_count`</p></li><li><p>JSON Path: `$[?(@.name=="vault_token_count")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
-|Vault: Token count by auth, total|<p>Total number of service tokens that were created by a auth method.</p>|Dependent item|vault.metrics.token.by_auth<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `vault_token_count_by_auth`</p></li><li><p>JSON Path: `$[?(@.name=="vault_token_count_by_auth")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
+|Vault: Token count by auth, total|<p>Total number of service tokens that were created by an auth method.</p>|Dependent item|vault.metrics.token.by_auth<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `vault_token_count_by_auth`</p></li><li><p>JSON Path: `$[?(@.name=="vault_token_count_by_auth")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |Vault: Token count by policy, total|<p>Total number of service tokens that have a policy attached.</p>|Dependent item|vault.metrics.token.by_policy<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `vault_token_count_by_policy`</p></li><li><p>JSON Path: `$[?(@.name=="vault_token_count_by_policy")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |Vault: Token count by ttl, total|<p>Number of service tokens, grouped by the TTL range they were assigned at creation.</p>|Dependent item|vault.metrics.token.by_ttl<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `vault_token_count_by_ttl`</p></li><li><p>JSON Path: `$[?(@.name=="vault_token_count_by_ttl")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li></ul>|
 |Vault: Token creation, rate|<p>Number of service or batch tokens created.</p>|Dependent item|vault.metrics.token.creation.rate<p>**Preprocessing**</p><ul><li><p>Prometheus to JSON: `vault_token_creation`</p></li><li><p>JSON Path: `$[?(@.name=="vault_token_creation")].value.sum()`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|

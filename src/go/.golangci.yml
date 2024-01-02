@@ -78,8 +78,8 @@ linters-settings:
     # switch
     default-signifies-exhaustive: true
   funlen:
-    lines: 1000
-    statements: 40
+    lines: 120
+    statements: 70
   gci:
     # put imports beginning with prefix after 3rd-party packages;
     # only support one prefix
@@ -87,10 +87,10 @@ linters-settings:
     local-prefixes: github.com/org/project
   gocognit:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
+    min-complexity: 30
   nestif:
     # minimal complexity of if statements to report, 5 by default
-    min-complexity: 4
+    min-complexity: 5
   goconst:
     # minimal length of string constant, 3 by default
     min-len: 10
@@ -98,7 +98,7 @@ linters-settings:
     min-occurrences: 3
   gocyclo:
     # minimal code complexity to report, 30 by default (but we recommend 10-20)
-    min-complexity: 10
+    min-complexity: 30
   godox:
     # report any comments starting with keywords, this is useful for TODO or FIXME comments that
     # might be left in the code accidentally and should be resolved before merging
@@ -239,4 +239,15 @@ issues:
     - path:  plugins/system/uptime/uptime_test.go
       linters:
         - lll
-
+    - path: pkg/zbxlib/logfile.go
+      linters:
+       - nlreturn
+    - path: plugins/vfs/file/encoding
+      linters:
+       - nlreturn
+    - path: pkg/tls/tls.go
+      linters:
+       - nlreturn
+    - path: pkg/zbxlib/expressions.go
+      linters:
+       - nlreturn

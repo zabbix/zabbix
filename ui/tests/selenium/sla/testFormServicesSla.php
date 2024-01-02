@@ -21,7 +21,7 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup sla
@@ -30,15 +30,16 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormServicesSla extends CWebTest {
 
-	use TableTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
 
 	private static $sla_sql = 'SELECT * FROM sla ORDER BY slaid';
@@ -74,8 +75,8 @@ class testFormServicesSla extends CWebTest {
 		];
 		$form->checkValue($default_values);
 
-		// Check that all locales are present in the dropdown.
-		$this->assertEquals(427, count($form->getField('Time zone')->getOptions()->asText()));
+		// Note that count of available timezones may differ based on the local environment configuration.
+		$this->assertEquals(420, count($form->getField('Time zone')->getOptions()->asText()));
 
 		// Check that mandatory fields are marked accordingly.
 		foreach (['Name', 'SLO', 'Effective date', 'Service tags'] as $sla_label) {

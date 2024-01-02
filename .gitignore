@@ -150,6 +150,7 @@ tests/libs/zbxcommon/zbx_dyn_escape_string
 tests/libs/zbxcommon/zbx_get_report_nextcheck
 tests/libs/zbxcommon/zbx_function_find
 tests/libs/zbxcommon/zbx_function_get_param_dyn
+tests/libs/zbxcommon/zbx_function_param_parse_ext
 tests/libs/zbxcommon/zbx_get_week_number
 tests/libs/zbxcommon/zbx_interval_preproc
 tests/libs/zbxcommon/zbx_json_to_xml
@@ -165,6 +166,7 @@ tests/libs/zbxcommon/zbx_user_macro_parse
 tests/libs/zbxcommon/zbx_validate_interval
 tests/libs/zbxcommon/zbx_variant_compare
 tests/libs/zbxcommon/zbx_xml_to_json
+tests/libs/zbxcommon/zbx_buf_readln
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers
 tests/libs/zbxcomms/zbx_tcp_check_allowed_peers_ipv4
 tests/libs/zbxcommshigh/zbx_tcp_recv_ext
@@ -234,6 +236,7 @@ tests/libs/zbxtime/zbx_iso8601_utc
 tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http
+tests/libs/zbxhttp/zbx_determine_charset
 tests/zabbix_server/preprocessor/item_preproc_csv_to_json
 tests/zabbix_server/preprocessor/item_preproc_xpath
 tests/zabbix_server/preprocessor/zbx_item_preproc

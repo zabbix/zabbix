@@ -27,8 +27,6 @@ $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmaps.php';
 $page['type'] = detect_page_type(PAGE_TYPE_HTML);
 
-require_once dirname(__FILE__).'/include/page_header.php';
-
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
 $fields = [
 	'maps' =>					[T_ZBX_INT, O_OPT, P_SYS|P_ONLY_ARRAY,	DB_ID,	null],
@@ -110,14 +108,21 @@ else {
 
 $allowed_edit = CWebUser::checkAccess(CRoleHelper::ACTIONS_EDIT_MAPS);
 
+if (!$allowed_edit && array_filter([
+		hasRequest('add') || hasRequest('update'),
+		hasRequest('delete') && hasRequest('sysmapid'),
+		hasRequest('action') && getRequest('action') == 'map.massdelete',
+		hasRequest('form')
+])) {
+	access_deny(ACCESS_DENY_PAGE);
+}
+
+require_once dirname(__FILE__).'/include/page_header.php';
+
 /*
  * Actions
  */
 if (hasRequest('add') || hasRequest('update')) {
-	if (!$allowed_edit) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$map = [
 		'name' => getRequest('name'),
 		'width' => getRequest('width'),
@@ -227,10 +232,6 @@ if (hasRequest('add') || hasRequest('update')) {
 }
 elseif ((hasRequest('delete') && hasRequest('sysmapid'))
 		|| (hasRequest('action') && getRequest('action') == 'map.massdelete')) {
-	if (!$allowed_edit) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$sysmapIds = getRequest('maps', []);
 
 	if (hasRequest('sysmapid')) {
@@ -265,10 +266,6 @@ elseif ((hasRequest('delete') && hasRequest('sysmapid'))
  * Display
  */
 if (hasRequest('form')) {
-	if (!$allowed_edit) {
-		access_deny(ACCESS_DENY_PAGE);
-	}
-
 	$current_userid = CWebUser::$data['userid'];
 	$userids[$current_userid] = $current_userid;
 	$user_groupids = [];

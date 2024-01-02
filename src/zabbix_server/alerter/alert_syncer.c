@@ -704,9 +704,9 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 			DBbegin();
 			DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", NULL);
+			zbx_db_insert_prepare(&db_event, "event_tag", "eventtagid", "eventid", "tag", "value", (char *)NULL);
 			zbx_db_insert_prepare(&db_problem, "problem_tag", "problemtagid", "eventid", "tag", "value",
-					NULL);
+					(char *)NULL);
 
 			for (i = 0; i < results_num; i++)
 			{

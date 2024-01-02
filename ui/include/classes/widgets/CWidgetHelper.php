@@ -621,9 +621,8 @@ class CWidgetHelper {
 			}
 
 			$table->addRow((new CRow([
-				(new CCol((new CDiv)
-					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('top: 0px;')
+				(new CCol(
+					(new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)
 				))->addClass(ZBX_STYLE_TD_DRAG_ICON),
 				(new CDiv($column['name']))->addClass('text'),
 				(new CDiv($label))->addClass('text'),
@@ -796,7 +795,7 @@ class CWidgetHelper {
 			(new CDiv([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
+					->addStyle('margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv(
 						(new CPatternSelect([
@@ -1152,7 +1151,7 @@ class CWidgetHelper {
 			(new CDiv([
 				(new CDiv())
 					->addClass(ZBX_STYLE_DRAG_ICON)
-					->addStyle('position: absolute; margin-left: -25px;'),
+					->addStyle('margin-left: -25px;'),
 				(new CDiv([
 					(new CDiv([
 						(new CButton())

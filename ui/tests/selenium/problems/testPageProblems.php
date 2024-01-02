@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -29,8 +29,20 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testPageProblems extends CLegacyWebTest {
 
-	use TagTrait;
-	use TableTrait;
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:filter-tags_0'
+			]
+		];
+	}
 
 	public function testPageProblems_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=problem.view');
@@ -375,7 +387,6 @@ class testPageProblems extends CLegacyWebTest {
 		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
 		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
-		$this->setTagSelector('id:filter-tags_0');
 		$this->setTags($data['tags']);
 		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
 		$this->query('name:filter_apply')->one()->click();
@@ -445,8 +456,9 @@ class testPageProblems extends CLegacyWebTest {
 		$this->zbxTestCheckboxSelect('details_0');
 
 		// Apply filter and check result
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
 		$this->query('name:filter_apply')->one()->click();
-		$this->query('xpath://form[@name="problem"]')->one()->waitUntilReloaded();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
 		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
 		$this->zbxTestClickButtonText('Reset');

@@ -19,7 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard, profiles
@@ -30,7 +31,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testDashboardForm extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Dashboard ids grouped by name.
@@ -71,15 +82,6 @@ class testDashboardForm extends CWebTest {
 		'Default page display period' => '1 hour',
 		'Start slideshow automatically' => false
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -333,7 +335,7 @@ class testDashboardForm extends CWebTest {
 	 * @param array					$data			data provider
 	 * @param string				$action			action that should be checked, create or update dashboard
 	 * @param CDashboardElement		$dashboard		dashboard element
-	 * @param COverlayDialogElement	$dialog			dasboard properties overlay dialog
+	 * @param COverlayDialogElement	$dialog			dashboard properties overlay dialog
 	 * @param array					$old_hash		hashes values before form submit
 	 */
 	private function checkProperties($data, $action, $dashboard, $dialog, $old_hash = null) {

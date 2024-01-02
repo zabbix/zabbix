@@ -406,9 +406,7 @@ class testDashboardPages extends CWebTest {
 			[
 				[
 					'fields' => [
-						// TODO: change name after fix ZBX-22972 to
-						// 'long_name_here_long_name_here_long_name_here_long_name_here_long_name_here'
-						'Name' => 'long_name',
+						'Name' => 'long_name_here_long_name_here_long_name_here_long_name_here_long_name_here',
 						'Page display period' => '2 minutes'
 					]
 				]
@@ -560,7 +558,7 @@ class testDashboardPages extends CWebTest {
 		$this->assertTrue($page_menu->query('xpath:.//a[@aria-label="Actions, Delete"]')->one()->isEnabled(false));
 
 		// Press Escape key to close page menu before saving the dashboard.
-		$this->page->keyPress(WebDriverKeys::ESCAPE);
+		$this->page->pressKey(WebDriverKeys::ESCAPE);
 		$page_menu->waitUntilNotVisible();
 
 		$dashboard->save();

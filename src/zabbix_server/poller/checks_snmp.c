@@ -1163,10 +1163,21 @@ reduce_max_vars:
 		}
 		else if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 		{
-			if (1 >= level)
+			if (1 >= level && 1 < max_vars)
 				goto reduce_max_vars;
 
 			ret = zbx_get_snmp_response_error(ss, &item->interface, status, response, error, max_error_len);
+			running = 0;
+			goto next;
+		}
+
+		if (NULL == response->variables)
+		{
+			if (1 >= level && 1 < max_vars)
+				goto reduce_max_vars;
+
+			zbx_strlcpy(error, "No values received.", max_error_len);
+			ret = NOTSUPPORTED;
 			running = 0;
 			goto next;
 		}

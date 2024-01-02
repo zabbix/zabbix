@@ -100,9 +100,10 @@ $triggersFormList
 	->addRow(
 		(new CLabel(_('Event name'), 'event_name')),
 		(new CTextAreaFlexible('event_name', $data['event_name']))
-			->setReadonly($readonly)
 			->setMaxlength(DB::getFieldLength('triggers', 'event_name'))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->disableSpellcheck()
+			->setReadonly($readonly)
 	)
 	->addRow(
 		new CLabel(_('Operational data'), 'opdata'),
@@ -147,7 +148,8 @@ $expression_row = [
 	))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableSpellcheck(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)
@@ -353,7 +355,8 @@ $recovery_expression_row = [
 	))
 		->addClass(ZBX_STYLE_MONOSPACE_FONT)
 		->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		->setAriaRequired(),
+		->setAriaRequired()
+		->disableSpellcheck(),
 	(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 	(new CButton('insert', ($data['recovery_expression_constructor'] == IM_TREE) ? _('Edit') : _('Add')))
 		->addClass(ZBX_STYLE_BTN_GREY)

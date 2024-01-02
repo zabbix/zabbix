@@ -31,6 +31,8 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup actions, profiles
  *
+ * @dataSource HostGroups
+ *
  * @onBefore prepareServiceActionData
  */
 class testFormAction extends CLegacyWebTest {
@@ -212,7 +214,7 @@ class testFormAction extends CLegacyWebTest {
 				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger']
 			],
 			[
-				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger name']
+				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Event name']
 			],
 			[
 				['eventsource' => EVENT_SOURCE_TRIGGERS, 'new_condition_conditiontype' => 'Trigger severity']
@@ -482,8 +484,8 @@ class testFormAction extends CLegacyWebTest {
 		]);
 
 		if ($eventsource == EVENT_SOURCE_TRIGGERS && array_key_exists('evaltype', $data)) {
-			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Trigger name contains TEST1');
-			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Trigger name contains TEST2');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_0"]/td[2]', 'Event name contains TEST1');
+			$this->zbxTestAssertElementText('//tr[@id="conditions_1"]/td[2]', 'Event name contains TEST2');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(0);"]');
 			$this->zbxTestAssertElementPresentXpath('//button[@name="remove" and @onclick="javascript: removeCondition(1);"]');
 		}
@@ -514,7 +516,7 @@ class testFormAction extends CLegacyWebTest {
 						'Template',
 						'Host',
 						'Trigger',
-						'Trigger name',
+						'Event name',
 						'Trigger severity',
 						'Time period',
 						'Problem is suppressed'
@@ -592,7 +594,7 @@ class testFormAction extends CLegacyWebTest {
 					'does not equal'
 				]);
 				break;
-			case 'Trigger name':
+			case 'Event name':
 			case 'Service name':
 			case 'Host name':
 			case 'Host metadata':
@@ -651,7 +653,7 @@ class testFormAction extends CLegacyWebTest {
 			case 'Service tag name':
 			case 'Service tag value':
 			case 'Service name':
-			case 'Trigger name':
+			case 'Event name':
 			case 'Time period':
 			case 'Host IP':
 			case 'Uptime/Downtime':
@@ -669,7 +671,7 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Tag name':
 			case 'Tag value':
-			case 'Trigger name':
+			case 'Event name':
 			case 'Service tag name':
 			case 'Service tag value':
 			case 'Service name':
@@ -689,7 +691,7 @@ class testFormAction extends CLegacyWebTest {
 		switch ($new_condition_conditiontype) {
 			case 'Tag name':
 			case 'Tag value':
-			case 'Trigger name':
+			case 'Event name':
 			case 'Service tag name':
 			case 'Service tag value':
 			case 'Service name':
@@ -979,7 +981,9 @@ class testFormAction extends CLegacyWebTest {
 			switch ($eventsource) {
 				case EVENT_SOURCE_TRIGGERS:
 				case EVENT_SOURCE_SERVICE:
-					$this->assertEquals($options->getOptions()->asText(), ['Send message', 'Reboot', 'Selenium script']);
+					$this->assertEquals(['Send message', 'Reboot', 'Script for host group testing', 'Selenium script'],
+							$options->getOptions()->asText()
+					);
 					break;
 
 				case EVENT_SOURCE_DISCOVERY:
@@ -996,6 +1000,7 @@ class testFormAction extends CLegacyWebTest {
 							'Disable host',
 							'Set host inventory mode',
 							'Reboot',
+							'Script for host group testing',
 							'Selenium script'
 					]);
 					break;
@@ -1153,7 +1158,7 @@ class testFormAction extends CLegacyWebTest {
 		// Check available operation types depending on event source and the selected operation type.
 		$message_types = ($eventsource === EVENT_SOURCE_INTERNAL)
 			? ['Send message', 'Notify all involved']
-			: ['Send message', 'Notify all involved', 'Reboot', 'Selenium script'];
+			: ['Send message', 'Notify all involved', 'Reboot', 'Script for host group testing', 'Selenium script'];
 		$this->assertEquals($message_types, $operation_details->query('id:operation-type-select')
 				->asDropdown()->one()->getOptions()->asText());
 		$this->assertEquals('Send message', $operation_details->getField('Operation')->getValue());
@@ -1224,7 +1229,7 @@ class testFormAction extends CLegacyWebTest {
 					'esc_period' => '123',
 					'conditions' => [
 						[
-							'Type' => CFormElement::RELOADABLE_FILL('Trigger name'),
+							'Type' => CFormElement::RELOADABLE_FILL('Event name'),
 							'Value' => 'trigger'
 						],
 						[
@@ -1240,7 +1245,7 @@ class testFormAction extends CLegacyWebTest {
 					'expected conditions' => [
 						'A' => 'Tag name does not contain Does not contain Tag',
 						'B' => 'Trigger severity equals Warning',
-						'C' => 'Trigger name contains trigger'
+						'C' => 'Event name contains trigger'
 					],
 					'operations' => [
 						[
@@ -1585,10 +1590,10 @@ class testFormAction extends CLegacyWebTest {
 		// adding conditions
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');
-		$this->zbxTestDropdownSelectWait('condition_type', 'Trigger name');
+		$this->zbxTestDropdownSelectWait('condition_type', 'Event name');
 		$this->zbxTestInputTypeWait('value', 'trigger');
 		$this->zbxTestClickXpath("//div[@class='overlay-dialogue-footer']//button[text()='Add']");
-		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Trigger name contains trigger');
+		$this->zbxTestAssertElementText("//tr[@id='conditions_0']/td[2]", 'Event name contains trigger');
 
 		$this->zbxTestClickXpathWait('//button[text()="Add" and contains(@onclick, "popup.condition.actions")]');
 		$this->zbxTestLaunchOverlayDialog('New condition');

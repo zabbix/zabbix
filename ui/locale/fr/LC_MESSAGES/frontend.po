@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-03 13:03+0000\n"
+"PO-Revision-Date: 2023-12-18 21:04+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -198,6 +198,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s de %2$s élément en défaut"
 msgstr[1] "%1$s de %2$s éléments en défaut"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr "%1$s ou %2$s - permet à la page d'être affichée uniquement dans un cadre sur la même origine que la page elle-même"
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr "%1$s ou %2$s - empêche la page d'être affichée dans un cadre, quel que soit le site qui tente de le faire"
 
 #: jsLoader.php:348
 #, c-format
@@ -2103,6 +2113,10 @@ msgstr "Impossible de modifier le type d'utilisateur de son propre rôle."
 msgid "Cannot clear history"
 msgstr "Impossible de nettoyer l'historique"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr "Impossible d'effacer l'historique et les tendances"
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "Impossible de cloner les prototypes de graphiques."
@@ -2540,6 +2554,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Impossible de désactiver le type de média"
 msgstr[1] "Impossible de désactiver les types de média"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "Impossible de désactiver le module"
+msgstr[1] "Impossible de désactiver les modules"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2623,6 +2643,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Impossible d'activer le type de média"
 msgstr[1] "Impossible d'activer les types de média"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "Impossible d'activer le module"
+msgstr[1] "Impossible d'activer les modules"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3363,6 +3389,10 @@ msgstr "Impossible de mettre à jour la maintenance"
 msgid "Cannot update media type"
 msgstr "Impossible de mettre à jour le type de média"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr "Impossible de mettre à jour le module"
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3566,7 +3596,7 @@ msgstr "Changement par seconde"
 #: app/views/popup.acknowledge.edit.php:71
 #: include/classes/helpers/CRoleHelper.php:462
 msgid "Change severity"
-msgstr "Changement de gravité"
+msgstr "Modifier la gravité"
 
 #: include/classes/html/CMacroValue.php:162
 msgid "Change type"
@@ -3732,6 +3762,14 @@ msgstr "Effacer l'historique"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Effacer l'historique et les tendances"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr "Effacer l'historique et les tendances des éléments sélectionnés ?"
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr "Effacer l'historique et les tendances des scénarios Web sélectionnés ?"
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6749,6 +6787,10 @@ msgstr "Supervision du journal d'événements. Retourne un journal"
 msgid "Event name"
 msgstr "Nom de l'événement"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr "Le nom de l'événement correspond au nom du déclencheur (avec les macros développées) sauf si un nom d'événement personnalisé est spécifié dans les paramètres du déclencheur."
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Paire de tags d'événement"
@@ -7963,6 +8005,10 @@ msgstr "Mettre en surbrillance la ligne entière"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Historique"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr "Historique et tendances effacés"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11939,6 +11985,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Module supprimé : %1$s."
 msgstr[1] "Modules supprimés : %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Module désactivé"
+msgstr[1] "Modules désactivés"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11946,12 +11998,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Module désactivé : %1$s."
 msgstr[1] "Modules désactivés : %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Module activé"
+msgstr[1] "Modules activés"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Module activé : %1$s."
 msgstr[1] "Modules activés : %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr "Module mis à jour"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13065,6 +13127,11 @@ msgstr "Éléments non hérités"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Non supporté"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr "Notez que %1$s ou %2$s seront considérés comme des noms d'hôtes s'ils sont utilisés sans guillemets."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19159,6 +19226,10 @@ msgstr "Uptime du processus du serveur Zabbix en secondes."
 msgid "Uptime/Downtime"
 msgstr "Fonctionnement/Arrêt"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr "Utiliser l'en-tête HTTP X-Frame-Options"
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Utiliser les requêtes de masse"
@@ -20561,6 +20632,10 @@ msgstr "Axe X"
 msgid "X-Frame-Options HTTP header"
 msgstr "En-tête HTTP X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr "Valeurs prises en charge de l'en-tête HTTP X-Frame-Options :"
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -20980,6 +21055,11 @@ msgstr "une durée relative est attendue"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "un caractère spécial"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr "une chaîne de noms d'hôtes séparés par des espaces ; l'ajout de %1$s à la liste permet d'afficher la page dans un cadre sur la même origine que la page elle-même"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -22337,6 +22417,10 @@ msgstr "now () - Nombre de secondes écoulées depuis le temps Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "nombre"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr "l'objet n'existe pas ou appartient à un autre objet"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504
