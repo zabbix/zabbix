@@ -3470,6 +3470,8 @@ section {
     fill: #cacaca; }
 
 .svg-pie-chart-legend {
+  position: relative;
+  top: 4px;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(var(--columns, 4), auto);
