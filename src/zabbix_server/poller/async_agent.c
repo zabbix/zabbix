@@ -84,7 +84,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		{
 			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 					" failed: Cannot resolve address: %s", dnserr));
-			goto stop;
+			return ZBX_ASYNC_TASK_STOP;
 		}
 
 		switch (agent_context->step)
@@ -94,7 +94,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						" failed: cannot initialize TCP connection to [[%s]:%hu]:"
 						" timed out", agent_context->item.interface.addr,
 						agent_context->item.interface.port));
-				break;
+				return ZBX_ASYNC_TASK_STOP;
 			case ZABBIX_AGENT_STEP_CONNECT_WAIT:
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: cannot establish TCP connection to [[%s]:%hu]:"

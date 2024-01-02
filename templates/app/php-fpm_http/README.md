@@ -26,7 +26,7 @@ This template has been tested on:
 
 ## Setup
 
-Note that depending on your OS distribution, the PHP-FPM executable/service name can vary. RHEL-like distributions usually name both process and service as `php-fpm`, while for Debian/Ubuntu based distributions it may include the version, for example: executable name - `php-fpm8.2`, systemd service name - `php8.2-fpm`. Ajdust the following instructions accordingly if needed.
+Note that depending on your OS distribution, the PHP-FPM executable/service name can vary. RHEL-like distributions usually name both process and service as `php-fpm`, while for Debian/Ubuntu based distributions it may include the version, for example: executable name - `php-fpm8.2`, systemd service name - `php8.2-fpm`. Adjust the following instructions accordingly if needed.
 
 1. Open the PHP-FPM configuration file and enable the status page as shown.
   ```

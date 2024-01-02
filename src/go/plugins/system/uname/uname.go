@@ -20,15 +20,28 @@
 package uname
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Uname",
+		"system.uname", "Returns system uname.",
+		"system.hostname", "Returns system host name.",
+		"system.sw.arch", "Software architecture information.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -42,12 +55,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Uname",
-		"system.uname", "Returns system uname.",
-		"system.hostname", "Returns system host name.",
-		"system.sw.arch", "Software architecture information.")
 }
