@@ -17,24 +17,59 @@
 class CControllerCorrelationCreate extends CController {
 
 	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
 		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
 	}
 
-	protected function checkInput(): bool {
-		$fields = [
-			'name' =>			'db correlation.name|required|not_empty',
-			'description' =>	'db correlation.description',
-			'evaltype' =>		'db correlation.evaltype|required|in '.implode(',', [CONDITION_EVAL_TYPE_AND_OR,
-				CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION
-			]),
-			'status' =>			'db correlation.status|in '.ZBX_CORRELATION_ENABLED,
-			'formula' =>		'db correlation.formula',
-			'op_close_new' =>	'in 1',
-			'op_close_old' =>	'in 1',
-			'conditions' =>		'required|array'
+	static function getValidationRules(): array {
+		$api_uniq = [
+			['correlation.get', ['name' => '{name}']]
 		];
 
-		$ret = $this->validateInput($fields);
+		return ['object', 'api_uniq' => $api_uniq, 'fields' => [
+			'name' => ['db correlation.name', 'required', 'not_empty'],
+			'description' => ['db correlation.description'],
+			'evaltype' => ['db correlation.evaltype', 'required', 'in' => [CONDITION_EVAL_TYPE_AND_OR, CONDITION_EVAL_TYPE_AND, CONDITION_EVAL_TYPE_OR, CONDITION_EVAL_TYPE_EXPRESSION]],
+			'status' => ['db correlation.status', 'required', 'in' => [ZBX_CORRELATION_ENABLED, ZBX_CORRELATION_DISABLED]],
+			'formula' => ['db correlation.formula'],
+			'op_close_new' => [
+				['boolean'],
+				['boolean', 'required', 'when' => ['op_close_old', false]]
+			],
+			'op_close_old' => ['boolean'],
+			'conditions' =>	['objects', 'required', 'uniq' => [['type', 'operator', 'tag', 'oldtag', 'newtag', 'value', 'groupid']], 'not_empty', 'fields' => [
+				'type' => ['db corr_condition.type', 'required', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP, ZBX_CORR_CONDITION_EVENT_TAG_PAIR, ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]],
+				'operator' => [
+					['db conditions.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG, ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
+					['db corr_condition_group.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]],
+					['db corr_condition_tagvalue.operator', 'required', 'in' => [CONDITION_OPERATOR_EQUAL, CONDITION_OPERATOR_NOT_EQUAL, CONDITION_OPERATOR_LIKE, CONDITION_OPERATOR_NOT_LIKE], 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]]]
+				],
+				'tag' => [
+					['db corr_condition_tag.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG, ZBX_CORR_CONDITION_NEW_EVENT_TAG]]],
+					['db corr_condition_tagvalue.tag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]]]
+				],
+				'oldtag' => ['db corr_condition_tagpair.oldtag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
+				'newtag' => ['db corr_condition_tagpair.newtag', 'required', 'not_empty', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_EVENT_TAG_PAIR]]],
+				'value' => ['db corr_condition_tagvalue.value', 'required', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE, ZBX_CORR_CONDITION_NEW_EVENT_TAG_VALUE]]],
+				'groupid' => ['db corr_condition_group.groupid', 'required', 'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]],
+				'formulaid' => ['string']
+			]]
+		]];
+	}
+
+	static function getValidationRulesForConditionPopup() {
+		$rules = self::getValidationRules();
+
+		return ['objects', 'fields' => [
+			'groupid' => ['array', 'required',
+				'field' => ['db corr_condition_group.groupid'],
+				'when' => ['type', 'in' => [ZBX_CORR_CONDITION_NEW_EVENT_HOSTGROUP]]
+			]
+		] + $rules['fields']['conditions']['fields']];
+	}
+
+	protected function checkInput(): bool {
+		$ret = $this->validateInput(self::getValidationRules());
 
 		if (!$ret) {
 			$this->setResponse(

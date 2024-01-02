@@ -234,7 +234,7 @@ $form_grid
 	])
 	->addItem([
 		new CLabel(_('Operations')),
-		new CFormField(
+		new CFormField([
 			(new CCheckBoxList())
 				->setOptions([
 					[
@@ -242,17 +242,24 @@ $form_grid
 						'checked' => $data['op_close_old'],
 						'name' => 'op_close_old',
 						'id' => 'operation_0_type',
-						'value' => '1'
+						'value' => '1',
+						'unchecked_value' => 0,
+						'error_container' => 'operations_error_container'
 					],
 					[
 						'label' => _('Close new event'),
 						'checked' => $data['op_close_new'],
 						'name' => 'op_close_new',
 						'id' => 'operation_1_type',
-						'value' => '1'
+						'value' => '1',
+						'unchecked_value' => 0,
+						'error_container' => 'operations_error_container'
 					]
-				])
-		)
+				]),
+			(new CDiv())
+				->setId('operations_error_container')
+				->addClass(ZBX_STYLE_ERROR_CONTAINER)
+		])
 	])
 	->addItem([
 		new CFormField((new CLabel(_('At least one operation must be selected.')))->setAsteriskMark())
