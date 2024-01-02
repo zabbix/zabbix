@@ -573,7 +573,7 @@ typedef struct
 	zbx_hashset_t		conditions;
 
 	/* Configuration synchronization timestamp of the rules. */
-	/* Update the cache if this timesamp is less than the    */
+	/* Update the cache if this timestamp is less than the   */
 	/* current configuration synchronization timestamp.      */
 	int			sync_ts;
 }
