@@ -23,8 +23,6 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users, config
- *
- * @dataSource UserPermissions
  */
 class testTimezone extends CWebTest {
 
@@ -44,7 +42,7 @@ class testTimezone extends CWebTest {
 		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
-		$etc_time = $this->getProblemTime('Trigger for tag permissions Oracle');
+		$etc_time = $this->getProblemTime('4_trigger_Average');
 
 		// UTC -3 hours.
 		$this->setTimezone('UTC', 'gui');
@@ -52,7 +50,7 @@ class testTimezone extends CWebTest {
 
 		// Return to problem page and check time.
 		$this->page->open('zabbix.php?action=problem.view');
-		$utc_time = $this->getProblemTime('Trigger for tag permissions Oracle');
+		$utc_time = $this->getProblemTime('4_trigger_Average');
 		$this->assertEquals($etc_time, $utc_time);
 	}
 
@@ -100,7 +98,7 @@ class testTimezone extends CWebTest {
 		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
-		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
+		$system_time = $this->getProblemTime('4_trigger_Average');
 		$this->page->logout();
 
 		// User timezone change.
@@ -110,7 +108,7 @@ class testTimezone extends CWebTest {
 
 		// User timezone check.
 		$this->page->open('zabbix.php?action=problem.view');
-		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
+		$user_time = $this->getProblemTime('4_trigger_Average');
 		$this->assertEquals($system_time, $user_time);
 		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.zbx_dbstr('test-timezone')));
 		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
@@ -192,7 +190,7 @@ class testTimezone extends CWebTest {
 		$this->page->userLogin('Admin', 'zabbix');
 		$this->setTimezone('System', 'gui');
 		$this->page->open('zabbix.php?action=problem.view');
-		$system_time = $this->getProblemTime('Trigger for tag permissions Oracle');
+		$system_time = $this->getProblemTime('4_trigger_Average');
 		$this->page->open('zabbix.php?action=user.edit');
 		$form = $this->query('name:user_form')->asForm()->waitUntilVisible()->one();
 		if (CTestArrayHelper::get($data, 'fields.Time zone')) {
@@ -212,7 +210,7 @@ class testTimezone extends CWebTest {
 
 		// Actual time after timezone change.
 		$this->page->open('zabbix.php?action=problem.view');
-		$user_time = $this->getProblemTime('Trigger for tag permissions Oracle');
+		$user_time = $this->getProblemTime('4_trigger_Average');
 		$this->assertEquals($system_time, $user_time);
 		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
