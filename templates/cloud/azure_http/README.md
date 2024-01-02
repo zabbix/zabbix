@@ -92,7 +92,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Storage accounts discovery|<p>The list of all storage accounts available under the subscription.</p>|Dependent item|azure.starage.acc.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Storage accounts discovery|<p>The list of all storage accounts available under the subscription.</p>|Dependent item|azure.storage.acc.discovery<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Storage accounts discovery
 
