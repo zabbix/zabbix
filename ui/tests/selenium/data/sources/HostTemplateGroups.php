@@ -261,8 +261,8 @@ class HostTemplateGroups {
 
 			// Collect LLD id and corresponding host prototype id for tests that check LLD links for host groups.
 			$return_ids[$lld_name] = [
-				'LLD id' => $lldid,
-				'Host prototype id' => $host_prototypeid
+				'lld_id' => $lldid,
+				'host_prototype_id' => $host_prototypeid
 			];
 
 			// Insert a discovered host the ID of which is by 1000 more than of the corresponding host prototype.

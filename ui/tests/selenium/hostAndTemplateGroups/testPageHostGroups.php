@@ -553,15 +553,20 @@ class testPageHostGroups extends testPageGroups {
 			$link = $table_cell->query('link', $lld_name)->one();
 			$this->assertTrue($link->isClickable());
 
-			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['LLD id'].'&hostid='.
-					$link_ids[$lld_name]['Host prototype id'].'&context=host';
+			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].'&hostid='.
+					$link_ids[$lld_name]['host_prototype_id'].'&context=host';
 			$this->assertEquals($link_url, $link->getAttribute('href'));
 		}
 
 		// Check that 3 dots are added after 1st LLD name, if there's more than 2 parent LLDs and no more LLDs are shown.
+		$name_parts = preg_split('/(,|:) /', $table_cell->getText());
+
 		if (array_key_exists('ellipsis', $data)) {
-			$name_parts = preg_split('/(,|:) /', $table_cell->getText());
 			$this->assertEquals([$data['links'][0], '...', $data['links'][1], $data['name']], $name_parts);
+		}
+		else {
+			array_push($data['links'], $data['name']);
+			$this->assertEquals($data['links'], $name_parts);
 		}
 	}
 }

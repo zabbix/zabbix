@@ -282,18 +282,17 @@ class testFormHostGroup extends testFormGroups {
 			$link = $discovered_by->query('link', $lld_name)->one();
 			$this->assertTrue($link->isClickable());
 
-			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['LLD id'].'&hostid='.
-					$link_ids[$lld_name]['Host prototype id'].'&context=host';
+			$link_url = 'host_prototypes.php?form=update&parent_discoveryid='.$link_ids[$lld_name]['lld_id'].'&hostid='.
+					$link_ids[$lld_name]['host_prototype_id'].'&context=host';
 			$this->assertEquals($link_url, $link->getAttribute('href'));
 		}
 
 		// Check that three dots are added after the 5th LLD name, if there are more than 5 parent LLDs.
 		if (CTestArrayHelper::get($data, 'ellipsis')) {
 			array_push($data['links'], '...');
-
-			$this->assertEquals($data['links'], explode(', ', $discovered_by->getText()));
 		}
 
+		$this->assertEquals($data['links'], explode(', ', $discovered_by->getText()));
 		$dialog->close();
 	}
 }
