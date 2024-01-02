@@ -20,21 +20,25 @@
 package empty
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.empty", "Returns empty value.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
 	return &plugin.Result{}, nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "DebugEmpty", "debug.empty", "Returns empty value.")
 }
