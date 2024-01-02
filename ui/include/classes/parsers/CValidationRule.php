@@ -76,8 +76,7 @@ class CValidationRule {
 									&& !$this->parseArrayDB($buffer, $pos, $rule)
 									&& !$this->parseArray($buffer, $pos, $rule)
 									&& !$this->parseFlags($buffer, $pos, $rule)
-									&& !$this->parseCuid($buffer, $pos, $rule)
-									&& !$this->parsePassword($buffer, $pos, $rule)) {
+									&& !$this->parseCuid($buffer, $pos, $rule)) {
 								// incorrect validation rule
 								break 3;
 							}
@@ -157,22 +156,6 @@ class CValidationRule {
 
 		$pos += 6;
 		$rules['string'] = true;
-
-		return true;
-	}
-
-	/**
-	 * password
-	 *
-	 * 'password' => true
-	 */
-	private function parsePassword($buffer, &$pos, &$rules) {
-		if (strncmp(substr($buffer, $pos), 'password', 8) != 0) {
-			return false;
-		}
-
-		$pos += 8;
-		$rules['password'] = true;
 
 		return true;
 	}

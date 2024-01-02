@@ -32,8 +32,8 @@ class CControllerUserProfileEdit extends CControllerUserEditGeneral {
 
 		$fields = [
 			'change_password' =>	'in 1',
-			'password1' =>			'password',
-			'password2' =>			'password',
+			'password1' =>			'string',
+			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),

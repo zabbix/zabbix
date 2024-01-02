@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:49:40Z'
+  date: '2023-12-28T08:16:27Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -145,9 +145,9 @@ zabbix_export:
               value: coprocessor
           triggers:
             - uuid: 31eca27ff6ce4ed78ee428ed3b8d8806
-              expression: 'min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}'
+              expression: 'min(/TiDB TiKV by HTTP/tikv.coprocessor_request_error.rate,5m)>{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}'
               name: 'TiKV: Too many coprocessor request error'
-              event_name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPOCESSOR.ERRORS.MAX.WARN} in 5m)'
+              event_name: 'TiKV: Too many coprocessor request error (over {$TIKV.COPROCESSOR.ERRORS.MAX.WARN} in 5m)'
               priority: WARNING
               tags:
                 - tag: scope
@@ -1047,7 +1047,7 @@ zabbix_export:
         - tag: target
           value: tikv
       macros:
-        - macro: '{$TIKV.COPOCESSOR.ERRORS.MAX.WARN}'
+        - macro: '{$TIKV.COPROCESSOR.ERRORS.MAX.WARN}'
           value: '1'
           description: 'Maximum number of coprocessor request errors'
         - macro: '{$TIKV.PENDING_COMMANDS.MAX.WARN}'
