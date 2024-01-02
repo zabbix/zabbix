@@ -1342,7 +1342,9 @@ class testPageProblems extends CWebTest {
 						'Show' => 'History'
 					],
 					'result' => [
-						['Problem' => 'Trigger for Age problem']
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL']
 					]
 				]
 			],

@@ -29,6 +29,8 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup hosts
  *
  * @onBefore prepareData
+ *
+ * @dataSource UserPermissions
  */
 class testPageReportsTopTriggers extends CWebTest {
 
@@ -513,7 +515,7 @@ class testPageReportsTopTriggers extends CWebTest {
 
 	public static function getFilterData() {
 		return [
-			// Check filter results from particular host group.
+			// #0 Check filter results from particular host group.
 			[
 				[
 					'fields' => [
@@ -532,7 +534,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from several host groups.
+			// #1 Check filter results from several host groups.
 			[
 				[
 					'fields' => [
@@ -569,7 +571,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from particular host.
+			// #2 Check filter results from particular host.
 			[
 				[
 					'fields' => [
@@ -588,7 +590,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Check filter results from several hosts.
+			// #3 Check filter results from several hosts.
 			[
 				[
 					'fields' => [
@@ -618,7 +620,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// No filter results if host doesn't belong to host group.
+			// #4 No filter results if host doesn't belong to host group.
 			[
 				[
 					'fields' => [
@@ -628,6 +630,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
+			// #5.
 			[
 				[
 					'fields' => [
@@ -637,7 +640,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search by "Problem" should not be case sensitive.
+			// #6 Search by "Problem" should not be case sensitive.
 			[
 				[
 					'fields' => [
@@ -656,7 +659,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Wrong name in filter field "Problem".
+			// #7 Wrong name in filter field "Problem".
 			[
 				[
 					'fields' => [
@@ -665,7 +668,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Trigger name with special characters.
+			// #8 Trigger name with special characters.
 			[
 				[
 					'fields' => [
@@ -684,7 +687,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Trigger name with macro.
+			// #9 Trigger name with macro.
 			[
 				[
 					'fields' => [
@@ -703,7 +706,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by severity.
+			// #10 Search by severity.
 			[
 				[
 					'fields' => [
@@ -722,7 +725,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by severities.
+			// #11 Search by severities.
 			[
 				[
 					'fields' => [
@@ -764,7 +767,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by tag.
+			// #12 Search by tag.
 			[
 				[
 					'tags' => [
@@ -783,6 +786,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'tags' => [
@@ -801,7 +805,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by tags.
+			// #14 Search by tags.
 			[
 				[
 					'tags' => [
@@ -821,6 +825,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'fields' => [
@@ -850,6 +855,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #16.
 			[
 				[
 					'tags' => [
@@ -878,7 +884,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by tags with empty result.
+			// #17 Search by tags with empty result.
 			[
 				[
 					'tags' => [
@@ -887,7 +893,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search results with several filtering parameters.
+			// #18 Search results with several filtering parameters.
 			[
 				[
 					'fields' => [
@@ -912,7 +918,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search results without filtering parameters.
+			// #19 Search results without filtering parameters.
 			[
 				[
 					'expected' => [
@@ -991,7 +997,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			/*
+			/* #20.
 			 * Search by date label.
 			 * Note: This test case depends on time when executed. E.g. if execution time is around 00:00 - 00:30 expected
 			 * result will be different, because some of prepareData generated problems will appear in yesterday's filter.
@@ -1014,6 +1020,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'date' => [
@@ -1032,7 +1039,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by custom time period.
+			// #22 Search by custom time period.
 			[
 				[
 					'date' => [
@@ -1045,6 +1052,18 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
 							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host for tag permissions',
+							'Trigger' => 'Trigger for tag permissions MySQL',
+							'Severity' => 'Not classified',
+							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host for tag permissions',
+							'Trigger' => 'Trigger for tag permissions Oracle',
+							'Severity' => 'Not classified',
+							'Number of problems' => '1'
 						]
 					],
 					'background_colors' => [
@@ -1052,6 +1071,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'date' => [
@@ -1071,6 +1091,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'date' => [
@@ -1090,7 +1111,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					]
 				]
 			],
-			// Search by custom time period and without expected data.
+			// #25 Search by custom time period and without expected data.
 			[
 				[
 					'date' => [
@@ -1100,7 +1121,7 @@ class testPageReportsTopTriggers extends CWebTest {
 					'expected' => []
 				]
 			],
-			// Search results from last month using custom time period.
+			// #26 Search results from last month using custom time period.
 			[
 				[
 					'date' => [
@@ -1165,6 +1186,18 @@ class testPageReportsTopTriggers extends CWebTest {
 						[
 							'Host' => 'Host for problem tags check',
 							'Trigger' => 'Problem with tag3',
+							'Severity' => 'Not classified',
+							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host for tag permissions',
+							'Trigger' => 'Trigger for tag permissions MySQL',
+							'Severity' => 'Not classified',
+							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host for tag permissions',
+							'Trigger' => 'Trigger for tag permissions Oracle',
 							'Severity' => 'Not classified',
 							'Number of problems' => '1'
 						]
