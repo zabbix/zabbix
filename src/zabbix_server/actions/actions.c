@@ -268,7 +268,7 @@ static void	objectids_to_pair(zbx_vector_uint64_t *objectids, zbx_vector_uint64_
  * Parameters: object          - [IN] type of object that generated event       *
  *             esc_events      - [IN] events being checked                      *
  *             objectids       - [IN] Object ids of the esc_events              *
- *                                    (contents can be changed by processing    *
+ *                                    (contents can be changed by processing.   *
  *                                    and should not be used by caller).        *
  *             objectids_pair  - [IN] Pairs of (objectid, source objectid)      *
  *                                    where objectid are ids of the esc_events  *
@@ -443,7 +443,8 @@ static int	check_host_template_condition(const zbx_vector_db_event_t *esc_events
 	}
 	zbx_db_free_result(result);
 
-	check_object_hierarchy(EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition, condition_value,
+	check_object_hierarchy(EVENT_OBJECT_TRIGGER, esc_events, &objectids, &objectids_pair, condition,
+			condition_value,
 			"select distinct t.triggerid,t.templateid,i.hostid"
 				" from items i,functions f,triggers t"
 				" where i.itemid=f.itemid"
@@ -1450,9 +1451,8 @@ static int	check_dservice_type_condition(const zbx_vector_db_event_t *esc_events
 	size_t			sql_alloc = 0, sql_offset = 0;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			object = EVENT_OBJECT_DSERVICE;
+	int			condition_value_i, object = EVENT_OBJECT_DSERVICE;
 	zbx_vector_uint64_t	objectids;
-	int			condition_value_i;
 
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
@@ -1568,9 +1568,8 @@ static int	check_duptime_condition(const zbx_vector_db_event_t *esc_events, zbx_
 	size_t			sql_alloc = 0;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	int			objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
+	int			condition_value_i, objects[2] = {EVENT_OBJECT_DHOST, EVENT_OBJECT_DSERVICE};
 	zbx_vector_uint64_t	objectids[2];
-	int			condition_value_i;
 
 	if (ZBX_CONDITION_OPERATOR_LESS_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_MORE_EQUAL != condition->op)
 		return NOTSUPPORTED;
@@ -1935,15 +1934,15 @@ static int	check_areg_proxy_condition(const zbx_vector_db_event_t *esc_events, z
 	return SUCCEED;
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: checks if events match single condition                              *
- *                                                                               *
- * Parameters: events    - [IN] autoregistration events to check                 *
- *                              (event->source == EVENT_SOURCE_AUTOREGISTRATION) *
- *             condition - [IN] condition for matching                           *
- *                                                                               *
- *********************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: checks if events match single condition                               *
+ *                                                                                *
+ * Parameters: esc_events - [IN] autoregistration events to check                 *
+ *                               (event->source == EVENT_SOURCE_AUTOREGISTRATION) *
+ *             condition  - [IN] condition for matching                           *
+ *                                                                                *
+ **********************************************************************************/
 static void	check_autoregistration_condition(const zbx_vector_db_event_t *esc_events, zbx_condition_t *condition)
 {
 	int		ret;
@@ -1976,7 +1975,7 @@ static void	check_autoregistration_condition(const zbx_vector_db_event_t *esc_ev
 
 /******************************************************************************
  *                                                                            *
- * Parameters: event - [IN]  event to check                                   *
+ * Parameters: event - [IN] event to check                                    *
  *                                                                            *
  * Comments: not all event objects are supported for internal events          *
  *                                                                            *
@@ -2067,10 +2066,10 @@ static int	check_intern_event_type_condition(const zbx_vector_db_event_t *esc_ev
 static void	get_object_ids_internal(const zbx_vector_db_event_t *esc_events, zbx_vector_uint64_t *objectids,
 		const int *objects, const int objects_num)
 {
-	int	j;
-
 	for (int i = 0; i < esc_events->values_num; i++)
 	{
+		int	j;
+
 		const zbx_db_event	*event = esc_events->values[i];
 
 		for (j = 0; j < objects_num; j++)
@@ -2283,11 +2282,10 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 
 		result = zbx_db_select("%s", sql);
 
-		int	j;
-
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
 			zbx_uint64_pair_t	pair;
+			int			j;
 
 			ZBX_STR2UINT64(pair.first, row[0]);
 
@@ -2299,8 +2297,8 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 		}
 		zbx_db_free_result(result);
 
-		check_object_hierarchy(objects[i], esc_events, objectids_ptr, objectids_pair_ptr, condition, condition_value,
-				0 == i ?
+		check_object_hierarchy(objects[i], esc_events, objectids_ptr, objectids_pair_ptr, condition,
+				condition_value, 0 == i ?
 					"select distinct t.triggerid,t.templateid,i.hostid"
 						" from items i,functions f,triggers t"
 						" where i.itemid=f.itemid"
@@ -2657,7 +2655,7 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: executes host, group, template operations linked to the action    *
+ * Purpose: Executes host, group, template operations linked to the action.   *
  *                                                                            *
  * Parameters: event    - [IN]                                                *
  *             actionid - [IN] action to execute operations for               *
@@ -2835,7 +2833,7 @@ ZBX_PTR_VECTOR_IMPL(escalation_new_ptr, zbx_escalation_new_t *)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: checks if the event is recovery event                             *
+ * Purpose: checks if event is recovery event                                 *
  *                                                                            *
  * Parameters: event - [IN] event to check                                    *
  *                                                                            *
@@ -3357,9 +3355,9 @@ static void	free_ack_escalation(zbx_ack_escalation_t *ack_escalation)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: process actions for each acknowledgment in the array              *
+ * Purpose: processes actions for each acknowledgment in array                *
  *                                                                            *
- * Parameters: ack_tasks        - [IN]                                        *
+ * Parameters: ack_tasks - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
 int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_tasks)
