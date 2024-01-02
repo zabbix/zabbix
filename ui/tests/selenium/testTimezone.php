@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 
 /**
  * @backup users, config
+ *
+ * @dataSource UserPermissions
  */
 class testTimezone extends CWebTest {
 
