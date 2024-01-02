@@ -28,6 +28,9 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  */
 class testFormUser extends CWebTest {
 
+	const UPDATE_USER = 'Tag-user';
+	const UPDATE_PASSWORD = 'Zabbix_Test_123';
+
 	/**
 	 * Attach MessageBehavior to the test.
 	 *
@@ -637,7 +640,7 @@ class testFormUser extends CWebTest {
 		try {
 			$this->page->logout();
 			// Log in with the created or updated user.
-			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = 'zabbix');
+			$password = CTestArrayHelper::get($data['fields'], 'Password', $data['fields']['Password'] = self::UPDATE_PASSWORD);
 			$this->page->userLogin($data['fields']['Username'], $password);
 			// Verification of URL after login.
 			$this->assertStringContainsString($data['fields']['URL (after login)'], $this->page->getCurrentURL());
@@ -674,7 +677,7 @@ class testFormUser extends CWebTest {
 
 	public function getUpdateData() {
 		return [
-			// Username is already taken by another user.
+			// #0 Username is already taken by another user.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -685,7 +688,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'User with username "Admin" already exists.'
 				]
 			],
-			// Empty 'Username' field.
+			// #1 Empty 'Username' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -696,7 +699,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Incorrect value for field "username": cannot be empty.'
 				]
 			],
-			// Empty 'Password (once again)' field.
+			// #2 Empty 'Password (once again)' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -707,7 +710,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// Empty 'Password' field.
+			// #3 Empty 'Password' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -718,7 +721,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// 'Password' and 'Password (once again)' do not match.
+			// #4 'Password' and 'Password (once again)' do not match.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -731,7 +734,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Both passwords must be equal.'
 				]
 			],
-			// Empty 'Refresh' field.
+			// #5 Empty 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -745,7 +748,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Incorrect value for field "refresh": cannot be empty.'
 				]
 			],
-			// Digits in value of the 'Refresh' field.
+			// #6 Digits in value of the 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -756,7 +759,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
 			],
-			// Value of the 'Refresh' field too large.
+			// #7 Value of the 'Refresh' field too large.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -767,6 +770,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -777,7 +781,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/refresh": value must be one of 0-3600.'
 				]
 			],
-			// Non time unit value in 'Refresh' field.
+			// #9 Non time unit value in 'Refresh' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -788,7 +792,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/refresh": a time unit is expected.'
 				]
 			],
-			//	'Rows per page' field equal to '0'.
+			// #10 'Rows per page' field equal to '0'.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -799,7 +803,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
 			],
-			//	Non-numeric value of 'Rows per page' field.
+			// #11 Non-numeric value of 'Rows per page' field.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -810,7 +814,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/rows_per_page": value must be one of 1-999999.'
 				]
 			],
-			// 'Autologout' below minimal value.
+			// #12 'Autologout' below minimal value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -823,7 +827,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
-			// 'Autologout' above maximal value.
+			// #13 'Autologout' above maximal value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -836,6 +840,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -848,6 +853,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -860,6 +866,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -872,7 +879,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": value must be one of 0, 90-86400.'
 				]
 			],
-			// 'Autologout' with a non-numeric value.
+			// #17 'Autologout' with a non-numeric value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -885,7 +892,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/autologout": a time unit is expected.'
 				]
 			],
-			// 'Autologout' with an empty value.
+			// #18 'Autologout' with an empty value.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -898,7 +905,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Incorrect value for field "autologout": cannot be empty.'
 				]
 			],
-			// URL unacceptable.
+			// #19 URL unacceptable.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -909,7 +916,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// Incorrect URL protocol.
+			// #20 Incorrect URL protocol.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -920,7 +927,7 @@ class testFormUser extends CWebTest {
 					'error_details' => 'Invalid parameter "/1/url": unacceptable URL.'
 				]
 			],
-			// Updating all fields (except password) of an existing user.
+			// #21 Updating all fields (except password) of an existing user.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -946,6 +953,7 @@ class testFormUser extends CWebTest {
 					'check_form' => true
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -972,7 +980,7 @@ class testFormUser extends CWebTest {
 	 * @dataProvider getUpdateData
 	 */
 	public function testFormUser_Update($data) {
-		$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
+		$update_user = CTestArrayHelper::get($data, 'user_to_update', self::UPDATE_USER);
 		$sql = 'SELECT * FROM users';
 		$old_hash = CDBHelper::getHash($sql);
 
