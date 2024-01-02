@@ -24,7 +24,8 @@ ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 typedef union {
 	struct {
 		zbx_uint32_t	port;
-		zbx_uint32_t	dcheck_type;
+		uint16_t	dcheck_type;
+		uint16_t	addr_type;
 	}		key;
 	zbx_uint64_t	buf;
 }
@@ -37,7 +38,8 @@ zbx_hash_t	discoverer_task_hash(const void *data)
 	dtask_hash_t			state;
 
 	state.key.port = task->port;
-	state.key.dcheck_type = DISCOVERY_ADDR_IP == task->addr_type ? 0 : task->dchecks.values[0]->type;
+	state.key.dcheck_type = task->dchecks.values[0]->type;
+	state.key.addr_type = task->addr_type;
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&state.buf);
 
 	if (DISCOVERY_ADDR_RANGE == task->addr_type)

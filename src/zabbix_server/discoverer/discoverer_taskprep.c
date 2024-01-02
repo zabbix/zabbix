@@ -124,7 +124,8 @@ static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 }
 
 static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck,
-		zbx_vector_iprange_t *ipranges, unsigned char *need_resolve, zbx_hashset_t *tasks)
+		zbx_vector_iprange_t *ipranges, unsigned char *need_resolve, zbx_uint64_t *queue_capacity,
+		zbx_hashset_t *tasks)
 {
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
@@ -175,6 +176,8 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 
 		if (1 == *need_resolve)
 			*need_resolve = 0;
+
+		(*queue_capacity)--;
 	}
 
 	return (zbx_uint64_t)checks_count;
@@ -248,8 +251,8 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, char *ip, int un
 
 		if (SUCCEED == dcheck_is_async(dcheck))
 		{
-			(*queue_capacity)--;
-			checks_count += process_check_range(drule, dcheck_common, ipranges, need_resolve, tasks);
+			checks_count += process_check_range(drule, dcheck_common, ipranges, need_resolve,
+					queue_capacity, tasks);
 		}
 		else
 			checks_count += process_check(drule, dcheck_common, ip, need_resolve, queue_capacity, tasks);
@@ -354,7 +357,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashs
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
 
-	for (i = 0; '\0' != start[i]; start[i] == ',' ? i++ : *start++);
+	for (i = 1; NULL != (start = strchr(start, ',')); i++);	/* i = 1 to guarantee at least 1 iprange */
 
 	zbx_vector_iprange_reserve(ipranges, (size_t)i);
 

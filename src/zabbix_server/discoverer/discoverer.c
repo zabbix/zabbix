@@ -170,40 +170,14 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
 
 	switch (dcheck->type)
 	{
-		case SVC_SSH:
-			service = "ssh";
-			break;
 		case SVC_LDAP:
 			service = "ldap";
-			break;
-		case SVC_SMTP:
-			service = "smtp";
-			break;
-		case SVC_FTP:
-			service = "ftp";
-			break;
-		case SVC_HTTP:
-			service = "http";
-			break;
-		case SVC_POP:
-			service = "pop";
-			break;
-		case SVC_NNTP:
-			service = "nntp";
-			break;
-		case SVC_IMAP:
-			service = "imap";
-			break;
-		case SVC_TCP:
-			service = "tcp";
 			break;
 		case SVC_HTTPS:
 			service = "https";
 			break;
 		case SVC_TELNET:
 			service = "telnet";
-			break;
-		case SVC_AGENT:
 			break;
 		default:
 			ret = FAIL;
@@ -212,35 +186,17 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
 
 	if (SUCCEED == ret)
 	{
-		char		key[MAX_STRING_LEN];
+		char	key[MAX_STRING_LEN];
 
-		switch (dcheck->type)
+		zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
+
+		if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout) ||
+				NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
 		{
-			/* simple checks */
-			case SVC_SSH:
-			case SVC_LDAP:
-			case SVC_SMTP:
-			case SVC_FTP:
-			case SVC_HTTP:
-			case SVC_POP:
-			case SVC_NNTP:
-			case SVC_IMAP:
-			case SVC_TCP:
-			case SVC_HTTPS:
-			case SVC_TELNET:
-				zbx_snprintf(key, sizeof(key), "net.tcp.service[%s,%s,%d]", service, ip, port);
-
-				if (SUCCEED != zbx_execute_agent_check(key, 0, &result, dcheck->timeout) ||
-						NULL == ZBX_GET_UI64_RESULT(&result) || 0 == result.ui64)
-				{
-					ret = FAIL;
-				}
-
-				break;
-			default:
-				break;
+			ret = FAIL;
 		}
 	}
+
 	zbx_free_agent_result(&result);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ret:%s", log_worker_id, __func__, zbx_result_string(ret));
