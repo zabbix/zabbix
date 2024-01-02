@@ -61,7 +61,6 @@ global $ZBX_SERVER_NAME;
 		(new CDiv([
 			(new CDiv(makeLogo(LOGO_TYPE_NORMAL)))->addClass(ZBX_STYLE_SIGNIN_LOGO),
 			(new CForm())
-				->setAttribute('autocomplete', 'off')
 				->setAttribute('aria-label', _('Sign in'))
 				->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
 				->addItem(
@@ -71,7 +70,10 @@ global $ZBX_SERVER_NAME;
 							(new CTextBox('name'))->setAttribute('autofocus', 'autofocus'),
 							$error
 						])
-						->addItem([new CLabel(_('Password'), 'password'), new CPassBox('password')])
+						->addItem([
+							new CLabel(_('Password'), 'password'),
+							(new CPassBox('password'))->setAttribute('autocomplete', 'off')
+						])
 						->addItem(
 							(new CCheckBox('autologin'))
 								->setLabel(_('Remember me for 30 days'))
