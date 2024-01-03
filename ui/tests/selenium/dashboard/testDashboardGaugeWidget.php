@@ -395,9 +395,13 @@ class testDashboardGaugeWidget extends testWidgets {
 			foreach ($parameters['depending'] as $parameter => $labels) {
 				foreach ($labels as $label) {
 					$field = $form->getField($label);
-					($parameter === 'editable')
-						? $this->assertTrue($field->isEnabled($parameters['status']))
-						: $this->assertTrue($field->isVisible($parameters['status']));
+
+					if ($parameter === 'editable') {
+						$this->assertTrue($field->isEnabled($parameters['status']));
+					}
+					else {
+						$this->assertTrue($field->isVisible($parameters['status']));
+					}
 				}
 			}
 		}
