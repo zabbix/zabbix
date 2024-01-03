@@ -520,13 +520,19 @@ var hintBox = {
 			if (!isVisible(element)) {
 				hintBox.deleteHint(target);
 			}
-			else if (target.scrollObserver !== undefined) {
-				const element_rect = element.getBoundingClientRect();
 
-				if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
-					hintBox.deleteHint(target);
+			setTimeout(() => {
+				if (target.scrollObserver !== undefined) {
+					const element_rect = element.getBoundingClientRect();
+
+					if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
+						const do_focus_target = document.activeElement === document.body
+							|| element.hintBoxItem[0].contains(document.activeElement);
+
+						hintBox.deleteHint(target, do_focus_target);
+					}
 				}
-			}
+			});
 		});
 
 		target.observer.observe(document.body, {
@@ -583,7 +589,10 @@ var hintBox = {
 		}
 
 		if (element_rect.x !== target.scrollObserver.x || element_rect.y !== target.scrollObserver.y) {
-			hintBox.deleteHint(target);
+			const do_focus_target = document.activeElement === document.body
+				|| element.hintBoxItem[0].contains(document.activeElement);
+
+			hintBox.deleteHint(target, do_focus_target);
 		}
 	},
 
@@ -672,10 +681,10 @@ var hintBox = {
 		hintBox.deleteHint(target);
 	},
 
-	deleteHint: function(target) {
+	deleteHint: function(target, do_focus_target = true) {
 		if (typeof target.hintboxid !== 'undefined') {
 			jQuery(target).removeAttr('data-expanded');
-			removeFromOverlaysStack(target.hintboxid);
+			removeFromOverlaysStack(target.hintboxid, do_focus_target);
 		}
 
 		if (target.hintBoxItem) {
@@ -684,7 +693,7 @@ var hintBox = {
 			delete target.hintBoxItem;
 
 			if (target.isStatic) {
-				if (jQuery(target).data('return-control') !== undefined) {
+				if (jQuery(target).data('return-control') !== undefined && do_focus_target) {
 					jQuery(target).data('return-control').focus();
 				}
 				delete target.isStatic;
