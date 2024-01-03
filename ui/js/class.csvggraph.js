@@ -269,6 +269,10 @@
 					to_offset: Math.ceil(to_offset)
 				})
 					.then((time_period) => {
+						if (time_period === null) {
+							return;
+						}
+
 						widget._startUpdating();
 						widget.feedback({time_period});
 						widget.broadcast({_timeperiod: time_period});
@@ -296,7 +300,7 @@
 				}
 
 				if ('has_fields_errors' in time_period) {
-					return;
+					throw new Error();
 				}
 
 				return time_period;
@@ -314,6 +318,8 @@
 				}
 
 				widget._updateMessages(messages, title);
+
+				return null;
 			})
 			.finally(() => {
 				widget._hidePreloader();
@@ -756,6 +762,10 @@
 							to: data.timePeriod.to,
 						})
 							.then((time_period) => {
+								if (time_period === null) {
+									return;
+								}
+
 								widget._startUpdating();
 								widget.feedback({time_period});
 								widget.broadcast({_timeperiod: time_period});

@@ -26,6 +26,7 @@ import (
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
@@ -43,6 +44,8 @@ const (
 	attributeDiscovery = "smart.attribute.discovery"
 )
 
+var impl Plugin
+
 // Options -
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -56,7 +59,17 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Smart",
+		"smart.disk.discovery", "Returns JSON array of smart devices.",
+		"smart.disk.get", "Returns JSON data of smart device.",
+		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
@@ -443,12 +456,4 @@ func clearString(str string) error {
 	}
 
 	return nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Smart",
-		"smart.disk.discovery", "Returns JSON array of smart devices.",
-		"smart.disk.get", "Returns JSON data of smart device.",
-		"smart.attribute.discovery", "Returns JSON array of smart device attributes.",
-	)
 }
