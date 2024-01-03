@@ -3076,6 +3076,10 @@ static void	zbx_init_snmp(const char *progname)
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
+
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_LOAD, 1);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_SAVE, 1);
+
 	init_snmp(progname);
 	zbx_snmp_init_done = 1;
 
@@ -3340,7 +3344,6 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 
 	SNMP_MT_INITLOCK;
 
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp(progname);
 
 	if (0 != snmp_rwlock_init_done)
