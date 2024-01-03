@@ -548,6 +548,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		int	i;
 
 		ZBX_UNUSED(poller_type);
+		ZBX_UNUSED(progname);
 
 		for (i = 0; i < num; i++)
 		{
