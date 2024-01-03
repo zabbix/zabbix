@@ -3113,9 +3113,7 @@ static void	zbx_shutdown_snmp(const char *progname)
  ******************************************************************************/
 void	zbx_init_library_mt_snmp(const char *progname)
 {
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 0);
 	zbx_init_snmp(progname);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 
 	if (0 == snmp_rwlock_init_done)
 	{
