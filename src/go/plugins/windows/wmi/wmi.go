@@ -23,16 +23,28 @@ import (
 	"encoding/json"
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/wmi"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Wmi",
+		"wmi.get", "Execute WMI query and return the first selected object.",
+		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // wmiFmtAdapter returns value adapted to the format of classic C Zabbix agent for compatibility reasons.
 // Boolean values should be converted to "True" and "False" strings starting with capital letter.
@@ -81,11 +93,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Wmi",
-		"wmi.get", "Execute WMI query and return the first selected object.",
-		"wmi.getall", "Execute WMI query and return the whole response converted in JSON format.",
-	)
 }
