@@ -63,7 +63,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	public function setLinesCount(int $lines_count): self {
-		$this->lines_count = min($lines_count, ceil(count($this->legend_items) / $this->columns_count));
+		$this->lines_count = $lines_count;
 
 		return $this;
 	}
