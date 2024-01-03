@@ -275,7 +275,7 @@ class testFormWebScenarioStep extends CWebTest {
 			}
 		}
 
-		// Check the buttons in the web scenario step coniguration form.
+		// Check the buttons in the web scenario step configuration form.
 		foreach ($buttons as $button) {
 			$this->assertTrue($dialog->query('button', $button)->one()->isClickable());
 		}

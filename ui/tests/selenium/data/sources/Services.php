@@ -123,7 +123,7 @@ class Services {
 				'sortorder' => 12
 			],
 			[
-				'name' => 'Service for duplitate check',
+				'name' => 'Service for duplicate check',
 				'algorithm' => 1,
 				'sortorder' => 13
 			],

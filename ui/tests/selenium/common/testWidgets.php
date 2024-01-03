@@ -39,7 +39,7 @@ class testWidgets extends CWebTest {
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
-		// Item types expected in items table. For the most cases theses are all items except of Binary and depenedent.
+		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
 		$item_types = [
 			'Character item',
 			'Float item',
@@ -73,7 +73,7 @@ class testWidgets extends CWebTest {
 				$widget_dialog->fill(['Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype')]);
 				$this->assertTrue($widget_dialog->getField('Item prototype')->isVisible());
 
-				// For Graph prototoype only numeric item prototypes are available.
+				// For Graph prototype only numeric item prototypes are available.
 				$item_types = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
 				break;
 		}

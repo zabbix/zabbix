@@ -687,12 +687,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'index' => 0,
 							'macro' => '{$SNMP_COMMUNITY}',
 							'value' => 'new redefined value 1',
-							'description' => 'new redifined description 1'
+							'description' => 'new redefined description 1'
 						],
 						[
 							'macro' => '{$_}',
-							'value' => 'new redifined value 2',
-							'description' => 'new redifined description 2'
+							'value' => 'new redefined value 2',
+							'description' => 'new redefined description 2'
 						]
 					]
 				]
@@ -1388,7 +1388,7 @@ abstract class testFormMacros extends CLegacyWebTest {
 				[
 					'macro' => '{$SECRET_HOST_MACRO}',
 					'type' => 'Secret text',
-					'chenge_type' => true
+					'change_type' => true
 				]
 			],
 			[
@@ -1471,14 +1471,16 @@ abstract class testFormMacros extends CLegacyWebTest {
 				// Change value text or type and check that New value button is not displayed and Revert button appeared.
 				if (CTestArrayHelper::get($data, 'change_type', false)) {
 					$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
+					$change_button = $value_field->getNewValueButton();
+					$this->assertFalse($change_button->isValid());
 				}
 				else {
 					$change_button->click();
+					$this->assertFalse($change_button->isEnabled());
 				}
 
 				$value_field->invalidate();
 
-				$this->assertFalse($change_button->isEnabled());
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {

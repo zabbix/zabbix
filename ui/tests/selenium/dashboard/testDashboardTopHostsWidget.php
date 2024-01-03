@@ -304,16 +304,16 @@ class testDashboardTopHostsWidget extends testWidgets {
 				[
 					'main_fields' =>  [
 						'Name' => 'Several item columns',
-						'Order by' => 'duplicated colum name'
+						'Order by' => 'duplicated column name'
 					],
 					'column_fields' => [
 						[
-							'Name' => 'duplicated colum name',
+							'Name' => 'duplicated column name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory'
 						],
 						[
-							'Name' => 'duplicated colum name',
+							'Name' => 'duplicated column name',
 							'Data' => 'Item value',
 							'Item' => 'Available memory in %'
 						]
