@@ -218,11 +218,13 @@ $form_grid
 	])
 	->addItem([
 		(new CLabel(_('Conditions'), $condition_table->getId()))->setAsteriskMark(),
-		(new CFormField($condition_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-			->setAriaRequired()
+		(new CFormField(
+			(new CDiv($condition_table))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->addStyle('min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+				->setAriaRequired()
+		))
 	])
 	->addItem([
 		new CLabel(_('Description'), 'description'),
