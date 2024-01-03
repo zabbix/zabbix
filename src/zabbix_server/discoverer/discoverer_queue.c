@@ -19,6 +19,7 @@
 
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
+#include "zbx_discoverer_constants.h"
 
 #define DISCOVERER_QUEUE_INIT_NONE	0x00
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01
@@ -82,7 +83,7 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: pop job from job queue                                            *
+ * Purpose: pop job from job queue and count control of snmpv3 workers        *
  *                                                                            *
  * Parameters: queue - [IN]                                                   *
  *                                                                            *
@@ -92,12 +93,57 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  ******************************************************************************/
 zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 {
-	void	*job;
+#	define SNMPV3_WORKERS_MAX	1
 
-	if (SUCCEED == zbx_list_pop(&queue->jobs, &job))
-		return (zbx_discoverer_job_t*)job;
+	zbx_discoverer_job_t	*job = NULL;
+	zbx_discoverer_task_t	*task;
+	zbx_vector_uint64_t	ids;
+	static int		snmpv3_allowed_workers = SNMPV3_WORKERS_MAX;
 
-	return NULL;
+	zbx_vector_uint64_create(&ids);
+
+	while (SUCCEED == zbx_list_pop(&queue->jobs, (void*)&job))
+	{
+		if (SUCCEED != zbx_list_peek(&job->tasks, (void*)&task))
+			break;
+
+		if (SVC_SNMPv3 != task->dchecks.values[0]->type)
+			break;
+
+		if (0 != snmpv3_allowed_workers)
+		{
+			snmpv3_allowed_workers--;
+			break;
+		}
+
+		if (job->tasks.head == job->tasks.tail)	/* just one snmpv3 task in the list */
+		{
+			zbx_uint64_t	id = job->druleid;
+
+			discoverer_queue_push(queue, job);
+			job = NULL;
+
+			if (queue->jobs.head == queue->jobs.tail)	/* just one snmpv3 job in the list */
+				break;
+
+			if (FAIL != zbx_vector_uint64_search(&ids, id, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+				break;
+
+			zbx_vector_uint64_append(&ids, id);
+			continue;
+		}
+
+		(void)zbx_list_pop(&job->tasks, (void*)&task);
+		(void)zbx_list_append(&job->tasks, (void*)&task, NULL);
+
+		break;
+	}
+
+	zbx_vector_uint64_destroy(&ids);
+
+	return job;
+
+#	undef SNMPV3_WORKERS_MAX
 }
 
 /******************************************************************************
