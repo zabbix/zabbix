@@ -35,7 +35,6 @@ typedef struct
 	zbx_async_notify_cb_t		finished_cb;
 
 	void				*finished_data;
-
 	const char			*progname;
 }
 zbx_async_worker_t;
