@@ -134,7 +134,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 
 		// Check main (generic) fields.
-		$this->assertNonUniformLabel('Show header', $form);
+		$this->assertTrue(in_array('Show header', $form->getLabels()->asText()));
 
 		foreach (['Type', 'Name', 'Refresh interval'] as $label) {
 			$this->assertTrue($form->getLabel($label)->isClickable());
@@ -620,12 +620,55 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
+	 * Test opening Pie chart edit form and saving without any changes.
+	 */
+	public function testDashboardPieChartWidget_SimpleUpdate(){
+		$this->createUpdatePieChart(null, 'Simple update widget', true);
+	}
+
+	/**
 	 * Test updating of Pie chart.
 	 *
 	 * @dataProvider getPieChartData
 	 */
 	public function testDashboardPieChartWidget_Update($data){
 		$this->createUpdatePieChart($data, 'Edit widget');
+	}
+
+	/**
+	 * Test opening Pie chart edit form and saving without any changes.
+	 */
+	public function testDashboardPieChartWidget_CancelUpdate(){
+		$this->createUpdatePieChart(null, 'Simple update widget', false, true);
+	}
+
+	/**
+	 * Test deleting a Pie chart widget.
+	 */
+	public function testDashboardPieChartWidget_Delete(){
+		$name = 'Pie chart for deletion';
+		$this->createCleanWidget($name);
+		$widget_id = CDBHelper::getValue('SELECT widgetid FROM widget WHERE name='.zbx_dbstr($name));
+
+		// Delete the widget and save dashboard.
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$dashboard->edit()->deleteWidget($name)->save();
+		$this->page->waitUntilReady();
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
+
+		// Assert that the widget has been deleted.
+		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
+		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
+
+		// Check both - widget and widget_field DB tables.
+		$sql = 'SELECT NULL FROM widget w CROSS JOIN widget_field wf'.
+				' WHERE w.widgetid='.zbx_dbstr($widget_id).' OR wf.widgetid='.zbx_dbstr($widget_id);
+		$this->assertEquals(0, CDBHelper::getCount($sql));
+
+		// Check by name too.
+		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM widget WHERE name='.zbx_dbstr($name)));
 	}
 
 	public function getPieChartDisplayData() {
@@ -906,7 +949,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * @param array $data                 data from data provider
 	 * @param string $edit_widget_name    if this is set, then a widget named like this is updated
 	 */
-	protected function createUpdatePieChart($data, $edit_widget_name = null) {
+	protected function createUpdatePieChart($data, $edit_widget_name = null, $simple_update = false, $cancel_update = false) {
 		if ($edit_widget_name) {
 			$this->createCleanWidget($edit_widget_name);
 		}
@@ -919,15 +962,34 @@ class testDashboardPieChartWidget extends CWebTest {
 			? $dashboard->edit()->getWidget($edit_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		// Fill data and assert.
-		$this->fillForm($data['fields'], $form);
-		$form->submit();
+		if ($simple_update || $cancel_update) {
+			// Set the expected data for simple update and update cancel.
+			$data = [
+				'fields' => [
+					'main_fields' => ['Name' => $edit_widget_name],
+					'Data set' => ['item' => 'Test Items', 'host' => 'Test Host']
+				]
+			];
+		}
+		else {
+			// Fill form if not a simple update.
+			$this->fillForm($data['fields'], $form);
+		}
+
+		// Submit (if not cancelling).
+		if ($cancel_update) {
+			COverlayDialogElement::find()->one()->query('button:Cancel')->one()->click();
+		}
+		else {
+			$form->submit();
+		}
+
+		// Assert the result.
 		$this->assertEditFormAfterSave($data, $dashboard);
 
 		// Check total Widget count.
 		$count_added = (int) (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD);
 		$this->assertEquals($old_widget_count + ($edit_widget_name ? 0 : $count_added), $dashboard->getWidgets()->count());
-
 	}
 
 	/**
@@ -1031,6 +1093,8 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * @param CDashboardElement $dashboard    dashboard element
 	 */
 	protected function assertEditFormAfterSave($data, $dashboard) {
+		$count_sql = 'SELECT NULL FROM widget WHERE name='.zbx_dbstr($this->calculateWidgetName($data['fields']));
+
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
 
@@ -1086,10 +1150,17 @@ class testDashboardPieChartWidget extends CWebTest {
 					$form->checkValue($data['fields'][$tab]);
 				}
 			}
+
+			// Assert DB record exists.
+			$this->assertEquals(1, CDBHelper::getCount($count_sql));
 		}
 		else {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
+
+			// Assert DB record does not exist.
+			$this->assertEquals(0, CDBHelper::getCount($count_sql));
 		}
+
 	}
 
 	/**
