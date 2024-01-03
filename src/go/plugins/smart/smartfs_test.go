@@ -115,7 +115,7 @@ func Test_runner_executeBase(t *testing.T) {
 				{
 					args: []string{
 						"-a",
-						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+						"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
 						"-j",
 					},
 					err: nil,
@@ -134,8 +134,8 @@ func Test_runner_executeBase(t *testing.T) {
 						DevType:  "nvme",
 					},
 					{
-						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
-						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
 						DevType:  "nvme",
 					},
 				},
@@ -158,21 +158,21 @@ func Test_runner_executeBase(t *testing.T) {
 					SmartStatus:     &smartStatus{SerialNumber: true},
 					SmartAttributes: smartAttributes{},
 				},
-				"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": {
+				"IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1": { //nolint:lll
 					ModelName:    "APPLE SSD AP0512Z",
 					SerialNumber: "0ba02202c4bc1a1e",
 					Info: deviceInfo{
-						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
-						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+						Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+						InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
 						DevType:  "nvme",
-						name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+						name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
 					},
 					Smartctl: smartctlField{
 						Version:    []int{7, 4},
 						ExitStatus: 4,
 						Messages: []message{
 							{
-								"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745",
+								"Read 1 entries from Error Information Log failed: GetLogPage failed: system=0x38, sub=0x0, code=745", //nolint:lll
 							},
 						},
 					},
@@ -373,11 +373,19 @@ func Test_runner_executeRaids(t *testing.T) {
 							{Attrname: "Reallocated_Sector_Ct", ID: 5},
 							{Attrname: "Power_On_Hours", ID: 9},
 							{Attrname: "Power_Cycle_Count", ID: 12},
-							{Attrname: "Available_Reservd_Space", ID: 170, Thresh: 10},
+							{
+								Attrname: "Available_Reservd_Space",
+								ID:       170,
+								Thresh:   10,
+							},
 							{Attrname: "Program_Fail_Count", ID: 171},
 							{Attrname: "Erase_Fail_Count", ID: 172},
 							{Attrname: "Unsafe_Shutdown_Count", ID: 174},
-							{Attrname: "Power_Loss_Cap_Test", ID: 175, Thresh: 10},
+							{
+								Attrname: "Power_Loss_Cap_Test",
+								ID:       175,
+								Thresh:   10,
+							},
 							{Attrname: "SATA_Downshift_Count", ID: 183},
 							{Attrname: "End-to-End_Error", ID: 184, Thresh: 90},
 							{Attrname: "Reported_Uncorrect", ID: 187},
@@ -390,7 +398,11 @@ func Test_runner_executeRaids(t *testing.T) {
 							{Attrname: "Workld_Media_Wear_Indic", ID: 226},
 							{Attrname: "Workld_Host_Reads_Perc", ID: 227},
 							{Attrname: "Workload_Minutes", ID: 228},
-							{Attrname: "Available_Reservd_Space", ID: 232, Thresh: 10},
+							{
+								Attrname: "Available_Reservd_Space",
+								ID:       232,
+								Thresh:   10,
+							},
 							{Attrname: "Media_Wearout_Indicator", ID: 233},
 							{Attrname: "Thermal_Throttle", ID: 234},
 							{Attrname: "Host_Writes_32MiB", ID: 241},
@@ -546,7 +558,6 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 		wantJsonDevices map[string]jsonDevice
 		wantDevices     map[string]deviceParser
 	}{
-		// TODO: GET ACTUAL TEST DATA.
 		{
 			"+valid",
 			[]expectation{
@@ -595,7 +606,7 @@ func Test_runner_executeMegaRaids(t *testing.T) {
 			},
 		},
 		{
-			"-JSONRunner",
+			"+JSONRunner",
 			[]expectation{
 				{
 					args: []string{
@@ -987,8 +998,6 @@ func TestPlugin_getDevices(t *testing.T) {
 		wantMegaraid []deviceInfo
 		wantErr      bool
 	}{
-		// TODO: need to get smartctl --scann -d sat -j  outputs of megaraid
-		// devices.
 		{
 			"+env1",
 			expect{true},
@@ -1037,8 +1046,8 @@ func TestPlugin_getDevices(t *testing.T) {
 			},
 			[]deviceInfo{
 				{
-					Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
-					InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1",
+					Name:     "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
+					InfoName: "IOService:/AppleARMPE/arm-io@10F00000/AppleT811xIO/ans@77400000/AppleASCWrapV4/iop-ans-nub/RTBuddy(ANS2)/RTBuddyService/AppleANS3NVMeController/NS_01@1", //nolint:lll
 					DevType:  "nvme",
 				},
 			},

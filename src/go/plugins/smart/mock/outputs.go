@@ -50,5 +50,4 @@ var (
 
 	//go:embed outputs/env_1_get_raid_sda_cciss_0.json
 	OutputEnv1GetRaidSdaCciss0 []byte
-
 )

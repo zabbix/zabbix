@@ -74,7 +74,6 @@ func init() {
 	}
 }
 
-
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
@@ -110,19 +109,19 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	case diskDiscovery:
 		jsonArray, err = p.diskDiscovery()
 		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 	case diskGet:
 		jsonArray, err = p.diskGet(params)
 		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 	case attributeDiscovery:
 		jsonArray, err = p.attributeDiscovery()
 		if err != nil {
-			return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotFetchData)
 		}
 
 	default:
@@ -154,7 +153,7 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 
 	jsonArray, err = json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return
@@ -199,7 +198,7 @@ func (p *Plugin) diskGetSingle(path, raidType string) ([]byte, error) {
 
 	jsonArray, err := json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return jsonArray, nil
@@ -219,7 +218,7 @@ func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
 	if fields == nil {
 		jsonArray, err = json.Marshal([]string{})
 		if err != nil {
-			return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+			return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		return
@@ -227,7 +226,7 @@ func (p *Plugin) diskGetAll() (jsonArray []byte, err error) {
 
 	jsonArray, err = json.Marshal(fields)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return
@@ -257,7 +256,7 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 
 	jsonArray, err = json.Marshal(out)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotMarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	return
@@ -268,12 +267,12 @@ func (p *Plugin) attributeDiscovery() (jsonArray []byte, err error) {
 func setSingleDiskFields(dev []byte) (out map[string]interface{}, err error) {
 	attr := make(map[string]interface{})
 	if err = json.Unmarshal(dev, &attr); err != nil {
-		return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	var sd singleDevice
 	if err = json.Unmarshal(dev, &sd); err != nil {
-		return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 	}
 
 	diskType := getType(getTypeFromJson(attr), getRateFromJson(attr), getTablesFromJson(attr))
@@ -334,7 +333,7 @@ func setDiskFields(deviceJsons map[string]jsonDevice) (out []interface{}, err er
 	for k, v := range deviceJsons {
 		b := make(map[string]interface{})
 		if err = json.Unmarshal([]byte(v.jsonData), &b); err != nil {
-			return out, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+			return out, errs.WrapConst(err, zbxerr.ErrorCannotMarshalJSON)
 		}
 
 		b["disk_name"] = cutPrefix(k)
@@ -456,7 +455,7 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 
 func clearString(str string) error {
 	if !cleanRegex.MatchString(str) {
-		return zbxerr.New(fmt.Sprintf("invalid characters found in parameter '%s'", str))
+		return errs.Errorf("invalid characters found in parameter %q", str)
 	}
 
 	return nil

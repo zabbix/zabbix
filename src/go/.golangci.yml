@@ -146,7 +146,7 @@ linters-settings:
     # with golangci-lint call it on a directory with the changed file.
     check-exported: false
   whitespace:
-    multi-if: false   # Enforces newlines (or comments) after every multi-line if statement
+    multi-if: false # Enforces newlines (or comments) after every multi-line if statement
     multi-func: false # Enforces newlines (or comments) after every multi-line function signature
   wsl:
     # If true append is only allowed to be cuddled if appending value is
@@ -175,14 +175,14 @@ linters:
     - megacheck
     - staticcheck
     - structcheck
-    - varcheck 
+    - varcheck
     - dupl
     - exhaustive
     - funlen
     - gocognit
     - goconst
     - gocyclo
-  #  - goerr113
+    #  - goerr113
     - gofmt
     - gomnd
     - lll
@@ -193,7 +193,7 @@ linters:
     - unconvert
     - unparam
     - whitespace
-   # - wsl
+    # - wsl
   disable:
     - govet
     - ineffassign
@@ -233,21 +233,24 @@ linters:
 issues:
   exclude-rules:
     # Exclude some linters from running on tests files.
-    - path:  pkg/zbxcomms/comms_test.go
+    - path: _test\.go
+      linters:
+        - funlen
+    - path: pkg/zbxcomms/comms_test.go
       linters:
         - lll
-    - path:  plugins/system/uptime/uptime_test.go
+    - path: plugins/system/uptime/uptime_test.go
       linters:
         - lll
     - path: pkg/zbxlib/logfile.go
       linters:
-       - nlreturn
+        - nlreturn
     - path: plugins/vfs/file/encoding
       linters:
-       - nlreturn
+        - nlreturn
     - path: pkg/tls/tls.go
       linters:
-       - nlreturn
+        - nlreturn
     - path: pkg/zbxlib/expressions.go
       linters:
-       - nlreturn
+        - nlreturn

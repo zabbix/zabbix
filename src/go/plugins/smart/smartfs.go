@@ -21,7 +21,6 @@ package smart
 
 import (
 	"encoding/json"
-	"errors"
 	"fmt"
 	"runtime"
 	"sort"
@@ -30,6 +29,7 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
@@ -221,6 +221,13 @@ type runner struct {
 	jsonDevices  map[string]jsonDevice
 }
 
+func init() {
+	cpuCount = runtime.NumCPU()
+	if cpuCount < 1 {
+		cpuCount = 1
+	}
+}
+
 // execute returns the smartctl runner with all devices data returned by smartctl.
 // If jsonRunner is 'true' the returned data is in json format in 'jsonDevices' field.
 // If jsonRunner is 'false' the returned data is 'devices' field.
@@ -263,7 +270,7 @@ func (p *Plugin) execute(jsonRunner bool) (*runner, error) {
 func (p *Plugin) executeSingle(path string) ([]byte, error) {
 	out, err := p.ctl.Execute("-a", path, "-j")
 	if err != nil {
-		return nil, fmt.Errorf("Failed to execute smartctl: %w.", err)
+		return nil, errs.Wrap(err, "failed to execute smartctl")
 	}
 
 	return out, nil
@@ -383,14 +390,14 @@ func (p *Plugin) checkVersion() error {
 
 	out, err := p.ctl.Execute("-j", "-V")
 	if err != nil {
-		return fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+		return errs.Wrap(err, "failed to execute smartctl")
 	}
 
 	var smartctl smartctl
 
 	err = json.Unmarshal(out, &smartctl)
 	if err != nil {
-		return zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	return evaluateVersion(smartctl.Smartctl.Version)
@@ -415,7 +422,7 @@ func versionCheckNeeded() bool {
 // evaluateVersion checks version digits if they match the current allowed version or higher.
 func evaluateVersion(versionDigits []int) error {
 	if len(versionDigits) < 1 {
-		return fmt.Errorf("Invalid smartctl version")
+		return errs.Errorf("invalid smartctl version")
 	}
 
 	var version string
@@ -427,11 +434,11 @@ func evaluateVersion(versionDigits []int) error {
 
 	v, err := strconv.ParseFloat(version, 64)
 	if err != nil {
-		return zbxerr.ErrorCannotParseResult.Wrap(err)
+		return errs.WrapConst(err, zbxerr.ErrorCannotParseResult)
 	}
 
 	if v < supportedSmartctl {
-		return fmt.Errorf(
+		return errs.Errorf(
 			"Incorrect smartctl version, must be %v or higher",
 			supportedSmartctl,
 		)
@@ -455,14 +462,14 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	for name := range r.names {
 		devices, err := r.plugin.ctl.Execute("-a", name, "-j")
 		if err != nil {
-			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
+			r.err <- errs.Wrap(err, "failed to execute smartctl")
 			return
 		}
 
 		var dp deviceParser
 
 		if err = json.Unmarshal(devices, &dp); err != nil {
-			r.err <- zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+			r.err <- errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 			return
 		}
 
@@ -708,16 +715,16 @@ func (dp *deviceParser) checkErr() (err error) {
 
 	for _, m := range dp.Smartctl.Messages {
 		if err == nil {
-			err = errors.New(m.Str)
+			err = errs.New(m.Str)
 
 			continue
 		}
 
-		err = fmt.Errorf("%s, %s", err.Error(), m.Str)
+		err = errs.Errorf("%s, %s", err.Error(), m.Str)
 	}
 
 	if err == nil {
-		err = errors.New("unknown error from smartctl")
+		err = errs.New("unknown error from smartctl")
 	}
 
 	return
@@ -729,15 +736,12 @@ func (dp *deviceParser) checkErr() (err error) {
 func (p *Plugin) getDevices() (basic, raid, megaraid []deviceInfo, err error) {
 	basicTmp, err := p.scanDevices("--scan", "-j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf("Failed to scan for devices: %w.", err)
+		return nil, nil, nil, errs.Wrap(err, "failed to scan for devices")
 	}
 
 	raidTmp, err := p.scanDevices("--scan", "-d", "sat", "-j")
 	if err != nil {
-		return nil, nil, nil, fmt.Errorf(
-			"Failed to scan for sat devices: %w.",
-			err,
-		)
+		return nil, nil, nil, errs.Wrap(err, "failed to scan for sat devices")
 	}
 
 	basic, raid, megaraid = formatDeviceOutput(basicTmp, raidTmp)
@@ -788,7 +792,7 @@ func (p *Plugin) scanDevices(args ...string) ([]deviceInfo, error) {
 
 	err = json.Unmarshal(out, &d)
 	if err != nil {
-		return nil, zbxerr.ErrorCannotUnmarshalJSON.Wrap(err)
+		return nil, errs.WrapConst(err, zbxerr.ErrorCannotUnmarshalJSON)
 	}
 
 	sort.SliceStable(
@@ -799,11 +803,4 @@ func (p *Plugin) scanDevices(args ...string) ([]deviceInfo, error) {
 	)
 
 	return d.Info, nil
-}
-
-func init() {
-	cpuCount = runtime.NumCPU()
-	if cpuCount < 1 {
-		cpuCount = 1
-	}
 }

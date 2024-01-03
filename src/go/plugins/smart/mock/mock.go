@@ -71,17 +71,20 @@ func (c *MockController) ExpectationsWhereMet() error {
 // WithArgs sets the expected arguments.
 func (e *expectation) WithArgs(args ...string) *expectation {
 	e.args = args
+
 	return e
 }
 
 // WillReturnError sets the expected error return.
 func (e *expectation) WillReturnError(err error) *expectation {
 	e.err = err
+
 	return e
 }
 
 // WillReturnOutput sets the expected output return.
 func (e *expectation) WillReturnOutput(out []byte) *expectation {
 	e.out = out
+
 	return e
 }
