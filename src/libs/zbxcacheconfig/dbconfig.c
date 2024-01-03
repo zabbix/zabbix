@@ -2818,17 +2818,20 @@ char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type)
 	return tmt;
 }
 
-#define DUMP_HASHMAP(source_hashmap, hash_type, search_key, map_key)				\
-do												\
-{												\
-	zbx_hashset_iter_t      iter;								\
-	hash_type		*next;								\
-	zbx_hashset_iter_reset(&source_hashmap, &iter);						\
-	THIS_SHOULD_NEVER_HAPPEN;								\
-	zabbix_log(LOG_LEVEL_DEBUG, "cannot find id in map: " ZBX_FS_UI64 "\n", search_key);	\
-	while (NULL != (next = (hash_type *)zbx_hashset_iter_next(&iter)))			\
-		zabbix_log(LOG_LEVEL_DEBUG, "map key: " ZBX_FS_UI64 "\n", next->map_key);	\
-}												\
+#define DUMP_HASHMAP(source_hashmap, hash_type, search_key)						\
+do													\
+{													\
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))						\
+	{												\
+		zbx_hashset_iter_t      iter;								\
+		hash_type		*next;								\
+		zbx_hashset_iter_reset(&source_hashmap, &iter);						\
+		THIS_SHOULD_NEVER_HAPPEN;								\
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot find id in map: " ZBX_FS_UI64, search_key);		\
+		while (NULL != (next = (hash_type *)zbx_hashset_iter_next(&iter)))			\
+			zabbix_log(LOG_LEVEL_DEBUG, "map key: " ZBX_FS_UI64, next->search_key);		\
+	}												\
+}													\
 while(0)
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
@@ -3499,7 +3502,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->numitems, numitem);
 			}
 			else
-				DUMP_HASHMAP(config->numitems, ZBX_DC_NUMITEM, itemid, itemid);
+				DUMP_HASHMAP(config->numitems, ZBX_DC_NUMITEM, itemid);
 		}
 
 		/* SNMP items */
@@ -3512,7 +3515,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
 			}
 			else
-				DUMP_HASHMAP(config->snmpitems, ZBX_DC_SNMPITEM, itemid, itemid);
+				DUMP_HASHMAP(config->snmpitems, ZBX_DC_SNMPITEM, itemid);
 		}
 
 		/* IPMI items */
@@ -3525,7 +3528,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
 			}
 			else
-				DUMP_HASHMAP(config->ipmiitems, ZBX_DC_IPMIITEM, itemid, itemid);
+				DUMP_HASHMAP(config->ipmiitems, ZBX_DC_IPMIITEM, itemid);
 		}
 
 		/* trapper items */
@@ -3538,7 +3541,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->trapitems, trapitem);
 			}
 			else
-				DUMP_HASHMAP(config->trapitems, ZBX_DC_TRAPITEM, itemid, itemid);
+				DUMP_HASHMAP(config->trapitems, ZBX_DC_TRAPITEM, itemid);
 	}
 
 	/* dependent items */
@@ -3559,7 +3562,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->logitems, logitem);
 			}
 			else
-				DUMP_HASHMAP(config->logitems, ZBX_DC_LOGITEM, itemid, itemid);
+				DUMP_HASHMAP(config->logitems, ZBX_DC_LOGITEM, itemid);
 		}
 
 		/* db items */
@@ -3575,7 +3578,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->dbitems, dbitem);
 			}
 			else
-				DUMP_HASHMAP(config->dbitems, ZBX_DC_DBITEM, itemid, itemid);
+				DUMP_HASHMAP(config->dbitems, ZBX_DC_DBITEM, itemid);
 		}
 
 		/* SSH items */
@@ -3593,7 +3596,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->sshitems, sshitem);
 			}
 			else
-				DUMP_HASHMAP(config->sshitems, ZBX_DC_SSHITEM, itemid, itemid);
+				DUMP_HASHMAP(config->sshitems, ZBX_DC_SSHITEM, itemid);
 		}
 
 		/* TELNET items */
@@ -3610,7 +3613,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
 			}
 			else
-				DUMP_HASHMAP(config->telnetitems, ZBX_DC_TELNETITEM, itemid, itemid);
+				DUMP_HASHMAP(config->telnetitems, ZBX_DC_TELNETITEM, itemid);
 		}
 
 		/* simple items */
@@ -3626,7 +3629,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
 			}
 			else
-				DUMP_HASHMAP(config->simpleitems, ZBX_DC_SIMPLEITEM, itemid, itemid);
+				DUMP_HASHMAP(config->simpleitems, ZBX_DC_SIMPLEITEM, itemid);
 		}
 
 		/* JMX items */
@@ -3642,7 +3645,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
 			}
 			else
-				DUMP_HASHMAP(config->jmxitems, ZBX_DC_JMXITEM, itemid, itemid);
+				DUMP_HASHMAP(config->jmxitems, ZBX_DC_JMXITEM, itemid);
 		}
 
 		/* calculated items */
@@ -3659,7 +3662,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->calcitems, calcitem);
 			}
 			else
-				DUMP_HASHMAP(config->calcitems, ZBX_DC_CALCITEM, itemid, itemid);
+				DUMP_HASHMAP(config->calcitems, ZBX_DC_CALCITEM, itemid);
 		}
 
 		/* HTTP agent items */
@@ -3684,7 +3687,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->httpitems, httpitem);
 			}
 			else
-				DUMP_HASHMAP(config->httpitems, ZBX_DC_HTTPITEM, itemid, itemid);
+				DUMP_HASHMAP(config->httpitems, ZBX_DC_HTTPITEM, itemid);
 		}
 
 		/* Script items */
@@ -3700,7 +3703,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 				zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
 			}
 			else
-				DUMP_HASHMAP(config->scriptitems, ZBX_DC_SCRIPTITEM, itemid, itemid);
+				DUMP_HASHMAP(config->scriptitems, ZBX_DC_SCRIPTITEM, itemid);
 		}
 
 		/* items */
@@ -3712,7 +3715,21 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 		{
 			/* item keys should be unique for items within a host, otherwise items with  */
 			/* same key share index and removal of last added item already cleared index */
-			DUMP_HASHMAP(config->items_hk, ZBX_DC_ITEM_HK, item_hk_local.hostid, hostid);
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+			{
+				zbx_hashset_iter_t	iter;
+				ZBX_DC_ITEM_HK		*next;
+				zbx_hashset_iter_reset(&config->items_hk, &iter);
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot find id in map, hostid: " ZBX_FS_UI64 ", key: %s",
+						item->hostid, item->key);
+				while (NULL != (next = (ZBX_DC_ITEM_HK *)zbx_hashset_iter_next(&iter)))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "map hostid: " ZBX_FS_UI64 ", key: %s",
+					next->hostid, next->key);
+				}
+			}
 		}
 		else if (item == item_hk->item_ptr)
 		{
