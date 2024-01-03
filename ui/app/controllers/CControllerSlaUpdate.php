@@ -57,7 +57,7 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 					);
 				}
 				catch (InvalidArgumentException $e) {
-					error($e->getMessage());
+					info($e->getMessage());
 					$ret = false;
 				}
 			}

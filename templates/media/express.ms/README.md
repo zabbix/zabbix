@@ -22,7 +22,7 @@ echo -n bb16c1e3-4ea9-542e-aa7f-2e26aff92780 | openssl dgst -sha256 -hmac 38h5z7
 # 34DF7A8702F0F5C952C81463626C0A18C8DD92A0AA71A97F37F5E2CDCADBEA2E
 ```
 
-5\. Make GET request to `/api/v2/botx/bots/<BOT_ID>/token?signatire=<SIGNATURE>` for getting permanent access token.<br>
+5\. Make GET request to `/api/v2/botx/bots/<BOT_ID>/token?signature=<SIGNATURE>` for getting permanent access token.<br>
 Example:<br>
 ```
 curl 'https://localhost/api/v2/botx/bots/bb16c1e3-4ea9-542e-aa7f-2e26aff92780/token?signature=34DF7A8702F0F5C952C81463626C0A18C8DD92A0AA71A97F37F5E2CDCADBEA2E'

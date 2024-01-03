@@ -77,9 +77,10 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 		$time_now = time();
 
 		$master_column = $configuration[$fields['column']];
-		$master_items_only_numeric_allowed = self::isNumericOnlyColumn($master_column);
 
-		$master_items = self::getItems($master_column['item'], $master_items_only_numeric_allowed, $groupids, $hostids);
+		$master_items = self::getItems($master_column['item'], self::isNumericOnlyColumn($master_column), $groupids,
+			$hostids
+		);
 		$master_item_values = self::getItemValues($master_items, $master_column, $time_now);
 
 		if (!$master_item_values) {
@@ -89,7 +90,7 @@ class CControllerWidgetTopHostsView extends CControllerWidget {
 			];
 		}
 
-		$master_items_only_numeric_present = $master_items_only_numeric_allowed && !array_filter($master_items,
+		$master_items_only_numeric_present = !array_filter($master_items,
 			static function(array $item): bool {
 				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
 			}
