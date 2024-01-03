@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,15 +23,26 @@ import (
 	"errors"
 	"fmt"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Swap",
+		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	if key != "system.swap.size" {
@@ -80,10 +91,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, errors.New("Invalid second parameter.")
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Swap",
-		"system.swap.size", "Returns Swap space size in bytes or in percentage from total.",
-	)
 }

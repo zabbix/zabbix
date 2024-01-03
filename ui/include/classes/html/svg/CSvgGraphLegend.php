@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	public function setLinesCount(int $lines_count): self {
-		$this->lines_count = min($lines_count, ceil(count($this->legend_items) / $this->columns_count));
+		$this->lines_count = $lines_count;
 
 		return $this;
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2224,22 +2224,13 @@ function prepareItemHeaders(array $headers): array {
  * @return array
  */
 function prepareItemParameters(array $parameters): array {
-	$_parameters = [];
-
-	if (is_array($parameters) && array_key_exists('name', $parameters)
-			&& array_key_exists('value', $parameters)) {
-		foreach ($parameters['name'] as $index => $name) {
-			if (array_key_exists($index, $parameters['value'])
-					&& ($name !== '' || $parameters['value'][$index] !== '')) {
-				$_parameters[] = [
-					'name' => $name,
-					'value' => $parameters['value'][$index]
-				];
-			}
+	foreach ($parameters as $i => $parameter) {
+		if ($parameter['name'] === '' && $parameter['value'] === '') {
+			unset($parameters[$i]);
 		}
 	}
 
-	return $_parameters;
+	return array_values($parameters);
 }
 
 /**

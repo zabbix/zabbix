@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,8 @@ import (
 	"strings"
 	"sync"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
-
 	"github.com/godbus/dbus/v5"
 )
 
@@ -81,6 +81,18 @@ type state struct {
 type stateMapping struct {
 	unitName   string
 	stateNames []string
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Systemd",
+		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
+		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
+		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
 }
 
 func (p *Plugin) getConnection() (*dbus.Conn, error) {
@@ -168,7 +180,10 @@ func (p *Plugin) get(params []string, conn *dbus.Conn) (interface{}, error) {
 		unitType = params[1]
 	}
 
-	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
+	obj := conn.Object(
+		"org.freedesktop.systemd1",
+		dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])),
+	)
 	err := obj.Call("org.freedesktop.DBus.Properties.GetAll", 0, "org.freedesktop.systemd1."+unitType).Store(&values)
 	if err != nil {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
@@ -239,7 +254,8 @@ func (p *Plugin) discovery(params []string, conn *dbus.Conn) (interface{}, error
 			continue
 		}
 
-		array = append(array, unitJson{u.Name, u.Description, u.LoadState, u.ActiveState,
+		array = append(array, unitJson{
+			u.Name, u.Description, u.LoadState, u.ActiveState,
 			u.SubState, u.Followed, u.Path, u.JobID, u.JobType, u.JobPath, state,
 		})
 	}
@@ -298,8 +314,12 @@ func (p *Plugin) info(params []string, conn *dbus.Conn) (interface{}, error) {
 		unitType = params[2]
 	}
 
-	obj := conn.Object("org.freedesktop.systemd1", dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])))
-	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).Store(&value)
+	obj := conn.Object(
+		"org.freedesktop.systemd1",
+		dbus.ObjectPath("/org/freedesktop/systemd1/unit/"+getName(params[0])),
+	)
+	err := obj.Call("org.freedesktop.DBus.Properties.Get", 0, "org.freedesktop.systemd1."+unitType, property).
+		Store(&value)
 	if nil != err {
 		return nil, fmt.Errorf("Cannot get unit property: %s", err)
 	}
@@ -344,7 +364,20 @@ func (p *Plugin) setUnitStates(v map[string]interface{}) {
 	mappings := []stateMapping{
 		{"LoadState", []string{"loaded", "error", "masked"}},
 		{"ActiveState", []string{"active", "reloading", "inactive", "failed", "activating", "deactivating"}},
-		{"UnitFileState", []string{"enabled", "enabled-runtime", "linked", "linked-runtime", "masked", "masked-runtime", "static", "disabled", "invalid"}},
+		{
+			"UnitFileState",
+			[]string{
+				"enabled",
+				"enabled-runtime",
+				"linked",
+				"linked-runtime",
+				"masked",
+				"masked-runtime",
+				"static",
+				"disabled",
+				"invalid",
+			},
+		},
 	}
 
 	for _, mapping := range mappings {
@@ -365,7 +398,6 @@ func (p *Plugin) createStateMapping(v map[string]interface{}, key string, names 
 	} else {
 		p.Debugf("cannot create mapping for '%s' unit state: unit state with information type string not found", key)
 	}
-
 }
 
 func isEnabledUnit(units []unitJson, p string) bool {
@@ -375,12 +407,4 @@ func isEnabledUnit(units []unitJson, p string) bool {
 		}
 	}
 	return false
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Systemd",
-		"systemd.unit.get", "Returns the bulked info, usage: systemd.unit.get[unit,<interface>].",
-		"systemd.unit.discovery", "Returns JSON array of discovered units, usage: systemd.unit.discovery[<type>].",
-		"systemd.unit.info", "Returns the unit info, usage: systemd.unit.info[unit,<parameter>,<interface>].",
-	)
 }
