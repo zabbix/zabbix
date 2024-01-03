@@ -104,7 +104,17 @@ jQuery(function ($) {
 					.insertBefore($input);
 
 				$input
-					.change(function() {$range.val(this.value); updateHandler();})
+					.change(function() {
+						const value = Number(this.value);
+
+						if (Number.isInteger(value)) {
+							$range[0].value = value;
+							updateHandler();
+						}
+						else {
+							this.value = $range[0].value;
+						}
+					})
 					.appendTo($control);
 			});
 		},

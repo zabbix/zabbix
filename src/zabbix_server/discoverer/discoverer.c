@@ -345,7 +345,8 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 					item.timeout = dcheck->timeout;
 
 					if (SUCCEED == zbx_agent_get_value(&item, source_ip, zbx_get_program_type_cb(),
-							&result) && NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
+							&result, &item.interface.version) &&
+							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{
 						zbx_strcpy_alloc(value, value_alloc, &value_offset, *pvalue);
 					}

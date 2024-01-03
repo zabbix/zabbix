@@ -582,9 +582,14 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$not_supported
-					.prop('disabled', false)
-					.trigger('change');
+				if ($not_supported.length) {
+					$not_supported
+						.prop('disabled', false)
+						.trigger('change');
+				}
+				else {
+					$('#value', $form).multilineInput('unsetReadOnly');
+				}
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');
