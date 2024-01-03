@@ -3477,7 +3477,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 			service_manager_trace(&service_manager);
 		}
 
-		if (service_manager_args_in->config_serviceman_sync_frequency < time_now - time_flush ||
+		if (service_manager_args_in->config_service_manager_sync_frequency < time_now - time_flush ||
 				1 == service_cache_reload_requested)
 		{
 			int	updated = 0, revision;

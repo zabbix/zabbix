@@ -55,7 +55,7 @@ static int	condition_match_service_name(const zbx_service_action_condition_t *co
  *                                                                            *
  * Parameters: tags  - [IN] tags to match                                     *
  *             name  - [IN] target tag name                                   *
- *             value - [IN] target tag value (NULL if only tag name are being *
+ *             value - [IN] target tag value (NULL if only tag name is being  *
  *                          matched                                           *
  *             op    - [IN] matching operator (ZBX_CONDITION_OPERATOR_*)      *
  *                                                                            *

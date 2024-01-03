@@ -52,7 +52,7 @@ zbx_service_problem_t;
 
 ZBX_PTR_VECTOR_DECL(service_problem_ptr, zbx_service_problem_t *)
 
-void    zbx_service_problem_free(zbx_service_problem_t *service_problem);
+void	zbx_service_problem_free(zbx_service_problem_t *service_problem);
 
 typedef struct
 {
@@ -79,7 +79,7 @@ zbx_service_rule_t;
 
 ZBX_PTR_VECTOR_DECL(service_rule_ptr, zbx_service_rule_t *)
 
-void    zbx_service_rule_free(zbx_service_rule_t *service_rule);
+void	zbx_service_rule_free(zbx_service_rule_t *service_rule);
 
 typedef struct zbx_service_s zbx_service_t;
 
@@ -134,7 +134,7 @@ zbx_status_update_t;
 
 ZBX_PTR_VECTOR_DECL(status_update_ptr, zbx_status_update_t *)
 
-void    zbx_status_update_free(zbx_status_update_t *status_update);
+void	zbx_status_update_free(zbx_status_update_t *status_update);
 
 /* service update queue items */
 typedef struct

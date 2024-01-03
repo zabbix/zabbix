@@ -2768,7 +2768,8 @@ static void	add_ack_escalation_r_eventids(zbx_vector_db_escalation_ptr_t *escala
 	zbx_vector_uint64_destroy(&r_eventids);
 }
 
-static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids, zbx_vector_db_service_t *services)
+static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids,
+		zbx_vector_db_service_t *services)
 {
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
