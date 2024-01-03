@@ -329,7 +329,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 */
 	public function testPageItemPrototypes_ButtonLink($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-			 	self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
 		$this->executeDiscoverEnable($data);
 	}
 
