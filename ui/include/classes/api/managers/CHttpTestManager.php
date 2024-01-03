@@ -269,13 +269,13 @@ class CHttpTestManager {
 		foreach ($httptests as $httptest) {
 			if (array_key_exists('headers', $httptest)) {
 				$httptestids[$httptest['httptestid']] = true;
-				$types[] = ZBX_HTTPFIELD_HEADER;
+				$types[ZBX_HTTPFIELD_HEADER] = true;
 				$db_httptests[$httptest['httptestid']]['headers'] = [];
 			}
 
 			if (array_key_exists('variables', $httptest)) {
 				$httptestids[$httptest['httptestid']] = true;
-				$types[] = ZBX_HTTPFIELD_VARIABLE;
+				$types[ZBX_HTTPFIELD_VARIABLE] = true;
 				$db_httptests[$httptest['httptestid']]['variables'] = [];
 			}
 		}
@@ -288,7 +288,7 @@ class CHttpTestManager {
 			'output' => ['httptest_fieldid', 'httptestid', 'type', 'name', 'value'],
 			'filter' => [
 				'httptestid' => array_keys($httptestids),
-				'type' => $types
+				'type' => array_keys($types)
 			],
 			'sortfield' => ['httptest_fieldid']
 		];
@@ -740,21 +740,21 @@ class CHttpTestManager {
 		foreach ($httptests as &$httptest) {
 			if (array_key_exists('headers', $httptest)) {
 				$db_headers = $db_httptests !== null ? $db_httptests[$httptest['httptestid']]['headers'] : [];
-				$db_header = $db_httptests !== null ? reset($db_httptests[$httptest['httptestid']]['headers']) : false;
-				$db_fieldid = $db_httptests !== null ? key($db_httptests[$httptest['httptestid']]['headers']) : false;
 
 				foreach ($httptest['headers'] as &$header) {
-					if ($db_header !== false && $db_fieldid !== false
-							&& ($header['name'] !== $db_header['name'] || $header['value'] !== $db_header['value'])) {
-						$db_fieldid = false;
-					}
+					$db_header = array_shift($db_headers);
 
-					if ($db_fieldid !== false) {
-						$header['httptest_fieldid'] = $db_fieldid;
-						$db_header = next($db_httptests[$httptest['httptestid']]['headers']);
-						unset($db_headers[$db_fieldid]);
+					if ($db_header !== null) {
+						$upd_header = DB::getUpdatedValues('httptest_field', $header, $db_header);
 
-						$db_fieldid = key($db_httptests[$httptest['httptestid']]['headers']);
+						if ($upd_header) {
+							$upd_fields[] = [
+								'values' => $upd_header,
+								'where' => ['httptest_fieldid' => $db_header['httptest_fieldid']]
+							];
+						}
+
+						$header['httptest_fieldid'] = $db_header['httptest_fieldid'];
 					}
 					else {
 						$ins_fields[] = [
@@ -765,7 +765,7 @@ class CHttpTestManager {
 				}
 				unset($header);
 
-				$del_fieldids = array_merge($del_fieldids, array_keys($db_headers));
+				$del_fieldids = array_merge($del_fieldids, array_column($db_headers, 'httptest_fieldid'));
 			}
 
 			if (array_key_exists('variables', $httptest)) {
@@ -1143,22 +1143,21 @@ class CHttpTestManager {
 
 				if (array_key_exists('headers', $step)) {
 					$db_headers = $db_step !== null ? $db_step['headers'] : [];
-					$db_header = $db_step !== null ? reset($db_step['headers']) : false;
-					$db_fieldid = $db_step !== null ? key($db_step['headers']) : false;
 
 					foreach ($step['headers'] as &$header) {
-						if ($db_header !== false && $db_fieldid !== false
-								&& ($header['name'] !== $db_header['name']
-									|| $header['value'] !== $db_header['value'])) {
-							$db_fieldid = false;
-						}
+						$db_header = array_shift($db_headers);
 
-						if ($db_fieldid !== false) {
-							$header['httpstep_fieldid'] = $db_fieldid;
-							$db_header = next($db_step['headers']);
-							unset($db_headers[$db_fieldid]);
+						if ($db_header !== null) {
+							$upd_header = DB::getUpdatedValues('httpstep_field', $header, $db_header);
 
-							$db_fieldid = key($db_step['headers']);
+							if ($upd_header) {
+								$upd_fields[] = [
+									'values' => $upd_header,
+									'where' => ['httpstep_fieldid' => $db_header['httpstep_fieldid']]
+								];
+							}
+
+							$header['httpstep_fieldid'] = $db_header['httpstep_fieldid'];
 						}
 						else {
 							$ins_fields[] = [
@@ -1169,7 +1168,7 @@ class CHttpTestManager {
 					}
 					unset($header);
 
-					$del_fieldids = array_merge($del_fieldids, array_keys($db_headers));
+					$del_fieldids = array_merge($del_fieldids, array_column($db_headers, 'httpstep_fieldid'));
 				}
 
 				if (array_key_exists('variables', $step)) {
@@ -1206,23 +1205,21 @@ class CHttpTestManager {
 				if (array_key_exists('posts', $step)) {
 					if (is_array($step['posts'])) {
 						$db_posts = $db_step !== null && is_array($db_step['posts']) ? $db_step['posts'] : [];
-						$db_post = $db_step !== null && is_array($db_step['posts']) ? reset($db_step['posts']) : false;
-						$db_fieldid = $db_step !== null && is_array($db_step['posts'])
-							? key($db_step['posts'])
-							: false;
 
 						foreach ($step['posts'] as &$post) {
-							if ($db_post !== false && $db_fieldid !== false
-									&& ($post['name'] !== $db_post['name'] || $post['value'] !== $db_post['value'])) {
-								$db_fieldid = false;
-							}
+							$db_post = array_shift($db_posts);
 
-							if ($db_fieldid !== false) {
-								$post['httpstep_fieldid'] = $db_fieldid;
-								$db_post = next($db_step['posts']);
-								unset($db_posts[$db_fieldid]);
+							if ($db_post !== null) {
+								$upd_post = DB::getUpdatedValues('httpstep_field', $post, $db_post);
 
-								$db_fieldid = key($db_step['posts']);
+								if ($upd_post) {
+									$upd_fields[] = [
+										'values' => $upd_post,
+										'where' => ['httpstep_fieldid' => $db_post['httpstep_fieldid']]
+									];
+								}
+
+								$post['httpstep_fieldid'] = $db_post['httpstep_fieldid'];
 							}
 							else {
 								$ins_fields[] = [
@@ -1233,7 +1230,7 @@ class CHttpTestManager {
 						}
 						unset($post);
 
-						$del_fieldids = array_merge($del_fieldids, array_keys($db_posts));
+						$del_fieldids = array_merge($del_fieldids, array_column($db_posts, 'httpstep_fieldid'));
 					}
 					elseif ($db_step !== null && is_array($db_step['posts'])) {
 						$del_fieldids = array_merge($del_fieldids, array_keys($db_step['posts']));
@@ -1242,22 +1239,21 @@ class CHttpTestManager {
 
 				if (array_key_exists('query_fields', $step)) {
 					$db_query_fields = $db_step !== null ? $db_step['query_fields'] : [];
-					$db_query_field = $db_step !== null ? reset($db_step['query_fields']) : false;
-					$db_fieldid = $db_step !== null ? key($db_step['query_fields']) : false;
 
 					foreach ($step['query_fields'] as &$query_field) {
-						if ($db_query_field !== false && $db_fieldid !== false
-								&& ($query_field['name'] !== $db_query_field['name']
-									|| $query_field['value'] !== $db_query_field['value'])) {
-							$db_fieldid = false;
-						}
+						$db_query_field = array_shift($db_query_fields);
 
-						if ($db_fieldid !== false) {
-							$query_field['httpstep_fieldid'] = $db_fieldid;
-							$db_query_field = next($db_step['query_fields']);
-							unset($db_query_fields[$db_fieldid]);
+						if ($db_query_field !== null) {
+							$upd_query_field = DB::getUpdatedValues('httpstep_field', $query_field, $db_query_field);
 
-							$db_fieldid = key($db_step['query_fields']);
+							if ($upd_query_field) {
+								$upd_fields[] = [
+									'values' => $upd_query_field,
+									'where' => ['httpstep_fieldid' => $db_query_field['httpstep_fieldid']]
+								];
+							}
+
+							$query_field['httpstep_fieldid'] = $db_query_field['httpstep_fieldid'];
 						}
 						else {
 							$ins_fields[] = [
@@ -1268,7 +1264,7 @@ class CHttpTestManager {
 					}
 					unset($query_field);
 
-					$del_fieldids = array_merge($del_fieldids, array_keys($db_query_fields));
+					$del_fieldids = array_merge($del_fieldids, array_column($db_query_fields, 'httpstep_fieldid'));
 				}
 			}
 			unset($step);
