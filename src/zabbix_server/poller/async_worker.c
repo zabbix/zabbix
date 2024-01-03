@@ -267,11 +267,12 @@ static void	*async_worker_entry(void *args)
 	return NULL;
 }
 
-int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, char **error)
+int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, const char *progname, char **error)
 {
 	int		err, ret = FAIL;
 	pthread_attr_t	attr;
 
+	worker->progname = progname;
 	worker->queue = queue;
 
 	zbx_pthread_init_attr(&attr);
