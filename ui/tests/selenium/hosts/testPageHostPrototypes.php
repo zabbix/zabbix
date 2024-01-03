@@ -46,6 +46,18 @@ class testPageHostPrototypes extends testPagePrototypes {
 	public $several_success = 'Host prototypes updated';
 	public $sql = 'SELECT null FROM hosts WHERE hostid=';
 
+	public $headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
+	public $page_name = 'host';
+	public $amount = 4;
+	public $buttons = [
+		'Create enabled' => false,
+		'Create disabled' => false,
+		'Delete' => false,
+		'Create host prototype' => true
+	];
+	public $tag = '1 Host prototype monitored discovered {#H}';
+	public $clickable_headers = ['Name', 'Create enabled', 'Discover'];
+
 	protected static $prototype_hostids;
 	protected static $hostids;
 	protected static $host_druleids;
@@ -68,6 +80,16 @@ class testPageHostPrototypes extends testPagePrototypes {
 		]);
 		self::$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
+
+		$response = CDataHelper::createTemplates([
+			[
+				'host' => 'Template for host prototype',
+				'groups' => [
+					['groupid' => '1'] // template group 'Templates'
+				]
+			]
+		]);
+		$template_id = $response['templateids']['Template for host prototype'];
 
 		CDataHelper::call('hostprototype.create', [
 			[
@@ -118,7 +140,10 @@ class testPageHostPrototypes extends testPagePrototypes {
 						'groupid'=> 4 // Zabbix server
 					]
 				],
-				'discover' => HOST_NO_DISCOVER
+				'discover' => HOST_NO_DISCOVER,
+				'templates' => [
+					'templateid' => $template_id
+				]
 			]
 		]);
 		self::$prototype_hostids = CDataHelper::getIds('host');
@@ -127,46 +152,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	public function testPageHostPrototypes_Layout() {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
-
-		// Checking Title, Header and Column names.
-		$this->page->assertTitle('Configuration of host prototypes');
-		$this->page->assertHeader('Host prototypes');
-		$this->assertSame(['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'],
-				($this->query('class:list-table')->asTable()->one())->getHeadersText()
-		);
-
-		$this->assertTableStats(4);
-
-		// Check displayed buttons and their default status after opening host prototype page.
-		$buttons = [
-			'Create host prototype' => true,
-			'Create enabled' => false,
-			'Create disabled' => false,
-			'Delete' => false
-		];
-
-		foreach ($buttons as $button => $status) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
-		}
-
-		// Check tags on the specific host prototype.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$tags = $table->findRow('Name', '1 Host prototype monitored discovered {#H}')
-				->getColumn('Tags')->query('class:tag')->all();
-		$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
-
-		// Check hints for tags that appears after clicking on them.
-		foreach ($tags as $tag) {
-			$tag->click();
-			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
-			$this->assertEquals($tag->getText(), $hint->getText());
-			$hint->close();
-		}
-
-		// Check clickable headers.
-		foreach (['Name', 'Create enabled', 'Discover'] as $header) {
-			$this->assertTrue($table->query('link', $header)->one()->isClickable());
-		}
+		$this->layout();
 	}
 
 	public static function getSortingData() {

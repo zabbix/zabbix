@@ -39,7 +39,74 @@ class testPagePrototypes extends CWebTest {
 
 	public $single_success;
 	public $several_success;
-	public $sql;
+	public $headers;
+	public $page_name;
+	public $amount;
+	public $buttons;
+	public $tag;
+	public $clickable_headers;
+
+	public function layout() {
+		// Checking Title, Header and Column names.
+		$this->page->assertTitle('Configuration of '.$this->page_name.' prototypes');
+		$capital_name = ucfirst($this->page_name);
+		$this->page->assertHeader($capital_name.' prototypes');
+		$this->assertSame($this->headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
+
+		$this->assertTableStats($this->amount);
+
+		// Check displayed buttons and their default status after opening host prototype page.
+		foreach ($this->buttons as $button => $status) {
+			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
+		}
+
+		// Check tags on the specific host prototype.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
+		$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
+
+		// Check hints for tags that appears after clicking on them.
+		foreach ($tags as $tag) {
+			$tag->click();
+			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+			$this->assertEquals($tag->getText(), $hint->getText());
+			$hint->close();
+		}
+
+		// Check clickable headers.
+		foreach ($this->clickable_headers as $header) {
+			$this->assertTrue($table->query('link', $header)->one()->isClickable());
+		}
+
+		// Check additional configuration for item prototype page.
+		if ($this->page_name === 'item') {
+			$table->getRow(0)->query('xpath:.//button')->one()->click();
+			$this->page->waitUntilReady();
+			$popup_menu = CPopupMenuElement::find()->one()->waitUntilPresent();
+			$this->assertEquals(['CONFIGURATION'], $popup_menu->getTitles()->asText());
+			$this->assertEquals(['Item prototype', 'Trigger prototypes', 'Create trigger prototype', 'Create dependent item'],
+					$popup_menu->getItems()->asText()
+			);
+
+			$items = [
+				'Item prototype' => true,
+				'Trigger prototypes' => false,
+				'Create trigger prototype' => true,
+				'Create dependent item' => true
+			];
+
+			foreach ($items as $item => $enabled) {
+				$this->assertTrue($popup_menu->getItem($item)->isEnabled($enabled));
+			}
+		}
+
+		// Check Template column.
+		if ($this->page_name === 'host') {
+			$template_row = $table->findRow('Name', '4 Host prototype monitored not discovered {#H}');
+			$template_row->assertValues(['Templates' => 'Template for host prototype']);
+			$this->assertTrue($template_row->getColumn('Templates')->isClickable());
+		}
+	}
 
 	public function executeSorting($data) {
 		$table = $this->query('class:list-table')->asTable()->one();

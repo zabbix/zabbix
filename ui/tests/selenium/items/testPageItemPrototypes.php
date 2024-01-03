@@ -47,6 +47,19 @@ class testPageItemPrototypes extends testPagePrototypes {
 	public $several_success = 'Item prototypes updated';
 	public $sql = 'SELECT null FROM items WHERE itemid=';
 
+	public $headers = ['', '', 'Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover', 'Tags'];
+	public $page_name = 'item';
+	public $amount = 5;
+	public $buttons = [
+		'Create enabled' => false,
+		'Create disabled' => false,
+		'Mass update' => false,
+		'Delete' => false,
+		'Create item prototype' => true
+	];
+	public $tag = '5 Item prototype trapper with text type';
+	public $clickable_headers = ['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover'];
+
 	protected static $prototype_itemids;
 	protected static $hostids;
 	protected static $host_druleids;
@@ -119,10 +132,36 @@ class testPageItemPrototypes extends testPagePrototypes {
 				'discover' => ITEM_NO_DISCOVER,
 				'history' => '90d',
 				'trends' => '350d'
+			],
+			[
+				'name' => '5 Item prototype trapper with text type',
+				'key_' => '5_key[{#KEY}]',
+				'hostid' => self::$hostids['Host for item prototype check'],
+				'ruleid' => self::$host_druleids['Host for item prototype check:drule'],
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_TEXT,
+				'delay' => '',
+				'history' => '0',
+				'tags' => [
+					[
+						'tag' => 'name_1',
+						'value' => 'value_1'
+					],
+					[
+						'tag' => 'name_2',
+						'value' => 'value_2'
+					]
+				]
 			]
 		]);
 		$this->assertArrayHasKey('itemids', $item_prototype );
 		self::$prototype_itemids = CDataHelper::getIds('name');
+	}
+
+	public function testPageItemPrototypes_Layout() {
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
+		$this->layout();
 	}
 
 	public static function getSortingData() {
@@ -136,7 +175,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 						'1 Item prototype monitored discovered',
 						'2 Item prototype not monitored discovered',
 						'3 Item prototype not monitored not discovered',
-						'4 Item prototype monitored not discovered'
+						'4 Item prototype monitored not discovered',
+						'5 Item prototype trapper with text type'
 					]
 				]
 			],
@@ -149,7 +189,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 						'1_key[{#KEY}]',
 						'2_key[{#KEY}]',
 						'3_key[{#KEY}]',
-						'4_key[{#KEY}]'
+						'4_key[{#KEY}]',
+						'5_key[{#KEY}]'
 					]
 				]
 			],
@@ -159,6 +200,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 					'sort_by' => 'Interval',
 					'sort' => 'delay',
 					'result' => [
+						'',
 						15,
 						30,
 						45,
@@ -172,6 +214,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 					'sort_by' => 'History',
 					'sort' => 'history',
 					'result' => [
+						'0',
 						'60d',
 						'70d',
 						'80d',
@@ -185,6 +228,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 					'sort_by' => 'Trends',
 					'sort' => 'trends',
 					'result' => [
+						'',
 						'200d',
 						'250d',
 						'300d',
@@ -198,6 +242,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 					'sort_by' => 'Type',
 					'sort' => 'type',
 					'result' => [
+						'Zabbix trapper',
 						'Zabbix internal',
 						'Zabbix agent (active)',
 						'Calculated',
@@ -213,6 +258,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 					'result' => [
 						'Yes',
 						'Yes',
+						'Yes',
 						'No',
 						'No'
 					]
@@ -224,6 +270,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 					'sort_by' => 'Discover',
 					'sort' => 'discover',
 					'result' => [
+						'Yes',
 						'Yes',
 						'Yes',
 						'No',
@@ -308,7 +355,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 				[
 					'button' => 'Create enabled',
 					'column_check' => 'Create enabled',
-					'after' => ['Yes', 'Yes', 'Yes', 'Yes']
+					'after' => ['Yes', 'Yes', 'Yes', 'Yes', 'Yes']
 				]
 			],
 			// #7 Disable all host prototypes clicking on Create disabled button.
@@ -316,7 +363,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 				[
 					'button' => 'Create disabled',
 					'column_check' => 'Create enabled',
-					'after' => ['No', 'No', 'No', 'No']
+					'after' => ['No', 'No', 'No', 'No', 'No']
 				]
 			]
 		];
