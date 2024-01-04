@@ -29,6 +29,7 @@
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
 #include "zbxcrypto.h"
+#include "zbxhash.h"
 
 /* host macro discovery state */
 #define ZBX_USERMACRO_MANUAL	0
@@ -3314,10 +3315,10 @@ static void	lld_interface_snmp_prepare_sql(zbx_uint64_t hostid, const zbx_uint64
  *             tls_subject      - [IN] tls cert subject                       *
  *             tls_psk_identity - [IN]                                        *
  *             tls_psk          - [IN]                                        *
+ *             hgsets           - [IN]                                        *
+ *             permissions      - [IN]                                        *
  *             del_hostgroupids - [IN] host groups which should be deleted    *
- *             hgsets           - [IN] host groups sets which should be       *
- *                                     deleted                                *
- *             del_hgsetids     - [IN] host groups set which should be        *
+ *             del_hgsetids     - [IN] host groups sets which should be       *
  *                                     deleted                                *
  *                                                                            *
  ******************************************************************************/

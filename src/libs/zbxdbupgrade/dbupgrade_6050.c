@@ -2436,7 +2436,7 @@ static int	DBpatch_6050175(void)
 
 static int	DBpatch_6050176(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"ugset", "ugsetid", 0,
 				{
 					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -2456,7 +2456,7 @@ static int	DBpatch_6050177(void)
 
 static int	DBpatch_6050178(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"ugset_group", "ugsetid,usrgrpid", 0,
 				{
 					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -2491,7 +2491,7 @@ static int	DBpatch_6050181(void)
 
 static int	DBpatch_6050182(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"user_ugset", "userid", 0,
 				{
 					{"userid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -2526,7 +2526,7 @@ static int	DBpatch_6050185(void)
 
 static int	DBpatch_6050186(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"hgset", "hgsetid", 0,
 				{
 					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -2546,7 +2546,7 @@ static int	DBpatch_6050187(void)
 
 static int	DBpatch_6050188(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"hgset_group", "hgsetid,groupid", 0,
 				{
 					{"hgsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -2581,7 +2581,7 @@ static int	DBpatch_6050191(void)
 
 static int	DBpatch_6050192(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"host_hgset", "hostid", 0,
 				{
 					{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
@@ -2616,7 +2616,7 @@ static int	DBpatch_6050195(void)
 
 static int	DBpatch_6050196(void)
 {
-	const zbx_db_table_t table =
+	const zbx_db_table_t	table =
 			{"permission", "ugsetid,hgsetid", 0,
 				{
 					{"ugsetid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
