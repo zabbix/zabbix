@@ -1511,11 +1511,13 @@ class CHttpTestManager {
 				if ($exHttpTest) {
 					$newHttpTest['httptestid'] = $exHttpTest['httptestid'];
 
-					if (array_key_exists('variables', $newHttpTest)) {
-						foreach ($newHttpTest['variables'] as &$variable) {
-							unset($variable['httptest_fieldid']);
+					foreach (['headers', 'variables'] as $field_name) {
+						if (array_key_exists($field_name, $newHttpTest)) {
+							foreach ($newHttpTest[$field_name] as &$variable) {
+								unset($variable['httptest_fieldid']);
+							}
+							unset($variable);
 						}
-						unset($variable);
 					}
 
 					if (isset($hostHttpTest['byTemplateId'][$httpTestId])) {
@@ -1712,11 +1714,13 @@ class CHttpTestManager {
 				unset($step['httpstepid']);
 			}
 
-			if (array_key_exists('variables', $step)) {
-				foreach ($step['variables'] as &$variable) {
-					unset($variable['httpstep_fieldid']);
+			foreach (['headers', 'variables', 'posts', 'query_fields'] as $field_name) {
+				if (array_key_exists($field_name, $step)) {
+					foreach ($step[$field_name] as &$variable) {
+						unset($variable['httpstep_fieldid']);
+					}
+					unset($variable);
 				}
-				unset($variable);
 			}
 
 			$result[] = $step;
