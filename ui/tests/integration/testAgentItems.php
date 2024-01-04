@@ -630,7 +630,7 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 0,
-			'timeout' => '5s'
+			'timeout' => '1s'
 		],
 		[
 			'key' => 'net.tcp.port[123.123.123.123,111]',
@@ -638,7 +638,7 @@ class testAgentItems extends CIntegrationTest {
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'result' => 0,
-			'timeout' => '5s'
+			'timeout' => '1s'
 		],
 		[
 			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
@@ -850,7 +850,7 @@ class testAgentItems extends CIntegrationTest {
 
 		$data = [];
 		$wait_iterations = 10;
-		$wait_iteration_delay = 1;
+		$wait_iteration_delay = 2;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {
 			$db_items = $this->call('item.get', [
