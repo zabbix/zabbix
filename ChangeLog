@@ -198,7 +198,6 @@ A.F.....S. [ZBXNEXT-7726] added support for extended error checking in preproces
 A.F.I...S. [ZBXNEXT-8702] added support of group discovery from different prototypes/lld rules (dfofanovs, wiper)
 A.F....... [ZBXNEXT-4165] implemented `selectActions` parameter for API method `mediatype.get` to display all associated actions for media types (ddauksa)
 ..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
-..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
 ..F....... [ZBXNEXT-7687] extended Top Hosts widget column sorting (dfofanovs)
 ..FG...PS. [ZBXNEXT-6554] increased remote command execution limits to 16MB (dgoloscapov)
