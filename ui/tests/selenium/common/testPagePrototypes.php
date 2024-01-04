@@ -56,25 +56,28 @@ class testPagePrototypes extends CWebTest {
 
 		// Check that Breadcrumbs exists.
 		$breadcrumbs = [
-			1 => 'All hosts',
-			2 => 'Host for prototype check',
-			3 => 'Discovery list',
-			4 => 'Drule for prototype check'
+			'All hosts',
+			'Host for prototype check',
+			'Discovery list',
+			'Drule for prototype check',
+			'Item prototypes',
+			'Trigger prototypes',
+			'Graph prototypes',
+			'Host prototypes'
 		];
+		$this->assertEquals($breadcrumbs, $this->query('xpath://div[@class="header-navigation"]//a')->all()->asText());
 
-		foreach ($breadcrumbs as $selector => $value) {
-			$this->assertEquals([$value],
-					$this->query('xpath:(//ul[@class="breadcrumbs"]//span)['.$selector.']')->all()->asText()
-			);
-			$this->query('xpath:(//ul[@class="breadcrumbs"]//span)['.$selector.']')->one()->isClickable();
-		}
+		// Check number amount near breadcrumbs.
+		$this->assertEquals($this->amount, $this->query('xpath://div[@class="header-navigation"]//a[text()='.
+				CXPathHelper::escapeQuotes($capital_name.' prototypes').']/following-sibling::sup')->one()->getText()
+		);
 
-		// Check displayed buttons and their default status after opening host prototype page.
+		// Check displayed buttons and their default status after opening prototype page.
 		foreach ($this->buttons as $button => $status) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
 		}
 
-		// Check tags on the specific host prototype.
+		// Check tags on the specific prototype.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
 		$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
@@ -114,14 +117,14 @@ class testPagePrototypes extends CWebTest {
 			}
 		}
 
-		// Check Template column.
+		// Check Template column for host prototype page.
 		if ($this->page_name === 'host') {
 			$template_row = $table->findRow('Name', '4 Host prototype monitored not discovered {#H}');
 			$template_row->assertValues(['Templates' => 'Template for host prototype']);
 			$this->assertTrue($template_row->getColumn('Templates')->isClickable());
 		}
 
-		// Check Operational data column - values should be displayed.
+		// Check Operational data column - values should be displayed, on trigger prototype page.
 		if ($this->page_name === 'trigger') {
 			$opdata = [
 				'12345',
