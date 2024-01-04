@@ -184,8 +184,8 @@
 #	include <mach/mach_host.h>
 #endif
 
-#ifdef HAVE_MTENT_H
-#	include <mtent.h>
+#ifdef HAVE_MNTENT_H
+#	include <mntent.h>
 #endif
 
 #ifdef HAVE_NETDB_H
