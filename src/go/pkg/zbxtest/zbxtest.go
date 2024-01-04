@@ -51,3 +51,7 @@ func (ctx MockEmptyCtx) Timeout() int {
 
 	return defaultTimeout
 }
+
+func (ctx MockEmptyCtx) Delay() string {
+	return ""
+}
