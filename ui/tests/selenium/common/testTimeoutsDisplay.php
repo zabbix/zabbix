@@ -164,7 +164,7 @@ class testTimeoutsDisplay extends CWebTest {
 	 */
 	protected function fillGlobalTimeouts($values) {
 		$this->page->login()->open('zabbix.php?action=timeouts.edit')->waitUntilReady();
-		$form = $this->query('id:timeouts')->waitUntilVisible()->asForm()->one();
+		$form = $this->query('id:timeouts-form')->waitUntilVisible()->asForm()->one();
 
 		// Check values in form. If they are the same, we can skip and don't update them.
 		if ($form->checkValue($values, false) === true) {
