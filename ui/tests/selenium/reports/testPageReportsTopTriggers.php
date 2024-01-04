@@ -29,8 +29,6 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup hosts
  *
  * @onBefore prepareData
- *
- * @dataSource UserPermissions
  */
 class testPageReportsTopTriggers extends CWebTest {
 
@@ -411,6 +409,13 @@ class testPageReportsTopTriggers extends CWebTest {
 			for ($i = 1; $i <= $params['problem_count']; $i++) {
 				CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
 			}
+		}
+
+		// Delete some hosts and problems from previous tests and data source, not to interfere this test.
+		$rows = CDBHelper::getAll('SELECT * FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
+		if ($rows !== []) {
+			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
+			CDataHelper::call('host.delete', [$hostid]);
 		}
 	}
 
@@ -1052,18 +1057,6 @@ class testPageReportsTopTriggers extends CWebTest {
 							'Trigger' => 'Severity status: High',
 							'Severity' => 'High',
 							'Number of problems' => '1'
-						],
-						[
-							'Host' => 'Host for tag permissions',
-							'Trigger' => 'Trigger for tag permissions MySQL',
-							'Severity' => 'Not classified',
-							'Number of problems' => '1'
-						],
-						[
-							'Host' => 'Host for tag permissions',
-							'Trigger' => 'Trigger for tag permissions Oracle',
-							'Severity' => 'Not classified',
-							'Number of problems' => '1'
 						]
 					],
 					'background_colors' => [
@@ -1186,18 +1179,6 @@ class testPageReportsTopTriggers extends CWebTest {
 						[
 							'Host' => 'Host for problem tags check',
 							'Trigger' => 'Problem with tag3',
-							'Severity' => 'Not classified',
-							'Number of problems' => '1'
-						],
-						[
-							'Host' => 'Host for tag permissions',
-							'Trigger' => 'Trigger for tag permissions MySQL',
-							'Severity' => 'Not classified',
-							'Number of problems' => '1'
-						],
-						[
-							'Host' => 'Host for tag permissions',
-							'Trigger' => 'Trigger for tag permissions Oracle',
 							'Severity' => 'Not classified',
 							'Number of problems' => '1'
 						]
