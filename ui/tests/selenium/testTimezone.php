@@ -218,6 +218,17 @@ class testTimezone extends CWebTest {
 		$this->page->logout();
 	}
 
+	public function testTimezone_TimeSelector() {
+		$this->page->userLogin('Admin', 'zabbix');
+		$this->setTimezone('Atlantic/Cape_Verde', 'userprofile');
+		$this->page->open('zabbix.php?action=actionlog.list')->waitUntilReady();
+		$this->query('xpath://ul[contains(@class, "time-quick")]//a[text()="Today"]')->one()->click();;
+
+		// No error messages awaiting on time selector change.
+		$this->assertFalse($this->query('xpath://output['.CXPathHelper::fromClass('msg-bad').']')->exists());
+		$this->page->logout();
+	}
+
 	/**
 	 * Time received from Monitoring->Problems table.
 	 *
