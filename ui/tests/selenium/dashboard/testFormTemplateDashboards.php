@@ -1030,23 +1030,22 @@ class testFormTemplateDashboards extends CWebTest {
 								]
 							]
 						],
-						// TODO: fix after DEV-2674
-//						[
-//							'field' => 'Value arc',
-//							'type' => 'complex_field',
-//							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value-arc"]',
-//							'contents' => [
-//								[
-//									'field' => 'Size',
-//									'fieldid' => 'value_arc_size',
-//									'value' => 20,
-//									'attributes' => [
-//										'maxlength' => 3
-//									],
-//									'symbol_after' => '%'
-//								]
-//							]
-//						],
+						[
+							'field' => 'Value arc',
+							'type' => 'complex_field',
+							'field_locator' => 'xpath:.//div[@class="fields-group fields-group-value-arc"]',
+							'contents' => [
+								[
+									'field' => 'Size',
+									'fieldid' => 'value_arc_size',
+									'value' => 20,
+									'attributes' => [
+										'maxlength' => 3
+									],
+									'symbol_after' => '%'
+								]
+							]
+						],
 						[
 							'field' => 'Needle',
 							'type' => 'complex_field',
@@ -1118,7 +1117,7 @@ class testFormTemplateDashboards extends CWebTest {
 					],
 					/**
 					 * Disabled fields are duplicated in hidden fields in order to properly check their default values,
-					 * as in Gauge widget to enable some of the fields, value of other disabled fields needs to be changed.
+					 * as in Gauge widget to enable some of the fields, value of other disabled fields need to be changed.
 					 */
 					'disabled' => [
 						[
@@ -1799,7 +1798,7 @@ class testFormTemplateDashboards extends CWebTest {
 						],
 						[
 							'skip_mandatory_check' => true,
-							'field_locator' => 'xpath:.//label[text()="By me"]/../following-sibling::li/input[@type="checkbox"]',
+							'field_locator' => 'id:acknowledged_by_me',
 							'type' => 'checkbox',
 							'value' => false
 						]
@@ -2117,11 +2116,12 @@ class testFormTemplateDashboards extends CWebTest {
 				// Check that each of the fields in the list is hidden/disabled.
 				foreach ($data[$no_access_fields] as $no_access_field) {
 					if ($no_access_fields === 'hidden') {
-						// TODO: should be fixed after git-hook improvements in DEV-2396.
-						$this->assertFalse($widget_form->query("xpath:.//label[text()=".
-								CXPathHelper::escapeQuotes($no_access_field['field'])."]/following-sibling::div[1]")
-								->one(false)->isDisplayed()
-						);
+						$locator = (array_key_exists('field_locator', $no_access_field))
+							? $no_access_field['field_locator']
+							: 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($no_access_field['field']).
+									']/following-sibling::div[1]';
+
+						$this->assertFalse($widget_form->query($locator)->one(false)->isDisplayed());
 					}
 					else {
 						$field_locator = (array_key_exists('disabled_locator', $no_access_field))
@@ -2200,8 +2200,10 @@ class testFormTemplateDashboards extends CWebTest {
 		foreach ($fields as $field_details) {
 			// Field locator is used for stand-alone fields that cannot be located via label.
 			$field = (array_key_exists('field_locator', $field_details))
-				? $widget_form->query($field_details['field_locator'])->one()
+				? $widget_form->query($field_details['field_locator'])->one()->detect()
 				: $widget_form->getField($field_details['field']);
+
+			$this->assertTrue($field->isVisible());
 
 			// If the field replaces some other field, make sure that this other field is not displayed anymore.
 			if (array_key_exists('replaces', $field_details)) {
@@ -2215,12 +2217,10 @@ class testFormTemplateDashboards extends CWebTest {
 						/**
 						 * Locate the field from the perspective of its label. It's either the following div or one of
 						 * the div elements right after the label with the specified id.
-						 *
-						 * TODO: should be fixed after git-hook improvements in DEV-2396
 						 */
-						$label_xpath = "xpath:.//label[text()=".CXPathHelper::escapeQuotes($sub_field_details['field'])."]";
+						$label_xpath = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($sub_field_details['field']).']';
 						$field_locator =  array_key_exists('fieldid', $sub_field_details)
-							? $label_xpath."/following-sibling::div/*[@id=".CXPathHelper::escapeQuotes($sub_field_details['fieldid'])."]"
+							? $label_xpath.'/following-sibling::div/*[@id='.CXPathHelper::escapeQuotes($sub_field_details['fieldid'])."]"
 							: $label_xpath.'/following-sibling::div[1]';
 					}
 					else {
@@ -2298,9 +2298,8 @@ class testFormTemplateDashboards extends CWebTest {
 				$checkbox_list = $field->asCheckboxList();
 
 				foreach ($field_details['checkboxes'] as $label => $value) {
-					// TODO: should be fixed after git-hook improvements in DEV-2396.
-					$this->assertEquals($value, $checkbox_list->query("xpath:.//label[text()=".
-							CXPathHelper::escapeQuotes($label)."]/../input")->one()->asCheckbox()->isChecked()
+					$this->assertEquals($value, $checkbox_list->query('xpath:.//label[text()='.
+							CXPathHelper::escapeQuotes($label).']/../input')->one()->asCheckbox()->isChecked()
 					);
 				}
 				break;
@@ -4256,7 +4255,6 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->query('button:Apply')->one()->click();
 		CDashboardElement::find()->one()->waitUntilReady();
 
-		// TODO: should be fixed after git-hook improvements in DEV-2396.
 		$skip_selectors = [
 			'class:clock',
 			'xpath://th[text()="Zabbix frontend version"]/following-sibling::td[1]',
