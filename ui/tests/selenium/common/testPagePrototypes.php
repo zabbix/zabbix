@@ -52,8 +52,22 @@ class testPagePrototypes extends CWebTest {
 		$capital_name = ucfirst($this->page_name);
 		$this->page->assertHeader($capital_name.' prototypes');
 		$this->assertSame($this->headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
-
 		$this->assertTableStats($this->amount);
+
+		// Check that Breadcrumbs exists.
+		$breadcrumbs = [
+			1 => 'All hosts',
+			2 => 'Host for prototype check',
+			3 => 'Discovery list',
+			4 => 'Drule for prototype check'
+		];
+
+		foreach ($breadcrumbs as $selector => $value) {
+			$this->assertEquals([$value],
+					$this->query('xpath:(//ul[@class="breadcrumbs"]//span)['.$selector.']')->all()->asText()
+			);
+			$this->query('xpath:(//ul[@class="breadcrumbs"]//span)['.$selector.']')->one()->isClickable();
+		}
 
 		// Check displayed buttons and their default status after opening host prototype page.
 		foreach ($this->buttons as $button => $status) {

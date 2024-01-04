@@ -66,11 +66,11 @@ class testPageHostPrototypes extends testPagePrototypes {
 	public function prepareHostPrototypeData() {
 		$host_result = CDataHelper::createHosts([
 			[
-				'host' => 'Host for host prototype check',
+				'host' => 'Host for prototype check',
 				'groups' => [['groupid' => 4]], // Zabbix server
 				'discoveryrules' => [
 					[
-						'name' => 'Drule for host prototype check',
+						'name' => 'Drule for prototype check',
 						'key_' => 'drule',
 						'type' => ITEM_TYPE_TRAPPER,
 						'delay' => 0
@@ -94,7 +94,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 		CDataHelper::call('hostprototype.create', [
 			[
 				'host' => '1 Host prototype monitored discovered {#H}',
-				'ruleid' => self::$host_druleids['Host for host prototype check:drule'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'groupLinks' =>  [
 					[
 						'groupid'=> 4 // Zabbix server
@@ -113,7 +113,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 			],
 			[
 				'host' => '2 Host prototype not monitored discovered {#H}',
-				'ruleid' => self::$host_druleids['Host for host prototype check:drule'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'groupLinks' =>  [
 					[
 						'groupid'=> 4 // Zabbix server
@@ -123,7 +123,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 			],
 			[
 				'host' => '3 Host prototype not monitored not discovered {#H}',
-				'ruleid' => self::$host_druleids['Host for host prototype check:drule'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'groupLinks' =>  [
 					[
 						'groupid'=> 4 // Zabbix server
@@ -134,7 +134,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 			],
 			[
 				'host' => '4 Host prototype monitored not discovered {#H}',
-				'ruleid' => self::$host_druleids['Host for host prototype check:drule'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'groupLinks' =>  [
 					[
 						'groupid'=> 4 // Zabbix server
@@ -151,7 +151,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 
 	public function testPageHostPrototypes_Layout() {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->layout();
 	}
 
@@ -206,7 +206,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	 */
 	public function testPageHostPrototypes_Sorting($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -294,7 +294,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	 */
 	public function testPageHostPrototypes_ButtonLink($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeDiscoverEnable($data);
 	}
 
@@ -334,7 +334,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	 */
 	public function testPageHostPrototypes_Delete($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for host prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_hostids[$name]));

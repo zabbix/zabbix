@@ -67,11 +67,34 @@ class testPageItemPrototypes extends testPagePrototypes {
 	public function prepareItemPrototypeData() {
 		$host_result = CDataHelper::createHosts([
 			[
-				'host' => 'Host for item prototype check',
+				'host' => 'Host for prototype check',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_SNMP,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.0.1',
+						'dns' => '',
+						'port' => '161',
+						'details' => [
+							'version' => 1,
+							'community' => 'test'
+						]
+					]
+				],
+				'items' => [
+					[
+						'name' => 'Master item',
+						'key_' => 'master_item',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'delay' => '0'
+					]
+				],
 				'groups' => [['groupid' => 4]], // Zabbix server
 				'discoveryrules' => [
 					[
-						'name' => 'Drule for item prototype check',
+						'name' => 'Drule for prototype check',
 						'key_' => 'drule',
 						'type' => ITEM_TYPE_TRAPPER,
 						'delay' => 0
@@ -86,8 +109,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '1 Item prototype monitored discovered',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for item prototype check'],
-				'ruleid' => self::$host_druleids['Host for item prototype check:drule'],
+				'hostid' => self::$hostids['Host for prototype check'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 15,
@@ -97,8 +120,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '2 Item prototype not monitored discovered',
 				'key_' => '2_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for item prototype check'],
-				'ruleid' => self::$host_druleids['Host for item prototype check:drule'],
+				'hostid' => self::$hostids['Host for prototype check'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_INTERNAL,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 30,
@@ -109,8 +132,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '3 Item prototype not monitored not discovered',
 				'key_' => '3_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for item prototype check'],
-				'ruleid' => self::$host_druleids['Host for item prototype check:drule'],
+				'hostid' => self::$hostids['Host for prototype check'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'url' => 'test',
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -123,8 +146,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '4 Item prototype monitored not discovered',
 				'key_' => '4_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for item prototype check'],
-				'ruleid' => self::$host_druleids['Host for item prototype check:drule'],
+				'hostid' => self::$hostids['Host for prototype check'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_CALCULATED,
 				'params' => '1+1',
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -136,8 +159,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '5 Item prototype trapper with text type',
 				'key_' => '5_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for item prototype check'],
-				'ruleid' => self::$host_druleids['Host for item prototype check:drule'],
+				'hostid' => self::$hostids['Host for prototype check'],
+				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '',
@@ -160,7 +183,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 
 	public function testPageItemPrototypes_Layout() {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->layout();
 	}
 
@@ -288,7 +311,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 */
 	public function testPageItemPrototypes_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -376,7 +399,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 */
 	public function testPageItemPrototypes_ButtonLink($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeDiscoverEnable($data);
 	}
 
@@ -416,7 +439,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 */
 	public function testPageItemPrototypes_Delete($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for item prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_itemids[$name]));
@@ -431,114 +454,110 @@ class testPageItemPrototypes extends testPagePrototypes {
 		}
 	}
 
-	public function testPageItemPrototypes_NotDisplayedValues() {
-
+	public static function getNotDisplayedValuesData() {
+		return [
+			// #0 SNMP trapper without interval.
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty SNMP interval',
+						'Type' => 'SNMP trap',
+						'Key' => 'snmp_interval_[{#KEY}]'
+					],
+					'check' => [
+						'Interval' => ''
+					]
+				]
+			],
+			// #1 Zabbix trapper without interval.
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty Zabbix trapper interval',
+						'Type' => 'Zabbix trapper',
+						'Key' => 'zabbix_trapper_interval_[{#KEY}]'
+					],
+					'check' => [
+						'Interval' => ''
+					]
+				]
+			],
+			// #2 Dependent item without interval.
+			[
+				[
+					'fields' => [
+						'Name' => 'Empty dependent item interval',
+						'Type' => 'Dependent item',
+						'Master item' => 'Master item',
+						'Key' => 'dependent_interval_[{#KEY}]'
+					],
+					'check' => [
+						'Interval' => ''
+					]
+				]
+			],
+			// #3 Zabbix agent with type of information - text.
+			[
+				[
+					'fields' => [
+						'Name' => 'Text zabbix trapper',
+						'Type' => 'Zabbix trapper',
+						'Type of information' => 'Text',
+						'Key' => 'text_[{#KEY}]'
+					],
+					'check' => [
+						'Trends' => ''
+					]
+				]
+			],
+			// #4 Zabbix agent with type of information - character.
+			[
+				[
+					'fields' => [
+						'Name' => 'Character zabbix trapper',
+						'Type' => 'Zabbix trapper',
+						'Type of information' => 'Character',
+						'Key' => 'character_[{#KEY}]'
+					],
+					'check' => [
+						'Trends' => ''
+					]
+				]
+			],
+			// #5 Zabbix agent with type of information - log.
+			[
+				[
+					'fields' => [
+						'Name' => 'Log zabbix trapper',
+						'Type' => 'Zabbix trapper',
+						'Type of information' => 'Log',
+						'Key' => 'log_[{#KEY}]'
+					],
+					'check' => [
+						'Trends' => ''
+					]
+				]
+			]
+		];
 	}
 
-//	// Returns all item protos
-//	public static function data() {
-//		return CDBHelper::getDataProvider(
-//			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
-//			' FROM items i,item_discovery d,items di,hosts h'.
-//			' WHERE i.itemid=d.itemid'.
-//				' AND h.hostid=i.hostid'.
-//				' AND d.parent_itemid=di.itemid'.
-//				' AND i.key_ LIKE \'%-layout-test%\''
-//		);
-//	}
+	/**
+	 * Check that empty values displayed in Trends and Interval columns.
+	 *
+	 * @dataProvider getNotDisplayedValuesData
+	 */
+	public function testPageItemPrototypes_NotDisplayedValues($data) {
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
-//	/**
-//	* @dataProvider data
-//	*/
-//	public function testPageItemPrototypes_CheckLayout($data) {
-//		$drule = $data['d_name'];
-//		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
-//		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
-//				$data['parent_itemid'].'&context='.$context);
-//
-//		$this->zbxTestCheckTitle('Configuration of item prototypes');
-//		$this->zbxTestCheckHeader('Item prototypes');
-//		$this->zbxTestTextPresent($drule);
-//		$this->zbxTestTextPresent($data['name']);
-//		$this->zbxTestTextPresent('Displaying');
-//
-//		if ($data['status'] == HOST_STATUS_MONITORED || $data['status'] == HOST_STATUS_NOT_MONITORED) {
-//			$this->zbxTestTextPresent('All hosts');
-//		}
-//		if ($data['status'] == HOST_STATUS_TEMPLATE) {
-//			$this->zbxTestTextPresent('All templates');
-//		}
-//
-//		$this->zbxTestTextPresent(['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled']);
-//		$this->zbxTestTextNotPresent('Info');
-//		// TODO someday should check that interval is not shown for trapper items, trends not shown for non-numeric items etc
-//
-//		$this->zbxTestTextPresent(['Create disabled', 'Delete']);
-//	}
-//
-//	/**
-//	 * @dataProvider data
-//	 * @backupOnce triggers
-//	 */
-//	public function testPageItemPrototypes_SimpleDelete($data) {
-//		$itemid = $data['itemid'];
-//		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
-//		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
-//				$data['parent_itemid'].'&context='.$context);
-//
-//		$this->zbxTestCheckTitle('Configuration of item prototypes');
-//		$this->zbxTestCheckboxSelect('itemids_'.$itemid);
-//		$this->query('button:Delete')->one()->click();
-//
-//		$this->zbxTestAcceptAlert();
-//
-//		$this->zbxTestCheckTitle('Configuration of item prototypes');
-//		$this->zbxTestCheckHeader('Item prototypes');
-//		$this->assertMessage(TEST_GOOD, 'Item prototype deleted');
-//
-//		$sql = 'SELECT null FROM items WHERE itemid='.$itemid;
-//		$this->assertEquals(0, CDBHelper::getCount($sql));
-//	}
-//
-//	// Returns all discovery rules
-//	public static function rule() {
-//		return CDBHelper::getDataProvider(
-//			'SELECT h.status,i.name,i.itemid,d.parent_itemid,h.hostid,di.name AS d_name'.
-//			' FROM items i,item_discovery d,items di,hosts h'.
-//			' WHERE i.itemid=d.itemid'.
-//				' AND h.hostid=i.hostid'.
-//				' AND d.parent_itemid=di.itemid'.
-//				' AND h.host LIKE \'%-layout-test%\''
-//		);
-//	}
-//
-//	/**
-//	 * @dataProvider rule
-//	 * @backupOnce triggers
-//	 */
-//	public function testPageItemPrototypes_MassDelete($rule) {
-//		$itemid = $rule['itemid'];
-//		$druleid = $rule['parent_itemid'];
-//		$drule = $rule['d_name'];
-//		$hostid = $rule['hostid'];
-//		$context = (str_contains($rule['name'], '001')) ? 'template' : 'host';
-//
-//		$itemids = CDBHelper::getAll('select itemid from item_discovery where parent_itemid='.$druleid);
-//		$itemids = zbx_objectValues($itemids, 'itemid');
-//
-//		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.$druleid.'&context='.$context);
-//		$this->zbxTestCheckTitle('Configuration of item prototypes');
-//		$this->zbxTestCheckboxSelect('all_items');
-//		$this->query('button:Delete')->one()->click();
-//
-//		$this->zbxTestAcceptAlert();
-//
-//		$this->page->waitUntilReady();
-//		$this->zbxTestCheckTitle('Configuration of item prototypes');
-//		$this->zbxTestCheckHeader('Item prototypes');
-//		$this->assertMessage(TEST_GOOD, 'Item prototype deleted');
-//
-//		$sql = 'SELECT null FROM items WHERE '.dbConditionInt('itemid', $itemids);
-//		$this->assertEquals(0, CDBHelper::getCount($sql));
-//	}
+		$this->query('button:Create item prototype')->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill($data['fields']);
+		$form->submit()->waitUntilNotVisible();
+		$this->page->waitUntilReady();
+
+		$table = $this->query('class:list-table')->asTable()->one();
+		$template_row = $table->findRow('Key', $data['fields']['Key']);
+		$template_row->assertValues($data['check']);
+	}
 }
