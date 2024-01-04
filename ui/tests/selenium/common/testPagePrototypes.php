@@ -120,6 +120,19 @@ class testPagePrototypes extends CWebTest {
 			$template_row->assertValues(['Templates' => 'Template for host prototype']);
 			$this->assertTrue($template_row->getColumn('Templates')->isClickable());
 		}
+
+		// Check Operational data column - values should be displayed.
+		if ($this->page_name === 'trigger') {
+			$opdata = [
+				'12345',
+				'{#PROT_MAC}',
+				'test',
+				'!@#$%^&*',
+				'{$TEST}',
+				'🙂🙃'
+			];
+			$this->assertTableDataColumn($opdata, 'Operational data');
+		}
 	}
 
 	public function executeSorting($data) {
@@ -155,7 +168,7 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
-		// Check column value for one host prototypes or for them all.
+		// Check column value for one prototype or for them all.
 		if (array_key_exists('name', $data)) {
 			$this->assertMessage(TEST_GOOD, $this->single_success);
 			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
@@ -167,16 +180,16 @@ class testPagePrototypes extends CWebTest {
 	}
 
 	public function executeDelete($data) {
-		// Check that host prototype exists in DB and displayed in Host prototype table.
+		// Check that prototype exists in DB and displayed in prototype table.
 		foreach ($data['name'] as $name) {
 			$this->assertTrue(in_array($name, $this->getTableColumnData('Name')));
 		}
 
-		// Select host prototype and click on Delete button.
+		// Select prototype and click on Delete button.
 		$this->selectTableRows($data['name']);
 		$this->query('button:Delete')->one()->click();
 
-		// Check that after canceling Delete, host prototype still exists in DB nad displayed in table.
+		// Check that after canceling Delete, prototype still exists in DB nad displayed in table.
 		if (array_key_exists('cancel', $data)) {
 			$this->page->dismissAlert();
 			foreach ($data['name'] as $name) {
@@ -188,7 +201,7 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, $data['message']);
 
-			// Check that host prototype doesn't exist in DB and not displayed in Host prototype table.
+			// Check that prototype doesn't exist in DB and not displayed in prototype table.
 			foreach ($data['name'] as $name) {
 				$this->assertFalse(in_array($name, $this->getTableColumnData('Name')));
 			}

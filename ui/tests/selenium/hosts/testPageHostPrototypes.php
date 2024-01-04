@@ -62,7 +62,6 @@ class testPageHostPrototypes extends testPagePrototypes {
 	protected static $hostids;
 	protected static $host_druleids;
 
-
 	public function prepareHostPrototypeData() {
 		$host_result = CDataHelper::createHosts([
 			[
