@@ -21,7 +21,9 @@
 
 namespace Widgets\Item\Includes;
 
-use API;
+use API,
+	CItemHelper,
+	CWidgetsData;
 
 use Zabbix\Widgets\{
 	CWidgetField,
@@ -39,7 +41,8 @@ use Zabbix\Widgets\Fields\{
 	CWidgetFieldSelect,
 	CWidgetFieldTextArea,
 	CWidgetFieldTextBox,
-	CWidgetFieldThresholds
+	CWidgetFieldThresholds,
+	CWidgetFieldTimePeriod
 };
 
 use Widgets\Item\Widget;
@@ -58,6 +61,10 @@ class WidgetForm extends CWidgetForm {
 	private const DEFAULT_UNITS_SIZE = 35;
 	private const DEFAULT_TIME_SIZE = 15;
 
+	public const ITEM_VALUE_DATA_SOURCE_AUTO = 0;
+	public const ITEM_VALUE_DATA_SOURCE_HISTORY = 1;
+	public const ITEM_VALUE_DATA_SOURCE_TRENDS = 2;
+
 	private bool $is_binary_units = false;
 
 	public function __construct(array $values, ?string $templateid) {
@@ -75,6 +82,16 @@ class WidgetForm extends CWidgetForm {
 
 			$this->is_binary_units = $items && isBinaryUnits($items[0]['units']);
 		}
+	}
+
+	public function getFieldsValues(): array {
+		$fields_values = parent::getFieldsValues();
+
+		if ($fields_values['aggregate_function'] == AGGREGATE_NONE) {
+			unset($fields_values['time_period']);
+		}
+
+		return $fields_values;
 	}
 
 	public function validate(bool $strict = false): array {
@@ -267,6 +284,35 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				new CWidgetFieldColor('bg_color', _('Background color'))
+			)
+			->addField(
+				(new CWidgetFieldSelect('aggregate_function', _('Aggregation function'), [
+					AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+					AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+					AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+					AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+					AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+					AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+					AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
+					AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
+				]))->setDefault(AGGREGATE_NONE)
+			)
+			->addField(
+				(new CWidgetFieldTimePeriod('time_period', _('Time period')))
+					->setDefault([
+						CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+							CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+						)
+					])
+					->setDefaultPeriod(['from' => 'now-1h', 'to' => 'now'])
+					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('history', _('History data'), [
+					self::ITEM_VALUE_DATA_SOURCE_AUTO => _('Auto'),
+					self::ITEM_VALUE_DATA_SOURCE_HISTORY => _('History'),
+					self::ITEM_VALUE_DATA_SOURCE_TRENDS => _('Trends')
+				]))->setDefault(self::ITEM_VALUE_DATA_SOURCE_AUTO)
 			)
 			->addField(
 				new CWidgetFieldThresholds('thresholds', _('Thresholds'), $this->is_binary_units)

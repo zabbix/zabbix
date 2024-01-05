@@ -245,4 +245,136 @@ class CItemHelper extends CItemGeneralHelper {
 			'preservekeys' => true
 		] + $src_options);
 	}
+
+	/**
+	 * Get translated name of aggregate function.
+	 *
+	 * @param int $function
+	 *
+	 * @return string
+	 */
+	public static function getAggregateFunctionName(int $function): string {
+		static $names;
+
+		if ($names === null) {
+			$names = [
+				AGGREGATE_NONE => _('not used'),
+				AGGREGATE_MIN => _('min'),
+				AGGREGATE_MAX => _('max'),
+				AGGREGATE_AVG => _('avg'),
+				AGGREGATE_COUNT => _('count'),
+				AGGREGATE_SUM => _('sum'),
+				AGGREGATE_FIRST => _('first'),
+				AGGREGATE_LAST => _('last')
+			];
+		}
+
+		return $names[$function];
+	}
+
+	/**
+	 * Resolve string representation of the aggregate function into AGGREGATE_* constant.
+	 *
+	 * @param string $name
+	 *
+	 * @return int
+	 */
+	public static function resolveAggregateFunction(string $name): int {
+		static $functions = [
+			'min' => AGGREGATE_MIN,
+			'max' => AGGREGATE_MAX,
+			'avg' => AGGREGATE_AVG,
+			'count' => AGGREGATE_COUNT,
+			'sum' => AGGREGATE_SUM,
+			'first' => AGGREGATE_FIRST,
+			'last' => AGGREGATE_LAST
+		];
+
+		return $functions[$name];
+	}
+
+	/**
+	 * Add 'source' property to items ('history' or 'trends'), for the specified time stamp, based on item configuration
+	 * and housekeeping settings.
+	 *
+	 * Items must have 'history' and 'trends' properties set.
+	 *
+	 * @param array $items  Array of items.
+	 * @param int   $time   Unix time stamp to calculate data source for.
+	 *
+	 * @return array  Items with updated 'history' and 'trends' properties, as well as 'source' property set.
+	 */
+	public static function addDataSource(array $items, int $time): array {
+		static $hk_history_global, $hk_history_time, $hk_trends_global, $hk_trends_time;
+
+		if ($hk_history_global === null) {
+			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
+
+			if ($hk_history_global == 1) {
+				$hk_history_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
+			}
+		}
+
+		if ($hk_trends_global === null) {
+			$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
+
+			if ($hk_trends_global == 1) {
+				$hk_trends_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
+			}
+		}
+
+		if ($hk_history_global) {
+			foreach ($items as &$item) {
+				$item['history'] = $hk_history_time;
+			}
+			unset($item);
+		}
+
+		if ($hk_trends_global) {
+			foreach ($items as &$item) {
+				$item['trends'] = $hk_trends_time;
+			}
+			unset($item);
+		}
+
+		if (!$hk_history_global || !$hk_trends_global) {
+			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items,
+				array_merge($hk_history_global ? [] : ['history'], $hk_trends_global ? [] : ['trends'])
+			);
+
+			foreach ($items as &$item) {
+				if (!$hk_trends_time) {
+					$item['history'] = timeUnitToSeconds($item['history']);
+
+					if ($item['history'] === null) {
+						$item['history'] = 0;
+
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
+							_('invalid history storage period')
+						));
+					}
+				}
+
+				if (!$hk_trends_global) {
+					$item['trends'] = timeUnitToSeconds($item['trends']);
+
+					if ($item['trends'] === null) {
+						$item['trends'] = 0;
+
+						error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
+							_('invalid trend storage period')
+						));
+					}
+				}
+			}
+			unset($item);
+		}
+
+		foreach ($items as &$item) {
+			$item['source'] = $item['trends'] == 0 || time() - $item['history'] <= $time ? 'history' : 'trends';
+		}
+		unset($item);
+
+		return $items;
+	}
 }

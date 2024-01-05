@@ -77,6 +77,11 @@ class CWidgetFieldTimePeriod {
 	 */
 	#is_disabled = false;
 
+	/**
+	 * @type {boolean}
+	 */
+	#is_hidden = false;
+
 	constructor({
 		field_name,
 		field_value = {from: '', to: ''},
@@ -135,6 +140,16 @@ class CWidgetFieldTimePeriod {
 		this.#updateField();
 	}
 
+	get hidden() {
+		return this.#is_hidden;
+	}
+
+	set hidden(is_hidden) {
+		this.#is_hidden = is_hidden;
+
+		this.#updateField();
+	}
+
 	#initField() {
 		if (this.#widget_accepted) {
 			const $multiselect = jQuery(`#${this.#field_name}_reference`);
@@ -177,24 +192,31 @@ class CWidgetFieldTimePeriod {
 	}
 
 	#updateField() {
+		for (const element of document.querySelectorAll(`.js-${this.#field_name}-data-source`)) {
+			element.style.display = this.#is_hidden ? 'none' : '';
+		}
+
 		for (const element of document.querySelectorAll(`[name="${this.#field_name}[data_source]"]`)) {
 			element.checked = element.value == this.#data_source;
-			element.disabled = this.#is_disabled;
+			element.disabled = this.#is_hidden || this.#is_disabled;
 		}
 
 		const reference_dashboard = document.getElementById(`${this.#field_name}_reference_dashboard`);
 
 		if (reference_dashboard !== null) {
-			reference_dashboard.disabled = this.#is_disabled
+			reference_dashboard.disabled = this.#is_hidden || this.#is_disabled
 				|| this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DASHBOARD;
 		}
 
 		for (const element of document.querySelectorAll(`.js-${this.#field_name}-reference`)) {
-			element.style.display = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET ? 'none' : '';
+			element.style.display = this.#is_hidden || this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET
+				? 'none'
+				: '';
 		}
 
 		if (this.#widget_accepted) {
-			if (!this.#is_disabled && this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET) {
+			if (!this.#is_hidden && !this.#is_disabled
+					&& this.#data_source == CWidgetFieldTimePeriod.DATA_SOURCE_WIDGET) {
 				this.#reference_multiselect.multiSelect('enable');
 			}
 			else {
@@ -213,14 +235,17 @@ class CWidgetFieldTimePeriod {
 			const element = document.getElementById(element_id);
 
 			if (element !== null) {
-				element.disabled = this.#is_disabled || this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
+				element.disabled = this.#is_hidden || this.#is_disabled
+					|| this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT;
 			}
 		}
 
 		const date_picker_form_rows = `.js-${this.#field_name}-from, .js-${this.#field_name}-to`;
 
 		for (const element of document.querySelectorAll(date_picker_form_rows)) {
-			element.style.display = this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT ? 'none' : '';
+			element.style.display = this.#is_hidden || this.#data_source != CWidgetFieldTimePeriod.DATA_SOURCE_DEFAULT
+				? 'none'
+				: '';
 		}
 	}
 

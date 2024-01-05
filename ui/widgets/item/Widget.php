@@ -49,6 +49,10 @@ class Widget extends CWidget {
 	public const CHANGE_INDICATOR_DOWN = 2;
 	public const CHANGE_INDICATOR_UP_DOWN = 3;
 
+	public const HISTORY_DATA_AUTO = 0;
+	public const HISTORY_DATA_HISTORY = 1;
+	public const HISTORY_DATA_TRENDS = 2;
+
 	public function getDefaultName(): string {
 		return _('Item value');
 	}

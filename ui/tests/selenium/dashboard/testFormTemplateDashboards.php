@@ -384,11 +384,6 @@ class testFormTemplateDashboards extends CWebTest {
 										'value' => self::TEMPLATE_ITEM
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.0.timeshift',
-										'value' => ''
-									],
-									[
 										'type' => 0,
 										'name' => 'columns.0.display',
 										'value' => 1
@@ -1559,6 +1554,28 @@ class testFormTemplateDashboards extends CWebTest {
 							'type' => 'table',
 							'headers' => ['', 'Threshold', 'Action'],
 							'buttons' => ['Add']
+						],
+						[
+							'field' => 'Aggregation function',
+							'type' => 'dropdown',
+							'fieldid' => 'aggregate_function',
+							'possible_values' => [
+								'not used',
+								'min',
+								'max',
+								'avg',
+								'count',
+								'sum',
+								'first',
+								'last'
+							],
+							'value' => 'not used'
+						],
+						[
+							'field' => 'History data',
+							'type' => 'radio_button',
+							'possible_values' => ['Auto', 'History', 'Trends'],
+							'value' => 'Auto'
 						]
 					],
 					'fill_for_hidden' => [
@@ -2219,7 +2236,7 @@ class testFormTemplateDashboards extends CWebTest {
 						 * the div elements right after the label with the specified id.
 						 */
 						$label_xpath = 'xpath:.//label[text()='.CXPathHelper::escapeQuotes($sub_field_details['field']).']';
-						$field_locator =  array_key_exists('fieldid', $sub_field_details)
+						$field_locator = array_key_exists('fieldid', $sub_field_details)
 							? $label_xpath.'/following-sibling::div/*[@id='.CXPathHelper::escapeQuotes($sub_field_details['fieldid'])."]"
 							: $label_xpath.'/following-sibling::div[1]';
 					}
@@ -3022,7 +3039,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
 						'fill' => [
 							'xpath:.//input[@id="thresholds_0_color"]/..' => 'FFC107',
-							'id:thresholds_0_threshold' => "50",
+							'id:thresholds_0_threshold' => '50',
 							'id:th_show_labels' => true,
 							'id:th_show_arc' => true,
 							'id:th_arc_size' => 55
@@ -3311,7 +3328,11 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:time_size' => '',
 						'id:decimal_size' => '',
 						'id:value_size' => '',
-						'id:units_size' => ''
+						'id:units_size' => '',
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom',
+						'id:time_period_from' => '',
+						'id:time_period_to' => ''
 					],
 					'error_message' => [
 						'Invalid parameter "Item": cannot be empty',
@@ -3320,7 +3341,9 @@ class testFormTemplateDashboards extends CWebTest {
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Time period/From": cannot be empty.',
+						'Invalid parameter "Time period/To": cannot be empty.'
 					]
 				]
 			],
@@ -3337,7 +3360,17 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:time_size' => 'abc',
 						'id:decimal_size' => 'abc',
 						'id:value_size' => 'abc',
-						'id:units_size' => 'abc'
+						'id:units_size' => 'abc',
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'abc',
+						'id:time_period_to' => 'abc'
+					],
+					'actions' => [
+						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',
+						'fill' => [
+							'id:thresholds_0_threshold' => 'abc'
+						]
 					],
 					'swap_expected' => [
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM,
@@ -3352,7 +3385,10 @@ class testFormTemplateDashboards extends CWebTest {
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Invalid parameter "Time period/From": a time is expected.',
+						'Invalid parameter "Time period/To": a time is expected.',
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.'
 					]
 				]
 			],
@@ -3370,7 +3406,11 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:time_size' => 0,
 						'id:decimal_size' => 0,
 						'id:value_size' => 0,
-						'id:units_size' => 0
+						'id:units_size' => 0,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h',
+						'id:time_period_to' => 'now-3550'
 					],
 					'swap_expected' => [
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
@@ -3381,7 +3421,8 @@ class testFormTemplateDashboards extends CWebTest {
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Minimum time period to display is 1 minute.'
 					]
 				]
 			],
@@ -3399,7 +3440,11 @@ class testFormTemplateDashboards extends CWebTest {
 						'id:time_size' => 101,
 						'id:decimal_size' => 101,
 						'id:value_size' => 101,
-						'id:units_size' => 101
+						'id:units_size' => 101,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-4y',
+						'id:time_period_to' => 'now-1y'
 					],
 					'swap_expected' => [
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
@@ -3410,7 +3455,8 @@ class testFormTemplateDashboards extends CWebTest {
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
 						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.'
+						'Invalid parameter "Size": value must be one of 1-100.',
+						'Maximum time period to display is 730 days.'
 					]
 				]
 			],
@@ -3463,7 +3509,12 @@ class testFormTemplateDashboards extends CWebTest {
 						'xpath:.//input[@id="up_color"]/..' => 'FFBF00',
 						'xpath:.//input[@id="down_color"]/..' => '7B1FA2',
 						'xpath:.//input[@id="updown_color"]/..' => 'AFB42B',
-						'xpath:.//input[@id="bg_color"]/..' => '00131D'
+						'xpath:.//input[@id="bg_color"]/..' => '00131D',
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1M',
+						'id:time_period_to' => 'now-1w',
+						'History data' => 'Trends'
 					],
 					'actions' => [
 						'click' => 'xpath:.//table[@id="thresholds-table"]//button[text()="Add"]',

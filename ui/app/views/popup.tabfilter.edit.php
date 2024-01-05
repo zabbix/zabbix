@@ -37,7 +37,7 @@ $form_list = (new CFormList())
 
 if ($data['support_custom_time']) {
 	$form_list
-		->addRow(_('Set custom time period'),
+		->addRow(_('Override time period selector'),
 			(new CCheckBox('filter_custom_time', 1))
 				->setChecked($data['filter_custom_time'])
 		)

@@ -104,6 +104,8 @@ class CControllerDashboardWidgetsSanitize extends CController {
 						$this->hasInput('templateid') ? $this->getInput('templateid') : null
 					);
 
+					$form->validate();
+
 					$widgets_api[$index] = ['fields' => $form->fieldsToApi()];
 				}
 			}
