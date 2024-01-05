@@ -297,6 +297,23 @@ out:
 }
 #endif	/* _WINDOWS */
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: find next newline in buffer using newline encoding                *
+ *                                                                            *
+ * Parameters: p       - [IN] pointer to buffer to look for newline (nonnull) *
+ *             p_next  - [OUT] location of start of next newline              *
+ *             p_end   - [IN] pointer to end of buffer p                      *
+ *             cr      - [IN] carriage return string                          *
+ *             lf      - [IN] line feed string                                *
+ *             szbyte  - [IN] size of newline strings                         *
+ *                                                                            *
+ * Comment: This function replaces '\0' symbols with '?'.                     *
+ *                                                                            *
+ * Return value: pointer to end of line (before newline string) or            *
+ *               NULL if newline is not found.                                *
+ *                                                                            *
+ ******************************************************************************/
 char	*zbx_find_buf_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf, size_t szbyte)
 {
 	if (1 == szbyte)	/* single-byte character set */
