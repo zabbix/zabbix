@@ -133,6 +133,16 @@ window.widget_tophosts_form = new class {
 			delete data.thresholds;
 		}
 
+		if (data.time_period) {
+			for (const [key, value] of Object.entries(data.time_period)) {
+				input.setAttribute('name', `columns[${this._column_index}][time_period][${key}]`);
+				input.setAttribute('value', value);
+				this._form.appendChild(input.cloneNode());
+			}
+
+			delete data.time_period;
+		}
+
 		for (const [key, value] of Object.entries(data)) {
 			input.setAttribute('name', `columns[${this._column_index}][${key}]`);
 			input.setAttribute('value', value);

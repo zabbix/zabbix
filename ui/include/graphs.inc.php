@@ -68,27 +68,6 @@ function graph_item_drawtype2str($drawtype) {
 	}
 }
 
-function graph_item_aggr_fnc2str($calc_fnc) {
-	switch ($calc_fnc) {
-		case AGGREGATE_NONE:
-			return _('none');
-		case AGGREGATE_MIN:
-			return _('min');
-		case AGGREGATE_MAX:
-			return _('max');
-		case AGGREGATE_AVG:
-			return _('avg');
-		case AGGREGATE_COUNT:
-			return _('count');
-		case AGGREGATE_SUM:
-			return _('sum');
-		case AGGREGATE_FIRST:
-			return _('first');
-		case AGGREGATE_LAST:
-			return _('last');
-	}
-}
-
 function getGraphDims($graphid = null) {
 	$graphDims = [];
 

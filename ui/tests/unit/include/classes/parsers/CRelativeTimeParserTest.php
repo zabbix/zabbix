@@ -345,6 +345,24 @@ class CRelativeTimeParserTest extends TestCase {
 				]
 			],
 			[
+				'now-2147483647', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '2147483647', 'suffix' => 's']
+					],
+					'match' => 'now-2147483647'
+				]
+			],
+			[
+				'now-2147483648', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [],
+					'match' => 'now'
+				]
+			],
+			[
 				'now-300s', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,

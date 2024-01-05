@@ -22,17 +22,17 @@
 namespace Widgets\TopHosts\Actions;
 
 use API,
+	CAggFunctionData,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CHousekeepingHelper,
+	CItemHelper,
 	CMacrosResolverHelper,
 	CNumberParser,
 	CSettingsHelper,
 	Manager;
 
 use Widgets\TopHosts\Widget;
-
 use Zabbix\Widgets\Fields\CWidgetFieldColumnsList;
 
 class WidgetView extends CControllerDashboardWidgetView {
@@ -141,23 +141,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 			];
 		}
 
-		$time_now = time();
-
 		$master_column_index = $this->fields_values['column'];
 		$master_column = $configuration[$master_column_index];
 		$master_entities = $hosts;
 		$master_entity_values = [];
-		$master_items_can_be_numeric = false;
 
 		switch ($master_column['data']) {
 			case CWidgetFieldColumnsList::DATA_ITEM_VALUE:
-				$master_items_can_be_numeric = true;
 				$master_entities = array_key_exists($master_column_index, $items)
 					? $items[$master_column_index]
 					: self::getItems($master_column['item'], self::isNumericOnlyColumn($master_column), $groupids,
 						$hostids
 					);
-				$master_entity_values = self::getItemValues($master_entities, $master_column, $time_now);
+				$master_entity_values = self::getItemValues($master_entities, $master_column);
 				break;
 
 			case CWidgetFieldColumnsList::DATA_HOST_NAME:
@@ -178,11 +174,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 				break;
 		}
 
-		$master_items_only_numeric_present = $master_items_can_be_numeric && !array_filter($master_entities,
-			static function(array $item): bool {
-				return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
-			}
-		);
+		$master_items_only_numeric_present = $master_column['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
+			&& ($master_column['aggregate_function'] == AGGREGATE_COUNT
+				|| !array_filter($master_entities,
+					static function(array $item): bool {
+						return !in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+					}
+				)
+			);
 
 		if ($this->fields_values['order'] == Widget::ORDER_TOP_N) {
 			if ($master_items_only_numeric_present) {
@@ -276,7 +275,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 						: self::getItems($column['item'], $numeric_only, $groupids, $hostids);
 				}
 
-				$column_item_values = self::getItemValues($column_items, $column, $time_now);
+				$column_item_values = self::getItemValues($column_items, $column);
 			}
 
 			if ($calc_extremes && ($column['min'] !== '' || $column['max'] !== '')) {
@@ -400,10 +399,19 @@ class WidgetView extends CControllerDashboardWidgetView {
 		];
 	}
 
+	/**
+	 * Check if column configuration requires selecting numeric items only.
+	 *
+	 * @param array $column  Column configuration.
+	 *
+	 * @return bool
+	 */
 	private static function isNumericOnlyColumn(array $column): bool {
-		return $column['aggregate_function'] != AGGREGATE_NONE
-			|| $column['display'] != CWidgetFieldColumnsList::DISPLAY_AS_IS
-			|| array_key_exists('thresholds', $column);
+		if ($column['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {
+			return CAggFunctionData::requiresNumericItem($column['aggregate_function']);
+		}
+
+		return $column['aggregate_function'] != AGGREGATE_COUNT;
 	}
 
 	private static function getItems(string $name, bool $numeric_only, ?array $groupids, ?array $hostids): array {
@@ -440,155 +448,72 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $items;
 	}
 
-	private static function getItemValues(array $items, array $column, int $time_now): array {
-		static $history_period;
+	private static function getItemValues(array $items, array $column): array {
+		static $history_period_s;
 
-		if ($history_period === null) {
-			$history_period = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
+		if ($history_period_s === null) {
+			$history_period_s = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::HISTORY_PERIOD));
 		}
 
-		$timeshift = $column['timeshift'] !== '' ? timeUnitToSeconds($column['timeshift']) : 0;
-
-		$time_to = $time_now + $timeshift;
-
 		$time_from = $column['aggregate_function'] != AGGREGATE_NONE
-			? $time_to - timeUnitToSeconds($column['aggregate_interval'])
-			: $time_to - $history_period;
+			? $column['time_period']['from_ts']
+			: time() - $history_period_s;
 
-		$function = $column['aggregate_function'] != AGGREGATE_NONE
-			? $column['aggregate_function']
-			: AGGREGATE_LAST;
-
-		$interval = $time_to;
-
-		self::addDataSource($items, $time_from, $time_now, $column['history']);
+		$items = self::addDataSource($items, $time_from, $column);
 
 		$result = [];
 
-		if ($column['aggregate_function'] == AGGREGATE_NONE) {
+		if ($column['aggregate_function'] != AGGREGATE_NONE) {
+			$values = Manager::History()->getAggregatedValues($items, $column['aggregate_function'], $time_from,
+				$column['time_period']['to_ts']
+			);
+
+			$result += array_column($values, 'value', 'itemid');
+		}
+		else {
 			$items_by_source = ['history' => [], 'trends' => []];
 
-			foreach ($items as $itemid => $item) {
+			foreach (self::addDataSource($items, $time_from, $column) as $itemid => $item) {
 				$items_by_source[$item['source']][$itemid] = $item;
 			}
 
-			if ($timeshift != 0) {
-				$values = [];
-
-				foreach ($items_by_source['history'] as $itemid => $item) {
-					$history = Manager::History()->getValueAt($item, $time_to, 0);
-
-					if (is_array($history)) {
-						$values[$itemid] = $history['value'];
-					}
-				}
-			}
-			else {
-				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period);
-				$values = array_column(array_column($values, 0), 'value', 'itemid');
+			if ($items_by_source['history']) {
+				$values = Manager::History()->getLastValues($items_by_source['history'], 1, $history_period_s);
+				$result += array_column(array_column($values, 0), 'value', 'itemid');
 			}
 
-			$result += $values;
-			$items = $items_by_source['trends'];
+			if ($items_by_source['trends']) {
+				$values = Manager::History()->getAggregatedValues($items_by_source['trends'], AGGREGATE_LAST,
+					$time_from
+				);
+
+				$result += array_column($values, 'value', 'itemid');
+			}
 		}
-
-		$values = Manager::History()->getAggregationByInterval($items, $time_from, $time_to, $function, $interval);
-		$values = array_column(array_column(array_column($values, 'data'), 0),
-			$function == AGGREGATE_COUNT ? 'count' : 'value', 'itemid'
-		);
-
-		$result += $values;
 
 		return $result;
 	}
 
-	private static function addDataSource(array &$items, int $time_from, int $time_now, int $data_source): void {
-		if ($data_source == CWidgetFieldColumnsList::HISTORY_DATA_HISTORY
-				|| $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS) {
+	private static function addDataSource(array $items, int $time, array $column): array {
+		if ($column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_AUTO) {
+			$items = CItemHelper::addDataSource($items, $time);
+		}
+		else {
 			foreach ($items as &$item) {
-				$item['source'] = $data_source == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
-					&& ($item['value_type'] == ITEM_VALUE_TYPE_FLOAT || $item['value_type'] == ITEM_VALUE_TYPE_UINT64)
-						? 'trends'
-						: 'history';
+				$item['source'] = $column['history'] == CWidgetFieldColumnsList::HISTORY_DATA_TRENDS
+					? 'trends'
+					: 'history';
 			}
 			unset($item);
-
-			return;
-		}
-
-		static $hk_history_global, $global_history_time, $hk_trends_global, $global_trends_time;
-
-		if ($hk_history_global === null) {
-			$hk_history_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL);
-
-			if ($hk_history_global) {
-				$global_history_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-			}
-		}
-
-		if ($hk_trends_global === null) {
-			$hk_trends_global = CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL);
-
-			if ($hk_history_global) {
-				$global_trends_time = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-			}
-		}
-
-		if ($hk_history_global) {
-			foreach ($items as &$item) {
-				$item['history'] = $global_history_time;
-			}
-			unset($item);
-		}
-
-		if ($hk_trends_global) {
-			foreach ($items as &$item) {
-				$item['trends'] = $global_trends_time;
-			}
-			unset($item);
-		}
-
-		if (!$hk_history_global || !$hk_trends_global) {
-			$items = CMacrosResolverHelper::resolveTimeUnitMacros($items,
-				array_merge($hk_history_global ? [] : ['history'], $hk_trends_global ? [] : ['trends'])
-			);
-
-			$processed_items = [];
-
-			foreach ($items as $itemid => $item) {
-				if (!$global_trends_time) {
-					$item['history'] = timeUnitToSeconds($item['history']);
-
-					if ($item['history'] === null) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'history',
-							_('invalid history storage period')
-						));
-
-						continue;
-					}
-				}
-
-				if (!$hk_trends_global) {
-					$item['trends'] = timeUnitToSeconds($item['trends']);
-
-					if ($item['trends'] === null) {
-						error(_s('Incorrect value for field "%1$s": %2$s.', 'trends',
-							_('invalid trend storage period')
-						));
-
-						continue;
-					}
-				}
-
-				$processed_items[$itemid] = $item;
-			}
-
-			$items = $processed_items;
 		}
 
 		foreach ($items as &$item) {
-			$item['source'] = $item['trends'] == 0 || $time_now - $item['history'] <= $time_from ? 'history' : 'trends';
+			if (!in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])) {
+				$item['source'] = 'history';
+			}
 		}
 		unset($item);
+
+		return $items;
 	}
 }

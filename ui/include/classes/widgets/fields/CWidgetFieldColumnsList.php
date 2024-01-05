@@ -21,6 +21,7 @@
 
 namespace Zabbix\Widgets\Fields;
 
+use CWidgetsData;
 use Zabbix\Widgets\CWidgetField;
 
 class CWidgetFieldColumnsList extends CWidgetField {
@@ -51,6 +52,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		'6AC8FF', 'EE2B29', '3CA20D', '6F4BBC', '00A1FF', 'F3601B', '1CAE59', '45CFDB', '894BBC', '6D6D6D'
 	];
 
+	private array $time_period_fields = [];
+
 	public function __construct(string $name, string $label = null) {
 		parent::__construct($name, $label);
 
@@ -63,14 +66,62 @@ class CWidgetFieldColumnsList extends CWidgetField {
 		return $this;
 	}
 
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		$this->time_period_fields = [];
+
+		$columns_values = $this->getValue();
+
+		foreach ($columns_values as $column_index => &$value) {
+			if ($value['data'] != self::DATA_ITEM_VALUE
+					|| $value['aggregate_function'] == AGGREGATE_NONE) {
+				continue;
+			}
+
+			$time_period_field = (new CWidgetFieldTimePeriod($this->name.'.'.$column_index.'.time_period'))
+				->setDefault([
+					CWidgetField::FOREIGN_REFERENCE_KEY => CWidgetField::createTypedReference(
+						CWidgetField::REFERENCE_DASHBOARD, CWidgetsData::DATA_TYPE_TIME_PERIOD
+					)
+				])
+				->setInType(CWidgetsData::DATA_TYPE_TIME_PERIOD)
+				->acceptDashboard()
+				->acceptWidget()
+				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+				->setFullName('/'.($column_index + 1));
+
+			if (array_key_exists('time_period', $value)) {
+				$time_period_field->setValue($value['time_period']);
+			}
+
+			$errors = $time_period_field->validate($strict);
+
+			if ($errors) {
+				return $errors;
+			}
+
+			$value['time_period'] = $time_period_field->getValue();
+
+			$this->time_period_fields[] = $time_period_field;
+		}
+		unset($value);
+
+		$this->setValue($columns_values);
+
+		return [];
+	}
+
 	public function toApi(array &$widget_fields = []): void {
 		$fields = [
 			'name' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'data' => ZBX_WIDGET_FIELD_TYPE_INT32,
 			'item' => ZBX_WIDGET_FIELD_TYPE_STR,
-			'timeshift' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'aggregate_function' => ZBX_WIDGET_FIELD_TYPE_INT32,
-			'aggregate_interval' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'min' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'max' => ZBX_WIDGET_FIELD_TYPE_STR,
 			'decimal_places' => ZBX_WIDGET_FIELD_TYPE_INT32,
@@ -106,6 +157,10 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				];
 			}
 		}
+
+		foreach ($this->time_period_fields as $time_period_field) {
+			$time_period_field->toApi($widget_fields);
+		}
 	}
 
 	protected function getValidationRules(bool $strict = false): array {
@@ -118,14 +173,8 @@ class CWidgetFieldColumnsList extends CWidgetField {
 											['else' => true,
 												'type' => API_STRING_UTF8]
 			]],
-			'timeshift'				=> ['type' => API_TIME_UNIT, 'in' => implode(':', [ZBX_MIN_TIMESHIFT, ZBX_MAX_TIMESHIFT])],
 			'aggregate_function'	=> ['type' => API_INT32, 'in' => implode(',', [AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST]), 'default' => AGGREGATE_NONE],
-			'aggregate_interval'	=> ['type' => API_MULTIPLE, 'rules' => [
-											['if' => ['field' => 'aggregate_function', 'in' => implode(',', [AGGREGATE_MIN, AGGREGATE_MAX, AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST, AGGREGATE_LAST])],
-												'type' => API_TIME_UNIT, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_TIME_UNIT_WITH_YEAR, 'in' => implode(':', [1, ZBX_MAX_TIMESHIFT])],
-											['else' => true,
-												'type' => API_STRING_UTF8]
-			]],
+			'time_period'			=> ['type' => API_ANY],
 			'display'				=> ['type' => API_MULTIPLE, 'rules' => [
 											['if' => ['field' => 'data', 'in' => self::DATA_ITEM_VALUE],
 												'type' => API_INT32, 'default' => self::DISPLAY_AS_IS, 'in' => implode(',', [self::DISPLAY_AS_IS, self::DISPLAY_BAR, self::DISPLAY_INDICATORS])],
