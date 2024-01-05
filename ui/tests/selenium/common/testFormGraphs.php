@@ -559,7 +559,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty Y MIN and MAX itmes',
+						'Name' => 'Empty Y MIN and MAX items',
 						'Width' => 200,
 						'Height' => 400,
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
