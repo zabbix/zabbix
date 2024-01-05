@@ -56,13 +56,13 @@ class CControllerQueueDetails extends CController {
 		}
 		else {
 			$queue_data = array_column($queue_data, null, 'itemid');
-			$items = API::Item()->get([
-				'output' => ['hostid', 'name'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['hostid', 'name_resolved'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($queue_data),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			if (count($queue_data) != count($items)) {
 				$items += API::DiscoveryRule()->get([

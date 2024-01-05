@@ -41,7 +41,7 @@ sub escape_xml_attribute($)
 
 	return $attribute;
 }
-
+my $valgrind = 0;
 sub launch($$$)
 {
 	my $test_suite = shift;
@@ -71,7 +71,17 @@ sub launch($$$)
 		{
 			my $current_dir = getcwd();
 			chdir $path;
-			eval {run3('./' . $filename, \$in, \$out, \$err)};
+			if ($valgrind)
+			{
+				print $test_case->{'name'} . "\n";
+				eval {run3('valgrind --track-origins=yes --leak-check=yes --read-var-info=yes --leak-resolution=high ./' . $filename, \$in, \$out, \$err)};
+				print $err;
+			}
+			else
+			{
+				eval {run3('./' . $filename, \$in, \$out, \$err)};
+			}
+
 			chdir $current_dir;
 		}
 		else
@@ -113,7 +123,8 @@ my $help = 0;
 GetOptions(
 	'help|?' => \$help,
 	'xml:s' => \$xml,
-	'suite=s' => \$target_suite
+	'suite=s' => \$target_suite,
+	'v' => \$valgrind
 ) or pod2usage(2);
 
 pod2usage(-verbose => 2, -noperldoc => 1) if ($help);

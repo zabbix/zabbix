@@ -39,6 +39,7 @@ typedef struct
 	int			processing;
 	int			config_timeout;
 	const char		*config_source_ip;
+	const char		*progname;
 	struct event_base	*base;
 	struct evdns_base	*dnsbase;
 }
@@ -97,6 +98,7 @@ static void	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 	poller_config->processing = 0;
 	poller_config->config_source_ip = dmanager->source_ip;
 	poller_config->config_timeout = dmanager->config_timeout;
+	poller_config->progname = dmanager->progname;
 	discovery_async_poller_dns_init(poller_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
@@ -195,7 +197,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 		item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 	}
 
-	zbx_set_snmp_bulkwalk_options();
+	zbx_set_snmp_bulkwalk_options(poller_config->progname);
 
 	if (SUCCEED != (ret = zbx_async_check_snmp(&item, &result, process_snmp_result, async_result, NULL,
 			poller_config->base, poller_config->dnsbase, poller_config->config_source_ip,

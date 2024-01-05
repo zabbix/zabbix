@@ -47,12 +47,12 @@
 #endif
 
 static ZBX_THREAD_LOCAL int	log_worker_id;
+static zbx_get_progname_f	zbx_get_progname_cb = NULL;
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
 
 ZBX_PTR_VECTOR_IMPL(discoverer_services_ptr, zbx_discoverer_dservice_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_results_ptr, zbx_discoverer_results_t*)
 ZBX_PTR_VECTOR_IMPL(discoverer_jobs_ptr, zbx_discoverer_job_t*)
-
-extern unsigned char			program_type;
 
 #define ZBX_DISCOVERER_STARTUP_TIMEOUT	30
 
@@ -703,7 +703,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_append(jobs, job);
 		rule_count++;
 next:
-		if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			discovery_clean_services(drule->druleid);
 
 		zbx_dc_drule_queue(now, drule->druleid, delay);
@@ -1305,7 +1305,7 @@ static void	discoverer_worker_stop(zbx_discoverer_worker_t *worker)
 static void	discoverer_libs_init(void)
 {
 #ifdef HAVE_NETSNMP
-	zbx_init_library_mt_snmp();
+	zbx_init_library_mt_snmp(zbx_get_progname_cb());
 #endif
 #ifdef HAVE_LIBCURL
 	curl_global_init(CURL_GLOBAL_DEFAULT);
@@ -1323,7 +1323,7 @@ static void	discoverer_libs_init(void)
 static void	discoverer_libs_destroy(void)
 {
 #ifdef HAVE_NETSNMP
-	zbx_shutdown_library_mt_snmp();
+	zbx_shutdown_library_mt_snmp(zbx_get_progname_cb());
 #endif
 #ifdef HAVE_LIBCURL
 	curl_global_cleanup();
@@ -1342,6 +1342,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
 	manager->config_timeout = args_in->config_timeout;
 	manager->source_ip = args_in->config_source_ip;
+	manager->progname = args_in->zbx_get_progname_cb_arg();
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
@@ -1364,7 +1365,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	zbx_vector_discoverer_jobs_ptr_create(&manager->job_refs);
 
 	manager->timekeeper = zbx_timekeeper_create(args_in->workers_num, NULL);
-
 	manager->workers_num = args_in->workers_num;
 	manager->workers = (zbx_discoverer_worker_t*)zbx_calloc(NULL, (size_t)args_in->workers_num,
 			sizeof(zbx_discoverer_worker_t));
@@ -1513,11 +1513,13 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
-
+	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
+	zbx_get_program_type_cb = discoverer_args_in->zbx_get_program_type_cb_arg;
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
 #endif
+	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -1683,7 +1685,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 					break;
 #ifdef HAVE_NETSNMP
 				case ZBX_RTC_SNMP_CACHE_RELOAD:
-					zbx_clear_cache_snmp(process_type, process_num);
+					zbx_clear_cache_snmp(process_type, process_num, zbx_get_progname_cb());
 					break;
 #endif
 				case ZBX_RTC_SHUTDOWN:

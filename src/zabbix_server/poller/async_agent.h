@@ -25,7 +25,8 @@
 
 typedef enum
 {
-	ZABBIX_AGENT_STEP_CONNECT_WAIT = 0,
+	ZABBIX_AGENT_STEP_CONNECT_INIT = 0,
+	ZABBIX_AGENT_STEP_CONNECT_WAIT,
 	ZABBIX_AGENT_STEP_TLS_WAIT,
 	ZABBIX_AGENT_STEP_SEND,
 	ZABBIX_AGENT_STEP_RECV
@@ -50,6 +51,7 @@ typedef struct
 	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
 	zbx_async_rdns_step_t		rdns_step;
 	char				*reverse_dns;
+	struct zbx_json			j;
 }
 zbx_agent_context;
 

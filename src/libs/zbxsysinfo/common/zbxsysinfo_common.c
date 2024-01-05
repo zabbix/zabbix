@@ -78,8 +78,9 @@ static zbx_metric_t	parameters_common[] =
 	{"vfs.dir.count",	CF_HAVEPARAMS,	vfs_dir_count,		VFS_TEST_DIR},
 	{"vfs.dir.get",		CF_HAVEPARAMS,	vfs_dir_get,		VFS_TEST_DIR},
 
-	{"net.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"},
-	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"},
+	{"net.dns",		CF_HAVEPARAMS,	net_dns,		NULL},
+	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		NULL},
+	{"net.dns.perf",	CF_HAVEPARAMS,	net_dns_perf,		NULL},
 	{"net.tcp.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.dns.query",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_HAVEPARAMS,	net_tcp_port,		",80"},

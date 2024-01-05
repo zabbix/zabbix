@@ -241,7 +241,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 3a0451e3edda4a73aded57aa254fd813
-              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALTH_SCORE}"'
               name: 'Sharepoint: Bad health score'
               priority: AVERAGE
               tags:
@@ -478,7 +478,7 @@ zabbix_export:
           description: 'Filter to exclude discovered types.'
         - macro: '{$SHAREPOINT.LLD_INTERVAL}'
           value: 3h
-        - macro: '{$SHAREPOINT.MAX_HEALT_SCORE}'
+        - macro: '{$SHAREPOINT.MAX_HEALTH_SCORE}'
           value: '5'
           description: |
             Must be in the range from 0 to 10

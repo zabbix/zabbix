@@ -44,6 +44,7 @@ $available_js = [
 	'class.widget.iterator.js' => '',
 	'class.widget.misconfigured.js' => '',
 	'class.widget.paste-placeholder.js' => '',
+	'class.widget-field.checkbox-list.js' => '',
 	'class.widget-field.multiselect.js' => '',
 	'class.widget-field.time-period.js' => '',
 	'class.widget-select.popup.js' => '',
@@ -101,6 +102,7 @@ $available_js = [
 	'class.overlaycollection.js' => '',
 	'class.overlay.js' => '',
 	'class.cverticalaccordion.js' => '',
+	'class.script.js' => '',
 	'class.scrollable.js' => '',
 	'class.sidebar.js' => '',
 	'class.sortable.js' => '',
@@ -391,7 +393,8 @@ $translate_strings = [
 		'Values' => _('Values'),
 		'View' => _('View'),
 		'Web' => _('Web'),
-		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader')
+		'S_SELECTED_SR' => _x('%1$s, selected', 'screen reader'),
+		'Unexpected server error.' => _('Unexpected server error.')
 	],
 	'init.js' => [
 		'Debug' => _('Debug'),
@@ -426,6 +429,16 @@ $translate_strings = [
 	'macrovalue.js' => [
 		'Set new value' => _('Set new value'),
 		'value' => _('value')
+	],
+	'class.script.js' => [
+		'Cancel' => _('Cancel'),
+		'Cannot open URL' => _('Cannot open URL'),
+		'Execute' => _('Execute'),
+		'Execution confirmation' => _('Execution confirmation'),
+		'Invalid URL: %1$s' => _('Invalid URL: %1$s'),
+		'Open URL' => _('Open URL'),
+		'Unexpected server error.' => _('Unexpected server error.'),
+		'URL opening confirmation' => _('URL opening confirmation')
 	]
 ];
 
@@ -451,6 +464,7 @@ if (empty($_GET['files'])) {
 		'class.menu-item.js',
 		'class.rpc.js',
 		'class.csuggest.js',
+		'class.script.js',
 		'class.scrollable.js',
 		'class.sidebar.js',
 		'class.template.js',

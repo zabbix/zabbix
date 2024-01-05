@@ -61,6 +61,7 @@ typedef struct
 
 	zbx_timekeeper_t			*timekeeper;
 	const char				*source_ip;
+	const char				*progname;
 	int					config_timeout;
 }
 zbx_discoverer_manager_t;

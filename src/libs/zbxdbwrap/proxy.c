@@ -1639,6 +1639,12 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;
 
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		*info = zbx_strdup(*info, "data collection has been paused");
+		return FAIL;
+	}
+
 	um_handle = zbx_dc_open_user_macros();
 
 	ret = process_client_history_data(sock, jp, ts, sender_item_validator, &rights, info);

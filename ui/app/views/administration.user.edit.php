@@ -312,7 +312,7 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
-		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6))
+		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
@@ -407,7 +407,9 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 						(new CButtonLink(_('Edit')))
 							->setAttribute('data-parameters', json_encode($parameters))
 							->setEnabled(!$data['readonly'])
-							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters));'),
+							->onClick('PopUp("popup.media", JSON.parse(this.dataset.parameters),
+								{dialogue_class: "modal-popup-generic"});'
+							),
 						(new CButtonLink(_('Remove')))
 							->setEnabled(!$data['readonly'])
 							->onClick('removeMedia('.$index.');')
@@ -422,7 +424,10 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 			$media_table_info,
 			(new CButtonLink(_('Add')))
 				->setEnabled(!$data['readonly'])
-				->onClick('PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
+				->onClick('PopUp("popup.media", '.
+					json_encode(['dstfrm' => $user_form->getName()]).
+					', {dialogue_class: "modal-popup-generic"});'
+				)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')

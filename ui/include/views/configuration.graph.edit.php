@@ -442,7 +442,8 @@ $items_table->addRow(
 						->setAttribute('data-parameters', json_encode($parameters_add))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend(JSON.parse(this.dataset.parameters), view.getOnlyHostParam())
+								jQuery.extend(JSON.parse(this.dataset.parameters), view.getOnlyHostParam()),
+								{dialogue_class: "modal-popup-generic", trigger_element: this}
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),
