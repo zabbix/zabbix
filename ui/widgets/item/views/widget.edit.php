@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,6 +63,28 @@ $form
 			)
 			->addFieldsGroup(
 				getThresholdFieldsGroupView($data['fields'])->addRowClass('js-row-thresholds')
+			)
+			->addField(
+				(new CWidgetFieldSelectView($data['fields']['aggregate_function']))
+					->setFieldHint(
+						makeWarningIcon(_('With this setting only numeric items will be displayed.'))
+							->addStyle('display: none')
+							->setId('item-aggregate-function-warning')
+					)
+			)
+			->addField(
+				(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
+					->setDateFormat(ZBX_FULL_DATE_TIME)
+					->setFromPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->setToPlaceholder(_('YYYY-MM-DD hh:mm:ss'))
+					->addRowClass('js-row-time-period')
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonListView($data['fields']['history']))->setFieldHint(
+					makeWarningIcon(
+						_('This setting applies only to numeric data. Non-numeric data will always be taken from history.')
+					)->setId('item-history-data-warning')
+				)
 			)
 	)
 	->addField($data['templateid'] === null
@@ -226,7 +248,7 @@ function getChangeIndicatorFieldsGroupView(array $fields): CWidgetFieldsGroupVie
 function getThresholdFieldsGroupView(array $fields): CWidgetFieldsGroupView {
 	return (new CWidgetFieldsGroupView(_('Thresholds')))
 		->setFieldHint(
-			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-value-thresholds-warning')
+			makeWarningIcon(_('This setting applies only to numeric data.'))->setId('item-thresholds-warning')
 		)
 		->addField(
 			(new CWidgetFieldThresholdsView($fields['thresholds']))->removeLabel()

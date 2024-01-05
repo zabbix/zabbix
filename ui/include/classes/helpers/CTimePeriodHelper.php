@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ class CTimePeriodHelper {
 		if ($max_period === null) {
 			$range_time_parser = new CRangeTimeParser();
 			$range_time_parser->parse('now-'.CSettingsHelper::get(CSettingsHelper::MAX_PERIOD));
-			$max_period = 1 + time() - $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
+			$max_period = time() - $range_time_parser->getDateTime(true, $timezone)->getTimestamp();
 		}
 
 		return $max_period;
@@ -110,7 +110,7 @@ class CTimePeriodHelper {
 		$max_period = self::getMaxPeriod();
 
 		if ($time_period['to_ts'] - $time_period['from_ts'] + 1 > $max_period) {
-			$time_period['from_ts'] = $time_period['to_ts'] - $max_period + 1;
+			$time_period['from_ts'] = $time_period['to_ts'] - $max_period;
 		}
 
 		$time_period['from'] = date(ZBX_FULL_DATE_TIME, $time_period['from_ts']);

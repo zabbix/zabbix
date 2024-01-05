@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,10 +35,11 @@ typedef struct
 	zbx_async_notify_cb_t		finished_cb;
 
 	void				*finished_data;
+	const char			*progname;
 }
 zbx_async_worker_t;
 
-int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, char **error);
+int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, const char *progname, char **error);
 void	async_worker_stop(zbx_async_worker_t *worker);
 void	async_worker_destroy(zbx_async_worker_t *worker);
 void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb, void *finished_data);
