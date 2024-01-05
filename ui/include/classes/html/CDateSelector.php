@@ -78,11 +78,11 @@ class CDateSelector extends CTag {
 	private $enabled = true;
 
 	/**
-	 * Maxlength attribute of the input field. Aligned with the date format by default.
+	 * Maxlength attribute of the input field.
 	 *
 	 * @var int
 	 */
-	private $maxlength;
+	private $maxlength = 255;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
