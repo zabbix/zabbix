@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -75,7 +75,9 @@ ZBX_THREAD_ENTRY(httppoller_thread, args)
 		if ((int)sec >= nextcheck)
 		{
 			httptests_count += process_httptests((int)sec, httppoller_args_in->config_source_ip,
-					&nextcheck);
+					httppoller_args_in->config_ssl_ca_location,
+					httppoller_args_in->config_ssl_cert_location,
+					httppoller_args_in->config_ssl_key_location, &nextcheck);
 			total_sec += zbx_time() - sec;
 
 			if (0 == nextcheck)

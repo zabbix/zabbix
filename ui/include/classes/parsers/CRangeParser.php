@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,25 +25,9 @@
 class CRangeParser extends CParser {
 
 	/**
-	 * User macro parser.
-	 *
-	 * @var CUserMacroParser
+	 * @var array
 	 */
-	private $user_macro_parser;
-
-	/**
-	 * LLD macro parser.
-	 *
-	 * @var CLLDMacroParser
-	 */
-	private $lld_macro_parser;
-
-	/**
-	 * LLD macro function parser.
-	 *
-	 * @var CLLDMacroFunctionParser
-	 */
-	private $lld_macro_function_parser;
+	private $macro_parsers = [];
 
 	/**
 	 * Number parser.
@@ -92,11 +76,10 @@ class CRangeParser extends CParser {
 		]);
 
 		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
+			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -182,26 +165,12 @@ class CRangeParser extends CParser {
 	 * @return bool
 	 */
 	private function parseConstant($source, &$pos) {
-		if ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->user_macro_parser->getLength();
-			$this->range[] = $this->user_macro_parser->getMatch();
-
-			return true;
-		}
-
-		if ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->lld_macro_parser->getLength();
-			$this->range[] = $this->lld_macro_parser->getMatch();
-
-			return true;
-		}
-
-		if ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->lld_macro_function_parser->getLength();
-			$this->range[] = $this->lld_macro_function_parser->getMatch();
-
-			return true;
+		foreach ($this->macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+				$pos += $macro_parser->getLength();
+				$this->range[] = $macro_parser->getMatch();
+				return true;
+			}
 		}
 
 		return $this->parseDigits($source, $pos);

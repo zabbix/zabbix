@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -470,11 +470,13 @@ err:
 
 int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str;
-	char		buf[MAX_BUFFER_LEN], *utf8, *tmp, *ptr = NULL;
-	int		nbytes, f = -1, ret = SYSINFO_RET_FAIL;
+	char		*filename, *regexp, encoding[32], *output, *start_line_str, *end_line_str, buf[MAX_BUFFER_LEN],
+			*utf8, *tmp, *ptr = NULL, *line;
+	int		f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts = zbx_time();
+	ssize_t		nbytes;
+	void		*saveptr = NULL;
 
 	if (6 < request->nparam)
 	{
@@ -540,7 +542,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		goto err;
 	}
 
-	while (0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
+	while (0 < (nbytes = zbx_buf_readln(f, buf, sizeof(buf), encoding, &line, &saveptr)))
 	{
 		char	*err_msg;
 
@@ -553,7 +555,7 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
+		if (NULL == (utf8 = zbx_convert_to_utf8(line, nbytes, encoding, &err_msg)))
 		{
 			SET_MSG_RESULT(result, err_msg);
 			goto err;
@@ -593,6 +595,8 @@ int	vfs_file_regexp(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(saveptr);
+
 	if (-1 != f)
 		close(f);
 
@@ -601,11 +605,13 @@ err:
 
 int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char		*filename, *regexp, *tmp, encoding[32];
-	char		buf[MAX_BUFFER_LEN], *utf8, *start_line_str, *end_line_str;
-	int		nbytes, res, f = -1, ret = SYSINFO_RET_FAIL;
+	char		*filename, *regexp, *tmp, encoding[32], *line, buf[MAX_BUFFER_LEN], *utf8, *start_line_str,
+			*end_line_str;
+	int		res, f = -1, ret = SYSINFO_RET_FAIL;
 	zbx_uint32_t	start_line, end_line, current_line = 0;
 	double		ts = zbx_time();
+	ssize_t		nbytes;
+	void		*saveptr = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -672,7 +678,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	res = 0;
 
-	while (0 == res && 0 < (nbytes = zbx_read_text_line_from_file(f, buf, sizeof(buf), encoding)))
+	while (0 == res && 0 < (nbytes = zbx_buf_readln(f, buf, sizeof(buf), encoding, &line, &saveptr)))
 	{
 		char	*err_msg;
 
@@ -685,7 +691,7 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (++current_line < start_line)
 			continue;
 
-		if (NULL == (utf8 = zbx_convert_to_utf8(buf, nbytes, encoding, &err_msg)))
+		if (NULL == (utf8 = zbx_convert_to_utf8(line, nbytes, encoding, &err_msg)))
 		{
 			SET_MSG_RESULT(result, err_msg);
 			goto err;
@@ -715,6 +721,8 @@ int	vfs_file_regmatch(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 	ret = SYSINFO_RET_OK;
 err:
+	zbx_free(saveptr);
+
 	if (-1 != f)
 		close(f);
 
@@ -921,9 +929,17 @@ err:
 
 static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 {
+	/* On HP-UX zbx_sha256_finish() requires buffer specified in 2nd argument to */
+	/* be uint32_t-aligned to avoid crash (ZBX-23471). */
+	typedef union	{
+		zbx_uint32_t	ui[ZBX_SHA256_DIGEST_SIZE / sizeof(zbx_uint32_t)];
+		char		ch[ZBX_SHA256_DIGEST_SIZE];
+	} aligned_buf_t;
+
 	int		i, f, ret = SYSINFO_RET_FAIL;
 	char		buf[16 * ZBX_KIBIBYTE];
-	char		hash_res[ZBX_SHA256_DIGEST_SIZE], hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
+	aligned_buf_t	hash_res;
+	char		hash_res_stringhexes[ZBX_SHA256_DIGEST_SIZE * 2 + 1];
 	double		ts;
 	ssize_t		nr;
 	sha256_ctx	ctx;
@@ -961,13 +977,13 @@ static int	vfs_file_cksum_sha256(char *filename, AGENT_RESULT *result)
 		goto err;
 	}
 
-	zbx_sha256_finish(&ctx, hash_res);
+	zbx_sha256_finish(&ctx, hash_res.ch);
 
 	for (i = 0 ; i < ZBX_SHA256_DIGEST_SIZE; i++)
 	{
 		char z[3];
 
-		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res[i]);
+		zbx_snprintf(z, 3, "%02x", (unsigned char)hash_res.ch[i]);
 		hash_res_stringhexes[i * 2] = z[0];
 		hash_res_stringhexes[i * 2 + 1] = z[1];
 	}

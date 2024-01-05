@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,12 @@ class CControllerScriptEdit extends CController {
 			'confirmation' => '',
 			'enable_confirmation' => false,
 			'hgstype' => 0,
-			'actions' => []
+			'actions' => [],
+			'manualinput' => ZBX_SCRIPT_MANUALINPUT_DISABLED,
+			'manualinput_prompt' => '',
+			'manualinput_validator_type' => ZBX_SCRIPT_MANUALINPUT_TYPE_STRING,
+			'manualinput_validator' => '',
+			'manualinput_default_value' => ''
 		];
 
 		// Get values from the database.
@@ -99,7 +104,9 @@ class CControllerScriptEdit extends CController {
 			$scripts = API::Script()->get([
 				'output' => ['scriptid', 'name', 'command', 'host_access', 'usrgrpid', 'groupid', 'description',
 					'confirmation', 'type', 'execute_on', 'timeout', 'scope', 'port', 'authtype', 'username',
-					'password', 'publickey', 'privatekey', 'menu_path', 'parameters', 'url', 'new_window'
+					'password', 'publickey', 'privatekey', 'menu_path', 'parameters', 'url', 'new_window',
+					'manualinput', 'manualinput_prompt', 'manualinput_validator', 'manualinput_validator_type',
+					'manualinput_default_value'
 				],
 				'scriptids' => $this->getInput('scriptid'),
 				'selectActions' => []
@@ -140,6 +147,11 @@ class CControllerScriptEdit extends CController {
 				$data['menu_path'] = $script['menu_path'];
 				$data['parameters'] = $script['parameters'];
 				$data['actions'] = $script['actions'];
+				$data['manualinput'] = $script['manualinput'];
+				$data['manualinput_prompt'] = $script['manualinput_prompt'];
+				$data['manualinput_validator'] = $script['manualinput_validator'];
+				$data['manualinput_validator_type'] = $script['manualinput_validator_type'];
+				$data['manualinput_default_value'] = $script['manualinput_default_value'];
 
 				if ($data['type'] == ZBX_SCRIPT_TYPE_WEBHOOK) {
 					CArrayHelper::sort($data['parameters'], ['name']);

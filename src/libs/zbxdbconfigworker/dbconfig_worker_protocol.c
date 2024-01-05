@@ -1,7 +1,6 @@
-<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,37 +17,28 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxdbconfigworker.h"
+#include "zbxserialize.h"
+#include "zbxalgo.h"
 
-/**
- * A parser for reference macros like \0-\9.
- */
-class CReplacementParser extends CParser {
+void	zbx_dbconfig_worker_serialize_ids(unsigned char **data, size_t *data_offset, const zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	data_len = 0, vector_uint64_len;
 
-	/**
-	 * @param string    $source
-	 * @param int       $pos
-	 *
-	 * @return int
-	 */
-	public function parse($source, $pos = 0) {
-		$this->length = 0;
-		$this->match = '';
+	zbx_serialize_prepare_vector_uint64_len(data_len, ids, vector_uint64_len);
 
-		$p = $pos;
+	*data = (unsigned char *)zbx_malloc(NULL, data_len);
 
-		if (!isset($source[$p]) || $source[$p] !== '\\') {
-			return CParser::PARSE_FAIL;
-		}
-		$p++;
+	*data_offset = data_len;
 
-		if (!isset($source[$p]) || !ctype_digit($source[$p])) {
-			return CParser::PARSE_FAIL;
-		}
-		$p++;
+	zbx_serialize_vector_uint64(*data, ids, vector_uint64_len);
+}
 
-		$this->length = $p - $pos;
-		$this->match = substr($source, $pos, $this->length);
+void	zbx_dbconfig_worker_deserialize_ids(const unsigned char *data, zbx_uint32_t size,
+		zbx_vector_uint64_t *ids)
+{
+	zbx_uint32_t	vector_uint64_len;
 
-		return (isset($source[$pos + $this->length]) ? self::PARSE_SUCCESS_CONT : self::PARSE_SUCCESS);
-	}
+	if (0 != size)
+		(void)zbx_deserialize_vector_uint64(data, ids, vector_uint64_len);
 }

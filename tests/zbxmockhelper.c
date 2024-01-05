@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,15 +23,16 @@
 #include "zbxmockutil.h"
 #include "zbxmockhelper.h"
 
-char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected)
+char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t *expected)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	fragment, fragments;
 	const char		*value;
 	size_t			length, offset = 0;
-	char			*buffer;
+	char			*buffer = NULL;
 
-	buffer = zbx_malloc(NULL, expected);
+	if (0 != *expected)
+		buffer = zbx_malloc(NULL, *expected);
 
 	fragments = zbx_mock_get_parameter_handle(path);
 
@@ -40,15 +41,19 @@ char	*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected)
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_binary(fragment, &value, &length)))
 			fail_msg("Cannot read data '%s'", zbx_mock_error_string(error));
 
-		if (offset + length > expected)
-			fail_msg("Incorrect message size");
+		if (0 != *expected && offset + length > *expected)
+			fail_msg("Incorrect message size, expected:%ld actual:%ld", *expected, offset + length);
+
+		buffer = zbx_realloc(buffer, offset + length);
 
 		memcpy(buffer + offset, value, length);
 		offset += length;
 	}
 
-	if (offset != expected)
-		fail_msg("Assembled message is smaller:" ZBX_FS_UI64 " than expected:" ZBX_FS_UI64, offset, expected);
+	if (0 != *expected && offset != *expected)
+		fail_msg("Assembled message is smaller:" ZBX_FS_UI64 " than expected:" ZBX_FS_UI64, offset, *expected);
+
+	*expected = offset;
 
 	return buffer;
 }

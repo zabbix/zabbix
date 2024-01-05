@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,9 +121,9 @@ $item_form_list
 				->setAttribute('type', 'text/x-jquery-tmpl')
 				->addItem(new CRow([
 					(new CCol((new CDiv)->addClass(ZBX_STYLE_DRAG_ICON)))->addClass(ZBX_STYLE_TD_DRAG_ICON),
-					(new CTextBox('headers[name][#{index}]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
+					(new CTextBox('headers[#{index}][name]', '#{name}'))->setWidth(ZBX_TEXTAREA_HTTP_PAIR_NAME_WIDTH),
 					RARR(),
-					(new CTextBox('headers[value][#{index}]', '#{value}', false, 2000))
+					(new CTextBox('headers[#{index}][value]', '#{value}', false, 2000))
 						->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH),
 					(new CButtonLink(_('Remove')))->setAttribute('data-row-action', 'remove_row')
 				])),

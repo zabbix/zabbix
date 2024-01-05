@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['ssh://username@hostname:/path ',							[],															true],
 			['/chart_bar.php?a=1&b=2',									[],															true],
 			['http://localhost:{$PORT}',								[],															true], // Macros allowed.
+			['http://localhost:{MANUALINPUT}',							['allow_manualinput_macro' => true],						true], // Manual input macro allowed.
 			['http://{$INVALID!MACRO}',									[],															true], // Macros allowed, but it's not a valid macro.
 			['/',														[],															true], // "/" is a valid path to home directory.
 			['/../',													[],															true],
@@ -97,6 +98,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['{$USER_URL_MACRO}?a=1',									[],															true],
 			['http://{$USER_URL_MACRO}?a=1',							[],															true],
 			['http://{$USER_URL_MACRO}',								[],															true],
+			['http://{{$M}.regsub("(.*)", \1)}',						[],															true],
 			['http://{{{$USER_URL_MACRO}',								[],															true],
 			['http://{$MACRO{$MACRO}}',									[],															true],
 			['{$MACRO{',												[],															true],
@@ -104,11 +106,12 @@ class CHtmlUrlValidatorTest extends TestCase {
 			["h\tt\rt\nps://zabbix.com",								[],															true], // CR, LF and TAB characters are ignored by browsers.
 			['ht tps://zabbix.com',										[],															true], // URL with spaces in schema is treated as a path.
 			// Inventory macros are going to be considered as "path".
-			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
-			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
-			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
-			['{INVENTORY.URL.A0}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
 			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_NONE],		true],
+			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
+			['{INVENTORY.URL.A}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
+			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
+			['{INVENTORY.URL.A1}',										['allow_inventory_macro' => INVENTORY_URL_MACRO_TRIGGER],	true],
+			['{{INVENTORY.URL.B}.regsub("(\d+)", \1)}',					['allow_inventory_macro' => INVENTORY_URL_MACRO_HOST],		true],
 			// Event tag macros are going to be considered as "path".
 			['text{EVENT.TAGS."JIRAID"}text',							[],															true],
 			['text{EVENT.TAGS."JIRAID"}text',							['allow_event_tags_macro' => true],							true],
@@ -135,7 +138,9 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['',														[],															false], // Cannot be empty.
 			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returns false.
 			['vbscript:msgbox(]',										[],															false], // Invalid scheme.
-			['notexist://localhost',									[],															false] // Invalid scheme.
+			['notexist://localhost',									[],															false], // Invalid scheme.
+			['http://localhost:{$PORT}',								['allow_user_macro' => false],								false], // User macro not allowed.
+			['http://localhost:{MANUALINPUT}',							[],															false] // Manual input macro not allowed.
 		];
 	}
 

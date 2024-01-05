@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -459,6 +459,14 @@ class CRelativeTimeParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("^([0-9]+)", "{$M}: \1")}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [],
+					'match' => '{{$M}.regsub("^([0-9]+)", "{$M}: \1")}'
+				]
+			],
+			[
 				'{$M: context}', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -467,11 +475,27 @@ class CRelativeTimeParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M: context}.regsub("^([0-9]+)", "{$M}: \1")}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [],
+					'match' => '{{$M: context}.regsub("^([0-9]+)", "{$M}: \1")}'
+				]
+			],
+			[
 				'{$M}TEXT', 0, ['usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS_CONT,
 					'tokens' => [],
 					'match' => '{$M}'
+				]
+			],
+			[
+				'{{$M}.regsub("^([0-9]+)", "{$M}: \1")}TEXT', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [],
+					'match' => '{{$M}.regsub("^([0-9]+)", "{$M}: \1")}'
 				]
 			],
 			[

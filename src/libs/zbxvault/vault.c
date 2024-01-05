@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,8 +27,9 @@
 #define ZBX_VAULT_TIMEOUT	SEC_PER_MIN
 
 typedef	int (*zbx_vault_kvs_get_cb_t)(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, const char *path, long timeout, zbx_kvs_t *kvs,
-		char **error);
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
+		long timeout, zbx_kvs_t *kvs, char **error);
 
 static zbx_vault_kvs_get_cb_t	zbx_vault_kvs_get_cb;
 static const char		*zbx_vault_dbuser_key, *zbx_vault_dbpassword_key;
@@ -87,14 +88,17 @@ int	zbx_vault_init(const zbx_config_vault_t *config_vault, char **error)
 }
 
 int	zbx_vault_kvs_get(const char *path, zbx_kvs_t *kvs, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip, char **error)
+		const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **error)
 {
 	return zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
-			config_vault->tls_key_file, config_source_ip, path, ZBX_VAULT_TIMEOUT, kvs, error);
+			config_vault->tls_key_file, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, path, ZBX_VAULT_TIMEOUT, kvs, error);
 }
 
 int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **dbuser, char **dbpassword,
-		const char *config_source_ip, char **error)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error)
 {
 	int		ret = FAIL;
 	zbx_kvs_t	kvs;
@@ -121,7 +125,8 @@ int	zbx_vault_db_credentials_get(const zbx_config_vault_t *config_vault, char **
 	zbx_kvs_create(&kvs, 2);
 
 	if (SUCCEED != zbx_vault_kvs_get_cb(config_vault->url, config_vault->token, config_vault->tls_cert_file,
-			config_vault->tls_key_file, config_source_ip, config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs,
+			config_vault->tls_key_file, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, config_vault->db_path, ZBX_VAULT_TIMEOUT, &kvs,
 			error))
 	{
 		goto fail;

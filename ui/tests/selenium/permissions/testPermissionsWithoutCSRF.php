@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -638,6 +638,14 @@ class testPermissionsWithoutCSRF extends CWebTest {
 				[
 					'db' => 'SELECT * FROM module',
 					'link' => 'zabbix.php?action=audit.settings.edit',
+					'return_button' => true
+				]
+			],
+			// #70 Timeout options update.
+			[
+				[
+					'db' => 'SELECT * FROM config',
+					'link' => 'zabbix.php?action=timeouts.edit',
 					'return_button' => true
 				]
 			]

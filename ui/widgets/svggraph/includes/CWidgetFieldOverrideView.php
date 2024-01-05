@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -334,6 +334,7 @@ class CWidgetFieldOverrideView extends CWidgetFieldView {
 						'srcfld1' => 'itemid',
 						'real_hosts' => 1,
 						'numeric' => 1,
+						'resolve_macros' => 1,
 						'dstfrm' => $this->form_name,
 						'dstfld1' => zbx_formatDomId($this->field->getName().'['.$row_num.'][items][]')
 					],

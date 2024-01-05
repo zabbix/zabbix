@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -258,7 +258,7 @@ void	zbx_handle_log(void)
 	UNLOCK_LOG;
 }
 
-int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error)
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *syslog_app_name, char **error)
 {
 	const char	*filename = log_file_cfg->log_file_name;
 	int		type = log_file_cfg->log_type;

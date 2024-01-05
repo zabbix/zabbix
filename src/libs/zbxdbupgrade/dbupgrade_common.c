@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,7 +83,7 @@ int	delete_problems_with_nonexistent_object(void)
 
 	return SUCCEED;
 }
-
+#ifndef HAVE_SQLITE3
 int	create_problem_3_index(void)
 {
 	if (FAIL == zbx_db_index_exists("problem", "problem_3"))
@@ -100,3 +100,4 @@ int	drop_c_problem_2_index(void)
 #endif
 	return SUCCEED;
 }
+#endif

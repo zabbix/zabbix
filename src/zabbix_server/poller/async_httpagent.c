@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,8 @@ void	zbx_async_check_httpagent_clean(zbx_httpagent_context *httpagent_context)
 }
 
 int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const char *config_source_ip,
-		CURLM *curl_handle)
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, CURLM *curl_handle)
 {
 	char			*error = NULL;
 	zbx_httpagent_context	*httpagent_context = zbx_malloc(NULL, sizeof(zbx_httpagent_context));
@@ -57,7 +58,8 @@ int	zbx_async_check_httpagent(zbx_dc_item_t *item, AGENT_RESULT *result, const c
 			item->retrieve_mode, item->http_proxy, item->follow_redirects, item->timeout, 1,
 			item->ssl_cert_file, item->ssl_key_file, item->ssl_key_password, item->verify_peer,
 			item->verify_host, item->authtype, item->username, item->password, NULL, item->post_type,
-			item->output_format, config_source_ip, &error))
+			item->output_format, config_source_ip, config_ssl_ca_location, config_ssl_cert_location,
+			config_ssl_key_location, &error))
 	{
 		SET_MSG_RESULT(result, error);
 

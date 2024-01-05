@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,8 +24,10 @@
 #include "zbxjson.h"
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-	const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type);
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks);
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type);
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		const char *progname, zbx_get_config_forks_f get_config_forks);
 
 #endif

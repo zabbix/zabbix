@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,8 @@
 
 #include "zbxsysinc.h"
 
+#include "zbxthreads.h"
+
 /* IPC start */
 #include "zbxtypes.h"
 #include "zbxmutexs.h"
@@ -36,9 +38,12 @@ int	zbx_coredump_disable(void);
 #	error "This module allowed only for Unix OS"
 #endif
 
+void	zbx_init_library_nix(zbx_get_progname_f get_progname_cb);
+
 typedef void	(*zbx_on_exit_t)(int);
 typedef void	(*zbx_signal_handler_f)(int flags);
 typedef void	(*zbx_signal_redirect_f)(int flags, zbx_signal_handler_f signal_handler_cb);
+typedef	ZBX_THREAD_HANDLE *(*zbx_get_threads_f)(void);
 
 void	zbx_set_exiting_with_fail(void);
 void	zbx_set_exiting_with_succeed(void);
@@ -50,7 +55,8 @@ typedef const char*	(*zbx_get_pid_file_pathname_f)(void);
 
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		zbx_get_pid_file_pathname_f get_pid_file_cb, zbx_on_exit_t zbx_on_exit_cb_arg, int config_log_type,
-		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb);
+		const char *config_log_file, zbx_signal_redirect_f signal_redirect_cb,
+		zbx_get_threads_f get_threads_cb,  zbx_get_config_int_f get_threads_num_cb);
 void	zbx_daemon_stop(void);
 
 int	zbx_sigusr_send(int flags, const char *pid_file_pathname);

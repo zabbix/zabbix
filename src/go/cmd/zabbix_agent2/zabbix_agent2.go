@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,6 +57,7 @@ const usageMessageFormat = //
   %[1]s [-c config-file]
   %[1]s [-c config-file] [-v] -p
   %[1]s [-c config-file] [-v] -t item-key
+  %[1]s [-c config-file] -T
   %[1]s [-c config-file] -R runtime-option
   %[1]s -h
   %[1]s -V
@@ -108,6 +109,7 @@ type Arguments struct {
 	configPath     string
 	foreground     bool
 	test           string
+	testConfig     bool
 	print          bool
 	verbose        bool
 	version        bool
@@ -160,9 +162,13 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		fatalExit("", errors.Join(err, eventLogErr(err)))
 	}
 
+	if args.testConfig {
+		fmt.Printf("Validating configuration file \"%s\"\n", args.configPath)
+	}
+
 	err = conf.Load(args.configPath, &agent.Options)
 	if err != nil {
-		if args.configPath != "" {
+		if args.configPath != "" || args.testConfig {
 			fatalExit("", errors.Join(err, eventLogErr(err)))
 		}
 
@@ -225,7 +231,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 	defer cleanUpExternal()
 
-	if args.test != "" || args.print {
+	if args.test != "" || args.print || args.testConfig {
 		m, err := prepareMetricPrintManager(args.verbose)
 		if err != nil {
 			fatalExit("failed to prepare metric print", err)
@@ -233,7 +239,7 @@ func main() { //nolint:funlen,gocognit,gocyclo
 
 		if args.test != "" {
 			checkMetric(m, args.test)
-		} else {
+		} else if args.print {
 			checkMetrics(m)
 		}
 
@@ -241,16 +247,11 @@ func main() { //nolint:funlen,gocognit,gocyclo
 		monitor.Wait(monitor.Scheduler)
 		cleanUpExternal()
 
-		return
-	}
+		if args.testConfig {
+			fmt.Print("Validation successful\n")
+		}
 
-	if args.verbose {
-		fatalExit(
-			"",
-			errors.New(
-				"verbose parameter can be specified only with test or print parameters",
-			),
-		)
+		return
 	}
 
 	var logType int
@@ -502,6 +503,15 @@ func parseArgs(fs *flag.FlagSet) (*Arguments, error) {
 			},
 			Default: "",
 			Dest:    &args.test,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test-config",
+				Shorthand:   "T",
+				Description: "Validate configuration file and exit",
+			},
+			Default: false,
+			Dest:    &args.testConfig,
 		},
 		&zbxflag.StringFlag{
 			Flag: zbxflag.Flag{

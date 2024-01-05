@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -185,8 +185,12 @@ class CControllerMenuPopup extends CController {
 			}
 
 			$all_scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
-				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				? API::Script()->getScriptsByHosts(['hostid' => $data['hostid']])
 				: [];
+
+			if ($all_scripts) {
+				$all_scripts = array_key_exists($data['hostid'], $all_scripts) ? $all_scripts[$data['hostid']] : [];
+			}
 
 			$scripts = [];
 			$urls = [];
@@ -260,7 +264,12 @@ class CControllerMenuPopup extends CController {
 					'name' => $script['name'],
 					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
+					'confirmation' => $script['confirmation'],
+					'manualinput' => $script['manualinput'],
+					'manualinput_prompt' => $script['manualinput_prompt'],
+					'manualinput_validator_type' => $script['manualinput_validator_type'],
+					'manualinput_validator' => $script['manualinput_validator'],
+					'manualinput_default_value' => $script['manualinput_default_value']
 				];
 			}
 
@@ -271,7 +280,13 @@ class CControllerMenuPopup extends CController {
 					'url' => $url['url'],
 					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
 					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''),
+					'manualinput' => $url['manualinput'],
+					'manualinput_prompt' => $url['manualinput_prompt'],
+					'manualinput_validator_type' => $url['manualinput_validator_type'],
+					'manualinput_validator' => $url['manualinput_validator'],
+					'manualinput_default_value' => $url['manualinput_default_value'],
+					'scriptid' => $url['scriptid']
 				];
 			}
 
@@ -310,7 +325,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'key_', 'name', 'flags', 'type', 'value_type', 'history', 'trends'],
+			'output' => ['hostid', 'key_', 'name_resolved', 'flags', 'type', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid'],
@@ -343,7 +358,7 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
-				'name' => $db_item['name'],
+				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
@@ -584,7 +599,7 @@ class CControllerMenuPopup extends CController {
 						$db_triggers = API::Trigger()->get([
 							'output' => ['triggerid', 'description'],
 							'selectHosts' => ['hostid', 'name', 'status'],
-							'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+							'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 							'triggerids' => array_column($selement['elements'], 'triggerid'),
 							'preservekeys' => true
 						]);
@@ -603,7 +618,7 @@ class CControllerMenuPopup extends CController {
 							}
 							unset($item);
 
-							CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+							CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 							$with_hostname = count($hosts) > 1;
 
@@ -614,8 +629,8 @@ class CControllerMenuPopup extends CController {
 
 								$items[] = [
 									'name' => $with_hostname
-										? $item['hostname'].NAME_DELIMITER.$item['name']
-										: $item['name'],
+										? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+										: $item['name_resolved'],
 									'params' => [
 										'itemid' => $item['itemid'],
 										'action' => in_array(
@@ -699,7 +714,7 @@ class CControllerMenuPopup extends CController {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+			'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 			'triggerids' => $data['triggerid'],
 			'preservekeys' => true
 		]);
@@ -735,7 +750,7 @@ class CControllerMenuPopup extends CController {
 			}
 			unset($item);
 
-			CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+			CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 			$with_hostname = count($hosts) > 1;
 			$items = [];
@@ -743,8 +758,8 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $item['hostname'].NAME_DELIMITER.$item['name']
-						: $item['name'],
+						? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+						: $item['name_resolved'],
 					'params' => [
 						'itemid' => $item['itemid'],
 						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
@@ -823,7 +838,7 @@ class CControllerMenuPopup extends CController {
 			$scripts_by_events = [];
 
 			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
-				$scripts_by_events = API::Script()->getScriptsByEvents([$event['eventid']]);
+				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
@@ -884,7 +899,12 @@ class CControllerMenuPopup extends CController {
 					'name' => $script['name'],
 					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
+					'confirmation' => $script['confirmation'],
+					'manualinput' => $script['manualinput'],
+					'manualinput_prompt' => $script['manualinput_prompt'],
+					'manualinput_validator_type' => $script['manualinput_validator_type'],
+					'manualinput_validator' => $script['manualinput_validator'],
+					'manualinput_default_value' => $script['manualinput_default_value']
 				];
 			}
 
@@ -893,7 +913,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
+				$menu_data_parameters = [
 					'label' => $url['name'],
 					'menu_path' => $url['menu_path'],
 					'url' => $url['url'],
@@ -901,6 +921,19 @@ class CControllerMenuPopup extends CController {
 					'confirmation' => $url['confirmation'],
 					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 				];
+
+				if (array_key_exists('scriptid', $url)) {
+					$menu_data_parameters += [
+						'manualinput' => $url['manualinput'],
+						'manualinput_prompt' => $url['manualinput_prompt'],
+						'manualinput_validator_type' => $url['manualinput_validator_type'],
+						'manualinput_validator' => $url['manualinput_validator'] ,
+						'manualinput_default_value' => $url['manualinput_default_value'],
+						'scriptid' => $url['scriptid']
+					];
+				}
+
+				$menu_data['urls'][] = $menu_data_parameters;
 			}
 
 			if (array_key_exists('urls', $menu_data)) {

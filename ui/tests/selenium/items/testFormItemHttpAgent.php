@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -438,7 +438,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -455,7 +455,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -471,7 +471,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -488,7 +488,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -505,24 +505,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
-					]
-				]
-			],
-			[
-				[
-					'fields' => [
-						'Name' => 'item without second header value',
-						'Key' => 'item-without-second-header-value',
-						'URL' => 'zabbix.com'
-					],
-					'headers' => [
-						['name' => 'user', 'value' => 'admin'],
-						['name' => 'password']
-					],
-					'error' => 'Cannot add item',
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -538,7 +521,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 					],
 					'error' => 'Cannot add item',
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -680,7 +663,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -691,18 +674,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/query_fields": nonempty key and value pair expected.'
-					]
-				]
-			],
-			// Check header fields.
-			[
-				[
-					'headers' => [
-						['name' => 'user update', 'value' => '', 'action' => 'update']
-					],
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/query_fields/2/name": cannot be empty.'
 					]
 				]
 			],
@@ -712,7 +684,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['name' => '', 'value' => 'admin update', 'action' => 'update']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/1/name": cannot be empty.'
 					]
 				]
 			],
@@ -723,18 +695,7 @@ class testFormItemHttpAgent extends CLegacyWebTest {
 						['value' => 'admin']
 					],
 					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
-					]
-				]
-			],
-			[
-				[
-					'headers' => [
-						['name' => 'user update', 'value' => 'admin update', 'action' => 'update'],
-						['name' => 'user']
-					],
-					'error_details' => [
-						'Invalid parameter "/1/headers": nonempty key and value pair expected.'
+						'Invalid parameter "/1/headers/2/name": cannot be empty.'
 					]
 				]
 			],

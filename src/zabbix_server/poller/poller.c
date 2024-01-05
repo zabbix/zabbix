@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 **/
 
 #include "poller.h"
+#include "zbxpoller.h"
+
 #include "zbxexpression.h"
 
 #include "checks_external.h"
@@ -46,7 +48,20 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxsysinfo.h"
-#include "zbxpoller.h"
+
+static zbx_get_progname_f	zbx_get_progname_cb = NULL;
+
+zbx_get_progname_f	poller_get_progname(void)
+{
+	return zbx_get_progname_cb;
+}
+
+static zbx_get_program_type_f	zbx_get_program_type_cb = NULL;
+
+zbx_get_program_type_f	poller_get_program_type(void)
+{
+	return zbx_get_program_type_cb;
+}
 
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 {
@@ -57,14 +72,14 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type)
 {
-	int	res = FAIL;
+	int	res = FAIL, version = item->interface.version;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key_orig);
 
 	switch (item->type)
 	{
 		case ITEM_TYPE_ZABBIX:
-			res = zbx_agent_get_value(item, config_comms->config_source_ip, program_type, result);
+			res = zbx_agent_get_value(item, config_comms->config_source_ip, program_type, result, &version);
 			break;
 		case ITEM_TYPE_SIMPLE:
 			/* simple checks use their own timeouts */
@@ -102,7 +117,9 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 #ifdef HAVE_LIBCURL
-			res = get_value_http(item, config_comms->config_source_ip, result);
+			res = get_value_http(item, config_comms->config_source_ip, config_comms->config_ssl_ca_location,
+					config_comms->config_ssl_cert_location, config_comms->config_ssl_key_location,
+					result);
 #else
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Support for HTTP agent checks was not compiled in."));
 			res = CONFIG_ERROR;
@@ -519,9 +536,11 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/* Actually this could be called by trapper, without poller being initialized, */
+/* so cannot call poller_get_progname(), need progname to be passed directly. */
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, unsigned char program_type)
+		int config_startup_time, unsigned char program_type, const char *progname)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -529,6 +548,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		int	i;
 
 		ZBX_UNUSED(poller_type);
+		ZBX_UNUSED(progname);
 
 		for (i = 0; i < num; i++)
 		{
@@ -540,7 +560,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip);
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip, progname);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -634,7 +654,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  **********************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
-		int config_unreachable_delay, unsigned char program_type)
+		int config_unreachable_delay, unsigned char program_type, const char *progname)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -660,7 +680,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
-			program_type);
+			program_type, progname);
 
 	zbx_timespec(&timespec);
 
@@ -675,7 +695,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				if (ZBX_INTERFACE_AVAILABLE_TRUE != last_available)
 				{
 					zbx_activate_item_interface(&timespec, &items[i].interface, items[i].itemid,
-							items[i].type, items[i].host.host, &data, &data_alloc,
+							items[i].type, items[i].host.host, 0, &data, &data_alloc,
 							&data_offset);
 					last_available = ZBX_INTERFACE_AVAILABLE_TRUE;
 				}
@@ -805,6 +825,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 
 	scriptitem_es_engine_init();
 
+	zbx_get_program_type_cb = poller_args_in->zbx_get_program_type_cb_arg;
+	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
 			poller_args_in->zbx_get_program_type_cb_arg);
@@ -842,7 +864,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
 					poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
 					poller_args_in->config_unreachable_period,
-					poller_args_in->config_unreachable_delay, info->program_type);
+					poller_args_in->config_unreachable_delay, info->program_type,
+					poller_args_in->zbx_get_progname_cb_arg());
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}
@@ -881,7 +904,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			if (ZBX_RTC_SNMP_CACHE_RELOAD == rtc_cmd)
 			{
 				if (ZBX_POLLER_TYPE_NORMAL == poller_type || ZBX_POLLER_TYPE_UNREACHABLE == poller_type)
-					zbx_clear_cache_snmp(process_type, process_num);
+					zbx_clear_cache_snmp(process_type, process_num, poller_get_progname()());
 			}
 #endif
 			if (ZBX_RTC_SHUTDOWN == rtc_cmd)

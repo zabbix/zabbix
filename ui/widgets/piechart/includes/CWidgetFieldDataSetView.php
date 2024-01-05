@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 		$itemids = array_merge(...array_column($values, 'itemids'));
 		$item_names = [];
 		if ($itemids) {
-			$item_names = CWidgetFieldDataSet::getItemNames($itemids);
+			$item_names = CWidgetFieldDataSet::getItemNames($itemids, !$this->field->isTemplateDashboard());
 		}
 
 		foreach ($values as $i => $value) {
@@ -178,6 +178,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							'srcfld1' => 'name',
 							'real_hosts' => 1,
 							'numeric' => 1,
+							'resolve_macros' => 1,
 							'dstfrm' => $this->form_name,
 							'dstfld1' => zbx_formatDomId($field_name.'['.$row_num.'][items][]')
 						],

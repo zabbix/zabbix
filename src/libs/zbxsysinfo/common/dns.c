@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@
 **/
 
 #include "dns.h"
-#include "zbxsysinfo.h"
+#include "ip_reverse.h"
 #include "../sysinfo.h"
+
+#include "zbxsysinfo.h"
 
 #include "zbxtime.h"
 #include "zbxstr.h"
@@ -97,8 +99,38 @@ static char	*get_name(unsigned char *msg, unsigned char *msg_end, unsigned char 
 }
 #endif	/* !defined(_WINDOWS) && !defined(__MINGW32__)*/
 
-/* Replace zbx_inet_ntop with inet_ntop in case of drop Windows XP/W2k3 support */
+/* Replace zbx_inet_ntop/zbx_inet_pton with inet_ntop/inet_pton in case of drop Windows XP/W2k3 support */
 #if defined(_WINDOWS) || defined(__MINGW32__)
+int	zbx_inet_pton(int af, const char *src, void *dst)
+{
+	struct sockaddr_storage	ss;
+	int			size = sizeof(ss);
+	char			src_copy[INET6_ADDRSTRLEN + 1];
+
+	memset(&ss, '\0', sizeof(ss));
+	ss.ss_family = af;
+	zbx_strlcpy(src_copy, src, INET6_ADDRSTRLEN+1);
+	src_copy[INET6_ADDRSTRLEN] = 0;
+
+	if (0 == WSAStringToAddressA(src_copy, af, NULL, (struct sockaddr *)&ss, &size))
+	{
+		switch(af)
+		{
+			case AF_INET:
+				*((struct in_addr *)dst) = ((struct sockaddr_in *)&ss)->sin_addr;
+				return SUCCEED;
+			case AF_INET6:
+				*((struct in6_addr *)dst) = ((struct sockaddr_in6 *)&ss)->sin6_addr;
+				return SUCCEED;
+			default:
+				return FAIL;
+		}
+		return SUCCEED;
+	}
+
+	return FAIL;
+}
+
 const char *zbx_inet_ntop(int af, const void *src, char *dst, size_t size)
 {
 	struct sockaddr_storage ss;
@@ -254,9 +286,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		freeaddrinfo(hres);
 #endif
 	if (NULL == zone_str || '\0' == *zone_str)
-		zbx_strscpy(zone, "zabbix.com");
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Second parameter cannot be empty."));
+		return SYSINFO_RET_FAIL;
+	}
 	else
+	{
 		zbx_strscpy(zone, zone_str);
+	}
 
 	param = get_rparam(request, 2);
 
@@ -310,6 +347,20 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid sixth parameter."));
 		return SYSINFO_RET_FAIL;
+	}
+
+	if (T_PTR == type)
+	{
+		char	*reversed_zone = NULL, *error = NULL;
+
+		if (FAIL == zbx_ip_reverse(zone, &reversed_zone, &error))
+		{
+			SET_MSG_RESULT(result, error);
+
+			return SYSINFO_RET_FAIL;
+		}
+		zbx_strscpy(zone, reversed_zone);
+		zbx_free(reversed_zone);
 	}
 
 #if defined(_WINDOWS) || defined(__MINGW32__)

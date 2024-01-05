@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,7 +38,8 @@ $fields = [
 	'height' =>			[T_ZBX_INT,			O_OPT, P_NZERO,	'{} > 0',	null],
 	'graph3d' =>		[T_ZBX_INT,			O_OPT, P_NZERO,	IN('0,1'),	null],
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
-	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null],
+	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),	null]
 ];
 if (!check_fields($fields)) {
 	session_write_close();
@@ -107,10 +108,12 @@ $db_items = API::Item()->get([
 	'preservekeys' => true
 ]);
 
+$resolve_macros = (bool) getRequest('resolve_macros', 0);
+
 // get graph items
 foreach ($dbGraph['gitems'] as $gItem) {
 	if ($db_items[$gItem['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($gItem['itemid'], $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
+		$graph->addItem($gItem['itemid'], $resolve_macros, $gItem['calc_fnc'], $gItem['color'], $gItem['type']);
 	}
 }
 

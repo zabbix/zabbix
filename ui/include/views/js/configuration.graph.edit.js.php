@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -354,6 +354,7 @@
 					src.setArgument('height', $('#height').val());
 					src.setArgument('graphtype', $('#graphtype').val());
 					src.setArgument('legend', $('#show_legend').is(':checked') ? 1 : 0);
+					src.setArgument('resolve_macros', this.context === 'template' ? 0 : 1);
 
 					if (this.graphs.graphtype == <?= GRAPH_TYPE_PIE ?>
 							|| this.graphs.graphtype == <?= GRAPH_TYPE_EXPLODED ?>) {

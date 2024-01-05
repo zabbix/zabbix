@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,14 +23,22 @@ import (
 	"errors"
 	"fmt"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
+
+var impl Plugin
 
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 }
@@ -51,8 +59,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Users", "system.users.num", "Returns number of useres logged in.")
 }

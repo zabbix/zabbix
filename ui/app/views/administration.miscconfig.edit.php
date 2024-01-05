@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ $from_list = (new CFormList())
 	)
 	->addRow((new CTag('h4', true, _('Authorization')))->addClass('input-section-header'))
 	->addRow((new CLabel(_('Login attempts'), 'login_attempts'))->setAsteriskMark(),
-		(new CNumericBox('login_attempts', $data['login_attempts'], 2))
+		(new CNumericBox('login_attempts', $data['login_attempts'], 2, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
@@ -104,42 +104,74 @@ $from_list = (new CFormList())
 			->setModern(true)
 	)
 	->addRow((new CTag('h4', true, _('Security')))->addClass('input-section-header'))
-	->addRow(_('Validate URI schemes'),
-		(new CCheckBox('validate_uri_schemes'))
-			->setUncheckedValue('0')
-			->setChecked($data['validate_uri_schemes'] == 1)
+	->addRow(
+		new CLabel(_('Validate URI schemes'), 'validate_uri_schemes'),
+		[
+			(new CCheckBox('validate_uri_schemes'))
+				->setUncheckedValue('0')
+				->setChecked($data['validate_uri_schemes'] == 1),
+			(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes'], false,
+				DB::getFieldLength('config', 'uri_valid_schemes')
+			))
+				->setAttribute('placeholder', _('Valid URI schemes'))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setEnabled($data['validate_uri_schemes'] == 1)
+				->setAriaRequired()
+		]
 	)
-	->addRow((new CLabel(_('Valid URI schemes'), 'uri_valid_schemes')),
-		(new CTextBox('uri_valid_schemes', $data['uri_valid_schemes'], false,
-			DB::getFieldLength('config', 'uri_valid_schemes')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setEnabled($data['validate_uri_schemes'] == 1)
-			->setAriaRequired()
+	->addRow(
+		(new CLabel([_('Use X-Frame-Options HTTP header'),
+			makeHelpIcon([
+				_('X-Frame-Options HTTP header supported values:'),
+				(new CList([
+					_s('%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself',
+						'SAMEORIGIN', "'self'"
+					),
+					_s('%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so',
+						'DENY', "'none'"
+					),
+					_s('a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself',
+						"'self'"
+					)
+				]))->addClass(ZBX_STYLE_LIST_DASHED),
+				BR(),
+				_s('Note that %1$s or %2$s will be regarded as hostnames if used without single quotes.', "'self'",
+					"'none'"
+				)
+			])
+		], 'x_frame_header_enabled'))->setAsteriskMark(),
+		[
+			(new CCheckBox('x_frame_header_enabled'))
+				->setUncheckedValue('0')
+				->setChecked($data['x_frame_header_enabled'] == 1),
+			(new CTextBox('x_frame_options', $data['x_frame_options'], false,
+				DB::getFieldLength('config', 'x_frame_options')
+			))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('placeholder', _('X-Frame-Options HTTP header'))
+				->setAriaRequired()
+				->setEnabled($data['x_frame_header_enabled'] == 1)
+		]
 	)
-	->addRow((new CLabel(_('X-Frame-Options HTTP header'), 'x_frame_options'))->setAsteriskMark(),
-		(new CTextBox('x_frame_options', $data['x_frame_options'], false,
-			DB::getFieldLength('config', 'x_frame_options')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setAriaRequired()
-	)
-	->addRow(_('Use iframe sandboxing'),
-		(new CCheckBox('iframe_sandboxing_enabled'))
-			->setUncheckedValue('0')
-			->setChecked($data['iframe_sandboxing_enabled'] == 1)
-	)
-	->addRow((new CLabel(_('Iframe sandboxing exceptions'), 'iframe_sandboxing_exceptions')),
-		(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
-			DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
-		))
-			->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
-			->setEnabled($data['iframe_sandboxing_enabled'] == 1)
-			->setAriaRequired()
+	->addRow(
+		new CLabel(_('Use iframe sandboxing'), 'iframe_sandboxing_enabled'),
+		[
+			(new CCheckBox('iframe_sandboxing_enabled'))
+				->setUncheckedValue('0')
+				->setChecked($data['iframe_sandboxing_enabled'] == 1),
+			(new CTextBox('iframe_sandboxing_exceptions', $data['iframe_sandboxing_exceptions'], false,
+				DB::getFieldLength('config', 'iframe_sandboxing_exceptions')
+			))
+				->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+				->setAttribute('placeholder', _('Iframe sandboxing exceptions'))
+				->setEnabled($data['iframe_sandboxing_enabled'] == 1)
+				->setAriaRequired()
+		]
 	);
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('miscconfig')))->removeId())
+	->setId('miscconfig-form')
 	->setName('otherForm')
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'miscconfig.update')

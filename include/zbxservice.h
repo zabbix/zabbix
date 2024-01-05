@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,14 +26,16 @@
 
 ZBX_PTR_VECTOR_DECL(service, zbx_db_service *)
 
-#define ZBX_IPC_SERVICE_SERVICE			"service"
-#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS	1
-#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS	2
-#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE	3
-#define ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE	4
-#define ZBX_IPC_SERVICE_SERVICE_PARENT_LIST	5
-#define ZBX_IPC_SERVICE_EVENT_SEVERITIES	6
-#define ZBX_IPC_SERVICE_RELOAD_CACHE		7
+#define ZBX_IPC_SERVICE_SERVICE				"service"
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS		1
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_TAGS		2
+#define ZBX_IPC_SERVICE_SERVICE_PROBLEMS_DELETE		3
+#define ZBX_IPC_SERVICE_SERVICE_ROOTCAUSE		4
+#define ZBX_IPC_SERVICE_SERVICE_PARENT_LIST		5
+#define ZBX_IPC_SERVICE_EVENT_SEVERITIES		6
+#define ZBX_IPC_SERVICE_RELOAD_CACHE			7
+#define ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS		8
+#define ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS	9
 
 void	zbx_service_flush(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size);
 void	zbx_service_send(zbx_uint32_t code, unsigned char *data, zbx_uint32_t size, zbx_ipc_message_t *response);
@@ -49,7 +51,7 @@ zbx_event_severity_t;
 void	zbx_event_severity_free(zbx_event_severity_t *event_severity);
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags);
+		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags, int suppressed);
 void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
 void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t eventid, const zbx_vector_tags_t *tags);

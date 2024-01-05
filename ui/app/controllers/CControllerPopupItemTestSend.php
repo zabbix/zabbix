@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,24 +327,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				'item_type' => 'type'
 			]);
 
-			if (array_key_exists('headers', $item_test_data)) {
-				$item_test_data['headers'] = $this->transformHeaderFields($item_test_data['headers']);
-			}
-
-			if (array_key_exists('query_fields', $item_test_data)) {
-				$item_test_data['query_fields'] = $this->transformQueryFields($item_test_data['query_fields']);
-			}
-
-			if (array_key_exists('parameters', $item_test_data)) {
-				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
-			}
-
 			if ($item_test_data['type'] == ITEM_TYPE_CALCULATED) {
 				$item_test_data['host']['hostid'] = $this->getInput('hostid');
 			}
 
 			// Only non-empty fields need to be sent to server.
 			$item_test_data = $this->unsetEmptyValues($item_test_data);
+
+			self::transformFields($item_test_data);
 
 			/*
 			 * Server will turn off status code check if field value is empty. If field is not present, then server will

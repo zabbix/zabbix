@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -629,14 +629,16 @@ class testAgentItems extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 0
+			'result' => 0,
+			'timeout' => '5s'
 		],
 		[
 			'key' => 'net.tcp.port[123.123.123.123,111]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'component' => self::COMPONENT_AGENT2,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'result' => 0
+			'result' => 0,
+			'timeout' => '5s'
 		],
 		[
 			'key' => 'net.tcp.port[,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
@@ -712,6 +714,11 @@ class testAgentItems extends CIntegrationTest {
 				'value_type' => $item['valueType'],
 				'delay' => '1s'
 			];
+
+			if (array_key_exists('timeout', $item))
+			{
+				$data['timeout'] = $item['timeout'];
+			}
 
 			$items[] = array_merge($data, [
 				'hostid' => self::$hostids[$item['component']],

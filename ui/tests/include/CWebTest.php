@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,12 @@ require_once __DIR__.'/helpers/CXPathHelper.php';
 require_once __DIR__.'/helpers/CImageHelper.php';
 require_once __DIR__.'/../../include/classes/helpers/CMessageHelper.php';
 require_once __DIR__.'/../../include/classes/routing/CUrl.php';
+
+require_once __DIR__.'/../selenium/behaviors/CMessageBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CMacrosBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CPreprocessingBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CTableBehavior.php';
+require_once __DIR__.'/../selenium/behaviors/CTagBehavior.php';
 
 define('TEST_GOOD', 0);
 define('TEST_BAD', 1);

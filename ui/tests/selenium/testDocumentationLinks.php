@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Proxies
+ * @dataSource Proxies, Actions
  *
  * @backup profiles, module, services, token, connector
  *
@@ -2596,6 +2596,13 @@ class testDocumentationLinks extends CWebTest {
 						]
 					],
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
+				]
+			],
+			// #237 Administration -> General -> Timeouts.
+			[
+				[
+					'url' => 'zabbix.php?action=timeouts.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
 				]
 			]
 		];

@@ -1,8 +1,7 @@
 <?php
-
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,24 +21,29 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
+ * Test for checking Item Value Widget.
+ *
  * @backup dashboard
  *
  * @onBefore prepareDashboardData
  *
- * @dataSource WebScenarios
+ * @dataSource WebScenarios, AllItemValueTypes
  */
-class testDashboardItemValueWidget extends CWebTest {
+class testDashboardItemValueWidget extends testWidgets {
 
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
 		return [
-			'class' => CMessageBehavior::class
+			CMessageBehavior::class,
+			CTableBehavior::class
 		];
 	}
 
@@ -208,7 +212,10 @@ class testDashboardItemValueWidget extends CWebTest {
 		self::$dashboardid = $response['dashboardids'][0];
 	}
 
-	public function testDashboardItemValueWidget_Layout() {
+	/**
+	 * Test of the Item Value widget form fields layout.
+	 */
+	public function testDashboardItemValueWidget_FormLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->waitUntilReady()->one();
 		$form = $dashboard->edit()->addWidget()->waitUntilReady()->asForm();
@@ -372,26 +379,26 @@ class testDashboardItemValueWidget extends CWebTest {
 
 		// Check Override host field.
 		$override = $form->getField('Override host');
-		$popup_menu_selector = 'xpath:.//button[contains(@class, "zi-chevron-down")]';
+		$popup_menu = $override->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
 
-		foreach (['button:Select', $popup_menu_selector] as $button) {
-			$this->assertTrue($override->query($button)->one()->isClickable());
+		foreach ([$override->query('button:Select')->one(), $popup_menu] as $button) {
+			$this->assertTrue($button->isClickable());
 		}
 
-		$menu = $override->query($popup_menu_selector)->asPopupButton()->one()->getMenu();
+		$menu = $popup_menu->asPopupButton()->getMenu();
 		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
-
-		$override->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Dashboard');
+		$menu->select('Dashboard');
 		$form->checkValue(['Override host' => 'Dashboard']);
 		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
-			->one()->isVisible()
+				->one()->isVisible()
 		);
 
 		$override->query('button:Select')->waitUntilCLickable()->one()->click();
 		$dialogs = COverlayDialogElement::find()->all();
 		$this->assertEquals('Widget', $dialogs->last()->getTitle());
 
-		for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
+		$dialog_count = $dialogs->count();
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
 			$dialogs->get($i)->close(true);
 		}
 	}
@@ -1415,5 +1422,13 @@ class testDashboardItemValueWidget extends CWebTest {
 			);
 			$index++;
 		}
+	}
+
+	/**
+	 * Test function for assuring that binary items are not available in Item Value widget.
+	 */
+	public function testDashboardItemValueWidget_CheckAvailableItems() {
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
+		$this->checkAvailableItems($url, 'Item value');
 	}
 }

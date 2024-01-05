@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -873,24 +873,6 @@ class CConfigurationImport {
 					unset($item[$master_item_key]);
 				}
 
-				if ($item['type'] == ITEM_TYPE_HTTPAGENT) {
-					$headers = [];
-
-					foreach ($item['headers'] as $header) {
-						$headers[$header['name']] = $header['value'];
-					}
-
-					$item['headers'] = $headers;
-
-					$query_fields = [];
-
-					foreach ($item['query_fields'] as $query_field) {
-						$query_fields[] = [$query_field['name'] => $query_field['value']];
-					}
-
-					$item['query_fields'] = $query_fields;
-				}
-
 				foreach ($item['preprocessing'] as &$preprocessing_step) {
 					$preprocessing_step['params'] = implode("\n", $preprocessing_step['parameters']);
 
@@ -1137,24 +1119,6 @@ class CConfigurationImport {
 				}
 				unset($discovery_rule['interface_ref']);
 
-				if ($discovery_rule['type'] == ITEM_TYPE_HTTPAGENT) {
-					$headers = [];
-
-					foreach ($discovery_rule['headers'] as $header) {
-						$headers[$header['name']] = $header['value'];
-					}
-
-					$discovery_rule['headers'] = $headers;
-
-					$query_fields = [];
-
-					foreach ($discovery_rule['query_fields'] as $query_field) {
-						$query_fields[] = [$query_field['name'] => $query_field['value']];
-					}
-
-					$discovery_rule['query_fields'] = $query_fields;
-				}
-
 				if ($discovery_rule['type'] == ITEM_TYPE_DEPENDENT) {
 					if (!array_key_exists('key', $discovery_rule[$master_item_key])) {
 						throw new Exception( _s('Incorrect value for field "%1$s": %2$s.', 'master_itemid',
@@ -1367,24 +1331,6 @@ class CConfigurationImport {
 					}
 					else {
 						unset($item_prototype[$master_item_key]);
-					}
-
-					if ($item_prototype['type'] == ITEM_TYPE_HTTPAGENT) {
-						$headers = [];
-
-						foreach ($item_prototype['headers'] as $header) {
-							$headers[$header['name']] = $header['value'];
-						}
-
-						$item_prototype['headers'] = $headers;
-
-						$query_fields = [];
-
-						foreach ($item_prototype['query_fields'] as $query_field) {
-							$query_fields[] = [$query_field['name'] => $query_field['value']];
-						}
-
-						$item_prototype['query_fields'] = $query_fields;
 					}
 
 					$item_prototypeid = null;

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -115,25 +115,19 @@ class testTriggerDependencies extends CWebTest {
 		// Check that dependent triggers displayed on triggers list page.
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// TODO: uncomment after ZBX-23623 fix. Maybe better solution can be found after bugfix.
-//		$linked_triggers = [
-//			'Trigger that linked' => 'Template that linked to host: ',
-//			'trigger prototype linked update{#KEY}' => 'Template that linked to host: ',
-//			'trigger template linked update' => 'Template that linked to template: ',
-//			'trigger prototype template update{#KEY}' => 'Template that linked to template: '
-//		];
-//
-//		$linked = array_key_exists($trigger_name, $linked_triggers) ? $linked_triggers[$trigger_name] : null;
-//
-//		$this->assertTableHasDataColumn([$linked.$trigger_name."\n".
-//			'Depends on:'."\n".
-//			implode("\n", $data['result'])
-//		]);
+		$linked_triggers = [
+			'Trigger that linked' => 'Template that linked to host: ',
+			'trigger prototype linked update{#KEY}' => 'Template that linked to host: ',
+			'trigger template linked update' => 'Template that linked to template: ',
+			'trigger prototype template update{#KEY}' => 'Template that linked to template: '
+		];
 
-		// TODO: remove this foreach after ZBX-23623 fix.
-		foreach ($data['result'] as $result) {
-			$table->findRow('Name', $trigger_name, true)->getColumn('Name')->query('link', $result)->exists();
-		}
+		$linked = array_key_exists($trigger_name, $linked_triggers) ? $linked_triggers[$trigger_name] : null;
+
+		$this->assertTableHasDataColumn([$linked.$trigger_name."\n".
+			'Depends on:'."\n".
+			implode("\n", $data['result'])
+		]);
 
 		// Open just created/updated trigger and navigate to dependencies tab.
 		$table->query('link', $trigger_name)->one()->click();

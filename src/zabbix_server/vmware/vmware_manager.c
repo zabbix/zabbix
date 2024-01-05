@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -258,6 +258,8 @@ ZBX_THREAD_ENTRY(vmware_thread, args)
 	}
 
 	zbx_setproctitle("%s #%d [terminated]", get_process_type_string(process_type), process_num);
+	xmlCleanupParser();
+	curl_global_cleanup();
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -280,11 +280,17 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
+				foreach ($inputs[$field] as $num => $row) {
+					if ($row['name'] === '') {
+						unset($inputs[$field][$num]);
+					}
+				}
+
 				$texts_having_macros = array_merge(
 					array_column($inputs[$field], 'name'),
 					array_column($inputs[$field], 'value')
 				);
-				$texts_having_macros = array_filter($texts_having_macros, function($str) {
+				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
 					return (strstr($str, '{') !== false);
 				});
 

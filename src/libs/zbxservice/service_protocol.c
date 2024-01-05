@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 #include "zbxdbhigh.h"
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags)
+		int clock, int ns, int value, int severity, const zbx_vector_tags_t *tags, int suppressed)
 {
 	zbx_uint32_t	data_len = 0, *len = NULL;
 	int		i;
@@ -36,6 +36,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 	zbx_serialize_prepare_value(data_len, value);
 	zbx_serialize_prepare_value(data_len, severity);
 	zbx_serialize_prepare_value(data_len, tags->values_num);
+	zbx_serialize_prepare_value(data_len, suppressed);
 
 	if (0 != tags->values_num)
 	{
@@ -78,6 +79,8 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 		ptr += zbx_serialize_str(ptr, tag->value, len[i * 2 + 1]);
 	}
 
+	(void)zbx_serialize_value(ptr, suppressed);
+
 	zbx_free(len);
 }
 
@@ -117,6 +120,9 @@ void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_v
 				zbx_vector_ptr_append(&event->tags, tag);
 			}
 		}
+
+		data += zbx_deserialize_value(data, &event->suppressed);
+		event->mtime = 0;
 	}
 }
 

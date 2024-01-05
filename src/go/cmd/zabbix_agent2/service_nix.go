@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,11 @@
 
 package main
 
-import "git.zabbix.com/ap/plugin-support/zbxflag"
+import (
+	"errors"
+
+	"git.zabbix.com/ap/plugin-support/zbxflag"
+)
 
 const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`
 
@@ -40,7 +44,32 @@ func eventLogErr(err error) error { return nil }
 
 func confirmService() {}
 
-func validateExclusiveFlags(args *Arguments) error { return nil }
+func validateExclusiveFlags(args *Arguments) error {
+	var (
+		exclusiveFlagsSet = []bool{
+			args.print,
+			args.test != "",
+			args.runtimeCommand != "",
+			args.testConfig,
+		}
+		count int
+	)
+
+	if args.verbose && !(args.test != "" || args.print) {
+		return errors.New("option -v, --verbose can only be specified with -t or -p")
+	}
+
+	for _, exclusiveFlagSet := range exclusiveFlagsSet {
+		if exclusiveFlagSet {
+			count++
+		}
+		if count >= 2 { //nolint:gomnd
+			return errors.New("mutually exclusive options used, see -h, --help for more information")
+		}
+	}
+
+	return nil
+}
 
 func handleWindowsService(conf string) error { return nil }
 
