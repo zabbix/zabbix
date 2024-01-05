@@ -1125,10 +1125,10 @@ out:
 
 static void	*discoverer_worker_entry(void *net_check_worker)
 {
+	int			err;
 	sigset_t		mask;
 	zbx_discoverer_worker_t	*worker = (zbx_discoverer_worker_t*)net_check_worker;
 	zbx_discoverer_queue_t	*queue = worker->queue;
-	int			err, *snmpv3_allowed_workers = worker->snmpv3_allowed_workers;
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "thread started [%s #%d]",
 			get_process_type_string(ZBX_PROCESS_TYPE_DISCOVERER), worker->worker_id);
@@ -1158,7 +1158,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 		int			ret;
 		zbx_discoverer_job_t	*job;
 
-		if (NULL != (job = discoverer_queue_pop(queue, snmpv3_allowed_workers)))
+		if (NULL != (job = discoverer_queue_pop(queue)))
 		{
 			int			worker_max;
 			unsigned char		dcheck_type;
@@ -1226,7 +1226,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			job->workers_used--;
 
 			if (SVC_SNMPv3 == dcheck_type)
-				(*snmpv3_allowed_workers)++;
+				queue->snmpv3_allowed_workers++;
 
 			if (DISCOVERER_JOB_STATUS_WAITING == job->status)
 			{
@@ -1259,7 +1259,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 }
 
 static int	discoverer_worker_init(zbx_discoverer_worker_t *worker, zbx_discoverer_queue_t *queue,
-		zbx_timekeeper_t *timekeeper, int *snmpv3_allowed_workers, void *func(void *), char **error)
+		zbx_timekeeper_t *timekeeper, void *func(void *), char **error)
 {
 	int	err;
 
@@ -1267,7 +1267,6 @@ static int	discoverer_worker_init(zbx_discoverer_worker_t *worker, zbx_discovere
 	worker->queue = queue;
 	worker->timekeeper = timekeeper;
 	worker->stop = 1;
-	worker->snmpv3_allowed_workers = snmpv3_allowed_workers;
 
 	if (0 != (err = pthread_create(&worker->thread, NULL, func, (void *)worker)))
 	{
@@ -1343,7 +1342,6 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 	memset(manager, 0, sizeof(zbx_discoverer_manager_t));
 	manager->config_timeout = args_in->config_timeout;
 	manager->source_ip = args_in->config_source_ip;
-	manager->snmpv3_allowed_workers = SNMPV3_WORKERS_MAX;
 
 	if (0 != (err = pthread_mutex_init(&manager->results_lock, NULL)))
 	{
@@ -1351,7 +1349,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 		return FAIL;
 	}
 
-	if (SUCCEED != discoverer_queue_init(&manager->queue, error))
+	if (SUCCEED != discoverer_queue_init(&manager->queue, SNMPV3_WORKERS_MAX, error))
 	{
 		pthread_mutex_destroy(&manager->results_lock);
 		return FAIL;
@@ -1376,7 +1374,7 @@ static int	discoverer_manager_init(zbx_discoverer_manager_t *manager, zbx_thread
 		manager->workers[i].worker_id = i + 1;
 
 		if (SUCCEED != discoverer_worker_init(&manager->workers[i], &manager->queue, manager->timekeeper,
-				&manager->snmpv3_allowed_workers, discoverer_worker_entry, error))
+				discoverer_worker_entry, error))
 		{
 			goto out;
 		}

@@ -45,7 +45,6 @@ typedef struct
 	int			stop;
 	int			flags;
 	zbx_timekeeper_t	*timekeeper;
-	int			*snmpv3_allowed_workers;
 }
 zbx_discoverer_worker_t;
 
@@ -63,8 +62,6 @@ typedef struct
 	zbx_timekeeper_t			*timekeeper;
 	const char				*source_ip;
 	int					config_timeout;
-	int					snmpv3_allowed_workers;
-
 }
 zbx_discoverer_manager_t;
 

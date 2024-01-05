@@ -29,6 +29,7 @@ typedef struct
 	int		workers_num;
 	zbx_list_t	jobs;
 	zbx_uint64_t	pending_checks_count;
+	int		snmpv3_allowed_workers;
 	pthread_mutex_t	lock;
 	pthread_cond_t	event;
 	int		flags;
@@ -43,10 +44,10 @@ void	discoverer_queue_destroy(zbx_discoverer_queue_t *queue);
 void	discoverer_queue_register_worker(zbx_discoverer_queue_t *queue);
 void	discoverer_queue_deregister_worker(zbx_discoverer_queue_t *queue);
 int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error);
-int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error);
+int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_workers, char **error);
 void	discoverer_queue_clear_jobs(zbx_list_t *jobs);
 void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job);
 
-zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue, int *snmpv3_allowed_workers);
+zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue);
 
 #endif

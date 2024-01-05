@@ -91,7 +91,7 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  *               processed.                                                   *
  *                                                                            *
  ******************************************************************************/
-zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue, int *snmpv3_allowed_workers)
+zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 {
 	zbx_discoverer_job_t	*job = NULL;
 	zbx_discoverer_task_t	*task;
@@ -107,9 +107,9 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue, int *s
 		if (SVC_SNMPv3 != task->dchecks.values[0]->type)
 			break;
 
-		if (0 != *snmpv3_allowed_workers)
+		if (0 != queue->snmpv3_allowed_workers)
 		{
-			(*snmpv3_allowed_workers)--;
+			queue->snmpv3_allowed_workers--;
 			break;
 		}
 
@@ -243,12 +243,13 @@ int	discoverer_queue_wait(zbx_discoverer_queue_t *queue, char **error)
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error)
+int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_workers, char **error)
 {
 	int	err, ret = FAIL;
 
 	queue->workers_num = 0;
 	queue->pending_checks_count = 0;
+	queue->snmpv3_allowed_workers = snmpv3_allowed_workers;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 
 	zbx_list_create(&queue->jobs);
