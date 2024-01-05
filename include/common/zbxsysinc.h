@@ -157,10 +157,6 @@
 #	include <fcntl.h>
 #endif
 
-#ifdef HAVE_KNLIST_H
-#	include <knlist.h>
-#endif
-
 #ifdef HAVE_KSTAT_H
 #	include <kstat.h>
 #endif
