@@ -589,7 +589,6 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 
 		switch (token->type)
 		{
-			case ZBX_EVAL_TOKEN_VAR_MACRO:
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 				ret = um_expand_cb(data, &value, hostids, hostids_num, error);
