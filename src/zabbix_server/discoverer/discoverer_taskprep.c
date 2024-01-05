@@ -129,7 +129,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 {
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
-	zbx_task_range_t	range_cmp = {.id = 0 };
+	zbx_task_range_t	range_cmp = {.id = 0};
 	int			port = ZBX_PORTRANGE_INIT_PORT;
 	unsigned int		checks_count = 0;
 
@@ -168,6 +168,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 		task_local.addr.range = (zbx_task_range_t *)zbx_malloc(NULL, sizeof(zbx_task_range_t));
 		memset(task_local.addr.range, 0, sizeof(zbx_task_range_t));
 		task_local.addr.range->ipranges = ipranges;
+		task_local.addr.range->state.port = ZBX_PORTRANGE_INIT_PORT;
 		task_local.addr.range->state.count = DISCOVERER_JOB_TASKS_SKIP_LIMIT;
 		task_local.addr.range->state.checks_per_ip += checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
@@ -454,6 +455,6 @@ out:
 
 	zbx_hashset_destroy(&tasks_local);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() tasks:%d check_counts(ip):%d", __func__, tasks->num_data,
-			check_counts->num_data);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() drule:" ZBX_FS_UI64 " tasks:%d check_counts(ip):%d", __func__,
+			drule->druleid, tasks->num_data, check_counts->num_data);
 }

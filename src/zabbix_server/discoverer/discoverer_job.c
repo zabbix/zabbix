@@ -56,12 +56,12 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
 	dtask_hash_t			state1, state2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(task1->addr_type, task2->addr_type);
-
 	state1.key.port = task1->port;
 	state2.key.port = task2->port;
-	state1.key.dcheck_type = DISCOVERY_ADDR_IP == task1->addr_type ? 0 : task1->dchecks.values[0]->type;
-	state2.key.dcheck_type = DISCOVERY_ADDR_IP == task2->addr_type ? 0 : task2->dchecks.values[0]->type;
+	state1.key.dcheck_type = task1->dchecks.values[0]->type;
+	state2.key.dcheck_type = task2->dchecks.values[0]->type;
+	state1.key.addr_type = task1->addr_type;
+	state2.key.addr_type = task2->addr_type;
 	ZBX_RETURN_IF_NOT_EQUAL(state1.buf, state2.buf);
 
 	if (DISCOVERY_ADDR_IP == task1->addr_type)

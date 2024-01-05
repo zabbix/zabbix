@@ -53,8 +53,8 @@ typedef struct
 		int		port;
 		int		index_port;
 		int		dcheck_index;
-		int		count;
-		unsigned int	checks_per_ip;
+		int		count;		/* total count of checks in range or -1 */
+		unsigned int	checks_per_ip;	/* count of checks per ip */
 	}
 	state;
 	zbx_vector_iprange_t	*ipranges;

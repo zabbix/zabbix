@@ -47,6 +47,6 @@ int	discoverer_queue_init(zbx_discoverer_queue_t *queue, char **error);
 void	discoverer_queue_clear_jobs(zbx_list_t *jobs);
 void	discoverer_queue_push(zbx_discoverer_queue_t *queue, zbx_discoverer_job_t *job);
 
-zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue);
+zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue, int *snmpv3_allowed_workers);
 
 #endif

@@ -471,13 +471,14 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 		return FAIL;
 	}
 
-	log_worker_id = worker_id;
+	if (0 == log_worker_id)
+		log_worker_id = worker_id;
+
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
 			" checks per ip:%u dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
 			task->addr.range->id, task->addr.range->state.count, task->addr.range->state.checks_per_ip,
 			task->dchecks.values_num, task->dchecks.values[task->addr.range->state.dcheck_index]->type,
 			worker_max);
-
 
 	if (0 == worker_max)
 		worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
@@ -575,6 +576,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 
 			task->addr.range->state.port = ZBX_PORTRANGE_INIT_PORT;
 			zbx_vector_portrange_clear(&port_ranges);
+
 		}
 
 		task->addr.range->state.dcheck_index = 0;
@@ -597,7 +599,9 @@ out:	/* try to close all handles if they are exhausted */
 
 	discovery_async_poller_destroy(&poller_config);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() state.count:%d first ip:%s last ip:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
+			" last ip:%s", log_worker_id, __func__, druleid,
+			task->dchecks.values[task->addr.range->state.dcheck_index]->type,
 			task->addr.range->state.count, first_ip, ip);
 
 	return ret;

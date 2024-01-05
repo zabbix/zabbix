@@ -91,14 +91,11 @@ void	discoverer_queue_notify_all(zbx_discoverer_queue_t *queue)
  *               processed.                                                   *
  *                                                                            *
  ******************************************************************************/
-zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
+zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue, int *snmpv3_allowed_workers)
 {
-#	define SNMPV3_WORKERS_MAX	1
-
 	zbx_discoverer_job_t	*job = NULL;
 	zbx_discoverer_task_t	*task;
 	zbx_vector_uint64_t	ids;
-	static int		snmpv3_allowed_workers = SNMPV3_WORKERS_MAX;
 
 	zbx_vector_uint64_create(&ids);
 
@@ -110,9 +107,9 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 		if (SVC_SNMPv3 != task->dchecks.values[0]->type)
 			break;
 
-		if (0 != snmpv3_allowed_workers)
+		if (0 != *snmpv3_allowed_workers)
 		{
-			snmpv3_allowed_workers--;
+			(*snmpv3_allowed_workers)--;
 			break;
 		}
 
@@ -134,7 +131,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 		}
 
 		(void)zbx_list_pop(&job->tasks, (void*)&task);
-		(void)zbx_list_append(&job->tasks, (void*)&task, NULL);
+		(void)zbx_list_append(&job->tasks, (void*)task, NULL);
 
 		break;
 	}
@@ -142,8 +139,6 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 	zbx_vector_uint64_destroy(&ids);
 
 	return job;
-
-#	undef SNMPV3_WORKERS_MAX
 }
 
 /******************************************************************************
