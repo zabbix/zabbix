@@ -203,19 +203,24 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 	for (int i = 0; i < cache->group_updates.values_num; i++)
 	{
 		zbx_pg_group_t	*group = cache->group_updates.values[i];
-		int		online = 0, healthy = 0;
+		int		online = 0, offline = 0, healthy = 0, total = group->proxies.values_num;
 
 		for (int j = 0; j < group->proxies.values_num; j++)
 		{
-			if (ZBX_PG_PROXY_STATUS_ONLINE == group->proxies.values[j]->status)
+			switch (group->proxies.values[j]->status)
 			{
-				online++;
+				case ZBX_PG_PROXY_STATUS_ONLINE:
+					online++;
 
-				if (now - group->proxies.values[j]->lastaccess + PGM_STATUS_CHECK_INTERVAL <
-						group->failover_delay)
-				{
-					healthy++;
-				}
+					if (now - group->proxies.values[j]->lastaccess + PGM_STATUS_CHECK_INTERVAL <
+							group->failover_delay)
+					{
+						healthy++;
+					}
+					break;
+				case ZBX_PG_PROXY_STATUS_OFFLINE:
+					offline++;
+					break;
 			}
 		}
 
@@ -224,36 +229,38 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 		switch (group->status)
 		{
 			case ZBX_PG_GROUP_STATUS_UNKNOWN:
-				status = ZBX_PG_GROUP_STATUS_ONLINE;
+				status = ZBX_PG_GROUP_STATUS_RECOVERY;
 				ZBX_FALLTHROUGH;
-			case ZBX_PG_GROUP_STATUS_ONLINE:
-				if (group->min_online > online)
-					status = ZBX_PG_GROUP_STATUS_OFFLINE;
-				else if (group->min_online > healthy)
-					status = ZBX_PG_GROUP_STATUS_DECAY;
-				break;
-			case ZBX_PG_GROUP_STATUS_OFFLINE:
-				if (0 < online && group->proxies.values_num == online)
-					status = ZBX_PG_GROUP_STATUS_ONLINE;
-				else if (group->min_online <= online)
-					status = ZBX_PG_GROUP_STATUS_RECOVERY;
-				break;
 			case ZBX_PG_GROUP_STATUS_RECOVERY:
-				if (group->min_online > healthy)
+				if (total - offline < group->min_online)
 				{
-					status = ZBX_PG_GROUP_STATUS_DECAY;
+					status = ZBX_PG_GROUP_STATUS_OFFLINE;
 				}
-				else if (now - group->status_time > group->failover_delay ||
-						group->proxies.values_num == online)
+				else if (total == online)
 				{
 					status = ZBX_PG_GROUP_STATUS_ONLINE;
+				}
+				else if (now - group->status_time > group->failover_delay)
+				{
+					if (online >= group->min_online)
+						status = ZBX_PG_GROUP_STATUS_ONLINE;
+					else
+						status = ZBX_PG_GROUP_STATUS_OFFLINE;
 				}
 				break;
 			case ZBX_PG_GROUP_STATUS_DECAY:
-				if (group->min_online <= healthy)
+				if (healthy >= group->min_online)
 					status = ZBX_PG_GROUP_STATUS_ONLINE;
-				else if (group->min_online > online)
+				else if (online < group->min_online)
 					status = ZBX_PG_GROUP_STATUS_OFFLINE;
+				break;
+			case ZBX_PG_GROUP_STATUS_OFFLINE:
+				if (online >= group->min_online)
+					status = ZBX_PG_GROUP_STATUS_RECOVERY;
+				break;
+			case ZBX_PG_GROUP_STATUS_ONLINE:
+				if (healthy < group->min_online)
+					status = ZBX_PG_GROUP_STATUS_DECAY;
 				break;
 		}
 
@@ -264,7 +271,7 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 			group->status = status;
 			group->status_time = now;
-			group->flags = ZBX_PG_GROUP_UPDATE_STATUS;
+			group->flags |= ZBX_PG_GROUP_UPDATE_STATUS;
 		}
 	}
 
