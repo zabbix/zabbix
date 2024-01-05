@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,23 +25,39 @@ import (
 	"time"
 	"unicode/utf8"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/version"
 )
+
+var (
+	impl          Plugin
+	hostnames     = map[uint64]string{}
+	FirstHostname string
+	performTask   PerformTask
+)
+
+type PerformTask func(key string, timeout time.Duration, clientID uint64) (result string, err error)
 
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
-var hostnames = map[uint64]string{}
-var FirstHostname string
-
-type PerformTask func(key string, timeout time.Duration, clientID uint64) (result string, err error)
-
-var performTask PerformTask
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Agent",
+		"agent.hostname", "Returns Hostname from agent configuration.",
+		"agent.hostmetadata", "Returns string with agent host metadata.",
+		"agent.ping", "Returns agent availability check result.",
+		"agent.variant", "Returns agent variant.",
+		"agent.version", "Version of Zabbix agent.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func SetHostname(clientID uint64, hostname string) {
 	hostnames[clientID] = hostname
@@ -115,13 +131,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, fmt.Errorf("Not implemented: %s", key)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Agent",
-		"agent.hostname", "Returns Hostname from agent configuration.",
-		"agent.hostmetadata", "Returns string with agent host metadata.",
-		"agent.ping", "Returns agent availability check result.",
-		"agent.variant", "Returns agent variant.",
-		"agent.version", "Version of Zabbix agent.")
 }

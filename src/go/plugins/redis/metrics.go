@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,63 @@
 package redis
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
 )
 
+const (
+	keyConfig  = "redis.config"
+	keyInfo    = "redis.info"
+	keyPing    = "redis.ping"
+	keySlowlog = "redis.slowlog.count"
+)
+
+var (
+	maxAuthPassLen = 512
+	uriDefaults    = &uri.Defaults{Scheme: "tcp", Port: "6379"}
+)
+
+// Common params: [URI|Session][,User][,Password]
+var (
+	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
+			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
+			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
+	paramPassword = metric.NewConnParam("Password", "Redis password.").WithDefault("").
+			WithValidator(metric.LenValidator{Max: &maxAuthPassLen})
+)
+
+var metrics = metric.MetricSet{
+	keyConfig: metric.New("Returns configuration parameters of Redis server.",
+		[]*metric.Param{
+			paramURI, paramPassword,
+			metric.NewParam("Pattern", "Glob-style pattern to filter configuration parameters.").
+				WithDefault("*"),
+		}, false),
+
+	keyInfo: metric.New("Returns output of INFO command.",
+		[]*metric.Param{
+			paramURI, paramPassword,
+			metric.NewParam("Section", "Section of information to return.").WithDefault("default"),
+		}, false),
+
+	keyPing: metric.New("Test if connection is alive or not.",
+		[]*metric.Param{paramURI, paramPassword}, false),
+
+	keySlowlog: metric.New("Returns the number of slow log entries since Redis has been started.",
+		[]*metric.Param{paramURI, paramPassword}, false),
+}
+
 // handlerFunc defines an interface must be implemented by handlers.
 type handlerFunc func(conn redisClient, params map[string]string) (res interface{}, err error)
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {
@@ -46,46 +96,4 @@ func getHandlerFunc(key string) handlerFunc {
 	default:
 		return nil
 	}
-}
-
-const (
-	keyConfig  = "redis.config"
-	keyInfo    = "redis.info"
-	keyPing    = "redis.ping"
-	keySlowlog = "redis.slowlog.count"
-)
-
-var maxAuthPassLen = 512
-var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "6379"}
-
-// Common params: [URI|Session][,User][,Password]
-var (
-	paramURI = metric.NewConnParam("URI", "URI to connect or session name.").
-			WithDefault(uriDefaults.Scheme + "://localhost:" + uriDefaults.Port).WithSession().
-			WithValidator(uri.URIValidator{Defaults: uriDefaults, AllowedSchemes: []string{"tcp", "unix"}})
-	paramPassword = metric.NewConnParam("Password", "Redis password.").WithDefault("").
-			WithValidator(metric.LenValidator{Max: &maxAuthPassLen})
-)
-
-var metrics = metric.MetricSet{
-	keyConfig: metric.New("Returns configuration parameters of Redis server.",
-		[]*metric.Param{paramURI, paramPassword,
-			metric.NewParam("Pattern", "Glob-style pattern to filter configuration parameters.").
-				WithDefault("*"),
-		}, false),
-
-	keyInfo: metric.New("Returns output of INFO command.",
-		[]*metric.Param{paramURI, paramPassword,
-			metric.NewParam("Section", "Section of information to return.").WithDefault("default"),
-		}, false),
-
-	keyPing: metric.New("Test if connection is alive or not.",
-		[]*metric.Param{paramURI, paramPassword}, false),
-
-	keySlowlog: metric.New("Returns the number of slow log entries since Redis has been started.",
-		[]*metric.Param{paramURI, paramPassword}, false),
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 }
