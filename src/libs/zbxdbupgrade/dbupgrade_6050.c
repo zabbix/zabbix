@@ -2698,29 +2698,36 @@ static int	DBpatch_6050177(void)
 
 static int	DBpatch_6050178(void)
 {
-	return DBcreate_index("usrgrp", "usrgrp_3", "mfaid", 0);
+	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("usrgrp", &field);
 }
 
 static int	DBpatch_6050179(void)
+{
+	return DBcreate_index("usrgrp", "usrgrp_3", "mfaid", 0);
+}
+
+static int	DBpatch_6050180(void)
 {
 	const zbx_db_field_t	field = {"mfa_status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050180(void)
+static int	DBpatch_6050181(void)
 {
 	const zbx_db_field_t	field = {"mfaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
 
 	return DBadd_field("config", &field);
 }
 
-static int	DBpatch_6050181(void)
+static int	DBpatch_6050182(void)
 {
 	return DBcreate_index("config", "config_5", "mfaid", 0);
 }
 
-static int	DBpatch_6050182(void)
+static int	DBpatch_6050183(void)
 {
 	const zbx_db_table_t	table =
 			{"mfa", "mfaid", 0,
@@ -2741,26 +2748,26 @@ static int	DBpatch_6050182(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050183(void)
-{
-	return DBcreate_index("mfa", "mfa_1", "name", 1);
-}
-
 static int	DBpatch_6050184(void)
 {
-	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
-
-	return DBadd_foreign_key("usrgrp", 3, &field);
+	return DBcreate_index("mfa", "mfa_1", "name", 1);
 }
 
 static int	DBpatch_6050185(void)
 {
 	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
 
-	return DBadd_foreign_key("config", 5, &field);
+	return DBadd_foreign_key("usrgrp", 3, &field);
 }
 
 static int	DBpatch_6050186(void)
+{
+	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, 0};
+
+	return DBadd_foreign_key("config", 5, &field);
+}
+
+static int	DBpatch_6050187(void)
 {
 	const zbx_db_table_t	table =
 			{"mfa_totp_secret", "mfa_totp_secretid", 0,
@@ -2777,24 +2784,24 @@ static int	DBpatch_6050186(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050187(void)
+static int	DBpatch_6050188(void)
 {
 	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_1", "mfaid", 0);
 }
 
-static int	DBpatch_6050188(void)
+static int	DBpatch_6050189(void)
 {
 	const zbx_db_field_t	field = {"mfaid", NULL, "mfa", "mfaid", 0, 0, 0, ZBX_FK_CASCADE_DELETE};
 
 	return DBadd_foreign_key("mfa_totp_secret", 1, &field);
 }
 
-static int	DBpatch_6050189(void)
+static int	DBpatch_6050190(void)
 {
 	return DBcreate_index("mfa_totp_secret", "mfa_totp_secret_2", "userid", 0);
 }
 
-static int	DBpatch_6050190(void)
+static int	DBpatch_6050191(void)
 {
 	const zbx_db_field_t	field = {"userid", NULL, "users", "userid", 0, 0, 0,
 			ZBX_FK_CASCADE_DELETE};
@@ -2997,5 +3004,6 @@ DBPATCH_ADD(6050187, 0, 1)
 DBPATCH_ADD(6050188, 0, 1)
 DBPATCH_ADD(6050189, 0, 1)
 DBPATCH_ADD(6050190, 0, 1)
+DBPATCH_ADD(6050191, 0, 1)
 
 DBPATCH_END()
