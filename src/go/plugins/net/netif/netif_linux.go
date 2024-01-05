@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import (
 	"strconv"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
 )
@@ -60,6 +61,22 @@ var mapNetStatOut = map[string]uint{
 	"compressed": 15,
 }
 
+func init() {
+	stdOs = std.NewOs()
+
+	err := plugin.RegisterMetrics(
+		&impl, "NetIf",
+		"net.if.collisions", "Returns number of out-of-window collisions.",
+		"net.if.in", "Returns incoming traffic statistics on network interface.",
+		"net.if.out", "Returns outgoing traffic statistics on network interface.",
+		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
+		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
 func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNums *[]uint) error {
 	if statNum, ok := mapNetStat[statName]; ok {
 		*statNums = append(*statNums, statNum)
@@ -69,7 +86,7 @@ func (p *Plugin) addStatNum(statName string, mapNetStat map[string]uint, statNum
 	return nil
 }
 
-func (p *Plugin) getNetStats(networkIf string, statName string, dir dirFlag) (result uint64, err error) {
+func (p *Plugin) getNetStats(networkIf, statName string, dir dirFlag) (result uint64, err error) {
 	var statNums []uint
 
 	if dir&dirIn != 0 {
@@ -188,16 +205,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return p.getNetStats(params[0], mode, direction)
-}
-
-func init() {
-	stdOs = std.NewOs()
-
-	plugin.RegisterMetrics(&impl, "NetIf",
-		"net.if.collisions", "Returns number of out-of-window collisions.",
-		"net.if.in", "Returns incoming traffic statistics on network interface.",
-		"net.if.out", "Returns outgoing traffic statistics on network interface.",
-		"net.if.total", "Returns sum of incoming and outgoing traffic statistics on network interface.",
-		"net.if.discovery", "Returns list of network interfaces. Used for low-level discovery.")
-
 }

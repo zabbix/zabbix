@@ -909,7 +909,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Raw data for a IAX trunk.'
+              description: 'Raw data for an IAX trunk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
