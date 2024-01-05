@@ -55,8 +55,7 @@ AC_CHECK_HEADERS(stdio.h stdlib.h string.h unistd.h netdb.h signal.h \
   math.h sys/socket.h dirent.h ctype.h \
   fcntl.h sys/param.h arpa/inet.h \
   sys/vfs.h sys/pstat.h sys/sysinfo.h sys/statvfs.h sys/statfs.h \
-  sys/socket.h sys/loadavg.h arpa/inet.h \
-  sys/vmmeter.h strings.h vm/vm_param.h \
+  sys/loadavg.h sys/vmmeter.h strings.h vm/vm_param.h \
   sys/time.h kstat.h sys/syscall.h sys/sysmacros.h \
   stdint.h mach/host_info.h mach/mach_host.h knlist.h pwd.h \
   sys/var.h arpa/nameser.h assert.h sys/dkstat.h sys/disk.h sys/sched.h \
