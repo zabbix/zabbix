@@ -292,7 +292,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
 		$this->page->login()->open('graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-			 self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_graphids[$name]));
