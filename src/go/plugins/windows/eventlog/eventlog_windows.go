@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,14 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/glexpr"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxlib"
 )
+
+var impl Plugin
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -50,6 +53,19 @@ type metadata struct {
 	params    []string
 	blob      unsafe.Pointer
 	lastcheck time.Time
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsEventlog",
+		"eventlog", "Windows event log file monitoring.",
+		"eventlog.count", "Windows event log file monitoring.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+
+	impl.SetHandleTimeout(true)
 }
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -104,13 +120,7 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	// with flexible checks there are no guaranteed refresh time,
 	// so using number of seconds elapsed since last check
 	now := time.Now()
-	var refresh int
-	if data.lastcheck.IsZero() {
-		refresh = 1
-	} else {
-		refresh = int((now.Sub(data.lastcheck) + time.Second/2) / time.Second)
-	}
-
+	refresh := zbxlib.GetCheckIntervalSeconds(ctx.ItemID(), ctx.Delay(), now, data.lastcheck)
 	logitem := zbxlib.EventLogItem{Results: make([]*zbxlib.EventLogResult, 0), Output: ctx.Output()}
 	grxp := ctx.GlobalRegexp().(*glexpr.Bundle)
 	zbxlib.ProcessEventLogCheck(data.blob, &logitem, refresh, grxp.Cblob, isCountItem)
@@ -144,13 +154,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return nil, nil
-}
-
-var impl Plugin
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog", "Windows event log file monitoring.")
-	plugin.RegisterMetrics(&impl, "WindowsEventlog", "eventlog.count", "Windows event log file monitoring.")
-
-	impl.SetHandleTimeout(true)
 }

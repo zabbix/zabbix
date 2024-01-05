@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -522,26 +522,26 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Check Override host field.
 		$override = $form->getField('Override host');
-		$popup_menu_selector = 'xpath:.//button[contains(@class, "zi-chevron-down")]';
+		$popup_menu = $override->query('xpath:.//button[contains(@class, "zi-chevron-down")]')->one();
 
-		foreach (['button:Select', $popup_menu_selector] as $button) {
-			$this->assertTrue($override->query($button)->one()->isClickable());
+		foreach ([$override->query('button:Select')->one(), $popup_menu] as $button) {
+			$this->assertTrue($button->isClickable());
 		}
 
-		$menu = $override->query($popup_menu_selector)->asPopupButton()->one()->getMenu();
+		$menu = $popup_menu->asPopupButton()->getMenu();
 		$this->assertEquals(['Widget', 'Dashboard'], $menu->getItems()->asText());
-
-		$override->query($popup_menu_selector)->asPopupButton()->one()->getMenu()->select('Dashboard');
+		$menu->select('Dashboard');
 		$form->checkValue(['Override host' => 'Dashboard']);
 		$this->assertTrue($override->query('xpath:.//span[@data-hintbox-contents="Dashboard is used as data source."]')
-			->one()->isVisible()
+				->one()->isVisible()
 		);
 
 		$override->query('button:Select')->waitUntilCLickable()->one()->click();
 		$dialogs = COverlayDialogElement::find()->all();
 		$this->assertEquals('Widget', $dialogs->last()->getTitle());
 
-		for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
+		$dialog_count = $dialogs->count();
+		for ($i = $dialog_count - 1; $i >= 0; $i--) {
 			$dialogs->get($i)->close(true);
 		}
 	}
