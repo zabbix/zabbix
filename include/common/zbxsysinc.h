@@ -184,10 +184,6 @@
 #	include <mach/mach_host.h>
 #endif
 
-#ifdef HAVE_MNTENT_H
-#	include <mntent.h>
-#endif
-
 #ifdef HAVE_NETDB_H
 #if defined(_AIX)       /* AIX 5.1 needs this to get hstrerror() declaration */
 #define _USE_IRS
