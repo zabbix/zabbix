@@ -118,22 +118,22 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 			[
 				'description' => '2 Trigger prototype not monitored discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
-				'status' => ITEM_STATUS_DISABLED,
+				'status' => TRIGGER_STATUS_DISABLED,
 				'opdata' => '{#PROT_MAC}',
 				'priority' => 1
 			],
 			[
 				'description' => '3 Trigger prototype not monitored not discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
-				'status' => ITEM_STATUS_DISABLED,
-				'discover' => ITEM_NO_DISCOVER,
+				'status' => TRIGGER_STATUS_DISABLED,
+				'discover' => TRIGGER_NO_DISCOVER,
 				'opdata' => 'test',
 				'priority' => 2
 			],
 			[
 				'description' => '4 Trigger prototype monitored not discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
-				'discover' => ITEM_NO_DISCOVER,
+				'discover' => TRIGGER_NO_DISCOVER,
 				'tags' => [
 					[
 						'tag' => 'name_1',

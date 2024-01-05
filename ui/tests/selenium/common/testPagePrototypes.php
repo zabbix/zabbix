@@ -53,6 +53,7 @@ class testPagePrototypes extends CWebTest {
 		$this->page->assertHeader($capital_name.' prototypes');
 		$this->assertSame($this->headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
 		$this->assertTableStats($this->amount);
+		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check that Breadcrumbs exists.
 		$breadcrumbs = [
@@ -77,17 +78,17 @@ class testPagePrototypes extends CWebTest {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
 		}
 
-		// Check tags on the specific prototype.
-		$table = $this->query('class:list-table')->asTable()->one();
-		$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
-		$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
+		// Check tags (Graph prototypes doesn't have any tags).
+		if ($this->page_name !== 'graph') {
+			$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
+			$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
 
-		// Check hints for tags that appears after clicking on them.
-		foreach ($tags as $tag) {
-			$tag->click();
-			$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
-			$this->assertEquals($tag->getText(), $hint->getText());
-			$hint->close();
+			foreach ($tags as $tag) {
+				$tag->click();
+				$hint = $this->query('xpath://div[@data-hintboxid]')->asOverlayDialog()->waitUntilPresent()->all()->last();
+				$this->assertEquals($tag->getText(), $hint->getText());
+				$hint->close();
+			}
 		}
 
 		// Check clickable headers.
@@ -135,6 +136,13 @@ class testPagePrototypes extends CWebTest {
 				'🙂🙃'
 			];
 			$this->assertTableDataColumn($opdata, 'Operational data');
+		}
+
+		// Check Width and Height columns for graph prototype page.
+		if ($this->page_name === 'graph') {
+			foreach (['Width', 'Height'] as $column) {
+				$this->assertTableDataColumn([100, 200, 300, 400], $column);
+			}
 		}
 	}
 
