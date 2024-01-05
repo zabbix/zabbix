@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2784,7 +2784,7 @@ static void	process_problem_suppression(zbx_vector_uint64_t *eventids, zbx_servi
 				zbx_vector_ptr_create(&services_diff_local.service_problems);
 				zbx_vector_ptr_create(&services_diff_local.service_problems_recovered);
 
-				services_diff_local.flags |= (ZBX_FLAG_SERVICE_RECALCULATE |
+				services_diff_local.flags = (ZBX_FLAG_SERVICE_RECALCULATE |
 						ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS);
 
 				zbx_hashset_insert(&service_manager->service_diffs, &services_diff_local,
@@ -2865,6 +2865,13 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 					zbx_hashset_insert(&service_manager->recovery_events, &event,
 							sizeof(zbx_event_t *));
 					continue;
+				}
+
+				/* exclude problems with negative duration from downtime */
+				if (event->clock < (*ptr)->clock)
+				{
+					event->clock = (*ptr)->clock;
+					event->ns = (*ptr)->ns;
 				}
 
 				recover_services_problem(service_manager, event);

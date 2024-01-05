@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -233,16 +233,6 @@ class CValidationRuleTest extends TestCase {
 					'required' => true,
 					'json' => true,
 					'cuid' => true
-				]
-			],
-			[
-				'string', '', [
-					'string' => true
-				]
-			],
-			[
-				'password', '', [
-					'password' => true
 				]
 			],
 			['in', 'Cannot parse validation rules "in" at position 0.', false],

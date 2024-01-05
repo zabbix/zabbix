@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -286,7 +286,7 @@ class PostgresqlDbBackend extends DbBackend {
 				' WHERE number_compressed_chunks != 0 AND '.dbConditionString('hypertable_name::text', $tables)
 			));
 
-			return (bool) $result['chunks'];
+			return $result && $result['chunks'];
 		}
 
 		$query = implode(' UNION ', array_map(function ($table) {
@@ -297,7 +297,7 @@ class PostgresqlDbBackend extends DbBackend {
 
 		$result = DBfetch(DBselect($query));
 
-		return (bool) $result['chunks'];
+		return $result && $result['chunks'];
 	}
 
 	/**

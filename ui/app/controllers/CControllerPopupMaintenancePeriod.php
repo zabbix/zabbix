@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -122,14 +122,14 @@ class CControllerPopupMaintenancePeriod extends CController {
 		$this->getInputs($data, array_keys($rules));
 
 		if ($data['period'] < 300) {
-			error(_('Incorrect maintenance period (minimum 5 minutes)'));
+			info(_('Incorrect maintenance period (minimum 5 minutes)'));
 
 			return false;
 		}
 
 		$validator = new CNewValidator($data, $rules);
 		$errors = $validator->getAllErrors();
-		array_map('error', $errors);
+		array_map('info', $errors);
 
 		return !$errors;
 	}

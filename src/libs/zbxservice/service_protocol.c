@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -79,7 +79,7 @@ void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *dat
 		ptr += zbx_serialize_str(ptr, tag->value, len[i * 2 + 1]);
 	}
 
-	ptr += zbx_serialize_value(ptr, suppressed);
+	(void)zbx_serialize_value(ptr, suppressed);
 
 	zbx_free(len);
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -327,7 +327,6 @@ class CNewValidator {
 					break;
 
 				case 'string':
-				case 'password':
 					if (!is_string($value) && !is_numeric($value)) {
 						$this->addError($fatal,
 							_s('Incorrect value for field "%1$s": %2$s.', $field, _('a character string is expected'))

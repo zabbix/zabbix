@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1394,13 +1394,17 @@ typedef struct
 zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+char	*zbx_find_buf_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf,
+		size_t szbyte);
 #define ZBX_READ_ERR		-1
 #define ZBX_READ_WRONG_ENCODING	-2
 int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);
+
+ssize_t	zbx_buf_readln(int fd, char *buf, size_t bufsz, const char *encoding, char **value, void **saveptr);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 

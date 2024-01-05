@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,15 +34,6 @@ import (
 	"zabbix.com/pkg/pdh"
 	"zabbix.com/pkg/win32"
 )
-
-func init() {
-	plugin.RegisterMetrics(
-		&impl,
-		"WindowsPerfMon",
-		"perf_counter", "Value of any Windows performance counter.",
-		"perf_counter_en", "Value of any Windows performance counter in English.",
-	)
-}
 
 const (
 	maxInactivityPeriod = time.Hour * 25
@@ -80,6 +71,17 @@ type Plugin struct {
 }
 
 type historyIndex int
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsPerfMon",
+		"perf_counter", "Value of any Windows performance counter.",
+		"perf_counter_en", "Value of any Windows performance counter in English.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (any, error) {
@@ -337,7 +339,7 @@ func (h historyIndex) dec(interval int) historyIndex {
 	return h
 }
 
-func (h historyIndex) sub(value int, interval int) historyIndex {
+func (h historyIndex) sub(value, interval int) historyIndex {
 	h -= historyIndex(value)
 	for int(h) < 0 {
 		h += historyIndex(interval)

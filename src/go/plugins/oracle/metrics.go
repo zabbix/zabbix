@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@ package oracle
 import (
 	"context"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
@@ -58,6 +59,13 @@ const (
 type handlerFunc func(
 	ctx context.Context, conn OraClient, params map[string]string, extraParams ...string,
 ) (res interface{}, err error)
+
+func init() {
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // getHandlerFunc returns a handlerFunc related to a given key.
 func getHandlerFunc(key string) handlerFunc {
@@ -318,8 +326,4 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramPassword, paramService},
 		false,
 	),
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
 }

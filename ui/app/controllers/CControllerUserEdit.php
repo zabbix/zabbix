@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,8 @@ class CControllerUserEdit extends CControllerUserEditGeneral {
 			'surname' =>			'db users.surname',
 			'user_groups' =>		'array_id|not_empty',
 			'change_password' =>	'in 1',
-			'password1' =>			'password',
-			'password2' =>			'password',
+			'password1' =>			'string',
+			'password2' =>			'string',
 			'lang' =>				'db users.lang|in '.implode(',', $locales),
 			'timezone' =>			'db users.timezone|in '.implode(',', array_keys($this->timezones)),
 			'theme' =>				'db users.theme|in '.implode(',', $themes),

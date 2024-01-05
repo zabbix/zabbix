@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -265,19 +265,18 @@ if ($data['action'] === 'userprofile.edit' || $data['db_user']['username'] !== Z
 			->setId('autologout_visible')
 			->setChecked($data['autologout'] !== '0'),
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
-		(new CTextBox('autologout', $autologout, false, DB::getFieldLength('users', 'autologout')))
-			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
+		(new CTextBox('autologout', $autologout))->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 	]);
 }
 
 $user_form_list
 	->addRow((new CLabel(_('Refresh'), 'refresh'))->setAsteriskMark(),
-		(new CTextBox('refresh', $data['refresh'], false, DB::getFieldLength('users', 'refresh')))
+		(new CTextBox('refresh', $data['refresh']))
 			->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
-		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6))
+		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)

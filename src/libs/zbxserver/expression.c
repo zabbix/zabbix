@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -6580,7 +6580,11 @@ exit:
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error(void *user_data, const xmlError *err)
+#endif
 {
 	zbx_libxml_error_t	*err_ctx;
 

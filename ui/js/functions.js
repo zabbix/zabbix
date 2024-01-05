@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -826,7 +826,7 @@ function makeMessageBox(type, messages, title, show_close_box, show_details) {
 function downloadSvgImage(svg, file_name) {
 	var $dom_node = jQuery(svg),
 		canvas = document.createElement('canvas'),
-		labels = $dom_node.next('.svg-graph-legend'),
+		labels = $dom_node.next('.svg-graph-legend,.svg-single-item-graph-legend,.svg-single-two-items-graph-legend'),
 		$clone = $dom_node.clone(),
 		$container = $dom_node.closest('.dashboard-grid-widget-content'),
 		image = new Image,
@@ -869,7 +869,7 @@ function downloadSvgImage(svg, file_name) {
 		);
 
 	$clone.attr('height', canvas.height + 'px').append($labels_clone);
-	image.src = 'data:image/svg+xml;base64,' + btoa(new XMLSerializer().serializeToString($clone[0]));
+	image.src = 'data:image/svg+xml;utf8,' + new XMLSerializer().serializeToString($clone[0]).replace(/#/g, '%23');
 }
 
 /**

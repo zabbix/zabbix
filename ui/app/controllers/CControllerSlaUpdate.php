@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ class CControllerSlaUpdate extends CControllerSlaCreateUpdate {
 					);
 				}
 				catch (InvalidArgumentException $e) {
-					error($e->getMessage());
+					info($e->getMessage());
 					$ret = false;
 				}
 			}

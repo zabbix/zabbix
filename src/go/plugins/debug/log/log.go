@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,11 @@ package log
 import (
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
@@ -37,7 +40,12 @@ type watchRequest struct {
 	sink     plugin.ResultWriter
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) run() {
 	p.Debugf("activating plugin")
@@ -58,7 +66,8 @@ run:
 						Value:       &value,
 						LastLogsize: &lastlogsize,
 						Ts:          now,
-						Mtime:       &mtime})
+						Mtime:       &mtime,
+					})
 				}
 			}
 		case wr := <-p.input:
@@ -95,8 +104,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 
 func (p *Plugin) Validate(private interface{}) (err error) {
 	return
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "DebugLog", "debug.log", "Returns timestamp each second.")
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ class CControllerMiscConfigEdit extends CController {
 			'login_block' =>					'db config.login_block',
 			'validate_uri_schemes' =>			'db config.validate_uri_schemes',
 			'uri_valid_schemes' =>				'db config.uri_valid_schemes',
+			'x_frame_header_enabled' =>			'in 0,1',
 			'x_frame_options' =>				'db config.x_frame_options',
 			'iframe_sandboxing_enabled' =>		'db config.iframe_sandboxing_enabled',
 			'iframe_sandboxing_exceptions' =>	'db config.iframe_sandboxing_exceptions',
@@ -85,9 +86,6 @@ class CControllerMiscConfigEdit extends CController {
 			'uri_valid_schemes' => $this->getInput('uri_valid_schemes', CSettingsHelper::get(
 				CSettingsHelper::URI_VALID_SCHEMES
 			)),
-			'x_frame_options' => $this->getInput('x_frame_options', CSettingsHelper::get(
-				CSettingsHelper::X_FRAME_OPTIONS
-			)),
 			'iframe_sandboxing_enabled' => $this->getInput('iframe_sandboxing_enabled', CSettingsHelper::get(
 				CSettingsHelper::IFRAME_SANDBOXING_ENABLED
 			)),
@@ -113,6 +111,10 @@ class CControllerMiscConfigEdit extends CController {
 				CSettingsHelper::SCHEDULED_REPORT_TEST_TIMEOUT
 			))
 		];
+
+		$x_frame_options = $this->getInput('x_frame_options', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
+		$data['x_frame_header_enabled'] = strcasecmp('null', $x_frame_options) == 0 ? 0 : 1;
+		$data['x_frame_options'] = $data['x_frame_header_enabled'] == 1	? $x_frame_options : '';
 
 		$data['discovery_group_data'] = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],

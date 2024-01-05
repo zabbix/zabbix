@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 			$limits = [
 				'Tile URL' => 1024,
 				'Attribution text ' => 1024,
-				'Max zoom level' => 10
+				'Max zoom level' => 2
 			];
 			foreach ($limits as $field => $max_length) {
 				$this->assertEquals($max_length, $form->getField($field)->getAttribute('maxlength'));
@@ -263,7 +263,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Tile URL' => 'bbb',
 						'Max zoom level' => 'aa'
 					],
-					'error' => 'Incorrect value "aa" for "geomaps_max_zoom" field.'
+					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
 			],
 			// #9.
@@ -275,7 +275,7 @@ class testFormAdministrationGeneralGeomaps extends CWebTest {
 						'Tile URL' => 'bbb',
 						'Max zoom level' => '!%:'
 					],
-					'error' => 'Incorrect value "!%:" for "geomaps_max_zoom" field.'
+					'error' => 'Incorrect value for field "geomaps_max_zoom": value must be no less than "1".'
 				]
 			],
 			// #10.

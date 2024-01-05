@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,16 +22,18 @@ package trapper
 import (
 	"fmt"
 	"io/ioutil"
-
 	"net"
 	"regexp"
 	"strconv"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
 )
+
+var impl Plugin
 
 // Plugin
 type Plugin struct {
@@ -40,7 +42,15 @@ type Plugin struct {
 	listeners map[int]*trapListener
 }
 
-var impl Plugin
+func init() {
+	impl.manager = watch.NewManager(&impl)
+	impl.listeners = make(map[int]*trapListener)
+
+	err := plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Watch(requests []*plugin.Request, ctx plugin.ContextProvider) {
 	p.manager.Lock()
@@ -134,11 +144,4 @@ func (p *Plugin) EventSourceByKey(key string) (es watch.EventSource, err error) 
 		p.listeners[port] = listener
 	}
 	return listener, nil
-}
-
-func init() {
-	impl.manager = watch.NewManager(&impl)
-	impl.listeners = make(map[int]*trapListener)
-
-	plugin.RegisterMetrics(&impl, "DebugTrapper", "debug.trap", "Listen on port for incoming TCP data.")
 }

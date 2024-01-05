@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,39 +155,59 @@ class testFormAdministrationGeneral extends CWebTest {
 	 * @param boolean    $other		  If it is Other configuration parameters form
 	 */
 	public function executeCheckForm($data, $other = false) {
+		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
+
+		if ($expected === TEST_GOOD) {
+			$message = 'Configuration updated';
+			$values = $data['fields'];
+			$db = CTestArrayHelper::get($data, 'db', []);
+		}
+		else {
+			$message = 'Cannot update configuration';
+			$values = $this->default_values;
+			$db = $this->db_default_values;
+		}
+
 		$this->page->login()->open($this->config_link);
 		$form = $this->query($this->form_selector)->waitUntilVisible()->asForm()->one();
+
 		// Reset form in case of previous test case.
 		$this->resetConfiguration($form, $this->default_values, 'Reset defaults', $other);
+
 		// Fill form with new data.
 		if (CTestArrayHelper::get($data, 'fields.Default time zone')) {
 			$data['fields']['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($data['fields']['Default time zone']);
 		}
+
 		$form->fill($data['fields']);
 
 		$form->submit();
 		$this->page->waitUntilReady();
-		$message = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
-			? 'Configuration updated'
-			: 'Cannot update configuration';
-		$this->assertMessage($data['expected'], $message, CTestArrayHelper::get($data, 'details'));
+
+		$this->assertMessage($expected, $message, CTestArrayHelper::get($data, 'details'));
+
 		// Check saved configuration in frontend.
 		$this->page->refresh();
 		$form->invalidate();
+
 		// Check trimming symbols in Login attempts field.
-		if (CTestArrayHelper::get($data['fields'], 'Login attempts') === '3M') {
-			$data['fields']['Login attempts'] = '3';
+		if (CTestArrayHelper::get($values, 'Login attempts') === '3M') {
+			$values['Login attempts'] = '3';
 		}
-		$values = (CTestArrayHelper::get($data, 'expected')) === TEST_GOOD ? $data['fields'] : $this->default_values;
-		if (CTestArrayHelper::get($data, 'expected') === TEST_BAD && CTestArrayHelper::get($values, 'Default time zone')) {
+
+		if (CTestArrayHelper::get($values, 'Default time zone')) {
 			$values['Default time zone'] = CDateTimeHelper::getTimeZoneFormat($values['Default time zone']);
 		}
+
+		if (CTestArrayHelper::get($data, 'trim')) {
+			$values = array_map('trim', $values);
+		}
+
 		$form->checkValue($values);
+
 		// Check saved configuration in database.
 		$config = CDBHelper::getRow('SELECT * FROM config');
-		$db = (CTestArrayHelper::get($data, 'expected') === TEST_GOOD)
-			? CTestArrayHelper::get($data, 'db', [])
-			: $this->db_default_values;
+
 		foreach ($db as $key => $value) {
 			$this->assertArrayHasKey($key, $config);
 			$this->assertEquals($value, $config[$key]);

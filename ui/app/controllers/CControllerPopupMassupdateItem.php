@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,11 +241,11 @@ class CControllerPopupMassupdateItem extends CController {
 						}
 
 						if ($simple_interval_parser->parse($interval['delay']) != CParser::PARSE_SUCCESS) {
-							error(_s('Invalid interval "%1$s".', $interval['delay']));
+							info(_s('Invalid interval "%1$s".', $interval['delay']));
 							throw new Exception();
 						}
 						elseif ($time_period_parser->parse($interval['period']) != CParser::PARSE_SUCCESS) {
-							error(_s('Invalid interval "%1$s".', $interval['period']));
+							info(_s('Invalid interval "%1$s".', $interval['period']));
 							throw new Exception();
 						}
 
@@ -257,7 +257,7 @@ class CControllerPopupMassupdateItem extends CController {
 						}
 
 						if ($scheduling_interval_parser->parse($interval['schedule']) != CParser::PARSE_SUCCESS) {
-							error(_s('Invalid interval "%1$s".', $interval['schedule']));
+							info(_s('Invalid interval "%1$s".', $interval['schedule']));
 							throw new Exception();
 						}
 

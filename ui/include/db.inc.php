@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -109,8 +109,7 @@ function DBstart() {
 	$result = false;
 
 	if ($DB['TRANSACTIONS'] != 0) {
-		error('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
-
+		info('POSSIBLE ERROR: Used incorrect logic in database processing, started subtransaction!');
 		return $result;
 	}
 
@@ -145,14 +144,15 @@ function DBstart() {
 function DBend($doCommit = true) {
 	global $DB;
 
+	$result = false;
+
 	if (!isset($DB['DB']) || empty($DB['DB'])) {
-		return false;
+		return $result;
 	}
 
 	if ($DB['TRANSACTIONS'] == 0) {
-		error('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
-
-		return false;
+		info('POSSIBLE ERROR: Used incorrect logic in database processing, transaction not started!');
+		return $result;
 	}
 
 	$DBresult = $doCommit && $DB['TRANSACTION_NO_FAILED_SQLS'];
@@ -551,7 +551,7 @@ function zbx_db_search($table, $options, &$sql_parts) {
 
 	$tableSchema = DB::getSchema($table);
 	if (!$tableSchema) {
-		error(_s('Error in search request for table "%1$s".', $table));
+		info(_s('Error in search request for table "%1$s".', $table));
 	}
 
 	$start = $options['startSearch'] ? '' : '%';
