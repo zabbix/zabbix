@@ -1452,212 +1452,497 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * @param array $user
+	 * @param array $data
 	 *
 	 * @return string|array
 	 */
-	public function login(array $user) {
+	public function login(array $data) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'password' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED, 'length' => 255],
 			'userData' =>	['type' => API_FLAG]
 		]];
 
-		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$new_user = [];
-		$ldap_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
-		$default_auth_type = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
-		$sensitive = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE;
-		$user_data = $this->findAccessibleUser($user['username'], $sensitive, $default_auth_type, true);
+		$db_users = self::findLoginUsersByUsername($data['username']);
 
-		if (!array_key_exists('db_user', $user_data) && $user['username'] !== ZBX_GUEST_USER
-				&& $default_auth_type == ZBX_AUTH_LDAP
-				&& CAuthenticationHelper::isLdapProvisionEnabled($ldap_userdirectoryid)) {
-			$idp_user_data = API::UserDirectory()->test([
-				'userdirectoryid' => $ldap_userdirectoryid,
-				'test_username' => $user['username'],
-				'test_password' => $user['password']
-			]);
+		$created = !$db_users && $data['username'] !== ZBX_GUEST_USER
+			? $this->tryToCreateLdapProvisionedUser($data, $db_users)
+			: false;
 
-			if ($idp_user_data['usrgrps']) {
-				$new_user = $this->createProvisionedUser($idp_user_data);
-				$user_data = $this->findAccessibleUser($new_user['username'], true, ZBX_AUTH_LDAP, false);
+		self::checkSingleUserExists($data['username'], $db_users);
+
+		$db_user = $db_users[0];
+
+		if (!$created && $db_user['userdirectoryid'] != 0) {
+			self::checkUserProvisionedByLdap($db_user);
+		}
+
+		self::addUserGroupFields($db_user, $group_status, $group_auth_type, $group_userdirectoryid);
+
+		$db_user['auth_type'] = $db_user['userdirectoryid'] == 0 ? $group_auth_type : ZBX_AUTH_LDAP;
+
+		if (!$created) {
+			self::checkLoginTemporarilyBlocked($db_user);
+
+			if ($db_user['auth_type'] == ZBX_AUTH_LDAP) {
+				self::checkLdapAuthenticationEnabled($db_user);
+
+				$idp_user_data = self::verifyLdapCredentials($data, $db_user, $group_userdirectoryid);
+				$this->tryToUpdateLdapProvisionedUser($db_user, $group_status, $idp_user_data);
+			}
+			else {
+				self::verifyPassword($data, $db_user);
 			}
 		}
 
-		if (array_key_exists('error', $user_data)) {
-			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
-				CWebUser::getIp(), $user['username'], CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
-			);
+		self::checkGroupStatus($db_user, $group_status);
+		self::checkRole($db_user);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
+		self::addAdditionalFields($db_user);
+		self::setTimezone($db_user['timezone']);
+		self::createSession($db_user);
+
+		if ($db_user['attempt_failed'] != 0) {
+			self::resetFailedLoginAttempts($db_user);
 		}
-
-		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
-
-		if ($db_user['attempt_failed'] >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-			$sec_left = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK))
-				- (time() - $db_user['attempt_clock']);
-
-			if ($sec_left > 0) {
-				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
-					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
-				);
-
-				self::exception(ZBX_API_ERROR_PERMISSIONS,
-					_('Incorrect user name or password or account is temporarily blocked.')
-				);
-			}
-		}
-
-		try {
-			switch ($db_user['auth_type']) {
-				case ZBX_AUTH_LDAP:
-					if ($new_user) {
-						break;
-					}
-
-					$ldap_auth_enabled = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED);
-
-					if ($ldap_auth_enabled == ZBX_AUTH_LDAP_DISABLED) {
-						self::exception(ZBX_API_ERROR_INTERNAL, _('LDAP authentication is disabled.'));
-					}
-
-					$userdirectoryid = $db_user['userdirectoryid'] != 0
-						? $db_user['userdirectoryid']
-						: $user_data['permissions']['userdirectoryid'];
-					$exists = false;
-
-					if ($userdirectoryid != 0) {
-						$exists = API::UserDirectory()->get([
-							'countOutput' => true,
-							'userdirectoryids' => $userdirectoryid,
-							'filter' => ['idp_type' => IDP_TYPE_LDAP]
-						]) > 0;
-					}
-
-					if (!$exists) {
-						self::exception(ZBX_API_ERROR_INTERNAL, _('Cannot find user directory for LDAP.'));
-					}
-
-					$idp_user_data = API::UserDirectory()->test([
-						'userdirectoryid' => $userdirectoryid,
-						'test_username' => $user['username'],
-						'test_password' => $user['password']
-					]);
-
-					if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
-						$db_user['deprovisioned'] = true;
-						$idp_user_data['userid'] = $db_user['userid'];
-						$upd_user = $this->updateProvisionedUser($idp_user_data);
-
-						if ($upd_user) {
-							$user_data = $this->findAccessibleUser($db_user['username'], true, ZBX_AUTH_LDAP, false);
-							$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
-						}
-					}
-
-					break;
-
-				case ZBX_AUTH_INTERNAL:
-					if ($db_user['userdirectoryid'] != 0) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-					}
-
-					if (!password_verify($user['password'], $db_user['passwd'])) {
-						self::exception(ZBX_API_ERROR_PERMISSIONS,
-							_('Incorrect user name or password or account is temporarily blocked.')
-						);
-					}
-					break;
-
-				case ZBX_AUTH_NONE:
-				default:
-					self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions for system access.'));
-			}
-		}
-		catch (APIException $e) {
-			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS && $db_user && !$db_user['deprovisioned']) {
-				$attempt_failed = $db_user['attempt_failed'] + 1;
-
-				DB::update('users', [
-					'values' => [
-						'attempt_failed' => $attempt_failed,
-						'attempt_clock' => time(),
-						'attempt_ip' => substr($db_user['userip'], 0, 39)
-					],
-					'where' => ['userid' => $db_user['userid']]
-				]);
-
-				$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
-				$db_users = [$db_user['userid'] => $db_user];
-
-				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
-					CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
-				);
-				self::addAuditLogByUser($db_user['userid'], $db_user['userip'], $db_user['username'],
-					CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
-				);
-
-				if ($attempt_failed >= CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
-					self::exception(ZBX_API_ERROR_PERMISSIONS,
-						_('Incorrect user name or password or account is temporarily blocked.')
-					);
-				}
-			}
-
-			self::exception(ZBX_API_ERROR_PERMISSIONS, $e->getMessage());
-		}
-
-		if ($db_user['deprovisioned'] || $db_user['roleid'] == 0) {
-			self::exception(ZBX_API_ERROR_PERMISSIONS,
-				_('Incorrect user name or password or account is temporarily blocked.')
-			);
-		}
-
-		// Start session.
-		unset($db_user['passwd']);
-		$this->setTimezone($db_user['timezone']);
-		$db_user = self::createSession($db_user);
 
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
-		return array_key_exists('userData', $user) && $user['userData'] ? $db_user : $db_user['sessionid'];
+		return array_key_exists('userData', $data) && $data['userData'] ? $db_user : $db_user['sessionid'];
 	}
 
-	/**
-	 * This method should not be listed in CUser::ACCESS_RULES to disallow call it via http API.
-	 * Login user by username. Return array with user data.
-	 *
-	 * @param string    $username        User username to search for.
-	 * @param bool|null $case_sensitive  Perform case-sensitive search.
-	 * @param int|null  $default_auth    Default system authentication type.
-	 *
-	 * @return array
-	 */
-	public function loginByUsername($username, $case_sensitive = null, $default_auth = null) {
-		$user_data = $this->findAccessibleUser($username, $case_sensitive, $default_auth, false);
+	public static function loginByUsername(string $username, bool $case_sensitive): array {
+		$db_users = self::findUsersByUsername($username, $case_sensitive);
 
-		if (array_key_exists('error', $user_data)) {
-			self::addAuditLogByUser(array_key_exists('db_user', $user_data) ? $user_data['db_user']['userid'] : null,
-				CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED, CAudit::RESOURCE_USER
-			);
+		self::checkSingleUserExists($username, $db_users);
 
-			self::exception(ZBX_API_ERROR_PARAMETERS, $user_data['error']);
-		}
+		$db_user = $db_users[0];
 
-		$db_user = $this->addExtraFields($user_data['db_user'], $user_data['permissions']);
-		$this->setTimezone($db_user['timezone']);
+		self::addUserGroupFields($db_user, $group_status, $group_auth_type);
 
-		unset($db_user['passwd']);
-		$db_user = self::createSession($db_user);
+		self::checkGroupStatus($db_user, $group_status);
+		self::checkRole($db_user);
+
+		$db_user['auth_type'] =
+			$db_user['userdirectoryid'] == 0 || !self::isLdapUserDirectory($db_user['userdirectoryid'])
+				? $group_auth_type
+				: ZBX_AUTH_LDAP;
+
+		self::addAdditionalFields($db_user);
+		self::setTimezone($db_user['timezone']);
+		self::createSession($db_user);
 
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
 		return $db_user;
+	}
+
+	private static function findLoginUsersByUsername(string $username): array {
+		$case_sensitive =
+			CAuthenticationHelper::get(CAuthenticationHelper::LDAP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE;
+
+		$db_users = self::findUsersByUsername($username, $case_sensitive);
+
+		if ($db_users && !$case_sensitive) {
+			self::unsetCaseInsensitiveUsersOfInternalAuthType($db_users, $username);
+		}
+
+		return $db_users;
+	}
+
+	public static function findUsersByUsername(string $username, bool $case_sensitive = true): array {
+		$db_users = [];
+
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
+			'userdirectoryid', 'ts_provisioned'
+		];
+
+		if ($case_sensitive) {
+			$db_users = DB::select('users', [
+				'output' => $fields,
+				'filter' => ['username' => $username]
+			]);
+		}
+		else {
+			$db_users = DBfetchArray(DBselect(
+				'SELECT '.implode(',', $fields).
+				' FROM users'.
+				' WHERE LOWER(username)='.zbx_dbstr(mb_strtolower($username))
+			));
+		}
+
+		return $db_users;
+	}
+
+	/**
+	 * Leave only the user with ZBX_AUTH_INTERNAL authentication type, whose username strictly matches the given
+	 * username, in the given users array.
+	 * The given users array is cleared if users are only of ZBX_AUTH_INTERNAL authentication type, but none of them
+	 * matched by the given username.
+	 *
+	 * Otherwise the users array will remain unchanged for further LDAP case insensitive authentication attempt.
+	 *
+	 * @param array  $db_users
+	 * @param string $username
+	 */
+	private static function unsetCaseInsensitiveUsersOfInternalAuthType(array &$db_users, string $username): void {
+		$gui_accesses = array_column(DBfetchArray(DBselect(
+			'SELECT ug.userid,MAX(g.gui_access) AS gui_access'.
+			' FROM users_groups ug,usrgrp g'.
+			' WHERE ug.usrgrpid=g.usrgrpid'.
+				' AND '.dbConditionId('ug.userid', array_column($db_users, 'userid')).
+			' GROUP BY ug.userid'
+		)), 'gui_access', 'userid');
+
+		$auth_types = [];
+
+		foreach ($db_users as $i => $db_user) {
+			$gui_access = array_key_exists($db_user['userid'], $gui_accesses)
+				? $gui_accesses[$db_user['userid']]
+				: GROUP_GUI_ACCESS_SYSTEM;
+
+			$auth_type = self::getAuthTypeByGuiAccess($gui_access);
+
+			if ($auth_type == ZBX_AUTH_INTERNAL && $db_user['username'] === $username) {
+				$db_users = array_intersect_key($db_users, array_flip([$i]));
+				$auth_types = [];
+				break;
+			}
+
+			$auth_types[$auth_type] = true;
+		}
+
+		if (count($auth_types) == 1 && array_key_exists(ZBX_AUTH_INTERNAL, $auth_types)) {
+			$db_users = [];
+		}
+
+		$db_users = array_values($db_users);
+	}
+
+	/**
+	 * Get the actual authentication type for the given GUI access value.
+	 * The authentication type for GROUP_GUI_ACCESS_DISABLED should be the same as for GROUP_GUI_ACCESS_SYSTEM, because
+	 * even if frontend access is disabled, this shouldn't disable the login into API.
+	 *
+	 * @param int $gui_access
+	 *
+	 * @return int
+	 */
+	private static function getAuthTypeByGuiAccess(int $gui_access): int {
+		if ($gui_access == GROUP_GUI_ACCESS_INTERNAL) {
+			$auth_type = ZBX_AUTH_INTERNAL;
+		}
+		elseif ($gui_access == GROUP_GUI_ACCESS_LDAP) {
+			$auth_type = ZBX_AUTH_LDAP;
+		}
+		else {
+			$auth_type = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
+		}
+
+		return $auth_type;
+	}
+
+	private function tryToCreateLdapProvisionedUser(array $data, array &$db_users): bool {
+		$ldap_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
+
+		if (CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_LDAP
+				&& CAuthenticationHelper::isLdapProvisionEnabled($ldap_userdirectoryid)) {
+			$idp_user_data = API::UserDirectory()->test([
+				'userdirectoryid' => $ldap_userdirectoryid,
+				'test_username' => $data['username'],
+				'test_password' => $data['password']
+			]);
+
+			if ($idp_user_data['usrgrps']) {
+				$user = $this->createProvisionedUser($idp_user_data);
+				$db_users = self::findUsersByUsername($user['username']);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function checkSingleUserExists(string $username, array $db_users): void {
+		if (!$db_users) {
+			self::loginException(null, $username, ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
+		}
+
+		if (count($db_users) > 1) {
+			self::loginException(null, $username, ZBX_API_ERROR_PERMISSIONS,
+				_s('Authentication failed: %1$s.', _('supplied credentials are not unique'))
+			);
+		}
+	}
+
+	private static function checkUserProvisionedByLdap(array $db_user) {
+		if (!self::isLdapUserDirectory($db_user['userdirectoryid'])) {
+			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
+		}
+	}
+
+	private static function isLdapUserDirectory(string $userdirectoryid): bool {
+		return (bool) DB::select('userdirectory', [
+			'output' => [],
+			'userdirectoryids' => $userdirectoryid,
+			'filter' => ['idp_type' => ZBX_AUTH_LDAP]
+		]);
+	}
+
+	/**
+	 * Add user group data fields to the given user and populates the given $group_status and $group_userdirectoryid.
+	 * Note: user without groups is able to log in with default user group field values.
+	 */
+	public static function addUserGroupFields(array &$db_user, int &$group_status = null, int &$group_auth_type = null,
+			string &$group_userdirectoryid = null): void {
+		$db_user['debug_mode'] = GROUP_DEBUG_MODE_DISABLED;
+		$db_user['deprovisioned'] = false;
+		$db_user['gui_access'] = GROUP_GUI_ACCESS_SYSTEM;
+
+		$group_auth_type = self::getAuthTypeByGuiAccess($db_user['gui_access']);
+		$group_status = GROUP_STATUS_ENABLED;
+		$group_userdirectoryid = 0;
+
+		$result = DBselect(
+			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
+			' FROM users_groups ug,usrgrp g'.
+			' WHERE ug.usrgrpid=g.usrgrpid'.
+				' AND '.dbConditionId('ug.userid', [$db_user['userid']])
+		);
+
+		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+
+		$userdirectoryids = [];
+
+		while ($row = DBfetch($result)) {
+			if ($row['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
+				$db_user['debug_mode'] = $row['debug_mode'];
+			}
+
+			if (bccomp($row['usrgrpid'], $deprovision_groupid) == 0 && $db_user['userdirectoryid'] != 0) {
+				$db_user['deprovisioned'] = true;
+			}
+
+			if ($row['gui_access'] > $db_user['gui_access']) {
+				$db_user['gui_access'] = $row['gui_access'];
+				$group_auth_type = self::getAuthTypeByGuiAccess($row['gui_access']);
+			}
+
+			if ($row['users_status'] == GROUP_STATUS_DISABLED) {
+				$group_status = $row['users_status'];
+			}
+
+			if ($group_auth_type == ZBX_AUTH_LDAP) {
+				$userdirectoryids[$row['userdirectoryid']] = true;
+			}
+		}
+
+		if ($group_auth_type == ZBX_AUTH_LDAP) {
+			if (array_key_exists(0, $userdirectoryids)) {
+				unset($userdirectoryids[0]);
+
+				if (CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID) != 0) {
+					$userdirectoryids[CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID)] = true;
+				}
+			}
+
+			if (count($userdirectoryids) > 1) {
+				$db_userdirectories = DB::select('userdirectory', [
+					'output' => [],
+					'userdirectoryids' => array_keys($userdirectoryids),
+					'sortfield' => ['name'],
+					'limit' => 1,
+					'preservekeys' => true
+				]);
+
+				$group_userdirectoryid = key($db_userdirectories);
+			}
+			elseif ($userdirectoryids) {
+				$group_userdirectoryid = key($userdirectoryids);
+			}
+		}
+	}
+
+	private static function checkLoginTemporarilyBlocked(array $db_user): void {
+		if ($db_user['attempt_failed'] < CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS)) {
+			return;
+		}
+
+		$login_blocking_interval = timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::LOGIN_BLOCK));
+		$actual_login_blocking_interval = time() - $db_user['attempt_clock'];
+
+		if ($actual_login_blocking_interval < $login_blocking_interval) {
+			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
+		}
+	}
+
+	private static function checkLdapAuthenticationEnabled(array $db_user): void {
+		if (CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED) == ZBX_AUTH_LDAP_DISABLED) {
+			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
+		}
+	}
+
+	private static function verifyLdapCredentials(array $data, array $db_user, string $group_userdirectoryid): array {
+		try {
+			return API::UserDirectory()->test([
+				'userdirectoryid' => $db_user['userdirectoryid'] != 0
+					? $db_user['userdirectoryid']
+					: $group_userdirectoryid,
+				'test_username' => $data['username'],
+				'test_password' => $data['password']
+			]);
+		}
+		catch (APIException $e) {
+			if ($e->getCode() == ZBX_API_ERROR_PERMISSIONS) {
+				self::increaseFailedLoginAttempts($db_user);
+
+				self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+					_('Incorrect user name or password or account is temporarily blocked.')
+				);
+			}
+
+			throw $e;
+		}
+	}
+
+	private function tryToUpdateLdapProvisionedUser(array &$db_user, int &$group_status, array $idp_user_data): void {
+		if (CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])) {
+			$idp_user_data['userid'] = $db_user['userid'];
+
+			if ($this->updateProvisionedUser($idp_user_data)) {
+
+				$db_user = self::findUsersByUsername($db_user['username'])[0];
+
+				self::addUserGroupFields($db_user, $group_status);
+				$db_user['auth_type'] = ZBX_AUTH_LDAP;
+			}
+			else {
+				$db_user['deprovisioned'] = true;
+			}
+		}
+	}
+
+	private static function verifyPassword(array $data, array &$db_user): void {
+		$options = [
+			'output' => ['passwd'],
+			'userids' => $db_user['userid']
+		];
+		[$db_passwd] = DBfetchColumn(DBselect(DB::makeSql('users', $options)), 'passwd');
+
+		if (!password_verify($data['password'], $db_passwd)) {
+			self::increaseFailedLoginAttempts($db_user);
+
+			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PERMISSIONS,
+				_('Incorrect user name or password or account is temporarily blocked.')
+			);
+		}
+	}
+
+	private static function increaseFailedLoginAttempts(array $db_user): void {
+		$attempt_failed = $db_user['attempt_failed'] + 1;
+
+		DB::update('users', [
+			'values' => [
+				'attempt_failed' => $attempt_failed,
+				'attempt_clock' => time(),
+				'attempt_ip' => substr(CWebUser::getIp(), 0, 39)
+			],
+			'where' => ['userid' => $db_user['userid']]
+		]);
+
+		$users = [['userid' => $db_user['userid'], 'attempt_failed' => $attempt_failed]];
+		$db_users = [$db_user['userid'] => $db_user];
+
+		self::addAuditLogByUser($db_user['userid'], CWebUser::getIp(), $db_user['username'],
+			CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users
+		);
+	}
+
+	private static function checkGroupStatus(array $db_user, int $group_status): void {
+		if ($group_status == GROUP_STATUS_DISABLED) {
+			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PARAMETERS,
+				_('No permissions for system access.')
+			);
+		}
+	}
+
+	private static function checkRole(array $db_user): void {
+		if ($db_user['roleid'] == 0) {
+			self::loginException($db_user['userid'], $db_user['username'], ZBX_API_ERROR_PARAMETERS,
+				_('No permissions for system access.')
+			);
+		}
+	}
+
+	private static function loginException(?string $userid, string $username, int $code, string $error): void {
+		self::addAuditLogByUser($userid, CWebUser::getIp(), $username, CAudit::ACTION_LOGIN_FAILED,
+			CAudit::RESOURCE_USER
+		);
+
+		self::exception($code, $error);
+	}
+
+	private static function addAdditionalFields(array &$db_user): void {
+		$db_user['type'] = self::getUserType($db_user['roleid']);
+		$db_user['userip'] = CWebUser::getIp();
+
+		if ($db_user['lang'] === LANG_DEFAULT) {
+			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
+		}
+
+		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
+			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
+		}
+	}
+
+	private static function resetFailedLoginAttempts(array $db_user): void {
+		$upd_user = ['attempt_failed' => 0];
+
+		DB::update('users', [
+			'values' => $upd_user,
+			'where' => ['userid' => $db_user['userid']]
+		]);
+
+		$users = [$upd_user + ['userid' => $db_user['userid']]];
+		$db_users = [$db_user['userid'] => $db_user];
+
+		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
+	}
+
+
+	private static function setTimezone(?string $timezone): void {
+		if ($timezone !== null && $timezone !== ZBX_DEFAULT_TIMEZONE) {
+			date_default_timezone_set($timezone);
+		}
+	}
+
+	private static function createSession(array &$db_user): void {
+		$db_user['sessionid'] = CEncryptHelper::generateKey();
+		$db_user['secret'] = CEncryptHelper::generateKey();
+
+		DB::insert('sessions', [[
+			'sessionid' => $db_user['sessionid'],
+			'userid' => $db_user['userid'],
+			'lastaccess' => time(),
+			'status' => ZBX_SESSION_ACTIVE,
+			'secret' => $db_user['secret']
+		]], false);
+
+		self::$userData = $db_user;
 	}
 
 	/**
@@ -1712,34 +1997,36 @@ class CUser extends CApiService {
 			$userid = $db_token['userid'];
 		}
 
-		$db_users = DB::select('users', [
-			'output' => ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
-				'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-				'userdirectoryid', 'ts_provisioned'
-			],
-			'userids' => $userid
-		]);
+		$fields = ['userid', 'username', 'name', 'surname', 'url', 'autologin', 'autologout', 'lang', 'refresh',
+			'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
+			'userdirectoryid', 'ts_provisioned'
+		];
 
-		$db_user = $db_users[0];
+		[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
 
-		$permissions = $this->getUserGroupsPermissions($db_user);
-
-		$db_user = $this->addExtraFields($db_user, $permissions);
-		$this->setTimezone($db_user['timezone']);
+		self::addUserGroupFields($db_user, $group_status, $group_auth_type);
 
 		if (!$db_user['deprovisioned'] && CAuthenticationHelper::isTimeToProvision($db_user['ts_provisioned'])
 				&& CAuthenticationHelper::isLdapProvisionEnabled($db_user['userdirectoryid'])
 				&& !$this->provisionLdapUser($db_user)) {
-			$db_user['deprovisioned'] = true;
+			[$db_user] = DB::select('users', ['output' => $fields, 'userids' => $userid]);
+
+			self::addUserGroupFields($db_user, $group_status, $group_auth_type);
 		}
+
+		$db_user['auth_type'] =
+			$db_user['userdirectoryid'] == 0 || !self::isLdapUserDirectory($db_user['userdirectoryid'])
+				? $group_auth_type
+				: ZBX_AUTH_LDAP;
+
+		self::addAdditionalFields($db_user);
+		self::setTimezone($db_user['timezone']);
 
 		if ($session['sessionid'] !== null) {
 			$autologout = timeUnitToSeconds($db_user['autologout']);
 
-			// Check system permissions.
 			if (($autologout != 0 && $db_session['lastaccess'] + $autologout <= $time)
-					|| $permissions['users_status'] == GROUP_STATUS_DISABLED
-					|| $db_user['deprovisioned']) {
+					|| $group_status == GROUP_STATUS_DISABLED) {
 				DB::delete('sessions', [
 					'status' => ZBX_SESSION_PASSIVE,
 					'userid' => $db_user['userid']
@@ -1764,8 +2051,7 @@ class CUser extends CApiService {
 			$db_user['secret'] = $db_session['secret'];
 		}
 		else {
-			// Check permissions.
-			if ($permissions['users_status'] == GROUP_STATUS_DISABLED || $db_user['deprovisioned']) {
+			if ($group_status == GROUP_STATUS_DISABLED) {
 				self::exception(ZBX_API_ERROR_NO_AUTH, _('Not authorized.'));
 			}
 
@@ -1995,8 +2281,9 @@ class CUser extends CApiService {
 	 * @return array
 	 */
 	public function updateProvisionedUser(array $idp_user_data): array {
-		$attrs = array_flip(array_merge(self::PROVISIONED_FIELDS, ['userdirectoryid', 'userid']));
-		unset($attrs['passwd']);
+		$attrs = array_flip(array_merge(
+			array_diff(self::PROVISIONED_FIELDS, ['username', 'passwd']), ['userdirectoryid', 'userid']
+		));
 		$user = array_intersect_key($idp_user_data, $attrs);
 
 		$userid = $user['userid'];
@@ -2033,98 +2320,7 @@ class CUser extends CApiService {
 
 		self::updateForce(array_values($users), $db_users);
 
-		return $user;
-	}
-
-	/**
-	 * Returns user groups permissions of specific user.
-	 *
-	 * @param array $user
-	 *
-	 * @return array
-	 */
-	private function getUserGroupsPermissions(array $user): array {
-		$permissions = [
-			'debug_mode' => GROUP_DEBUG_MODE_DISABLED,
-			'users_status' => GROUP_STATUS_ENABLED,
-			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
-			'deprovisioned' => false,
-			'userdirectoryid' => 0
-		];
-		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
-
-		$db_usrgrps = DBselect(
-			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
-			' FROM usrgrp g,users_groups ug'.
-			' WHERE g.usrgrpid=ug.usrgrpid'.
-				' AND ug.userid='.$user['userid']
-		);
-
-		$has_user_groups = false;
-		$userdirectoryids = [];
-
-		while ($db_usrgrp = DBfetch($db_usrgrps)) {
-			$has_user_groups = true;
-
-			if ($db_usrgrp['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
-				$permissions['debug_mode'] = GROUP_DEBUG_MODE_ENABLED;
-			}
-
-			if ($db_usrgrp['usrgrpid'] == $deprovision_groupid && $user['userdirectoryid'] !== '0') {
-				$permissions['deprovisioned'] = true;
-
-				continue;
-			}
-
-			if ($db_usrgrp['users_status'] == GROUP_STATUS_DISABLED) {
-				$permissions['users_status'] = GROUP_STATUS_DISABLED;
-			}
-
-			if ($db_usrgrp['gui_access'] > $permissions['gui_access']) {
-				$permissions['gui_access'] = $db_usrgrp['gui_access'];
-				$userdirectoryids = [];
-			}
-
-			if ($permissions['gui_access'] == $db_usrgrp['gui_access']
-					&& ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_LDAP
-						|| ($db_usrgrp['gui_access'] == GROUP_GUI_ACCESS_SYSTEM
-							&& CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_LDAP
-			))) {
-				$userdirectoryids[$db_usrgrp['userdirectoryid']] = true;
-			}
-		}
-
-		if (!$has_user_groups) {
-			$permissions['gui_access'] = GROUP_GUI_ACCESS_INTERNAL;
-		}
-
-		if ($userdirectoryids) {
-			if (array_key_exists(0, $userdirectoryids)) {
-				unset($userdirectoryids[0]);
-				$default_userdirectoryid = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_USERDIRECTORYID);
-
-				if ($default_userdirectoryid != 0) {
-					$userdirectoryids[$default_userdirectoryid] = true;
-				}
-			}
-
-			if (count($userdirectoryids) === 1) {
-				$permissions['userdirectoryid'] = array_keys($userdirectoryids)[0];
-			}
-			elseif (count($userdirectoryids) > 1) {
-				$db_userdirectoryids = API::UserDirectory()->get([
-					'output' => [],
-					'userdirectoryids' => array_keys($userdirectoryids),
-					'sortfield' => ['name'],
-					'limit' => 1,
-					'preservekeys' => true
-				]);
-
-				$permissions['userdirectoryid'] = array_keys($db_userdirectoryids)[0];
-			}
-		}
-
-		return $permissions;
+		return $user + ['username' => $db_users[$userid]['username']];
 	}
 
 	/**
@@ -2134,7 +2330,7 @@ class CUser extends CApiService {
 	 *
 	 * @return int
 	 */
-	private function getUserType(string $roleid): int {
+	private static function getUserType(string $roleid): int {
 		if (!$roleid) {
 			return USER_TYPE_ZABBIX_USER;
 		}
@@ -2239,200 +2435,6 @@ class CUser extends CApiService {
 		}
 
 		return $result;
-	}
-
-	/**
-	 * Initialize session for user. Returns user data array with valid sessionid.
-	 *
-	 * @param array  $db_user  User data from database.
-	 *
-	 * @return array
-	 */
-	private static function createSession(array $db_user): array {
-		$db_user['sessionid'] = CEncryptHelper::generateKey();
-		$db_user['secret'] = CEncryptHelper::generateKey();
-
-		DB::insert('sessions', [[
-			'sessionid' => $db_user['sessionid'],
-			'userid' => $db_user['userid'],
-			'lastaccess' => time(),
-			'status' => ZBX_SESSION_ACTIVE,
-			'secret' => $db_user['secret']
-		]], false);
-
-		self::$userData = $db_user;
-
-		if ($db_user['attempt_failed'] != 0) {
-			$upd_user = ['attempt_failed' => 0];
-
-			DB::update('users', [
-				'values' => $upd_user,
-				'where' => ['userid' => $db_user['userid']]
-			]);
-
-			$users = [$upd_user + ['userid' => $db_user['userid']]];
-			$db_users = [$db_user['userid'] => $db_user];
-
-			self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_USER, $users, $db_users);
-		}
-
-		return $db_user;
-	}
-
-	/**
-	 * Find accessible user by username.
-	 *
-	 * @param string $username          User username to search for.
-	 * @param bool   $case_sensitive    Perform case sensitive search.
-	 * @param int    $default_auth      System default authentication type.
-	 * @param bool   $do_group_check    Is actual only when $case_sensitive equals false. In HTTP authentication case
-	 *                                  user username string is case insensitive string even for groups with frontend
-	 *                                  access GROUP_GUI_ACCESS_INTERNAL.
-	 *
-	 * @return array The array with the following keys:
-	 *                       - 'error' - (optional) the error message;
-	 *                       - 'db_user' - contains user data when at least one user is found;
-	 *                       - 'permissions' - (optional) contains user permissions data.
-	 */
-	public function findAccessibleUser(string $username, bool $case_sensitive, int $default_auth,
-			bool $do_group_check): array {
-		$db_users = [];
-		$group_to_auth_map = [
-			GROUP_GUI_ACCESS_SYSTEM => $default_auth,
-			GROUP_GUI_ACCESS_INTERNAL => ZBX_AUTH_INTERNAL,
-			GROUP_GUI_ACCESS_LDAP => ZBX_AUTH_LDAP,
-			GROUP_GUI_ACCESS_DISABLED => $default_auth
-		];
-		$fields = ['userid', 'username', 'name', 'surname', 'passwd', 'url', 'autologin', 'autologout', 'lang',
-			'refresh', 'theme', 'attempt_failed', 'attempt_ip', 'attempt_clock', 'rows_per_page', 'timezone', 'roleid',
-			'userdirectoryid'
-		];
-
-		if ($case_sensitive) {
-			$db_users = DB::select('users', [
-				'output' => $fields,
-				'filter' => ['username' => $username]
-			]);
-		}
-		else {
-			$db_users_rows = DBfetchArray(DBselect(
-				'SELECT '.implode(',', $fields).
-				' FROM users'.
-					' WHERE LOWER(username)='.zbx_dbstr(strtolower($username))
-			));
-
-			if ($do_group_check) {
-				// Users with ZBX_AUTH_INTERNAL access attribute 'username' is always case sensitive.
-				foreach($db_users_rows as $db_user_row) {
-					$permissions = $this->getUserGroupsPermissions($db_user_row);
-
-					if ($group_to_auth_map[$permissions['gui_access']] != ZBX_AUTH_INTERNAL
-							|| $db_user_row['username'] === $username) {
-						$db_users[] = $db_user_row;
-					}
-				}
-			}
-			else {
-				$db_users = $db_users_rows;
-			}
-		}
-
-		if (!$db_users) {
-			return ['error' => _('Incorrect user name or password or account is temporarily blocked.')];
-		}
-
-		$db_user = reset($db_users);
-
-		if (count($db_users) > 1) {
-			return ['error' => _s('Authentication failed: %1$s.', _('supplied credentials are not unique')),
-				'db_user' => $db_user
-			];
-		}
-
-		$permissions = $this->getUserGroupsPermissions($db_user);
-
-		if ($permissions['users_status'] == GROUP_STATUS_DISABLED) {
-			return ['error' => _('No permissions for system access.'), 'db_user' => $db_user];
-		}
-
-		return ['db_user' => $db_user, 'permissions' => $permissions];
-	}
-
-	/**
-	 * Adds extra fields to database user data.
-	 *
-	 * @param array  $db_user
-	 * @param array  $group_attrs
-	 * @param string $group_attrs['debug_mode']
-	 * @param string $group_attrs['gui_access']
-	 * @param string $group_attrs['userdirectoryid']
-	 * @param bool   $group_attrs['deprovisioned']
-	 *
-	 * @return array $db_user array with extra fields set.
-	 */
-	private function addExtraFields(array $db_user, array $group_attrs): array {
-		$db_user['type'] = $this->getUserType($db_user['roleid']);
-		$db_user['userip'] = CWebUser::getIp();
-		$db_user['debug_mode'] = $group_attrs['debug_mode'];
-		$db_user['gui_access'] = $group_attrs['gui_access'];
-		$db_user['deprovisioned'] = $group_attrs['deprovisioned'];
-
-		if ($db_user['lang'] === LANG_DEFAULT) {
-			$db_user['lang'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG);
-		}
-
-		if ($db_user['timezone'] === TIMEZONE_DEFAULT) {
-			$db_user['timezone'] = CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_TIMEZONE);
-		}
-
-		$gui_access = $db_user['gui_access'];
-
-		if ($gui_access == GROUP_GUI_ACCESS_SYSTEM) {
-			$gui_access = CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE) == ZBX_AUTH_INTERNAL
-				? GROUP_GUI_ACCESS_INTERNAL : GROUP_GUI_ACCESS_LDAP;
-		}
-
-		switch ($gui_access) {
-			case GROUP_GUI_ACCESS_INTERNAL:
-				$db_user['auth_type'] = ZBX_AUTH_INTERNAL;
-				$userdirectoryid = $db_user['userdirectoryid'] == 0
-					? $group_attrs['userdirectoryid']
-					: $db_user['userdirectoryid'];
-
-				if ($userdirectoryid != 0) {
-					$userdirectories = DB::select('userdirectory', [
-						'output' => ['idp_type'],
-						'userdirectoryids' => [$userdirectoryid]
-					]);
-
-					if ($userdirectories && $userdirectories[0]['idp_type'] == IDP_TYPE_LDAP) {
-						$db_user['auth_type'] = ZBX_AUTH_LDAP;
-					}
-				}
-
-				break;
-
-			case GROUP_GUI_ACCESS_LDAP:
-				$db_user['auth_type'] = ZBX_AUTH_LDAP;
-
-				break;
-
-			default:
-				$db_user['auth_type'] = ZBX_AUTH_NONE;
-		}
-
-		return $db_user;
-	}
-
-	/**
-	 * Sets the default user timezone used by all date/time functions.
-	 *
-	 * @param string|null $timezone
-	 */
-	private function setTimezone(?string $timezone): void {
-		if ($timezone !== null && $timezone !== ZBX_DEFAULT_TIMEZONE) {
-			date_default_timezone_set($timezone);
-		}
 	}
 
 	/**
