@@ -77,7 +77,7 @@ class testItemTest extends CWebTest {
 	/**
 	 * Check test item button state depending on item type.
 	 *
-	 * @param arary		$data			data provider
+	 * @param array		$data			data provider
 	 * @param string	$item_name		item given name
 	 * @param string	$item_type		type of an item: item, prototype or lld rule
 	 * @param string	$success_text	text part of a success message
@@ -701,7 +701,7 @@ class testItemTest extends CWebTest {
 	/**
 	 * Check test item form.
 	 *
-	 * @param arary		$data			data provider
+	 * @param array		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
 	 * @param string	$id				id of a host, template or LLD rule
 	 * @param string	$items			pointer to form in URL

@@ -42,8 +42,6 @@ class testPageHostPrototypes extends testPagePrototypes {
 		];
 	}
 
-	public $single_success = 'Host prototype updated';
-	public $several_success = 'Host prototypes updated';
 	public $sql = 'SELECT null FROM hosts WHERE hostid=';
 
 	public $headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];

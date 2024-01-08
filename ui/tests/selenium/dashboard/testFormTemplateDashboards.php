@@ -3687,7 +3687,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Problems'),
-						'Name' => 'roblems widget with too much lines',
+						'Name' => 'Problems widget with too much lines',
 						'Show lines' => 101
 					],
 					'error_message' => 'Invalid parameter "Show lines": value must be one of 1-100.'
@@ -3758,7 +3758,7 @@ class testFormTemplateDashboards extends CWebTest {
 						'Type' => CFormElement::RELOADABLE_FILL('Problems by severity'),
 						'Name' => 'Problems by severity widget with all parameters',
 						'Refresh interval' => '10 seconds',
-						'Problem' => 'Our reality is disapointing',
+						'Problem' => 'Our reality is disappointing',
 						'Severity' => ['Not classified', 'Information', 'Warning', 'Average', 'High', 'Disaster'],
 						'Problem tags' => 'Or',
 						'id:tags_0_tag' => 'tag_name',

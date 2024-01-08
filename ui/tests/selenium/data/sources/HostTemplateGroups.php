@@ -174,7 +174,7 @@ class HostTemplateGroups {
 
 		CDataHelper::call('correlation.create', [
 			[
-				'name' => 'Corellation for host group testing',
+				'name' => 'Correlation for host group testing',
 				'filter' => [
 					'evaltype' => ZBX_CORR_OPERATION_CLOSE_OLD,
 					'conditions' => [

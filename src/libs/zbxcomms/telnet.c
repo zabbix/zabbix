@@ -132,7 +132,7 @@ static ssize_t	telnet_socket_write(zbx_socket_t *s, const void *buf, size_t coun
 				break;
 			}
 
-			telnet_waitsocket(s->socket, POLLOUT);
+			(void)telnet_waitsocket(s->socket, POLLOUT);
 			continue;
 		}
 
