@@ -2294,6 +2294,7 @@ class CUser extends CApiService {
 		]);
 		$user['ts_provisioned'] = time();
 		$users = [$userid => $user];
+		$user += ['username' => $db_users[$userid]['username']];
 
 		if (array_key_exists('medias', $user)) {
 			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
@@ -2320,7 +2321,7 @@ class CUser extends CApiService {
 
 		self::updateForce(array_values($users), $db_users);
 
-		return $user + ['username' => $db_users[$userid]['username']];
+		return $user;
 	}
 
 	/**
