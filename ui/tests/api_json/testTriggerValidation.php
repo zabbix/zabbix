@@ -140,7 +140,7 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
-			'add unexisting dependent trigger' => [
+			'add nonexistent dependent trigger' => [
 				'triggers' => [
 					[
 						'triggerid' => self::UPDATE_TRIGGER_1,

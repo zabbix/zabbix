@@ -402,7 +402,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param bool   $options['html']				  Returns formatted trigger expression. Default: false.
 	 * @param bool   $options['resolve_usermacros']	  Resolve user macros. Default: false.
 	 * @param bool   $options['resolve_macros']		  Resolve macros in item keys and functions. Default: false.
-	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
+	 * @param bool   $options['resolve_functionids']  Resolve functionid macros. Default: true.
 	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
 	 * @param string $options['context']              Additional parameter in URL to identify main section.
 	 *                                                Default: 'host'.
@@ -1911,7 +1911,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
 	 * inventory<1-9> macros, user macros, event macros, user data macros and manual input macro.
 	 *
-	 * @param array  $data                                  Array of unersolved macros.
+	 * @param array  $data                                  Array of unresolved macros.
 	 * @param array  $data[<eventid>]                       Array of scripts. Contains script ID as keys.
 	 * @param array  $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
 	 * @param array  $events                                Array of events.
