@@ -42,7 +42,12 @@ class CFormFieldsetCollapsible {
 		});
 
 		for (const element of this._observed_fields) {
-			new ResizeObserver(() => this._update()).observe(element);
+			new ResizeObserver(() => {
+				// Use of setTimeout() to prevent ResizeObserver observation error in Safari.
+				setTimeout(() => {
+					this._update();
+				});
+			}).observe(element);
 		}
 	}
 
