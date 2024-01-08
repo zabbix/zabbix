@@ -193,10 +193,7 @@ void	zbx_locks_destroy(void)
 	shm_id = 0;
 #else
 	if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
-	{
-		zabbix_log(LOG_LEVEL_TRACE, "cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID,
-				zbx_strerror(errno));
-	}
+		zabbix_log(LOG_LEVEL_TRACE, "cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
 #endif
 }
 
