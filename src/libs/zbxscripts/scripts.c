@@ -504,7 +504,11 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	zbx_dc_interface_t	interface;
 
 	memset(&interface, 0, sizeof(interface));
-	zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT);
+	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT))
+	{
+		zbx_strlcpy(error, "cannot find host AGENT interface", max_error_len);
+		return FAIL;
+	}
 
 	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
 			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
