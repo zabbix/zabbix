@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,6 +86,10 @@ abstract class CWidgetFieldView {
 		$this->field_hint = $hint;
 
 		return $this;
+	}
+
+	public function getLabelClass(): ?string {
+		return $this->label_class_list ? implode(' ', $this->label_class_list) : null;
 	}
 
 	public function addLabelClass(?string $class): self {

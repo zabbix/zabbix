@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -382,7 +382,7 @@ class testFormGroups extends CWebTest {
 			$form = $this->openForm($data['fields']['Group name']);
 			$form->checkValue($data['fields']['Group name']);
 
-			// Change group name after succefull update scenario.
+			// Change group name after successful update scenario.
 			if ($action === 'update') {
 				static::$update_group = $data['fields']['Group name'];
 			}
@@ -877,11 +877,11 @@ class testFormGroups extends CWebTest {
 	 */
 	public function checkSubgroupsPermissions($data) {
 		// Prepare groups array, change key to 'Host groups' or 'Template groups'.
-		foreach ($data['groups_after'] as &$group_premissions) {
-			$group_premissions[ucfirst($this->object).' groups'] = $group_premissions['groups'];
-			unset($group_premissions['groups']);
+		foreach ($data['groups_after'] as &$group_permissions) {
+			$group_permissions[ucfirst($this->object).' groups'] = $group_permissions['groups'];
+			unset($group_permissions['groups']);
 		}
-		unset($group_premissions);
+		unset($group_permissions);
 
 		// Create new parent or subgroup to check nested permissions.
 		if (array_key_exists('create', $data)) {
