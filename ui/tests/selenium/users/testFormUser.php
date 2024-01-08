@@ -68,7 +68,7 @@ const SQL = 'SELECT * FROM users';
 		// Create user with frontent access -> LDAP.
 		CDataHelper::call('user.create', [
 			[
-				'username' => 'John Smith',
+				'username' => 'John Zabbix',
 				'passwd' => 'test5678',
 				'roleid' => '3'
 			],
@@ -78,7 +78,7 @@ const SQL = 'SELECT * FROM users';
 				'roleid' => '2',
 				'usrgrps' => [
 					[
-						'usrgrpid' =>  $usergrpids['Zabbix LDAP']
+						'usrgrpid' => $usergrpids['Zabbix LDAP']
 					]
 				]
 			]
@@ -99,7 +99,7 @@ const SQL = 'SELECT * FROM users';
 						'Password' => '',
 						'Password (once again)' => '',
 						'Language' => 'System default',
-						'Time zone' => 'System default: (UTC+03:00) Europe/Riga', // Jenkins time zone.
+						'Time zone' => CDateTimeHelper::getTimeZoneFormat('System default'), // For local tests change system default 'Europe/Riga' to 'UTC'.
 						'Theme' => 'System default',
 						'Auto-login' => false,
 						'id:autologout_visible' => false,
@@ -110,9 +110,8 @@ const SQL = 'SELECT * FROM users';
 					],
 					'disabled' => ['id:autologout'],
 					'enabled_buttons' => ['Add', 'Cancel', 'Select'],
-					'count' => 3,
-					'hintbox_warning' => 'You are not able to choose some of the languages, '.
-							'because locales for them are not installed on the web server.'
+					'hintbox_warning' => 'You are not able to choose some of the languages,'.
+							' because locales for them are not installed on the web server.'
 				]
 			],
 			[
@@ -129,9 +128,15 @@ const SQL = 'SELECT * FROM users';
 						'Rows per page' => '50',
 						'URL (after login)' => ''
 					],
-					'disabled' => ['Change password', 'id:label-lang', 'id:label-timezone', 'id:label-theme'],
+					'disabled' => ['Username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
+						'xpath:.//button[@id="label-timezone"]/..', 'xpath:.//button[@id="label-theme"]/..'
+					],
+					'disabled_values' => [
+						'id:label-lang' => 'System default',
+						'id:label-timezone' => CDateTimeHelper::getTimeZoneFormat('System default'),
+						'id:label-theme' => 'System default'
+					],
 					'enabled_buttons' => ['Update', 'Delete', 'Cancel', 'Select'],
-					'count' => 4,
 					'hintbox_warning' => 'Password can only be changed for users using the internal Zabbix authentication.'
 				]
 			],
@@ -139,7 +144,7 @@ const SQL = 'SELECT * FROM users';
 				[
 					'user' => 'Admin',
 					'role' => 'Super admin role',
-					'required' => ['Username', 'Current password', 'Password',  'Password (once again)', 'Refresh', 'Rows per page'],
+					'required' => ['Username', 'Current password', 'Password', 'Password (once again)', 'Refresh', 'Rows per page'],
 					'default' => [
 						'Username' => 'Admin',
 						'Name' => 'Zabbix',
@@ -149,7 +154,7 @@ const SQL = 'SELECT * FROM users';
 						'Password' => '',
 						'Password (once again)' => '',
 						'Language' => 'System default',
-						'Time zone' => 'System default: (UTC+03:00) Europe/Riga', // Jenkins time zone.
+						'Time zone' => CDateTimeHelper::getTimeZoneFormat('System default'),
 						'Theme' => 'System default',
 						'Auto-login' => true,
 						'id:autologout_visible' => false,
@@ -160,9 +165,8 @@ const SQL = 'SELECT * FROM users';
 					],
 					'disabled' => ['id:autologout', 'button:Delete'],
 					'enabled_buttons' => ['Update', 'Cancel', 'Select'],
-					'count' => 3,
-					'hintbox_warning' => 'You are not able to choose some of the languages, '.
-							'because locales for them are not installed on the web server.'
+					'hintbox_warning' => 'You are not able to choose some of the languages,'.
+							' because locales for them are not installed on the web server.'
 				]
 			]
 		];
@@ -173,13 +177,13 @@ const SQL = 'SELECT * FROM users';
 	 */
 	public function testFormUser_Layout($data) {
 		$this->page->login()->open('zabbix.php?action=user.list');
-		$user = CTestArrayHelper::get($data, 'user', 'Admin');
+		$user = CTestArrayHelper::get($data, 'user', 'new');
 
-		if (array_key_exists('user', $data)) {
-			$this->query('link', $user)->waitUntilVisible()->one()->click();
+		if ($user === 'new') {
+			$this->query('button:Create user')->one()->click();
 		}
 		else {
-			$this->query('button:Create user')->one()->click();
+			$this->query('link', $user)->waitUntilVisible()->one()->click();
 		}
 
 		$this->page->assertTitle('Configuration of users');
@@ -190,17 +194,27 @@ const SQL = 'SELECT * FROM users';
 		$this->assertEquals(['User', 'Media', 'Permissions'], $form->getTabs());
 
 		// Check default values.
-		if (array_key_exists('user', $data) && $user === 'Admin') {
+		if ($user === 'Admin') {
+			foreach (['id:current_password', 'id:password1', 'id:password2'] as $field) {
+				$this->assertFalse($form->query($field)->one(false)->isValid());
+			}
+
 			$form->query('button:Change password')->one()->click();
+			$this->assertFalse($form->query('button:Change password')->one(false)->isValid());
 		}
 
 		$form->checkValue($data['default']);
 
-		if (array_key_exists('user', $data) && $user === 'guest') {
-			$this->assertEquals(0, $form->query('button', $data['disabled'])
-					->all()->filter(CElementFilter::CLICKABLE)->count()
-			);
-			$this->assertEquals(0, $form->query('id:username')->all()->filter(CElementFilter::CLICKABLE)->count());
+		foreach ($data['disabled'] as $locator) {
+			$field = $form->getField($locator);
+			$this->assertTrue($field->isDisplayed());
+			$this->assertFalse($field->isEnabled());
+		}
+
+		if (array_key_exists('disabled_values', $data)) {
+			foreach ($data['disabled_values'] as $element => $value) {
+				$this->assertEquals($value, $form->query($element)->one()->getText());
+			}
 		}
 		else {
 			$inputs = [
@@ -236,25 +250,21 @@ const SQL = 'SELECT * FROM users';
 				$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
 			}
 
-			if (array_key_exists('user', $data) && $user === 'Admin') {
+			if ($user === 'Admin') {
 				$this->assertTrue($form->getField('Current password')->isAttributePresent(['maxlength' => '255']));
 			}
 
-			foreach ($data['disabled'] as $field) {
-				$this->assertTrue($form->getField($field)->isEnabled(false));
-			}
-
-			$form->getLabel('Password')->query('xpath:./button[@data-hintbox]')->one()->click();
-			$hint = $form->query('xpath://div[@class="overlay-dialogue"]')->waitUntilReady();
-			$help_message = "Password requirements:".
-					"\nmust be at least 8 characters long".
-					"\nmust not contain user's name, surname or username".
-					"\nmust not be one of common or context-specific passwords";
+			$form->getLabel('Password')->query('xpath:.//button[@data-hintbox]')->one()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->waitUntilReady();
+			$help_message = "Password requirements:\n".
+					"must be at least 8 characters long\n".
+					"must not contain user's name, surname or username\n".
+					"must not be one of common or context-specific passwords";
 			$this->assertEquals($help_message, $hint->one()->getText());
 			$hint->query('class:btn-overlay-close')->one()->click();
 
 			$info_message = 'Password is not mandatory for non internal authentication type.';
-			$this->assertEquals($info_message, $form->query('xpath://div[contains(text(), "'.$info_message.'")]')->one()->getText());
+			$this->assertEquals($info_message, $form->query('xpath:.//div[contains(text(), "'.$info_message.'")]')->one()->getText());
 		}
 
 		// Check hintbox contains correct text message.
@@ -266,40 +276,39 @@ const SQL = 'SELECT * FROM users';
 		$this->assertEquals($data['required'], $form->getRequiredLabels());
 
 		// Check that buttons are present and clickable.
-		$this->assertEquals($data['count'], $form->query('button', $data['enabled_buttons'])->all()
+		$this->assertEquals(count($data['enabled_buttons']), $form->query('button', $data['enabled_buttons'])->all()
 				->filter(CElementFilter::CLICKABLE)->count()
 		);
 
 		// Check Media tab layout.
 		$form->selectTab('Media');
-		$this->assertEqualsCanonicalizing(['Media'], $form->getLabels(CElementFilter::VISIBLE)->asText());
-		$media_table = $form->query('id:mediaTab')->asTable()->one();
+		$this->assertEquals(['Media'], array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
+		$media_tab = $form->query('id:mediaTab')->one();
+		$media_table = $media_tab->asTable();
 
 		$this->assertEquals(['Type', 'Send to', 'When active', 'Use if severity', 'Status', 'Action'],
 				$media_table->getHeadersText()
 		);
 
+		$add_button = $media_tab->query('button:Add')->one();
+		$this->assertTrue($add_button->isClickable());
+
 		// Check that Media tab buttons are present.
-		if (array_key_exists('user', $data)) {
-			if ($user === 'Admin') {
-				$this->assertEquals(3, $form->query('button', ['Add', 'Update', 'Cancel'])->all()
-						->filter(CElementFilter::CLICKABLE)->count()
-				);
-			}
-			else {
-				$this->assertEquals(4, $form->query('button', ['Add', 'Update', 'Delete', 'Cancel'])->all()
-						->filter(CElementFilter::CLICKABLE)->count()
-				);
-			}
+		if ($user === 'Admin') {
+			$buttons = ['Update', 'Cancel'];
+		}
+		elseif ($user === 'guest') {
+			$buttons = ['Update', 'Delete', 'Cancel'];
 		}
 		else {
-			$this->assertEquals(3, $form->query('button', ['Add', 'Cancel'])->all()
-					->filter(CElementFilter::CLICKABLE)->count()
-			);
+			$buttons = ['Add', 'Cancel'];
 		}
+		$this->assertEquals(count($buttons), $this->query('class:tfoot-buttons')->one()->query('button', $buttons)->all()
+				->filter(CElementFilter::CLICKABLE)->count()
+		);
 
-		$this->query('xpath://button[contains(@class, "btn-link") and contains(text(), "Add")]')->one()->click();
-		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
+		$add_button->click();
+		$dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 		$this->assertEquals('Media', $dialog->getTitle());
 		$dialog_form = $dialog->asForm();
 
@@ -319,25 +328,32 @@ const SQL = 'SELECT * FROM users';
 			],
 			'buttons' => ['Add', 'Cancel']
 		];
-		$this->assertEqualsCanonicalizing($modal_form['fields'], $dialog_form->getLabels(CElementFilter::VISIBLE)->asText());
+		$this->assertEquals($modal_form['fields'], array_values($dialog_form->getLabels(CElementFilter::VISIBLE)->asText()));
 		$dialog_form->checkValue($modal_form['default']);
 		$this->assertEquals(2, $dialog->getFooter()->query('button', $modal_form['buttons'])->all()
 				->filter(CElementFilter::CLICKABLE)->count()
 		);
+
+		foreach (['Send to', 'When active'] as $label) {
+			$this->assertTrue($dialog_form->isRequired($label));
+		}
+
 		$dialog->close();
 
 		// Check Permissions tab layout.
 		$form->selectTab('Permissions');
 		$form->checkValue($data['role']);
 
-		if (array_key_exists('user', $data) && $user === 'Admin') {
+		if ($user === 'Admin') {
+			$this->assertFalse($form->getField('Role')->asMultiselect()->isEnabled());
 			$this->assertFalse($form->isRequired('Role'));
 		}
 		else {
+			$this->assertTrue($form->getField('id:roleid')->isEnabled());
 			$this->assertTrue($form->isRequired('Role'));
 		}
 
-		if($data['role'] === '') {
+		if ($data['role'] === '') {
 			$this->assertTrue($form->getField('id:roleid_ms')->isAttributePresent(['placeholder' => 'type here to search']));
 		}
 	}
@@ -1020,19 +1036,18 @@ const SQL = 'SELECT * FROM users';
 				]
 			],
 			// Empty password fields for user without user group.
-			// TODO: Uncomment data provider when ZBX-23497 will be fixed.
-//			[
-//				[
-//					'expected' => TEST_BAD,
-//					'user_to_update' => 'John Smith',
-//					'fields' => [
-//						'Password' => '',
-//						'Password (once again)' => ''
-//					],
-//					'error_title' => 'Cannot update user',
-//					'error_details' => 'Incorrect value for field "Password": cannot be empty'
-//				]
-//			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'user_to_update' => 'John Zabbix',
+					'fields' => [
+						'Password' => '',
+						'Password (once again)' => ''
+					],
+					'error_title' => 'Cannot update user',
+					'error_details' => 'Incorrect value for field "Password": cannot be empty'
+				]
+			],
 			// Username is already taken by another user.
 			[
 				[
@@ -1390,7 +1405,11 @@ const SQL = 'SELECT * FROM users';
 	 */
 	public function testFormUser_Update($data) {
 		$update_user = CTestArrayHelper::get($data, 'user_to_update', 'Tag-user');
-		$old_hash = CDBHelper::getHash(self::SQL);
+
+		if ($data['expected'] === TEST_BAD) {
+			$old_hash = CDBHelper::getHash(self::SQL);
+		}
+
 		$this->page->login()->open('zabbix.php?action=user.list');
 		$this->query('link', $update_user)->waitUntilVisible()->one()->click();
 
@@ -1425,7 +1444,7 @@ const SQL = 'SELECT * FROM users';
 		$form->submit();
 
 		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields'])) {
-			if ($update_user === 'LDAP user' || $update_user === 'no-access-to-the-frontend') {
+			if ($update_user === 'LDAP user' || $update_user === 'no-access-to-the-frontend' || $update_user === 'John Zabbix') {
 				$this->assertFalse($this->page->isAlertPresent());
 			}
 			else {
@@ -1557,7 +1576,7 @@ const SQL = 'SELECT * FROM users';
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Username' => 'John Smith'
+						'Username' => 'John Zabbix'
 					]
 				]
 			],
