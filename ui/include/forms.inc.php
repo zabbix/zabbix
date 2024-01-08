@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -126,21 +126,8 @@ function getItemFormData(array $item = []) {
 	}
 
 	if ($data['type'] == ITEM_TYPE_SCRIPT) {
-		$values = [];
-
-		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
-				&& array_key_exists('value', $data['parameters'])) {
-			foreach ($data['parameters']['name'] as $index => $key) {
-				if (array_key_exists($index, $data['parameters']['value'])) {
-					$values[] = [
-						'name' => $key,
-						'value' => $data['parameters']['value'][$index]
-					];
-				}
-			}
-		}
-
-		$data['parameters'] = $values;
+		CArrayHelper::sort($data['parameters'], ['name']);
+		$data['parameters'] = array_values($data['parameters']);
 	}
 	else {
 		$data['parameters'] = [];
@@ -247,6 +234,7 @@ function getItemFormData(array $item = []) {
 
 		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
+			$data['parameters'] = array_values($data['parameters']);
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];

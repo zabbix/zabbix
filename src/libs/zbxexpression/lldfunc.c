@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -677,7 +677,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		else
 			zbx_substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-		if (SUCCEED != zbx_function_param_quote(&param, quoted))
+		if (SUCCEED != zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON))
 		{
 			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
 			ret = FAIL;

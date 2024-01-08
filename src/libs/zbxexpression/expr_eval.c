@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -979,7 +979,8 @@ static int	expression_eval_one(zbx_expression_eval_t *eval, zbx_expression_query
 						args[i].data.dbl);
 				break;
 			case ZBX_VARIANT_STR:
-				zbx_strquote_alloc(&params, &params_alloc, &params_offset, args[i].data.str);
+				zbx_strquote_alloc_opt(&params, &params_alloc, &params_offset, args[i].data.str,
+						ZBX_STRQUOTE_DEFAULT);
 				break;
 			case ZBX_VARIANT_UI64:
 				zbx_snprintf_alloc(&params, &params_alloc, &params_offset, ZBX_FS_UI64,

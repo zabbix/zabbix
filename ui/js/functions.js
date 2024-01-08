@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -515,67 +515,6 @@ function overlayDialogue(params, trigger_elmnt) {
 	addToOverlaysStack(overlay);
 
 	return overlay;
-}
-
-/**
- * Execute script.
- *
- * @param string scriptid			Script ID.
- * @param string confirmation		Confirmation text.
- * @param {Node} trigger_element	UI element that was clicked to open overlay dialogue.
- * @param string hostid				Host ID.
- * @param string eventid			Event ID.
- * @param string csrf_token			CSRF token.
- */
-function executeScript(scriptid, confirmation, trigger_element, hostid = null, eventid = null, csrf_token) {
-	var execute = function() {
-		var popup_options = {scriptid: scriptid};
-
-		if (hostid !== null) {
-			popup_options.hostid = hostid;
-		}
-
-		if (eventid !== null) {
-			popup_options.eventid = eventid;
-		}
-
-		if (Object.keys(popup_options).length === 2) {
-			popup_options._csrf_token = csrf_token;
-
-			PopUp('popup.scriptexec', popup_options, {dialogue_class: 'modal-popup-medium', trigger_element});
-		}
-	};
-
-	if (confirmation.length > 0) {
-		overlayDialogue({
-			'title': t('Execution confirmation'),
-			'content': jQuery('<span>')
-				.addClass('confirmation-msg')
-				.text(confirmation),
-			'class': 'modal-popup modal-popup-small position-middle',
-			'buttons': [
-				{
-					'title': t('Cancel'),
-					'class': 'btn-alt',
-					'focused': (hostid === null && eventid === null),
-					'action': function() {}
-				},
-				{
-					'title': t('Execute'),
-					'enabled': (hostid !== null || eventid !== null),
-					'focused': (hostid !== null || eventid !== null),
-					'action': function() {
-						execute();
-					}
-				}
-			]
-		}, trigger_element);
-
-		return false;
-	}
-	else {
-		execute();
-	}
 }
 
 (function($) {

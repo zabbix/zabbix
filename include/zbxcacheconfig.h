@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ typedef struct
 	int		disable_until;
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
+	int		version;
 }
 zbx_dc_interface_t;
 
@@ -112,6 +113,7 @@ typedef struct
 	char			host[ZBX_HOSTNAME_BUF_LEN];
 	zbx_dc_interface_t	interface;
 	int			ret;
+	int			version;
 	AGENT_RESULT		result;
 }
 zbx_dc_item_context_t;
@@ -885,6 +887,7 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
 		int unreachable_period, int unreachable_delay, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out, const char *error_msg);
+void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */

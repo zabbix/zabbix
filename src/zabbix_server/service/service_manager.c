@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2872,6 +2872,13 @@ static void	process_events(zbx_vector_ptr_t *events, zbx_service_manager_t *serv
 					zbx_hashset_insert(&service_manager->recovery_events, &event,
 							sizeof(zbx_event_t *));
 					continue;
+				}
+
+				/* exclude problems with negative duration from downtime */
+				if (event->clock < (*ptr)->clock)
+				{
+					event->clock = (*ptr)->clock;
+					event->ns = (*ptr)->ns;
 				}
 
 				recover_services_problem(service_manager, event);

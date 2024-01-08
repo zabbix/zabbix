@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -322,7 +322,7 @@ int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_ma
 		}
 
 		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
-		params[nparam++] = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
+		params[nparam++] = zbx_function_param_unquote_dyn_compat(ptr + param_pos, param_len, &quoted);
 	}
 
 	ret = macrofunc(params, nparam, out);

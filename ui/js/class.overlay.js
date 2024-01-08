@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -70,8 +70,9 @@ function Overlay(type, dialogueid) {
 	this.$dialogue.append(this.$dialogue.$footer);
 
 	this.$dialogue.$body.on('submit', 'form', function(e) {
-		if (this.$btn_submit) {
-			e.preventDefault();
+		e.preventDefault();
+
+		if (this.$btn_submit && this.$btn_submit.prop('disabled') === false) {
 			this.$btn_submit.trigger('click');
 		}
 	}.bind(this));
@@ -151,13 +152,13 @@ Overlay.prototype.recoverFocus = function() {
 	}
 
 	if (jQuery('[autofocus=autofocus]', this.$dialogue).length) {
-		jQuery('[autofocus=autofocus]', this.$dialogue).first().focus();
+		jQuery('[autofocus=autofocus]', this.$dialogue)[0].focus();
 	}
 	else if (jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).length) {
-		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue).first().focus();
+		jQuery('.overlay-dialogue-body form :focusable', this.$dialogue)[0].focus();
 	}
 	else {
-		jQuery(':focusable:first', this.$dialogue).focus();
+		jQuery(':focusable:first', this.$dialogue)[0].focus();
 	}
 };
 
@@ -177,7 +178,7 @@ Overlay.prototype.containFocus = function() {
 			.on('keydown.containFocus', function(e) {
 				// TAB and SHIFT
 				if (e.which == 9 && e.shiftKey) {
-					last_focusable.focus();
+					last_focusable[0].focus();
 					return false;
 				}
 			});
@@ -186,7 +187,7 @@ Overlay.prototype.containFocus = function() {
 			.on('keydown.containFocus', function(e) {
 				// TAB and not SHIFT
 				if (e.which == 9 && !e.shiftKey) {
-					first_focusable.focus();
+					first_focusable[0].focus();
 					return false;
 				}
 			});

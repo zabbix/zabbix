@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -191,8 +191,12 @@ class CControllerMenuPopup extends CController {
 			}
 
 			$all_scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
-				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				? API::Script()->getScriptsByHosts(['hostid' => $data['hostid']])
 				: [];
+
+			if ($all_scripts) {
+				$all_scripts = array_key_exists($data['hostid'], $all_scripts) ? $all_scripts[$data['hostid']] : [];
+			}
 
 			$scripts = [];
 			$urls = [];
@@ -266,7 +270,12 @@ class CControllerMenuPopup extends CController {
 					'name' => $script['name'],
 					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
+					'confirmation' => $script['confirmation'],
+					'manualinput' => $script['manualinput'],
+					'manualinput_prompt' => $script['manualinput_prompt'],
+					'manualinput_validator_type' => $script['manualinput_validator_type'],
+					'manualinput_validator' => $script['manualinput_validator'],
+					'manualinput_default_value' => $script['manualinput_default_value']
 				];
 			}
 
@@ -277,7 +286,13 @@ class CControllerMenuPopup extends CController {
 					'url' => $url['url'],
 					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
 					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
+					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : ''),
+					'manualinput' => $url['manualinput'],
+					'manualinput_prompt' => $url['manualinput_prompt'],
+					'manualinput_validator_type' => $url['manualinput_validator_type'],
+					'manualinput_validator' => $url['manualinput_validator'],
+					'manualinput_default_value' => $url['manualinput_default_value'],
+					'scriptid' => $url['scriptid']
 				];
 			}
 
@@ -829,7 +844,7 @@ class CControllerMenuPopup extends CController {
 			$scripts_by_events = [];
 
 			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
-				$scripts_by_events = API::Script()->getScriptsByEvents([$event['eventid']]);
+				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
@@ -890,7 +905,12 @@ class CControllerMenuPopup extends CController {
 					'name' => $script['name'],
 					'menu_path' => $script['menu_path'],
 					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
+					'confirmation' => $script['confirmation'],
+					'manualinput' => $script['manualinput'],
+					'manualinput_prompt' => $script['manualinput_prompt'],
+					'manualinput_validator_type' => $script['manualinput_validator_type'],
+					'manualinput_validator' => $script['manualinput_validator'],
+					'manualinput_default_value' => $script['manualinput_default_value']
 				];
 			}
 
@@ -899,7 +919,7 @@ class CControllerMenuPopup extends CController {
 			}
 
 			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
+				$menu_data_parameters = [
 					'label' => $url['name'],
 					'menu_path' => $url['menu_path'],
 					'url' => $url['url'],
@@ -907,6 +927,19 @@ class CControllerMenuPopup extends CController {
 					'confirmation' => $url['confirmation'],
 					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
 				];
+
+				if (array_key_exists('scriptid', $url)) {
+					$menu_data_parameters += [
+						'manualinput' => $url['manualinput'],
+						'manualinput_prompt' => $url['manualinput_prompt'],
+						'manualinput_validator_type' => $url['manualinput_validator_type'],
+						'manualinput_validator' => $url['manualinput_validator'] ,
+						'manualinput_default_value' => $url['manualinput_default_value'],
+						'scriptid' => $url['scriptid']
+					];
+				}
+
+				$menu_data['urls'][] = $menu_data_parameters;
 			}
 
 			if (array_key_exists('urls', $menu_data)) {

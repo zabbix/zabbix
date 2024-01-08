@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -107,7 +107,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #0.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => false
@@ -122,7 +121,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #1.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
@@ -137,7 +135,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #2.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -153,7 +150,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #3.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -169,7 +165,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #4.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -185,7 +180,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #5.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -201,7 +195,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #6.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -217,7 +210,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #7.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -233,7 +225,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #8.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -249,7 +240,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #9.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -265,7 +255,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #10.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -281,7 +270,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #11.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -297,7 +285,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #12.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -313,7 +300,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #13.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
@@ -329,7 +315,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #14.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -345,7 +330,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #15.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -361,7 +345,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #16.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
@@ -377,7 +360,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 			// #17.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,

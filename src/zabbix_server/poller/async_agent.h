@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,7 +25,8 @@
 
 typedef enum
 {
-	ZABBIX_AGENT_STEP_CONNECT_WAIT = 0,
+	ZABBIX_AGENT_STEP_CONNECT_INIT = 0,
+	ZABBIX_AGENT_STEP_CONNECT_WAIT,
 	ZABBIX_AGENT_STEP_TLS_WAIT,
 	ZABBIX_AGENT_STEP_SEND,
 	ZABBIX_AGENT_STEP_RECV
@@ -47,6 +48,7 @@ typedef struct
 	unsigned char		tls_connect;
 	const char		*config_source_ip;
 	int			config_timeout;
+	struct zbx_json		j;
 }
 zbx_agent_context;
 

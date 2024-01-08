@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,8 +26,47 @@
 #include "audit/zbxaudit.h"
 #include "zbxevent.h"
 #include "zbxdbwrap.h"
+#include "zbxregexp.h"
+#include "zbxstr.h"
 #include "zbx_trigger_constants.h"
 #include "zbx_scripts_constants.h"
+
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: replace occurrence of macro in input string with value given in       *
+ *          macrovalue, with memory management                                    *
+ *                                                                                *
+ * Parameters:  in               - [IN] input string to be processed              *
+ *              macro            - [IN] macro to replace                          *
+ *              macrovalue       - [IN] value to replace the macro with           *
+ *              out              - [IN/OUT] pointer to memory holding the result  *
+ *              out_alloc        - [IN/OUT] size of the memory holding the result *
+ *                                                                                *
+ * Return value:  SUCCEED - the remote command was executed successfully          *
+ *                FAIL    - an error occurred                                     *
+ *                                                                                *
+ **********************************************************************************/
+static void	substitute_macro(const char *in, const char *macro, const char *macrovalue, char **out, size_t *out_alloc)
+{
+	zbx_token_t	token;
+	int		pos = 0;
+	size_t		out_offset = 0, macrovalue_len;
+
+	macrovalue_len = strlen(macrovalue);
+	zbx_strcpy_alloc(out, out_alloc, &out_offset, in);
+	out_offset++;
+
+	for (; SUCCEED == zbx_token_find(*out, pos, &token, ZBX_TOKEN_SIMPLE_MACRO); pos++)
+	{
+		pos = token.loc.r;
+
+		if (0 == strncmp(*out + token.loc.l, macro, token.loc.r - token.loc.l + 1))
+		{
+			pos += zbx_replace_mem_dyn(out, out_alloc, &out_offset, token.loc.l,
+					token.loc.r - token.loc.l + 1, macrovalue, macrovalue_len);
+		}
+	}
+}
 
 /******************************************************************************
  *                                                                            *
@@ -90,8 +129,9 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 	zbx_db_row_t	row;
 	zbx_uint64_t	usrgrpid_l, groupid_l;
 
-	db_result = zbx_db_select("select command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
+	db_result = zbx_db_select("select name,command,host_access,usrgrpid,groupid,type,execute_on,timeout,scope,port,authtype"
 			",username,password,publickey,privatekey"
+			",manualinput,manualinput_validator,manualinput_validator_type"
 			" from scripts"
 			" where scriptid=" ZBX_FS_UI64, scriptid);
 
@@ -107,45 +147,54 @@ static int	zbx_get_script_details(zbx_uint64_t scriptid, zbx_script_t *script, i
 		goto fail;
 	}
 
-	ZBX_DBROW2UINT64(usrgrpid_l, row[2]);
+	ZBX_DBROW2UINT64(usrgrpid_l, row[3]);
 	*usrgrpid = usrgrpid_l;
 
-	ZBX_DBROW2UINT64(groupid_l, row[3]);
+	ZBX_DBROW2UINT64(groupid_l, row[4]);
 	*groupid = groupid_l;
 
-	ZBX_STR2UCHAR(script->type, row[4]);
+	ZBX_STR2UCHAR(script->type, row[5]);
 
 	if (ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT == script->type)
-		ZBX_STR2UCHAR(script->execute_on, row[5]);
+		ZBX_STR2UCHAR(script->execute_on, row[6]);
 
 	if (ZBX_SCRIPT_TYPE_SSH == script->type)
 	{
-		ZBX_STR2UCHAR(script->authtype, row[9]);
-		script->publickey = zbx_strdup(script->publickey, row[12]);
-		script->privatekey = zbx_strdup(script->privatekey, row[13]);
+		ZBX_STR2UCHAR(script->authtype, row[10]);
+		script->publickey = zbx_strdup(script->publickey, row[13]);
+		script->privatekey = zbx_strdup(script->privatekey, row[14]);
 	}
 
 	if (ZBX_SCRIPT_TYPE_SSH == script->type || ZBX_SCRIPT_TYPE_TELNET == script->type)
 	{
-		script->port = zbx_strdup(script->port, row[8]);
-		script->username = zbx_strdup(script->username, row[10]);
-		script->password = zbx_strdup(script->password, row[11]);
+		script->port = zbx_strdup(script->port, row[9]);
+		script->username = zbx_strdup(script->username, row[11]);
+		script->password = zbx_strdup(script->password, row[12]);
 	}
 
-	script->command = zbx_strdup(script->command, row[0]);
-	script->command_orig = zbx_strdup(script->command_orig, row[0]);
+	ZBX_STR2UCHAR(script->manualinput, row[15]);
+
+	if (ZBX_SCRIPT_MANUALINPUT_YES == script->manualinput)
+	{
+		script->manualinput_validator = zbx_strdup(script->manualinput_validator, row[16]);
+		ZBX_STR2UCHAR(script->manualinput_validator_type, row[17]);
+	}
+
+	script->name = zbx_strdup(script->name, row[0]);
+	script->command = zbx_strdup(script->command, row[1]);
+	script->command_orig = zbx_strdup(script->command_orig, row[1]);
 
 	script->scriptid = scriptid;
 
-	ZBX_STR2UCHAR(script->host_access, row[1]);
+	ZBX_STR2UCHAR(script->host_access, row[2]);
 
-	if (SUCCEED != zbx_is_time_suffix(row[6], &script->timeout, ZBX_LENGTH_UNLIMITED))
+	if (SUCCEED != zbx_is_time_suffix(row[7], &script->timeout, ZBX_LENGTH_UNLIMITED))
 	{
 		zbx_strlcpy(error, "Invalid timeout value in script configuration.", error_len);
 		goto fail;
 	}
 
-	*scope = atoi(row[7]);
+	*scope = atoi(row[8]);
 
 	ret = SUCCEED;
 fail:
@@ -217,6 +266,42 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
 	return SUCCEED;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: validates given user input with a validator of given type         *
+ *                                                                            *
+ * Parameters:  manualinput     - [IN] user provided input string             *
+ *              validator       - [IN] string containing a validator          *
+ *              validator_type  - [IN] indicator for how to interpret the     *
+ *                                     validator string                       *
+ *                                                                            *
+ * Return value:  SUCCEED or FAIL                                             *
+ *                                                                            *
+ ******************************************************************************/
+static int validate_manualinput(const char *manualinput, const char *validator, const unsigned char validator_type)
+{
+	int	ret = FAIL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() manualinput:%s, validator:%s, validator_type:%hhu",
+			__func__, manualinput, validator, validator_type);
+
+	switch (validator_type)
+	{
+		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_REGEX:
+			ret = (NULL != zbx_regexp_match(manualinput, validator, NULL) ? SUCCEED : FAIL);
+			break;
+		case ZBX_SCRIPT_MANUALINPUT_VALIDATOR_TYPE_LIST:
+			ret = zbx_str_in_list(validator, manualinput, ',');
+			break;
+		default:
+			THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
+}
+
 /**************************************************************************************
  *                                                                                    *
  * Purpose: executing command                                                         *
@@ -226,6 +311,7 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *              eventid                - [IN]                                         *
  *              user                   - [IN] user who executes command               *
  *              clientip               - [IN] IP of client                            *
+ *              manualinput            - [IN] user provided value to the script       *
  *              config_timeout         - [IN]                                         *
  *              config_trapper_timeout - [IN]                                         *
  *              config_source_ip       - [IN]                                         *
@@ -241,10 +327,10 @@ static int	zbx_check_event_end_recovery_event(zbx_uint64_t eventid, zbx_uint64_t
  *                                                                                    *
  **************************************************************************************/
 static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64_t eventid, zbx_user_t *user,
-		const char *clientip, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
+		const char *clientip, const char *manualinput, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0, i, macro_type;
+	int			ret = FAIL, scope = 0, i, n, macro_type;
 	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
@@ -256,8 +342,8 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	zbx_dc_um_handle_t	*um_handle = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() scriptid:" ZBX_FS_UI64 " hostid:" ZBX_FS_UI64 " eventid:" ZBX_FS_UI64
-			" userid:" ZBX_FS_UI64 " clientip:%s",
-			__func__, scriptid, hostid, eventid, user->userid, clientip);
+			" userid:" ZBX_FS_UI64 " clientip:%s, manualinput:%s",
+			__func__, scriptid, hostid, eventid, user->userid, clientip, manualinput);
 
 	*error = '\0';
 	memset(&host, 0, sizeof(host));
@@ -393,7 +479,64 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 
 	user_timezone = zbx_db_get_user_timezone(user->userid);
 
+	if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type)
+	{
+		if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
+			goto fail;
+	}
+
 	/* substitute macros in script body and webhook parameters */
+
+	if (ZBX_SCRIPT_MANUALINPUT_YES == script.manualinput)
+	{
+		char	*expanded_cmd = NULL;
+		size_t	expanded_cmd_size;
+
+		if (NULL == manualinput)
+		{
+			zbx_strlcpy(error, "Script takes user input, but none was provided.", sizeof(error));
+			goto fail;
+		}
+
+		if (FAIL == validate_manualinput(manualinput, script.manualinput_validator, script.manualinput_validator_type))
+		{
+			zbx_strlcpy(error, "Provided script user input failed validation.", sizeof(error));
+			goto fail;
+		}
+
+		substitute_macro(script.command, "{MANUALINPUT}", manualinput, &expanded_cmd, &expanded_cmd_size);
+
+		script.command = zbx_strdup(script.command, expanded_cmd);
+
+		zbx_free(expanded_cmd);
+
+		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
+		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
+		{
+			for (n = 0; n < webhook_params.values_num; n++)
+			{
+				char	*expanded_value = NULL;
+				size_t	expanded_value_size;
+
+				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
+				if (NULL == strstr(webhook_params.values[n].second, "{MANUALINPUT}"))
+					continue;
+
+				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput,
+						&expanded_value, &expanded_value_size);
+
+				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second, expanded_value);
+
+				zbx_free(expanded_value);
+			}
+		}
+	}
+	else if (NULL != manualinput) /* script does not take additional input yet we've received a value anyway */
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "script (name:%s) "
+				"does not accept additional manual input, but request contains it anyway",
+				script.name);
+	}
 
 	if (0 != hostid)	/* script on host */
 		macro_type = ZBX_MACRO_TYPE_SCRIPT;
@@ -421,9 +564,6 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 	}
 	else
 	{
-		if (SUCCEED != zbx_db_fetch_webhook_params(script.scriptid, &webhook_params, error, sizeof(error)))
-			goto fail;
-
 		for (i = 0; i < webhook_params.values_num; i++)
 		{
 			if (SUCCEED != zbx_substitute_simple_macros_unmasked(NULL, problem_event, recovery_event,
@@ -561,8 +701,8 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 		int config_trapper_timeout, const char *config_source_ip, zbx_get_config_forks_f get_config_forks,
 		unsigned char program_type)
 {
-	char			*result = NULL, *send = NULL, *debug = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
-				clientip[MAX_STRING_LEN];
+	char			*result = NULL, *send = NULL, *debug = NULL, *manualinput = NULL, tmp[64], tmp_hostid[64], tmp_eventid[64],
+				clientip[MAX_STRING_LEN], tmp_manualinput[MAX_STRING_LEN];
 	int			ret = FAIL, got_hostid = 0, got_eventid = 0;
 	zbx_uint64_t		scriptid, hostid = 0, eventid = 0;
 	struct zbx_json		j;
@@ -657,8 +797,13 @@ int	node_process_command(zbx_socket_t *sock, const char *data, const struct zbx_
 	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_CLIENTIP, clientip, sizeof(clientip), NULL))
 		*clientip = '\0';
 
-	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, config_timeout,
-			config_trapper_timeout, config_source_ip, get_config_forks, program_type, &result, &debug)))
+	if (SUCCEED == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_MANUALINPUT, tmp_manualinput,
+			sizeof(tmp_manualinput), NULL))
+		manualinput = tmp_manualinput;
+
+	if (SUCCEED == (ret = execute_script(scriptid, hostid, eventid, &user, clientip, manualinput,
+			config_timeout, config_trapper_timeout, config_source_ip, get_config_forks, program_type,
+			&result, &debug)))
 	{
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_RESPONSE, ZBX_PROTO_VALUE_SUCCESS, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&j, ZBX_PROTO_TAG_DATA, result, ZBX_JSON_TYPE_STRING);

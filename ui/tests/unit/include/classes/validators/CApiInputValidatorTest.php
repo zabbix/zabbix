@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -4553,6 +4553,12 @@ class CApiInputValidatorTest extends TestCase {
 				'text{EVENT.TAGS."JIRAID"}text'
 			],
 			[
+				['type' => API_URL, 'flags' => API_ALLOW_MANUALINPUT_MACRO],
+				'text{MANUALINPUT}text',
+				'/1/url',
+				'text{MANUALINPUT}text'
+			],
+			[
 				['type' => API_IP],
 				'',
 				'/1/ip',
@@ -8983,6 +8989,66 @@ class CApiInputValidatorTest extends TestCase {
 				'/',
 				false,
 				'Invalid parameter "/7": value (hostid, macro)=(1, {$MACRO: "context"}) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['scriptid'], ['menu_path']], 'fields' => [
+					'scriptid'	=> ['type' => API_ID],
+					'menu_path'	=> ['type' => API_SCRIPT_MENU_PATH]
+				]],
+				[
+					['scriptid' => 2, 'menu_path' => 'System / Utils / Ping'],
+					['scriptid' => 3, 'menu_path' => 'System / Utils / Traceroute'],
+					['scriptid' => 1, 'menu_path' => 'System / Reboot'],
+					['scriptid' => 4, 'menu_path' => 'System / Console'],
+					['scriptid' => 5, 'menu_path' => 'System / Docker / Containers'],
+					['scriptid' => 6, 'menu_path' => 'System / Docker / Images']
+				],
+				'/',
+				true,
+				''
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['scriptid'], ['menu_path']], 'fields' => [
+					'scriptid'	=> ['type' => API_ID],
+					'menu_path'	=> ['type' => API_SCRIPT_MENU_PATH]
+				]],
+				[
+					['scriptid' => 2, 'menu_path' => 'System / Utils / Ping'],
+					['scriptid' => 3, 'menu_path' => 'System / Utils / Traceroute'],
+					['scriptid' => 1, 'menu_path' => 'System / Reboot'],
+					['scriptid' => 4, 'menu_path' => 'System / Console'],
+					['scriptid' => 5, 'menu_path' => 'System / Docker / Containers'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils/Traceroute']
+				],
+				'/',
+				false,
+				'Invalid parameter "/6": value (menu_path)=(System/Utils/Traceroute) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['scriptid'], ['menu_path']], 'fields' => [
+					'scriptid'	=> ['type' => API_ID],
+					'menu_path'	=> ['type' => API_SCRIPT_MENU_PATH]
+				]],
+				[
+					['scriptid' => 2, 'menu_path' => 'System/Utils'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils/']
+				],
+				'/',
+				false,
+				'Invalid parameter "/2": value (menu_path)=(System/Utils/) already exists.'
+			],
+			[
+				['type' => API_OBJECTS, 'uniq' => [['scriptid'], ['menu_path']], 'fields' => [
+					'scriptid'	=> ['type' => API_ID],
+					'menu_path'	=> ['type' => API_SCRIPT_MENU_PATH]
+				]],
+				[
+					['scriptid' => 2, 'menu_path' => '/System/Utils'],
+					['scriptid' => 6, 'menu_path' => 'System/Utils']
+				],
+				'/',
+				false,
+				'Invalid parameter "/2": value (menu_path)=(System/Utils) already exists.'
 			],
 			[
 				['type' => API_OBJECT, 'fields' => [

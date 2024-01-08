@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -5178,7 +5178,7 @@ static char	*dbpatch_formula_to_expression(zbx_uint64_t itemid, const char *form
 
 			zbx_function_param_parse(ptr + par_l + 1, &param_pos, &param_len, &sep_pos);
 
-			arg0 = zbx_function_param_unquote_dyn(ptr + par_l + 1 + param_pos, param_len, &quoted);
+			arg0 = zbx_function_param_unquote_dyn_compat(ptr + par_l + 1 + param_pos, param_len, &quoted);
 			arg0_len = strlen(arg0);
 			zbx_remove_chars(arg0, "\t\n\r");
 			if (strlen(arg0) != arg0_len)
@@ -5442,7 +5442,7 @@ static int	dbpatch_aggregate2formula(const char *itemid, const AGENT_REQUEST *re
 
 		if (SUCCEED == dbpatch_is_composite_constant(request->params[3]))
 		{
-			dbpatch_strcpy_alloc_quoted(str, str_alloc, str_offset, request->params[3]);
+			dbpatch_strcpy_alloc_quoted_compat(str, str_alloc, str_offset, request->params[3]);
 		}
 		else
 		{
@@ -5934,7 +5934,8 @@ static int	compose_trigger_expression(zbx_db_row_t row, zbx_uint64_t rules, char
 			continue;
 		}
 
-		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules, &error))
+		if (FAIL == zbx_eval_parse_expression(&ctx, trigger_expr, rules | ZBX_EVAL_PARSE_STR_V64_COMPAT,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "%s: error parsing trigger expression for %s: %s",
 					__func__, row[0], error);

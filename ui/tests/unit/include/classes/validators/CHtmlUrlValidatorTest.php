@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['ssh://username@hostname:/path ',							[],															true],
 			['/chart_bar.php?a=1&b=2',									[],															true],
 			['http://localhost:{$PORT}',								[],															true], // Macros allowed.
+			['http://localhost:{MANUALINPUT}',							['allow_manualinput_macro' => true],						true], // Manual input macro allowed.
 			['http://{$INVALID!MACRO}',									[],															true], // Macros allowed, but it's not a valid macro.
 			['/',														[],															true], // "/" is a valid path to home directory.
 			['/../',													[],															true],
@@ -137,7 +138,9 @@ class CHtmlUrlValidatorTest extends TestCase {
 			['',														[],															false], // Cannot be empty.
 			['ftp://user@host:port',									[],															false], // Scheme is allowed, but "port" is not a valid number and url_parse() returns false.
 			['vbscript:msgbox(]',										[],															false], // Invalid scheme.
-			['notexist://localhost',									[],															false] // Invalid scheme.
+			['notexist://localhost',									[],															false], // Invalid scheme.
+			['http://localhost:{$PORT}',								['allow_user_macro' => false],								false], // User macro not allowed.
+			['http://localhost:{MANUALINPUT}',							[],															false] // Manual input macro not allowed.
 		];
 	}
 
