@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-19 11:57+0000\n"
+"PO-Revision-Date: 2024-01-06 12:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -15055,7 +15055,7 @@ msgstr "Anul·la el període de tendència de l'element"
 
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
-msgstr ""
+msgstr "Anul·lar la tria de període de temps"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -22422,7 +22422,7 @@ msgstr "Amb problemes"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
-msgstr ""
+msgstr "Amb aquesta configuració només veureu dades numèriques."
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
@@ -22431,7 +22431,7 @@ msgstr "Amb aquesta configuració només es mostraran els elements numèrics en 
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
 msgid "With this setting only numeric items will be displayed."
-msgstr ""
+msgstr "Amb aquesta configuració només veureu elements numèrics."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -24435,7 +24435,7 @@ msgstr "no triat"
 
 #: include/classes/helpers/CItemHelper.php:261
 msgid "not used"
-msgstr ""
+msgstr "no emprat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
