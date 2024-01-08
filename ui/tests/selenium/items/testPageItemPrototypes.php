@@ -19,9 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
 /**
@@ -30,20 +27,6 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  * @onBefore prepareItemPrototypeData
  */
 class testPageItemPrototypes extends testPagePrototypes {
-
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CTableBehavior::class,
-			CMessageBehavior::class
-		];
-	}
-
-	public $sql = 'SELECT null FROM items WHERE itemid=';
 
 	public $headers = ['', '', 'Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover', 'Tags'];
 	public $page_name = 'item';
@@ -303,7 +286,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	}
 
 	/**
-	 * Sort item prototypes.
+	 * Sort item prototypes by Name, Key, Interval, History, Trends, Type, Create enabled and Discover columns.
 	 *
 	 * @dataProvider getSortingData
 	 */
@@ -436,11 +419,12 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageItemPrototypes_Delete($data) {
+		$sql = 'SELECT null FROM items WHERE itemid=';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_itemids[$name]));
+			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_itemids[$name]));
 		}
 
 		$this->executeDelete($data);
@@ -448,7 +432,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
 
 		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($this->sql.self::$prototype_itemids[$name]));
+			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_itemids[$name]));
 		}
 	}
 
@@ -540,7 +524,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	}
 
 	/**
-	 * Check that empty values displayed in Trends and Interval columns.
+	 * Check that empty values displayed in Trends and Interval columns for some item types and types of information.
 	 *
 	 * @dataProvider getNotDisplayedValuesData
 	 */

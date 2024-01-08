@@ -18,9 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+
 require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
 /**
@@ -29,20 +27,6 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  * @onBefore prepareHostPrototypeData
  */
 class testPageHostPrototypes extends testPagePrototypes {
-
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CTableBehavior::class,
-			CMessageBehavior::class
-		];
-	}
-
-	public $sql = 'SELECT null FROM hosts WHERE hostid=';
 
 	public $headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
 	public $page_name = 'host';
@@ -330,11 +314,12 @@ class testPageHostPrototypes extends testPagePrototypes {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageHostPrototypes_Delete($data) {
+		$sql = 'SELECT null FROM hosts WHERE hostid=';
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_hostids[$name]));
+			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
 		}
 
 		$this->executeDelete($data);
@@ -342,7 +327,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
 
 		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($this->sql.self::$prototype_hostids[$name]));
+			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
 		}
 	}
 }

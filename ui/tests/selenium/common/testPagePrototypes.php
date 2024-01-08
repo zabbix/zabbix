@@ -94,7 +94,7 @@ class testPagePrototypes extends CWebTest {
 			$this->assertTrue($table->query('link', $header)->one()->isClickable());
 		}
 
-		// Check additional configuration for item prototype page.
+		// Check additional popup configuration for item prototype page.
 		if ($this->page_name === 'item') {
 			$table->getRow(0)->query('xpath:.//button')->one()->click();
 			$this->page->waitUntilReady();
@@ -144,6 +144,11 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check available sorting on prototype page.
+	 *
+	 * @param $data		data from data provider
+	 */
 	public function executeSorting($data) {
 		$table = $this->query('class:list-table')->asTable()->one();
 		foreach (['desc', 'asc'] as $sorting) {
@@ -153,6 +158,11 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
+	 *
+	 * @param $data		data from data provider
+	 */
 	public function executeDiscoverEnable($data) {
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -188,8 +198,13 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check Delete scenarios.
+	 *
+	 * @param $data		data from data provider
+	 */
 	public function executeDelete($data) {
-		// Check that prototype exists in DB and displayed in prototype table.
+		// Check that prototype exists and displayed in prototype table.
 		foreach ($data['name'] as $name) {
 			$this->assertTrue(in_array($name, $this->getTableColumnData('Name')));
 		}
@@ -210,7 +225,7 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 			$this->assertMessage(TEST_GOOD, $data['message']);
 
-			// Check that prototype doesn't exist in DB and not displayed in prototype table.
+			// Check that prototype doesn't exist and not displayed in prototype table.
 			foreach ($data['name'] as $name) {
 				$this->assertFalse(in_array($name, $this->getTableColumnData('Name')));
 			}

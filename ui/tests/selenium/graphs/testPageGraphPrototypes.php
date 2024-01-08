@@ -19,9 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 
 /**
@@ -30,20 +27,6 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  * @onBefore prepareGraphPrototypeData
  */
 class testPageGraphPrototypes extends testPagePrototypes {
-
-	/**
-	 * Attach MessageBehavior and TableBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [
-			CTableBehavior::class,
-			CMessageBehavior::class
-		];
-	}
-
-	public $sql = 'SELECT null FROM graphs WHERE graphid=';
 
 	public $headers = ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'];
 	public $page_name = 'graph';
@@ -210,7 +193,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	}
 
 	/**
-	 * Sort graph prototypes.
+	 * Sort graph prototypes by Name, Graph type and Discover columns.
 	 *
 	 * @dataProvider getSortingData
 	 */
@@ -244,7 +227,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	}
 
 	/**
-	 * Check from Discover column.
+	 * Check link from Discover column.
 	 *
 	 * @dataProvider getButtonLinkData
 	 */
@@ -289,11 +272,12 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 * @dataProvider getDeleteData
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
+		$sql = 'SELECT null FROM graphs WHERE graphid=';
 		$this->page->login()->open('graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($this->sql.self::$prototype_graphids[$name]));
+			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_graphids[$name]));
 		}
 
 		$this->executeDelete($data);
@@ -301,7 +285,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
 
 		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($this->sql.self::$prototype_graphids[$name]));
+			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_graphids[$name]));
 		}
 	}
 }
