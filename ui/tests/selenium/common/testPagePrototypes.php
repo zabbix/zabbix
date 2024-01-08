@@ -37,8 +37,6 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
-	public $single_success;
-	public $several_success;
 	public $headers;
 	public $page_name;
 	public $amount;
@@ -181,11 +179,11 @@ class testPagePrototypes extends CWebTest {
 
 		// Check column value for one prototype or for them all.
 		if (array_key_exists('name', $data)) {
-			$this->assertMessage(TEST_GOOD, $this->single_success);
+			$this->assertMessage(TEST_GOOD, ucfirst($this->page_name).' prototype updated');
 			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, $this->several_success);
+			$this->assertMessage(TEST_GOOD, ucfirst($this->page_name).' prototypes updated');
 			$this->assertTableDataColumn($data['after'], $data['column_check']);
 		}
 	}

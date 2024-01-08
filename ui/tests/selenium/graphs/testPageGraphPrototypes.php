@@ -43,8 +43,6 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		];
 	}
 
-	public $single_success = 'Graph prototype updated';
-	public $several_success = 'Graph prototypes updated';
 	public $sql = 'SELECT null FROM graphs WHERE graphid=';
 
 	public $headers = ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'];

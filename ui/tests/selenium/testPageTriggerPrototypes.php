@@ -42,8 +42,6 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 		];
 	}
 
-	public $single_success = 'Trigger prototype updated';
-	public $several_success = 'Trigger prototypes updated';
 	public $sql = 'SELECT null FROM triggers WHERE triggerid=';
 
 	public $headers = ['', 'Severity', 'Name', 'Operational data', 'Expression', 'Create enabled', 'Discover', 'Tags'];

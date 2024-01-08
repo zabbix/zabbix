@@ -43,8 +43,6 @@ class testPageItemPrototypes extends testPagePrototypes {
 		];
 	}
 
-	public $single_success = 'Item prototype updated';
-	public $several_success = 'Item prototypes updated';
 	public $sql = 'SELECT null FROM items WHERE itemid=';
 
 	public $headers = ['', '', 'Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover', 'Tags'];
