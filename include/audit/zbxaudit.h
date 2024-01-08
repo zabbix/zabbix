@@ -79,7 +79,7 @@ int	zbx_get_auditlog_mode(void);
 		{											\
 			return;										\
 		}											\
-		if (((context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT) == 1) && \
+		if ((0 != (context_mode & ZBX_AUDIT_AUTOREGISTRATION_NETWORK_DISCOVERY_LLD_CONTEXT)) && \
 				SUCCEED == zbx_get_auditlog_mode())					\
 		{											\
 			return;										\
