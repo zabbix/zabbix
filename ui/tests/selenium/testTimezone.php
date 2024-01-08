@@ -219,6 +219,27 @@ class testTimezone extends CWebTest {
 	}
 
 	/**
+	 * Check for time parser error absence (Added after ZBX-23883).
+	 */
+	public function testTimezone_TimeSelector() {
+		$this->page->userLogin('Admin', 'zabbix');
+		$this->setTimezone('Atlantic/Cape_Verde', 'userprofile');
+		$this->page->open('zabbix.php?action=actionlog.list&from=now-1h&to=now&filter_messages=&filter_set=1')->waitUntilReady();
+		$filter = CFilterElement::find()->one();
+		$filter->selectTab('Last 1 hour');
+
+		foreach (['This day last week', 'Day before yesterday', 'Today so far', 'Yesterday', 'Today'] as $time) {
+			$filter->query('link', $time)->one()->click();
+			$this->page->waitUntilReady();
+
+			// No error messages awaiting on time selector change.
+			$this->assertFalse($this->query('xpath://output['.CXPathHelper::fromClass('msg-bad').']')->exists());
+		}
+
+		$this->page->logout();
+	}
+
+	/**
 	 * Time received from Monitoring->Problems table.
 	 *
 	 * @param string $problem   problem name from monitoring->problems
