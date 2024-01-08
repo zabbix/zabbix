@@ -155,11 +155,13 @@ class CScreenDiscovery extends CScreenBase {
 
 					$host_name = '';
 					$hostid = '';
+					$host_status = HOST_STATUS_NOT_MONITORED;
 
 					$host = reset($dservices[$dservice['dserviceid']]['hosts']);
 					if ($host) {
 						$host_name = $host['name'];
 						$hostid = $host['hostid'];
+						$host_status = $host['status'];
 					}
 
 					if ($primary_ip !== '') {
@@ -182,6 +184,7 @@ class CScreenDiscovery extends CScreenBase {
 							'type' => $htype,
 							'class' => $hclass,
 							'host' => $host_name,
+							'status' => $host_status,
 							'hostid' => $hostid,
 							'time' => $htime
 						];
@@ -241,7 +244,9 @@ class CScreenDiscovery extends CScreenBase {
 					$host = $h_data['host'];
 
 					if ($h_data['hostid'] !== '') {
-						$host = (new CLinkAction($host))->setMenuPopup(CMenuPopupHelper::getHost($h_data['hostid']));
+						$host = (new CLinkAction($host))
+							->addClass($h_data['status'] == HOST_STATUS_NOT_MONITORED ? ZBX_STYLE_RED : null)
+							->setMenuPopup(CMenuPopupHelper::getHost($h_data['hostid']));
 					}
 				}
 
