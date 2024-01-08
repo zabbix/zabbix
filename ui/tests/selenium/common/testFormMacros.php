@@ -1471,16 +1471,14 @@ abstract class testFormMacros extends CLegacyWebTest {
 				// Change value text or type and check that New value button is not displayed and Revert button appeared.
 				if (CTestArrayHelper::get($data, 'change_type', false)) {
 					$value_field->changeInputType(CInputGroupElement::TYPE_TEXT);
-					$change_button = $value_field->getNewValueButton();
-					$this->assertFalse($change_button->isValid());
 				}
 				else {
 					$change_button->click();
-					$this->assertFalse($change_button->isEnabled());
 				}
 
 				$value_field->invalidate();
 
+				$this->assertFalse($value_field->getNewValueButton()->isEnabled());
 				$this->assertTrue($revert_button->isClickable());
 			}
 			else {
