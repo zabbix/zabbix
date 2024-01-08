@@ -2691,9 +2691,16 @@ static int	DBpatch_6050176(void)
 
 static int	DBpatch_6050177(void)
 {
-	const zbx_db_field_t	field = {"error", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("drules", &field);
+}
+
+static int	DBpatch_6050178(void)
+{
+	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("proxy_dhistory", &field);
 }
 
 #endif
@@ -2878,5 +2885,6 @@ DBPATCH_ADD(6050174, 0, 1)
 DBPATCH_ADD(6050175, 0, 1)
 DBPATCH_ADD(6050176, 0, 1)
 DBPATCH_ADD(6050177, 0, 1)
+DBPATCH_ADD(6050178, 0, 1)
 
 DBPATCH_END()
