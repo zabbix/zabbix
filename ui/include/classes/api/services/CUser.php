@@ -2004,6 +2004,7 @@ class CUser extends CApiService {
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
+		unset($db_user['ugsetid']);
 
 		if ($db_user['attempt_failed'] != 0) {
 			self::resetFailedLoginAttempts($db_user);
@@ -2034,6 +2035,7 @@ class CUser extends CApiService {
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
+		unset($db_user['ugsetid']);
 
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
@@ -2397,7 +2399,7 @@ class CUser extends CApiService {
 
 	private static function addAdditionalFields(array &$db_user): void {
 		$db_user['type'] = self::getUserType($db_user['roleid']);
-		$db_user['ugsetid'] = $this->getUgSetId($db_user);
+		$db_user['ugsetid'] = self::getUgSetId($db_user);
 		$db_user['userip'] = CWebUser::getIp();
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
@@ -2547,6 +2549,7 @@ class CUser extends CApiService {
 			}
 
 			self::$userData = $db_user + ['sessionid' => $session['sessionid']];
+
 			$db_user['sessionid'] = $session['sessionid'];
 			$db_user['secret'] = $db_session['secret'];
 		}
@@ -2561,7 +2564,10 @@ class CUser extends CApiService {
 			]);
 
 			self::$userData = $db_user + ['token' => $session['token']];
+
 		}
+
+		unset($db_user['ugsetid']);
 
 		return $db_user;
 	}
