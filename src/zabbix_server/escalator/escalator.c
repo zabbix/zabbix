@@ -267,8 +267,12 @@ static int	check_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, ch
 	result = zbx_db_select("%s", sql);
 
 	if (NULL == (row = zbx_db_fetch(result)) || atoi(row[0]) != hgsetids.values_num)
+	{
+		zbx_db_free_result(result);
 		goto out;
+	}
 
+	zbx_db_free_result(result);
 	zbx_vector_uint64_create(&hostgroupids);
 
 	result = zbx_db_select(
