@@ -85,8 +85,7 @@ class testPageApiTokens extends CWebTest {
 		}
 
 		// Check that all filter fields are present.
-		$filter_form = $this->query('name:zbx_filter')->asForm()->one();
-		$this->assertEquals($filter_fields, $filter_form->getLabels()->asText());
+		$this->assertEquals($filter_fields, $this->query('name:zbx_filter')->asForm()->one()->getLabels()->asText());
 
 		// Check the count of returned tokens and the count of selected tokens.
 		$this->assertTableStats($tokens_count);

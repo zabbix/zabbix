@@ -157,8 +157,7 @@ class testDashboardTriggerOverviewWidget extends CWebTest {
 		// Delete some hosts and problems from previous tests and data source, not to interfere this test.
 		$rows = CDBHelper::getAll('SELECT * FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
 		if ($rows !== []) {
-			$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr('Host for tag permissions'));
-			CDataHelper::call('host.delete', [$hostid]);
+			CDataHelper::call('host.delete', [$rows[0]['hostid']]);
 		}
 	}
 

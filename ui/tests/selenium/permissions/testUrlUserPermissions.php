@@ -712,7 +712,7 @@ class testUrlUserPermissions extends CLegacyWebTest {
 					$this->page->userLogin('test-admin', 'zabbix12345');
 					break;
 				case 'user-zabbix':
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 50);
+					$this->page->userLogin('user-zabbix', 'zabbix');
 					break;
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {

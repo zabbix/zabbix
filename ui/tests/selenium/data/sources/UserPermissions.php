@@ -24,8 +24,6 @@
  */
 class UserPermissions {
 
-	protected static $time;
-
 	public static function load() {
 		// Prepare host group and host with item and triggers.
 		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Host group for tag permissions']]);
@@ -64,9 +62,8 @@ class UserPermissions {
 		// Create events and problems..
 		CDataHelper::addItemData($items['itemids'][0], 0);
 
-		self::$time = time();
 		foreach (array_keys($triggerids) as $trigger_name) {
-			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, ['clock' => self::$time]);
+			CDBHelper::setTriggerProblem($trigger_name, TRIGGER_VALUE_TRUE, ['clock' => time()]);
 		}
 
 		// Create user groups with corresponding permissions and users.
