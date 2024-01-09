@@ -190,6 +190,13 @@ class CSVGPie {
 	#sector_observer;
 
 	/**
+	 * Animation finished promise.
+	 *
+	 * @type {Promise<void>}
+	 */
+	#animation_finished_promise = Promise.resolve();
+
+	/**
 	 * @param {Object} padding             Inner padding of the root SVG element.
 	 *        {number} padding.horizontal
 	 *        {number} padding.vertical
@@ -365,7 +372,7 @@ class CSVGPie {
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 			.data(this.#pieGenerator(is), key);
 
-		this.#arcs_container
+		this.#animation_finished_promise = this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC}`)
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_WHOLE)
@@ -449,6 +456,15 @@ class CSVGPie {
 	 */
 	destroy() {
 		this.#svg.node().remove();
+	}
+
+	/**
+	 * Get animation finished promise.
+	 *
+	 * @returns {Promise<void>}
+	 */
+	promiseAnimationFinished() {
+		return this.#animation_finished_promise;
 	}
 
 	/**
