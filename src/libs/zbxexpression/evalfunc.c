@@ -3603,15 +3603,13 @@ int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, 
 		ret = FAIL;
 	}
 
-	if (ret == FAIL)
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
-	}
-	else
+	if (SUCCEED == ret)
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s' of type:'%s'", __func__, zbx_result_string(ret),
 				zbx_variant_value_desc(value), zbx_variant_type_desc(value));
 	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
