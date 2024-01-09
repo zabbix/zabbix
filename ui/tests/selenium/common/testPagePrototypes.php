@@ -123,7 +123,7 @@ class testPagePrototypes extends CWebTest {
 			$this->assertTrue($template_row->getColumn('Templates')->isClickable());
 		}
 
-		// Check Operational data column - values should be displayed, on trigger prototype page.
+		// Check Operational data and expression column - values should be displayed, on trigger prototype page.
 		if ($this->page_name === 'trigger') {
 			$opdata = [
 				'12345',
@@ -134,6 +134,12 @@ class testPagePrototypes extends CWebTest {
 				'🙂🙃'
 			];
 			$this->assertTableDataColumn($opdata, 'Operational data');
+
+			$trigger_row = $table->getRow(0);
+			$this->assertEquals('last(/Host for prototype check/1_key[{#KEY}])=0',
+					$trigger_row->getColumn('Expression')->getText()
+			);
+			$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
 		}
 
 		// Check Width and Height columns for graph prototype page.
