@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,12 +26,12 @@
 package modbus
 
 import (
+	"encoding/binary"
 	"fmt"
 	"time"
 
-	"encoding/binary"
-
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	named "github.com/BurntSushi/locker"
 	"github.com/goburrow/modbus"
@@ -62,8 +62,10 @@ type PluginOptions struct {
 	Sessions map[string]*Session `conf:"optional"`
 }
 
-type bits8 uint8
-type bits16 uint16
+type (
+	bits8  uint8
+	bits16 uint16
+)
 
 // Set of supported modbus connection types
 const (
@@ -139,13 +141,20 @@ const (
 var impl Plugin
 
 func init() {
-	plugin.RegisterMetrics(&impl, "Modbus",
-		"modbus.get", "Returns a JSON array of the requested values, usage: modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].")
+	err := plugin.RegisterMetrics(
+		&impl,
+		"Modbus",
+		"modbus.get",
+		"Returns a JSON array of the requested values, usage: "+
+			"modbus.get[endpoint,<slave id>,<function>,<address>,<count>,<type>,<endianness>,<offset>].",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
 }
 
 // Export - main function of plugin
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
-
 	if key != "modbus.get" {
 		return nil, plugin.UnsupportedMetricError
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -608,7 +608,7 @@ class testPageServicesServices extends CWebTest {
 		// Fill filter form with data.
 		$filter_form->fill(CTestArrayHelper::get($data, 'filter'));
 
-		// If data contains Tags fill them separataly, because tags form is more complicated.
+		// If data contains Tags fill them separately, because tags form is more complicated.
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			if (CTestArrayHelper::get($data['Tags'], 'Source')) {
 				$filter_form->getField('id:filter_tag_source')->asSegmentedRadio()->fill($data['Tags']['Source']);

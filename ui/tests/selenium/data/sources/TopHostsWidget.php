@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 class TopHostsWidget {
 
@@ -102,11 +103,6 @@ class TopHostsWidget {
 										'value' => 'Available memory'
 									],
 									[
-										'type' => 1,
-										'name' => 'columns.0.timeshift',
-										'value' => ''
-									],
-									[
 										'type' => 0,
 										'name' => 'columns.0.aggregate_function',
 										'value' => 0
@@ -150,11 +146,6 @@ class TopHostsWidget {
 										'type' => 1,
 										'name' => 'columns.1.item',
 										'value' => 'Available memory in %'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.1.timeshift',
-										'value' => ''
 									],
 									[
 										'type' => 0,
@@ -228,6 +219,12 @@ class TopHostsWidget {
 				]
 			],
 			[
+				'name' => 'top_host_zoom_filter',
+				'display_period' => 30,
+				'auto_start' => 1,
+				'pages' => [[]]
+			],
+			[
 				'name' => 'top_host_create',
 				'display_period' => 30,
 				'auto_start' => 1,
@@ -264,11 +261,6 @@ class TopHostsWidget {
 										'type' => 1,
 										'name' => 'columns.0.item',
 										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.0.timeshift',
-										'value' => ''
 									],
 									[
 										'type' => 0,
@@ -332,11 +324,6 @@ class TopHostsWidget {
 										'type' => 1,
 										'name' => 'columns.0.item',
 										'value' => 'Available memory'
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.0.timeshift',
-										'value' => ''
 									],
 									[
 										'type' => 0,

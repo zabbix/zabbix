@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,10 +24,7 @@ use Zabbix\Core\{
 	CWidget
 };
 
-use Zabbix\Widgets\{
-	CWidgetField,
-	CWidgetForm
-};
+use Zabbix\Widgets\CWidgetField;
 
 class CDashboardHelper {
 
@@ -63,45 +60,15 @@ class CDashboardHelper {
 	}
 
 	/**
-	 * Get widget module and form instances for the raw data retrieved from the database.
+	 * Prepare dashboard pages and widgets for the presentation.
 	 *
 	 * @param array       $pages         Dashboard pages with widgets as returned by the dashboard API.
 	 * @param string|null $templateid    Template ID, if used.
+	 * @param bool        $with_rf_rate  Supply refresh rates for widgets, for the current user.
 	 *
 	 * @return array
 	 */
-	public static function prepareWidgetsAndForms(array $pages, ?string $templateid): array {
-		$widgets_and_forms = [];
-
-		foreach ($pages as $page) {
-			foreach ($page['widgets'] as $widget_data) {
-				/** @var CWidget $widget */
-				$widget = APP::ModuleManager()->getModule($widget_data['type']);
-
-				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
-					$form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
-
-					$widgets_and_forms[$widget_data['widgetid']] = [
-						'widget' => $widget,
-						'form' => $form
-					];
-				}
-			}
-		}
-
-		return $widgets_and_forms;
-	}
-
-	/**
-	 * Prepare dashboard pages and widgets for the presentation.
-	 *
-	 * @param array $widgets_and_forms  Widget module and form instances.
-	 * @param array $pages              Dashboard pages with widgets as returned by the dashboard API.
-	 * @param bool  $with_rf_rate       Supply refresh rates for widgets, for the current user.
-	 *
-	 * @return array
-	 */
-	public static function preparePages(array $widgets_and_forms, array $pages, bool $with_rf_rate): array {
+	public static function preparePages(array $pages, ?string $templateid, bool $with_rf_rate): array {
 		$prepared_pages = [];
 
 		foreach ($pages as $page) {
@@ -126,13 +93,11 @@ class CDashboardHelper {
 					'messages' => []
 				];
 
-				if (array_key_exists($widget_data['widgetid'], $widgets_and_forms)) {
-					/** @var CWidget $widget */
-					/** @var CWidgetForm $form */
-					[
-						'widget' => $widget,
-						'form' => $form
-					] = $widgets_and_forms[$widget_data['widgetid']];
+				/** @var CWidget $widget */
+				$widget = APP::ModuleManager()->getModule($widget_data['type']);
+
+				if ($widget !== null && $widget->getType() === CModule::TYPE_WIDGET) {
+					$form = $widget->getForm(self::constructWidgetFields($widget_data['fields']), $templateid);
 
 					$prepared_widget['messages'] = $form->validate();
 					$prepared_widget['fields'] = $form->getFieldsValues();
@@ -167,30 +132,46 @@ class CDashboardHelper {
 	/**
 	 * Get dashboard data source requirements.
 	 *
-	 * @param array $widgets_and_forms  Widget module and form instances.
+	 * @param array $prepared_pages  Dashboard pages, prepared and validated using preparePages method.
 	 *
 	 * @return array
 	 */
-	public static function getBroadcastRequirements(array $widgets_and_forms): array {
+	public static function getBroadcastRequirements(array $prepared_pages): array {
 		$requirements = [];
 
-		/** @var CWidgetForm $form */
-		foreach ($widgets_and_forms as ['form' => $form]) {
-			foreach ($form->getFields() as $field) {
-				if ($field->isDashboardAccepted()) {
-					$value = $field->getValue();
-
-					if (!array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $value)) {
+		foreach ($prepared_pages as $prepared_page) {
+			foreach ($prepared_page['widgets'] as $widget_data) {
+				foreach ($widget_data['fields'] as $field) {
+					if (!is_array($field)) {
 						continue;
 					}
 
-					[
-						'reference' => $reference,
-						'type' => $type
-					] = CWidgetField::parseTypedReference($value[CWidgetField::FOREIGN_REFERENCE_KEY]);
+					$objects = [$field];
 
-					if ($reference === CWidgetField::REFERENCE_DASHBOARD) {
-						$requirements[$type] = true;
+					while ($objects) {
+						$objects_next = [];
+
+						foreach ($objects as $object) {
+							if (array_key_exists(CWidgetField::FOREIGN_REFERENCE_KEY, $object)) {
+								[
+									'reference' => $reference,
+									'type' => $type
+								] = CWidgetField::parseTypedReference($object[CWidgetField::FOREIGN_REFERENCE_KEY]);
+
+								if ($reference === CWidgetField::REFERENCE_DASHBOARD) {
+									$requirements[$type] = true;
+								}
+							}
+							else {
+								foreach ($object as $object_next) {
+									if (is_array($object_next)) {
+										$objects_next[] = $object_next;
+									}
+								}
+							}
+
+							$objects = $objects_next;
+						}
 					}
 				}
 			}

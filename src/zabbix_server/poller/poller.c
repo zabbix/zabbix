@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -536,9 +536,11 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/* Actually this could be called by trapper, without poller being initialized, */
+/* so cannot call poller_get_progname(), need progname to be passed directly. */
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, unsigned char program_type)
+		int config_startup_time, unsigned char program_type, const char *progname)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -546,6 +548,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		int	i;
 
 		ZBX_UNUSED(poller_type);
+		ZBX_UNUSED(progname);
 
 		for (i = 0; i < num; i++)
 		{
@@ -557,8 +560,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		}
 #else
 		/* SNMP checks use their own timeouts */
-		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip,
-				poller_get_progname()());
+		get_values_snmp(items, results, errcodes, num, poller_type, config_comms->config_source_ip, progname);
 #endif
 	}
 	else if (ITEM_TYPE_JMX == items[0].type)
@@ -652,7 +654,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  **********************************************************************************/
 static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
-		int config_unreachable_delay, unsigned char program_type)
+		int config_unreachable_delay, unsigned char program_type, const char *progname)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -678,7 +680,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
-			program_type);
+			program_type, progname);
 
 	zbx_timespec(&timespec);
 
@@ -862,7 +864,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 			processed += get_values(poller_type, &nextcheck, poller_args_in->config_comms,
 					poller_args_in->config_startup_time, poller_args_in->config_unavailable_delay,
 					poller_args_in->config_unreachable_period,
-					poller_args_in->config_unreachable_delay, info->program_type);
+					poller_args_in->config_unreachable_delay, info->program_type,
+					poller_args_in->zbx_get_progname_cb_arg());
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}

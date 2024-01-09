@@ -1,12 +1,22 @@
 Changes for 7.0.0beta1
 
 New features:
+..F.I..... [ZBXNEXT-8496] added aggregations for Item value widget and time period functionality for Top hosts and Item value widgets (averza, esekace, kkuzmina, MVekslers)
 .......P.. [ZBXNEXT-8724] improved error messages when proxy is starting up (dimir)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
 .........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
+.......PS. [ZBX-23914] fixed use of uninitialized protocol version variable during snmp checks (vso)
+A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
+.........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
+.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+.......PS. [ZBX-23906] fixed Zabbix server and proxy crash when executing SNMP agent item (arimdjonoks)
+..F....... [ZBX-23562] fixed time period selector validation for maximum time period (averza, esekace)
+...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
+.........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
 ..F....... [ZBX-23696] fixed script item parameters and HTTP agent item query fields and headers not being passed to Zabbix server when testing items (agriscenko)
@@ -196,7 +206,6 @@ A.F.....S. [ZBXNEXT-7726] added support for extended error checking in preproces
 .......PS. [ZBXNEXT-8714] increased MariaDB maximum supported version to 11.1 (mprihodko)
 A.F.I...S. [ZBXNEXT-8702] added support of group discovery from different prototypes/lld rules (dfofanovs, wiper)
 A.F....... [ZBXNEXT-4165] implemented `selectActions` parameter for API method `mediatype.get` to display all associated actions for media types (ddauksa)
-..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 ..F....... [ZBXNEXT-7761] updated User groups permissions and problem tag filters 'Add' button behaviour to add a new row (ddauksa)
 .........T [ZBXNEXT-8576] added template integration with Acronis Cyber Protect Cloud (knaglis)
 ..F....... [ZBXNEXT-7687] extended Top Hosts widget column sorting (dfofanovs)
@@ -470,6 +479,12 @@ New features:
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
+.........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
+.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
+.........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
+.......PS. [ZBX-23631] removed tag 'tags' in case of an error collecting tags from *discovery items (MVekslers)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
 ..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
@@ -2048,6 +2063,10 @@ New features:
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
+.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+.........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
+...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
 .........T [ZBX-23835] updated Meraki templates (egordymov)
