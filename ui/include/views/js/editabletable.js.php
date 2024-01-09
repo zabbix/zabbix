@@ -82,8 +82,8 @@
 			});
 
 			/**
-			 * Enable or disable table rows sorting according to rows count. At least 2 rows should exists to be able
-			 * sort rows using drag and drop.
+			 * Enable or disable table rows sorting according to row count. At least 2 rows should exist to enable
+			 * sorting rows using drag and drop.
 			 */
 			function setSortableState() {
 				const allow_sort = (table.find('.' + table_row_class).length < 2);
