@@ -246,7 +246,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		// Check that close button is present and clickable
 		$this->assertTrue($dialog->query('class:btn-overlay-close')->one()->isClickable());
 
-		// Check if footer buttons present and clickable.
+		// Check if footer buttons are present and clickable.
 		$this->assertEquals(['Add', 'Cancel'], $dialog->getFooter()->query('button')->all()
 				->filter(CElementFilter::CLICKABLE)->asText()
 		);
@@ -364,9 +364,8 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 	public function testDashboardDiscoveryStatusWidget_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::SQL);
-
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-			self::$dashboardid['Dashboard for testing actions with discovery status widget'])->waitUntilReady();
+				self::$dashboardid['Dashboard for testing actions with discovery status widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->getWidget(self::$update_widget)->edit()->submit();
 		$dashboard->save();
@@ -375,9 +374,9 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
-		public function testDashboardDiscoveryStatusWidget_Delete() {
+	public function testDashboardDiscoveryStatusWidget_Delete() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-			self::$dashboardid['Dashboard for testing actions with discovery status widget'])->waitUntilReady();
+				self::$dashboardid['Dashboard for testing actions with discovery status widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$widget = $dashboard->getWidget(self::DELETE_WIDGET);
 		$dashboard->deleteWidget(self::DELETE_WIDGET);
@@ -435,7 +434,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$new_name = 'Cancel test';
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
-			self::$dashboardid['Dashboard for testing cancel button for discovery status widget'])->waitUntilReady();
+				self::$dashboardid['Dashboard for testing cancel button for discovery status widget'])->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
@@ -555,11 +554,11 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals(2, $widget_data->query('class:red')->all()->count());
 		$this->assertEquals(2, $widget_data->query('class:green')->all()->count());
 
-		// Check the links of the discovery rules.
 		$drules = [[$drule_id_1, $drule_id_2, $drule_id_3, $drule_id_4, $drule_id_5],
 			[self::DISCOVERY_RULE_1, self::DISCOVERY_RULE_2, self::DISCOVERY_RULE_3, self::DISCOVERY_RULE_4, self::DISCOVERY_RULE_5]
 		];
 
+		// Check the links of the discovery rules.
 		for ($i = 0; $i <= 4; $i++) {
 			$this->assertEquals('zabbix.php?action=discovery.view&filter_set=1&filter_druleids%5B0%5D='.$drules[0][$i],
 					$widget_data->query('link', $drules[1][$i])->one()->getAttribute('href')
@@ -569,7 +568,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 	public function testDashboardDiscoveryStatusWidget_checkEmptyWidget() {
 
-		// Disable discovery rules in the ldatabase to check the content of the empty widget.
+		// Disable discovery rules in the database to check the content of the empty widget.
 		DBexecute('UPDATE drules SET status=1 WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_1).
 				'OR name='.zbx_dbstr(self::DISCOVERY_RULE_2).
 				'OR name='.zbx_dbstr(self::DISCOVERY_RULE_3).
@@ -611,13 +610,13 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 		// Trim leading and trailing spaces from expected results if necessary.
 		if (array_key_exists('trim', $data)) {
-				$data['fields']['Name'] = trim($data['fields']['Name']);
+			$data['fields']['Name'] = trim($data['fields']['Name']);
 		}
 		// If name is empty string it is replaced by default name "Discovery status".
 		$header = ($data['fields']['Name'] === '') ? 'Discovery status' : $data['fields']['Name'];
 
 		if ($update) {
-				self::$update_widget = $header;
+			self::$update_widget = $header;
 		}
 
 		COverlayDialogElement::ensureNotPresent();
