@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,6 +215,27 @@ class testTimezone extends CWebTest {
 		$this->assertEquals($data['timezone_db'], CDBHelper::getValue('SELECT timezone FROM users WHERE username='.
 				zbx_dbstr($data['fields']['Username'])));
 		$this->assertEquals('system', CDBHelper::getValue('SELECT default_timezone FROM config WHERE configid='.zbx_dbstr('1')));
+		$this->page->logout();
+	}
+
+	/**
+	 * Check for time parser error absence (Added after ZBX-23883).
+	 */
+	public function testTimezone_TimeSelector() {
+		$this->page->userLogin('Admin', 'zabbix');
+		$this->setTimezone('Atlantic/Cape_Verde', 'userprofile');
+		$this->page->open('zabbix.php?action=actionlog.list&from=now-1h&to=now&filter_messages=&filter_set=1')->waitUntilReady();
+		$filter = CFilterElement::find()->one();
+		$filter->selectTab('Last 1 hour');
+
+		foreach (['This day last week', 'Day before yesterday', 'Today so far', 'Yesterday', 'Today'] as $time) {
+			$filter->query('link', $time)->one()->click();
+			$this->page->waitUntilReady();
+
+			// No error messages awaiting on time selector change.
+			$this->assertFalse($this->query('xpath://output['.CXPathHelper::fromClass('msg-bad').']')->exists());
+		}
+
 		$this->page->logout();
 	}
 

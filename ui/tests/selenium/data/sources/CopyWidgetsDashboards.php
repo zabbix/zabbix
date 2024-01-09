@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1401,18 +1401,18 @@ class CopyWidgetsDashboards {
 									],
 									[
 										'type' => 1,
-										'name' => 'columns.0.timeshift',
-										'value' => ''
+										'name' => 'columns.0.time_period.from',
+										'value' => 'now-1h'
+									],
+									[
+										'type' => 1,
+										'name' => 'columns.0.time_period.to',
+										'value' => 'now'
 									],
 									[
 										'type' => 0,
 										'name' => 'columns.0.aggregate_function',
 										'value' => 2
-									],
-									[
-										'type' => 1,
-										'name' => 'columns.0.aggregate_interval',
-										'value' => '1h'
 									],
 									[
 										'type' => 1,
