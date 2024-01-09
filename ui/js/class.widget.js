@@ -173,7 +173,7 @@ class CWidget extends CWidgetBase {
 	 * @returns {Promise<void>}
 	 */
 	promiseReady() {
-		return new Promise((resolve) => {
+		return new Promise(resolve => {
 			let incomplete = 0;
 
 			const image_complete = () => {
@@ -192,7 +192,8 @@ class CWidget extends CWidgetBase {
 			}
 
 			if (incomplete === 0) {
-				resolve();
+				// Wait until preloader icon is removed on animation frame.
+				requestAnimationFrame(() => resolve());
 			}
 		});
 	}
