@@ -56,6 +56,9 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 
 	ZBX_UNUSED(fd);
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+				get_agent_step_string(agent_context->step), event, agent_context->item.itemid);
+
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
 		zbx_update_selfmon_counter(poller_config->info, ZBX_PROCESS_STATE_BUSY);
