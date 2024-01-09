@@ -639,20 +639,27 @@ class testAgentItems extends CIntegrationTest {
 		return [
 			self::COMPONENT_SERVER => [
 				'UnavailableDelay' => 5,
-				'UnreachableDelay' => 1
+				'UnreachableDelay' => 1,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_AGENT => [
 				'Hostname' => self::COMPONENT_AGENT,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'AllowKey' => 'system.run[*]',
-				'HostMetadata' => self::AGENT_METADATA
+				'HostMetadata' => self::AGENT_METADATA,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
 			],
 			self::COMPONENT_AGENT2 => [
 				'Hostname' => self::COMPONENT_AGENT2,
 				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
 				'AllowKey' => 'system.run[*]',
 				'Plugins.Uptime.Capacity' => '10',
-				'HostMetadata' => self::AGENT_METADATA
+				'HostMetadata' => self::AGENT_METADATA,
+				'DebugLevel' => 5,
+				'LogFileSize' => 0
+
 			]
 		];
 	}
@@ -702,7 +709,7 @@ class testAgentItems extends CIntegrationTest {
 
 		$data = [];
 		$wait_iterations = 10;
-		$wait_iteration_delay = 1;
+		$wait_iteration_delay = 2;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {
 			$db_items = $this->call('item.get', [
@@ -842,7 +849,10 @@ class testAgentItems extends CIntegrationTest {
 					self::fail('Wrong element type in '.$key);
 				}
 
-				self::assertEquals($array_value, $cmpr[$array_key], 'Value (array key: '.$array_key.') is not expected for '.$key);
+				self::assertEquals($array_value, $cmpr[$array_key],
+						'Value (array key: '.$array_key.') is not expected for '.
+						$key."\n Received: ".json_encode($cmpr[$array_key]).
+						".\n But expected: ".json_encode($array_value)."\n");
 			}
 		}
 	}
