@@ -44,6 +44,8 @@
 
 #include <event2/dns.h>
 
+static ZBX_THREAD_LOCAL zbx_hashset_t	engineids;		/* EngineID Cache */
+
 static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_t *poller_config)
 {
 	zbx_timespec_t		timespec;
@@ -471,6 +473,7 @@ static void	socket_read_event_cb(evutil_socket_t fd, short what, void *arg)
 	ZBX_UNUSED(arg);
 }
 
+
 ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
@@ -528,7 +531,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 #endif
 	}
 	else
+	{
 		async_poller_dns_init(&poller_config, poller_args_in);
+
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
+			zbx_init_snmp_engineid_cache();
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -586,7 +594,12 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	}
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+	{
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
+			zbx_clear_snmp_engineid_cache();
+
 		async_poller_dns_destroy(&poller_config);
+	}
 
 	event_del(rtc_event);
 	async_poller_stop(&poller_config);
