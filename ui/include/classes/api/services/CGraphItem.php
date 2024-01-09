@@ -83,6 +83,17 @@ class CGraphItem extends CApiService {
 			if ($options['editable']) {
 				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
 			}
+
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM graphs_items gi1'.
+				' JOIN items i1 ON gi1.itemid=i1.itemid'.
+				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
+					' AND p1.ugsetid=p.ugsetid'.
+				' WHERE gi.graphid=gi1.graphid'.
+					' AND p1.permission IS NULL'.
+			')';
 		}
 
 		// graphids
