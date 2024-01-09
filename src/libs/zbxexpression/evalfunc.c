@@ -1966,13 +1966,17 @@ static int	evaluate_BITAND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 
 	if (SUCCEED != get_function_parameter_uint64(parameters, 2, &mask))
 	{
-		*error = zbx_strdup(*error, "invalid third parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto clean;
 	}
 
-	/* prepare the 1st and the 3rd parameter for passing to evaluate_LAST() */
-	last_parameters = zbx_function_get_param_dyn(parameters, 1);
+	if (NULL == (last_parameters = zbx_function_get_param_dyn(parameters, 1)))
+	{
+		*error = zbx_strdup(*error, "invalid first parameter");
+		goto clean;
+	}
 
+	/* prepare the 1st for passing to evaluate_LAST() */
 	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
 	{
 		/* the evaluate_LAST() should return uint64 value, but just to be sure try to convert it */
@@ -3597,8 +3601,15 @@ int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, 
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s' of type:'%s'", __func__, zbx_result_string(ret),
-			zbx_variant_value_desc(value), zbx_variant_type_desc(value));
+	if (ret == FAIL)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s' of type:'%s'", __func__, zbx_result_string(ret),
+				zbx_variant_value_desc(value), zbx_variant_type_desc(value));
+	}
 
 	return ret;
 }
