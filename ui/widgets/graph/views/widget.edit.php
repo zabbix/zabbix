@@ -26,7 +26,6 @@
  * @var array $data
  */
 
-
 if (array_key_exists('itemid', $data['fields'])) {
 	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 		->setPopupParameter('numeric', true);
