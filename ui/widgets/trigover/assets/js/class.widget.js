@@ -18,7 +18,7 @@
 **/
 
 
-class CWidgetTrigerOver extends CWidget {
+class CWidgetTriggerOver extends CWidget {
 
 	onStart() {
 		this._events = {

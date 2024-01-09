@@ -700,7 +700,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$token_types[] = CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION;
 				}
 
-				$rigth_parentheses = [];
+				$right_parentheses = [];
 				$tokens = $expression_parser->getResult()->getTokensOfTypes($token_types);
 
 				foreach ($tokens as $token) {
@@ -709,14 +709,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
 						case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
 						case CExpressionParserResult::TOKEN_TYPE_STRING:
-							foreach ($rigth_parentheses as $pos => $value) {
+							foreach ($right_parentheses as $pos => $value) {
 								if ($pos < $token['pos']) {
 									if ($pos_left != $pos) {
 										$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
 									}
 									$expression[] = bold($value);
 									$pos_left = $pos + strlen($value);
-									unset($rigth_parentheses[$pos]);
+									unset($right_parentheses[$pos]);
 								}
 							}
 							if ($pos_left != $token['pos']) {
@@ -731,8 +731,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					switch ($token['type']) {
 						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
 							$expression[] = bold($token['data']['function'].'(');
-							$rigth_parentheses[$token['pos'] + $token['length'] - 1] = ')';
-							ksort($rigth_parentheses, SORT_NUMERIC);
+							$right_parentheses[$token['pos'] + $token['length'] - 1] = ')';
+							ksort($right_parentheses, SORT_NUMERIC);
 							break;
 
 						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
@@ -759,13 +759,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				$len = strlen($trigger[$source]);
-				foreach ($rigth_parentheses as $pos => $value) {
+				foreach ($right_parentheses as $pos => $value) {
 					if ($pos_left != $pos) {
 						$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
 					}
 					$expression[] = bold($value);
 					$pos_left = $pos + strlen($value);
-					unset($rigth_parentheses[$pos]);
+					unset($right_parentheses[$pos]);
 				}
 				if ($pos_left != $len) {
 					$expression[] = substr($trigger[$source], $pos_left);

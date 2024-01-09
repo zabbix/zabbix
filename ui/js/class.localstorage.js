@@ -507,7 +507,7 @@ ZBX_LocalStorageKey.prototype.truncate = function() {
 };
 
 /**
- * Sunscribe a callback to key sync request.
+ * Subscribe a callback to key sync request.
  *
  * @param {callable} callback
  */
