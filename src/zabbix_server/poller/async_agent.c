@@ -70,31 +70,6 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		goto stop;
 	}
 
-	if (0 == event)
-	{
-		/* initialization */
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_agent_step_string(agent_context->step), event, agent_context->item.itemid);
-
-		if (SUCCEED != zbx_socket_connect(&agent_context->s, SOCK_STREAM, agent_context->config_source_ip,
-				addr, agent_context->item.interface.port, agent_context->config_timeout))
-		{
-			agent_context->item.ret = NETWORK_ERROR;
-			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
-					" during %s", get_agent_step_string(agent_context->step)));
-			goto stop;
-		}
-
-		*fd = agent_context->s.socket;
-
-		return ZBX_ASYNC_TASK_WRITE;
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_agent_step_string(agent_context->step), event, agent_context->item.itemid);
-	}
-
 	if (0 != (event & EV_TIMEOUT))
 	{
 		agent_context->item.ret = TIMEOUT_ERROR;
