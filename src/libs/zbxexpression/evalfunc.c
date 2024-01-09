@@ -1976,7 +1976,7 @@ static int	evaluate_BITAND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 		goto clean;
 	}
 
-	/* bitand(<item_key>,#0,1)                                                               */
+	/* bitand(<item_key>,#0,1)                                                       */
 	/* First parameter is the item name, second is history count, third is the mask. */
 	/* First and second parameters are resent to evaluate_LAST().                    */
 	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
