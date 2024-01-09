@@ -42,9 +42,10 @@ else {
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
-	->addField($field_itemid)
+	->addField($field_itemid->addRowClass('item_prototye_multiselect'))
 	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid'])
+		? (new CWidgetFieldMultiSelectGraphPrototypeView($data['fields']['graphid']))
+			->addRowClass('graph_prototye_multiselect')
 		: null
 	)
 	->addField(
@@ -66,4 +67,6 @@ else {
 		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_graph_prototype_form.init();')
 	->show();

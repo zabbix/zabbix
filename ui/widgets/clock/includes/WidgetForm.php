@@ -60,7 +60,7 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		if ($this->getFieldValue('time_type') == TIME_TYPE_HOST && $this->getFieldValue('itemid') == []) {
-			$errors[] = _s('Invalid parameter "Item": cannot be empty.');
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
 		}
 
 		if ($this->getFieldValue('clock_type') == Widget::TYPE_DIGITAL && !$this->getFieldValue('show')) {

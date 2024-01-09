@@ -26,6 +26,7 @@
  * @var array $data
  */
 
+
 if (array_key_exists('itemid', $data['fields'])) {
 	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 		->setPopupParameter('numeric', true);
@@ -42,9 +43,9 @@ else {
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
-	->addField($field_itemid)
+	->addField(($field_itemid)->addRowClass('item_multiselect'))
 	->addField(array_key_exists('graphid', $data['fields'])
-		? new CWidgetFieldMultiSelectGraphView($data['fields']['graphid'])
+		? (new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('graph_multiselect')
 		: null
 	)
 	->addField(
@@ -60,4 +61,6 @@ else {
 		? new CWidgetFieldMultiSelectOverrideHostView($data['fields']['override_hostid'])
 		: null
 	)
+	->includeJsFile('widget.edit.js.php')
+	->addJavaScript('widget_graph_form.init();')
 	->show();
