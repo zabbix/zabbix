@@ -1458,7 +1458,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong equals operator',
-						'Key' => 'rometeus-wrong-equals-operator'
+						'Key' => 'prometeus-wrong-equals-operator'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}=1']
@@ -1681,7 +1681,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter =!',
-						'Key' => 'wrong-second-parameter-equals-exlamation'
+						'Key' => 'wrong-second-parameter-equals-exclamation'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']

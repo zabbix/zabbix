@@ -812,7 +812,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Mimimal fields create'
+						'Name' => 'Minimal fields create'
 					],
 					'Checks' => [['default' => true]]
 				]
