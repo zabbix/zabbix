@@ -1966,17 +1966,19 @@ static int	evaluate_BITAND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 
 	if (SUCCEED != get_function_parameter_uint64(parameters, 2, &mask))
 	{
-		*error = zbx_strdup(*error, "invalid second parameter");
+		*error = zbx_strdup(*error, "invalid third parameter");
 		goto clean;
 	}
 
 	if (NULL == (last_parameters = zbx_function_get_param_dyn(parameters, 1)))
 	{
-		*error = zbx_strdup(*error, "invalid first parameter");
+		*error = zbx_strdup(*error, "invalid second parameter");
 		goto clean;
 	}
 
-	/* prepare the 1st for passing to evaluate_LAST() */
+	/* bitand(<item_key>,#0,1)                                                               */
+	/* First parameter is the item name, second is history count, third is the mask. */
+	/* First and second parameters are resent to evaluate_LAST().                    */
 	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
 	{
 		/* the evaluate_LAST() should return uint64 value, but just to be sure try to convert it */
