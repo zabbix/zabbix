@@ -22,7 +22,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15
 	github.com/mediocregopher/radix/v3 v3.8.1
 	github.com/memcachier/mc/v3 v3.0.3
-	github.com/miekg/dns v1.1.50
+	github.com/miekg/dns v1.1.55
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
 	golang.org/x/net v0.18.0

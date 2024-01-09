@@ -1378,7 +1378,7 @@ class testFormScheduledReport extends CWebTest {
 					CPopupMenuElement::find()->waitUntilVisible()->one()->select('View related reports');
 					$table = COverlayDialogElement::find()->waitUntilReady()->one()->asTable();
 					$this->assertFalse($table->query('link', $name)->one(false)->isValid());
-					// Open another dahsboard and check related reports.
+					// Open another dashboard and check related reports.
 					$this->page->open('zabbix.php?action=dashboard.list')->waitUntilReady();
 					$this->query('link', $data['fields']['Dashboard'])->waitUntilClickable()->one()->click();
 				}
