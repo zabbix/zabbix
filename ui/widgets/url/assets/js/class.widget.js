@@ -21,15 +21,19 @@
 class CWidgetUrl extends CWidget {
 
 	promiseReady() {
-		return new Promise((resolve) => {
-			const iframe = this._target.querySelector('iframe');
+		const readiness = [super.promiseReady()];
 
-			if (iframe === null) {
-				return resolve(super.promiseReady());
-			}
+		const iframe = this._target.querySelector('iframe');
 
-			iframe.addEventListener('load', () => setTimeout(() => resolve(super.promiseReady()), 200));
-		});
+		if (iframe !== null) {
+			readiness.push(
+				new Promise(resolve => {
+					iframe.addEventListener('load', () => setTimeout(resolve, 200));
+				})
+			);
+		}
+
+		return Promise.all(readiness);
 	}
 
 	getUpdateRequestData() {
