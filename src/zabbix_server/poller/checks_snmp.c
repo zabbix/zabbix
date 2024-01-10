@@ -95,7 +95,6 @@
  ******************************************************************************/
 typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
 
-
 typedef struct
 {
 	char		*addr;
@@ -182,7 +181,6 @@ typedef struct
 	int			finished;
 }
 zbx_snmp_result_t;
-
 
 static ZBX_THREAD_LOCAL zbx_hashset_t	snmpidx;		/* Dynamic Index Cache */
 static char				zbx_snmp_init_done;
@@ -786,6 +784,8 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	zbx_snmp_sess_t		ssp = NULL;
 	char			addr[128];
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	snmp_sess_init(&session);
 
 	/* Allow using sub-OIDs higher than MAX_INT, like in 'snmpwalk -Ir'. */
@@ -966,6 +966,7 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 #endif
 
 	SOCK_STARTUP;
+
 	if (NULL == (ssp = snmp_sess_open(&session)))
 	{
 		SOCK_CLEANUP;
@@ -2346,6 +2347,8 @@ static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 {
 	struct variable_list	*var;
 	int			ret = SUCCEED;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	if (STAT_SUCCESS != status || SNMP_ERR_NOERROR != response->errstat)
 	{
