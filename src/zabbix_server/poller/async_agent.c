@@ -56,8 +56,8 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 
 	ZBX_UNUSED(fd);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_agent_step_string(agent_context->step), event, agent_context->item.itemid);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
+				get_agent_step_string(agent_context->step), event, agent_context->item.itemid, addr);
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
 	{
@@ -234,8 +234,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					/* retry with other protocol */
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 				}
-
-				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns)
+				else if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns)
 				{
 					agent_context->rdns_step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
 					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
