@@ -213,12 +213,13 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *
 			if (1 == *need_resolve)
 				*need_resolve = 0;
 
-			zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
-			zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
 			zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
 		}
 		else
+		{
+			zbx_vector_dc_dcheck_ptr_destroy(&task_local.dchecks);
 			zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
+		}
 
 		(*queue_capacity)--;
 		checks_count++;
