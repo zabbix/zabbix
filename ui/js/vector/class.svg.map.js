@@ -491,7 +491,13 @@ SVGMap.prototype.update = function (options, incremental) {
 
 			this.options = SVGElement.mergeAttributes(this.options, options);
 
-			resolve();
+			const readiness = [];
+
+			this.options.container.querySelectorAll('image').forEach(image => {
+				readiness.push(new Promise(resolve => image.addEventListener('load', resolve)));
+			});
+
+			resolve(Promise.all(readiness));
 		}, this);
 	});
 
