@@ -494,6 +494,11 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 						'Down' => ''
 					],
 					[
+						'Discovery rule' => 'Discovery rule for proxy delete test',
+						'Up' => '',
+						'Down' => ''
+					],
+					[
 						'Discovery rule' => self::DISCOVERY_RULE_2,
 						'Up' => '',
 						'Down' => ''
@@ -529,6 +534,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$drule_id_3 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_3));
 		$drule_id_4 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_4));
 		$drule_id_5 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_5));
+		$drule_id_6 = CDBHelper::getValue('SELECT druleid FROM drules WHERE name='.zbx_dbstr('Discovery rule for proxy delete test'));
 
 		// Insert data into the database (dhosts table), to imitate the host discovery.
 		for ($i = 1, $j = 101; $i + $j <= 301; $i++, $j++) {
@@ -554,12 +560,13 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals(2, $widget_data->query('class:red')->all()->count());
 		$this->assertEquals(2, $widget_data->query('class:green')->all()->count());
 
-		$drules = [[$drule_id_1, $drule_id_2, $drule_id_3, $drule_id_4, $drule_id_5],
-			[self::DISCOVERY_RULE_1, self::DISCOVERY_RULE_2, self::DISCOVERY_RULE_3, self::DISCOVERY_RULE_4, self::DISCOVERY_RULE_5]
+		$drules = [[$drule_id_1, $drule_id_2, $drule_id_3, $drule_id_4, $drule_id_5, $drule_id_6],
+			[self::DISCOVERY_RULE_1, self::DISCOVERY_RULE_2, self::DISCOVERY_RULE_3, self::DISCOVERY_RULE_4,
+				self::DISCOVERY_RULE_5, 'Discovery rule for proxy delete test']
 		];
 
 		// Check the links of the discovery rules.
-		for ($i = 0; $i <= 4; $i++) {
+		for ($i = 0; $i <= 5; $i++) {
 			$this->assertEquals('zabbix.php?action=discovery.view&filter_set=1&filter_druleids%5B0%5D='.$drules[0][$i],
 					$widget_data->query('link', $drules[1][$i])->one()->getAttribute('href')
 			);
@@ -569,11 +576,10 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 	public function testDashboardDiscoveryStatusWidget_checkEmptyWidget() {
 
 		// Disable discovery rules in the database to check the content of the empty widget.
-		DBexecute('UPDATE drules SET status=1 WHERE name='.zbx_dbstr(self::DISCOVERY_RULE_1).
-				'OR name='.zbx_dbstr(self::DISCOVERY_RULE_2).
-				'OR name='.zbx_dbstr(self::DISCOVERY_RULE_3).
-				'OR name='.zbx_dbstr(self::DISCOVERY_RULE_4).
-				'OR name='.zbx_dbstr(self::DISCOVERY_RULE_5)
+		DBexecute('UPDATE drules SET status=1 WHERE name IN ('.
+				zbx_dbstr(self::DISCOVERY_RULE_1).', '.zbx_dbstr(self::DISCOVERY_RULE_2).
+				', '.zbx_dbstr(self::DISCOVERY_RULE_3).', '.zbx_dbstr(self::DISCOVERY_RULE_4).
+				', '.zbx_dbstr(self::DISCOVERY_RULE_5).', '.zbx_dbstr('Discovery rule for proxy delete test').')'
 		);
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.
