@@ -167,18 +167,18 @@ static void	async_reverse_dns_event(int err, char type, int count, int ttl, void
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot reverse DNS name: %s", evdns_err_to_string(err));
 		task->error = zbx_strdup(task->error, evdns_err_to_string(err));
-		task->address = NULL;
+		zbx_free(task->address);
 	}
 	else
 	{
 		if (0 != count)
 		{
-			task->address = zbx_strdup(NULL, *(char **)addresses);
+			task->address = zbx_strdup(task->address, *(char **)addresses);
 			zabbix_log(LOG_LEVEL_DEBUG, "resolved reverse DNS name: %s", task->address);
 
 		}
 		else
-			task->address = NULL;
+			zbx_free(task->address);
 	}
 
 	async_event(-1, 0, task);
@@ -207,7 +207,7 @@ static void	async_dns_event(int err, struct evutil_addrinfo *ai, void *arg)
 			ip[0] = '\0';
 
 		task->ai = ai;
-		task->address = zbx_strdup(NULL, ip);
+		task->address = zbx_strdup(task->address, ip);
 		evtimer_add(task->timeout_event, &tv);
 		async_event(-1, 0, task);
 	}
