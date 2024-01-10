@@ -29,6 +29,7 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 class testFormUser extends CWebTest {
 
 const SQL = 'SELECT * FROM users';
+const ZABBIX_LDAP_USER = 'John Zabbix';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -68,7 +69,7 @@ const SQL = 'SELECT * FROM users';
 		// Create user with frontent access -> LDAP.
 		CDataHelper::call('user.create', [
 			[
-				'username' => 'John Zabbix',
+				'username' => self::ZABBIX_LDAP_USER,
 				'passwd' => 'test5678',
 				'roleid' => '3'
 			],
@@ -264,12 +265,14 @@ const SQL = 'SELECT * FROM users';
 			$hint->query('class:btn-overlay-close')->one()->click();
 
 			$info_message = 'Password is not mandatory for non internal authentication type.';
-			$this->assertEquals($info_message, $form->query('xpath:.//div[contains(text(), "'.$info_message.'")]')->one()->getText());
+			$this->assertEquals($info_message, $form->query('xpath:.//div[contains(text(), '.
+					CXPathHelper::escapeQuotes($info_message).')]')->one()->getText()
+			);
 		}
 
 		// Check hintbox contains correct text message.
-		$this->assertEquals($data['hintbox_warning'], $this->query('xpath://button[contains(@data-hintbox-contents, "'.
-				$data['hintbox_warning'].'")]')->one()->getAttribute('data-hintbox-contents')
+		$this->assertEquals($data['hintbox_warning'], $this->query('xpath://button[contains(@data-hintbox-contents, '.
+				CXPathHelper::escapeQuotes($data['hintbox_warning']).')]')->one()->getAttribute('data-hintbox-contents')
 		);
 
 		// Check required fields.
@@ -333,11 +336,7 @@ const SQL = 'SELECT * FROM users';
 		$this->assertEquals(2, $dialog->getFooter()->query('button', $modal_form['buttons'])->all()
 				->filter(CElementFilter::CLICKABLE)->count()
 		);
-
-		foreach (['Send to', 'When active'] as $label) {
-			$this->assertTrue($dialog_form->isRequired($label));
-		}
-
+		$this->assertEquals(['Send to', 'When active'], $dialog_form->getRequiredLabels());
 		$dialog->close();
 
 		// Check Permissions tab layout.
@@ -1039,7 +1038,7 @@ const SQL = 'SELECT * FROM users';
 			[
 				[
 					'expected' => TEST_BAD,
-					'user_to_update' => 'John Zabbix',
+					'user_to_update' => self::ZABBIX_LDAP_USER,
 					'fields' => [
 						'Password' => '',
 						'Password (once again)' => ''
@@ -1423,8 +1422,8 @@ const SQL = 'SELECT * FROM users';
 		if ($update_user === 'LDAP change password button check') {
 			$this->assertFalse($form->query('button:Change password')->one()->isClickable());
 			$hintbox = 'Password can only be changed for users using the internal Zabbix authentication.';
-			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, "'.$hintbox.'")]')
-					->one()->getAttribute('data-hintbox-contents')
+			$this->assertEquals($hintbox, $this->query('xpath://button[contains(@data-hintbox-contents, '.
+					CXPathHelper::escapeQuotes($hintbox).')]')->one()->getAttribute('data-hintbox-contents')
 			);
 		}
 
@@ -1444,7 +1443,7 @@ const SQL = 'SELECT * FROM users';
 		$form->submit();
 
 		if (array_key_exists('Password', $data['fields']) && array_key_exists('Password (once again)', $data['fields'])) {
-			if ($update_user === 'LDAP user' || $update_user === 'no-access-to-the-frontend' || $update_user === 'John Zabbix') {
+			if ($update_user === 'LDAP user' || $update_user === 'no-access-to-the-frontend' || $update_user === self::ZABBIX_LDAP_USER) {
 				$this->assertFalse($this->page->isAlertPresent());
 			}
 			else {
@@ -1576,7 +1575,7 @@ const SQL = 'SELECT * FROM users';
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
-						'Username' => 'John Zabbix'
+						'Username' => self::ZABBIX_LDAP_USER
 					]
 				]
 			],
