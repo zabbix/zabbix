@@ -28,8 +28,8 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  */
 class testFormUser extends CWebTest {
 
-const SQL = 'SELECT * FROM users';
-const ZABBIX_LDAP_USER = 'John Zabbix';
+	const SQL = 'SELECT * FROM users';
+	const ZABBIX_LDAP_USER = 'John Zabbix';
 
 	/**
 	 * Attach MessageBehavior to the test.
