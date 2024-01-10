@@ -5,3 +5,6 @@ noinst_LIBRARIES = libzbxdiag_proxy.a
 libzbxdiag_proxy_a_SOURCES = \
 	diag_proxy.c \
 	diag_proxy.h
+
+libzbxdiag_proxy_a_CFLAGS = \
+	$(TLS_CFLAGS)
