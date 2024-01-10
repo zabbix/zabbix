@@ -56,6 +56,7 @@ void	zbx_set_snmp_bulkwalk_options(const char *progname);
 void	zbx_unset_snmp_bulkwalk_options(void);
 void	zbx_init_snmp_engineid_cache(void);
 void	zbx_clear_snmp_engineid_cache(void);
+void	zbx_housekeep_snmp_engineid_cache(void);
 
 #endif
 
