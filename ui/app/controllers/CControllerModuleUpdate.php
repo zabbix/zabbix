@@ -24,7 +24,7 @@ class CControllerModuleUpdate extends CController {
 	static function getValidationRules() {
 		return ['object', 'fields' => [
 			'moduleid' => ['db module.moduleid', 'required'],
-			'status' => ['boolean']
+			'status' => ['db module.status', 'in' => [MODULE_STATUS_ENABLED]]
 		]];
 	}
 
