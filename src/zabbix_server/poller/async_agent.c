@@ -234,7 +234,9 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					/* retry with other protocol */
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 				}
-				else if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns)
+
+				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == agent_context->resolve_reverse_dns &&
+						SUCCEED == agent_context->item.ret)
 				{
 					agent_context->rdns_step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
 					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
