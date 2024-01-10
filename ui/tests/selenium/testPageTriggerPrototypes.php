@@ -152,75 +152,10 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 		$this->layout();
 	}
 
-	public static function getSortingData() {
-		return [
-			// #0 Sort by Severity.
-			[
-				[
-					'sort_by' => 'Severity',
-					'sort' => 'priority',
-					'result' => [
-						'Not classified',
-						'Information',
-						'Warning',
-						'Average',
-						'High',
-						'Disaster'
-					]
-				]
-			],
-			// #1 Sort by Name.
-			[
-				[
-					'sort_by' => 'Name',
-					'sort' => 'description',
-					'result' => [
-						'1 Trigger prototype monitored discovered_{#KEY}',
-						'2 Trigger prototype not monitored discovered_{#KEY}',
-						'3 Trigger prototype not monitored not discovered_{#KEY}',
-						'4 Trigger prototype monitored not discovered_{#KEY}',
-						'5 Trigger prototype for high severity_{#KEY}',
-						'6 Trigger prototype for disaster severity_{#KEY}'
-					]
-				]
-			],
-			// #2 Sort by Create enabled.
-			[
-				[
-					'sort_by' => 'Create enabled',
-					'sort' => 'status',
-					'result' => [
-						'Yes',
-						'Yes',
-						'Yes',
-						'Yes',
-						'No',
-						'No'
-					]
-				]
-			],
-			// #3 Sort by Discover.
-			[
-				[
-					'sort_by' => 'Discover',
-					'sort' => 'discover',
-					'result' => [
-						'Yes',
-						'Yes',
-						'Yes',
-						'Yes',
-						'No',
-						'No'
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * Sort trigger prototypes by Severity, Name, Create enabled and Discover columns.
 	 *
-	 * @dataProvider getSortingData
+	 * @dataProvider getTriggersSortingData
 	 */
 	public function testPageTriggerPrototypes_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
@@ -228,87 +163,10 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 		$this->executeSorting($data);
 	}
 
-	public static function getButtonLinkData() {
-		return [
-			// #0 Click on Create disabled button.
-			[
-				[
-					'name' => '1 Trigger prototype monitored discovered_{#KEY}',
-					'button' => 'Create disabled',
-					'column_check' => 'Create enabled',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			],
-			// #1 Click on Create enabled button.
-			[
-				[
-					'name' => '2 Trigger prototype not monitored discovered_{#KEY}',
-					'button' => 'Create enabled',
-					'column_check' => 'Create enabled',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #2 Enabled clicking on link in Create enabled column.
-			[
-				[
-					'name' => '3 Trigger prototype not monitored not discovered_{#KEY}',
-					'column_check' => 'Create enabled',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #3 Disabled clicking on link in Create enabled column.
-			[
-				[
-					'name' => '4 Trigger prototype monitored not discovered_{#KEY}',
-					'column_check' => 'Create enabled',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			],
-			// #4 Enable discovering clicking on link in Discover column.
-			[
-				[
-					'name' => '3 Trigger prototype not monitored not discovered_{#KEY}',
-					'column_check' => 'Discover',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #5 Disable discovering clicking on link in Discover column.
-			[
-				[
-					'name' => '2 Trigger prototype not monitored discovered_{#KEY}',
-					'column_check' => 'Discover',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			],
-			// #6 Enable all trigger prototypes clicking on Create enabled button.
-			[
-				[
-					'button' => 'Create enabled',
-					'column_check' => 'Create enabled',
-					'after' => ['Yes', 'Yes', 'Yes', 'Yes', 'Yes', 'Yes']
-				]
-			],
-			// #7 Disable all trigger prototypes clicking on Create disabled button.
-			[
-				[
-					'button' => 'Create disabled',
-					'column_check' => 'Create enabled',
-					'after' => ['No', 'No', 'No', 'No', 'No', 'No']
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @dataProvider getButtonLinkData
+	 * @dataProvider getTriggersButtonLinkData
 	 */
 	public function testPageTriggerPrototypes_ButtonLink($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&parent_discoveryid='.
@@ -316,39 +174,10 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 		$this->executeDiscoverEnable($data);
 	}
 
-	public static function getDeleteData() {
-		return [
-			// #0 Cancel delete.
-			[
-				[
-					'name' => ['1 Trigger prototype monitored discovered_{#KEY}'],
-					'cancel' => true
-				]
-			],
-			// #1 Delete one.
-			[
-				[
-					'name' => ['2 Trigger prototype not monitored discovered_{#KEY}'],
-					'message' => 'Trigger prototype deleted'
-				]
-			],
-			// #2 Delete more than 1.
-			[
-				[
-					'name' => [
-						'3 Trigger prototype not monitored not discovered_{#KEY}',
-						'4 Trigger prototype monitored not discovered_{#KEY}'
-					],
-					'message' => 'Trigger prototypes deleted'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getDeleteData
+	 * @dataProvider getTriggersDeleteData
 	 */
 	public function testPageTriggerPrototypes_Delete($data) {
 		$sql = 'SELECT null FROM triggers WHERE triggerid=';
