@@ -286,6 +286,12 @@ class testDashboardCopyWidgets extends CWebTest {
 			],
 			[
 				[
+					'name' => 'Discovery status widget',
+					'copy to' => 'same page'
+				]
+			],
+			[
+				[
 					'name' => 'Graph (classic) widget',
 					'copy to' => 'same page'
 				]
