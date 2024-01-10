@@ -188,6 +188,7 @@ require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
 
 // Prototype pages.
+require_once dirname(__FILE__).'/prototype/testPagePrototypeGraphsTemplate.php';
 require_once dirname(__FILE__).'/prototype/testPagePrototypeHostsTemplate.php';
 require_once dirname(__FILE__).'/prototype/testPagePrototypeItemsTemplate.php';
 require_once dirname(__FILE__).'/prototype/testPagePrototypeTriggersTemplate.php';
@@ -491,6 +492,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUpdateProblem');
 
 		// Prototype pages.
+		$suite->addTestSuite('testPagePrototypeGraphsTemplate');
 		$suite->addTestSuite('testPagePrototypeHostsTemplate');
 		$suite->addTestSuite('testPagePrototypeItemsTemplate');
 		$suite->addTestSuite('testPagePrototypeTriggersTemplate');

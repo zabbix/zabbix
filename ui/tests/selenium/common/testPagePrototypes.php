@@ -379,6 +379,50 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	public static function getGraphsSortingData() {
+		return [
+			// #0 Sort by Name.
+			[
+				[
+					'sort_by' => 'Name',
+					'sort' => 'name',
+					'result' => [
+						'1 Graph prototype discovered_{#KEY}',
+						'2 Graph prototype not discovered_{#KEY}',
+						'3 Graph prototype pie discovered_{#KEY}',
+						'4 Graph prototype exploded not discovered_{#KEY}'
+					]
+				]
+			],
+			// #1 Sort by Graph type.
+			[
+				[
+					'sort_by' => 'Graph type',
+					'sort' => 'graphtype',
+					'result' => [
+						'Exploded',
+						'Normal',
+						'Pie',
+						'Stacked'
+					]
+				]
+			],
+			// #2 Sort by Discover.
+			[
+				[
+					'sort_by' => 'Discover',
+					'sort' => 'discover',
+					'result' => [
+						'Yes',
+						'Yes',
+						'No',
+						'No'
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check available sorting on prototype page.
 	 *
@@ -624,6 +668,29 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	public static function getGraphsButtonLinkData() {
+		return [
+			// #0 Enable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '2 Graph prototype not discovered_{#KEY}',
+					'column_check' => 'Discover',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #1 Disable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '1 Graph prototype discovered_{#KEY}',
+					'column_check' => 'Discover',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
@@ -746,6 +813,35 @@ class testPagePrototypes extends CWebTest {
 						'4 Trigger prototype monitored not discovered_{#KEY}'
 					],
 					'message' => 'Trigger prototypes deleted'
+				]
+			]
+		];
+	}
+
+	public static function getGraphsDeleteData() {
+		return [
+			// #0 Cancel delete.
+			[
+				[
+					'name' => ['1 Graph prototype discovered_{#KEY}'],
+					'cancel' => true
+				]
+			],
+			// #1 Delete one.
+			[
+				[
+					'name' => ['2 Graph prototype not discovered_{#KEY}'],
+					'message' => 'Graph prototype deleted'
+				]
+			],
+			// #2 Delete more than 1.
+			[
+				[
+					'name' => [
+						'3 Graph prototype pie discovered_{#KEY}',
+						'4 Graph prototype exploded not discovered_{#KEY}'
+					],
+					'message' => 'Graph prototypes deleted'
 				]
 			]
 		];

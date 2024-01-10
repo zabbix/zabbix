@@ -148,54 +148,10 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		$this->layout();
 	}
 
-	public static function getSortingData() {
-		return [
-			// #0 Sort by Name.
-			[
-				[
-					'sort_by' => 'Name',
-					'sort' => 'name',
-					'result' => [
-						'1 Graph prototype discovered_{#KEY}',
-						'2 Graph prototype not discovered_{#KEY}',
-						'3 Graph prototype pie discovered_{#KEY}',
-						'4 Graph prototype exploded not discovered_{#KEY}'
-					]
-				]
-			],
-			// #1 Sort by Graph type.
-			[
-				[
-					'sort_by' => 'Graph type',
-					'sort' => 'graphtype',
-					'result' => [
-						'Exploded',
-						'Normal',
-						'Pie',
-						'Stacked'
-					]
-				]
-			],
-			// #2 Sort by Discover.
-			[
-				[
-					'sort_by' => 'Discover',
-					'sort' => 'discover',
-					'result' => [
-						'Yes',
-						'Yes',
-						'No',
-						'No'
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * Sort graph prototypes by Name, Graph type and Discover columns.
 	 *
-	 * @dataProvider getSortingData
+	 * @dataProvider getGraphsSortingData
 	 */
 	public function testPageGraphPrototypes_Sorting($data) {
 		$this->page->login()->open('graphs.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
@@ -203,33 +159,10 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		$this->executeSorting($data);
 	}
 
-	public static function getButtonLinkData() {
-		return [
-			// #0 Enable discovering clicking on link in Discover column.
-			[
-				[
-					'name' => '2 Graph prototype not discovered_{#KEY}',
-					'column_check' => 'Discover',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #1 Disable discovering clicking on link in Discover column.
-			[
-				[
-					'name' => '1 Graph prototype discovered_{#KEY}',
-					'column_check' => 'Discover',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check link from Discover column.
 	 *
-	 * @dataProvider getButtonLinkData
+	 * @dataProvider getGraphsButtonLinkData
 	 */
 	public function testPageGraphPrototypes_ButtonLink($data) {
 		$this->page->login()->open('graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
@@ -237,39 +170,10 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		$this->executeDiscoverEnable($data);
 	}
 
-	public static function getDeleteData() {
-		return [
-			// #0 Cancel delete.
-			[
-				[
-					'name' => ['1 Graph prototype discovered_{#KEY}'],
-					'cancel' => true
-				]
-			],
-			// #1 Delete one.
-			[
-				[
-					'name' => ['2 Graph prototype not discovered_{#KEY}'],
-					'message' => 'Graph prototype deleted'
-				]
-			],
-			// #2 Delete more than 1.
-			[
-				[
-					'name' => [
-						'3 Graph prototype pie discovered_{#KEY}',
-						'4 Graph prototype exploded not discovered_{#KEY}'
-					],
-					'message' => 'Graph prototypes deleted'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getDeleteData
+	 * @dataProvider getGraphsDeleteData
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
 		$sql = 'SELECT null FROM graphs WHERE graphid=';
