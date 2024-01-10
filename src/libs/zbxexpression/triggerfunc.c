@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -695,7 +695,7 @@ static int	expand_expression_macros(zbx_eval_context_t *ctx, zbx_dc_um_handle_t 
 	}
 
 	return zbx_eval_expand_user_macros(ctx, hostids, hostids_num,
-			(zbx_macro_expand_func_t)zbx_dc_expand_user_macros, um_handle, error);
+			(zbx_macro_expand_func_t)zbx_dc_expand_user_and_func_macros, um_handle, error);
 }
 
 static int	expand_trigger_macros(zbx_dc_trigger_t *tr, zbx_db_event *db_event, zbx_dc_um_handle_t *um_handle,

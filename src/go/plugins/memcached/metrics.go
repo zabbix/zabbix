@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,27 +20,11 @@
 package memcached
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
 )
-
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(conn MCClient, params map[string]string) (res interface{}, err error)
-
-// getHandlerFunc returns a handlerFunc related to a given key.
-func getHandlerFunc(key string) handlerFunc {
-	switch key {
-	case keyStats:
-		return statsHandler // memcached.stats[[connString][,user][,password][,type]]
-
-	case keyPing:
-		return pingHandler // memcached.ping[[connString][,user][,password]]
-
-	default:
-		return nil
-	}
-}
 
 const (
 	keyPing  = "memcached.ping"
@@ -48,8 +32,10 @@ const (
 )
 
 // https://github.com/memcached/memcached/blob/master/sasl_defs.c#L26
-var maxEntryLen = 252
-var uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "11211"}
+var (
+	maxEntryLen = 252
+	uriDefaults = &uri.Defaults{Scheme: "tcp", Port: "11211"}
+)
 
 // Common params: [URI|Session][,User][,Password]
 var (
@@ -64,17 +50,50 @@ var metrics = metric.MetricSet{
 	keyPing: metric.New("Test if connection is alive or not.",
 		[]*metric.Param{paramURI, paramUser, paramPassword}, false),
 
-	keyStats: metric.New("Returns output of stats command.",
-		[]*metric.Param{paramURI, paramUser, paramPassword,
-			metric.NewParam("Type", "One of supported stat types: items, sizes, slabs and settings. "+
-				"Empty by default (returns general statistics).").WithDefault(statsTypeGeneral).
+	keyStats: metric.New(
+		"Returns output of stats command.",
+		[]*metric.Param{
+			paramURI, paramUser, paramPassword,
+			metric.NewParam(
+				"Type",
+				"One of supported stat types: items, sizes, slabs and settings. "+
+					"Empty by default (returns general statistics).",
+			).WithDefault(statsTypeGeneral).
 				WithValidator(metric.SetValidator{
-					Set:             []string{statsTypeGeneral, statsTypeItems, statsTypeSizes, statsTypeSlabs, statsTypeSettings},
+					Set: []string{
+						statsTypeGeneral,
+						statsTypeItems,
+						statsTypeSizes,
+						statsTypeSlabs,
+						statsTypeSettings,
+					},
 					CaseInsensitive: true,
 				}),
-		}, false),
+		},
+		false,
+	),
 }
 
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(conn MCClient, params map[string]string) (res interface{}, err error)
+
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+// getHandlerFunc returns a handlerFunc related to a given key.
+func getHandlerFunc(key string) handlerFunc {
+	switch key {
+	case keyStats:
+		return statsHandler // memcached.stats[[connString][,user][,password][,type]]
+
+	case keyPing:
+		return pingHandler // memcached.ping[[connString][,user][,password]]
+
+	default:
+		return nil
+	}
 }

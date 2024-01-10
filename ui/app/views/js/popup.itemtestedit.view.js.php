@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 function makeStepResult(step) {
 	if (typeof step.error !== 'undefined') {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
-			{error: step.error || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
+			{error: escapeHtml(step.error) || <?= json_encode(htmlentities(_('<empty string>'))) ?>}
 		));
 	}
 	else if (typeof step.result === 'undefined' || step.result === null) {
@@ -45,7 +45,7 @@ function makeStepResult(step) {
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result').html()).evaluate(
-			jQuery.extend({result: step.result})
+			{result: step.result, result_hint: escapeHtml(step.result)}
 		));
 	}
 	else {
@@ -381,13 +381,13 @@ function processItemPreprocessingTestResults(steps) {
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
-					]) ?>, {failed: step.result})));
+					]) ?>, {failed: step.result, failed_hint: escapeHtml(step.result)})));
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_ERROR ?>:
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set error to')
-					]) ?>, {failed: step.failed})));
+					]) ?>, {failed: step.failed, failed_hint: escapeHtml(step.failed)})));
 					break;
 			}
 		}
@@ -582,9 +582,14 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$not_supported
-					.prop('disabled', false)
-					.trigger('change');
+				if ($not_supported.length) {
+					$not_supported
+						.prop('disabled', false)
+						.trigger('change');
+				}
+				else {
+					$('#value', $form).multilineInput('unsetReadOnly');
+				}
 
 				<?php if ($data['show_prev']): ?>
 					$('#prev_value', $form).multilineInput('unsetReadOnly');

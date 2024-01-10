@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -46,6 +46,10 @@ abstract class testFormPreprocessing extends CWebTest {
 	public $button;
 	public $fail_message;
 
+	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
+	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
+	const INHERITED_ITEM_PROTOTYPE	= 15096;	// 'testInheritanceDiscoveryRule' -> 'testInheritanceItemPrototypePreprocessing'
+	const CLONE_ITEM_PROTOTYPEID	= 23804;	// 'Discovery rule for triggers filtering' -> 'Discovered item {#TEST}'
 	const CLONE_PREPROCESSING = [
 		[
 			'type' => '1',
@@ -1477,7 +1481,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong equals operator',
-						'Key' => 'rometeus-wrong-equals-operator[{#KEY}]'
+						'Key' => 'prometeus-wrong-equals-operator[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{__name__=~"<regex>"}=1']
@@ -1701,7 +1705,7 @@ abstract class testFormPreprocessing extends CWebTest {
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Name' => 'Item Prometeus wrong first parameter =!',
-						'Key' => 'wrong-second-parameter-equals-exlamation[{#KEY}]'
+						'Key' => 'wrong-second-parameter-equals-exclamation[{#KEY}]'
 					],
 					'preprocessing' => [
 						['type' => 'Prometheus pattern', 'parameter_1' => '{label_name=!"name"}']
@@ -2082,12 +2086,9 @@ abstract class testFormPreprocessing extends CWebTest {
 		$this->page->login()->open($this->link);
 		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
 
-		if ($lld == true) {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		}
-		else{
-			$form = COverlayDialogElement::find()->one()->waitUntilready()->asForm();
-		}
+		$form = $lld
+			? $this->query('name:itemForm')->waitUntilPresent()->asForm()->one()
+			: COverlayDialogElement::find()->one()->waitUntilready()->asForm();
 
 		$form->fill($data['fields']);
 		$form->selectTab('Preprocessing');
@@ -2850,20 +2851,17 @@ abstract class testFormPreprocessing extends CWebTest {
 		// Open original item on host and get its' preprocessing steps.
 		$this->page->login()->open($link);
 
-		if ($item === 'Item' || $item === 'Item prototype') {
-			if ($item === 'Item') {
-			$item_name = CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? '15094' : '99102'));
-			}
-			else {
-			$item_name = CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? '15096' : '23804'));
-			}
+		if ($item === 'Discovery rule') {
+			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		}
+		else {
+			$item_name = ($item === 'Item')
+				? CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEMID : self::CLONE_ITEMID))
+				: CDBHelper::getValue('SELECT name FROM items WHERE itemid='.($templated ? self::INHERITED_ITEM_PROTOTYPE : self::CLONE_ITEM_PROTOTYPEID));
 
 			$this->query('link', $item_name)->one()->click();
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 			$form = $dialog->asForm();
-		}
-		else {
-			$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
 		}
 
 		if ($templated) {

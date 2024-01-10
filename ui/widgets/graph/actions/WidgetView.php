@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,6 +22,7 @@
 namespace Widgets\Graph\Actions;
 
 use API,
+	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CGraphDraw,
@@ -109,7 +110,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				]);
 
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name'],
+					'output' => ['itemid', 'name_resolved'],
 					'selectHosts' => ['name'],
 					'hostids' => $this->fields_values['override_hostid'],
 					'filter' => [
@@ -118,11 +119,14 @@ class WidgetView extends CControllerDashboardWidgetView {
 					],
 					'webitems' => true
 				]);
-
 				$item = reset($items);
-				$resourceid = $items ? $item['itemid'] : null;
 
-				if ($resourceid === null) {
+				if ($item) {
+					$resourceid = $item['itemid'];
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+				}
+				else {
+					$resourceid = null;
 					$is_resource_available = false;
 				}
 			}
@@ -211,7 +215,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
 				$items = API::Item()->get([
-					'output' => ['name', 'key_', 'delay', 'hostid'],
+					'output' => [!$this->isTemplateDashboard() ? 'name_resolved' : 'name', 'key_', 'delay', 'hostid'],
 					'selectHosts' => ['name'],
 					'itemids' => $resourceid,
 					'filter' => ['value_type' => [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]],
@@ -221,6 +225,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if (!$item) {
 					$is_resource_available = false;
+				}
+				elseif (!$this->isTemplateDashboard()) {
+					$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
 				}
 			}
 			elseif ($this->fields_values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
@@ -334,6 +341,10 @@ class WidgetView extends CControllerDashboardWidgetView {
 					->setArgument('legend', $this->fields_values['show_legend'] && $graph['show_legend'] ? 1 : 0)
 					->setArgument('from')
 					->setArgument('to');
+			}
+
+			if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
+				$graph_src->setArgument('resolve_macros', 1);
 			}
 
 			$graph_src

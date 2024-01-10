@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -348,13 +348,13 @@ class CScreenProblem extends CScreenBase {
 		$data['problems'] = array_slice($data['problems'], 0, $limit + 1, true);
 
 		if ($show_opdata && $data['triggers']) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'name', 'value_type', 'units'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'name_resolved', 'value_type', 'units'],
 				'selectValueMap' => ['mappings'],
 				'triggerids' => array_keys($data['triggers']),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			foreach ($data['triggers'] as &$trigger) {
 				foreach ($trigger['functions'] as $function) {
@@ -1044,7 +1044,7 @@ class CScreenProblem extends CScreenBase {
 			);
 
 			$this->data['filter']['compact_view']
-				? $header_clock->addStyle('width: 115px;')
+				? $header_clock->addStyle('width: 132px;')
 				: $header_clock->addClass(ZBX_STYLE_CELL_WIDTH);
 
 			if ($show_timeline) {
@@ -1083,7 +1083,7 @@ class CScreenProblem extends CScreenBase {
 					make_sorting_header(_('Severity'), 'severity', $this->data['sort'], $this->data['sortorder'],
 						$link
 					)->addStyle('width: 120px;'),
-					$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 115px;') : null,
+					$show_recovery_data ? (new CColHeader(_('Recovery time')))->addStyle('width: 132px;') : null,
 					$show_recovery_data ? (new CColHeader(_('Status')))->addStyle('width: 70px;') : null,
 					(new CColHeader(_('Info')))->addStyle('width: 24px;'),
 					make_sorting_header(_('Host'), 'host', $this->data['sort'], $this->data['sortorder'], $link)

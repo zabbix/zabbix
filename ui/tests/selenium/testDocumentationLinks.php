@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../include/CWebTest.php';
 use Facebook\WebDriver\WebDriverKeys;
 
 /**
- * @dataSource Proxies
+ * @dataSource Proxies, Actions
  *
  * @backup profiles, module, services, token, connector
  *
@@ -648,7 +648,6 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
-					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -874,7 +873,6 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
-					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -1129,7 +1127,6 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
-					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -1285,7 +1282,6 @@ class testDocumentationLinks extends CWebTest {
 							'element' => 'button:Test'
 						]
 					],
-					'item_action' => 'test',
 					'doc_link' => '/en/manual/config/items/item#testing'
 				]
 			],
@@ -2600,7 +2596,13 @@ class testDocumentationLinks extends CWebTest {
 						]
 					],
 					'doc_link' => '/en/manual/config/export/streaming#configuration'
-
+				]
+			],
+			// #237 Administration -> General -> Timeouts.
+			[
+				[
+					'url' => 'zabbix.php?action=timeouts.edit',
+					'doc_link' => '/en/manual/web_interface/frontend_sections/administration/general#timeouts'
 				]
 			]
 		];
@@ -2620,7 +2622,7 @@ class testDocumentationLinks extends CWebTest {
 		}
 
 		$dialog = COverlayDialogElement::find()->one(false);
-		$location = ($dialog->isValid()) ? $dialog->waitUntilReady() : $this;
+		$location = ($dialog->isValid()) ? COverlayDialogElement::find()->all()->last()->waitUntilReady() : $this;
 
 		// Check all widget documentation links.
 		if (array_key_exists('widget_type', $data)) {
@@ -2628,21 +2630,17 @@ class testDocumentationLinks extends CWebTest {
 			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
 		}
 
-		if (array_key_exists('item_action', $data)) {
-			$test_overlay = COverlayDialogElement::find()->all()->last();
-		}
-
 		// Get the documentation link and compare it with expected result.
-		$link = (array_key_exists('item_action', $data) ? $test_overlay : $location)
-			->query('class', ['btn-icon zi-help', 'btn-icon zi-help-small'])->one();
+		$link = $location->query('class', ['btn-icon zi-help', 'btn-icon zi-help-small'])->one();
 		$this->assertEquals(self::$path_start.self::$version.$data['doc_link'], $link->getAttribute('href'));
 
 		// If the link was located in a popup - close this popup.
 		if ($dialog->isValid()) {
-			if (array_key_exists('item_action', $data)) {
-				$test_overlay->getFooter()->query('button:Cancel')->one()->click();
+			$dialogs = COverlayDialogElement::find()->all();
+
+			for ($i = $dialogs->count() - 1; $i >= 0; $i--) {
+				$dialogs->get($i)->close(true);
 			}
-			$location->close();
 		}
 
 		// Cancel element creation/update if it impacts execution of next cases and close alert.

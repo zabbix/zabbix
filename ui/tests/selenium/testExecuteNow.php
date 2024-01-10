@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -638,23 +638,18 @@ class testExecuteNow extends CWebTest {
 		if ($lld === false) {
 			$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		}
+
 		// Disabled "Execute now" button.
 		if (!array_key_exists('expected', $data)) {
-			if ($lld === true) {
-				$this->query('button:Execute now')->one()->isEnabled(false);
-			}
-			else {
-				$this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
-			}
+			$lld
+				? $this->query('button:Execute now')->one()->isEnabled(false)
+				: $this->assertTrue($dialog->getFooter()->query('button:Execute now')->one()->isEnabled(false));
 			return;
 		}
 
-		if ($lld === false) {
-			$dialog->getFooter()->query('button:Execute now')->one()->click();
-		}
-		else {
-			$this->query('button:Execute now')->one()->click();
-		}
+		$lld
+			? $this->query('button:Execute now')->one()->click()
+			: $dialog->getFooter()->query('button:Execute now')->one()->click();
 
 		if (CTestArrayHelper::get($data, 'expected') === TEST_GOOD) {
 			$this->assertMessage(TEST_GOOD, $data['message']);

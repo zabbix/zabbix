@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 #define ZBX_MACRO_TYPE_TRIGGER_DESCRIPTION	0x00000010	/* name */
 #define ZBX_MACRO_TYPE_TRIGGER_COMMENTS		0x00000020	/* description */
 #define ZBX_MACRO_TYPE_ITEM_KEY			0x00000040
-#define ZBX_MACRO_TYPE_INTERFACE_ADDR		0x00000080
 #define ZBX_MACRO_TYPE_COMMON			0x00000100
 #define ZBX_MACRO_TYPE_PARAMS_FIELD		0x00000200
 #define ZBX_MACRO_TYPE_SCRIPT			0x00000400

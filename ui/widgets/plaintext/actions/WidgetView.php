@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		else {
 			if ($this->fields_values['itemids']) {
 				$items = API::Item()->get([
-					'output' => ['itemid', 'name', 'key_', 'value_type', 'units', 'valuemapid'],
+					'output' => ['itemid', 'name_resolved', 'key_', 'value_type', 'units', 'valuemapid'],
 					'selectHosts' => ['name'],
 					'selectValueMap' => ['mappings'],
 					'itemids' => $this->fields_values['itemids'],
@@ -59,7 +59,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($items && $this->fields_values['override_hostid']) {
 					$items = API::Item()->get([
-						'output' => ['itemid', 'name', 'value_type', 'units', 'valuemapid'],
+						'output' => ['itemid', 'name_resolved', 'value_type', 'units', 'valuemapid'],
 						'selectHosts' => ['name'],
 						'selectValueMap' => ['mappings'],
 						'filter' => [
@@ -70,6 +70,8 @@ class WidgetView extends CControllerDashboardWidgetView {
 						'preservekeys' => true
 					]);
 				}
+
+				$items = CArrayHelper::renameObjectsKeys($items, ['name_resolved' => 'name']);
 			}
 
 			if (!$items) {

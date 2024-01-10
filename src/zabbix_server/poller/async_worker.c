@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,8 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 			case AGENT_ERROR:
 				zbx_activate_item_interface(&timespec, &interface_status->interface,
 						interface_status->itemid, type,
-						interface_status->host, &data, &data_alloc, &data_offset);
+						interface_status->host, interface_status->version, &data, &data_alloc,
+						&data_offset);
 				break;
 			case NETWORK_ERROR:
 			case GATEWAY_ERROR:
@@ -266,11 +267,12 @@ static void	*async_worker_entry(void *args)
 	return NULL;
 }
 
-int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, char **error)
+int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, const char *progname, char **error)
 {
 	int		err, ret = FAIL;
 	pthread_attr_t	attr;
 
+	worker->progname = progname;
 	worker->queue = queue;
 
 	zbx_pthread_init_attr(&attr);

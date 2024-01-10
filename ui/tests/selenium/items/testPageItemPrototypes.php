@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
@@ -47,7 +48,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	*/
 	public function testPageItemPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
-		$context = (str_contains($data['name'], '001')) ? 'template' : 'host';
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context='.$context);
 
@@ -77,11 +78,10 @@ class testPageItemPrototypes extends CLegacyWebTest {
 	 */
 	public function testPageItemPrototypes_SimpleDelete($data) {
 		$itemid = $data['itemid'];
-		$drule = $data['d_name'];
-		$context = (str_contains($data['name'], '001')) ? 'template' : 'host';
-
+		$context = ($data['status'] == HOST_STATUS_TEMPLATE) ? 'template' : 'host';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&parent_discoveryid='.
 				$data['parent_itemid'].'&context='.$context);
+
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckboxSelect('itemids_'.$itemid);
 		$this->query('button:Delete')->one()->click();
@@ -129,6 +129,7 @@ class testPageItemPrototypes extends CLegacyWebTest {
 
 		$this->zbxTestAcceptAlert();
 
+		$this->page->waitUntilReady();
 		$this->zbxTestCheckTitle('Configuration of item prototypes');
 		$this->zbxTestCheckHeader('Item prototypes');
 		$this->assertMessage(TEST_GOOD, 'Item prototype deleted');

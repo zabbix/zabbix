@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,29 +24,24 @@
  */
 class CPrometheusPatternParser extends CParser {
 
+	/**
+	 * @var array
+	 */
+	private $macro_parsers = [];
+
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false
 	];
 
-	private $user_macro_parser;
-	private $lld_macro_parser;
-	private $lld_macro_function_parser;
-
 	public function __construct($options = []) {
-		if (array_key_exists('usermacros', $options)) {
-			$this->options['usermacros'] = $options['usermacros'];
-		}
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
+		$this->options = $options + $this->options;
 
 		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
+			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -127,24 +122,14 @@ class CPrometheusPatternParser extends CParser {
 	private function parseMetric($source, &$pos) {
 		if (preg_match('/^[a-zA-Z_:][a-zA-Z0-9_:]*/', substr($source, $pos), $matches)) {
 			$pos += strlen($matches[0]);
-
 			return true;
 		}
-		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->user_macro_parser->getLength();
 
-			return true;
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->lld_macro_parser->getLength();
-
-			return true;
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->lld_macro_function_parser->getLength();
-
-			return true;
+		foreach ($this->macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+				$pos += $macro_parser->getLength();
+				return true;
+			}
 		}
 
 		return false;
@@ -178,17 +163,16 @@ class CPrometheusPatternParser extends CParser {
 
 			$p += strlen($matches[0]);
 		}
-		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->user_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_function_parser->getLength();
-		}
 		else {
+			foreach ($this->macro_parsers as $macro_parser) {
+				if ($macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+					$p += $macro_parser->getLength();
+					break;
+				}
+			}
+		}
+
+		if ($p == $pos) {
 			return false;
 		}
 
@@ -320,24 +304,14 @@ class CPrometheusPatternParser extends CParser {
 
 		if (preg_match('/^('.$pattern_num.'|'.$pattern_inf.'|'.$pattern_nan.')/i', substr($source, $pos), $matches)) {
 			$pos += strlen($matches[0]);
-
 			return true;
 		}
-		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->user_macro_parser->getLength();
 
-			return true;
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->lld_macro_parser->getLength();
-
-			return true;
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $pos) != self::PARSE_FAIL) {
-			$pos += $this->lld_macro_function_parser->getLength();
-
-			return true;
+		foreach ($this->macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($source, $pos) != self::PARSE_FAIL) {
+				$pos += $macro_parser->getLength();
+				return true;
+			}
 		}
 
 		return false;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,9 @@ zbx_log_t;
 #define AR_META		0x40
 #define AR_BIN		0x80
 
-/* agent return structure */
+/* Agent return structure.                                       */
+/* Need to preserve the compatibility with previous versions,    */
+/* so new fields must be added at the end of the struct.         */
 typedef struct
 {
 	zbx_uint64_t	lastlogsize;	/* meta information */
@@ -98,9 +100,9 @@ typedef struct
 	char		*text;
 	char		*msg;		/* possible error message */
 	zbx_log_t	*log;
-	char		*bin;
 	int		type;		/* flags: see AR_* above */
 	int		mtime;		/* meta information */
+	char		*bin;
 }
 AGENT_RESULT;
 
@@ -164,10 +166,10 @@ zbx_metric_t;
 #define ZBX_ISSET_DBL(res)	((res)->type & AR_DOUBLE)
 #define ZBX_ISSET_STR(res)	((res)->type & AR_STRING)
 #define ZBX_ISSET_TEXT(res)	((res)->type & AR_TEXT)
-#define ZBX_ISSET_BIN(res)	((res)->type & AR_BIN)
 #define ZBX_ISSET_LOG(res)	((res)->type & AR_LOG)
 #define ZBX_ISSET_MSG(res)	((res)->type & AR_MESSAGE)
 #define ZBX_ISSET_META(res)	((res)->type & AR_META)
+#define ZBX_ISSET_BIN(res)	((res)->type & AR_BIN)
 
 #define ZBX_ISSET_VALUE(res)	((res)->type & (AR_UINT64 | AR_DOUBLE | AR_STRING | AR_TEXT | AR_LOG))
 
@@ -215,18 +217,6 @@ do									\
 }									\
 while (0)
 
-#define ZBX_UNSET_BIN_RESULT(res)					\
-									\
-do									\
-{									\
-	if ((res)->type & AR_BIN)					\
-	{								\
-		zbx_free((res)->bin);					\
-		(res)->type &= ~AR_BIN	;				\
-	}								\
-}									\
-while (0)
-
 #define ZBX_UNSET_LOG_RESULT(res)					\
 									\
 do									\
@@ -253,6 +243,18 @@ do									\
 }									\
 while (0)
 
+#define ZBX_UNSET_BIN_RESULT(res)					\
+									\
+do									\
+{									\
+	if ((res)->type & AR_BIN)					\
+	{								\
+		zbx_free((res)->bin);					\
+		(res)->type &= ~AR_BIN	;				\
+	}								\
+}									\
+while (0)
+
 /* AR_META is always excluded */
 #define ZBX_UNSET_RESULT_EXCLUDING(res, exc_type)				\
 										\
@@ -262,9 +264,9 @@ do										\
 	if (!(exc_type & AR_DOUBLE))	ZBX_UNSET_DBL_RESULT(res);		\
 	if (!(exc_type & AR_STRING))	ZBX_UNSET_STR_RESULT(res);		\
 	if (!(exc_type & AR_TEXT))	ZBX_UNSET_TEXT_RESULT(res);		\
-	if (!(exc_type & AR_BIN))	ZBX_UNSET_BIN_RESULT(res);		\
 	if (!(exc_type & AR_LOG))	ZBX_UNSET_LOG_RESULT(res);		\
 	if (!(exc_type & AR_MESSAGE))	ZBX_UNSET_MSG_RESULT(res);		\
+	if (!(exc_type & AR_BIN))	ZBX_UNSET_BIN_RESULT(res);		\
 }										\
 while (0)
 
@@ -276,9 +278,9 @@ while (0)
 	ZBX_UNSET_DBL_RESULT((result));		\
 	ZBX_UNSET_STR_RESULT((result));		\
 	ZBX_UNSET_TEXT_RESULT((result));	\
-	ZBX_UNSET_BIN_RESULT(result);		\
 	ZBX_UNSET_LOG_RESULT((result));		\
 	ZBX_UNSET_MSG_RESULT((result));		\
+	ZBX_UNSET_BIN_RESULT(result);		\
 }
 
 #define SYSINFO_RET_OK		0
@@ -326,15 +328,6 @@ typedef struct
 	int		clock;
 	int		ns;
 	const char	*value;
-}
-ZBX_HISTORY_BIN;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	int		clock;
-	int		ns;
-	const char	*value;
 	const char	*source;
 	int		timestamp;
 	int		logeventid;
@@ -349,7 +342,6 @@ typedef struct
 	void	(*history_string_cb)(const ZBX_HISTORY_STRING *history, int history_num);
 	void	(*history_text_cb)(const ZBX_HISTORY_TEXT *history, int history_num);
 	void	(*history_log_cb)(const ZBX_HISTORY_LOG *history, int history_num);
-	void	(*history_bin_cb)(const ZBX_HISTORY_BIN *history, int history_num);
 }
 ZBX_HISTORY_WRITE_CBS;
 

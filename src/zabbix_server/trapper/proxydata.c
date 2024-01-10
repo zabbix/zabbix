@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,11 +41,11 @@ int	zbx_send_proxy_data_response(const zbx_dc_proxy_t *proxy, zbx_socket_t *sock
 	switch (upload_status)
 	{
 		case ZBX_PROXY_UPLOAD_DISABLED:
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED,
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HISTORY_UPLOAD, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED,
 					ZBX_JSON_TYPE_STRING);
 			break;
 		case ZBX_PROXY_UPLOAD_ENABLED:
-			zbx_json_addstring(&json, ZBX_PROTO_TAG_PROXY_UPLOAD, ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED,
+			zbx_json_addstring(&json, ZBX_PROTO_TAG_HISTORY_UPLOAD, ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED,
 					ZBX_JSON_TYPE_STRING);
 			break;
 	}
@@ -152,7 +152,7 @@ void	recv_proxy_data(zbx_socket_t *sock, const struct zbx_json_parse *jp, const 
 		goto reply;
 	}
 
-	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)))
+	if (FAIL == (ret = zbx_hc_check_proxy(proxy.proxyid)) || SUCCEED == zbx_vps_monitor_capped())
 	{
 		upload_status = ZBX_PROXY_UPLOAD_DISABLED;
 		ret = proxy_data_no_history(jp);

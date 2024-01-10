@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ $filter_columns[0]
 			'popup' => [
 				'filter_preselect' => [
 					'id' => 'filter_groupids_',
-					'submit_as' => 'groupid'
+					'submit_as' => $data['context'] === 'host' ? 'groupid' : 'templategroupid'
 				],
 				'parameters' => [
 					'srctbl' => $data['context'] === 'host' ? 'hosts' : 'templates',

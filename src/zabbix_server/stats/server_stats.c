@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,4 +139,25 @@ void	zbx_server_stats_ext_get(struct zbx_json *json, const void *arg)
 		zabbix_log(LOG_LEVEL_WARNING, "cannot get proxy data: %s", error);
 		zbx_free(error);
 	}
+
+	zbx_vps_monitor_stats_t	vps_stats;
+
+	zbx_vps_monitor_get_stats(&vps_stats);
+
+	zbx_json_addobject(json, "vps");
+	zbx_json_adduint64(json, "status", (SUCCEED == zbx_vps_monitor_capped() ? 1 : 0));
+	zbx_json_adduint64(json, "written_total", vps_stats.written_num);
+	zbx_json_adduint64(json, "limit", vps_stats.values_limit);
+
+	if (0 != vps_stats.values_limit)
+	{
+		zbx_json_addobject(json, "overcommit");
+		zbx_json_adduint64(json, "limit", vps_stats.overcommit_limit);
+		zbx_json_adduint64(json, "available", vps_stats.overcommit_limit - vps_stats.overcommit);
+		zbx_json_addfloat(json, "pavailable", (double)(vps_stats.overcommit_limit - vps_stats.overcommit) *
+				100 / vps_stats.overcommit_limit);
+		zbx_json_close(json);
+	}
+
+	zbx_json_close(json);
 }

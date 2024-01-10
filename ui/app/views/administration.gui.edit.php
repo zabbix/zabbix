@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,19 +91,19 @@ $gui_tab = (new CFormList())
 			->setId('default_theme')
 	)
 	->addRow((new CLabel(_('Limit for search and filter results'), 'search_limit'))->setAsteriskMark(),
-		(new CNumericBox('search_limit', $data['search_limit'], 6))
+		(new CNumericBox('search_limit', $data['search_limit'], 6, false, false, false))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow(
 		(new CLabel(_('Max number of columns and rows in overview tables'), 'max_overview_table_size'))
 			->setAsteriskMark(),
-		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6))
+		(new CNumericBox('max_overview_table_size', $data['max_overview_table_size'], 6, false, false, false))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
 	->addRow((new CLabel(_('Max count of elements to show inside table cell'), 'max_in_table'))->setAsteriskMark(),
-		(new CNumericBox('max_in_table', $data['max_in_table'], 5))
+		(new CNumericBox('max_in_table', $data['max_in_table'], 5, false, false, false))
 			->setAriaRequired()
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 	)
@@ -150,6 +150,7 @@ $gui_view = (new CTabView())
 
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('gui')))->removeId())
+	->setId('gui-form')
 	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->setAction((new CUrl('zabbix.php'))
 		->setArgument('action', 'gui.update')

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,10 +60,10 @@ class CControllerConnectorEdit extends CController {
 
 		if ($this->hasInput('connectorid')) {
 			$db_connectors = API::Connector()->get([
-				'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'max_senders',
-					'max_attempts', 'timeout', 'http_proxy', 'authtype', 'username', 'password', 'token', 'verify_peer',
-					'verify_host', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'description', 'status',
-					'tags_evaltype'
+				'output' => ['connectorid', 'name', 'protocol', 'data_type', 'url', 'max_records', 'item_value_type',
+					'max_senders', 'max_attempts', 'attempt_interval', 'timeout', 'http_proxy', 'authtype', 'username',
+					'password', 'token', 'verify_peer', 'verify_host', 'ssl_cert_file', 'ssl_key_file',
+					'ssl_key_password', 'description', 'status', 'tags_evaltype'
 				],
 				'selectTags' => ['tag', 'operator', 'value'],
 				'connectorids' => $this->getInput('connectorid')
@@ -94,6 +94,7 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => $this->connector['protocol'],
 					'data_type' => (int) $this->connector['data_type'],
 					'url' => $this->connector['url'],
+					'item_value_type' => (int) $this->connector['item_value_type'],
 					'authtype' => (int) $this->connector['authtype'],
 					'username' => $this->connector['username'],
 					'password' => $this->connector['password'],
@@ -103,6 +104,7 @@ class CControllerConnectorEdit extends CController {
 					'max_records' => (int) $this->connector['max_records'],
 					'max_senders' => (int) $this->connector['max_senders'],
 					'max_attempts' => (int) $this->connector['max_attempts'],
+					'attempt_interval' => $this->connector['attempt_interval'],
 					'timeout' => $this->connector['timeout'],
 					'verify_peer' => (int) $this->connector['verify_peer'],
 					'verify_host' => (int) $this->connector['verify_host'],
@@ -132,6 +134,7 @@ class CControllerConnectorEdit extends CController {
 					'protocol' => (int) $db_defaults['protocol'],
 					'data_type' => (int) $db_defaults['data_type'],
 					'url' => $db_defaults['url'],
+					'item_value_type' => (int) $db_defaults['item_value_type'],
 					'authtype' => (int) $db_defaults['authtype'],
 					'username' => $db_defaults['username'],
 					'password' => $db_defaults['password'],
@@ -140,6 +143,7 @@ class CControllerConnectorEdit extends CController {
 					'max_records' => (int) $db_defaults['max_records'],
 					'max_senders' => (int) $db_defaults['max_senders'],
 					'max_attempts' => (int) $db_defaults['max_attempts'],
+					'attempt_interval' => $db_defaults['attempt_interval'],
 					'timeout' => $db_defaults['timeout'],
 					'http_proxy' => $db_defaults['http_proxy'],
 					'verify_peer' => (int) $db_defaults['verify_peer'],

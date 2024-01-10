@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,13 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
+int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
+		AGENT_RESULT *result);
+int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
+		zbx_vector_ptr_t *add_results);
+
 int	check_vcenter_cluster_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username, const char *password,
@@ -37,8 +44,6 @@ int	check_vcenter_cluster_status(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_cluster_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 int	check_vcenter_alarms_get(AGENT_REQUEST *request, const char *username, const char *password,
@@ -60,12 +65,6 @@ int	check_vcenter_datastore_size(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_datastore_write(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results);
-int	check_vcenter_fullname(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-int	check_vcenter_version(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *username, const char *password,
@@ -266,12 +265,6 @@ int	check_vcenter_dc_alarms_get(AGENT_REQUEST *request, const char *username, co
 int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, const char *password,
-		AGENT_RESULT *result);
-
-int	check_vcenter_eventlog(AGENT_REQUEST *request, const zbx_dc_item_t *item, AGENT_RESULT *result,
-		zbx_vector_ptr_t *add_results);
-
-int	check_vcenter_cl_perfcounter(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result);
 
 int	check_vcenter_rp_cpu_usage(AGENT_REQUEST *request, const char *username, const char *password,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -788,10 +788,9 @@ class CHostInterface extends CApiService {
 			return;
 		}
 
-		$user_macro_parser = new CUserMacroParser();
+		$dns_parser = new CDnsParser(['usermacros' => true, 'lldmacros' => true, 'macros' => true]);
 
-		if (!preg_match('/^'.ZBX_PREG_DNS_FORMAT.'$/', $interface['dns'])
-				&& $user_macro_parser->parse($interface['dns']) != CParser::PARSE_SUCCESS) {
+		if ($dns_parser->parse($interface['dns']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('Incorrect interface DNS parameter "%1$s" provided.', $interface['dns'])
 			);
@@ -811,14 +810,9 @@ class CHostInterface extends CApiService {
 			return;
 		}
 
-		$user_macro_parser = new CUserMacroParser();
-
-		if (preg_match('/^'.ZBX_PREG_MACRO_NAME_FORMAT.'$/', $interface['ip'])
-				|| $user_macro_parser->parse($interface['ip']) == CParser::PARSE_SUCCESS) {
-			return;
-		}
-
-		$ip_parser = new CIPParser(['v6' => ZBX_HAVE_IPV6]);
+		$ip_parser = new CIPParser(
+			['usermacros' => true, 'lldmacros' => true, 'macros' => true, 'v6' => ZBX_HAVE_IPV6]
+		);
 
 		if ($ip_parser->parse($interface['ip']) != CParser::PARSE_SUCCESS) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid IP address "%1$s".', $interface['ip']));
@@ -1027,7 +1021,7 @@ class CHostInterface extends CApiService {
 
 	private function checkIfInterfaceHasItems(array $interfaceIds) {
 		$items = API::Item()->get([
-			'output' => ['name'],
+			'output' => ['name_resolved'],
 			'selectHosts' => ['name'],
 			'interfaceids' => $interfaceIds,
 			'preservekeys' => true,
@@ -1039,7 +1033,7 @@ class CHostInterface extends CApiService {
 			$host = reset($item['hosts']);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name'], $host['name']));
+				_s('Interface is linked to item "%1$s" on "%2$s".', $item['name_resolved'], $host['name']));
 		}
 	}
 

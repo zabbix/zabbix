@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1558,8 +1558,8 @@ class CWidgetBase {
 			this._hide_preloader_animation_frame = null;
 		}
 
-		this._body.classList.add('is-loading');
-		this._body.classList.remove('is-loading-fadein', 'delayed-15s');
+		this._contents.classList.add('is-loading');
+		this._contents.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
 	/**
@@ -1573,7 +1573,7 @@ class CWidgetBase {
 		}
 
 		this._hide_preloader_animation_frame = requestAnimationFrame(() => {
-			this._body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+			this._contents.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
 			this._hide_preloader_animation_frame = null;
 		});
 	}
@@ -1589,7 +1589,7 @@ class CWidgetBase {
 			this._hide_preloader_animation_frame = null;
 		}
 
-		this._body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+		this._contents.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
 	/**

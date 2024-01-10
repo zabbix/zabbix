@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,11 +31,11 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup actions, profiles
  *
- * @onBefore prepareServiceActionData
+ * @dataSource Actions
  */
 class testFormAction extends CLegacyWebTest {
 
-	private $event_sources = [
+	protected $event_sources = [
 		EVENT_SOURCE_TRIGGERS => 'Trigger actions',
 		EVENT_SOURCE_SERVICE => 'Service actions',
 		EVENT_SOURCE_DISCOVERY => 'Discovery actions',
@@ -43,19 +43,7 @@ class testFormAction extends CLegacyWebTest {
 		EVENT_SOURCE_INTERNAL => 'Internal actions'
 	];
 
-	/**
-	 * Id of the action to be used for Simple update and Clone scenarios.
-	 *
-	 * @var integer
-	 */
-	protected static $actionid;
-
-	/**
-	 * Name of the action to be used for Simple update and Clone scenarios.
-	 *
-	 * @var integer
-	 */
-	protected static $action_name = 'Service action';
+	const SERVICE_ACTION = 'Service action';
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -63,91 +51,7 @@ class testFormAction extends CLegacyWebTest {
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [
-			'class' => CMessageBehavior::class
-		];
-	}
-
-	/**
-	 * Function creates Service actions.
-	 */
-	public function prepareServiceActionData() {
-		$response = CDataHelper::call('action.create', [
-			[
-				'name' => self::$action_name,
-				'eventsource' => 4,
-				'status' => '0',
-				'esc_period' => '1h',
-				'filter' => [
-					'evaltype' => 0,
-					'conditions' => [
-						[
-							'conditiontype' => 28,
-							'operator' => 2,
-							'value' => 'Service name'
-						],
-						[
-							'conditiontype' => 25,
-							'operator' => 2,
-							'value' => 'Service tag name'
-						]
-					]
-				],
-				'operations' => [
-					[
-						'operationtype' => 0,
-						'esc_period' => 0,
-						'esc_step_from' => 1,
-						'esc_step_to' => 1,
-						'opmessage' => [
-							'default_msg' => 1,
-							'mediatypeid' => 0
-						],
-						'opmessage_usr' => [
-							[
-								'userid' => 1
-							]
-						]
-					]
-				],
-				'recovery_operations' => [
-					[
-						'operationtype' => 11,
-						'opmessage' => [
-							'default_msg' => 0,
-							'subject' => 'Subject',
-							'message' => 'Message'
-						]
-					]
-				],
-				'update_operations' => [
-					[
-						'operationtype' => 0,
-						'opmessage' => [
-							'default_msg' => 1,
-							'mediatypeid' => 1
-						],
-						'opmessage_grp' => [
-							[
-								'usrgrpid' => 7
-							]
-						]
-					]
-				]
-			]
-		]);
-
-
-		$this->assertArrayHasKey('actionids', $response);
-		self::$actionid = $response['actionids'][0];
-
-		CDataHelper::call('service.create', [
-			[
-				'name' => 'Reference service',
-				'algorithm' => 1,
-				'sortorder' => 1
-			]
-		]);
+		return ['class' => CMessageBehavior::class];
 	}
 
 	public static function layout() {
@@ -1175,7 +1079,7 @@ class testFormAction extends CLegacyWebTest {
 		return [
 			[
 				[
-						'name' => self::$action_name,
+						'name' => self::SERVICE_ACTION,
 						'eventsource' => '4'
 				]
 			]
@@ -1703,7 +1607,7 @@ class testFormAction extends CLegacyWebTest {
 	}
 
 	public function testFormAction_Clone() {
-		$id = self::$actionid;
+		$id = CDataHelper::get('Actions.Service action');
 		$sql = 'SELECT a.eventsource, a.evaltype, a.status, a.esc_period, a.formula, a.pause_suppressed, '.
 				'c.conditiontype, c.operator, c.value, c.value2, '.
 				'o.operationtype, o.esc_period, o.esc_step_from, o.esc_step_to, o.evaltype, o.recovery '.
@@ -1719,12 +1623,9 @@ class testFormAction extends CLegacyWebTest {
 		$this->zbxTestClickXpathWait('//div[@data-dialogueid="action-edit"]//button[text()="Clone"]');
 		$dialog = $this->query('class:overlay-dialogue-body')->asOverlayDialog()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$form->getField('id:name')->fill(self::$action_name.' Clone');
+		$form->getField('id:name')->fill(self::SERVICE_ACTION.' Clone');
 		$form->submit();
 		$this->assertMessage(TEST_GOOD, 'Action added');
-
-		// Unused variable.
-//		$id = CDBHelper::getValue('SELECT actionid FROM actions WHERE name='.zbx_dbstr(self::$action_name.' Clone'));
 		$this->assertEquals($original_hash, CDBHelper::getHash($sql));
 	}
 }

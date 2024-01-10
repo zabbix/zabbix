@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../common/testFormPreprocessing.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
@@ -34,8 +35,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const HOSTID					= 40001;	// 'Simple form test host'
 	const INHERITANCE_TEMPLATEID	= 15000;	// 'Inheritance test template'
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
-	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
-	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
 
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [
@@ -118,7 +117,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	public function testFormPreprocessingItem_CopyItem() {
 		$item_key = 'test-inheritance-item-preprocessing';	// testInheritanceItemPreprocessing
 		$item_name = 'testInheritanceItemPreprocessing';
-		$itemid = 15094;									// testInheritanceItemPreprocessing
 		$original_hostid = 15001;							// "Template inheritance test host"
 		$target_hostname = 'Simple form test host';
 

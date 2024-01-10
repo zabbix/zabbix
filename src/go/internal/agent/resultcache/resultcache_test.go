@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ type mockWriter struct {
 	t       *testing.T
 }
 
-func (w *mockWriter) Write(data []byte, timeout time.Duration) (err []error) {
+func (w *mockWriter) Write(data []byte, timeout time.Duration) (upload bool, err []error) {
 	log.Debugf("%s", string(data))
 	if w.counter&1 != 0 {
 		err = []error{errors.New("mock error")}
@@ -51,7 +51,7 @@ func (w *mockWriter) Write(data []byte, timeout time.Duration) (err []error) {
 			w.lastid++
 		}
 	}
-
+	upload = true
 	w.counter++
 	return
 }

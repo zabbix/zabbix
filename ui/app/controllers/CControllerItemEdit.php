@@ -1,7 +1,7 @@
 <?php declare(strict_types=0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -196,16 +196,19 @@ class CControllerItemEdit extends CControllerItem {
 				'output' => ['valuemapid', 'name', 'hostid'],
 				'valuemapids' => [$item['valuemapid']]
 			]);
-			$item['valuemap'] = $valuemap ? reset($valuemap) : [];
+			$valuemap = $valuemap ? reset($valuemap) : [];
 
-			if ($item['valuemap'] && $this->getInput('templateid', 0)) {
-				$host_valuemap = API::ValueMap()->get([
-					'output' => ['valuemapid'],
-					'search' => ['name' => $item['valuemap']['name']],
+			if ($valuemap && $valuemap['hostid'] != $host['hostid']) {
+				$valuemap = API::ValueMap()->get([
+					'output' => ['valuemapid', 'name', 'hostid'],
+					'search' => ['name' => $valuemap['name']],
 					'filter' => ['hostid' => $host['hostid']]
 				]);
-				$item['valuemap']['valuemapid'] = $host_valuemap ? $host_valuemap[0]['valuemapid'] : 0;
+				$valuemap = $valuemap ? reset($valuemap) : [];
 			}
+
+			$item['valuemap'] = $valuemap;
+			$item['valuemapid'] = $valuemap ? $valuemap['valuemapid'] : 0;
 		}
 
 		if ($item['master_itemid']) {

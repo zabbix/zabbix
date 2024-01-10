@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -580,7 +580,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => 12345
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "12345".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "12345".'
 				]
 			],
 			// #19.
@@ -592,7 +592,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => 'Text 😀'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "Text 😀".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "Text 😀".'
 				]
 			],
 			// #20.
@@ -604,7 +604,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.300-305'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "192.168.4.300-305".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "192.168.4.300-305".'
 				]
 			],
 			// #21.
@@ -628,7 +628,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/111'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "192.168.4.0/111".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/111".'
 				]
 			],
 			// #23.
@@ -640,7 +640,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '192.168.4.0/129'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "192.168.4.0/129".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/129".'
 				]
 			],
 			// #24.
@@ -664,7 +664,7 @@ class testFormNetworkDiscovery extends CWebTest {
 						'IP range' => '2001:db8::/130'
 					],
 					'Checks' => [['default' => true]],
-					'error_details' => 'Incorrect value for field "iprange": invalid address range "2001:db8::/130".'
+					'error_details' => 'Incorrect value for field "iprange": incorrect address starting from "/130".'
 				]
 			],
 			// #26.
@@ -732,7 +732,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Mimimal fields create'
+						'Name' => 'Minimal fields create'
 					],
 					'Checks' => [['default' => true]]
 				]
@@ -1392,7 +1392,6 @@ class testFormNetworkDiscovery extends CWebTest {
 			// #1 Change SNMP to other type of checks.
 			[
 				[
-					'expected' => TEST_BAD,
 					'Checks' => [
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -1405,34 +1404,36 @@ class testFormNetworkDiscovery extends CWebTest {
 							'index' => 1,
 							'Check type' => 'POP',
 							'Port range' => 2020
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 2,
+							'Check type' => 'Zabbix agent',
+							'Key' => 'test_key'
 						]
 					],
 					'expected_checks' => [
 						'ICMP ping "allow redirect"',
 						'POP (2020)',
-						'Telnet (205)'
+						'Zabbix agent "test_key"'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => true
+							'IP address' => true,
+							'Zabbix agent "test_key"' => false
 						],
 						'Host name' => [
-							'DNS name' => false,
+							'DNS name' => true,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => true,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
+							'Zabbix agent "test_key"' => false
 						],
 						'Visible name' => [
 							'Host name' => false,
 							'DNS name' => false,
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
-							'SNMPv3 agent (9999) "new test SNMP OID _2"' => false
+							'Zabbix agent "test_key"' => false
 						]
-					],
-					'error_details' => 'Only Zabbix agent, SNMPv1, SNMPv2 and SNMPv3 checks can be made unique.'
+					]
 				]
 			],
 			// #2 Delete two checks, one left.
@@ -1449,24 +1450,21 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'SNMPv1 agent (200) "new test SNMP OID"'
+						'ICMP ping "allow redirect"'
 
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
-							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => true
 						],
 						'Host name' => [
-							'DNS name' => false,
-							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => true
+							'DNS name' => true,
+							'IP address' => false
 						],
 						'Visible name' => [
 							'Host name' => false,
 							'DNS name' => false,
-							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false
+							'IP address' => true
 						]
 					]
 				]
@@ -1484,26 +1482,23 @@ class testFormNetworkDiscovery extends CWebTest {
 						]
 					],
 					'expected_checks' => [
-						'SNMPv1 agent (200) "new test SNMP OID"',
+						'ICMP ping "allow redirect"',
 						'SNMPv2 agent (903) "v2 new test SNMP OID"'
 					],
 					'expected_radios' => [
 						'Device uniqueness criteria' => [
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Host name' => [
-							'DNS name' => false,
+							'DNS name' => true,
 							'IP address' => false,
-							'SNMPv1 agent (200) "new test SNMP OID"' => true,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						],
 						'Visible name' => [
 							'Host name' => false,
 							'DNS name' => false,
 							'IP address' => true,
-							'SNMPv1 agent (200) "new test SNMP OID"' => false,
 							'SNMPv2 agent (903) "v2 new test SNMP OID"' => false
 						]
 					]

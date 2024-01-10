@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -165,6 +165,7 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Show symptoms' => ['value' => false, 'enabled' => true],
 			'Show suppressed problems' => ['value' => false, 'enabled' => true],
 			'id:acknowledgement_status' => ['value' => 'All', 'enabled' => true],
+			'id:acknowledged_by_me' => ['value' => false, 'enabled' => false],
 			'Sort entries by' => ['value' => 'Time (descending)', 'enabled' => true],
 			'Show timeline' => ['value' => true, 'enabled' => true],
 			'Show lines' => ['value' => 25, 'enabled' => true, 'maxlength' => 3]
@@ -216,7 +217,8 @@ class testDashboardProblemsWidget extends CWebTest {
 			'Problem tags' => ['And/Or', 'Or'],
 			'Show tags' => ['None', '1', '2', '3'],
 			'Tag name' => ['Full', 'Shortened', 'None'],
-			'Show operational data' => ['None', 'Separately', 'With problem name']
+			'Show operational data' => ['None', 'Separately', 'With problem name'],
+			'Acknowledgement status' => ['All', 'Unacknowledged', 'Acknowledged']
 		];
 
 		foreach ($radios as $radio => $labels) {
@@ -228,6 +230,12 @@ class testDashboardProblemsWidget extends CWebTest {
 			$form->getField('Show tags')->asSegmentedRadio()->select($value);
 			$this->assertTrue($form->getField('Tag name')->isEnabled($status));
 			$this->assertTrue($form->getField('Tag display priority')->isEnabled($status));
+		}
+
+		// Check Acknowledgement status fields dependency.
+		foreach (['All' => false, 'Unacknowledged' => false, 'Acknowledged' => true] as $label => $status) {
+			$form->fill(['Acknowledgement status' => $label]);
+			$this->assertTrue($form->getField('id:acknowledged_by_me')->isEnabled($status));
 		}
 
 		// Check Show timeline checkbox editability.

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@
 #define zbx_serialize_prepare_vector_uint64_len(len, vector_uint64, vector_uint64_len)					\
 	do														\
 	{														\
-		vector_uint64_len = (zbx_uint32_t)vector_uint64.values_num * (zbx_uint32_t)sizeof(zbx_uint64_t);	\
+		vector_uint64_len = (zbx_uint32_t)vector_uint64->values_num * (zbx_uint32_t)sizeof(zbx_uint64_t);	\
 		len += vector_uint64_len + (zbx_uint32_t)sizeof(zbx_uint32_t);						\
 	}														\
 	while(0)
@@ -76,7 +76,7 @@
 		0 == len ? zbx_serialize_str_null(buffer) :					\
 		(										\
 			memcpy(buffer, (zbx_uint32_t *)&len, sizeof(zbx_uint32_t)),		\
-			memcpy(buffer + sizeof(zbx_uint32_t), vector_uint64.values, len),	\
+			memcpy(buffer + sizeof(zbx_uint32_t), vector_uint64->values, len),	\
 			len + sizeof(zbx_uint32_t)						\
 		)										\
 	)

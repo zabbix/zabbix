@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
@@ -102,8 +103,10 @@ class testInheritanceItem extends CLegacyWebTest {
 		$this->query('button:Create item')->one()->click();
 		$dialog = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $dialog->asForm();
-		$form->getField('Name')->fill($data['name']);
-		$form->getField('Key')->fill($data['key']);
+		$form->fill([
+			'Name' => $data['name'],
+			'Key' => $data['key']
+		]);
 		$dialog->getFooter()->query('button:Add')->one()->click();
 
 		switch ($data['expected']) {

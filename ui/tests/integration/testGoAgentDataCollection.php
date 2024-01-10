@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,12 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'net.dns.record[,zabbix.com]',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
+		],
+		[
+			'key' => 'net.dns.perf[,zabbix.com]',
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
+			'valueType' => ITEM_VALUE_TYPE_FLOAT,
+			'threshold' => 10000
 		],
 		[
 			'key' => 'net.if.discovery',

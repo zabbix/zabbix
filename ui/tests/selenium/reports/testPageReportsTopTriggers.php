@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1262,8 +1262,7 @@ class testPageReportsTopTriggers extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'menu-popup-item'
-					]
+					'Items' => ['Linux: Number of processes' => 'menu-popup-item']
 				]
 			],
 			'host_menu' => [
@@ -1318,15 +1317,14 @@ class testPageReportsTopTriggers extends CWebTest {
 				if (is_array($link)) {
 					foreach ($link as $menu_level2 => $attribute) {
 						// Check 2-level menu links.
+						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
+
 						if (str_contains($attribute, 'menu-popup-item')) {
-							$this->assertEquals($attribute, $popup->getItem($menu_level1)->query('xpath:./../ul//a')
-									->one()->getAttribute('class')
-							);
+							$this->assertEquals($attribute, $item_link->getAttribute('class'));
 						}
 						else {
-						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
-						$this->assertEquals($menu_level2, $item_link->getText());
-						$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+							$this->assertEquals($menu_level2, $item_link->getText());
+							$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
 						}
 					}
 				}

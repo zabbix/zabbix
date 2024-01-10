@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 #include "zbxxml.h"
+
+#define ZBX_XPATH_PROP_OBJECT(type)	ZBX_XPATH_PROP_OBJECT_ID(type, "") "/"
+
 
 #define		VMWARE_SHORT_STR_LEN	MAX_STRING_LEN / 8
 
@@ -71,6 +74,106 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 #define ZBX_MAXQUERYMETRICS_UNLIMITED				1000
 #define ZBX_VCENTER_LESS_THAN_6_5_0_STATS_MAXQUERYMETRICS	64
 #define ZBX_VCENTER_6_5_0_AND_MORE_STATS_MAXQUERYMETRICS	256
+
+/* value of custom query for a specific instance */
+typedef struct
+{
+	char			*response;
+#define	ZBX_VMWARE_CQV_EMPTY	0
+#define	ZBX_VMWARE_CQV_VALUE	1
+#define	ZBX_VMWARE_CQV_ERROR	2
+	unsigned char		status;
+	zbx_vmware_cust_query_t	*instance;
+}
+zbx_vmware_cq_value_t;
+
+ZBX_PTR_VECTOR_DECL(cq_value, zbx_vmware_cq_value_t *)
+
+/* VMware alarms cache information */
+typedef struct
+{
+	char	*alarm;
+	char	*name;
+	char	*system_name;
+	char	*description;
+	int	enabled;
+}
+zbx_vmware_alarm_details_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
+
+typedef struct
+{
+	zbx_vector_vmware_alarm_t		*alarms;
+	zbx_vector_vmware_alarm_details_t	details;
+}
+zbx_vmware_alarms_data_t;
+/* VMware alarms cache information END */
+
+#define ZBX_XPATH_PROP_OBJECT_ID(type, id)								\
+	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']" id "][1]"
+
+#define ZBX_XPATH_PROP_NAME_NODE(property)								\
+	"*[local-name()='propSet'][*[local-name()='name'][text()='" property "']][1]/*[local-name()='val']"
+
+#define ZBX_XPATH_PROP_NAME(property)									\
+	"/*/*/*/*/*/" ZBX_XPATH_PROP_NAME_NODE(property)
+
+void	vmware_props_free(char **props, int props_num);
+
+typedef struct
+{
+	const char	*property_collector;
+	CURL		*easyhandle;
+	char		*token;
+}
+zbx_property_collection_iter;
+
+int	zbx_property_collection_init(CURL *easyhandle, const char *property_collection_query,
+		const char *property_collector, const char *fn_parent, zbx_property_collection_iter **iter,
+		xmlDoc **xdoc, char **error);
+
+int	zbx_property_collection_next(const char *fn_parent, zbx_property_collection_iter *iter, xmlDoc **xdoc,
+		char **error);
+
+void	zbx_property_collection_free(zbx_property_collection_iter *iter);
+
+#define ZBX_XPATH_OBJECTS_BY_TYPE(type)									\
+	"/*/*/*/*/*[local-name()='objects'][*[local-name()='obj'][@type='" type "']]"
+
+int	vmware_ds_id_compare(const void *d1, const void *d2);
+
+char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const char *soap_type,
+		const char *obj_id, zbx_vector_cq_value_t *cqvs);
+
+typedef int	(*nodeprocfunc_t)(void *, char **);
+
+typedef struct
+{
+	const char	*name;
+	const char	*xpath;
+	nodeprocfunc_t	func;
+	unsigned short	vc_min;
+}
+zbx_vmware_propmap_t;
+
+char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, int props_num);
+
+int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_service_t *service,
+		CURL *easyhandle, xmlDoc *xdoc, xmlNode *node, zbx_vector_str_t *ids,
+		zbx_vmware_alarms_data_t *alarms_data, char **error);
+
+void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_t *cqvs);
+
+#define ZBX_XPATH_VM_HARDWARE(property)									\
+	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\
+		"/*[local-name()='val']/*[local-name()='" property "']"
+
+#define ZBX_XPATH_OBJS_BY_TYPE(type)									\
+	"/*/*/*/*/*[local-name()='objects']/*[local-name()='obj'][@type='" type "']"
+
+char	*evt_msg_strpool_strdup(const char *str, zbx_uint64_t *len);
+void	evt_msg_strpool_strfree(char *str);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

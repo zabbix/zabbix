@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -499,6 +499,7 @@ class CAudit {
 		'dashboard.pages.widgets' => 'widgetid',
 		'dashboard.pages.widgets.fields' => 'widget_fieldid',
 		'discoveryrule.filter.conditions' => 'item_conditionid',
+		'discoveryrule.headers' => 'sortorder',
 		'discoveryrule.lld_macro_paths' => 'lld_macro_pathid',
 		'discoveryrule.overrides' => 'lld_overrideid',
 		'discoveryrule.overrides.filter.conditions' => 'lld_override_conditionid',
@@ -507,6 +508,7 @@ class CAudit {
 		'discoveryrule.overrides.operations.optemplate' => 'lld_override_optemplateid',
 		'discoveryrule.parameters' => 'item_parameterid',
 		'discoveryrule.preprocessing' => 'item_preprocid',
+		'discoveryrule.query_fields' => 'sortorder',
 		'hostgroup.hosts' => 'hostgroupid',
 		'hostprototype.groupLinks' => 'group_prototypeid',
 		'hostprototype.groupPrototypes' => 'group_prototypeid',
@@ -515,12 +517,16 @@ class CAudit {
 		'hostprototype.tags' => 'hosttagid',
 		'hostprototype.templates' => 'hosttemplateid',
 		'iconmap.mappings' => 'iconmappingid',
+		'item.headers' => 'sortorder',
 		'item.parameters' => 'item_parameterid',
 		'item.preprocessing' => 'item_preprocid',
 		'item.tags' => 'itemtagid',
+		'item.query_fields' => 'sortorder',
+		'itemprototype.headers' => 'sortorder',
 		'itemprototype.parameters' => 'item_parameterid',
 		'itemprototype.preprocessing' => 'item_preprocid',
 		'itemprototype.tags' => 'itemtagid',
+		'itemprototype.query_fields' => 'sortorder',
 		'maintenance.groups' => 'maintenance_groupid',
 		'maintenance.hosts' => 'maintenance_hostid',
 		'maintenance.tags' => 'maintenancetagid',
@@ -920,6 +926,12 @@ class CAudit {
 		$table_name = self::TABLE_NAMES[$resource];
 
 		if ($object_path !== self::API_NAMES[$resource]) {
+			$abstract_object_path = self::getAbstractPath($object_path);
+
+			if (!array_key_exists($abstract_object_path, self::NESTED_OBJECTS_TABLE_NAMES)) {
+				return false;
+			}
+
 			$table_name = self::NESTED_OBJECTS_TABLE_NAMES[self::getAbstractPath($object_path)];
 		}
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,6 +17,7 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../../include/items.inc.php';
@@ -516,8 +517,9 @@ class testFormPreprocessingTest extends CWebTest {
 			$this->assertEquals(($i+1).': '.$step['type'], $table->getRow($i)->getText());
 		}
 
-		$dialog->query('class:btn-overlay-close')->one()->click();
+		$dialog->close();
 		$form->submit();
+		COverlayDialogElement::ensureNotPresent();
 
 		// Assert right steps order after item saving.
 		$this->page->open('zabbix.php?action=item.list&context=host&filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID);

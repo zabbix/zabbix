@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,6 +36,7 @@ final class CItemData {
 			'kernel.openfiles',
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
@@ -141,6 +142,7 @@ final class CItemData {
 			'modbus.get[endpoint,<slaveid>,<function>,<address>,<count>,<type>,<endianness>,<offset>]',
 			'mqtt.get[<broker_url>,topic,<username>,<password>]',
 			'net.dns.record[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]',
 			'net.if.collisions[if]',
 			'net.if.discovery',
@@ -394,7 +396,8 @@ final class CItemData {
 			'zabbix[wcache,<cache>,<mode>]',
 			'zabbix[proxy_buffer,buffer,<mode>]',
 			'zabbix[proxy_buffer,state,current]',
-			'zabbix[proxy_buffer,state,changes]'
+			'zabbix[proxy_buffer,state,changes]',
+			'zabbix[vps,written]'
 		],
 		ITEM_TYPE_DB_MONITOR => [
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',
@@ -1206,6 +1209,14 @@ final class CItemData {
 				'documentation_link' => [
 					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.record',
 					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.record'
+				]
+			],
+			'net.dns.perf[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
+				'description' => _('Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise'),
+				'value_type' => ITEM_VALUE_TYPE_FLOAT,
+				'documentation_link' => [
+					ITEM_TYPE_ZABBIX => 'config/items/itemtypes/zabbix_agent#net.dns.perf',
+					ITEM_TYPE_ZABBIX_ACTIVE => 'config/items/itemtypes/zabbix_agent#net.dns.perf'
 				]
 			],
 			'net.dns[<ip>,name,<type>,<timeout>,<count>,<protocol>]' => [
@@ -2979,6 +2990,13 @@ final class CItemData {
 			],
 			'zabbix[proxy_buffer,state,changes]' => [
 				'description' => _('Returns number of state changes from disk/memory mode since start. Frequent state changes indicates that either memory buffer size or age must be increased.'),
+				'value_type' => ITEM_VALUE_TYPE_UINT64,
+				'documentation_link' => [
+					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'
+				]
+			],
+			'zabbix[vps,written]' => [
+				'description' => _('Returns total number of history values written to database.'),
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'documentation_link' => [
 					ITEM_TYPE_INTERNAL => 'config/items/itemtypes/internal'

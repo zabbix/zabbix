@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,21 +17,18 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#define _GNU_SOURCE	/* required for getting a CPU program counter and registers in sys/ucontext.h */
+
 #include "fatal.h"
+#include "nix_internal.h"
 
 #include "config.h"
 
 #ifdef HAVE_SIGNAL_H
-#	if !defined(_GNU_SOURCE)
-#		define _GNU_SOURCE	/* required for getting at program counter */
-#	endif
 #	include <signal.h>
 #endif
 
 #ifdef HAVE_SYS_UCONTEXT_H
-#	if !defined(_GNU_SOURCE)
-#		define _GNU_SOURCE	/* required for getting at program counter */
-#	endif
 #	include <sys/ucontext.h>
 #endif
 
@@ -361,7 +358,8 @@ void	zbx_log_fatal_info(void *context, unsigned int flags)
 #ifdef	ZBX_GET_PC
 	zabbix_log(LOG_LEVEL_CRIT, "================================");
 	zabbix_log(LOG_LEVEL_CRIT, "Please consider attaching a disassembly listing to your bug report.");
-	zabbix_log(LOG_LEVEL_CRIT, "This listing can be produced with, e.g., objdump -DSswx %s.", progname);
+	zabbix_log(LOG_LEVEL_CRIT, "This listing can be produced with, e.g., objdump -DSswx %s.",
+			nix_get_progname_cb()());
 #endif
 
 	zabbix_log(LOG_LEVEL_CRIT, "================================");

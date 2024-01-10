@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,6 @@
 
 #include "zbxexpr.h"
 
-const char	*func_macro_in_list(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
-int	zbx_calculate_macro_function(const char *expression, const zbx_token_func_macro_t *func_macro, char **out);
+char	*func_get_macro_from_func(const char *str, zbx_token_func_macro_t *fm, int *N_functionid);
 
 #endif

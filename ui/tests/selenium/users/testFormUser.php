@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1135,12 +1135,7 @@ class testFormUser extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'username' => 'user-for-blocking',
-					'parameters' => [
-						'DB_table' => 'opmessage_usr',
-						'column' => 'operationid',
-						'value' => '19'
-					],
-					'error_details' => 'User "user-for-blocking" is used in "Trigger action 4" action.'
+					'error_details' => 'User "user-for-blocking" is used in "Action with user" action.'
 				]
 			]
 		];

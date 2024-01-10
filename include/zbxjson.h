@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,7 @@
 #define ZBX_PROTO_TAG_KEY_ORIG			"key_orig"
 #define ZBX_PROTO_TAG_KEYS			"keys"
 #define ZBX_PROTO_TAG_LASTLOGSIZE		"lastlogsize"
+#define ZBX_PROTO_TAG_MANUALINPUT		"manualinput"
 #define ZBX_PROTO_TAG_MTIME			"mtime"
 #define ZBX_PROTO_TAG_LOGTIMESTAMP		"timestamp"
 #define ZBX_PROTO_TAG_LOGSOURCE			"source"
@@ -173,7 +174,7 @@
 #define ZBX_PROTO_TAG_EXPRESSION		"expression"
 #define ZBX_PROTO_TAG_CLIENTIP			"clientip"
 #define ZBX_PROTO_TAG_ITEM_TAGS			"item_tags"
-#define ZBX_PROTO_TAG_PROXY_UPLOAD		"upload"
+#define ZBX_PROTO_TAG_HISTORY_UPLOAD		"upload"
 #define ZBX_PROTO_TAG_DASHBOARDID		"dashboardid"
 #define ZBX_PROTO_TAG_USERID			"userid"
 #define ZBX_PROTO_TAG_PERIOD			"period"
@@ -212,6 +213,7 @@
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"
 
+#define ZBX_PROTO_VALUE_GET_PASSIVE_CHECKS	"passive checks"
 #define ZBX_PROTO_VALUE_GET_ACTIVE_CHECKS	"active checks"
 #define ZBX_PROTO_VALUE_PROXY_CONFIG		"proxy config"
 #define ZBX_PROTO_VALUE_PROXY_HEARTBEAT		"proxy heartbeat"
@@ -241,8 +243,8 @@
 #define ZBX_PROTO_VALUE_PREPROCESSING_TEST	"preprocessing.test"
 #define ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE	"expressions.evaluate"
 
-#define ZBX_PROTO_VALUE_PROXY_UPLOAD_ENABLED	"enabled"
-#define ZBX_PROTO_VALUE_PROXY_UPLOAD_DISABLED	"disabled"
+#define ZBX_PROTO_VALUE_HISTORY_UPLOAD_ENABLED	"enabled"
+#define ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED	"disabled"
 
 #define ZBX_PROTO_VALUE_REPORT_TEST		"report.test"
 
@@ -295,6 +297,7 @@ const char	*zbx_json_strerror(void);
 
 void	zbx_json_init(struct zbx_json *j, size_t allocate);
 void	zbx_json_initarray(struct zbx_json *j, size_t allocate);
+void	zbx_json_init_with(struct zbx_json *j, const char *src);
 void	zbx_json_clean(struct zbx_json *j);
 void	zbx_json_free(struct zbx_json *j);
 void	zbx_json_addobject(struct zbx_json *j, const char *name);

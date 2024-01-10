@@ -66,6 +66,7 @@ OBJS = \
 	..\..\..\src\libs\zbxversion\version.o \
 	..\..\..\src\libs\zbxthreads\threads.o \
 	..\..\..\src\zabbix_get\zabbix_get.o \
+	..\..\..\src\libs\zbxagentget\agent_get.o \
 	..\..\..\src\libs\zbxregexp\zbxregexp.o \
 	..\..\..\src\libs\zbxxml\xml.o \
 	..\..\..\src\libs\zbxwin32\fatal.o
