@@ -37,7 +37,7 @@ typedef struct
 	char				*error;
 	struct evdns_base		*dnsbase;
 	struct evutil_addrinfo		*ai;
-	const char			*address;
+	char				*address;
 }
 zbx_async_task_t;
 
