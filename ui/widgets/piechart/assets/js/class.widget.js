@@ -38,7 +38,7 @@ class CWidgetPieChart extends CWidget {
 		const readiness = [super.promiseReady()];
 
 		if (this.#pie_chart !== null) {
-			readiness.push(this.#pie_chart.promiseAnimationFinished());
+			readiness.push(this.#pie_chart.promiseRendered());
 		}
 
 		return Promise.all(readiness);

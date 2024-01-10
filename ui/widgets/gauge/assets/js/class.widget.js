@@ -49,7 +49,7 @@ class CWidgetGauge extends CWidget {
 		const readiness = [super.promiseReady()];
 
 		if (this.gauge !== null) {
-			readiness.push(this.gauge.promiseAnimationFinished());
+			readiness.push(this.gauge.promiseRendered());
 		}
 
 		return Promise.all(readiness);

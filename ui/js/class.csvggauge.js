@@ -139,11 +139,11 @@ class CSVGGauge {
 	#pos_current = 0;
 
 	/**
-	 * Animation finished promise.
+	 * Rendered promise.
 	 *
 	 * @type {Promise<void>}
 	 */
-	#animation_finished_promise = Promise.resolve();
+	#rendered_promise = Promise.resolve();
 
 	/**
 	 * @param {HTMLElement} container           HTML container to append the root SVG element to.
@@ -318,7 +318,7 @@ class CSVGGauge {
 				}
 			}
 
-			this.#animation_finished_promise = this.#animate(this.#pos_current, pos_new,
+			this.#rendered_promise = this.#animate(this.#pos_current, pos_new,
 				(pos) => {
 					const angle = (pos - 0.5) * this.#config.angle;
 
@@ -356,12 +356,12 @@ class CSVGGauge {
 	}
 
 	/**
-	 * Get animation finished promise.
+	 * Get rendered promise.
 	 *
 	 * @returns {Promise<void>}
 	 */
-	promiseAnimationFinished() {
-		return this.#animation_finished_promise;
+	promiseRendered() {
+		return this.#rendered_promise;
 	}
 
 	/**
