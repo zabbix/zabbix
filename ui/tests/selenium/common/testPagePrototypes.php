@@ -44,7 +44,7 @@ class testPagePrototypes extends CWebTest {
 	public $tag;
 	public $clickable_headers;
 
-	public function layout() {
+	public function layout($template = false) {
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Configuration of '.$this->page_name.' prototypes');
 		$capital_name = ucfirst($this->page_name);
@@ -54,9 +54,8 @@ class testPagePrototypes extends CWebTest {
 		$table = $this->query('class:list-table')->asTable()->one();
 
 		// Check that Breadcrumbs exists.
+		$links = ($template) ? ['All templates', 'Template for prototype check'] : ['All hosts', 'Host for prototype check'];
 		$breadcrumbs = [
-			'All hosts',
-			'Host for prototype check',
 			'Discovery list',
 			'Drule for prototype check',
 			'Item prototypes',
@@ -64,7 +63,9 @@ class testPagePrototypes extends CWebTest {
 			'Graph prototypes',
 			'Host prototypes'
 		];
-		$this->assertEquals($breadcrumbs, $this->query('xpath://div[@class="header-navigation"]//a')->all()->asText());
+		$this->assertEquals(array_merge($links, $breadcrumbs),
+				$this->query('xpath://div[@class="header-navigation"]//a')->all()->asText()
+		);
 
 		// Check number amount near breadcrumbs.
 		$this->assertEquals($this->amount, $this->query('xpath://div[@class="header-navigation"]//a[text()='.
@@ -150,6 +151,50 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	public static function getHostSortingData() {
+		return [
+			// #0 Sort by Name.
+			[
+				[
+					'sort_by' => 'Name',
+					'sort' => 'name',
+					'result' => [
+						'1 Host prototype monitored discovered {#H}',
+						'2 Host prototype not monitored discovered {#H}',
+						'3 Host prototype not monitored not discovered {#H}',
+						'4 Host prototype monitored not discovered {#H}'
+					]
+				]
+			],
+			// #1 Sort by Create enabled.
+			[
+				[
+					'sort_by' => 'Create enabled',
+					'sort' => 'status',
+					'result' => [
+						'Yes',
+						'Yes',
+						'No',
+						'No'
+					]
+				]
+			],
+			// #2 Sort by Discover.
+			[
+				[
+					'sort_by' => 'Discover',
+					'sort' => 'discover',
+					'result' => [
+						'Yes',
+						'Yes',
+						'No',
+						'No'
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * Check available sorting on prototype page.
 	 *
@@ -162,6 +207,83 @@ class testPagePrototypes extends CWebTest {
 			$expected = ($sorting === 'asc') ? $data['result'] : array_reverse($data['result']);
 			$this->assertEquals($expected, $this->getTableColumnData($data['sort_by']));
 		}
+	}
+
+	public static function getHostButtonLinkData() {
+		return [
+			// #0 Click on Create disabled button.
+			[
+				[
+					'name' => '1 Host prototype monitored discovered {#H}',
+					'button' => 'Create disabled',
+					'column_check' => 'Create enabled',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #1 Click on Create enabled button.
+			[
+				[
+					'name' => '2 Host prototype not monitored discovered {#H}',
+					'button' => 'Create enabled',
+					'column_check' => 'Create enabled',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #2 Enabled clicking on link in Create enabled column.
+			[
+				[
+					'name' => '3 Host prototype not monitored not discovered {#H}',
+					'column_check' => 'Create enabled',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #3 Disabled clicking on link in Create enabled column.
+			[
+				[
+					'name' => '4 Host prototype monitored not discovered {#H}',
+					'column_check' => 'Create enabled',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #4 Enable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '3 Host prototype not monitored not discovered {#H}',
+					'column_check' => 'Discover',
+					'before' => 'No',
+					'after' => 'Yes'
+				]
+			],
+			// #5 Disable discovering clicking on link in Discover column.
+			[
+				[
+					'name' => '2 Host prototype not monitored discovered {#H}',
+					'column_check' => 'Discover',
+					'before' => 'Yes',
+					'after' => 'No'
+				]
+			],
+			// #6 Enable all host prototypes clicking on Create enabled button.
+			[
+				[
+					'button' => 'Create enabled',
+					'column_check' => 'Create enabled',
+					'after' => ['Yes', 'Yes', 'Yes', 'Yes']
+				]
+			],
+			// #7 Disable all host prototypes clicking on Create disabled button.
+			[
+				[
+					'button' => 'Create disabled',
+					'column_check' => 'Create enabled',
+					'after' => ['No', 'No', 'No', 'No']
+				]
+			]
+		];
 	}
 
 	/**
@@ -202,6 +324,35 @@ class testPagePrototypes extends CWebTest {
 			$this->assertMessage(TEST_GOOD, ucfirst($this->page_name).' prototypes updated');
 			$this->assertTableDataColumn($data['after'], $data['column_check']);
 		}
+	}
+
+	public static function getHostDeleteData() {
+		return [
+			// #0 Cancel delete.
+			[
+				[
+					'name' => ['1 Host prototype monitored discovered {#H}'],
+					'cancel' => true
+				]
+			],
+			// #1 Delete one.
+			[
+				[
+					'name' => ['2 Host prototype not monitored discovered {#H}'],
+					'message' => 'Host prototype deleted'
+				]
+			],
+			// #2 Delete more than 1.
+			[
+				[
+					'name' => [
+						'3 Host prototype not monitored not discovered {#H}',
+						'4 Host prototype monitored not discovered {#H}'
+					],
+					'message' => 'Host prototypes deleted'
+				]
+			]
+		];
 	}
 
 	/**
