@@ -201,6 +201,8 @@ static zbx_uint64_t	process_check(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *
 		task_local.addr_type = DISCOVERY_ADDR_IP;
 		task_local.addr.ip = ip;
 		task_local.port = (unsigned short)port;
+		zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
+		zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
 
 		if (NULL == (task = zbx_hashset_search(tasks, &task_local)))
 		{
