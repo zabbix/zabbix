@@ -23,13 +23,16 @@ class CControllerModuleEdit extends CController {
 	}
 
 	protected function checkInput(): bool {
-		$fields = [
-			'moduleid' => 'required|db module.moduleid'
-		];
-
-		$ret = $this->validateInput($fields);
+		$ret = $this->validateInput(['object', 'fields' => [
+			'moduleid' => ['db module.moduleid', 'required']
+		]]);
 
 		if (!$ret) {
+			foreach (CFormInputValidator::getErrors() as $field => $errors) {
+				$error = $errors[min(array_column($errors, 'level'))];
+				error(_s('%1$s: %2$s', $field, $error['message']));
+			}
+
 			$this->setResponse(
 				(new CControllerResponseData(['main_block' => json_encode([
 					'error' => [
