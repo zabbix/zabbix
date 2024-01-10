@@ -78,6 +78,7 @@ var dnsTypesGet = map[string]uint16{
 	"APL":        dns.TypeAPL,
 	"DS":         dns.TypeDS,
 	"SSHFP":      dns.TypeSSHFP,
+	"IPSECKEY":   dns.TypeIPSECKEY,
 	"RRSIG":      dns.TypeRRSIG,
 	"NSEC":       dns.TypeNSEC,
 	"DNSKEY":     dns.TypeDNSKEY,
@@ -111,6 +112,7 @@ var dnsTypesGet = map[string]uint16{
 	"URI":        dns.TypeURI,
 	"CAA":        dns.TypeCAA,
 	"AVC":        dns.TypeAVC,
+	"AMTRELAY":   dns.TypeAMTRELAY,
 
 	"TKEY": dns.TypeTKEY,
 	"TSIG": dns.TypeTSIG,
