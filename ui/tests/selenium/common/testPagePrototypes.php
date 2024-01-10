@@ -153,6 +153,9 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Host prototype sorting.
+	 */
 	public static function getHostSortingData() {
 		return [
 			// #0 Sort by Name.
@@ -197,6 +200,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Item prototype sorting.
+	 */
 	public static function getItemsSortingData() {
 		return [
 			// #0 Sort by Name.
@@ -314,6 +320,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Trigger prototype sorting.
+	 */
 	public static function getTriggersSortingData() {
 		return [
 			// #0 Sort by Severity.
@@ -379,6 +388,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Graph prototype sorting.
+	 */
 	public static function getGraphsSortingData() {
 		return [
 			// #0 Sort by Name.
@@ -437,6 +449,9 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Host prototype disable/enable by link and button.
+	 */
 	public static function getHostButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
@@ -514,6 +529,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Item prototype disable/enable by link and button.
+	 */
 	public static function getItemsButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
@@ -591,6 +609,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Trigger prototype disable/enable by link and button.
+	 */
 	public static function getTriggersButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
@@ -668,6 +689,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Graph prototype disable/enable by link and button.
+	 */
 	public static function getGraphsButtonLinkData() {
 		return [
 			// #0 Enable discovering clicking on link in Discover column.
@@ -731,6 +755,9 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Host prototype delete.
+	 */
 	public static function getHostDeleteData() {
 		return [
 			// #0 Cancel delete.
@@ -760,6 +787,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Item prototype delete.
+	 */
 	public static function getItemsDeleteData() {
 		return [
 			// #0 Cancel delete.
@@ -789,6 +819,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Trigger prototype delete.
+	 */
 	public static function getTriggersDeleteData() {
 		return [
 			// #0 Cancel delete.
@@ -818,6 +851,9 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
+	/**
+	 * Graph prototype delete.
+	 */
 	public static function getGraphsDeleteData() {
 		return [
 			// #0 Cancel delete.
@@ -881,6 +917,9 @@ class testPagePrototypes extends CWebTest {
 		}
 	}
 
+	/**
+	 * Check value display in table for item prototype page.
+	 */
 	public static function getItemsNotDisplayedValuesData() {
 		return [
 			// #0 SNMP trapper without interval.
@@ -970,6 +1009,7 @@ class testPagePrototypes extends CWebTest {
 
 	/**
 	 * Check that empty values displayed in Trends and Interval columns for some item types and types of information.
+	 * Only for Item prototype.
 	 */
 	public function checkNotDisplayedValues($data) {
 		$this->query('button:Create item prototype')->one()->click();
