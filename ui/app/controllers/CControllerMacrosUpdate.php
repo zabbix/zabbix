@@ -24,7 +24,18 @@ class CControllerMacrosUpdate extends CController {
 		$ret = $this->validateInput($fields);
 
 		if (!$ret) {
-			$this->setResponse(new CControllerResponseFatal());
+			$form_errors = CFormInputValidator::getErrors();
+			$response = array_filter([
+				'form_errors' => $form_errors ?? null,
+				'error' => !$form_errors
+				? [
+					'title' => _('Cannot update macros'),
+					'messages' => array_column(get_and_clear_messages(), 'message')
+				]
+				: null
+			]);
+
+			$this->setResponse(new CControllerResponseData(['main_block' => json_encode($response)]));
 		}
 
 		return $ret;
