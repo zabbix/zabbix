@@ -168,127 +168,10 @@ class testPageItemPrototypes extends testPagePrototypes {
 		$this->layout();
 	}
 
-	public static function getSortingData() {
-		return [
-			// #0 Sort by Name.
-			[
-				[
-					'sort_by' => 'Name',
-					'sort' => 'name',
-					'result' => [
-						'1 Item prototype monitored discovered',
-						'2 Item prototype not monitored discovered',
-						'3 Item prototype not monitored not discovered',
-						'4 Item prototype monitored not discovered',
-						'5 Item prototype trapper with text type'
-					]
-				]
-			],
-			// #1 Sort by Key.
-			[
-				[
-					'sort_by' => 'Key',
-					'sort' => 'key_',
-					'result' => [
-						'1_key[{#KEY}]',
-						'2_key[{#KEY}]',
-						'3_key[{#KEY}]',
-						'4_key[{#KEY}]',
-						'5_key[{#KEY}]'
-					]
-				]
-			],
-			// #2 Sort by Interval.
-			[
-				[
-					'sort_by' => 'Interval',
-					'sort' => 'delay',
-					'result' => [
-						'',
-						15,
-						30,
-						45,
-						60
-					]
-				]
-			],
-			// #3 Sort by History.
-			[
-				[
-					'sort_by' => 'History',
-					'sort' => 'history',
-					'result' => [
-						'0',
-						'60d',
-						'70d',
-						'80d',
-						'90d'
-					]
-				]
-			],
-			// #4 Sort by Trends.
-			[
-				[
-					'sort_by' => 'Trends',
-					'sort' => 'trends',
-					'result' => [
-						'',
-						'200d',
-						'250d',
-						'300d',
-						'350d'
-					]
-				]
-			],
-			// #5 Sort by Type.
-			[
-				[
-					'sort_by' => 'Type',
-					'sort' => 'type',
-					'result' => [
-						'Zabbix trapper',
-						'Zabbix internal',
-						'Zabbix agent (active)',
-						'Calculated',
-						'HTTP agent'
-					]
-				]
-			],
-			// #6 Sort by Create enabled.
-			[
-				[
-					'sort_by' => 'Create enabled',
-					'sort' => 'status',
-					'result' => [
-						'Yes',
-						'Yes',
-						'Yes',
-						'No',
-						'No'
-					]
-				]
-			],
-			// #7 Sort by Discover.
-			[
-				[
-					'sort_by' => 'Discover',
-					'sort' => 'discover',
-					'result' => [
-						'Yes',
-						'Yes',
-						'Yes',
-						'No',
-						'No'
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * Sort item prototypes by Name, Key, Interval, History, Trends, Type, Create enabled and Discover columns.
 	 *
-	 * @dataProvider getSortingData
+	 * @dataProvider getItemsSortingData
 	 */
 	public function testPageItemPrototypes_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
@@ -296,87 +179,10 @@ class testPageItemPrototypes extends testPagePrototypes {
 		$this->executeSorting($data);
 	}
 
-	public static function getButtonLinkData() {
-		return [
-			// #0 Click on Create disabled button.
-			[
-				[
-					'name' => '1 Item prototype monitored discovered',
-					'button' => 'Create disabled',
-					'column_check' => 'Create enabled',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			],
-			// #1 Click on Create enabled button.
-			[
-				[
-					'name' => '2 Item prototype not monitored discovered',
-					'button' => 'Create enabled',
-					'column_check' => 'Create enabled',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #2 Enabled clicking on link in Create enabled column.
-			[
-				[
-					'name' => '3 Item prototype not monitored not discovered',
-					'column_check' => 'Create enabled',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #3 Disabled clicking on link in Create enabled column.
-			[
-				[
-					'name' => '4 Item prototype monitored not discovered',
-					'column_check' => 'Create enabled',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			],
-			// #4 Enable discovering clicking on link in Discover column.
-			[
-				[
-					'name' => '3 Item prototype not monitored not discovered',
-					'column_check' => 'Discover',
-					'before' => 'No',
-					'after' => 'Yes'
-				]
-			],
-			// #5 Disable discovering clicking on link in Discover column.
-			[
-				[
-					'name' => '2 Item prototype not monitored discovered',
-					'column_check' => 'Discover',
-					'before' => 'Yes',
-					'after' => 'No'
-				]
-			],
-			// #6 Enable all host prototypes clicking on Create enabled button.
-			[
-				[
-					'button' => 'Create enabled',
-					'column_check' => 'Create enabled',
-					'after' => ['Yes', 'Yes', 'Yes', 'Yes', 'Yes']
-				]
-			],
-			// #7 Disable all host prototypes clicking on Create disabled button.
-			[
-				[
-					'button' => 'Create disabled',
-					'column_check' => 'Create enabled',
-					'after' => ['No', 'No', 'No', 'No', 'No']
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @dataProvider getButtonLinkData
+	 * @dataProvider getItemsButtonLinkData
 	 */
 	public function testPageItemPrototypes_ButtonLink($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
@@ -384,39 +190,10 @@ class testPageItemPrototypes extends testPagePrototypes {
 		$this->executeDiscoverEnable($data);
 	}
 
-	public static function getDeleteData() {
-		return [
-			// #0 Cancel delete.
-			[
-				[
-					'name' => ['1 Item prototype monitored discovered'],
-					'cancel' => true
-				]
-			],
-			// #1 Delete one.
-			[
-				[
-					'name' => ['2 Item prototype not monitored discovered'],
-					'message' => 'Item prototype deleted'
-				]
-			],
-			// #2 Delete more than 1.
-			[
-				[
-					'name' => [
-						'3 Item prototype not monitored not discovered',
-						'4 Item prototype monitored not discovered'
-					],
-					'message' => 'Item prototypes deleted'
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getDeleteData
+	 * @dataProvider getItemsDeleteData
 	 */
 	public function testPageItemPrototypes_Delete($data) {
 		$sql = 'SELECT null FROM items WHERE itemid=';
@@ -436,110 +213,14 @@ class testPageItemPrototypes extends testPagePrototypes {
 		}
 	}
 
-	public static function getNotDisplayedValuesData() {
-		return [
-			// #0 SNMP trapper without interval.
-			[
-				[
-					'fields' => [
-						'Name' => 'Empty SNMP interval',
-						'Type' => 'SNMP trap',
-						'Key' => 'snmp_interval_[{#KEY}]'
-					],
-					'check' => [
-						'Interval' => ''
-					]
-				]
-			],
-			// #1 Zabbix trapper without interval.
-			[
-				[
-					'fields' => [
-						'Name' => 'Empty Zabbix trapper interval',
-						'Type' => 'Zabbix trapper',
-						'Key' => 'zabbix_trapper_interval_[{#KEY}]'
-					],
-					'check' => [
-						'Interval' => ''
-					]
-				]
-			],
-			// #2 Dependent item without interval.
-			[
-				[
-					'fields' => [
-						'Name' => 'Empty dependent item interval',
-						'Type' => 'Dependent item',
-						'Master item' => 'Master item',
-						'Key' => 'dependent_interval_[{#KEY}]'
-					],
-					'check' => [
-						'Interval' => ''
-					]
-				]
-			],
-			// #3 Zabbix agent with type of information - text.
-			[
-				[
-					'fields' => [
-						'Name' => 'Text zabbix trapper',
-						'Type' => 'Zabbix trapper',
-						'Type of information' => 'Text',
-						'Key' => 'text_[{#KEY}]'
-					],
-					'check' => [
-						'Trends' => ''
-					]
-				]
-			],
-			// #4 Zabbix agent with type of information - character.
-			[
-				[
-					'fields' => [
-						'Name' => 'Character zabbix trapper',
-						'Type' => 'Zabbix trapper',
-						'Type of information' => 'Character',
-						'Key' => 'character_[{#KEY}]'
-					],
-					'check' => [
-						'Trends' => ''
-					]
-				]
-			],
-			// #5 Zabbix agent with type of information - log.
-			[
-				[
-					'fields' => [
-						'Name' => 'Log zabbix trapper',
-						'Type' => 'Zabbix trapper',
-						'Type of information' => 'Log',
-						'Key' => 'log_[{#KEY}]'
-					],
-					'check' => [
-						'Trends' => ''
-					]
-				]
-			]
-		];
-	}
-
 	/**
 	 * Check that empty values displayed in Trends and Interval columns for some item types and types of information.
 	 *
-	 * @dataProvider getNotDisplayedValuesData
+	 * @dataProvider getItemsNotDisplayedValuesData
 	 */
 	public function testPageItemPrototypes_NotDisplayedValues($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-
-		$this->query('button:Create item prototype')->one()->click();
-		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['fields']);
-		$form->submit()->waitUntilNotVisible();
-		$this->page->waitUntilReady();
-
-		$table = $this->query('class:list-table')->asTable()->one();
-		$template_row = $table->findRow('Key', $data['fields']['Key']);
-		$template_row->assertValues($data['check']);
+		$this->checkNotDisplayedValues($data);
 	}
 }
