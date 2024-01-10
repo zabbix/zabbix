@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -316,7 +316,6 @@ static void	parse_traps(int flag)
 			*pzaddr = '\0';
 
 			process_trap(addr, begin, end);
-			end = NULL;
 		}
 
 		/* parse the current trap */

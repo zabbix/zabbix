@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -350,7 +350,7 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Non-nuneric SLO',
+						'Name' => 'Non-numeric SLO',
 						'SLO' => '123abc',
 						'id:service_tags_0_tag' => 'tag'
 					],

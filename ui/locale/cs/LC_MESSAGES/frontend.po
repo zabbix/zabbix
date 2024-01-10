@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-09-27 08:06+0000\n"
-"Last-Translator: tomass.olups <tomass.olups@zabbix.com>\n"
+"PO-Revision-Date: 2024-01-09 20:28+0000\n"
+"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -203,12 +203,12 @@ msgstr[2] "%1$s z %2$s prvků v hlásí problém"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s nebo %2$s – umožňuje zobrazení stránky pouze ve framu ve stejném origin jako stránka samotná"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s nebo %2$s – zabrání zobrazení stránky v rámci, bez ohledu na web, který se o to pokouší"
 
 #: jsLoader.php:341
 #, c-format
@@ -345,11 +345,11 @@ msgstr "(vytvořeno zjištěním hostitele)"
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(původní) k načtení jedné hodnoty synchronně, volitelně v kombinaci s jinými hodnotami"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(původní) k načtení podstromu v JSON"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -689,7 +689,6 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Třída akcí %1$s musí rozšířit třídu %2$s."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Akce byla smazána"
@@ -1153,11 +1152,11 @@ msgstr "Agent"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Agent (aktivní)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Agent (pasivní)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1433,7 +1432,7 @@ msgstr "Každoročně"
 
 #: jsLoader.php:201
 msgid "Another widget is used as data source."
-msgstr ""
+msgstr "Jako zdroj dat se používá jiný widget."
 
 #: app/partials/monitoring.host.filter.php:134 app/views/action.list.php:95
 #: app/views/administration.proxy.list.php:53
@@ -1563,17 +1562,17 @@ msgstr "Inventární číslo"
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "V %1$s %2$s každý %3$s týden"
+msgstr[1] "V %1$s %2$s každé %3$s týdny"
+msgstr[2] "V %1$s %2$s každé %3$s týdny"
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
-msgstr[2] ""
+msgstr[0] "V %1$s každý %2$s den"
+msgstr[1] "V %1$s každé %2$s dny"
+msgstr[2] "V %1$s každé %2$s dny"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
@@ -1643,7 +1642,7 @@ msgstr "Musí být povolen alespoň jeden parametr \"%1$s\" nebo \"%2$s\"."
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Musí být povolen alespoň jeden parametr."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -2387,7 +2386,7 @@ msgstr "Nelze změnit typ uživatele vlastní role."
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Nelze vymazat historii a trendy"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2581,12 +2580,11 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "Není možné smazat interního Zabbix uživatele \"%1$s\", zkuste ho vypnout."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "Nelze smazat akci"
-msgstr[1] "Nelze smazat akci"
-msgstr[2] "Nelze smazat akci"
+msgstr[1] "Nelze smazat akce"
+msgstr[2] "Nelze smazat akce"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
@@ -2629,23 +2627,20 @@ msgstr[1] "Korelace událostí nelze odstranit"
 msgstr[2] "Korelaci události nelze odstranit"
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "Nelze smazat graf"
-msgstr[1] "Nelze smazat graf"
-msgstr[2] "Nelze smazat graf"
+msgstr[1] "Nelze smazat grafy"
+msgstr[2] "Nelze smazat grafy"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "Není možné smazat prototyp grafu"
-msgstr[1] "Není možné smazat prototyp grafu"
-msgstr[2] "Není možné smazat prototyp grafu"
+msgstr[1] "Není možné smazat prototypy grafů"
+msgstr[2] "Není možné smazat prototypy grafů"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "Nelze smazat hostitele"
@@ -2709,20 +2704,18 @@ msgid "Cannot delete inventory."
 msgstr "Není možné smazat inventář."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
-msgstr[0] "Nelze smazat položku"
-msgstr[1] "Nelze smazat položku"
-msgstr[2] "Nelze smazat položku"
+msgstr[0] "Nelze smazat item"
+msgstr[1] "Nelze smazat itemy"
+msgstr[2] "Nelze smazat itemy"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
-msgstr[0] "Není možné smazat prototyp položky"
-msgstr[1] "Není možné smazat prototyp položky"
-msgstr[2] "Není možné smazat prototyp položky"
+msgstr[0] "Není možné smazat prototyp itemu"
+msgstr[1] "Není možné smazat prototyp itemů"
+msgstr[2] "Není možné smazat prototyp itemů"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2747,12 +2740,11 @@ msgstr[1] "Nelze odstranit moduly: %1$s"
 msgstr[2] "Nelze odstranit moduly: %1$s"
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "Nelze smazat síťovou mapu"
-msgstr[1] "Nelze smazat síťovou mapu"
-msgstr[2] "Nelze smazat síťovou mapu"
+msgstr[1] "Nelze smazat síťové mapy"
+msgstr[2] "Nelze smazat síťové mapy"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2810,12 +2802,11 @@ msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr "Nelze smazat službu \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "Nelze smazat šablonu"
-msgstr[1] "Nelze smazat šablonu"
-msgstr[2] "Nelze smazat šablonu"
+msgstr[1] "Nelze smazat šablony"
+msgstr[2] "Nelze smazat šablony"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2848,20 +2839,18 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "Není možné smazat web scénář \"%1$s\" patřící šabloně."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
-msgstr[0] "Nelze smazat spouštěč"
-msgstr[1] "Nelze smazat spouštěč"
-msgstr[2] "Nelze smazat spouštěč"
+msgstr[0] "Nelze smazat trigger"
+msgstr[1] "Nelze smazat triggery"
+msgstr[2] "Nelze smazat triggery"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
-msgstr[0] "Není možné smazat prototyp spouštěč"
-msgstr[1] "Není možné smazat prototyp spouštěč"
-msgstr[2] "Není možné smazat prototyp spouštěč"
+msgstr[0] "Není možné smazat prototyp triggeru"
+msgstr[1] "Není možné smazat prototypy triggerů"
+msgstr[2] "Není možné smazat prototypy triggerů"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -2890,12 +2879,11 @@ msgstr[1] "Uživatelské role nelze smazat"
 msgstr[2] "Uživatelské role nelze smazat"
 
 #: httpconf.php:178 httpconf.php:418
-#, fuzzy
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
-msgstr[0] "Není možné smazat web scénář"
-msgstr[1] "Není možné smazat web scénář"
-msgstr[2] "Není možné smazat web scénář"
+msgstr[0] "Není možné smazat webový scénář"
+msgstr[1] "Není možné smazat webové scénáře"
+msgstr[2] "Není možné smazat webové scénáře"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
@@ -3640,7 +3628,7 @@ msgstr "Není možné hromadně aktualizovat zobrazované jméno hosta."
 
 #: jsLoader.php:435
 msgid "Cannot open URL"
-msgstr ""
+msgstr "Nelze otevřít URL"
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -3992,12 +3980,11 @@ msgstr "Není možné aktualizovat skupiny pro objeveného hosta \"%1$s\"."
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
 #: app/controllers/CControllerPopupMassupdateHost.php:521
-#, fuzzy
 msgid "Cannot update host"
 msgid_plural "Cannot update hosts"
-msgstr[0] "Nelze upravit hostitele"
-msgstr[1] "Nelze upravit hostitele"
-msgstr[2] "Nelze upravit hostitele"
+msgstr[0] "Nelze aktualizovat hosta"
+msgstr[1] "Nelze aktualizovat hosty"
+msgstr[2] "Nelze aktualizovat hosty"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
@@ -4031,12 +4018,11 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "Nelze aktualizovat rozhraní pro zjištěného hosta \"%1$s\"."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
-msgstr[0] "Nelze upravit položku"
-msgstr[1] "Nelze upravit položku"
-msgstr[2] "Nelze upravit položku"
+msgstr[0] "Nelze aktualizovat item"
+msgstr[1] "Nelze aktualizovat itemy"
+msgstr[2] "Nelze aktualizovat itemy"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
@@ -4130,12 +4116,11 @@ msgstr "Nelze aktualizovat krok šablony webového scénáře \"%1$s\": %2$s."
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
-msgstr[0] "Nelze upravit šablonu"
-msgstr[1] "Nelze upravit šablonu"
-msgstr[2] "Nelze upravit šablonu"
+msgstr[0] "Nelze aktualizovat šablonu"
+msgstr[1] "Nelze aktualizovat šablony"
+msgstr[2] "Nelze aktualizovat šablony"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
@@ -4145,12 +4130,11 @@ msgstr "Skupiny šablon nelze smazat"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
-msgstr[0] "Nelze upravit spouštěč"
-msgstr[1] "Nelze upravit spouštěč"
-msgstr[2] "Nelze upravit spouštěč"
+msgstr[0] "Nelze aktualizovat trigger"
+msgstr[1] "Nelze aktualizovat triggery"
+msgstr[2] "Nelze aktualizovat triggery"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
@@ -4454,19 +4438,19 @@ msgstr "Vyčistit historii a trendy"
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "Vyčistit historii a trendy vybraného itemu?"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "Vyčistit historii a trendy vybraných itemů?"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "Vyčistit historii a trendy vybraných webového scénáře?"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "Vyčistit historii a trendy vybraných webových scénářů?"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -5121,7 +5105,7 @@ msgstr "Jméno kontextu"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "Pokračovat"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5696,7 +5680,7 @@ msgstr[2] "Dashboardy byl smazány"
 
 #: jsLoader.php:200
 msgid "Dashboard is used as data source."
-msgstr ""
+msgstr "Dashboard se používá jako zdroj dat."
 
 #: app/views/monitoring.host.dashboard.view.php:144
 msgid "Dashboard list"
@@ -6035,7 +6019,7 @@ msgstr "Defaultní mód inventář hostitele"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
-msgstr ""
+msgstr "Výchozí vstupní řetězec"
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7161,7 +7145,7 @@ msgstr "Jmenovatel dělitele"
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.item.prototype.edit.php:854
 msgid "Do not store"
-msgstr ""
+msgstr "Neuchovávat"
 
 #: jsLoader.php:213 jsLoader.php:358
 msgid "Do you wish to replace the conditional expression?"
@@ -7264,11 +7248,11 @@ msgstr "Styl vykreslení"
 
 #: app/views/administration.script.edit.php:353
 msgid "Dropdown"
-msgstr ""
+msgstr "Rozbalovací nabídka"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
-msgstr ""
+msgstr "Možnosti rozbalovací nabídky"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7670,7 +7654,7 @@ msgstr "Zapnout pasti"
 
 #: app/views/administration.script.edit.php:333
 msgid "Enable user input"
-msgstr ""
+msgstr "Povolit vstup uživatele"
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -7907,7 +7891,7 @@ msgstr "Název události"
 
 #: app/views/popup.condition.edit.php:672
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "Název eventu odpovídá názvu triggeru (s expandovanými makry), pokud není v nastavení triggeru určen vlastní název eventu."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -8229,7 +8213,7 @@ msgstr "Nepodařilo se aktualizovat sdílení nástěnky"
 
 #: jsLoader.php:128
 msgid "Failed to update time selector."
-msgstr ""
+msgstr "Nepodařilo se aktualizovat časový selektor."
 
 #: jsLoader.php:143
 msgid "Failed to update widget properties."
@@ -8327,7 +8311,7 @@ msgstr "Název pole"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr ""
+msgstr "Požadavky na pole:"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8788,12 +8772,11 @@ msgstr[1] "Grafy zkopírovány"
 msgstr[2] "Grafy zkopírovány"
 
 #: graphs.php:281 graphs.php:337
-#, fuzzy
 msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "Graf byl smazán"
-msgstr[1] "Graf byl smazán"
-msgstr[2] "Graf byl smazán"
+msgstr[1] "Grafy byly smazány"
+msgstr[2] "Grafy byly smazány"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -8837,12 +8820,11 @@ msgid "Graph prototype added"
 msgstr "Prototyp grafu byl přidán"
 
 #: graphs.php:273 graphs.php:316
-#, fuzzy
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "Prototyp grafu byl smazán"
-msgstr[1] "Prototyp grafu byl smazán"
-msgstr[2] "Prototyp grafu byl smazán"
+msgstr[1] "Prototypy grafu byly smazány"
+msgstr[2] "Prototypy grafu byly smazány"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9185,7 +9167,7 @@ msgstr "Historie"
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "History and trends cleared"
-msgstr ""
+msgstr "Historie a trendy byly vyčištěny"
 
 #: app/views/administration.housekeeping.edit.php:221
 msgid "History and trends compression"
@@ -9337,12 +9319,11 @@ msgid "Host dashboards"
 msgstr "Dashboard hosta"
 
 #: app/controllers/CControllerHostMassDelete.php:66
-#, fuzzy
 msgid "Host deleted"
 msgid_plural "Hosts deleted"
 msgstr[0] "Host byl smazán"
-msgstr[1] "Host byl smazán"
-msgstr[2] "Host byl smazán"
+msgstr[1] "Hosté byly smazány"
+msgstr[2] "Hosté byly smazány"
 
 #: app/controllers/CControllerHostGroupDisable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:492
@@ -9503,7 +9484,7 @@ msgstr "Typ popisu hosta"
 
 #: widgets/tophosts/includes/WidgetForm.php:159
 msgid "Host limit"
-msgstr ""
+msgstr "Limit hosta"
 
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
@@ -9549,12 +9530,11 @@ msgid "Host prototype added"
 msgstr "Prototyp hosta byl přidán"
 
 #: host_prototypes.php:139 host_prototypes.php:318
-#, fuzzy
 msgid "Host prototype deleted"
 msgid_plural "Host prototypes deleted"
 msgstr[0] "Prototyp hosta byl smazán"
-msgstr[1] "Prototyp hosta byl smazán"
-msgstr[2] "Prototyp hosta byl smazán"
+msgstr[1] "Prototypy hostů byly smazány"
+msgstr[2] "Prototypy hostů byly smazány"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -9628,12 +9608,11 @@ msgstr "Aktualizace hosta selhala."
 
 #: app/controllers/CControllerHostUpdate.php:150
 #: app/controllers/CControllerPopupMassupdateHost.php:510
-#, fuzzy
 msgid "Host updated"
 msgid_plural "Hosts updated"
 msgstr[0] "Host byl aktualizován"
-msgstr[1] "Host byl aktualizován"
-msgstr[2] "Host byl aktualizován"
+msgstr[1] "Hosté byly aktualizováni"
+msgstr[2] "Hosté byly aktualizováni"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -10224,7 +10203,7 @@ msgstr "Zahrnout položku události v menu"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 msgid "Include hosts in maintenance"
-msgstr ""
+msgstr "Zahrnout hosty do údržby"
 
 #: include/classes/data/CItemData.php:1117
 msgid "Incoming traffic statistics on network interface. Returns integer"
@@ -11009,15 +10988,15 @@ msgstr "Prvotní pohled je ignorován pokud je nastaven výchozí pohled."
 
 #: app/views/administration.script.edit.php:339
 msgid "Input prompt"
-msgstr ""
+msgstr "Vstupní prompt"
 
 #: app/views/administration.script.edit.php:349
 msgid "Input type"
-msgstr ""
+msgstr "Typ vstupu"
 
 #: app/views/administration.script.edit.php:376
 msgid "Input validation rule"
-msgstr ""
+msgstr "Pravidlo pro ověření vstupu"
 
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
@@ -11194,7 +11173,7 @@ msgstr "Neplatné SAML JIT poskytování v konfiguraci pro mapování uživatels
 #: jsLoader.php:438
 #, c-format
 msgid "Invalid URL: %1$s"
-msgstr ""
+msgstr "Neplatná adresa URL: %1$s"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -11226,7 +11205,7 @@ msgstr "Neplatná emailová adresa pro typ médií s ID \"%1$s\"."
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
-msgstr ""
+msgstr "Neplatný vstup"
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11668,12 +11647,11 @@ msgid "Item count"
 msgstr "Počet položek"
 
 #: items.php:524 items.php:735
-#, fuzzy
 msgid "Item deleted"
 msgid_plural "Items deleted"
-msgstr[0] "Položka byla smazána"
-msgstr[1] "Položka byla smazána"
-msgstr[2] "Položka byla smazána"
+msgstr[0] "Item byl smazán"
+msgstr[1] "Itemy byly smazány"
+msgstr[2] "Itemy byly smazány"
 
 #: items.php:708
 msgid "Item disabled"
@@ -11722,12 +11700,11 @@ msgid "Item prototype added"
 msgstr "Prototyp položky přidaný"
 
 #: disc_prototypes.php:302 disc_prototypes.php:499
-#, fuzzy
 msgid "Item prototype deleted"
 msgid_plural "Item prototypes deleted"
-msgstr[0] "Není možné smazat prototyp položky"
-msgstr[1] "Není možné smazat prototyp položky"
-msgstr[2] "Není možné smazat prototyp položky"
+msgstr[0] "Prototyp itemu byl smazán"
+msgstr[1] "Prototypy itemů byly smazány"
+msgstr[2] "Prototypy itemů byly smazány"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -11767,12 +11744,11 @@ msgid "Item type does not use interface"
 msgstr "Typ itemu nepoužívá rozhraní"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:287 items.php:670
-#, fuzzy
 msgid "Item updated"
 msgid_plural "Items updated"
-msgstr[0] "Položka byla aktualizována"
-msgstr[1] "Položka byla aktualizována"
-msgstr[2] "Položka byla aktualizována"
+msgstr[0] "Item byl aktualizován"
+msgstr[1] "Itemy byly aktualizovány"
+msgstr[2] "Itemy byly aktualizovány"
 
 #: widgets/item/Widget.php:53 widgets/tophosts/views/column.edit.php:64
 msgid "Item value"
@@ -12682,7 +12658,7 @@ msgstr "Ruční akce zařízení"
 
 #: app/views/script.userinput.edit.php:100
 msgid "Manual input"
-msgstr ""
+msgstr "Ruční zadání"
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -12909,7 +12885,7 @@ msgstr "Maximální počet sloupců a řádků v přehledových tabulkách"
 #: widgets/piechart/includes/WidgetForm.php:209
 #: widgets/svggraph/includes/WidgetForm.php:359
 msgid "Max number of rows"
-msgstr ""
+msgstr "Maximální počet řádků"
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -13327,12 +13303,12 @@ msgstr "Chybějící klíč \"%1$s\" pro host \"%2$s\"."
 
 #: widgets/hostavail/views/widget.view.php:38
 msgid "Mixed"
-msgstr ""
+msgstr "Různé"
 
 #: widgets/hostavail/views/widget.view.php:39
 msgctxt "compact table header"
 msgid "Mixed"
-msgstr ""
+msgstr "Různé"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:50
@@ -13750,12 +13726,11 @@ msgid "Network map added"
 msgstr "Síťová mapa byla přidána"
 
 #: sysmaps.php:265
-#, fuzzy
 msgid "Network map deleted"
 msgid_plural "Network maps deleted"
 msgstr[0] "Síťová mapa byla smazána"
-msgstr[1] "Síťová mapa byla smazána"
-msgstr[2] "Síťová mapa byla smazána"
+msgstr[1] "Síťové mapy byly smazány"
+msgstr[2] "Síťové mapy byly smazány"
 
 #: sysmaps.php:188
 msgid "Network map updated"
@@ -13864,11 +13839,11 @@ msgstr "Nová skupina zařízení"
 
 #: app/views/item.edit.php:218
 msgid "New item"
-msgstr ""
+msgstr "Nový item"
 
 #: app/views/item.prototype.edit.php:191
 msgid "New item prototype"
-msgstr ""
+msgstr "Nový prototyp itemu"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
@@ -13927,11 +13902,11 @@ msgstr "Nová skupina šablon"
 
 #: app/views/trigger.edit.php:144
 msgid "New trigger"
-msgstr ""
+msgstr "Nový trigger"
 
 #: app/views/trigger.prototype.edit.php:144
 msgid "New trigger prototype"
-msgstr ""
+msgstr "Nový prototyp triggeru"
 
 #: include/views/js/monitoring.sysmaps.js.php:191
 msgid "New triggers"
@@ -14006,7 +13981,7 @@ msgstr "Žádné změny."
 
 #: jsLoader.php:194
 msgid "No compatible widgets."
-msgstr ""
+msgstr "Žádné kompatibilní widgety."
 
 #: jsLoader.php:412 tests/selenium/modules/clock32/views/widget.view.php:83
 #: widgets/clock/views/widget.view.php:83
@@ -14588,7 +14563,7 @@ msgstr "Nepodporováno"
 #: app/views/administration.miscconfig.edit.php:138
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Pamatujte, že %1$s nebo %2$s budou považovány za názvy hostitelů, pokud budou použity bez jednoduchých uvozovek."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -14964,7 +14939,7 @@ msgstr "Počítány jsou pouze spouštěče přiřazené k povoleným hostitelů
 
 #: jsLoader.php:439
 msgid "Open URL"
-msgstr ""
+msgstr "Otevřít adresu URL"
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -15106,7 +15081,7 @@ msgstr "Pořadí"
 
 #: widgets/tophosts/includes/WidgetForm.php:144
 msgid "Order by"
-msgstr ""
+msgstr "Seřadit podle"
 
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
@@ -15220,7 +15195,7 @@ msgstr "Přepisování"
 
 #: include/classes/widgets/fields/CWidgetFieldMultiSelectOverrideHost.php:30
 msgid "Override host"
-msgstr ""
+msgstr "Přepsat hosta"
 
 #: app/partials/administration.system.info.php:210
 #: app/views/administration.housekeeping.edit.php:129
@@ -15231,6 +15206,10 @@ msgstr "Přepsaná položka historické periody"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Přepsat item trendové periody"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Přepsat výběr časového období"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -15699,7 +15678,7 @@ msgstr "Procentuální čára (vpravo)"
 
 #: include/classes/data/CItemData.php:1214
 msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
-msgstr ""
+msgstr "Provede DNS dotaz. Vrátí 0, pokud DNS nefunguje, jinak doba dotazu v sekundách (se zlomky)"
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -17202,7 +17181,7 @@ msgstr "Vrátí procento ztracených ICMP ping paketů."
 
 #: include/classes/data/CItemData.php:2999
 msgid "Returns total number of history values written to database."
-msgstr ""
+msgstr "Vrátí celkový počet hodnot historie zapsaných do databáze."
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -17386,7 +17365,7 @@ msgstr "SLA s ID \"%1$s\" není dostupná."
 
 #: include/classes/html/widgets/fields/CWidgetFieldMultiSelectSlaView.php:35
 msgid "SLAs"
-msgstr ""
+msgstr "SLA"
 
 #: app/partials/service.info.php:61 app/views/slareport.list.php:164
 msgid "SLI"
@@ -17469,7 +17448,7 @@ msgstr "SNMP komunita"
 
 #: include/items.inc.php:1570
 msgid "SNMP get value"
-msgstr ""
+msgstr "SNMP get hodnota"
 
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
@@ -18427,7 +18406,7 @@ msgstr "Zobrazit počet záznamů"
 
 #: widgets/hostavail/includes/WidgetForm.php:66
 msgid "Show only totals"
-msgstr ""
+msgstr "Zobrazit pouze součty"
 
 #: app/partials/monitoring.problem.filter.php:281
 #: widgets/problemsbysv/includes/WidgetForm.php:98
@@ -19013,7 +18992,7 @@ msgstr "Uložit přihlašovací údaje do"
 #: include/views/configuration.item.prototype.edit.php:840
 #: include/views/configuration.item.prototype.edit.php:855
 msgid "Store up to"
-msgstr ""
+msgstr "Uchovávat až"
 
 #: include/classes/setup/CSetupWizard.php:755
 #: include/classes/setup/CSetupWizard.php:756
@@ -19421,12 +19400,11 @@ msgid "Template dashboards"
 msgstr "Šablony dashboardu"
 
 #: app/controllers/CControllerTemplateDelete.php:133
-#, fuzzy
 msgid "Template deleted"
 msgid_plural "Templates deleted"
 msgstr[0] "Šablona byla smazána"
-msgstr[1] "Šablona byla smazána"
-msgstr[2] "Šablona byla smazána"
+msgstr[1] "Šablony byly smazány"
+msgstr[2] "Šablony byly smazány"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -19498,12 +19476,11 @@ msgstr "Šablona spouštěče"
 
 #: app/controllers/CControllerTemplateMassupdate.php:361
 #: app/controllers/CControllerTemplateUpdate.php:188
-#, fuzzy
 msgid "Template updated"
 msgid_plural "Templates updated"
 msgstr[0] "Šablona byla aktualizována"
-msgstr[1] "Šablona byla aktualizována"
-msgstr[2] "Šablona byla aktualizována"
+msgstr[1] "Šablony byly aktualizovány"
+msgstr[2] "Šablony byly aktualizovány"
 
 #: app/partials/hostmacros.inherited.list.html.php:55
 msgid "Template value"
@@ -19634,7 +19611,7 @@ msgstr "Testovací subjekt"
 
 #: app/views/administration.script.edit.php:345
 msgid "Test user input"
-msgstr ""
+msgstr "Test uživatelského vstupu"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -20132,7 +20109,7 @@ msgstr "Celková doba Elasticsearch: %1$s"
 
 #: widgets/hostavail/views/widget.view.php:81
 msgid "Total Hosts"
-msgstr ""
+msgstr "Celkový počet hostů"
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -20317,12 +20294,11 @@ msgid "Trigger data storage period"
 msgstr "Perioda ukládání dat spouštěče"
 
 #: app/controllers/CControllerTriggerDelete.php:62
-#, fuzzy
 msgid "Trigger deleted"
 msgid_plural "Triggers deleted"
-msgstr[0] "Spouštěč byl smazán"
-msgstr[1] "Spouštěč byl smazán"
-msgstr[2] "Spouštěč byl smazán"
+msgstr[0] "Trigger byl smazán"
+msgstr[1] "Triggery byly smazány"
+msgstr[2] "Triggery byly smazány"
 
 #: tr_events.php:169
 msgid "Trigger details"
@@ -20368,7 +20344,7 @@ msgstr "Typ popisku spouštěče"
 
 #: widgets/toptriggers/includes/WidgetForm.php:76
 msgid "Trigger limit"
-msgstr ""
+msgstr "Limit triggers"
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
@@ -20472,12 +20448,11 @@ msgid "Trigger prototype added"
 msgstr "Prototyp spouštěč přidaný"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
-#, fuzzy
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
-msgstr[0] "Není možné smazat prototyp spouštěč"
-msgstr[1] "Není možné smazat prototyp spouštěč"
-msgstr[2] "Není možné smazat prototyp spouštěč"
+msgstr[0] "Prototypy triggeru byl smazán"
+msgstr[1] "Prototypy triggerů byly smazány"
+msgstr[2] "Prototypy triggerů byly smazány"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -20518,12 +20493,11 @@ msgstr "Spouštěcí značky"
 
 #: app/controllers/CControllerTriggerMassupdate.php:220
 #: app/controllers/CControllerTriggerUpdate.php:147
-#, fuzzy
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
-msgstr[0] "Spouštěč byl aktualizován"
-msgstr[1] "Spouštěč byl aktualizován"
-msgstr[2] "Spouštěč byl aktualizován"
+msgstr[0] "Trigger byl aktualizován"
+msgstr[1] "Triggery byly aktualizovány"
+msgstr[2] "Triggery byly aktualizovány"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/controllers/CControllerPopupGeneric.php:241
@@ -20703,7 +20677,7 @@ msgstr "Jméno URL musí byt jedinečné v mapě \"%1$s\"."
 
 #: jsLoader.php:441
 msgid "URL opening confirmation"
-msgstr ""
+msgstr "potvrzení otevření adresy URL"
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -21275,7 +21249,7 @@ msgstr "Use %{ref} ve skupinovém filtru k referenční hodnotě tohoto uživate
 
 #: app/views/administration.miscconfig.edit.php:123
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "Použít HTTP hlavičku X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -21513,7 +21487,7 @@ msgstr "Skupiny uživatelů"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:61
 msgid "User input has been successfully tested."
-msgstr ""
+msgstr "Vstup uživatele byl úspěšně otestován."
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -21787,7 +21761,7 @@ msgstr "Statistiky zápisu datového úložiště VMware, \"url\" – adresa URL
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
-msgstr ""
+msgstr "Protokol událostí VMware, \"url! – URL služby VMware, \"režim\" – vše (výchozí) nebo přeskočit – přeskočit zpracování starších dat, \"závažnost\" – filtrování je ve výchozím nastavení zakázáno nebo \"chyba, varování, informace, uživatel\" v libovolné kombinaci"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
@@ -22479,12 +22453,11 @@ msgid "Web scenario added"
 msgstr "Web scénář přidaný"
 
 #: httpconf.php:178 httpconf.php:417
-#, fuzzy
 msgid "Web scenario deleted"
 msgid_plural "Web scenarios deleted"
-msgstr[0] "Web scénář smazaný"
-msgstr[1] "Web scénář smazaný"
-msgstr[2] "Web scénář smazaný"
+msgstr[0] "Web scénář byl smazaný"
+msgstr[1] "Webové scénáře byly smazány"
+msgstr[2] "Webové scénáře byly smazány"
 
 #: httpconf.php:386
 msgid "Web scenario disabled"
@@ -22566,7 +22539,7 @@ msgstr "Kdy je aktivní"
 #: include/classes/widgets/fields/CWidgetFieldTimePeriod.php:83
 #: jsLoader.php:195 jsLoader.php:199
 msgid "Widget"
-msgstr ""
+msgstr "Widget"
 
 #: include/classes/api/services/CDashboardGeneral.php:352
 #, c-format
@@ -22632,9 +22605,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "S problémy"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Při tomto nastavení se zobrazí pouze číselné údaje."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "S tímto nastavením budou v tomto sloupci zobrazeny pouze numerické hodnoty."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Při tomto nastavení se zobrazí pouze číselné položky."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22699,7 +22681,7 @@ msgstr "HTTP hlavička X-Frame-Options"
 
 #: app/views/administration.miscconfig.edit.php:125
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "Podporované hodnoty HTTP hlavičky X-Frame-Options:"
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
@@ -22969,7 +22951,7 @@ msgstr "Zabbix agent"
 
 #: widgets/hostavail/includes/WidgetForm.php:47
 msgid "Zabbix agent (active checks)"
-msgstr ""
+msgstr "Agent Zabbix (aktivní kontroly)"
 
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
@@ -22977,7 +22959,7 @@ msgstr "Zabbix agent (aktivní)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
-msgstr ""
+msgstr "Agent Zabbix (pasivní kontroly)"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -23154,7 +23136,7 @@ msgstr "speciální znak"
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "řetězec názvů hostitelů oddělených mezerami; přidání %1$s do seznamu umožňuje zobrazení stránky ve frame na stejném origin jako stránka samotná"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -23366,7 +23348,7 @@ msgstr "musí byť vybraný aspoň jeden den v týdnu"
 #: widgets/gauge/includes/WidgetForm.php:137
 #: widgets/item/includes/WidgetForm.php:90
 msgid "at least one option must be selected"
-msgstr ""
+msgstr "musí být vybrána alespoň jedna možnost"
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
@@ -24040,7 +24022,7 @@ msgstr "včetně podskupin"
 #: include/classes/parsers/CIPRangeParser.php:148
 #, c-format
 msgid "incorrect address starting from \"%1$s\""
-msgstr ""
+msgstr "nesprávná adresa začínající od \"%1$s\""
 
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
@@ -24088,7 +24070,7 @@ msgstr "nesprávné použití funkce \"%1$s\""
 #: include/classes/api/services/CScript.php:517
 #, c-format
 msgid "input does not match the provided pattern: %1$s"
-msgstr ""
+msgstr "vstup neodpovídá zadanému vzoru: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -24636,6 +24618,10 @@ msgstr "mimo"
 msgid "not selected"
 msgstr "nevybráno"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "nepoužívá se"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Počet sekund od Období"
@@ -25093,13 +25079,13 @@ msgstr "časové limity jsou zakázány, protože verze serveru proxy a serveru 
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
 msgid "to retrieve a single value"
-msgstr ""
+msgstr "k načtení jedné hodnoty"
 
 #: include/views/configuration.host.discovery.edit.php:548
 #: include/views/configuration.item.edit.php:638
 #: include/views/configuration.item.prototype.edit.php:609
 msgid "to retrieve a subtree"
-msgstr ""
+msgstr "k načtení podstromu"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1075
 msgid "trendavg() - Average value of a period T with exact period shift"
@@ -25332,7 +25318,7 @@ msgstr "hodnota %1$s již existuje"
 #: include/classes/parsers/CEscapedStringParser.php:72
 #, c-format
 msgid "value contains unescaped character at position %1$d"
-msgstr ""
+msgstr "hodnota obsahuje neescapovaný znak na pozici %1$d"
 
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
@@ -25470,7 +25456,7 @@ msgstr "hodnota nové značky události"
 
 #: include/classes/api/services/CScript.php:527
 msgid "values must be unique"
-msgstr ""
+msgstr "hodnoty musí být jedinečné"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"
