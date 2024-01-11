@@ -58,7 +58,6 @@ class CUserMacro extends CApiService {
 	 */
 	public function get($options = []) {
 		$result = [];
-		$userid = self::$userData['userid'];
 
 		$sqlParts = [
 			'select'	=> ['macros' => 'hm.hostmacroid'],
@@ -118,11 +117,11 @@ class CUserMacro extends CApiService {
 			else {
 				$sqlParts['from'][] = 'host_hgset hh';
 				$sqlParts['from'][] = 'permission p';
-				$sql_parts['where'][] = 'hm.hostid=hh.hostid';
-				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'hm.hostid=hh.hostid';
+				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
 
 				if ($options['editable']) {
-					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
+					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
 				}
 			}
 		}
