@@ -26,8 +26,7 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  *
  * @onBefore prepareGraphPrototypeTemplateData
  */
-class testPagePrototypeGraphsTemplate extends testPagePrototypes
-{
+class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 
 	public $headers = ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'];
 	public $page_name = 'graph';
@@ -39,7 +38,6 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes
 	public $clickable_headers = ['Name', 'Graph type', 'Discover'];
 
 	protected static $prototype_graphids;
-	protected static $hostids;
 	protected static $host_druleids;
 
 	public function prepareGraphPrototypeTemplateData() {

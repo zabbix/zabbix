@@ -138,8 +138,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	}
 
 	public function testPagePrototypeTriggersTemplate_Layout() {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->layout(true);
 	}
 
@@ -149,8 +149,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 * @dataProvider getTriggersSortingData
 	 */
 	public function testPagePrototypeTriggersTemplate_Sorting($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort='.$data['sort'].'&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -160,8 +160,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 * @dataProvider getTriggersButtonLinkData
 	 */
 	public function testPagePrototypeTriggersTemplate_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeDiscoverEnable($data);
 	}
 
@@ -172,8 +172,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 */
 	public function testPagePrototypeTriggersTemplate_Delete($data) {
 		$sql = 'SELECT null FROM triggers WHERE triggerid=';
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&parent_discoveryid='.
-			self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_triggerids[$name]));

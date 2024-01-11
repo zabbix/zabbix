@@ -38,7 +38,6 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	public $clickable_headers = ['Name', 'Graph type', 'Discover'];
 
 	protected static $prototype_graphids;
-	protected static $hostids;
 	protected static $host_druleids;
 
 	public function prepareGraphPrototypeData() {
@@ -70,14 +69,14 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		self::$hostids = $host_result['hostids'];
+		$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
 
 		$item_prototype  = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for graphs',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,

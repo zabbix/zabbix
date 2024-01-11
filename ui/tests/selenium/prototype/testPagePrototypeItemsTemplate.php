@@ -42,7 +42,6 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	public $clickable_headers = ['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover'];
 
 	protected static $prototype_itemids;
-	protected static $template_id;
 	protected static $host_druleids;
 
 	public function prepareItemPrototypeTemplateData() {
@@ -69,14 +68,14 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 				]
 			]
 		]);
-		self::$template_id = $response['templateids'];
+		$template_id = $response['templateids'];
 		self::$host_druleids = $response['discoveryruleids'];
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype monitored discovered',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => self::$template_id['Template for prototype check'],
+				'hostid' => $template_id['Template for prototype check'],
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -87,7 +86,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 			[
 				'name' => '2 Item prototype not monitored discovered',
 				'key_' => '2_key[{#KEY}]',
-				'hostid' => self::$template_id['Template for prototype check'],
+				'hostid' => $template_id['Template for prototype check'],
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'type' => ITEM_TYPE_INTERNAL,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -99,7 +98,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 			[
 				'name' => '3 Item prototype not monitored not discovered',
 				'key_' => '3_key[{#KEY}]',
-				'hostid' => self::$template_id['Template for prototype check'],
+				'hostid' => $template_id['Template for prototype check'],
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'url' => 'test',
@@ -113,7 +112,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 			[
 				'name' => '4 Item prototype monitored not discovered',
 				'key_' => '4_key[{#KEY}]',
-				'hostid' => self::$template_id['Template for prototype check'],
+				'hostid' => $template_id['Template for prototype check'],
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'type' => ITEM_TYPE_CALCULATED,
 				'params' => '1+1',
@@ -126,7 +125,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 			[
 				'name' => '5 Item prototype trapper with text type',
 				'key_' => '5_key[{#KEY}]',
-				'hostid' => self::$template_id['Template for prototype check'],
+				'hostid' => $template_id['Template for prototype check'],
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
@@ -149,8 +148,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	}
 
 	public function testPagePrototypeItemsTemplate_Layout() {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->layout(true);
 	}
 
@@ -171,8 +170,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 * @dataProvider getItemsButtonLinkData
 	 */
 	public function testPagePrototypeItemsTemplate_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&parent_discoveryid='.
-			self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeDiscoverEnable($data);
 	}
 
@@ -183,8 +182,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 */
 	public function testPagePrototypeItemsTemplate_Delete($data) {
 		$sql = 'SELECT null FROM items WHERE itemid=';
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_itemids[$name]));
@@ -205,8 +204,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 * @dataProvider getItemsNotDisplayedValuesData
 	 */
 	public function testPagePrototypeItemsTemplate_NotDisplayedValues($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkNotDisplayedValues($data);
 	}
 }

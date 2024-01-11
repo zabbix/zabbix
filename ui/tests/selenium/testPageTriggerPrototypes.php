@@ -42,7 +42,6 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	public $clickable_headers = ['Severity', 'Name', 'Create enabled', 'Discover'];
 
 	protected static $prototype_triggerids;
-	protected static $hostids;
 	protected static $host_druleids;
 
 	public function prepareTriggerPrototypeData() {
@@ -74,14 +73,14 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		self::$hostids = $host_result['hostids'];
+		$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
 
 		$item_prototype  = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for trigger',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -140,15 +139,14 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '🙂🙃',
 				'priority' => 5
-
 			]
 		]);
 		self::$prototype_triggerids = CDataHelper::getIds('description');
 	}
 
 	public function testPageTriggerPrototypes_Layout() {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->layout();
 	}
 
@@ -158,8 +156,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 * @dataProvider getTriggersSortingData
 	 */
 	public function testPageTriggerPrototypes_Sorting($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -169,8 +167,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 * @dataProvider getTriggersButtonLinkData
 	 */
 	public function testPageTriggerPrototypes_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeDiscoverEnable($data);
 	}
 
@@ -181,8 +179,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 */
 	public function testPageTriggerPrototypes_Delete($data) {
 		$sql = 'SELECT null FROM triggers WHERE triggerid=';
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		foreach ($data['name'] as $name) {
 			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_triggerids[$name]));

@@ -42,7 +42,6 @@ class testPageItemPrototypes extends testPagePrototypes {
 	public $clickable_headers = ['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover'];
 
 	protected static $prototype_itemids;
-	protected static $hostids;
 	protected static $host_druleids;
 
 	public function prepareItemPrototypeData() {
@@ -83,14 +82,14 @@ class testPageItemPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		self::$hostids = $host_result['hostids'];
+		$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
 
 		$item_prototype  = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype monitored discovered',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -101,7 +100,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '2 Item prototype not monitored discovered',
 				'key_' => '2_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_INTERNAL,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -113,7 +112,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '3 Item prototype not monitored not discovered',
 				'key_' => '3_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'url' => 'test',
@@ -127,7 +126,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '4 Item prototype monitored not discovered',
 				'key_' => '4_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_CALCULATED,
 				'params' => '1+1',
@@ -140,7 +139,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 			[
 				'name' => '5 Item prototype trapper with text type',
 				'key_' => '5_key[{#KEY}]',
-				'hostid' => self::$hostids['Host for prototype check'],
+				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
@@ -174,8 +173,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * @dataProvider getItemsSortingData
 	 */
 	public function testPageItemPrototypes_Sorting($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&'.
+				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
