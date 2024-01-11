@@ -612,33 +612,10 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
-	int		snmp_timestamp;
+	int		snmp_timestamp = 0;
 	char		*snmp_id = NULL, *snmp_node = NULL, *config_node_name_esc;
 
 	zbx_db_begin();
-
-	result = zbx_db_select("select value from globalvars where name='snmp_node'");
-	if (NULL == (row = zbx_db_fetch(result)))
-	{
-		zbx_db_execute("insert into globalvars (name,value) values ('snmp_node','')");
-		snmp_node = NULL;
-	}
-	else
-		snmp_node = zbx_strdup(NULL, row[0]);
-	zbx_db_free_result(result);
-
-	if (NULL == config_node_name)
-	{
-		zbx_db_execute("update globalvars set"
-				" value=''"
-				" where name in ('snmp_node','snmp_timestamp','snmp_id')");
-	}
-	else
-	{
-		config_node_name_esc = zbx_db_dyn_escape_string(config_node_name);
-		zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
-		zbx_free(config_node_name_esc);
-	}
 
 	result = zbx_db_select("select value from globalvars where name='snmp_lastsize'");
 	if (NULL == (row = zbx_db_fetch(result)))
@@ -650,69 +627,94 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 		ZBX_STR2UINT64(trap_lastsize, row[0]);
 	zbx_db_free_result(result);
 
-	result = zbx_db_select("select value from globalvars where name='snmp_timestamp'");
-	if (NULL == (row = zbx_db_fetch(result)))
+	if (NULL == config_node_name)
 	{
-		zbx_db_execute("insert into globalvars (name,value) values ('snmp_timestamp','0')");
-		snmp_timestamp = 0;
+		zbx_db_execute("delete from globalvars where name in ('snmp_node','snmp_timestamp','snmp_id')");
 	}
 	else
-		snmp_timestamp = atoi(row[0]);
-	zbx_db_free_result(result);
+	{
+		result = zbx_db_select("select value from globalvars where name='snmp_node'");
+		if (NULL != (row = zbx_db_fetch(result)))
+			snmp_node = zbx_strdup(NULL, row[0]);
+		zbx_db_free_result(result);
 
-	result = zbx_db_select("select value from globalvars where name='snmp_id'");
-	if (NULL == (row = zbx_db_fetch(result)))
-	{
-		zbx_db_execute("insert into globalvars (name,value) values ('snmp_id','')");
-		snmp_id = NULL;
+		result = zbx_db_select("select value from globalvars where name='snmp_timestamp'");
+		if (NULL == (row = zbx_db_fetch(result)))
+		{
+			zbx_db_execute("insert into globalvars (name,value) values ('snmp_timestamp','0')");
+		}
+		else
+			snmp_timestamp = atoi(row[0]);
+		zbx_db_free_result(result);
+
+		result = zbx_db_select("select value from globalvars where name='snmp_id'");
+		if (NULL == (row = zbx_db_fetch(result)))
+		{
+			zbx_db_execute("insert into globalvars (name,value) values ('snmp_id','')");
+		}
+		else
+			snmp_id = zbx_strdup(NULL, row[0]);
+		zbx_db_free_result(result);
 	}
-	else
-		snmp_id = zbx_strdup(NULL, row[0]);
-	zbx_db_free_result(result);
 
 	zbx_db_commit();
 
-	if (NULL != snmp_id && 0 != snmp_timestamp && NULL != snmp_node && NULL != config_node_name &&
-			0 != strcmp(config_node_name, snmp_node))
+	if (NULL != config_node_name)
 	{
-		int	skip = 1;
-
-		if (-1 != open_trap_file(config_snmptrap_file))
+		if (NULL != snmp_id && 0 != snmp_timestamp && NULL != snmp_node &&
+				0 != strcmp(config_node_name, snmp_node))
 		{
-			char	snmp_id_bin[ZBX_SHA512_BINARY_LENGTH];
-			int	ret;
+			int	skip = 1;
 
-			if (ZBX_SHA512_BINARY_LENGTH != (ret = zbx_hex2bin((const unsigned char *)snmp_id,
-					(unsigned char *)snmp_id_bin, ZBX_SHA512_BINARY_LENGTH)))
+			if (-1 != open_trap_file(config_snmptrap_file))
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "invalid SNMP ID length:%d", ret);
+				char	snmp_id_bin[ZBX_SHA512_BINARY_LENGTH];
+				int	ret;
+
+				if (ZBX_SHA512_BINARY_LENGTH != (ret = zbx_hex2bin((const unsigned char *)snmp_id,
+						(unsigned char *)snmp_id_bin, ZBX_SHA512_BINARY_LENGTH)))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "invalid SNMP ID length:%d", ret);
+				}
+				else
+				{
+					trap_lastsize = 0;
+
+					while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip,
+							config_node_name))
+						;
+
+					if (0 != offset)
+						parse_traps(1, snmp_timestamp, snmp_id_bin, &skip, config_node_name);
+				}
+
+				if (1 == skip)
+				{
+					trap_lastsize = 0;
+
+					while (0 < read_traps(config_snmptrap_file, snmp_timestamp, NULL, &skip,
+							config_node_name))
+						;
+
+					if (0 != offset)
+						parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
+				}
+
+				db_update_lastsize();
 			}
-			else
-			{
-				trap_lastsize = 0;
-
-				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip,
-						config_node_name))
-					;
-
-				if (0 != offset)
-					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip, config_node_name);
-			}
-
-			if (1 == skip)
-			{
-				trap_lastsize = 0;
-
-				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, NULL, &skip,
-						config_node_name))
-					;
-
-				if (0 != offset)
-					parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
-			}
-
-			db_update_lastsize();
 		}
+
+		config_node_name_esc = zbx_db_dyn_escape_string(ZBX_NULL2EMPTY_STR(config_node_name));
+
+		if (NULL == snmp_node)
+		{
+			zbx_db_execute("insert into globalvars (name,value) values ('snmp_node','%s')",
+					config_node_name_esc);
+		}
+		else
+			zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
+
+		zbx_free(config_node_name_esc);
 	}
 
 	zbx_free(snmp_node);
