@@ -490,8 +490,10 @@ SVGMap.prototype.update = function (options, incremental) {
 				this.updateItems('links', 'SVGMapLink', options.links, incremental);
 				this.updateBackground(options.background);
 			}
-			catch(e) {
-				console.error(e);
+			catch(exception) {
+				resolve();
+
+				throw exception;
 			}
 
 			this.options = SVGElement.mergeAttributes(this.options, options);
