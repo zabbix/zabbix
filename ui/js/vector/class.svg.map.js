@@ -483,11 +483,16 @@ SVGMap.prototype.update = function (options, incremental) {
 	this.rendered_promise = new Promise(resolve => {
 		// Images are preloaded before update.
 		this.imageCache.preload(images, function () {
-			// Update is performed after preloading all the images.
-			this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
-			this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
-			this.updateItems('links', 'SVGMapLink', options.links, incremental);
-			this.updateBackground(options.background);
+			try {
+				// Update is performed after preloading all the images.
+				this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
+				this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
+				this.updateItems('links', 'SVGMapLink', options.links, incremental);
+				this.updateBackground(options.background);
+			}
+			catch(e) {
+				console.error(e);
+			}
 
 			this.options = SVGElement.mergeAttributes(this.options, options);
 
