@@ -416,7 +416,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Aggregate')),
+							new CLabel(_('Aggregate'), $field_name.'['.$row_num.'][aggregate_grouping]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][aggregate_grouping]',
 									(int) $value['aggregate_grouping'])
