@@ -339,7 +339,8 @@ static void	compare_trap(const char *date, const char *trap, int snmp_timestamp,
  * Purpose: splits traps and processes them with process_trap()               *
  *                                                                            *
  ******************************************************************************/
-static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, int *skip)
+static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, int *skip,
+		const char *config_node_name)
 {
 	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr = NULL, *pzdate = NULL,
 		*last_date = NULL, *last_trap = NULL;
@@ -382,8 +383,12 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 			}
 			else
 			{
-				last_date = begin;	/* TODO: calculate only for HA*/
-				last_trap = end;
+				if (NULL != config_node_name)
+				{
+					last_date = begin;
+					last_trap = end;
+				}
+
 				process_trap(addr, begin, end);
 			}
 
@@ -419,7 +424,7 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper buffer is full,"
 						" trap data might be truncated");
-				parse_traps(1, snmp_timestamp, snmp_id_bin, skip);
+				parse_traps(1, snmp_timestamp, snmp_id_bin, skip, config_node_name);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "failed to find trap in SNMP trapper file");
@@ -448,7 +453,9 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 			else
 			{
 				process_trap(addr, begin, end);
-				db_update_snmp_id(begin, end);
+
+				if (NULL != config_node_name)
+					db_update_snmp_id(begin, end);
 			}
 
 			offset = 0;
@@ -499,7 +506,8 @@ static void	db_update_lastsize(void)
  * Purpose: reads traps and then parses them with parse_traps()               *
  *                                                                            *
  ******************************************************************************/
-static int	read_traps(const char *config_snmptrap_file, int snmp_timestamp, const char *snmp_id, int *skip)
+static int	read_traps(const char *config_snmptrap_file, int snmp_timestamp, const char *snmp_id, int *skip,
+		const char *config_node_name)
 {
 	int	nbytes = 0;
 	char	*error = NULL;
@@ -530,7 +538,7 @@ static int	read_traps(const char *config_snmptrap_file, int snmp_timestamp, cons
 		if (NULL == skip || 0 == *skip)
 			db_update_lastsize();
 
-		parse_traps(0, snmp_timestamp, snmp_id, skip);
+		parse_traps(0, snmp_timestamp, snmp_id, skip, config_node_name);
 	}
 out:
 	zbx_free(error);
@@ -673,11 +681,12 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 			}
 			else
 			{
-				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip))
+				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip,
+						config_node_name))
 					;
 
 				if (0 != offset)
-					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip);
+					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip, config_node_name);
 			}
 
 			/*if (1 == skip)
@@ -723,11 +732,11 @@ static int	get_latest_data(const char *config_snmptrap_file)
 						config_snmptrap_file, zbx_strerror(errno));
 			}
 
-			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL))
+			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, NULL))
 				;
 
 			if (0 != offset)
-				parse_traps(1, 0, NULL, NULL);
+				parse_traps(1, 0, NULL, NULL, NULL);
 
 			close_trap_file();
 		}
@@ -735,11 +744,11 @@ static int	get_latest_data(const char *config_snmptrap_file)
 		{
 			/* file has been rotated, process the current file */
 
-			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL))
+			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, NULL))
 				;
 
 			if (0 != offset)
-				parse_traps(1, 0, NULL, NULL);
+				parse_traps(1, 0, NULL, NULL, NULL);
 
 			close_trap_file();
 		}
@@ -753,7 +762,7 @@ static int	get_latest_data(const char *config_snmptrap_file)
 		{
 			if (1 == force)
 			{
-				parse_traps(1, 0, NULL, NULL);
+				parse_traps(1, 0, NULL, NULL, NULL);
 				force = 0;
 			}
 			else if (0 != offset && 0 == force)
@@ -816,7 +825,7 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 			if (SUCCEED != get_latest_data(snmptrapper_args_in->config_snmptrap_file))
 				break;
 
-			read_traps(snmptrapper_args_in->config_snmptrap_file, 0, NULL, NULL);
+			read_traps(snmptrapper_args_in->config_snmptrap_file, 0, NULL, NULL, NULL);
 		}
 
 		sec = zbx_time() - sec;
