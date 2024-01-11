@@ -666,8 +666,8 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 
 			trap_lastsize = 0;
 
-			if (ZBX_SHA512_BINARY_LENGTH != (ret = zbx_hex2bin(snmp_id, snmp_id_bin,
-					ZBX_SHA512_BINARY_LENGTH)))
+			if (ZBX_SHA512_BINARY_LENGTH != (ret = zbx_hex2bin((const unsigned char *)snmp_id,
+					(unsigned char *)snmp_id_bin, ZBX_SHA512_BINARY_LENGTH)))
 			{
 				zabbix_log(LOG_LEVEL_DEBUG, "invalid SNMP ID length:%d", ret);
 			}
@@ -795,15 +795,14 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, snmptrapper_args_in->config_snmptrap_file);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-	zabbix_increase_log_level();
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	DBget_lastsize(NULL, snmptrapper_args_in->config_snmptrap_file);
-
 	buffer = (char *)zbx_malloc(buffer, MAX_BUFFER_LEN);
 	*buffer = '\0';
+
+	DBget_lastsize(snmptrapper_args_in->config_ha_node_name, snmptrapper_args_in->config_snmptrap_file);
 
 	while (ZBX_IS_RUNNING())
 	{
