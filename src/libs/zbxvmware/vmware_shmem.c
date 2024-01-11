@@ -22,7 +22,7 @@
 #include "vmware_perfcntr.h"
 #include "zbxshmem.h"
 
-#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref,  __vm_shmem_malloc_func, \
+#define VMWARE_VECTOR_CREATE(ref, type)	zbx_vector_##type##_create_ext(ref, __vm_shmem_malloc_func, \
 		__vm_shmem_realloc_func, __vm_shmem_free_func)
 
 static zbx_shmem_info_t	*vmware_mem = NULL;
@@ -944,7 +944,8 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_shmem_malloc_func,
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
 
-	VMWARE_VECTOR_CREATE(&data->clusters, ptr);
+	//VMWARE_VECTOR_CREATE(&data->clusters, ptr);
+	VMWARE_VECTOR_CREATE(&data->clusters, vmware_cluster_ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore);
 	VMWARE_VECTOR_CREATE(&data->datacenters, vmware_datacenter);
@@ -952,7 +953,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->dvswitches, vmware_dvswitch);
 	VMWARE_VECTOR_CREATE(&data->alarms, vmware_alarm);
 	VMWARE_VECTOR_CREATE(&data->alarm_ids, str);
-	zbx_vector_ptr_reserve(&data->clusters, (size_t)src->clusters.values_num);
+	zbx_vector_vmware_cluster_ptr_reserve(&data->clusters, (size_t)src->clusters.values_num);
 	zbx_vector_ptr_reserve(&data->events, (size_t)src->events.values_alloc);
 	zbx_vector_vmware_datastore_reserve(&data->datastores, (size_t)src->datastores.values_num);
 	zbx_vector_vmware_datacenter_reserve(&data->datacenters, (size_t)src->datacenters.values_num);
@@ -967,13 +968,19 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	data->error = vmware_shared_strdup(src->error);
 
 	for (i = 0; i < src->clusters.values_num; i++)
-		zbx_vector_ptr_append(&data->clusters, vmware_cluster_shared_dup((zbx_vmware_cluster_t *)src->clusters.values[i]));
+	{
+		zbx_vector_vmware_cluster_ptr_append(&data->clusters,
+				vmware_cluster_shared_dup((zbx_vmware_cluster_t *)src->clusters.values[i]));
+	}
 
 	for (i = 0; i < src->events.values_num; i++)
 		zbx_vector_ptr_append(&data->events, vmware_shmem_event_dup((zbx_vmware_event_t *)src->events.values[i]));
 
 	for (i = 0; i < src->datastores.values_num; i++)
-		zbx_vector_vmware_datastore_append(&data->datastores, vmware_datastore_shared_dup(src->datastores.values[i]));
+	{
+		zbx_vector_vmware_datastore_append(&data->datastores,
+				vmware_datastore_shared_dup(src->datastores.values[i]));
+	}
 
 	for (i = 0; i < src->datacenters.values_num; i++)
 	{

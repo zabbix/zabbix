@@ -199,16 +199,15 @@ static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char
 	return vm;
 }
 
-static zbx_vmware_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *clusterid)
+static zbx_vmware_cluster_t	*cluster_get(zbx_vector_vmware_cluster_ptr_t *clusters, const char *clusterid)
 {
-	int			i;
 	zbx_vmware_cluster_t	*cluster;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __func__, clusterid);
 
-	for (i = 0; i < clusters->values_num; i++)
+	for (int i = 0; i < clusters->values_num; i++)
 	{
-		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = clusters->values[i];
 
 		if (0 == strcmp(cluster->id, clusterid))
 			goto out;
@@ -221,16 +220,15 @@ out:
 	return cluster;
 }
 
-static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, const char *name)
+static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_vmware_cluster_ptr_t *clusters, const char *name)
 {
-	int			i;
 	zbx_vmware_cluster_t	*cluster;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:'%s'", __func__, name);
 
-	for (i = 0; i < clusters->values_num; i++)
+	for (int i = 0; i < clusters->values_num; i++)
 	{
-		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = clusters->values[i];
 
 		if (0 == strcmp(cluster->name, name))
 			goto out;

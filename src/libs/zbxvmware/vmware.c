@@ -87,6 +87,7 @@ ZBX_PTR_VECTOR_IMPL(custquery_param, zbx_vmware_custquery_param_t)
 ZBX_PTR_VECTOR_IMPL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_alarm, zbx_vmware_alarm_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_diskinfo, zbx_vmware_diskinfo_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_cluster_ptr, zbx_vmware_cluster_t *)
 
 zbx_vmware_service_objects_t	*get_vmware_service_objects(void)
 {
@@ -566,8 +567,8 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		zbx_hashset_destroy(&data->hvs);
 		zbx_hashset_destroy(&data->vms_index);
 
-		zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_shared_free);
-		zbx_vector_ptr_destroy(&data->clusters);
+		zbx_vector_vmware_cluster_ptr_clear_ext(&data->clusters, vmware_cluster_shared_free);
+		zbx_vector_vmware_cluster_ptr_destroy(&data->clusters);
 
 		zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_shmem_event_free);
 		zbx_vector_ptr_destroy(&data->events);
@@ -837,8 +838,8 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 
 	zbx_hashset_destroy(&data->hvs);
 
-	zbx_vector_ptr_clear_ext(&data->clusters, (zbx_clean_func_t)vmware_cluster_free);
-	zbx_vector_ptr_destroy(&data->clusters);
+	zbx_vector_vmware_cluster_ptr_clear_ext(&data->clusters, vmware_cluster_free);
+	zbx_vector_vmware_cluster_ptr_destroy(&data->clusters);
 
 	zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_free);
 	zbx_vector_ptr_destroy(&data->events);
@@ -1657,28 +1658,26 @@ out:
 #	undef ZBX_POST_VMWARE_CLUSTER_STATUS
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: creates lists of vmware cluster and resource pool objects         *
- *                                                                            *
- * Parameters: service       - [IN] the vmware service                        *
- *             easyhandle    - [IN] the CURL handle                           *
- *             datastores    - [IN] all available Datastores                  *
- *             cq_values     - [IN/OUT] the vector with custom query entries  *
- *             clusters      - [OUT] a pointer to the resulting clusters      *
- *                              vector                                        *
- *             resourcepools - [OUT] a pointer to the resulting resource pool *
- *                              vector                                        *
- *             alarms_data   - [OUT] the vector with all alarms               *
- *             error         - [OUT] the error message in the case of failure *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: creates lists of vmware cluster and resource pool objects          *
+ *                                                                             *
+ * Parameters: service       - [IN] vmware service                             *
+ *             easyhandle    - [IN] CURL handle                                *
+ *             datastores    - [IN] all available Datastores                   *
+ *             cq_values     - [IN/OUT] vector with custom query entries       *
+ *             clusters      - [OUT] pointer to resulting clusters vector      *
+ *             resourcepools - [OUT] pointer to resulting resource pool vector *
+ *             alarms_data   - [OUT] vector with all alarms                    *
+ *             error         - [OUT] error message in case of failure          *
+ *                                                                             *
+ * Return value: SUCCEED - operation has completed successfully                *
+ *               FAIL    - operation has failed                                *
+ *                                                                             *
+ *******************************************************************************/
 static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *service, CURL *easyhandle,
 		const zbx_vector_vmware_datastore_t *datastores, zbx_vector_cq_value_t *cq_values,
-		zbx_vector_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
+		zbx_vector_vmware_cluster_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
@@ -1904,7 +1903,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	}
 
 	zbx_vector_vmware_resourcepool_sort(resourcepools, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_reserve(clusters, (size_t)(clusters->values_alloc + cl_chunks.values_num));
+	zbx_vector_vmware_cluster_ptr_reserve(clusters, (size_t)(clusters->values_alloc + cl_chunks.values_num));
 
 	for (i = cl_chunks.values_num - 1; i >= 0 ; i--)
 	{
@@ -1913,7 +1912,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		if (SUCCEED != vmware_service_get_cluster_state(easyhandle, datastores, cluster, cq_values, error))
 			goto clean;
 
-		zbx_vector_ptr_append(clusters, cluster);
+		zbx_vector_vmware_cluster_ptr_append(clusters, cluster);
 		zbx_vector_ptr_remove_noorder(&cl_chunks, i);
 	}
 
@@ -2468,7 +2467,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	page.alloc = 0;
 
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
-	zbx_vector_ptr_create(&data->clusters);
+	zbx_vector_vmware_cluster_ptr_create(&data->clusters);
 	zbx_vector_ptr_create(&data->events);
 	zbx_vector_vmware_datastore_create(&data->datastores);
 	zbx_vector_vmware_datacenter_create(&data->datacenters);

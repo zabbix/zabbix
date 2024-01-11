@@ -328,6 +328,7 @@ typedef struct
 	zbx_vector_str_t	alarm_ids;
 }
 zbx_vmware_cluster_t;
+ZBX_PTR_VECTOR_DECL(vmware_cluster_ptr, zbx_vmware_cluster_t *)
 
 /* the vmware resource pool data */
 typedef struct
@@ -370,6 +371,7 @@ typedef struct
 }
 zbx_vmware_event_t;
 
+
 /* the vmware service data object */
 typedef struct
 {
@@ -377,7 +379,7 @@ typedef struct
 
 	zbx_hashset_t				hvs;
 	zbx_hashset_t				vms_index;
-	zbx_vector_ptr_t			clusters;
+	zbx_vector_vmware_cluster_ptr_t		clusters;
 	zbx_vector_ptr_t			events;			/* vector of pointers to zbx_vmware_event_t structures */
 	int					max_query_metrics;	/* max count of Datastore perfCounters in one request */
 	zbx_vector_vmware_datastore_t		datastores;
