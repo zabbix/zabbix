@@ -50,10 +50,7 @@ $audit_settings_tab = (new CFormGrid())
 	->addItem([
 		new CLabel([
 			_('Log system actions'),
-			NBSP(),
-			makeHelpIcon(
-				_s('Log changes by low-level discovery, network discovery and autoregistration')
-			)
+			makeHelpIcon(_('Log changes by low-level discovery, network discovery and autoregistration'))
 		], 'auditlog_mode'),
 		new CFormField(
 			(new CCheckBox('auditlog_mode'))

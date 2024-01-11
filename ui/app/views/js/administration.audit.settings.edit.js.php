@@ -60,15 +60,15 @@
 								.prev('.msg-bad')
 								.remove();
 
-							$('#auditlog_mode')
-								.prop('checked',
-									<?= DB::getDefault('config', 'auditlog_mode') == 1 ? 'true' : 'false' ?>
-								),
 							$('#auditlog_enabled')
 								.prop('checked',
 									<?= (DB::getDefault('config', 'auditlog_enabled') == 1) ? 'true' : 'false' ?>
 								)
 								.change();
+							$('#auditlog_mode').prop('checked',
+								<?= DB::getDefault('config', 'auditlog_mode') == 1 ? 'true' : 'false' ?>
+							);
+
 							$('#hk_audit_mode')
 								.prop('checked',
 									<?= (DB::getDefault('config', 'hk_audit_mode') == 1) ? 'true' : 'false' ?>

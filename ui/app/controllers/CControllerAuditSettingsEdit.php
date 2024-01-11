@@ -51,10 +51,7 @@ class CControllerAuditSettingsEdit extends CController {
 			'auditlog_enabled' => $this->getInput('auditlog_enabled',
 				CSettingsHelper::get(CSettingsHelper::AUDITLOG_ENABLED)
 			),
-			'auditlog_mode' => $this->hasInput('auditlog_mode')
-				? $this->getInput('auditlog_mode', CSettingsHelper::get(CSettingsHelper::AUDITLOG_MODE))
-				: CSettingsHelper::get(CSettingsHelper::AUDITLOG_MODE)
-			,
+			'auditlog_mode' => $this->getInput('auditlog_mode', CSettingsHelper::get(CSettingsHelper::AUDITLOG_MODE)),
 			'hk_audit_mode' => $this->getInput('hk_audit_mode', CHousekeepingHelper::get(
 				CHousekeepingHelper::HK_AUDIT_MODE
 			)),
