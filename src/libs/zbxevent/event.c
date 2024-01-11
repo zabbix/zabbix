@@ -266,10 +266,20 @@ void	zbx_event_get_macro_value(const char *macro, const zbx_db_event *event, cha
 			zbx_event_get_tag(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
 		}
 	}
-	else if (EVENT_SOURCE_INTERNAL == event->source &&
-			0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
+	else if (EVENT_SOURCE_INTERNAL == event->source)
 	{
-		zbx_event_get_tag(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
+		if (0 == strcmp(macro, MVAR_EVENT_TAGS))
+		{
+			zbx_event_get_str_tags(event, replace_to);
+		}
+		else if (0 == strcmp(macro, MVAR_EVENT_TAGSJSON))
+		{
+			zbx_event_get_json_tags(event, replace_to);
+		}
+		else if (0 == strncmp(macro, MVAR_EVENT_TAGS_PREFIX, ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX)))
+		{
+			zbx_event_get_tag(macro + ZBX_CONST_STRLEN(MVAR_EVENT_TAGS_PREFIX), event, replace_to);
+		}
 	}
 	else if (EVENT_SOURCE_SERVICE == event->source)
 	{
