@@ -174,6 +174,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			}
 
 			tcpsvc_context->step = ZABBIX_TCPSVC_STEP_RECV;
+			tcpsvc_context->item.ret = FAIL;	/* preliminary init for recv loop */
 
 			zbx_tcp_recv_context_init(&tcpsvc_context->s, &tcpsvc_context->tcp_recv_context,
 					tcpsvc_context->item.flags);
@@ -352,7 +353,6 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	zbx_init_agent_result(&tcpsvc_context->item.result);
 	zbx_socket_clean(&tcpsvc_context->s);
 
-	tcpsvc_context->item.ret = FAIL;
 	tcpsvc_context->step = ZABBIX_TCPSVC_STEP_CONNECT_INIT;
 
 	if (SUCCEED == (ret = tcpsvc_send_context_init(tcpsvc_context->svc_type, ZBX_TCP_PROTOCOL,
