@@ -344,7 +344,7 @@ class testFormGroups extends CWebTest {
 			$form = $this->openForm($data['fields']['Group name']);
 			$form->checkValue($data['fields']['Group name']);
 
-			// Change group name after succefull update scenario.
+			// Change group name after successful update scenario.
 			if ($action === 'update') {
 				static::$update_group = $data['fields']['Group name'];
 			}
