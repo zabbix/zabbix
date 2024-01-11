@@ -349,6 +349,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	zbx_init_agent_result(&tcpsvc_context->item.result);
 	zbx_socket_clean(&tcpsvc_context->s);
 
+	tcpsvc_context->item.ret = NOTSUPPORTED;
 	tcpsvc_context->step = ZABBIX_TCPSVC_STEP_CONNECT_WAIT;
 
 	if (SUCCEED == (ret = tcpsvc_send_context_init(tcpsvc_context->svc_type, ZBX_TCP_PROTOCOL,
