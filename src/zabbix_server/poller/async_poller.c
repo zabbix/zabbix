@@ -41,6 +41,7 @@
 #include "zbxthreads.h"
 #include "zbxtime.h"
 #include "zbxtypes.h"
+#include "zbxasyncpoller.h"
 
 #include <event2/dns.h>
 
@@ -281,7 +282,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 			{
 				errcodes[i] = zbx_async_check_agent(&items[i], &results[i], process_agent_result,
 						poller_config, poller_config, poller_config->base, poller_config->dnsbase,
-						poller_config->config_source_ip);
+						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 			}
 			else
 			{
@@ -290,7 +291,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 						poller_config, poller_config, poller_config->base, poller_config->dnsbase,
-						poller_config->config_source_ip);
+						poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_NO);
 	#else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for SNMP checks was not compiled in."));

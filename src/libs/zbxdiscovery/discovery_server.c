@@ -470,6 +470,44 @@ static void	discovery_update_host_status(zbx_db_dhost *dhost, int status, int no
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: find host by ip                                                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_find_host(const zbx_uint64_t druleid, const char *ip, zbx_db_dhost *dhost)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	char		*ip_esc, sql[MAX_STRING_LEN];
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ip_esc = zbx_db_dyn_escape_field("dservices", "ip", ip);
+	zbx_snprintf(sql, sizeof(sql),
+			"select dh.dhostid,dh.status,dh.lastup,dh.lastdown"
+			" from dhosts dh,dservices ds"
+			" where ds.dhostid=dh.dhostid"
+				" and dh.druleid=" ZBX_FS_UI64
+				" and ds.ip" ZBX_SQL_STRCMP
+			" order by dh.dhostid",
+			druleid, ZBX_SQL_STRVAL_EQ(ip_esc));
+	zbx_free(ip_esc);
+	result = zbx_db_select_n(sql, 1);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		ZBX_STR2UINT64(dhost->dhostid, row[0]);
+		dhost->status = atoi(row[1]);
+		dhost->lastup = atoi(row[2]);
+		dhost->lastdown = atoi(row[3]);
+	}
+
+	zbx_db_free_result(result);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: process new host status                                           *
  *                                                                            *
  ******************************************************************************/
@@ -496,7 +534,8 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
  ******************************************************************************/
 void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
 		zbx_uint64_t unique_dcheckid, zbx_db_dhost *dhost, const char *ip, const char *dns, int port,
-		int status, const char *value, time_t now, zbx_add_event_func_t add_event_cb)
+		int status, const char *value, time_t now, zbx_vector_uint64_t *dserviceids,
+		zbx_add_event_func_t add_event_cb)
 {
 	DB_DSERVICE	dservice;
 
@@ -517,9 +556,45 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 
 	/* service was not registered because we do not add down service */
 	if (0 != dservice.dserviceid)
+	{
 		discovery_update_service_status(dhost, &dservice, status, value, (int)now, add_event_cb);
+		zbx_vector_uint64_append(dserviceids, dservice.dserviceid);
+	}
 
 	zbx_free(dservice.value);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: mark service status DOWN for all not received service statuses    *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t now,
+		zbx_vector_uint64_t *dserviceids)
+{
+	char	buffer[MAX_STRING_LEN], *sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dhostid:" ZBX_FS_UI64 " dserviceids:%d now:" ZBX_FS_UI64,
+			__func__, dhostid, dserviceids->values_num, now);
+
+	zbx_snprintf(buffer, sizeof(buffer),
+			"update dservices"
+			" set status=%d,lastup=%d,lastdown=%d"
+			" where (status=%d or lastup<>0)"
+				" and dhostid=" ZBX_FS_UI64
+				" and not",
+			DOBJECT_STATUS_DOWN, 0, (int)now, DOBJECT_STATUS_UP, dhostid);
+
+	zbx_vector_uint64_sort(dserviceids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+	zbx_db_prepare_multiple_query(buffer, "dserviceid", dserviceids, &sql, &sql_alloc, &sql_offset);
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+		zbx_db_execute("%s", sql);
+
+	zbx_free(sql);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

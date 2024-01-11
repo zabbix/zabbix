@@ -1687,6 +1687,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 	zbx_dservice_t			*service;
 	int				services_num, ret = FAIL, i, dchecks = 0;
 	zbx_vector_dservice_ptr_t	services_old;
+	zbx_vector_uint64_t		dserviceids;
 	zbx_db_drule			drule = {.druleid = druleid, .unique_dcheckid = unique_dcheckid};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1694,6 +1695,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 	memset(&dhost, 0, sizeof(dhost));
 
 	zbx_vector_dservice_ptr_create(&services_old);
+	zbx_vector_uint64_create(&dserviceids);
 
 	/* find host update */
 	for (i = *processed_num; i < services->values_num; i++)
@@ -1703,8 +1705,8 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() druleid:" ZBX_FS_UI64 " dcheckid:" ZBX_FS_UI64 " unique_dcheckid:"
 				ZBX_FS_UI64 " time:'%s %s' ip:'%s' dns:'%s' port:%hu status:%d value:'%s'",
 				__func__, drule.druleid, service->dcheckid, drule.unique_dcheckid,
-				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip, service->dns,
-				service->port, service->status, service->value);
+				zbx_date2str(service->itemtime, NULL), zbx_time2str(service->itemtime, NULL), ip,
+				service->dns, service->port, service->status, service->value);
 
 		if (0 == service->dcheckid)
 			break;
@@ -1788,7 +1790,7 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 			goto fail;
 		}
 
-		if (SUCCEED != zbx_db_lock_ids("dchecks", "dcheckid", dcheckids))
+		if (0 != dchecks && SUCCEED != zbx_db_lock_ids("dchecks", "dcheckid", dcheckids))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "checks are not available for druleid:" ZBX_FS_UI64, drule.druleid);
 			goto fail;
@@ -1797,47 +1799,65 @@ static int	process_services(const zbx_vector_dservice_ptr_t *services, const cha
 
 	if (0 == dchecks)
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "cannot process host update without services");
-		goto fail;
-	}
+		zbx_discovery_find_host(druleid, ip, &dhost);	/* we will mark all services as DOWN */
 
-	for (i = 0; i < services_old.values_num; i++)
-	{
-		service = services_old.values[i];
-
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		if (0 == dhost.dhostid)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
-			continue;
+			(*processed_num)++;
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot process update of unknown host without services");
+			goto out;
+		}
+	}
+	else
+	{
+		for (i = 0; i < services_old.values_num; i++)
+		{
+			service = services_old.values[i];
+
+			if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist",
+						service->dcheckid);
+				continue;
+			}
+
+			zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+					&dhost, ip, service->dns, service->port, service->status, service->value,
+					service->itemtime, &dserviceids, add_event_cb);
 		}
 
-		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime,
-				add_event_cb);
-	}
-
-	for (;*processed_num < services_num; (*processed_num)++)
-	{
-		service = services->values[*processed_num];
-
-		if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid, ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+		for (;*processed_num < services_num; (*processed_num)++)
 		{
-			zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist", service->dcheckid);
-			continue;
-		}
+			service = services->values[*processed_num];
 
-		zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid, &dhost, ip,
-				service->dns, service->port, service->status, service->value, service->itemtime,
-				add_event_cb);
+			if (FAIL == zbx_vector_uint64_bsearch(dcheckids, service->dcheckid,
+					ZBX_DEFAULT_UINT64_COMPARE_FUNC))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "dcheckid:" ZBX_FS_UI64 " does not exist",
+						service->dcheckid);
+				continue;
+			}
+
+			zbx_discovery_update_service(NULL, drule.druleid, service->dcheckid, drule.unique_dcheckid,
+					&dhost, ip, service->dns, service->port, service->status, service->value,
+					service->itemtime, &dserviceids, add_event_cb);
+		}
 	}
 
 	service = services->values[(*processed_num)++];
-	zbx_discovery_update_host(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
 
+	if (0 != dhost.dhostid)
+		zbx_discovery_update_service_down(dhost.dhostid, service->itemtime, &dserviceids);
+
+	zbx_discovery_update_host(NULL, 0, &dhost, NULL, NULL, service->status, service->itemtime, add_event_cb);
+out:
 	ret = SUCCEED;
 fail:
 	zbx_vector_dservice_ptr_clear_ext(&services_old, zbx_dservice_ptr_free);
 	zbx_vector_dservice_ptr_destroy(&services_old);
+	zbx_vector_uint64_destroy(&dserviceids);
+
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

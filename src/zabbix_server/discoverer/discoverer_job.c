@@ -19,14 +19,33 @@
 
 #include "discoverer_job.h"
 
+ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
+
+typedef union {
+	struct {
+		zbx_uint32_t	port;
+		uint16_t	dcheck_type;
+		uint16_t	addr_type;
+	}		key;
+	zbx_uint64_t	buf;
+}
+dtask_hash_t;
+
 zbx_hash_t	discoverer_task_hash(const void *data)
 {
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;
 	zbx_hash_t			hash;
-	zbx_uint64_t			port = task->port;
+	dtask_hash_t			state;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&port);
-	hash = ZBX_DEFAULT_STRING_HASH_ALGO(task->ip, strlen(task->ip), hash);
+	state.key.port = task->port;
+	state.key.dcheck_type = task->dchecks.values[0]->type;
+	state.key.addr_type = task->addr_type;
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&state.buf);
+
+	if (DISCOVERY_ADDR_RANGE == task->addr_type)
+		hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&task->addr.range->id, sizeof(task->addr.range->id), hash);
+	else
+		hash = ZBX_DEFAULT_STRING_HASH_ALGO(task->addr.ip, strlen(task->addr.ip), hash);
 
 	return hash;
 }
@@ -35,25 +54,32 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 {
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
+	dtask_hash_t			state1, state2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(task1->port, task2->port);
+	state1.key.port = task1->port;
+	state2.key.port = task2->port;
+	state1.key.dcheck_type = task1->dchecks.values[0]->type;
+	state2.key.dcheck_type = task2->dchecks.values[0]->type;
+	state1.key.addr_type = task1->addr_type;
+	state2.key.addr_type = task2->addr_type;
+	ZBX_RETURN_IF_NOT_EQUAL(state1.buf, state2.buf);
 
-	return strcmp(task1->ip, task2->ip);
+	if (DISCOVERY_ADDR_IP == task1->addr_type)
+		return strcmp(task1->addr.ip, task2->addr.ip);
+
+	ZBX_RETURN_IF_NOT_EQUAL(task1->addr.range->id, task2->addr.range->id);
+	return 0;
 }
 
 void	discoverer_task_clear(zbx_discoverer_task_t *task)
 {
-	if (NULL != task->ips)
-	{
-		zbx_vector_str_clear_ext(task->ips, zbx_str_free);
-		zbx_vector_str_destroy(task->ips);
-		zbx_free(task->ips);
-	}
+	if (DISCOVERY_ADDR_IP == task->addr_type)
+		zbx_free(task->addr.ip);
+	else
+		zbx_free(task->addr.range);	/* the range vector is stored on job level */
 
-	zbx_vector_dc_dcheck_ptr_clear_ext(&task->dchecks, zbx_discovery_dcheck_free);
+	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
-
-	zbx_free(task->ip);
 }
 
 void	discoverer_task_free(zbx_discoverer_task_t *task)
@@ -64,9 +90,15 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 
 zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 {
-	return NULL != task->ips ?
-			(zbx_uint64_t)task->ips->values_num * (zbx_uint64_t)task->dchecks.values_num :
-			(zbx_uint64_t)task->dchecks.values_num;
+	return (zbx_uint64_t)task->dchecks.values_num;
+}
+
+zbx_uint64_t	discoverer_task_ip_check_count_get(zbx_discoverer_task_t *task)
+{
+	if (DISCOVERY_ADDR_RANGE == task->addr_type && 0 != task->addr.range->state.checks_per_ip)
+		return (zbx_uint64_t)task->addr.range->state.checks_per_ip;	/* except ICMP */
+	else
+		return discoverer_task_check_count_get(task);
 }
 
 zbx_uint64_t	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
@@ -87,10 +119,16 @@ void	discoverer_job_free(zbx_discoverer_job_t *job)
 {
 	(void)discoverer_job_tasks_free(job);
 
+	zbx_vector_dc_dcheck_ptr_clear_ext(job->dchecks_common, zbx_discovery_dcheck_free);
+	zbx_vector_dc_dcheck_ptr_destroy(job->dchecks_common);
+	zbx_free(job->dchecks_common);
+	zbx_vector_iprange_destroy(job->ipranges);
+	zbx_free(job->ipranges);
 	zbx_free(job);
 }
 
-zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule)
+zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc_dcheck_ptr_t *dchecks_common,
+		zbx_vector_iprange_t *ipranges)
 {
 	zbx_discoverer_job_t	*job;
 
@@ -101,6 +139,8 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule)
 	job->drule_revision = drule->revision;
 	job->status = DISCOVERER_JOB_STATUS_QUEUED;
 	zbx_list_create(&job->tasks);
+	job->dchecks_common = dchecks_common;
+	job->ipranges = ipranges;
 
 	return job;
 }
