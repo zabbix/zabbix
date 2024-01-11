@@ -93,7 +93,7 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		if ($this->field->isWidgetAccepted()) {
 			$view_collection[] = [
-				'label' => (new CLabel(_('Widget')))
+				'label' => (new CLabel(_('Widget'), $field_name.'_reference_ms'))
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-reference')
 					->setAsteriskMark($this->isRequired()),
@@ -127,7 +127,7 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 
 		array_push($view_collection,
 			[
-				'label' => (new CLabel($this->field->getFromLabel()))
+				'label' => (new CLabel($this->field->getFromLabel(), $field_name.'_from'))
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-from')
 					->setAsteriskMark($this->isRequired()),
@@ -135,7 +135,7 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 				'class' => $style_class.'js-'.$field_name.'-from'
 			],
 			[
-				'label' => (new CLabel($this->field->getToLabel()))
+				'label' => (new CLabel($this->field->getToLabel(), $field_name.'_to'))
 					->addClass($this->getLabelClass())
 					->addClass('js-'.$field_name.'-to')
 					->setAsteriskMark($this->isRequired()),
