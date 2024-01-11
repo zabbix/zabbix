@@ -697,7 +697,7 @@ class testFormWebScenario extends CWebTest {
 					'tags' => self::$all_fields['tags']
 				]
 			],
-			// #24 Maximal possible value length in input elements except for update interval.
+			// #24 Maximal possible value length in input elements except for update interval and variables and header values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -722,7 +722,7 @@ class testFormWebScenario extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'name' => '{'.substr(STRING_255, 0, 253).'}',
-							'value' => STRING_2000
+							'value' => STRING_6000
 						]
 					],
 					'headers' => [
@@ -730,7 +730,7 @@ class testFormWebScenario extends CWebTest {
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'name' => STRING_255,
-							'value' => STRING_2000
+							'value' => STRING_6000
 						],
 						[
 							'action' => USER_ACTION_UPDATE,

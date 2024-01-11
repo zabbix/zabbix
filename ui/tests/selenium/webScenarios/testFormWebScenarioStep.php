@@ -645,7 +645,7 @@ class testFormWebScenarioStep extends CWebTest {
 					]
 				]
 			],
-			// #26 Maximal allowed length of fields except for timeout since maxlength is 255 but maxvalue is 3600.
+			// #26 Maximal fields lengths except for pair field values and timeout(since maxlength is 255 but maxvalue is 3600).
 			[
 				[
 					'fields' => [
@@ -669,7 +669,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'post fields' => [
 						[
 							'name' => STRING_255,
-							'value' => STRING_2000
+							'value' => STRING_6000
 						],
 						[
 							'name' => 'post_field_name',
@@ -679,7 +679,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'variables' => [
 						[
 							'name' => '{'.substr(STRING_255, 0, 253).'}',
-							'value' => STRING_2000
+							'value' => STRING_6000
 						],
 						[
 							'name' => '{variable_name}',
@@ -689,7 +689,7 @@ class testFormWebScenarioStep extends CWebTest {
 					'headers' => [
 						[
 							'name' => STRING_255,
-							'value' => STRING_2000
+							'value' => STRING_6000
 						],
 						[
 							'name' => 'header_name',
