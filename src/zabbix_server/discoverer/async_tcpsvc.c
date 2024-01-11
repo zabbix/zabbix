@@ -31,6 +31,8 @@ static const char	*get_tcpsvc_step_string(zbx_zabbix_tcpsvc_step_t step)
 {
 	switch (step)
 	{
+		case ZABBIX_TCPSVC_STEP_CONNECT_INIT:
+			return "init";
 		case ZABBIX_TCPSVC_STEP_CONNECT_WAIT:
 			return "connect";
 		case ZABBIX_TCPSVC_STEP_SEND:
@@ -109,37 +111,16 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 		poller_config->state = ZBX_PROCESS_STATE_BUSY;
 	}
 
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64 " addr:%s", __func__,
+				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid, addr);
+
+
 	if (ZABBIX_ASYNC_STEP_REVERSE_DNS == tcpsvc_context->rdns_step)
 	{
 		if (NULL != addr)
 			tcpsvc_context->reverse_dns = zbx_strdup(NULL, addr);
 
 		goto stop;
-	}
-
-	if (0 == event)
-	{
-		/* initialization */
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid);
-
-		if (SUCCEED != zbx_socket_connect(&tcpsvc_context->s, SOCK_STREAM, tcpsvc_context->config_source_ip,
-				addr, tcpsvc_context->item.interface.port, tcpsvc_context->config_timeout))
-		{
-			tcpsvc_context->item.ret = NETWORK_ERROR;
-			SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check failed"
-					" during %s", get_tcpsvc_step_string(tcpsvc_context->step)));
-			goto stop;
-		}
-
-		*fd = tcpsvc_context->s.socket;
-
-		return ZBX_ASYNC_TASK_READ;
-	}
-	else
-	{
-		zabbix_log(LOG_LEVEL_DEBUG, "In %s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
-				get_tcpsvc_step_string(tcpsvc_context->step), event, tcpsvc_context->item.itemid);
 	}
 
 	if (0 != (event & EV_TIMEOUT))
@@ -150,6 +131,27 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 	switch (tcpsvc_context->step)
 	{
+		case ZABBIX_TCPSVC_STEP_CONNECT_INIT:
+			/* initialization */
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d itemid:" ZBX_FS_UI64, __func__,
+					get_tcpsvc_step_string(tcpsvc_context->step), event,
+					tcpsvc_context->item.itemid);
+
+			if (SUCCEED != zbx_socket_connect(&tcpsvc_context->s, SOCK_STREAM,
+					tcpsvc_context->config_source_ip, addr, tcpsvc_context->item.interface.port,
+					tcpsvc_context->config_timeout))
+			{
+				tcpsvc_context->item.ret = NETWORK_ERROR;
+				SET_MSG_RESULT(&tcpsvc_context->item.result, zbx_dsprintf(NULL, "net.tcp.service check"
+						" failed during %s", get_tcpsvc_step_string(tcpsvc_context->step)));
+
+				goto out;
+			}
+
+			tcpsvc_context->step = ZABBIX_TCPSVC_STEP_CONNECT_WAIT;
+			*fd = tcpsvc_context->s.socket;
+
+			return ZBX_ASYNC_TASK_READ;
 		case ZABBIX_TCPSVC_STEP_CONNECT_WAIT:
 			if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
@@ -253,8 +255,9 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			return ZBX_ASYNC_TASK_READ;
 	}
 stop:
-	zbx_tcp_send_context_clear(&tcpsvc_context->tcp_send_context);
 	zbx_tcp_close(&tcpsvc_context->s);
+out:
+	zbx_tcp_send_context_clear(&tcpsvc_context->tcp_send_context);
 
 	return ZBX_ASYNC_TASK_STOP;
 
@@ -349,8 +352,8 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	zbx_init_agent_result(&tcpsvc_context->item.result);
 	zbx_socket_clean(&tcpsvc_context->s);
 
-	tcpsvc_context->item.ret = NOTSUPPORTED;
-	tcpsvc_context->step = ZABBIX_TCPSVC_STEP_CONNECT_WAIT;
+	tcpsvc_context->item.ret = FAIL;
+	tcpsvc_context->step = ZABBIX_TCPSVC_STEP_CONNECT_INIT;
 
 	if (SUCCEED == (ret = tcpsvc_send_context_init(tcpsvc_context->svc_type, ZBX_TCP_PROTOCOL,
 			&tcpsvc_context->tcp_send_context, result)))
