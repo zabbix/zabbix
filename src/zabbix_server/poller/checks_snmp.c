@@ -212,10 +212,10 @@ typedef struct
 	char	*hostname;
 	u_int	engineboots;
 }
-zbx_snmp_engineid_device;
+zbx_snmp_engineid_device_t;
 
-ZBX_VECTOR_DECL(engineid_device, zbx_snmp_engineid_device)
-ZBX_VECTOR_IMPL(engineid_device, zbx_snmp_engineid_device)
+ZBX_VECTOR_DECL(engineid_device, zbx_snmp_engineid_device_t)
+ZBX_VECTOR_IMPL(engineid_device, zbx_snmp_engineid_device_t)
 
 typedef struct
 {
@@ -224,21 +224,21 @@ typedef struct
 	zbx_vector_engineid_device_t	devices;
 	time_t							lastlog;
 }
-zbx_snmp_engineid_record;
+zbx_snmp_engineid_record_t;
 
 #undef ZBX_SNMP_MAX_ENGINEID_LEN
 
 static zbx_hash_t	snmp_engineid_cache_hash(const void *data)
 {
-	const zbx_snmp_engineid_record	*hv = (const zbx_snmp_engineid_record *)data;
+	const zbx_snmp_engineid_record_t	*hv = (const zbx_snmp_engineid_record_t *)data;
 
 	return ZBX_DEFAULT_STRING_HASH_ALGO(hv->engineid, hv->engineid_len, ZBX_DEFAULT_HASH_SEED);
 }
 
 static int	snmp_engineid_cache_compare(const void *d1, const void *d2)
 {
-	const zbx_snmp_engineid_record	*hv1 = (const zbx_snmp_engineid_record *)d1;
-	const zbx_snmp_engineid_record	*hv2 = (const zbx_snmp_engineid_record *)d2;
+	const zbx_snmp_engineid_record_t	*hv1 = (const zbx_snmp_engineid_record_t *)d1;
+	const zbx_snmp_engineid_record_t	*hv2 = (const zbx_snmp_engineid_record_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(hv1->engineid_len, hv2->engineid_len);
 
@@ -259,11 +259,11 @@ static void	zbx_clear_snmp_engineid_devices(zbx_vector_engineid_device_t *d)
 
 void	zbx_clear_snmp_engineid_cache(void)
 {
-	zbx_hashset_iter_t			iter;
-	zbx_snmp_engineid_record	*engineid;
+	zbx_hashset_iter_t		iter;
+	zbx_snmp_engineid_record_t	*engineid;
 
 	zbx_hashset_iter_reset(&engineid_cache, &iter);
-	while (NULL != (engineid = (zbx_snmp_engineid_record *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (engineid = (zbx_snmp_engineid_record_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_clear_snmp_engineid_devices(&engineid->devices);
 	}
@@ -273,27 +273,27 @@ void	zbx_clear_snmp_engineid_cache(void)
 
 static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_context_t *item_context)
 {
-	zbx_snmp_engineid_record	*ptr, local_record;
-	zbx_snmp_engineid_device	d;
-	u_int						current_engineboots = 0;
-	int							ret = SUCCEED;
+	zbx_snmp_engineid_record_t	*ptr, local_record;
+	zbx_snmp_engineid_device_t	d;
+	u_int				current_engineboots = 0;
+	int				ret = SUCCEED;
 
 	SNMP_MT_INITLOCK;
 
 	local_record.engineid_len = session->securityEngineIDLen;
 	memcpy(&local_record.engineid, session->securityEngineID, session->securityEngineIDLen);
 
-	if (0 == session->engineBoots)
+	if (0 == (current_engineboots = session->engineBoots))
 	{
-			Enginetime et;
+		Enginetime et;
 
-			et = search_enginetime_list(session->securityEngineID, (u_int)session->securityEngineIDLen);
+		et = search_enginetime_list(session->securityEngineID, (u_int)session->securityEngineIDLen);
 
-			while (NULL != et)
-			{
-				current_engineboots = et->engineBoot;
-				et = et->next;
-			}
+		while (NULL != et)
+		{
+			current_engineboots = et->engineBoot;
+			et = et->next;
+		}
 	}
 
 	if (NULL == (ptr = zbx_hashset_search(&engineid_cache, &local_record)))
@@ -311,9 +311,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	}
 	else
 	{
-		char			*hosts = NULL;
-		size_t			hosts_alloc = 0, hosts_offset = 0;
-		int				diff_engineboots = 0, found = 0;
+		char	*hosts = NULL;
+		size_t	hosts_alloc = 0, hosts_offset = 0;
+		int	diff_engineboots = 0, found = 0;
 
 		for (int i = 0; i < ptr->devices.values_num; i++)
 		{
@@ -332,8 +332,8 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 				if (0 != hosts_alloc)
 					zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, ", ");
 
-				zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, "%s (%s)", ptr->devices.values[i].address,
-						ptr->devices.values[i].hostname);
+				zbx_snprintf_alloc(&hosts, &hosts_alloc, &hosts_offset, "%s (%s)",
+						ptr->devices.values[i].address, ptr->devices.values[i].hostname);
 			}
 		}
 
@@ -353,8 +353,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 
 			if (now >= ptr->lastlog + ZBX_SNMP_ENGINEID_WARNING_PERIOD)
 			{
-				zabbix_log(LOG_LEVEL_WARNING, "SNMP engineId is not unique across following interfaces: %s (%s), %s",
-						item_context->interface.addr, item_context->host, hosts);
+				zabbix_log(LOG_LEVEL_WARNING, "SNMP engineId is not unique across following "
+						"interfaces: %s (%s), %s", item_context->interface.addr,
+						item_context->host, hosts);
 
 				ptr->lastlog = now;
 			}
@@ -374,11 +375,11 @@ out:
 void	zbx_housekeep_snmp_engineid_cache(void)
 {
 #define	ZBX_SNMP_ENGINEID_RETENTION_PERIOD	86400 + 3600
-	zbx_hashset_iter_t			iter;
-	zbx_snmp_engineid_record	*engineid;
+	zbx_hashset_iter_t		iter;
+	zbx_snmp_engineid_record_t	*engineid;
 
 	zbx_hashset_iter_reset(&engineid_cache, &iter);
-	while (NULL != (engineid = (zbx_snmp_engineid_record *)zbx_hashset_iter_next(&iter)))
+	while (NULL != (engineid = (zbx_snmp_engineid_record_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (engineid->lastlog + ZBX_SNMP_ENGINEID_RETENTION_PERIOD <= time(NULL))
 		{
