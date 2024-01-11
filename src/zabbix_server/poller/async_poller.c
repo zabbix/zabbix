@@ -605,7 +605,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
 	{
 		if (ZBX_POLLER_TYPE_SNMP == poller_type)
-			zbx_clear_snmp_engineid_cache();
+			zbx_clear_snmp_engineid_cache(1);
 
 		async_poller_dns_destroy(&poller_config);
 	}

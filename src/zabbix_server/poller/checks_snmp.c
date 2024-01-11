@@ -257,7 +257,7 @@ static void	zbx_clear_snmp_engineid_devices(zbx_vector_engineid_device_t *d)
 	zbx_vector_engineid_device_destroy(d);
 }
 
-void	zbx_clear_snmp_engineid_cache(void)
+void	zbx_clear_snmp_engineid_cache(int shutdown)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_snmp_engineid_record_t	*engineid;
@@ -266,9 +266,11 @@ void	zbx_clear_snmp_engineid_cache(void)
 	while (NULL != (engineid = (zbx_snmp_engineid_record_t *)zbx_hashset_iter_next(&iter)))
 	{
 		zbx_clear_snmp_engineid_devices(&engineid->devices);
+		zbx_hashset_iter_remove(&iter);
 	}
 
-	zbx_hashset_destroy(&engineid_cache);
+	if (1 == shutdown)
+		zbx_hashset_destroy(&engineid_cache);
 }
 
 static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_context_t *item_context)
@@ -277,8 +279,6 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	zbx_snmp_engineid_device_t	d;
 	u_int				current_engineboots = 0;
 	int				ret = SUCCEED;
-
-	SNMP_MT_INITLOCK;
 
 	local_record.engineid_len = session->securityEngineIDLen;
 	memcpy(&local_record.engineid, session->securityEngineID, session->securityEngineIDLen);
@@ -368,7 +368,6 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 		}
 	}
 out:
-	SNMP_MT_UNLOCK;
 	return ret;
 }
 
@@ -384,10 +383,9 @@ void	zbx_housekeep_snmp_engineid_cache(void)
 		if (engineid->lastlog + ZBX_SNMP_ENGINEID_RETENTION_PERIOD <= time(NULL))
 		{
 			zbx_clear_snmp_engineid_devices(&engineid->devices);
-			zbx_hashset_remove(&engineid_cache, engineid);
+			zbx_hashset_iter_remove(&iter);
 		}
 	}
-
 #undef	ZBX_SNMP_ENGINEID_RETENTION_PERIOD
 }
 
@@ -3556,7 +3554,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 	if (0 != snmp_rwlock_init_done)
 		zbx_init_library_mt_snmp(progname);
 
-	zbx_clear_snmp_engineid_cache();
+	zbx_clear_snmp_engineid_cache(0);
 
 	SNMP_MT_UNLOCK;
 }
