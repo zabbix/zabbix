@@ -594,7 +594,8 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 #endif
 		}
 
-		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >= SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
+				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
 			last_snmp_engineid_hk_time = time(NULL);
 			zbx_housekeep_snmp_engineid_cache();

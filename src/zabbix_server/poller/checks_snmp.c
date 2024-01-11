@@ -2783,7 +2783,8 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 			if (FAIL == zbx_snmp_cache_handle_engineid(session, &snmp_context->item))
 			{
 				snmp_context->item.ret = NOTSUPPORTED;
-				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "SNMP engineId is not unique"));
+				SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
+						"SNMP engineId is not unique"));
 				goto stop;
 			}
 
