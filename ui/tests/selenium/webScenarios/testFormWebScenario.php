@@ -162,7 +162,6 @@ class testFormWebScenario extends CWebTest {
 		// Check tabs available in the form.
 		$this->assertEquals(['Scenario', 'Steps', 'Tags', 'Authentication'], $form->getTabs());
 
-		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		$scenario_fields = [
 			'Name' => ['autofocus' => 'true', 'maxlength' => 64],
 			'Update interval' => ['value' => '1m', 'maxlength' => 255],
@@ -170,10 +169,10 @@ class testFormWebScenario extends CWebTest {
 			'Agent' => ['value' => 'Zabbix'],
 			'id:agent_other' => ['visible' => false, 'enabled' => false, 'maxlength' => 255],
 			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
-			"xpath:(//table[@data-type='variables']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(//table[@data-type='variables']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
-			"xpath:(//table[@data-type='headers']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(//table[@data-type='headers']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			'xpath:(//table[@data-type="variables"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@data-type="variables"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(//table[@data-type="headers"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@data-type="headers"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Enabled' => ['value' => true]
 		];
 
@@ -778,32 +777,31 @@ class testFormWebScenario extends CWebTest {
 							'value' => '   value   '
 						]
 					],
-					'trim' => true
-					// TODO: uncomment these lines when ZBX-22433 will be merged.
-//					'variables' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'name' => '{!@#$%^&*()_+=-良い一日を}',
-//							'value' => '!@#$%^&*()_+=-良い一日を'
-//						],
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'name' => '{abc}'
-//						]
-//					],
-//					'headers' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'name' => 'OneTwoThree'
-//						],
-//						[
-//							'name' => '!@#$%^&*()_+=-良い一日を',
-//							'value' => '!@#$%^&*()_+=-良い一日を'
-//						]
-//					]
+					'trim' => true,
+					'variables' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '   {!@#$%^&*()_+=-良い一日を}   ',
+							'value' => '   !@#$%^&*()_+=-良い一日を   '
+						],
+						[
+							'name' => '  {abc}  ',
+							'value' => '   '
+						]
+					],
+					'headers' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '   OneTwoThree   ',
+							'value' => '   FourFiveSix   '
+						],
+						[
+							'name' => '   !@#$%^&*()_+=-良い一日を   ',
+							'value' => '   !@#$%^&*()_+=-良い一日を   '
+						]
+					]
 				]
 			]
 		];
@@ -876,15 +874,11 @@ class testFormWebScenario extends CWebTest {
 		unset($fields['']);
 
 		foreach (['variables', 'headers'] as $field_name) {
-			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
-//			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 			$field = $form->getField(ucfirst($field_name));
-
-			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue();
-			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[2]")->one()->getValue();
+			$table_fields[$field_name]['name'] = $field->query('xpath:(//table[@data-type='.
+					CXPathHelper::escapeQuotes($field_name).']//input)[1]')->one()->getValue();
+			$table_fields[$field_name]['value'] = $field->query('xpath:(//table[@data-type='.
+					CXPathHelper::escapeQuotes($field_name).']//input)[2]')->one()->getValue();
 		}
 
 		$form->query('button:Clone')->one()->click();
@@ -904,16 +898,12 @@ class testFormWebScenario extends CWebTest {
 		$form->checkValue($fields);
 
 		foreach (['variables', 'headers'] as $field_name) {
-			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
-//			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
 			$field = $form->getField(ucfirst($field_name));
-
-			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[1]")->one()->getValue()
+			$this->assertEquals($table_fields[$field_name]['name'], $field->query('xpath:(//table[@data-type='.
+					CXPathHelper::escapeQuotes($field_name).']//input)[1]')->one()->getValue()
 			);
-			$this->assertEquals($table_fields[$field_name]['value'], $field->query("xpath:(//table[@data-type=".
-					CXPathHelper::escapeQuotes($field_name)."]//input)[2]")->one()->getValue()
+			$this->assertEquals($table_fields[$field_name]['value'], $field->query('xpath:(//table[@data-type='.
+					CXPathHelper::escapeQuotes($field_name).']//input)[2]')->one()->getValue()
 			);
 		}
 
@@ -1023,16 +1013,21 @@ class testFormWebScenario extends CWebTest {
 				self::$update_scenario = $data['scenario_fields']['Name'];
 			}
 
-			// TODO: add logic to trim headers an variables after ZBX-22433 is merged.
+			// Remove trailing and leading spaces from expected data before comparing it to the values in the form.
 			if (array_key_exists('trim', $data)) {
 				$skip_fields = ['Password', 'SSL key password'];
 
-				foreach (['scenario_fields', 'auth_fields', 'tags'] as $tab_fields) {
+				foreach (['scenario_fields', 'variables', 'headers', 'auth_fields', 'tags'] as $tab_fields) {
 					$original_fields = $data[$tab_fields];
 
 					if ($tab_fields === 'tags') {
 						foreach ($data[$tab_fields] as &$tag) {
 							$tag = array_map('trim', $tag);
+						}
+					}
+					elseif (in_array($tab_fields, ['variables', 'headers'])) {
+						foreach ($data[$tab_fields] as &$pair_field) {
+							$pair_field = array_map('trim', $pair_field);
 						}
 					}
 					else {
@@ -1061,17 +1056,15 @@ class testFormWebScenario extends CWebTest {
 
 			foreach (['variables', 'headers'] as $field_name) {
 				if (array_key_exists($field_name, $data)) {
-					// TODO: Replace the below workaround with a check via $table->checkValue() when ZBX-22433 is merged.
 					$field = $form->getField(ucfirst($field_name));
 
 					$i = 1;
-					// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 					foreach ($data[$field_name] as $field_pair) {
-						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[1]")->one()->getValue()
+						$this->assertEquals($field_pair['name'], $field->query('xpath:(//table[@data-type='.
+								CXPathHelper::escapeQuotes($field_name).']//tr['.$i.']//input)[1]')->one()->getValue()
 						);
-						$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@data-type=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//input)[2]")->one()->getValue()
+						$this->assertEquals($field_pair['value'], $field->query('xpath:(//table[@data-type='.
+								CXPathHelper::escapeQuotes($field_name).']//tr['.$i.']//input)[2]')->one()->getValue()
 						);
 						$i++;
 					}
@@ -1104,8 +1097,6 @@ class testFormWebScenario extends CWebTest {
 
 		foreach (['variables', 'headers'] as $field_name) {
 			if (array_key_exists($field_name, $data)) {
-				// TODO: Replace the below workaround with the commented line when ZBX-22433 is merged.
-//				$form->getField(ucfirst($field_name))->asMultifieldTable()->fill($data[$field_name]);
 				$field = $form->getField(ucfirst($field_name));
 
 				if (count($data[$field_name]) > 1) {
@@ -1113,12 +1104,11 @@ class testFormWebScenario extends CWebTest {
 				}
 
 				$i = 1;
-				// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 				foreach ($data[$field_name] as $field_pair) {
-					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
-							$i."]//input)[1]")->one()->fill($field_pair['name']);
-					$field->query("xpath:(//table[@data-type=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
-							$i."]//input)[2]")->one()->fill($field_pair['value']);
+					$field->query('xpath:(//table[@data-type='.CXPathHelper::escapeQuotes($field_name).']//tr['.
+							$i.']//input)[1]')->one()->fill($field_pair['name']);
+					$field->query('xpath:(//table[@data-type='.CXPathHelper::escapeQuotes($field_name).']//tr['.
+							$i.']//input)[2]')->one()->fill($field_pair['value']);
 					$i++;
 				}
 			}

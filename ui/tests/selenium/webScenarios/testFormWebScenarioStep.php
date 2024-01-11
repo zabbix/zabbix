@@ -110,20 +110,19 @@ class testFormWebScenarioStep extends CWebTest {
 
 		$this->assertEquals('Step of web scenario', $dialog->getTitle());
 
-		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		$step_fields = [
 			'Name' => ['maxlength' => 64],
 			'id:url' => [],
-			"xpath:(.//table[@data-type='query_fields']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='query_fields']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='post_fields']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='post_fields']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			'xpath:(.//table[@data-type="query_fields"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@data-type="query_fields"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 255],
+			'xpath:(.//table[@data-type="post_fields"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@data-type="post_fields"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Post type' => ['value' => 'Form data'],
 			'Raw post' => ['visible' => false],
-			"xpath:(.//table[@data-type='variables']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='variables']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
-			"xpath:(.//table[@data-type='headers']//input)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(.//table[@data-type='headers']//input)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			'xpath:(.//table[@data-type="variables"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@data-type="variables"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(.//table[@data-type="headers"]//input)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(.//table[@data-type="headers"]//input)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Follow redirects' => ['value' => false],
 			'Retrieve mode' => ['value' => 'Body'],
 			'Timeout' => ['value' => '15s', 'maxlength' => 255],
@@ -131,15 +130,14 @@ class testFormWebScenarioStep extends CWebTest {
 			'Required status codes' => ['maxlength' => 255]
 		];
 
-		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		// Differences between step creation form and update form of templated scenario step should be taken into account.
 		if (array_key_exists('step_name', $data)) {
 			$step_fields['Name'] = ['value' => $data['step_name'], 'enabled' => false, 'maxlength' => 64];
 			$step_fields['id:url']['value'] = 'http://zabbix.com';
 			$step_fields['Post type']['value'] = 'Raw data';
 			$step_fields['Raw post']['visible'] = true;
-			$step_fields["xpath:(.//table[@data-type='post_fields']//input)[1]"]['visible'] = false;
-			$step_fields["xpath:(.//table[@data-type='post_fields']//input)[2]"]['visible'] = false;
+			$step_fields['xpath:(.//table[@data-type="post_fields"]//input)[1]']['visible'] = false;
+			$step_fields['xpath:(.//table[@data-type="post_fields"]//input)[2]']['visible'] = false;
 			$step_fields['Follow redirects']['value'] = true;
 
 			$initial_type = 'Raw data';
@@ -710,6 +708,46 @@ class testFormWebScenarioStep extends CWebTest {
 						'Required string' => '   Zabbix   ',
 						'Required status codes' => '   404   '
 					],
+					'query fields' => [
+						[
+							'name' => '   trim query   ',
+							'value' => '   '
+						],
+						[
+							'name' => '   2nd trim query name - 良い一日を   ',
+							'value' => '   2nd trim query value - 良い一日を   '
+						]
+					],
+					'post fields' => [
+						[
+							'name' => '   trim post field name   ',
+							'value' => '   trim post field value   '
+						],
+						[
+							'name' => '   2nd trim post field name   ',
+							'value' => '   '
+						]
+					],
+					'variables' => [
+						[
+							'name' => '   {1st trim variable name - 良い一日を}   ',
+							'value' => '   '
+						],
+						[
+							'name' => '   {2nd trim variable name - 良い一日を}   ',
+							'value' => '   2nd trim variable value - 良い一日を   '
+						]
+					],
+					'headers' => [
+						[
+							'name' => '   1st trim header name - 良い一日を   ',
+							'value' => '   1st trim header value - 良い一日を   '
+						],
+						[
+							'name' => '   2nd trim header name - 良い一日を   ',
+							'value' => '   '
+						]
+					],
 					'trim' => true
 				]
 			]
@@ -759,8 +797,6 @@ class testFormWebScenarioStep extends CWebTest {
 
 		foreach (['variables', 'query fields', 'post fields', 'headers'] as $field_name) {
 			if (array_key_exists($field_name, $data)) {
-				// TODO: Replace the below workaround with the commented line when ZBX-22433 is merged.
-//				$form->getField(ucfirst($field_name))->asMultifieldTable()->fill($data[$field_name]);
 				$field = $step_form->getField(ucfirst($field_name));
 				$this->fillTableField($data[$field_name], $field);
 			}
@@ -784,9 +820,14 @@ class testFormWebScenarioStep extends CWebTest {
 			$scenario_form->submit();
 			$this->assertMessage(TEST_GOOD, 'Web scenario updated');
 
-			// TODO: add logic to trim headers an variables after ZBX-22433 is merged.
 			if (array_key_exists('trim', $data)) {
 				$data['fields'] = array_map('trim', $data['fields']);
+
+				foreach (['query fields', 'post fields', 'variables', 'headers'] as $pair_field_type) {
+					foreach ($data[$pair_field_type] as &$pair_field) {
+						$pair_field = array_map('trim', $pair_field);
+					}
+				}
 			}
 
 			if ($action === 'update') {
@@ -825,7 +866,6 @@ class testFormWebScenarioStep extends CWebTest {
 
 			foreach (['variables', 'query fields', 'post fields', 'headers'] as $field_name) {
 				if (array_key_exists($field_name, $data)) {
-					// TODO: Replace the below workaround with a check via $table->checkValue() when ZBX-22433 is merged.
 					$field = $step_form->getField(ucfirst($field_name));
 					$this->checkTableField($field, $data[$field_name]);
 				}
@@ -1231,7 +1271,7 @@ class testFormWebScenarioStep extends CWebTest {
 		$obtained_fields = [];
 		$i = 0;
 
-		foreach ($table_field->query('xpath:(.//tr[@class="sortable"])')->all() as $table_row) {
+		foreach ($table_field->query('xpath:(.//tr[@class])')->all() as $table_row) {
 			$obtained_fields[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
 
 			if (array_key_exists('value', $expected[$i])) {
@@ -1261,11 +1301,10 @@ class testFormWebScenarioStep extends CWebTest {
 				$add_button->click();
 			}
 
-			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-			$table_field->query("xpath:(.//tr[".$i."]//input)[1]")->one()->fill($row['name']);
+			$table_field->query('xpath:(.//tr['.$i.']//input)[1]')->one()->fill($row['name']);
 
 			if (array_key_exists('value', $row)) {
-				$table_field->query("xpath:(.//tr[".$i."]//input)[2]")->one()->fill($row['value']);
+				$table_field->query('xpath:(.//tr['.$i.']//input)[2]')->one()->fill($row['value']);
 			}
 
 			$i++;
