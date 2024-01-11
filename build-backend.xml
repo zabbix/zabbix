@@ -84,12 +84,10 @@
 							<arg line="-o"/>
 							<arg line="./clang-scan-build-reports"/>
 							<arg line="make"/>
-							<arg line="-j5"/>
 						</exec>
 					</try>
 					<finally>
 						<exec executable="make" failonerror="on">
-							<arg line="-j5"/>
 							<arg line="clean"/>
 						</exec>
 					</finally>
@@ -131,7 +129,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-j5"/>
 						<arg line="@{target}"/>
 					</exec>
 					<if>
@@ -145,7 +142,6 @@
 				</try>
 				<finally>
 					<exec executable="make" failonerror="on">
-						<arg line="-j5"/>
 						<arg line="clean"/>
 					</exec>
 				</finally>
@@ -189,7 +185,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-j5"/>
 						<arg line="tests_build"/>
 					</exec>
 					<mkdir dir="tests_results/@{conf-name}"/>
@@ -199,11 +194,9 @@
 				</try>
 				<finally>
 					<exec executable="make" failonerror="on">
-						<arg line="-j5"/>
 						<arg line="clean"/>
 					</exec>
 					<exec executable="make" failonerror="on">
-						<arg line="-j5"/>
 						<arg line="-C"/>
 						<arg line="tests"/>
 						<arg line="clean"/>
@@ -317,11 +310,9 @@
 			<arg line="--quiet"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j5"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j5"/>
 			<arg line="dist"/>
 		</exec>
 		<apply executable="tar">
@@ -342,7 +333,6 @@
 			<arg line="--enable-agent2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
-			<arg line="-j5"/>
 			<arg line="check"/>
 		</exec>
 	</target>
