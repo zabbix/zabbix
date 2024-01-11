@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:48:03Z'
+  date: '2024-01-12T09:28:13Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -48,7 +48,7 @@ zabbix_export:
               name: 'GCP: Authorization has failed'
               priority: AVERAGE
               description: |
-                GCP: Authorization has failed. 
+                GCP: Authorization has failed.
                 Check the authorization parameters and GCP API availability from a network segment, where Zabbix-server/proxy is located.
                 
               tags:
@@ -102,8 +102,11 @@ zabbix_export:
                     params = {
                         grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
                         assertion: signed_jwt
-                    },
-                    response = request.post(auth_url, JSON.stringify(params));
+                    }
+                if (typeof script_params.proxy !== 'undefined' && script_params.proxy !== '') {
+                    request.setProxy(script_params.proxy);
+                };
+                var response = request.post(auth_url, JSON.stringify(params));
             
                 Zabbix.log(4, '[ GCP API ] [ ' + auth_url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
@@ -184,6 +187,8 @@ zabbix_export:
               value: '{$GCP.PRIVATE.KEY.ID}'
             - name: private_key
               value: '{$GCP.PRIVATE.KEY}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
           tags:
             - tag: component
               value: raw
@@ -229,8 +234,11 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                      var request = new HttpRequest();
-                  
+                      var request = new HttpRequest(),
+                          proxy = '{$GCP.PROXY}';
+                      if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                          request.setProxy(proxy);
+                      };
                       request.addHeader('Authorization: Bearer ' + token);
                       request.addHeader('Content-Type: application/json');
                   
@@ -306,7 +314,7 @@ zabbix_export:
                               return addr.type === 'PRIMARY';
                           });
                   
-                          obj.ip = getFieldBool(int_addresses,'0.ipAddress') ? int_addresses[0].ipAddress : '0.0.0.0';
+                          obj.ip = getFieldBool(int_addresses, '0.ipAddress') ? int_addresses[0].ipAddress : '0.0.0.0';
                           obj.ext_ip = getFieldBool(ext_addresses, '0.ipAddress') ? ext_addresses[0].ipAddress : '0.0.0.0';
                       }
                       else {
@@ -407,8 +415,11 @@ zabbix_export:
                   
                   
                   function getHttpData(url, token) {
-                      var request = new HttpRequest();
-                  
+                      var request = new HttpRequest(),
+                          proxy = '{$GCP.PROXY}';
+                      if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                          request.setProxy(proxy);
+                      };
                       request.addHeader('Authorization: Bearer ' + token);
                       request.addHeader('Content-Type: application/json');
                   
@@ -596,7 +607,7 @@ zabbix_export:
                   
                       for (var i = 0; i < steps.length; i++) {
                           var step = steps[i];
-                          
+                  
                           if (typeof data !== 'object' || typeof data[step] === 'undefined') {
                               throw 'Required field "' + path + '" is not present in data received.'
                           }
@@ -606,8 +617,11 @@ zabbix_export:
                   }
                   
                   function getHttpData(url, token) {
-                      var request = new HttpRequest();
-                  
+                      var request = new HttpRequest(),
+                          proxy = '{$GCP.PROXY}';
+                      if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                          request.setProxy(proxy);
+                      };
                       request.addHeader('Authorization: Bearer ' + token);
                       request.addHeader('Content-Type: application/json');
                   
@@ -1323,7 +1337,7 @@ zabbix_export:
         - macro: '{$GCP.AUTH.FREQUENCY}'
           value: 45m
           description: |
-            The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency. 
+            The update interval for the GCP Authorization item, which also equals to the access token regeneration request frequency.
             Check the template documentation notes carefully for more details.
             
         - macro: '{$GCP.CLIENT.EMAIL}'
@@ -1426,6 +1440,8 @@ zabbix_export:
           description: 'Service account private key id.'
         - macro: '{$GCP.PROJECT.ID}'
           description: 'GCP project ID.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
       dashboards:
         - uuid: 71df4601171e471ea74a291242028394
           name: 'Project resources'
@@ -1709,7 +1725,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total number of login attempts since the last restart of SQL Server service. 
+            Total number of login attempts since the last restart of SQL Server service.
             This does not include pooled connections.
             
           preprocessing:
@@ -1874,7 +1890,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -1907,13 +1925,9 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData');
             
@@ -1941,6 +1955,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -2070,7 +2086,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            The fraction of the disk quota that is currently in use. 
+            The fraction of the disk quota that is currently in use.
             Shown as percentage.
             
           preprocessing:
@@ -2239,7 +2255,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Current percentage of pages found in the buffer cache without having to read from disk. 
+            Current percentage of pages found in the buffer cache without having to read from disk.
             The ratio is the total number of cache hits divided by the total number of cache lookups.
             
           preprocessing:
@@ -2293,9 +2309,9 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total number of buffers written by the buffer manager's lazy writer. 
-            The lazy writer is a system process that flushes out batches of dirty, aged buffers 
-            (buffers that contain changes that must be written back to disk before the buffer can be reused for a different page) 
+            Total number of buffers written by the buffer manager's lazy writer.
+            The lazy writer is a system process that flushes out batches of dirty, aged buffers
+            (buffers that contain changes that must be written back to disk before the buffer can be reused for a different page)
             and makes them available to user processes.
             
           preprocessing:
@@ -2350,7 +2366,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total number of physical database page reads. 
+            Total number of physical database page reads.
             This metric counts physical page reads across all databases.
             
           preprocessing:
@@ -2370,7 +2386,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total number of physical database page writes. 
+            Total number of physical database page writes.
             This metric counts physical page writes across all databases.
             
           preprocessing:
@@ -2409,7 +2425,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Total RAM usage in bytes. 
+            Total RAM usage in bytes.
             This metric reports the RAM usage of the database process, including the buffer/cache.
             
           preprocessing:
@@ -2430,7 +2446,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            The RAM usage in bytes. 
+            The RAM usage in bytes.
             This metric reports the RAM usage of the server, excluding the buffer/cache.
             
           preprocessing:
@@ -2566,7 +2582,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -2641,11 +2659,9 @@ zabbix_export:
                 base_paths.push(mssql_path + 'audits_size');
             };
             
-            var time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
+            var filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
                 j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
                 queries = [
                     { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
                     { name: 'mssql_', data: { query: '{' + mssql_paths.join(';') + '}' + j_filter } }
@@ -2685,6 +2701,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -2796,7 +2814,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -2829,13 +2849,9 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData');
             
@@ -2863,6 +2879,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -2911,7 +2929,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -2944,13 +2964,9 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData');
             
@@ -2978,6 +2994,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -3027,7 +3045,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total number of unrestricted full scans. 
+            Total number of unrestricted full scans.
             These can be either base-table or full-index scans.
             
           preprocessing:
@@ -3391,10 +3409,10 @@ zabbix_export:
               history: 7d
               trends: 90d
               description: |
-                Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}]. 
-                Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch. 
-                The count is incremented when the request is inserted. 
-                This count is decremented when the request is completed. 
+                Current number of pending I/Os waiting to be completed that are associated with the scheduler that goes by its ID [{#SCHEDULER.ID}].
+                Each scheduler has a list of pending I/Os that are checked to determine whether they have been completed every time there is a context switch.
+                The count is incremented when the request is inserted.
+                This count is decremented when the request is completed.
                 This number does not indicate the state of the I/Os.
                 
               preprocessing:
@@ -3523,6 +3541,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
@@ -3729,8 +3749,8 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Total number of bytes sent to the remote availability replica. 
-            For an async replica, returns the number of bytes before compression. 
+            Total number of bytes sent to the remote availability replica.
+            For an async replica, returns the number of bytes before compression.
             For a sync replica without compression, returns the actual number of bytes.
             
           preprocessing:
@@ -3825,7 +3845,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -3858,13 +3880,10 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
+                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
                 j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var base_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                base_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 keys = getField(base_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 values = getField(base_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
@@ -3891,6 +3910,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -3945,7 +3966,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Total count of Always On messages to resend.  
+            Total count of Always On messages to resend.
             This includes messages that were attempted to be sent but failed and require resending.
             
           preprocessing:
@@ -3974,6 +3995,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
@@ -4215,7 +4238,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            The fraction of the disk quota that is currently in use. 
+            The fraction of the disk quota that is currently in use.
             Shown as percentage.
             
           preprocessing:
@@ -4534,7 +4557,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Total RAM usage in bytes. 
+            Total RAM usage in bytes.
             This metric reports the RAM usage of the database process, including the buffer/cache.
             
           preprocessing:
@@ -4555,7 +4578,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            The RAM usage in bytes. 
+            The RAM usage in bytes.
             This metric reports the RAM usage of the server, excluding the buffer/cache.
             
           preprocessing:
@@ -4669,7 +4692,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -4726,11 +4751,8 @@ zabbix_export:
             }
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query',
+                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
                 queries = [
                     { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
                     { name: 'mysql_', data: { query: '{' + mysql_paths.join(';') + '}' + j_filter } }
@@ -4755,6 +4777,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -4956,6 +4980,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
@@ -5212,7 +5238,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -5245,15 +5273,11 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
+                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
                 j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var metric_raw = getHttpData(url, params.token, { query: '{' + mysql_paths.join(';') + '}' + j_filter });
-            
-            var metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                metric_raw = getHttpData(url, params.token, { query: '{' + mysql_paths.join(';') + '}' + j_filter }),
+                metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
             
@@ -5295,6 +5319,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -5346,7 +5372,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Indicates whether the I/O thread for reading the primary's binary log is running. 
+            Indicates whether the I/O thread for reading the primary's binary log is running.
             Possible values are Yes, No and Connecting.
             
           valuemap:
@@ -5443,6 +5469,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
@@ -5775,7 +5803,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            The fraction of the disk quota that is currently in use. 
+            The fraction of the disk quota that is currently in use.
             Shown as percentage.
             
           preprocessing:
@@ -5961,7 +5989,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Total RAM usage in bytes. 
+            Total RAM usage in bytes.
             This metric reports the RAM usage of the database process, including the buffer/cache.
             
           preprocessing:
@@ -5982,7 +6010,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            The RAM usage in bytes. 
+            The RAM usage in bytes.
             This metric reports the RAM usage of the server, excluding the buffer/cache.
             
           preprocessing:
@@ -6068,7 +6096,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -6135,11 +6165,9 @@ zabbix_export:
             }
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
+                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
                 j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
                 base_paths = [
                     'cpu/reserved_cores',
                     'cpu/usage_time',
@@ -6161,7 +6189,7 @@ zabbix_export:
                     ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
                 queries = [
                     { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
-                    { name: 'pgsql_', data: { query: '{' + pgsql_paths.join(';') + '}' + '| within ' + time_window + '| join' } }
+                    { name: 'pgsql_', data: { query: '{' + pgsql_paths.join(';') + '}' + '| within ' + params.time_window + '| join' } }
                 ];
             
             for (q in queries) {
@@ -6191,6 +6219,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -6246,7 +6276,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The number of the connections to the Cloud SQL PostgreSQL instance. 
+            The number of the connections to the Cloud SQL PostgreSQL instance.
             Includes connections to the system databases, which aren't visible by default.
             
           preprocessing:
@@ -6268,7 +6298,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Age of the oldest prepared transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. 
+            Age of the oldest prepared transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
             
           preprocessing:
@@ -6289,7 +6319,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Age of the oldest replica transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. 
+            Age of the oldest replica transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
             
           preprocessing:
@@ -6310,7 +6340,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Age of the oldest replication slot transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. 
+            Age of the oldest replication slot transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
             
           preprocessing:
@@ -6331,7 +6361,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Age of the oldest running transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction. 
+            Age of the oldest running transaction yet to be vacuumed in the Cloud SQL PostgreSQL instance, measured in number of transactions that have happened since the oldest transaction.
             Empty value when there is no such transaction type.
             
           preprocessing:
@@ -6532,7 +6562,9 @@ zabbix_export:
                 
                 function getHttpData(url, token, body) {
                     var request = new HttpRequest();
-                
+                    if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                        request.setProxy(params.proxy);
+                    };
                     request.addHeader('Authorization: Bearer ' + token);
                     request.addHeader('Content-Type: application/json');
                 
@@ -6574,14 +6606,11 @@ zabbix_export:
                 }
                 
                 var params = checkParams(JSON.parse(value)),
-                    time_window = params.time_window,
-                    project = params.project_id,
-                    filter = ' | within ' + time_window + " | filter database_id ='" + params.database_id + "'" + " | filter database ='" + params.database_name + "'",
+                    filter = ' | within ' + params.time_window + " | filter database_id ='" + params.database_id + "'" + " | filter database ='" + params.database_name + "'",
                     j_filter = filter + ' | join',
-                    url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query',
-                    common_paths = ['deadlock_count', 'tuples_returned_count', 'tuples_fetched_count'];
-                
-                var common_raw = getHttpData(url, params.token, { query: '{' + common_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                    url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                    common_paths = ['deadlock_count', 'tuples_returned_count', 'tuples_fetched_count'],
+                    common_raw = getHttpData(url, params.token, { query: '{' + common_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                     keys = getField(common_raw, 'timeSeriesDescriptor.pointDescriptors'),
                     values = getField(common_raw, 'timeSeriesData.0.pointData.0.values'),
                     re = /(^t_\d+\.value\.)/g;
@@ -6618,6 +6647,8 @@ zabbix_export:
                   value: '{#PGSQL.DB.NAME}'
                 - name: project_id
                   value: '{$GCP.PROJECT.ID}'
+                - name: proxy
+                  value: '{$GCP.PROXY}'
                 - name: time_window
                   value: '{$GCP.TIME.WINDOW}'
                 - name: token
@@ -6895,6 +6926,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
@@ -7192,7 +7225,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -7223,15 +7258,11 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter database_id = '" + params.database_id + "'",
+                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
                 j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var metric_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter });
-            
-            var metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                metric_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
                 metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
                 re = /(^t_\d+\.value\.)/g;
             
@@ -7261,7 +7292,7 @@ zabbix_export:
                 }
             }
             
-            var lag_raw = getHttpData(url, params.token, { query: pgsql_path + 'replica_byte_lag' + '| within ' + time_window + " | filter replica_name = '" + params.database_id + "'" }),
+            var lag_raw = getHttpData(url, params.token, { query: pgsql_path + 'replica_byte_lag' + '| within ' + params.time_window + " | filter replica_name = '" + params.database_id + "'" }),
                 lag_tsd = getField(lag_raw, 'timeSeriesData');
             
             for (t in lag_tsd) {
@@ -7280,6 +7311,8 @@ zabbix_export:
               value: '{$GCP.PROJECT.ID}:{HOST.NAME}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -7429,6 +7462,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
@@ -7544,9 +7579,9 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: |
-            Wait time is the time a vCPU is ready to run, but unexpectedly not scheduled to run. 
-            The wait time returned here is the accumulated value for all vCPUs. 
-            The time interval for which the value was measured is returned by Monitoring in whole seconds as start_time and end_time. 
+            Wait time is the time a vCPU is ready to run, but unexpectedly not scheduled to run.
+            The wait time returned here is the accumulated value for all vCPUs.
+            The time interval for which the value was measured is returned by Monitoring in whole seconds as start_time and end_time.
             This metric is only available for VMs that belong to the e2 family or to overcommitted VMs on sole-tenant nodes.
             
           preprocessing:
@@ -7569,8 +7604,8 @@ zabbix_export:
           value_type: FLOAT
           units: s
           description: |
-            Delta vCPU usage for all vCPUs, in vCPU-seconds. 
-            To compute the per-vCPU utilization fraction, divide this value by (end-start)*N, where end and start define this value's time interval and N is `compute.googleapis.com/instance/cpu/reserved_cores` at the end of the interval. 
+            Delta vCPU usage for all vCPUs, in vCPU-seconds.
+            To compute the per-vCPU utilization fraction, divide this value by (end-start)*N, where end and start define this value's time interval and N is `compute.googleapis.com/instance/cpu/reserved_cores` at the end of the interval.
             This value is reported by the hypervisor for the VM and can differ from `agent.googleapis.com/cpu/usage_time`, which is reported from inside the VM.
             
           preprocessing:
@@ -7592,7 +7627,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Fractional utilization of allocated CPU on this instance. 
+            Fractional utilization of allocated CPU on this instance.
             This metric is reported by the hypervisor for the VM and can differ from `agent.googleapis.com/cpu/utilization`, which is reported from inside the VM.
             
           preprocessing:
@@ -7658,7 +7693,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -7691,13 +7728,9 @@ zabbix_export:
             };
             
             var params = checkParams(JSON.parse(value)),
-                time_window = params.time_window,
-                project = project = params.project_id,
-                filter = ' | within ' + time_window + " | filter instance_id = '" + params.instance_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                j_filter = ' | within ' + params.time_window + " | filter instance_id = '" + params.instance_id + "'" + ' | join',
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
                 metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 time_series = getField(raw, 'timeSeriesData'),
                 arr = [];
@@ -7728,6 +7761,8 @@ zabbix_export:
               value: '{HOST.HOST}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -7822,7 +7857,7 @@ zabbix_export:
               name: 'GCP Compute Engine: Failed to get the instance state'
               priority: AVERAGE
               description: |
-                Failed to get the instance state. 
+                Failed to get the instance state.
                 Check access permissions to GCP API or service account.
                 
               manual_close: 'YES'
@@ -7845,8 +7880,8 @@ zabbix_export:
               name: 'GCP Compute Engine: The instance is in repairing state'
               priority: WARNING
               description: |
-                The VM is being repaired. 
-                Repairing occurs when the VM encounters an internal error or the underlying machine is unavailable due to maintenance. 
+                The VM is being repaired.
+                Repairing occurs when the VM encounters an internal error or the underlying machine is unavailable due to maintenance.
                 During this time, the VM is unusable.
                 
               manual_close: 'YES'
@@ -7889,7 +7924,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The validation status of early boot integrity policy. 
+            The validation status of early boot integrity policy.
             Empty value if integrity monitoring isn't enabled.
             
           valuemap:
@@ -7921,7 +7956,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The validation status of late boot integrity policy. 
+            The validation status of late boot integrity policy.
             Empty value if integrity monitoring isn't enabled.
             
           valuemap:
@@ -7955,7 +7990,7 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           description: |
-            Memory usage Percentage. 
+            Memory usage Percentage.
             This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
@@ -7987,7 +8022,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Total VM memory size. 
+            Total VM memory size.
             This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
@@ -8009,7 +8044,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Memory currently used in the VM. 
+            Memory currently used in the VM.
             This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
@@ -8031,7 +8066,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            The amount of memory read into the guest from its own swap space. 
+            The amount of memory read into the guest from its own swap space.
             This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
@@ -8053,7 +8088,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            The amount of memory written from the guest to its own swap space. 
+            The amount of memory written from the guest to its own swap space.
             This metric is only available for VMs that belong to the e2 family; returns empty value for different instance types.
             
           preprocessing:
@@ -8138,7 +8173,7 @@ zabbix_export:
             
             function queryMap(array, path, filter) {
                 var query_params = '{' + array.map(function (element) { return path + element; }).join(';') + '}';
-                return {query: query_params + filter}
+                return { query: query_params + filter }
             }
             
             function checkParams(params) {
@@ -8158,7 +8193,9 @@ zabbix_export:
             
             function getHttpData(url, token, body) {
                 var request = new HttpRequest();
-            
+                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                    request.setProxy(params.proxy);
+                };
                 request.addHeader('Authorization: Bearer ' + token);
                 request.addHeader('Content-Type: application/json');
             
@@ -8220,13 +8257,10 @@ zabbix_export:
                 base_paths = base_paths.concat(e2_paths);
             }
             
-            var time_window = params.time_window,
-                project = params.project_id,
-                filter = ' | within ' + time_window + " | filter instance_id = '" + params.instance_id + "'",
+            var filter = ' | within ' + params.time_window + " | filter instance_id = '" + params.instance_id + "'",
                 j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + project + '/timeSeries:query';
-            
-            var raw = getHttpData(url, params.token, queryMap(base_paths, base_path, j_filter)),
+                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                raw = getHttpData(url, params.token, queryMap(base_paths, base_path, j_filter)),
                 keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
                 values = getField(raw, 'timeSeriesData.0.pointData.0.values');
             
@@ -8239,7 +8273,7 @@ zabbix_export:
             }
             
             if (params.machine_type.match(/e2.*/)) {
-                obj.ram_pused = Math.floor((getField(obj,'ram_used') / getField(obj,'ram_size')) * 100);
+                obj.ram_pused = Math.floor((getField(obj, 'ram_used') / getField(obj, 'ram_size')) * 100);
             }
             
             var mirr_raw = getHttpData(url, params.token, { query: base_path + 'mirroring/dropped_packets_count' + filter }),
@@ -8292,6 +8326,8 @@ zabbix_export:
               value: '{$GCE.MACHINE.TYPE}'
             - name: project_id
               value: '{$GCP.PROJECT.ID}'
+            - name: proxy
+              value: '{$GCP.PROXY}'
             - name: time_window
               value: '{$GCP.TIME.WINDOW}'
             - name: token
@@ -8328,7 +8364,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
+            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
             The value is empty when load-balancing is not used.
             
@@ -8371,7 +8407,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
+            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
             The value is empty when load-balancing is not used.
             
@@ -8416,7 +8452,7 @@ zabbix_export:
           trends: 90d
           units: B
           description: |
-            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
+            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
             The value is empty when load-balancing is not used.
             
@@ -8459,7 +8495,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM. 
+            Whether traffic was received by an L3 loadbalanced IP address assigned to the VM.
             Traffic that is externally routed to the VM's standard internal or external IP address, such as L7 loadbalanced traffic, is not considered to be loadbalanced in this metric.
             The value is empty when load-balancing is not used.
             
@@ -8522,7 +8558,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The count of mirrored packets dropped. 
+            The count of mirrored packets dropped.
             Reason - invalid.
             
           preprocessing:
@@ -8544,7 +8580,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The count of mirrored packets dropped. 
+            The count of mirrored packets dropped.
             Reason - out of quota.
             
           preprocessing:
@@ -8566,7 +8602,7 @@ zabbix_export:
           history: 7d
           trends: 90d
           description: |
-            The count of mirrored packets dropped. 
+            The count of mirrored packets dropped.
             Reason - unknown.
             
           preprocessing:
@@ -8806,6 +8842,8 @@ zabbix_export:
         - macro: '{$GCP.DATA.TIMEOUT}'
           value: 15s
           description: 'A response timeout for an API.'
+        - macro: '{$GCP.PROXY}'
+          description: 'Sets HTTP proxy value. If this macro is empty then no proxy is used.'
         - macro: '{$GCP.TIME.WINDOW}'
           value: 5m
           description: |
