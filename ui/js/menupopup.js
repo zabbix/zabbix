@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1498,7 +1498,6 @@ function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 				url: url.url,
 				target: url.target,
 				confirmation: url.confirmation,
-				rel: url.rel,
 				manualinput: url.manualinput,
 				manualinput_prompt: url.manualinput_prompt,
 				manualinput_validator_type: url.manualinput_validator_type,

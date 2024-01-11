@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/windows"
 	"golang.org/x/sys/windows/svc"
@@ -33,12 +34,25 @@ import (
 	"zabbix.com/pkg/win32"
 )
 
+const (
+	startupTypeAuto = iota
+	startupTypeAutoDelayed
+	startupTypeManual
+	startupTypeDisabled
+	startupTypeUnknown
+	startupTypeTrigger
+)
+
+const (
+	ZBX_NON_EXISTING_SRV = 255
+)
+
+var impl Plugin
+
 // Plugin -
 type Plugin struct {
 	plugin.Base
 }
-
-var impl Plugin
 
 type serviceDiscovery struct {
 	Name           string `json:"{#SERVICE.NAME}"`
@@ -53,18 +67,17 @@ type serviceDiscovery struct {
 	StartupName    string `json:"{#SERVICE.STARTUPNAME}"`
 }
 
-const (
-	startupTypeAuto = iota
-	startupTypeAutoDelayed
-	startupTypeManual
-	startupTypeDisabled
-	startupTypeUnknown
-	startupTypeTrigger
-)
-
-const (
-	ZBX_NON_EXISTING_SRV = 255
-)
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WindowsServices",
+		"service.discovery", "List of Windows services for low-level discovery.",
+		"service.info", "Information about a service.",
+		"services", "Filtered list of Windows sercices.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func startupName(startup int) string {
 	switch startup {
@@ -81,7 +94,7 @@ func startupName(startup int) string {
 	}
 }
 
-func startupType(service *mgr.Service, config *mgr.Config) (stype int, strigger int) {
+func startupType(service *mgr.Service, config *mgr.Config) (stype, strigger int) {
 	n := uint32(1024)
 	for {
 		b := make([]byte, n)
@@ -280,7 +293,6 @@ func (p *Plugin) exportServiceInfo(params []string) (result interface{}, err err
 	defer m.Disconnect()
 
 	service, err := openServiceEx(m, params[0])
-
 	if err != nil {
 		if err.(syscall.Errno) == windows.ERROR_SERVICE_DOES_NOT_EXIST {
 			return ZBX_NON_EXISTING_SRV, nil
@@ -338,7 +350,14 @@ const (
 	stateFlagAll = stateFlagStarted | stateFlagStopped
 )
 
-func (p *Plugin) appendServiceName(m *mgr.Mgr, services *[]string, name string, excludeFilter map[string]bool, stateFilter int, typeFilter *uint32) {
+func (p *Plugin) appendServiceName(
+	m *mgr.Mgr,
+	services *[]string,
+	name string,
+	excludeFilter map[string]bool,
+	stateFilter int,
+	typeFilter *uint32,
+) {
 	if len(excludeFilter) != 0 {
 		if _, ok := excludeFilter[name]; ok {
 			return
@@ -490,13 +509,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WindowsServices",
-		"service.discovery", "List of Windows services for low-level discovery.",
-		"service.info", "Information about a service.",
-		"services", "Filtered list of Windows sercices.",
-	)
 }
