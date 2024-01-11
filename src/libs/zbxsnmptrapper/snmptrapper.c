@@ -743,7 +743,7 @@ static int	get_latest_data(const char *config_snmptrap_file, const char *config_
 						config_snmptrap_file, zbx_strerror(errno));
 			}
 
-			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, NULL))
+			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, config_node_name))
 				;
 
 			if (0 != offset)
@@ -755,7 +755,7 @@ static int	get_latest_data(const char *config_snmptrap_file, const char *config_
 		{
 			/* file has been rotated, process the current file */
 
-			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, NULL))
+			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, config_node_name))
 				;
 
 			if (0 != offset)
@@ -808,6 +808,7 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 
 	zbx_thread_snmptrapper_args	*snmptrapper_args_in = (zbx_thread_snmptrapper_args *)
 			(((zbx_thread_args_t *)args)->args);
+	zabbix_increase_log_level();zabbix_increase_log_level();
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
