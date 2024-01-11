@@ -111,10 +111,12 @@ class CWidgetFieldTimePeriodView extends CWidgetFieldView {
 		$default_period = $this->field->getDefaultPeriod();
 
 		$date_selector_from = (new CDateSelector($field_name.'[from]', $default_period['from']))
+			->setMaxLength($this->field->getMaxLength())
 			->setPlaceholder($this->from_placeholder)
 			->setEnabled(!$this->isDisabled());
 
 		$date_selector_to = (new CDateSelector($field_name.'[to]', $default_period['to']))
+			->setMaxLength($this->field->getMaxLength())
 			->setPlaceholder($this->to_placeholder)
 			->setEnabled(!$this->isDisabled());
 

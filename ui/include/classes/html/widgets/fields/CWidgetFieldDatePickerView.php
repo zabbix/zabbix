@@ -33,6 +33,7 @@ class CWidgetFieldDatePickerView extends CWidgetFieldView {
 
 	public function getView(): CDateSelector {
 		$view = (new CDateSelector($this->field->getName(), $this->field->getValue()))
+			->setMaxLength($this->field->getMaxLength())
 			->setAriaRequired($this->isRequired())
 			->setEnabled(!$this->isDisabled());
 
