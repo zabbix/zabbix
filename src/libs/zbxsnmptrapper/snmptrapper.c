@@ -17,6 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#define _GNU_SOURCE
+#include <time.h>
 #include "zbxsnmptrapper.h"
 
 #include "zbxtimekeeper.h"
@@ -36,6 +38,8 @@
 #include "zbxsysinfo.h"
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
+#include "zbxcrypto.h"
+
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
@@ -43,35 +47,6 @@ static ino_t	trap_ino = 0;
 static char	*buffer = NULL;
 static int	offset = 0;
 static int	force = 0;
-
-static void	DBget_lastsize(void)
-{
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-
-	zbx_db_begin();
-
-	result = zbx_db_select("select snmp_lastsize from globalvars");
-
-	if (NULL == (row = zbx_db_fetch(result)))
-	{
-		zbx_db_execute("insert into globalvars (globalvarid,snmp_lastsize) values (1,0)");
-		trap_lastsize = 0;
-	}
-	else
-		ZBX_STR2UINT64(trap_lastsize, row[0]);
-
-	zbx_db_free_result(result);
-
-	zbx_db_commit();
-}
-
-static void	db_update_lastsize(void)
-{
-	zbx_db_begin();
-	zbx_db_execute("update globalvars set snmp_lastsize=%lld", (long long int)trap_lastsize);
-	zbx_db_commit();
-}
 
 /******************************************************************************
  *                                                                            *
@@ -273,15 +248,101 @@ static void	process_trap(const char *addr, char *begin, char *end)
 	zbx_free(interfaceids);
 	zbx_free(trap);
 }
+#define	ZBX_SHA512_BINARY_LENGTH	64
+#define	ZBX_SHA512_HEX_LENGTH		(128 + 1)
+
+static void	get_trap_hash(const char *trap, char *hash)
+{
+	char	*ptr;
+
+	/* pdu info cannot be used to calculate hash as it is not same for trap received on other node */
+	/* first OID should always be sysUpTimeInstance */
+	if (NULL != (ptr = strstr(trap, "\nVARBINDS:\n")) || NULL != (ptr = strstr(trap, "sysUpTimeInstance")) ||
+			NULL != (ptr = strstr(trap, ".1.3.6.1.2.1.1.3.0")) ||
+			NULL != (ptr = strstr(trap, " iso.3.6.1.2.1.1.3.0")))
+	{
+		zbx_sha512_hash(ptr, hash);
+
+		return;
+	}
+
+	zbx_sha512_hash(trap, hash);
+}
+
+static void	db_update_snmp_id(const char *date, const char *trap)
+{
+	time_t	timestamp;
+	char	hash_bin[ZBX_SHA512_BINARY_LENGTH], hash_hex[ZBX_SHA512_HEX_LENGTH], *sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+
+	if (FAIL == zbx_iso8601_utc(date, &timestamp))
+		return;
+
+	get_trap_hash(trap, hash_bin);
+
+	zbx_bin2hex((unsigned char *)hash_bin, ZBX_SHA512_BINARY_LENGTH, hash_hex, ZBX_SHA512_HEX_LENGTH);
+
+	zbx_db_begin();
+
+	sql_offset = 0;
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update globalvars set value=%d where name='snmp_timestamp';\n", (int)timestamp);
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"update globalvars set value='%s' where name='snmp_id';\n", hash_hex);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+	zbx_db_execute("%s", sql);
+	zbx_free(sql);
+
+	zbx_db_commit();
+}
+
+static void	compare_trap(const char *date, const char *trap, int snmp_timestamp, const char *snmp_id_bin, int *skip)
+{
+	time_t	timestamp;
+
+	if (FAIL == zbx_iso8601_utc(date, &timestamp))
+	{
+		/* skip records with old or invalid timestamp until correct one is found */
+		zabbix_log(LOG_LEVEL_TRACE, "skipping invalid timestamp");
+		return;
+	}
+
+	if (NULL == snmp_id_bin)
+	{
+		if (timestamp >= snmp_timestamp)
+		{
+			*skip = 0;
+			zabbix_log(LOG_LEVEL_TRACE, "found record using timestamp");
+		}
+	}
+	if (timestamp > snmp_timestamp + SEC_PER_MIN)
+	{
+		zabbix_log(LOG_LEVEL_TRACE, "skipping past timestamp");
+	}
+	else if (timestamp > snmp_timestamp - SEC_PER_MIN)
+	{
+		char	hash_bin[ZBX_SHA512_BINARY_LENGTH];
+
+		get_trap_hash(trap, hash_bin);
+
+		if (0 == memcmp(hash_bin, snmp_id_bin, ZBX_SHA512_BINARY_LENGTH))
+		{
+			*skip = 0;
+			zabbix_log(LOG_LEVEL_TRACE, "found record using hash");
+		}
+	}
+}
 
 /******************************************************************************
  *                                                                            *
  * Purpose: splits traps and processes them with process_trap()               *
  *                                                                            *
  ******************************************************************************/
-static void	parse_traps(int flag)
+static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, int *skip)
 {
-	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr = NULL, *pzdate = NULL;
+	char	*c, *line, *begin = NULL, *end = NULL, *addr = NULL, *pzbegin, *pzaddr = NULL, *pzdate = NULL,
+		*last_date = NULL, *last_trap = NULL;
 
 	c = line = buffer;
 
@@ -315,7 +376,17 @@ static void	parse_traps(int flag)
 			*pzdate = '\0';
 			*pzaddr = '\0';
 
-			process_trap(addr, begin, end);
+			if (NULL != skip && 1 == *skip)
+			{
+				compare_trap(begin, end, snmp_timestamp, snmp_id_bin, skip);
+			}
+			else
+			{
+				last_date = begin;	/* TODO: calculate only for HA*/
+				last_trap = end;
+				process_trap(addr, begin, end);
+			}
+
 			end = NULL;
 		}
 
@@ -332,6 +403,9 @@ static void	parse_traps(int flag)
 		end = c + 1;	/* the rest of the trap */
 	}
 
+	if (NULL != last_trap)
+		db_update_snmp_id(last_date, last_trap);
+
 	if (0 == flag)
 	{
 		if (NULL == begin)
@@ -345,7 +419,7 @@ static void	parse_traps(int flag)
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper buffer is full,"
 						" trap data might be truncated");
-				parse_traps(1);
+				parse_traps(1, snmp_timestamp, snmp_id_bin, skip);
 			}
 			else
 				zabbix_log(LOG_LEVEL_WARNING, "failed to find trap in SNMP trapper file");
@@ -367,7 +441,16 @@ static void	parse_traps(int flag)
 			*pzdate = '\0';
 			*pzaddr = '\0';
 
-			process_trap(addr, begin, end);
+			if (NULL != skip && 1 == *skip)
+			{
+				compare_trap(begin, end, snmp_timestamp, snmp_id_bin, skip);
+			}
+			else
+			{
+				process_trap(addr, begin, end);
+				db_update_snmp_id(begin, end);
+			}
+
 			offset = 0;
 			*buffer = '\0';
 		}
@@ -404,12 +487,19 @@ static void	delay_trap_logs(char *error, int log_level)
 	}
 }
 
+static void	db_update_lastsize(void)
+{
+	zbx_db_begin();
+	zbx_db_execute("update globalvars set value=%lld where name='snmp_lastsize'", (long long int)trap_lastsize);
+	zbx_db_commit();
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: reads traps and then parses them with parse_traps()               *
  *                                                                            *
  ******************************************************************************/
-static int	read_traps(const char *config_snmptrap_file)
+static int	read_traps(const char *config_snmptrap_file, int snmp_timestamp, const char *snmp_id, int *skip)
 {
 	int	nbytes = 0;
 	char	*error = NULL;
@@ -436,8 +526,11 @@ static int	read_traps(const char *config_snmptrap_file)
 	{
 		buffer[nbytes + offset] = '\0';
 		trap_lastsize += nbytes;
-		db_update_lastsize();
-		parse_traps(0);
+
+		if (NULL == skip || 0 == *skip)
+			db_update_lastsize();
+
+		parse_traps(0, snmp_timestamp, snmp_id, skip);
 	}
 out:
 	zbx_free(error);
@@ -504,6 +597,107 @@ out:
 	return trap_fd;
 }
 
+
+
+static void	DBget_lastsize(const char *config_node_name, const char *config_snmptrap_file)
+{
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		snmp_timestamp;
+	char		*snmp_id = NULL, *snmp_node = NULL, *config_node_name_esc;
+
+	zbx_db_begin();
+
+	result = zbx_db_select("select value from globalvars where name='snmp_node'");
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_execute("insert into globalvars (name,value) values ('snmp_node','')");
+		snmp_node = NULL;
+	}
+	else
+		snmp_node = zbx_strdup(NULL, row[0]);
+	zbx_db_free_result(result);
+
+	config_node_name_esc = zbx_db_dyn_escape_string(ZBX_NULL2EMPTY_STR(config_node_name));
+	zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
+	zbx_free(config_node_name_esc);
+
+	result = zbx_db_select("select value from globalvars where name='snmp_lastsize'");
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_execute("insert into globalvars (name,value) values ('snmp_lastsize','0')");
+		trap_lastsize = 0;
+	}
+	else
+		ZBX_STR2UINT64(trap_lastsize, row[0]);
+	zbx_db_free_result(result);
+
+	result = zbx_db_select("select value from globalvars where name='snmp_timestamp'");
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_execute("insert into globalvars (name,value) values ('snmp_timestamp','0')");
+		snmp_timestamp = 0;
+	}
+	else
+		snmp_timestamp = atoi(row[0]);
+	zbx_db_free_result(result);
+
+	result = zbx_db_select("select value from globalvars where name='snmp_id'");
+	if (NULL == (row = zbx_db_fetch(result)))
+	{
+		zbx_db_execute("insert into globalvars (name,value) values ('snmp_id','')");
+		snmp_id = NULL;
+	}
+	else
+		snmp_id = zbx_strdup(NULL, row[0]);
+	zbx_db_free_result(result);
+
+	zbx_db_commit();
+
+	if (NULL != snmp_id && 0 != snmp_timestamp && NULL != snmp_node && NULL != config_node_name &&
+			0 != strcmp(config_node_name, snmp_node))
+	{
+		int	skip = 1;
+
+		if (-1 != open_trap_file(config_snmptrap_file))
+		{
+			char	snmp_id_bin[ZBX_SHA512_BINARY_LENGTH];
+			int	ret;
+
+			trap_lastsize = 0;
+
+			if (ZBX_SHA512_BINARY_LENGTH != (ret = zbx_hex2bin(snmp_id, snmp_id_bin,
+					ZBX_SHA512_BINARY_LENGTH)))
+			{
+				zabbix_log(LOG_LEVEL_DEBUG, "invalid SNMP ID length:%d", ret);
+			}
+			else
+			{
+				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip))
+					;
+
+				if (0 != offset)
+					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip);
+			}
+
+			/*if (1 == skip)
+			{
+				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip))
+					;
+
+				if (0 != offset)
+					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip);
+			}*/
+
+			/* close_trap_file(); */
+			db_update_lastsize();
+		}
+	}
+
+	zbx_free(snmp_node);
+	zbx_free(snmp_id);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Opens the latest trap file. If the current file has been rotated, *
@@ -529,11 +723,11 @@ static int	get_latest_data(const char *config_snmptrap_file)
 						config_snmptrap_file, zbx_strerror(errno));
 			}
 
-			while (0 < read_traps(config_snmptrap_file))
+			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL))
 				;
 
 			if (0 != offset)
-				parse_traps(1);
+				parse_traps(1, 0, NULL, NULL);
 
 			close_trap_file();
 		}
@@ -541,11 +735,11 @@ static int	get_latest_data(const char *config_snmptrap_file)
 		{
 			/* file has been rotated, process the current file */
 
-			while (0 < read_traps(config_snmptrap_file))
+			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL))
 				;
 
 			if (0 != offset)
-				parse_traps(1);
+				parse_traps(1, 0, NULL, NULL);
 
 			close_trap_file();
 		}
@@ -559,7 +753,7 @@ static int	get_latest_data(const char *config_snmptrap_file)
 		{
 			if (1 == force)
 			{
-				parse_traps(1);
+				parse_traps(1, 0, NULL, NULL);
 				force = 0;
 			}
 			else if (0 != offset && 0 == force)
@@ -601,12 +795,12 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() trapfile:'%s'", __func__, snmptrapper_args_in->config_snmptrap_file);
 
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
-
+	zabbix_increase_log_level();
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
 
-	DBget_lastsize();
+	DBget_lastsize(NULL, snmptrapper_args_in->config_snmptrap_file);
 
 	buffer = (char *)zbx_malloc(buffer, MAX_BUFFER_LEN);
 	*buffer = '\0';
@@ -623,7 +817,7 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 			if (SUCCEED != get_latest_data(snmptrapper_args_in->config_snmptrap_file))
 				break;
 
-			read_traps(snmptrapper_args_in->config_snmptrap_file);
+			read_traps(snmptrapper_args_in->config_snmptrap_file, 0, NULL, NULL);
 		}
 
 		sec = zbx_time() - sec;
