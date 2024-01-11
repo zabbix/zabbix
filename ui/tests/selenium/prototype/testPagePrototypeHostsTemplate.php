@@ -134,7 +134,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 	/**
 	 * Sort host prototypes by Name, Create enabled and Discover column.
 	 *
-	 * @dataProvider getHostSortingData
+	 * @dataProvider getHostsSortingData
 	 */
 	public function testPagePrototypeHostsTemplate_Sorting($data) {
 		$this->page->login()->open('host_prototypes.php?context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
@@ -145,7 +145,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @dataProvider getHostButtonLinkData
+	 * @dataProvider getHostsButtonLinkData
 	 */
 	public function testPagePrototypeHostsTemplate_ButtonLink($data) {
 		$this->page->login()->open('host_prototypes.php?context=template&sort=name&sortorder=ASC&parent_discoveryid='.
@@ -156,7 +156,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getHostDeleteData
+	 * @dataProvider getHostsDeleteData
 	 */
 	public function testPagePrototypeHostsTemplate_Delete($data) {
 		$sql = 'SELECT null FROM hosts WHERE hostid=';

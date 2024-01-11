@@ -156,7 +156,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Host prototype sorting.
 	 */
-	public static function getHostSortingData() {
+	public static function getHostsSortingData() {
 		return [
 			// #0 Sort by Name.
 			[
@@ -452,7 +452,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Host prototype disable/enable by link and button.
 	 */
-	public static function getHostButtonLinkData() {
+	public static function getHostsButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
 			[
@@ -758,7 +758,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Host prototype delete.
 	 */
-	public static function getHostDeleteData() {
+	public static function getHostsDeleteData() {
 		return [
 			// #0 Cancel delete.
 			[
