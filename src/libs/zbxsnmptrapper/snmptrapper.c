@@ -40,7 +40,6 @@
 #include "zbxpreproc.h"
 #include "zbxcrypto.h"
 
-
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
 static ino_t	trap_ino = 0;
@@ -605,8 +604,6 @@ out:
 	return trap_fd;
 }
 
-
-
 static void	DBget_lastsize(const char *config_node_name, const char *config_snmptrap_file)
 {
 	zbx_db_result_t	result;
@@ -626,9 +623,18 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 		snmp_node = zbx_strdup(NULL, row[0]);
 	zbx_db_free_result(result);
 
-	config_node_name_esc = zbx_db_dyn_escape_string(ZBX_NULL2EMPTY_STR(config_node_name));
-	zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
-	zbx_free(config_node_name_esc);
+	if (NULL == config_node_name)
+	{
+		zbx_db_execute("update globalvars set"
+				" value=''"
+				" where name in ('snmp_node','snmp_timestamp','snmp_id')");
+	}
+	else
+	{
+		config_node_name_esc = zbx_db_dyn_escape_string(config_node_name);
+		zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
+		zbx_free(config_node_name_esc);
+	}
 
 	result = zbx_db_select("select value from globalvars where name='snmp_lastsize'");
 	if (NULL == (row = zbx_db_fetch(result)))
@@ -672,8 +678,6 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 			char	snmp_id_bin[ZBX_SHA512_BINARY_LENGTH];
 			int	ret;
 
-			trap_lastsize = 0;
-
 			if (ZBX_SHA512_BINARY_LENGTH != (ret = zbx_hex2bin((const unsigned char *)snmp_id,
 					(unsigned char *)snmp_id_bin, ZBX_SHA512_BINARY_LENGTH)))
 			{
@@ -681,6 +685,8 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 			}
 			else
 			{
+				trap_lastsize = 0;
+
 				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip,
 						config_node_name))
 					;
@@ -689,17 +695,22 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip, config_node_name);
 			}
 
-			/*if (1 == skip)
+			if (1 == skip)
 			{
-				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip))
+				trap_lastsize = 0;
+
+				while (0 < read_traps(config_snmptrap_file, snmp_timestamp, NULL, &skip,
+						config_node_name))
 					;
 
 				if (0 != offset)
-					parse_traps(1, snmp_timestamp, snmp_id_bin, &skip);
-			}*/
+					parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
+			}
 
-			/* close_trap_file(); */
-			db_update_lastsize();
+			if (1 == skip)
+			{
+				db_update_lastsize();
+			}
 		}
 	}
 
@@ -716,7 +727,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
  *               FAIL - there are no new traps or trap file does not exist    *
  *                                                                            *
  ******************************************************************************/
-static int	get_latest_data(const char *config_snmptrap_file)
+static int	get_latest_data(const char *config_snmptrap_file, const char *config_node_name)
 {
 	zbx_stat_t	file_buf;
 
@@ -736,7 +747,7 @@ static int	get_latest_data(const char *config_snmptrap_file)
 				;
 
 			if (0 != offset)
-				parse_traps(1, 0, NULL, NULL, NULL);
+				parse_traps(1, 0, NULL, NULL, config_node_name);
 
 			close_trap_file();
 		}
@@ -748,7 +759,7 @@ static int	get_latest_data(const char *config_snmptrap_file)
 				;
 
 			if (0 != offset)
-				parse_traps(1, 0, NULL, NULL, NULL);
+				parse_traps(1, 0, NULL, NULL, config_node_name);
 
 			close_trap_file();
 		}
@@ -762,7 +773,7 @@ static int	get_latest_data(const char *config_snmptrap_file)
 		{
 			if (1 == force)
 			{
-				parse_traps(1, 0, NULL, NULL, NULL);
+				parse_traps(1, 0, NULL, NULL, config_node_name);
 				force = 0;
 			}
 			else if (0 != offset && 0 == force)
@@ -797,7 +808,6 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 
 	zbx_thread_snmptrapper_args	*snmptrapper_args_in = (zbx_thread_snmptrapper_args *)
 			(((zbx_thread_args_t *)args)->args);
-
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
@@ -822,10 +832,14 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 
 		while (ZBX_IS_RUNNING() && FAIL == zbx_vps_monitor_capped())
 		{
-			if (SUCCEED != get_latest_data(snmptrapper_args_in->config_snmptrap_file))
+			if (SUCCEED != get_latest_data(snmptrapper_args_in->config_snmptrap_file,
+					snmptrapper_args_in->config_ha_node_name))
+			{
 				break;
+			}
 
-			read_traps(snmptrapper_args_in->config_snmptrap_file, 0, NULL, NULL, NULL);
+			read_traps(snmptrapper_args_in->config_snmptrap_file, 0, NULL, NULL,
+					snmptrapper_args_in->config_ha_node_name);
 		}
 
 		sec = zbx_time() - sec;
