@@ -596,6 +596,7 @@ out:	/* try to close all handles if they are exhausted */
 	}
 
 	discoverer_net_check_result_flush(dmanager, task, &results, 1);
+	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);	/* Incomplete results*/
 	zbx_vector_discoverer_results_ptr_destroy(&results);
 	zbx_vector_portrange_destroy(&port_ranges);
 
