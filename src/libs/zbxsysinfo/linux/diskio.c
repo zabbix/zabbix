@@ -321,11 +321,14 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 
 			if (0 == lstat(tmp, &lstat_buf))
 			{
-				zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/device/type",
-						major(stat_buf->st_rdev), minor(stat_buf->st_rdev));
+				char	sys_blkdev_pfx_device_type[MAX_STRING_LEN];
 
-				if (NULL != (f = fopen(tmp, "r")) && 1 == fscanf(f, "%d", &type) &&
-						SCSI_TYPE_ROM == type)
+				zbx_snprintf(sys_blkdev_pfx_device_type, sizeof(sys_blkdev_pfx_device_type),
+						ZBX_SYS_BLKDEV_PFX "%u:%u/device/type", major(stat_buf->st_rdev),
+						minor(stat_buf->st_rdev));
+
+				if (NULL != (f = fopen(sys_blkdev_pfx_device_type, "r")) &&
+						1 == fscanf(f, "%d", &type) && SCSI_TYPE_ROM == type)
 				{
 					devtype_found = 1;
 
@@ -344,7 +347,7 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 			{
 				zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
 						major(stat_buf->st_rdev), minor(stat_buf->st_rdev));
-				
+
 				if (NULL != (f = fopen(tmp, "r")))
 				{
 					while (NULL != fgets(tmp, sizeof(tmp), f))
@@ -359,7 +362,7 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 							p = tmp + l - 1;
 							if ('\n' == *p)
 								*p = '\0';
-							
+
 							devtype_found = 1;
 							offset = DEVTYPE_STR_LEN;
 							break;
@@ -369,7 +372,7 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 				}
 			}
 		}
-		
+
 		if (0 == dev_bypass)
 		{
 			zbx_json_addobject(j, NULL);
