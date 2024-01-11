@@ -312,9 +312,13 @@ static void	compare_trap(const char *date, const char *trap, int snmp_timestamp,
 		if (timestamp >= snmp_timestamp)
 		{
 			*skip = 0;
-			zabbix_log(LOG_LEVEL_TRACE, "found record using timestamp");
+			zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper log does not contain last processed record,"
+					" trap data might be missing");
 		}
+
+		return;
 	}
+
 	if (timestamp > snmp_timestamp + SEC_PER_MIN)
 	{
 		zabbix_log(LOG_LEVEL_TRACE, "skipping past timestamp");
@@ -707,10 +711,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 					parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
 			}
 
-			if (1 == skip)
-			{
-				db_update_lastsize();
-			}
+			db_update_lastsize();
 		}
 	}
 
