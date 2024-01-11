@@ -53,8 +53,6 @@ class testDashboardItemValueWidget extends testWidgets {
 	protected static $dashboard_threshold;
 	protected static $old_name = 'New widget';
 	protected static $threshold_widget = 'Widget with thresholds';
-	protected static $threshold_check = 'Widget for thresholds check';
-
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
