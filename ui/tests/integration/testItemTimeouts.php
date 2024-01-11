@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -346,11 +346,22 @@ class testItemTimeouts extends CIntegrationTest {
 		$sync = preg_grep('/item timeouts:/', $data);
 		$this->assertTrue(count($sync) > 0);
 
+		/* We cannot just take $lines_expected number of lines after 'item timeouts' in log. */
+		/* Another process may start writing into log here. So, we must filter lines by pid. */
+		$pid = strtok(array_values($sync)[0], ':');
 		$sync_idx = array_keys($sync)[0];
 		$lines_expected = count($initial_timeouts);
-		$this->assertTrue(count($data) > $sync_idx + $lines_expected);
 
-		$synced_timeouts = array_slice($data, $sync_idx + 1, $lines_expected);
+		$synced_timeouts = array();
+		for ($x = $sync_idx + 1; $x < count($data); $x++) {
+			if (count($synced_timeouts) == $lines_expected) {
+				break;
+			}
+			if (preg_match('/^'.$pid.'/', $data[$x])) {
+				array_push($synced_timeouts, $data[$x]);
+			}
+		}
+
 		$synced_timeouts2 = preg_replace("/^\s*[0-9]+:[0-9]+:[0-9]+\.[0-9]+\s+/", "", $synced_timeouts);
 
 		$pairs = [];

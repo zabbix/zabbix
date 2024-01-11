@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -65,27 +65,6 @@ function graph_item_drawtype2str($drawtype) {
 			return _('Gradient line');
 		default:
 			return _('Unknown');
-	}
-}
-
-function graph_item_aggr_fnc2str($calc_fnc) {
-	switch ($calc_fnc) {
-		case AGGREGATE_NONE:
-			return _('none');
-		case AGGREGATE_MIN:
-			return _('min');
-		case AGGREGATE_MAX:
-			return _('max');
-		case AGGREGATE_AVG:
-			return _('avg');
-		case AGGREGATE_COUNT:
-			return _('count');
-		case AGGREGATE_SUM:
-			return _('sum');
-		case AGGREGATE_FIRST:
-			return _('first');
-		case AGGREGATE_LAST:
-			return _('last');
 	}
 }
 
