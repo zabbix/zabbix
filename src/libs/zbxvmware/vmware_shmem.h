@@ -19,8 +19,10 @@
 #ifndef ZABBIX_VMWARE_SHMEM_H
 #define ZABBIX_VMWARE_SHMEM_H
 
-#include "vmware.h"
+#include "zbxvmware.h"
+
 #include "zbxshmem.h"
+#include "zbxalgo.h"
 
 zbx_shmem_info_t	*vmware_shmem_get_vmware_mem(void);
 void	vmware_shmem_set_vmware_mem_NULL(void);

@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "vmware.h"
+#include "zbxvmware.h"
+
 #include "zbxjson.h"
 
 void	zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg)

@@ -23,7 +23,7 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware.h"
+#include "zbxvmware.h"
 #include "vmware_internal.h"
 
 void	vmware_vm_shared_free(zbx_vmware_vm_t *vm);
