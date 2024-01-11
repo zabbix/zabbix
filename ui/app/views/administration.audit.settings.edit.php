@@ -42,10 +42,7 @@ $form = (new CForm())
 $audit_settings_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
-		new CFormField(
-			(new CCheckBox('auditlog_enabled'))
-				->setChecked($data['auditlog_enabled'] == 1)
-		)
+		new CFormField((new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1))
 	])
 	->addItem([
 		new CLabel([
