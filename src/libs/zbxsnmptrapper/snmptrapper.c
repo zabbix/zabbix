@@ -47,6 +47,13 @@ static char	*buffer = NULL;
 static int	offset = 0;
 static int	force = 0;
 
+static void	db_update_lastsize(void)
+{
+	zbx_db_begin();
+	zbx_db_execute("update globalvars set value=%lld where name='snmp_lastsize'", (long long int)trap_lastsize);
+	zbx_db_commit();
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: adds trap to all matching items for specified interface           *
@@ -247,26 +254,6 @@ static void	process_trap(const char *addr, char *begin, char *end)
 	zbx_free(interfaceids);
 	zbx_free(trap);
 }
-#define	ZBX_SHA512_BINARY_LENGTH	64
-#define	ZBX_SHA512_HEX_LENGTH		(128 + 1)
-
-static void	get_trap_hash(const char *trap, char *hash)
-{
-	char	*ptr;
-
-	/* pdu info cannot be used to calculate hash as it is not same for trap received on other node */
-	/* first OID should always be sysUpTimeInstance */
-	if (NULL != (ptr = strstr(trap, "\nVARBINDS:\n")) || NULL != (ptr = strstr(trap, "sysUpTimeInstance")) ||
-			NULL != (ptr = strstr(trap, ".1.3.6.1.2.1.1.3.0")) ||
-			NULL != (ptr = strstr(trap, " iso.3.6.1.2.1.1.3.0")))
-	{
-		zbx_sha512_hash(ptr, hash);
-
-		return;
-	}
-
-	zbx_sha512_hash(trap, hash);
-}
 
 /******************************************************************************
  *                                                                            *
@@ -290,6 +277,27 @@ static void	delay_trap_logs(char *error, int log_level)
 		lastlogtime = now;
 		last_error_hash = error_hash;
 	}
+}
+
+#define	ZBX_SHA512_BINARY_LENGTH	64
+#define	ZBX_SHA512_HEX_LENGTH		(128 + 1)
+
+static void	get_trap_hash(const char *trap, char *hash)
+{
+	char	*ptr;
+
+	/* pdu info cannot be used to calculate hash as it is not same for trap received on other node */
+	/* first OID should always be sysUpTimeInstance */
+	if (NULL != (ptr = strstr(trap, "\nVARBINDS:\n")) || NULL != (ptr = strstr(trap, "sysUpTimeInstance")) ||
+			NULL != (ptr = strstr(trap, ".1.3.6.1.2.1.1.3.0")) ||
+			NULL != (ptr = strstr(trap, " iso.3.6.1.2.1.1.3.0")))
+	{
+		zbx_sha512_hash(ptr, hash);
+
+		return;
+	}
+
+	zbx_sha512_hash(trap, hash);
 }
 
 static void	db_update_snmp_id(const char *date, const char *trap)
@@ -511,13 +519,6 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 			*buffer = '\0';
 		}
 	}
-}
-
-static void	db_update_lastsize(void)
-{
-	zbx_db_begin();
-	zbx_db_execute("update globalvars set value=%lld where name='snmp_lastsize'", (long long int)trap_lastsize);
-	zbx_db_commit();
 }
 
 /******************************************************************************
@@ -744,6 +745,8 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 	zbx_free(snmp_node);
 	zbx_free(snmp_id);
 }
+#undef	ZBX_SHA512_BINARY_LENGTH
+#undef	ZBX_SHA512_HEX_LENGTH
 
 /******************************************************************************
  *                                                                            *
