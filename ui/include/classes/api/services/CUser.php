@@ -18,6 +18,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
+use BaconQrCode\Renderer\ImageRenderer;
+use BaconQrCode\Renderer\RendererStyle\RendererStyle;
+use BaconQrCode\Writer;
+use Duo\DuoUniversal\Client;
+use Duo\DuoUniversal\DuoException;
+use PragmaRX\Google2FA\Google2FA;
+use PragmaRX\Google2FA\Support\Constants;
+
 
 /**
  * Class containing methods for operations with users.
@@ -33,7 +42,9 @@ class CUser extends CApiService {
 		'login' => [],
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
+		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
+		'getconfirmdata' => [],
+		'confirm' => []
 	];
 
 	protected $tableName = 'users';
@@ -1647,12 +1658,15 @@ class CUser extends CApiService {
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
+		self::getMfa($db_user);
 
 		if ($db_user['attempt_failed'] != 0) {
 			self::resetFailedLoginAttempts($db_user);
 		}
 
-		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
+		if ($db_user['mfaid'] == null) {
+			self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
+		}
 
 		return array_key_exists('userData', $data) && $data['userData'] ? $db_user : $db_user['sessionid'];
 	}
@@ -2681,5 +2695,281 @@ class CUser extends CApiService {
 		}
 
 		return $user_medias;
+	}
+
+	/**
+	 * Collects information on user's MFA method. Adds 'mfaid' parameter, which is empty if MFA is not enabled for
+	 * this user.
+	 *
+	 * @param array $db_user
+	 */
+	private static function getMfa(array &$db_user): void {
+		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_DISABLED) {
+			$db_user['mfaid'] = null;
+			return;
+		}
+
+		$user_groups = API::UserGroup()->get([
+			'output' => ['mfaid'],
+			'userids' => $db_user['userid'],
+			'filter' => ['mfa_status' => GROUP_MFA_ENABLED]
+		]);
+
+		if (!$user_groups) {
+			$db_user['mfaid'] = null;
+			return;
+		}
+
+		DB::update('sessions', [
+			'values' => ['status' => ZBX_SESSION_VERIFICATION_REQUIRED],
+			'where' => ['sessionid' => $db_user['sessionid']]
+		]);
+
+		$mfaids = array_unique(array_column($user_groups, 'mfaid'));
+
+		if (in_array('0', $mfaids)) {
+			$db_user['mfaid'] = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
+			return;
+		}
+
+		$mfas = API::Mfa()->get([
+			'output' => API_OUTPUT_EXTEND,
+			'mfaids' => $mfaids,
+			'preservekeys' => true
+		]);
+
+		if (!$mfas) {
+			$db_user['mfaid'] = null;
+			return;
+		}
+
+		CArrayHelper::sort($mfas, ['name']);
+		$db_user['mfaid'] = reset($mfas)['mfaid'];
+	}
+
+	/**
+	 * Returns data necessary for user.confirm method.
+	 *
+	 * @param array $session_data
+	 *
+	 * Returns:
+	 *                     data['mfa']
+	 *                     data['userid]
+	 *
+	 * If MFA_TYPE_TOTP and user has no totp_secret additionally returns:
+	 *                     data['totp_secret']
+	 *                     data['qr_code_url']
+	 *
+	 * If MFA_TYPE_DUO additionally returns:
+	 *                     data['username']
+	 *                     data['state']
+	 *                     data['prompt_uri']
+	 */
+	public function getConfirmData(array $session_data): array {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'sessionid' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
+			'mfaid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'redirect_uri' =>	['type' => API_STRING_UTF8]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $session_data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		[$mfa] = DB::select('mfa', [
+			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
+				'client_secret'
+			],
+			'filter' => ['mfaid' => $session_data['mfaid']]
+		]);
+
+		[$userid] = DB::select('sessions', [
+			'output' => ['userid'],
+			'filter' => ['sessionid' => $session_data['sessionid']]
+		]);
+
+		$data = [
+			'mfa' => $mfa,
+			'userid' => $userid['userid']
+		];
+
+		if ($mfa['type'] == MFA_TYPE_TOTP) {
+			// Prepare TOTP generator.
+			$totp_generator = new Google2FA();
+
+			switch ($mfa['hash_function']) {
+				case TOTP_HASH_SHA256:
+					$totp_generator->setAlgorithm(Constants::SHA256);
+					break;
+
+				case TOTP_HASH_SHA512:
+					$totp_generator->setAlgorithm(Constants::SHA512);
+					break;
+
+				default:
+					$totp_generator->setAlgorithm(Constants::SHA1);
+			}
+
+			$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
+
+			if ($mfa['code_length'] == TOTP_CODE_LENGTH_8) {
+				$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
+			}
+
+			$user_totp_secret = DB::select('mfa_totp_secret', [
+				'output' => ['totp_secret'],
+				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
+			]);
+
+			if (!$user_totp_secret) {
+				$data['totp_secret'] = $totp_generator->generateSecretKey(TOTP_SECRET_LENGTH_32);
+				$data['qr_code_url'] = $totp_generator->getQRCodeUrl('Zabbix', $data['mfa']['name'],
+					$data['totp_secret']
+				);
+			}
+		}
+
+		if ($mfa['type'] == MFA_TYPE_DUO) {
+			try {
+				$duo_client = new Client($data['mfa']['clientid'], $data['mfa']['client_secret'],
+					$data['mfa']['api_hostname'], $session_data['redirect_uri']);
+
+				$duo_client->healthCheck();
+			}
+			catch (DuoException $e) {
+				throw new Exception('Verify the values in Duo Universal Prompt MFA method are correct. '.
+					$e->getMessage()
+				);
+			}
+
+			[$username] = DB::select('users', [
+				'output' => ['username'],
+				'filter' => ['userid' => $data['userid']]
+			]);
+			$data['username'] = $username['username'];
+
+			$data['state'] = $duo_client->generateState();
+			$data['prompt_uri'] = $duo_client->createAuthUrl($data['username'], $data['state']);
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Check MFA method authentication for the user based on provided data.
+	 *
+	 * @param array $data
+	 */
+	public function confirm(array $data): bool {
+		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
+			'sessionid' => 			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+			'mfa' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
+				'mfaid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
+				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
+				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('mfa', 'name')],
+				'hash_function' =>		['type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
+				'code_length' =>		['type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
+				'api_hostname' => 		['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'api_hostname')],
+				'clientid' =>			['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'clientid')],
+				'client_secret' =>		['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'client_secret')]
+			]],
+			'totp_secret' =>		['type' => API_STRING_UTF8],
+			'verification_code' =>	['type' => API_STRING_UTF8],
+			'state' =>				['type' => API_STRING_UTF8],
+			'username' =>			['type' => API_STRING_UTF8],
+			'redirect_uri' =>		['type' => API_STRING_UTF8],
+			'duo_code' =>			['type' => API_STRING_UTF8],
+			'duo_state' =>			['type' => API_STRING_UTF8]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
+		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
+			// Prepare TOTP generator.
+			$totp_generator = new Google2FA();
+
+			switch ($data['mfa']['hash_function']) {
+				case TOTP_HASH_SHA256:
+					$totp_generator->setAlgorithm(Constants::SHA256);
+					break;
+
+				case TOTP_HASH_SHA512:
+					$totp_generator->setAlgorithm(Constants::SHA512);
+					break;
+
+				default:
+					$totp_generator->setAlgorithm(Constants::SHA1);
+			}
+
+			$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
+
+			if ($data['mfa']['code_length'] == TOTP_CODE_LENGTH_8) {
+				$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
+			}
+
+			if ($data['totp_secret'] == '') {
+				$user_totp_secret = DB::select('mfa_totp_secret', [
+					'output' => ['totp_secret'],
+					'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
+				]);
+				$user_totp_secret = $user_totp_secret[0]['totp_secret'];
+			}
+			else {
+				$user_totp_secret = $data['totp_secret'];
+			}
+
+			$valid_code = $totp_generator->verifyKey($user_totp_secret, $data['verification_code']);
+
+			if ($valid_code) {
+				if ($data['totp_secret'] != '') {
+					DB::insert('mfa_totp_secret', [[
+						'mfaid' => $data['mfa']['mfaid'],
+						'userid' =>$data['userid'],
+						'totp_secret' => $data['totp_secret']
+					]]);
+				}
+			}
+			else {
+				throw new Exception(_('The verification code was incorrect, please try again.'));
+			}
+		}
+
+		if ($data['mfa']['type'] == MFA_TYPE_DUO) {
+			if (!array_key_exists('state', $data) || !array_key_exists('username', $data)) {
+				throw new Exception(_('No saved state please login again.'));
+			}
+
+			if ($data['duo_state'] != $data['state']) {
+				throw new Exception(_('Duo state does not match saved state.'));
+			}
+
+			try {
+				$duo_client = new Client($data['mfa']['clientid'], $data['mfa']['client_secret'],
+					$data['mfa']['api_hostname'], $data['redirect_uri']
+				);
+
+				$duo_client->exchangeAuthorizationCodeFor2FAResult($data['duo_code'],
+					$data['username']);
+			} catch (DuoException $e) {
+				throw new Exception(_('Error decoding Duo result.'));
+			}
+		}
+
+		DB::update('sessions', [
+			'values' => ['status' => ZBX_SESSION_ACTIVE],
+			'where' => ['sessionid' => $data['sessionid']]
+		]);
+
+		$outdated = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+
+		// Delete outdated sessions with required verification.
+		DBexecute('DELETE FROM sessions WHERE userid='.zbx_dbstr($data['userid']).' AND status='.
+			zbx_dbstr(ZBX_SESSION_VERIFICATION_REQUIRED).' AND lastaccess>'.zbx_dbstr($outdated)
+		);
+
+		return true;
 	}
 }

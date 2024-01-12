@@ -77,6 +77,11 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 		]);
 	}
 
+	if (CWebUser::$data['mfaid']) {
+		CSessionHelper::set('mfaid', CWebUser::$data['mfaid']);
+		redirect((new CUrl('index_mfa.php'))->setArgument('request', $request)->toString());
+	}
+
 	$redirect = array_filter([CWebUser::isGuest() ? '' : $request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 	redirect(reset($redirect));
 }
