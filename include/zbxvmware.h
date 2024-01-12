@@ -729,6 +729,12 @@ int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle,
 
 int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
 
+zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
+		const char *id);
+int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid,
+		int *unit);
+int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
+		zbx_uint64_t counterid, const char *instance);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
 zbx_vmware_t			*zbx_vmware_get_vmware(void);
