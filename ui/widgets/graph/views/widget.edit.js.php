@@ -24,30 +24,25 @@
 window.widget_graph_form = new class {
 
 	init() {
-		this._form = document.getElementById('widget-dialogue-form');
-		this._source_type = this._form.querySelector('#source_type input[name="source_type"]:checked').value;
+		document.getElementById('source_type').addEventListener('change', () => this.#updateForm());
 
-		document.getElementById('source_type').addEventListener('change', (e) => {
-			this._source_type = e.target.value;
-			this.updateForm();
-		});
-
-		this.updateForm();
+		this.#updateForm();
 	}
 
-	updateForm() {
-		const is_simple_graph = this._source_type == <?= ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH ?>;
-		const is_graph = this._source_type == <?= ZBX_WIDGET_FIELD_RESOURCE_GRAPH ?>;
+	#updateForm() {
+		const form = document.getElementById('widget-dialogue-form');
+		const is_graph = form.querySelector('#source_type input[name="source_type"]:checked').value
+			== <?= ZBX_WIDGET_FIELD_RESOURCE_GRAPH ?>;
 
-		Array.from(document.getElementsByClassName('item_multiselect')).map((element) => {
-			element.style.display = is_simple_graph ? '' : 'none';
-		});
-
-		Array.from(document.getElementsByClassName('graph_multiselect')).map((element) => {
+		form.querySelectorAll('.js-graph-multiselect').forEach(element => {
 			element.style.display = is_graph ? '' : 'none';
 		});
 
-		$('#itemid').multiSelect(is_simple_graph ? 'enable' : 'disable');
+		form.querySelectorAll('.js-item-multiselect').forEach(element => {
+			element.style.display = is_graph ? 'none' : '';
+		});
+
 		$('#graphid').multiSelect(is_graph ? 'enable' : 'disable');
+		$('#itemid').multiSelect(is_graph ? 'disable' : 'enable');
 	}
 };

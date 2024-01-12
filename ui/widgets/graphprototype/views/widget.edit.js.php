@@ -24,30 +24,25 @@
 window.widget_graph_prototype_form = new class {
 
 	init() {
-		this._form = document.getElementById('widget-dialogue-form');
-		this._source_type = this._form.querySelector('#source_type input[name="source_type"]:checked').value;
+		document.getElementById('source_type').addEventListener('change', () => this.#updateForm());
 
-		document.getElementById('source_type').addEventListener('change', (e) => {
-			this._source_type = e.target.value;
-			this.updateForm();
-		});
-
-		this.updateForm();
+		this.#updateForm();
 	}
 
-	updateForm() {
-		const is_simple_graph_prototype = this._source_type == <?= ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE ?>;
-		const is_graph_prototype = this._source_type == <?= ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE ?>;
+	#updateForm() {
+		const form = document.getElementById('widget-dialogue-form');
+		const is_graph_prototype = form.querySelector('#source_type input[name="source_type"]:checked').value
+			== <?= ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE ?>;
 
-		Array.from(document.getElementsByClassName('item_prototye_multiselect')).map((element) => {
-			element.style.display = is_simple_graph_prototype ? '' : 'none';
-		});
-
-		Array.from(document.getElementsByClassName('graph_prototye_multiselect')).map((element) => {
+		form.querySelectorAll('.js-graph-prototype-multiselect').forEach(element => {
 			element.style.display = is_graph_prototype ? '' : 'none';
 		});
 
-		$('#itemid').multiSelect(is_simple_graph_prototype ? 'enable' : 'disable');
+		form.querySelectorAll('.js-item-prototype-multiselect').forEach(element => {
+			element.style.display = is_graph_prototype ? 'none' : '';
+		});
+
 		$('#graphid').multiSelect(is_graph_prototype ? 'enable' : 'disable');
+		$('#itemid').multiSelect(is_graph_prototype ? 'disable' : 'enable');
 	}
 };

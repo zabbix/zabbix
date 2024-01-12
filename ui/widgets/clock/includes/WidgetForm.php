@@ -59,7 +59,7 @@ class WidgetForm extends CWidgetForm {
 			return $errors;
 		}
 
-		if ($this->getFieldValue('time_type') == TIME_TYPE_HOST && $this->getFieldValue('itemid') == []) {
+		if ($this->getFieldValue('time_type') == TIME_TYPE_HOST && !$this->getFieldValue('itemid')) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
 		}
 

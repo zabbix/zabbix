@@ -42,9 +42,7 @@ window.widget_clock_form = new class {
 			});
 		}
 
-		this._time_type.addEventListener('change', () => {
-			this.updateForm();
-		});
+		this._time_type.addEventListener('change', () => this.updateForm());
 
 		for (const checkbox of this._clock_type.querySelectorAll('input')) {
 			checkbox.addEventListener('change', () => this.updateForm());
@@ -58,9 +56,9 @@ window.widget_clock_form = new class {
 	}
 
 	updateForm() {
-		Array.from(document.getElementsByClassName('item-multiselect-row')).map((element) => {
-			element.style.display = this._time_type.value == <?= TIME_TYPE_HOST ?> ? '' : 'none';
-		});
+		document.querySelectorAll('.js-item-multiselect').forEach(element =>
+			element.style.display = this._time_type.value == <?= TIME_TYPE_HOST ?> ? '' : 'none'
+		);
 
 		$('#itemid').multiSelect(this._time_type.value != <?= TIME_TYPE_HOST ?> ? 'disable' : 'enable');
 

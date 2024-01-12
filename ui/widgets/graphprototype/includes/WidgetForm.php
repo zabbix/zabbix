@@ -54,12 +54,12 @@ class WidgetForm extends CWidgetForm {
 		}
 
 		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE
-				&& $this->getFieldValue('itemid') == []) {
+				&& !$this->getFieldValue('itemid')) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item prototype'), _('cannot be empty'));
 		}
 
 		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE
-				&& $this->getFieldValue('graphid') == []) {
+				&& !$this->getFieldValue('graphid')) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Graph prototype'), _('cannot be empty'));
 		}
 

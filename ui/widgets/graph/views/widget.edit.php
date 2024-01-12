@@ -42,9 +42,9 @@ else {
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
-	->addField(($field_itemid)->addRowClass('item_multiselect'))
+	->addField(($field_itemid)->addRowClass('js-item-multiselect'))
 	->addField(array_key_exists('graphid', $data['fields'])
-		? (new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('graph_multiselect')
+		? (new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('js-graph-multiselect')
 		: null
 	)
 	->addField(
