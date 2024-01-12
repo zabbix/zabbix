@@ -2689,6 +2689,143 @@ static int	DBpatch_6050176(void)
 	return ret;
 }
 
+static int	DBpatch_6050177(void)
+{
+	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0};
+
+	return DBadd_field("media", &field);
+}
+
+static int	DBpatch_6050178(void)
+{
+	return DBcreate_index("media", "media_3", "userdirectory_mediaid", 0);
+}
+
+static int	DBpatch_6050179(void)
+{
+	const zbx_db_field_t	field = {"userdirectory_mediaid", NULL, "userdirectory_media", "userdirectory_mediaid",
+			0, 0, 0, 0};
+
+	return DBadd_foreign_key("media", 3, &field);
+}
+
+static int	DBpatch_6050180(void)
+{
+	const zbx_db_field_t	field = {"active", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_media", &field);
+}
+
+static int	DBpatch_6050181(void)
+{
+	const zbx_db_field_t	field = {"severity", "63", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_media", &field);
+}
+
+static int	DBpatch_6050182(void)
+{
+	const zbx_db_field_t	field = {"period", "1-7,00:00-24:00", NULL, NULL, 1024, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("userdirectory_media", &field);
+}
+
+static int	DBpatch_6050183(void)
+{
+	zbx_db_row_t	row;
+	zbx_db_result_t	result;
+	char		*sql = NULL;
+	size_t		sql_alloc = 0, sql_offset = 0;
+	int		ret = SUCCEED;
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (NULL == (result = zbx_db_select("select userdirectory_mediaid,userdirectoryid,mediatypeid"
+			" from userdirectory_media")))
+	{
+		ret = FAIL;
+		goto out;
+	}
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_db_row_t	row2;
+		zbx_db_result_t	result2;
+		zbx_uint64_t	userdirectoryid, userdirectory_medeiaid, mediatypeid;
+
+		ZBX_STR2UINT64(userdirectory_medeiaid, row[0]);
+		ZBX_STR2UINT64(userdirectoryid, row[1]);
+		ZBX_STR2UINT64(mediatypeid, row[2]);
+
+		if (NULL == (result2 = zbx_db_select("select u.userid"
+				" from userdirectory ud,users u"
+				" where ud.userdirectoryid=" ZBX_FS_UI64 " and"
+					" u.userdirectoryid=ud.userdirectoryid and"
+					" ud.provision_status=1",
+					userdirectoryid)))
+		{
+			ret = FAIL;
+			goto out;
+		}
+
+		while (NULL != (row2 = zbx_db_fetch(result2)))
+		{
+			zbx_db_row_t	row3;
+			zbx_db_result_t	result3;
+			zbx_uint64_t	userid;
+			char		*select_sql;
+
+			ZBX_STR2UINT64(userid, row2[0]);
+
+			select_sql = zbx_dsprintf(NULL, "select mediaid"
+					" from media"
+					" where userid=" ZBX_FS_UI64 " and"
+						" mediatypeid=" ZBX_FS_UI64 " and"
+						" userdirectory_mediaid is null"
+					" order by mediaid", userid, mediatypeid);
+
+			if (NULL == (result3 = zbx_db_select_n(select_sql, 1)))
+			{
+				ret = FAIL;
+				zbx_free(select_sql);
+				goto out;
+			}
+			zbx_free(select_sql);
+
+			while (NULL != (row3 = zbx_db_fetch(result3)))
+			{
+				zbx_uint64_t	mediaid;
+
+				ZBX_STR2UINT64(mediaid, row3[0]);
+				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+						"update media"
+						" set userdirectory_mediaid=" ZBX_FS_UI64
+						" where mediaid=" ZBX_FS_UI64 ";\n",
+						userdirectory_medeiaid, mediaid);
+
+				if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
+					break;
+			}
+
+			zbx_db_free_result(result3);
+		}
+
+		zbx_db_free_result(result2);
+	}
+
+	zbx_db_free_result(result);
+	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+	}
+	zbx_free(sql);
+out:
+	return ret;
+
+}
 #endif
 
 DBPATCH_START(6050)
@@ -2870,5 +3007,12 @@ DBPATCH_ADD(6050173, 0, 1)
 DBPATCH_ADD(6050174, 0, 1)
 DBPATCH_ADD(6050175, 0, 1)
 DBPATCH_ADD(6050176, 0, 1)
+DBPATCH_ADD(6050177, 0, 1)
+DBPATCH_ADD(6050178, 0, 1)
+DBPATCH_ADD(6050179, 0, 1)
+DBPATCH_ADD(6050180, 0, 1)
+DBPATCH_ADD(6050181, 0, 1)
+DBPATCH_ADD(6050182, 0, 1)
+DBPATCH_ADD(6050183, 0, 1)
 
 DBPATCH_END()
