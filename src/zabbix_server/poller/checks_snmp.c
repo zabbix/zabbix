@@ -3557,7 +3557,8 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 	if (0 != snmp_rwlock_init_done)
 		zbx_init_library_mt_snmp(progname);
 
-	zbx_clear_snmp_engineid_cache();
+	if (ZBX_PROCESS_TYPE_SNMP_POLLER == process_type)
+		zbx_clear_snmp_engineid_cache();
 
 	SNMP_MT_UNLOCK;
 }
