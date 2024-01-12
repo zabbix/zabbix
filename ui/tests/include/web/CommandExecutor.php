@@ -29,6 +29,7 @@ use Facebook\WebDriver\Exception\WebDriverException;
 use Facebook\WebDriver\Exception\StaleElementReferenceException;
 use Facebook\WebDriver\Exception\UnknownErrorException;
 use Facebook\WebDriver\Exception\NoSuchElementException;
+use Facebook\WebDriver\Exception\UnrecognizedExceptionException;
 
 /**
  * Helper class that allows custom command execution.
@@ -61,6 +62,11 @@ class CommandExecutor extends HttpCommandExecutor {
 		// Allow single communication timeout during test execution
 		catch (WebDriverCurlException $exception) {
 			// Code is not missing here
+		}
+		catch (UnrecognizedExceptionException $exception) {
+			if (strpos($exception->getMessage(), 'not connected to DevTools') === false) {
+				throw $exception;
+			}
 		}
 		catch (UnknownErrorException|NoSuchElementException $exception) {
 			if (strpos($exception->getMessage(), 'ode with given id') !== false) {
