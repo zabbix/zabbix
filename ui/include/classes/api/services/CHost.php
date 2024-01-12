@@ -789,8 +789,6 @@ class CHost extends CHostGeneral {
 	}
 
 	public function updateForce(array $hosts, array $db_hosts): void {
-		$this->updateGroups($hosts, $db_hosts);
-		$this->updateHgSets($hosts, $db_hosts);
 		$this->updateTags($hosts, $db_hosts);
 		$this->updateMacros($hosts, $db_hosts);
 
@@ -831,7 +829,7 @@ class CHost extends CHostGeneral {
 				}
 			}
 
-			$data = $host;
+			$data = array_diff_key($host, array_flip(['hostid']));
 			$data['hosts'] = ['hostid' => $host['hostid']];
 			$result = $this->massUpdate($data);
 
@@ -840,6 +838,8 @@ class CHost extends CHostGeneral {
 			}
 		}
 
+		$this->updateGroups($hosts, $db_hosts);
+		$this->updateHgSets($hosts, $db_hosts);
 		$this->updateTemplates($hosts, $db_hosts);
 	}
 

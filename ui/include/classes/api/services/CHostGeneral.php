@@ -96,7 +96,9 @@ abstract class CHostGeneral extends CHostBase {
 		$id_field_name = $this instanceof CTemplate ? 'templateid' : 'hostid';
 
 		foreach ($hosts as $host) {
-			if (array_key_exists('groups', $host) && !$host['groups']) {
+			if (array_key_exists('groups', $host) && !$host['groups']
+					&& (!array_key_exists('nopermissions_groups', $db_hosts[$host['hostid']])
+						|| !$db_hosts[$host['hostid']]['nopermissions_groups'])) {
 				$error = $this instanceof CTemplate
 					? _s('Template "%1$s" cannot be without template group.', $db_hosts[$host[$id_field_name]]['host'])
 					: _s('Host "%1$s" cannot be without host group.', $db_hosts[$host[$id_field_name]]['host']);
