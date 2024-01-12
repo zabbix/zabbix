@@ -679,7 +679,8 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 
 	if (NULL != config_node_name)
 	{
-		if (NULL != snmp_id && '\0' != *snmp_id && NULL != snmp_node && 0 != strcmp(config_node_name, snmp_node))
+		if (NULL != snmp_id && '\0' != *snmp_id && NULL != snmp_node &&
+				0 != strcmp(config_node_name, snmp_node))
 		{
 			int	skip = 1;
 
@@ -727,6 +728,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 			}
 		}
 
+		zbx_db_begin();
 		config_node_name_esc = zbx_db_dyn_escape_string(ZBX_NULL2EMPTY_STR(config_node_name));
 
 		if (NULL == snmp_node)
@@ -738,6 +740,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 			zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
 
 		zbx_free(config_node_name_esc);
+		zbx_db_commit();
 	}
 
 	zbx_free(snmp_node);
