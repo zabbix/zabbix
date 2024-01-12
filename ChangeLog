@@ -1,6 +1,7 @@
 Changes for 7.0.0beta1
 
 New features:
+.........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
 ..F.I..... [ZBXNEXT-8496] added aggregations for Item value widget and time period functionality for Top hosts and Item value widgets (averza, esekace, kkuzmina, MVekslers)
 .......P.. [ZBXNEXT-8724] improved error messages when proxy is starting up (dimir)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
@@ -8,6 +9,13 @@ New features:
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
+.......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
+..F....... [ZBX-23874] fixed undefined array key error for map elements wih URL (esekace, Ivo)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+.........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
+..F....... [ZBX-23883] fixed PHP runtime error while using "/d", "/m" or "/h" modifiers in the time selector with some time zones (Sasha)
+A......... [ZBX-23262] fixed inability to log in using user.login API method if user has a user group with disabled frontend access (epulke, vmaksimovs)
 ...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
 .......PS. [ZBX-23914] fixed use of uninitialized protocol version variable during snmp checks (vso)
 A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
