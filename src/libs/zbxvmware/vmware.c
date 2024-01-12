@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "vmware.h"
+#include "zbxvmware.h"
+
 #include "vmware_internal.h"
 #include "vmware_perfcntr.h"
 #include "vmware_shmem.h"
 #include "vmware_service_cfglists.h"
-#include "vmware_vm.h"
 #include "vmware_hv.h"
 #include "vmware_ds.h"
 #include "vmware_event.h"
@@ -35,9 +35,8 @@
 #include "zbxmutexs.h"
 #include "zbxshmem.h"
 #include "zbxstr.h"
-#include "zbxnum.h"
-#include "zbxjson.h"
 #include "zbxsysinc.h"
+#include "zbxalgo.h"
 
 /*
  * The VMware data (zbx_vmware_service_t structure) are stored in shared memory.

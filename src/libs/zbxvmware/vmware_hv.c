@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,15 +18,18 @@
 **/
 
 #include "vmware_hv.h"
+#include "vmware_internal.h"
+#include "zbxvmware.h"
+
 #include "vmware_ds.h"
 #include "vmware_vm.h"
 #include "vmware_shmem.h"
-#include "vmware_internal.h"
-#include "vmware.h"
 
 #include "zbxstr.h"
 #include "zbxip.h"
 #include "zbxxml.h"
+#include "zbxnum.h"
+
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif

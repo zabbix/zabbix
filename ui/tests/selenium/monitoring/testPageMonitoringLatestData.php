@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -480,7 +480,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Fill filter form with data.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 
-		// If data contains Tags and their settings, fill them separataly, because tags form is more complicated.
+		// If data contains Tags and their settings, fill them separately, because tags form is more complicated.
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			$form->getField('id:evaltype_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags.Evaluation', 'And/Or'));
 			$form->getField('id:tags_0')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags', []));

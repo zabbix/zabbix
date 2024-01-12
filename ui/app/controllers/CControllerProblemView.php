@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,6 +120,9 @@ class CControllerProblemView extends CControllerProblem {
 			$refresh_curl->removeArgument('page');
 		}
 
+		$timeselector_from = $filter['filter_custom_time'] == 1 ? $filter['from'] : $profile->from;
+		$timeselector_to = $filter['filter_custom_time'] == 1 ? $filter['to'] : $profile->to;
+
 		$data = [
 			'action' => $this->getAction(),
 			'tabfilter_idx' => static::FILTER_IDX,
@@ -134,10 +137,10 @@ class CControllerProblemView extends CControllerProblem {
 				'page' => $filter['page'],
 				'csrf_token' => CCsrfTokenHelper::get('tabfilter'),
 				'timeselector' => [
-					'from' => $profile->from,
-					'to' => $profile->to,
+					'from' => $timeselector_from,
+					'to' => $timeselector_to,
 					'disabled' => ($filter['show'] != TRIGGERS_OPTION_ALL || $filter['filter_custom_time'])
-				] + getTimeselectorActions($profile->from, $profile->to)
+				] + getTimeselectorActions($timeselector_from, $timeselector_to)
 			],
 			'filter_tabs' => $filter_tabs,
 			'refresh_url' => $refresh_curl->getUrl(),

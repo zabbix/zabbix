@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,10 @@
 #ifndef ZABBIX_VMWARE_SHMEM_H
 #define ZABBIX_VMWARE_SHMEM_H
 
-#include "vmware.h"
+#include "zbxvmware.h"
+
 #include "zbxshmem.h"
+#include "zbxalgo.h"
 
 zbx_shmem_info_t	*vmware_shmem_get_vmware_mem(void);
 void	vmware_shmem_set_vmware_mem_NULL(void);

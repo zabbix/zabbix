@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2715,6 +2715,8 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 	item->key = NULL;
 	snmp_context->item.key_orig = zbx_strdup(NULL, item->key_orig);
 
+	snmp_context->item.version = item->interface.version;
+
 	zbx_init_agent_result(&snmp_context->item.result);
 
 	snmp_context->config_timeout = item->timeout;
@@ -3076,6 +3078,10 @@ static void	zbx_init_snmp(const char *progname)
 	sigaddset(&mask, SIGHUP);
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
+
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_LOAD, 1);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_SAVE, 1);
+
 	init_snmp(progname);
 	zbx_snmp_init_done = 1;
 
@@ -3109,9 +3115,7 @@ static void	zbx_shutdown_snmp(const char *progname)
  ******************************************************************************/
 void	zbx_init_library_mt_snmp(const char *progname)
 {
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 0);
 	zbx_init_snmp(progname);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 
 	if (0 == snmp_rwlock_init_done)
 	{
@@ -3340,7 +3344,6 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 
 	SNMP_MT_INITLOCK;
 
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp(progname);
 
 	if (0 != snmp_rwlock_init_done)

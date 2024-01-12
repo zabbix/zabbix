@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -178,7 +178,7 @@ class testPageGroups extends CWebTest {
 		$dialog->close();
 		$dialog->ensureNotPresent();
 
-		// Check link to hosts or templates page with selected group in filer.
+		// Check link to hosts or templates page with selected group in filter.
 		$group_id = CDBHelper::getValue('SELECT groupid FROM hstgrp WHERE name='.zbx_dbstr($links['name']));
 		$row->getColumn('Count')->query('link', $links['count'])->one()->click();
 		$this->assertStringContainsString((($this->object === 'host')

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2432,12 +2432,269 @@ static int	DBpatch_6050175(void)
 	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "name");
 }
 
+typedef struct
+{
+	char		*name;
+	zbx_uint64_t	wid;
+	zbx_uint64_t	wfid;
+	char		*value_str;
+	int		value_int;
+}
+zbx_wiget_field_t;
+
+ZBX_PTR_VECTOR_DECL(wiget_field, zbx_wiget_field_t *)
+ZBX_PTR_VECTOR_IMPL(wiget_field, zbx_wiget_field_t *)
+
+static void	zbx_wiget_field_free(zbx_wiget_field_t *wf)
+{
+	zbx_free(wf->name);
+	zbx_free(wf->value_str);
+	zbx_free(wf);
+}
+
+static int	zbx_wiget_field_compare(const void *d1, const void *d2)
+{
+	const zbx_wiget_field_t	*f1 = *(const zbx_wiget_field_t * const *)d1;
+	const zbx_wiget_field_t	*f2 = *(const zbx_wiget_field_t * const *)d2;
+
+	ZBX_RETURN_IF_NOT_EQUAL(f1->wid, f2->wid);
+
+	return strcmp(f1->name, f2->name);
+}
+
+static void	DBpatch_6050176_transform(zbx_vector_wiget_field_t *timeshift, zbx_vector_wiget_field_t *interval,
+		zbx_vector_wiget_field_t *aggr_func, zbx_vector_wiget_field_t *time_from,
+		zbx_vector_wiget_field_t *time_to, zbx_vector_uint64_t *nofunc_ids)
+{
+	int	i;
+
+	zbx_vector_wiget_field_sort(interval, zbx_wiget_field_compare);
+	zbx_vector_wiget_field_sort(timeshift, zbx_wiget_field_compare);
+
+	for (i = 0; i < aggr_func->values_num; i++)	/* remove fields if aggregate_function = 0 */
+	{
+		int			n;
+		zbx_wiget_field_t	*val = aggr_func->values[i];
+
+		if (0 != val->value_int)
+			continue;
+
+		if (FAIL != (n = zbx_vector_wiget_field_bsearch(interval, val, zbx_wiget_field_compare)))
+		{
+			zbx_vector_uint64_append(nofunc_ids, interval->values[n]->wfid);
+			zbx_wiget_field_free(interval->values[n]);
+			zbx_vector_wiget_field_remove_noorder(interval, n);
+		}
+
+		if (FAIL != (n = zbx_vector_wiget_field_bsearch(timeshift, val, zbx_wiget_field_compare)))
+		{
+			zbx_vector_uint64_append(nofunc_ids, timeshift->values[n]->wfid);
+			zbx_wiget_field_free(timeshift->values[n]);
+			zbx_vector_wiget_field_remove(timeshift, n);
+		}
+	}
+
+	while (0 < interval->values_num)	/* columns.N.time_period.from */
+	{
+		int			n;
+		const char		*shift, *sign_shift = "+", *sign_interv = "-";
+		zbx_wiget_field_t	*val = interval->values[interval->values_num - 1];
+
+		if (FAIL == (n = zbx_vector_wiget_field_bsearch(timeshift, val, zbx_wiget_field_compare)))
+			shift = "";
+		else
+			shift = timeshift->values[n]->value_str;
+
+		if ('\0' == *shift || '-' == *shift)
+			sign_shift = "";
+
+		if ('\0' == *val->value_str)
+			sign_interv = "";
+
+		val->value_str = zbx_dsprintf(val->value_str, "now%s%s%s%s", sign_shift, shift, sign_interv,
+				val->value_str);
+		zbx_vector_wiget_field_append(time_from, val);
+		zbx_vector_wiget_field_remove_noorder(interval, interval->values_num - 1);
+	}
+
+	while (0 < timeshift->values_num)	/* columns.N.time_period.to */
+	{
+		const char		*sign_shift = "+";
+		zbx_wiget_field_t	*val = timeshift->values[timeshift->values_num - 1];
+
+		if ('\0' == *val->value_str || '-' == *val->value_str)
+			sign_shift = "";
+
+		val->value_str = zbx_dsprintf(val->value_str, "now%s%s", sign_shift, val->value_str);
+		zbx_vector_wiget_field_append(time_to, val);
+		zbx_vector_wiget_field_remove_noorder(timeshift, timeshift->values_num - 1);
+	}
+}
+
+static int	DBpatch_6050176_load(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to,
+		zbx_vector_uint64_t *nofunc_ids)
+{
+	zbx_db_result_t			result;
+	zbx_db_row_t			row;
+	zbx_vector_wiget_field_t	timeshift, interval, aggr_func;
+
+	if (NULL == (result = zbx_db_select("select widget_fieldid,widgetid,name,value_str,value_int from widget_field"
+				" where name like 'columns.%%.timeshift'"
+					" or name like 'columns.%%.aggregate_interval'"
+					" or name like 'columns.%%.aggregate_function'"
+					" and widgetid in (select widgetid from widget where type='tophosts')")))
+	{
+		return FAIL;
+	}
+
+	zbx_vector_wiget_field_create(&timeshift);
+	zbx_vector_wiget_field_create(&interval);
+	zbx_vector_wiget_field_create(&aggr_func);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_wiget_field_t	*val;
+		const char		*name;
+		size_t			l;
+
+		val = (zbx_wiget_field_t *) zbx_malloc(NULL, sizeof(zbx_wiget_field_t));
+
+		ZBX_STR2UINT64(val->wfid, row[0]);
+		ZBX_STR2UINT64(val->wid, row[1]);
+		name = row[2];
+		l = strlen(name);
+		val->value_str = zbx_strdup(NULL, row[3]);
+		val->value_int = atoi(row[4]);
+
+		if ('t' == name[l - 1])
+		{
+			val->name = zbx_dsprintf(NULL, "%.*s", (int)(l - ZBX_CONST_STRLEN("columns" "timeshift")),
+					&name[ZBX_CONST_STRLEN("columns")]);
+			zbx_vector_wiget_field_append(&timeshift, val);
+		}
+		else if  ('l' == name[l - 1])
+		{
+			val->name = zbx_dsprintf(NULL, "%.*s",
+					(int)(l - ZBX_CONST_STRLEN("columns" "aggregate_interval")),
+					&name[ZBX_CONST_STRLEN("columns")]);
+			zbx_vector_wiget_field_append(&interval, val);
+		}
+		else
+		{
+			val->name = zbx_dsprintf(NULL, "%.*s",
+					(int)(l - ZBX_CONST_STRLEN("columns" "aggregate_function")),
+					&name[ZBX_CONST_STRLEN("columns")]);
+			zbx_vector_wiget_field_append(&aggr_func, val);
+		}
+	}
+	zbx_db_free_result(result);
+
+	DBpatch_6050176_transform(&timeshift, &interval, &aggr_func, time_from, time_to, nofunc_ids);
+
+	zbx_vector_wiget_field_clear_ext(&timeshift, zbx_wiget_field_free);
+	zbx_vector_wiget_field_clear_ext(&interval, zbx_wiget_field_free);
+	zbx_vector_wiget_field_clear_ext(&aggr_func, zbx_wiget_field_free);
+	zbx_vector_wiget_field_destroy(&timeshift);
+	zbx_vector_wiget_field_destroy(&interval);
+	zbx_vector_wiget_field_destroy(&aggr_func);
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050176_remove(zbx_vector_uint64_t *nofuncs)
+{
+	if (0 == nofuncs->values_num)
+		return SUCCEED;
+
+	zbx_vector_uint64_sort(nofuncs,ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	return zbx_db_execute_multiple_query("delete from widget_field where", "widget_fieldid", nofuncs);
+}
+
+static int	DBpatch_6050176_update(zbx_vector_wiget_field_t *time_from, zbx_vector_wiget_field_t *time_to)
+{
+	char	*sql = NULL;
+	size_t	sql_alloc = 0, sql_offset = 0;
+	int	i, ret = SUCCEED;
+
+	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	for (i = 0; i < time_from->values_num; i++)
+	{
+		zbx_wiget_field_t	*val = time_from->values[i];
+		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		zbx_snprintf(name, sizeof(name), "columns%stime_period.from", val->name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update widget_field"
+				" set value_str='%s',name='%s'"
+				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
+				val->value_str, name, val->wfid);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	for (i = 0; i < time_to->values_num; i++)
+	{
+		zbx_wiget_field_t	*val = time_to->values[i];
+		char			name[255 * ZBX_MAX_BYTES_IN_UTF8_CHAR + 1];
+
+		zbx_snprintf(name, sizeof(name), "columns%stime_period.to", val->name);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update widget_field"
+				" set value_str='%s',name='%s'"
+				" where widget_fieldid=" ZBX_FS_UI64 ";\n",
+				val->value_str, name, val->wfid);
+		zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+
+	if (16 < sql_offset)	/* in ORACLE always present begin..end; */
+	{
+		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_free(sql);
+
+	return ret;
+}
+
 static int	DBpatch_6050176(void)
+{
+	zbx_vector_wiget_field_t	time_from, time_to;
+	zbx_vector_uint64_t		nofuncs_ids;
+	int				ret = FAIL;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	zbx_vector_wiget_field_create(&time_from);
+	zbx_vector_wiget_field_create(&time_to);
+	zbx_vector_uint64_create(&nofuncs_ids);
+
+	if (SUCCEED == DBpatch_6050176_load(&time_from, &time_to, &nofuncs_ids)
+			&& SUCCEED == DBpatch_6050176_remove(&nofuncs_ids)
+			&& SUCCEED == DBpatch_6050176_update(&time_from, &time_to))
+	{
+		ret = SUCCEED;
+	}
+
+	zbx_vector_wiget_field_clear_ext(&time_from, zbx_wiget_field_free);
+	zbx_vector_wiget_field_clear_ext(&time_to, zbx_wiget_field_free);
+	zbx_vector_wiget_field_destroy(&time_from);
+	zbx_vector_wiget_field_destroy(&time_to);
+	zbx_vector_uint64_destroy(&nofuncs_ids);
+
+	return ret;
+}
+
+static int	DBpatch_6050177(void)
 {
 	return DBrename_table("globalvars", "globalvars_tmp");
 }
 
-static int	DBpatch_6050177(void)
+static int	DBpatch_6050178(void)
 {
 	const zbx_db_table_t	table =
 			{"globalvars", "name", 0,
@@ -2452,7 +2709,7 @@ static int	DBpatch_6050177(void)
 	return DBcreate_table(&table);
 }
 
-static int	DBpatch_6050178(void)
+static int	DBpatch_6050179(void)
 {
 	if (ZBX_DB_OK > zbx_db_execute("insert into globalvars (name,value)"
 			" select 'snmp_lastsize',snmp_lastsize from globalvars_tmp"))
@@ -2463,12 +2720,12 @@ static int	DBpatch_6050178(void)
 	return SUCCEED;
 }
 
-static int	DBpatch_6050179(void)
+static int	DBpatch_6050180(void)
 {
 	return DBdrop_table("globalvars_tmp");
 }
 
-static int	DBpatch_6050180(void)
+static int	DBpatch_6050181(void)
 {
 #ifdef HAVE_POSTGRESQL
 	if (FAIL == zbx_db_index_exists("globalvars", "globalvars_pkey1"))
@@ -2480,6 +2737,7 @@ static int	DBpatch_6050180(void)
 	return SUCCEED;
 #endif
 }
+
 
 #endif
 
@@ -2666,5 +2924,6 @@ DBPATCH_ADD(6050177, 0, 1)
 DBPATCH_ADD(6050178, 0, 1)
 DBPATCH_ADD(6050179, 0, 1)
 DBPATCH_ADD(6050180, 0, 1)
+DBPATCH_ADD(6050181, 0, 1)
 
 DBPATCH_END()
