@@ -2432,6 +2432,42 @@ static int	DBpatch_6050175(void)
 	return fix_expression_macro_escaping("media_type_param", "mediatype_paramid", "name");
 }
 
+static int	DBpatch_6050176(void)
+{
+	return DBrename_table("globalvars", "globalvars_tmp");
+}
+
+static int	DBpatch_6050177(void)
+{
+	const zbx_db_table_t	table =
+			{"globalvars", "name", 0,
+				{
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050178(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into globalvars (name,value)"
+			" select 'snmp_lastsize',snmp_lastsize from globalvars_tmp"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050179(void)
+{
+	return DBdrop_table("globalvars_tmp");
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2612,5 +2648,9 @@ DBPATCH_ADD(6050172, 0, 1)
 DBPATCH_ADD(6050173, 0, 1)
 DBPATCH_ADD(6050174, 0, 1)
 DBPATCH_ADD(6050175, 0, 1)
+DBPATCH_ADD(6050176, 0, 1)
+DBPATCH_ADD(6050177, 0, 1)
+DBPATCH_ADD(6050178, 0, 1)
+DBPATCH_ADD(6050179, 0, 1)
 
 DBPATCH_END()

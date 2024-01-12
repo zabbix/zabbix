@@ -323,8 +323,6 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 	zbx_db_commit();
 }
 
-
-
 static void	compare_trap(const char *date, const char *trap, int snmp_timestamp, const char *snmp_id_bin, int *skip)
 {
 	time_t	timestamp = 0;
