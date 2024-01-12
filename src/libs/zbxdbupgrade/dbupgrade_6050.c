@@ -2734,11 +2734,7 @@ static int	DBpatch_6050183(void)
 {
 	zbx_db_row_t	row;
 	zbx_db_result_t	result;
-	char		*sql = NULL;
-	size_t		sql_alloc = 0, sql_offset = 0;
 	int		ret = SUCCEED;
-
-	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 	if (NULL == (result = zbx_db_select("select userdirectory_mediaid,userdirectoryid,mediatypeid"
 			" from userdirectory_media")))
@@ -2776,7 +2772,6 @@ static int	DBpatch_6050183(void)
 			char		*select_sql;
 
 			ZBX_STR2UINT64(userid, row2[0]);
-
 			select_sql = zbx_dsprintf(NULL, "select mediaid"
 					" from media"
 					" where userid=" ZBX_FS_UI64 " and"
@@ -2795,16 +2790,22 @@ static int	DBpatch_6050183(void)
 			while (NULL != (row3 = zbx_db_fetch(result3)))
 			{
 				zbx_uint64_t	mediaid;
+				char		*update_sql;
 
 				ZBX_STR2UINT64(mediaid, row3[0]);
-				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				update_sql = zbx_dsprintf(NULL,
 						"update media"
 						" set userdirectory_mediaid=" ZBX_FS_UI64
 						" where mediaid=" ZBX_FS_UI64 ";\n",
 						userdirectory_medeiaid, mediaid);
 
-				if (SUCCEED != (ret = zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset)))
-					break;
+				if (ZBX_DB_OK > zbx_db_execute("%s", update_sql))
+				{
+					ret = FAIL;
+					zbx_free(update_sql);
+					goto out;
+				}
+				zbx_free(update_sql);
 			}
 
 			zbx_db_free_result(result3);
@@ -2814,14 +2815,6 @@ static int	DBpatch_6050183(void)
 	}
 
 	zbx_db_free_result(result);
-	zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (SUCCEED == ret && 16 < sql_offset)
-	{
-		if (ZBX_DB_OK > zbx_db_execute("%s", sql))
-			ret = FAIL;
-	}
-	zbx_free(sql);
 out:
 	return ret;
 
