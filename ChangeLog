@@ -3,6 +3,7 @@ Changes for 5.0.41rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
 ..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
 
 --------------------------------------------------------------------------------
