@@ -31,17 +31,21 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves a list of vmware service datacenters                    *
+ * Purpose: retrieves list of vmware service datacenters                      *
  *                                                                            *
- * Parameters: doc          - [IN] XML document                               *
+ * Parameters:                                                                *
+ *             service      - [IN]                                            *
+ *             easyhandle   - [IN]                                            *
+ *             doc          - [IN] XML document                               *
+ *             alarms_data  - [IN]                                            *
  *             datacenters  - [OUT] list of vmware datacenters                *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *service, CURL *easyhandle, xmlDoc *doc,
-		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_vmware_datacenter_t *datacenters)
+		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_vmware_datacenter_ptr_t *datacenters)
 {
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
@@ -68,7 +72,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 	}
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_datacenter_reserve(datacenters, (size_t)nodeset->nodeNr);
+	zbx_vector_vmware_datacenter_ptr_reserve(datacenters, (size_t)nodeset->nodeNr);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -101,10 +105,10 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 			zbx_str_free(error);
 		}
 
-		zbx_vector_vmware_datacenter_append(datacenters, datacenter);
+		zbx_vector_vmware_datacenter_ptr_append(datacenters, datacenter);
 	}
 
-	zbx_vector_vmware_datacenter_sort(datacenters, vmware_dc_id_compare);
+	zbx_vector_vmware_datacenter_ptr_sort(datacenters, vmware_dc_id_compare);
 
 	ret = SUCCEED;
 	xmlXPathFreeObject(xpathObj);
@@ -116,7 +120,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves a list of vmware service DVSwitch                       *
+ * Purpose: retrieves list of vmware service DVSwitch                         *
  *                                                                            *
  * Parameters: doc         - [IN] XML document                                *
  *             dvswitches  - [OUT] list of vmware DVSwitch                    *
@@ -125,7 +129,7 @@ out:
  *               FAIL    - the operation has failed                           *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswitch_t *dvsitches)
+static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswitch_ptr_t *dvswitches)
 {
 	char			*id, *name, *uuid;
 	int			i, ret = FAIL;
@@ -152,7 +156,7 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 	}
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_dvswitch_reserve(dvsitches, (size_t)nodeset->nodeNr);
+	zbx_vector_vmware_dvswitch_ptr_reserve(dvswitches, (size_t)nodeset->nodeNr);
 
 	for (i = 0; i < nodeset->nodeNr; i++)
 	{
@@ -183,10 +187,10 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 		dvswitch->id = id;
 		dvswitch->name = name;
 		dvswitch->uuid = uuid;
-		zbx_vector_vmware_dvswitch_append(dvsitches, dvswitch);
+		zbx_vector_vmware_dvswitch_ptr_append(dvswitches, dvswitch);
 	}
 
-	zbx_vector_vmware_dvswitch_sort(dvsitches, ZBX_DEFAULT_STR_COMPARE_FUNC);
+	zbx_vector_vmware_dvswitch_ptr_sort(dvswitches, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 	ret = SUCCEED;
 	xmlXPathFreeObject(xpathObj);
@@ -198,25 +202,25 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves a list of all vmware service hypervisor ids             *
+ * Purpose: retrieves list of all vmware service hypervisor ids               *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
  *             alarms_data  - [IN/OUT] list of vmware alarms                  *
  *             hvs          - [OUT] list of vmware hypervisor ids             *
  *             dss          - [OUT] list of vmware datastore ids              *
  *             datacenters  - [OUT] list of vmware datacenters                *
  *             dvswitches   - [OUT] list of vmware DVSwitch                   *
  *             vc_alarm_ids - [OUT] list of vc alarms id                      *
- *             error        - [OUT] the error message in the case of failure  *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vmware_alarms_data_t *alarms_data, zbx_vector_str_t *hvs, zbx_vector_str_t *dss,
-		zbx_vector_vmware_datacenter_t *datacenters, zbx_vector_vmware_dvswitch_t *dvswitches,
+		zbx_vector_vmware_datacenter_ptr_t *datacenters, zbx_vector_vmware_dvswitch_ptr_t *dvswitches,
 		zbx_vector_str_t *vc_alarm_ids, char **error)
 {
 #	define ZBX_POST_VCENTER_HV_DS_LIST							\

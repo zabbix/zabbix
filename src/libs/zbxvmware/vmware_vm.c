@@ -108,14 +108,14 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
  ******************************************************************************/
 void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_shmem_dev_free);
-	zbx_vector_ptr_destroy(&vm->devs);
+	zbx_vector_vmware_dev_ptr_clear_ext(&vm->devs, vmware_shmem_dev_free);
+	zbx_vector_vmware_dev_ptr_destroy(&vm->devs);
 
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_shmem_fs_free);
-	zbx_vector_ptr_destroy(&vm->file_systems);
+	zbx_vector_vmware_fs_ptr_clear_ext(&vm->file_systems, vmware_shmem_fs_free);
+	zbx_vector_vmware_fs_ptr_destroy(&vm->file_systems);
 
-	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_shmem_custom_attr_free);
-	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
+	zbx_vector_vmware_custom_attr_ptr_clear_ext(&vm->custom_attrs, vmware_shmem_custom_attr_free);
+	zbx_vector_vmware_custom_attr_ptr_destroy(&vm->custom_attrs);
 
 	zbx_vector_str_clear_ext(&vm->alarm_ids, vmware_shared_strfree);
 	zbx_vector_str_destroy(&vm->alarm_ids);
@@ -177,19 +177,19 @@ static void	vmware_custom_attr_free(zbx_vmware_custom_attr_t *ca)
  *                                                                            *
  * Purpose: frees resources allocated to store virtual machine                *
  *                                                                            *
- * Parameters: vm   - [IN] the virtual machine                                *
+ * Parameters: vm   - [IN]                                                    *
  *                                                                            *
  ******************************************************************************/
 void	vmware_vm_free(zbx_vmware_vm_t *vm)
 {
-	zbx_vector_ptr_clear_ext(&vm->devs, (zbx_clean_func_t)vmware_dev_free);
-	zbx_vector_ptr_destroy(&vm->devs);
+	zbx_vector_vmware_dev_ptr_clear_ext(&vm->devs, vmware_dev_free);
+	zbx_vector_vmware_dev_ptr_destroy(&vm->devs);
 
-	zbx_vector_ptr_clear_ext(&vm->file_systems, (zbx_mem_free_func_t)vmware_fs_free);
-	zbx_vector_ptr_destroy(&vm->file_systems);
+	zbx_vector_vmware_fs_ptr_clear_ext(&vm->file_systems, vmware_fs_free);
+	zbx_vector_vmware_fs_ptr_destroy(&vm->file_systems);
 
-	zbx_vector_vmware_custom_attr_clear_ext(&vm->custom_attrs, vmware_custom_attr_free);
-	zbx_vector_vmware_custom_attr_destroy(&vm->custom_attrs);
+	zbx_vector_vmware_custom_attr_ptr_clear_ext(&vm->custom_attrs, vmware_custom_attr_free);
+	zbx_vector_vmware_custom_attr_ptr_destroy(&vm->custom_attrs);
 
 	zbx_vector_str_clear_ext(&vm->alarm_ids, zbx_str_free);
 	zbx_vector_str_destroy(&vm->alarm_ids);
@@ -283,8 +283,8 @@ static char	**vmware_vm_get_nic_device_props(xmlDoc *details, xmlNode *node, xml
  *                                                                            *
  * Purpose: gets virtual machine network interface devices                    *
  *                                                                            *
- * Parameters: vm      - [OUT] the virtual machine                            *
- *             details - [IN] an xml document containing virtual machine data *
+ * Parameters: vm      - [OUT]                                                *
+ *             details - [IN] xml document containing virtual machine data    *
  *                                                                            *
  * Comments: The network interface devices are taken from vm device list      *
  *           filtered by macAddress key.                                      *
@@ -296,7 +296,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
 	xmlNode		*guestnet_node;
-	int		i, nics = 0;
+	int		nics = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -313,9 +313,9 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 
 	nodeset = xpathObj->nodesetval;
 	guestnet_node = zbx_xml_doc_get(details, ZBX_XPATH_PROP_NAME("guest.net"));
-	zbx_vector_ptr_reserve(&vm->devs, (size_t)(nodeset->nodeNr + vm->devs.values_alloc));
+	zbx_vector_vmware_dev_ptr_reserve(&vm->devs, (size_t)(nodeset->nodeNr + vm->devs.values_alloc));
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		char			*key;
 		zbx_vmware_dev_t	*dev;
@@ -330,7 +330,7 @@ static void	vmware_vm_get_nic_devices(zbx_vmware_vm_t *vm, xmlDoc *details)
 				"*[local-name()='deviceInfo']/*[local-name()='label']");
 		dev->props = vmware_vm_get_nic_device_props(details, nodeset->nodeTab[i], guestnet_node);
 
-		zbx_vector_ptr_append(&vm->devs, dev);
+		zbx_vector_vmware_dev_ptr_append(&vm->devs, dev);
 		nics++;
 	}
 clean:

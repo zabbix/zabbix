@@ -31,7 +31,7 @@
 
 #define ZBX_VMWARE_DS_REFRESH_VERSION	6
 
-ZBX_PTR_VECTOR_IMPL(vmware_datastore, zbx_vmware_datastore_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_datastore_ptr, zbx_vmware_datastore_t *)
 
 #define ZBX_XPATH_PROP_SUFFIX(property)									\
 	"*[local-name()='propSet'][*[local-name()='name']"						\
@@ -103,7 +103,7 @@ void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: find DS by canonical disk name (perf counter instance)            *
+ * Purpose: finds DS by canonical disk name (perf counter instance)           *
  *                                                                            *
  * Parameters: dss      - [IN] all known Datastores                           *
  *             diskname - [IN] canonical disk name                            *
@@ -111,12 +111,11 @@ void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
  * Return value: uuid of Datastore or NULL                                    *
  *                                                                            *
  ******************************************************************************/
-char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname)
+char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_ptr_t *dss, char *diskname)
 {
 	zbx_vmware_diskextent_t	dx_cmp = {.diskname = diskname};
-	int			i;
 
-	for (i = 0; i< dss->values_num; i++)
+	for (int i = 0; i< dss->values_num; i++)
 	{
 		zbx_vmware_datastore_t	*ds = dss->values[i];
 
@@ -429,23 +428,22 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 }
 
 /******************************************************************************
- * Function: vmware_hv_ds_access_parse                                        *
  *                                                                            *
- * Purpose: read access state of hv to ds                                     *
+ * Purpose: reads access state of hv to ds                                    *
  *                                                                            *
- * Parameters: xdoc    - [IN] the xml data with DS access info                *
- *             hv_dss  - [IN] the vector with all DS connected to HV          *
- *             hv_uuid - [IN] the uuid of HV                                  *
- *             hv_id   - [IN] the id of HV (for logging)                      *
- *             dss     - [IN/OUT] the vector with all Datastores              *
+ * Parameters: xdoc    - [IN] xml data with DS access info                    *
+ *             hv_dss  - [IN] vector with all DS connected to HV              *
+ *             hv_uuid - [IN] uuid of HV                                      *
+ *             hv_id   - [IN] id of HV (for logging)                          *
+ *             dss     - [IN/OUT] vector with all Datastores                  *
  *                                                                            *
  * Return value: count of updated DS                                          *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_dss, const char *hv_uuid,
-		const char *hv_id, zbx_vector_vmware_datastore_t *dss)
+		const char *hv_id, zbx_vector_vmware_datastore_ptr_t *dss)
 {
-	int		i, parsed_num = 0;
+	int		parsed_num = 0;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
@@ -469,7 +467,7 @@ static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_ds
 
 	nodeset = xpathObj->nodesetval;
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		int				j;
 		char				*value;
@@ -493,7 +491,7 @@ static int	vmware_hv_ds_access_parse(xmlDoc *xdoc, const zbx_vector_str_t *hv_ds
 
 		ds_cmp.id = hv_dss->values[j];
 
-		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
+		if (FAIL == (j = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, vmware_ds_id_compare)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Datastore \"%s\" not found on hypervisor \"%s\".", __func__,
 					ds_cmp.id, hv_id);
@@ -516,24 +514,23 @@ clean:
 }
 
 /******************************************************************************
- * Function: vmware_hv_ds_access_update                                       *
  *                                                                            *
  * Purpose: update access state of hv to ds                                   *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             hv_uuid      - [IN] the vmware hypervisor uuid                 *
- *             hv_id        - [IN] the vmware hypervisor id                   *
- *             hv_dss       - [IN] the vector with all DS connected to HV     *
- *             dss          - [IN/OUT] the vector with all Datastores         *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             hv_uuid      - [IN] vmware hypervisor uuid                     *
+ *             hv_id        - [IN] vmware hypervisor id                       *
+ *             hv_dss       - [IN] vector with all DS connected to HV         *
+ *             dss          - [IN/OUT] vector with all Datastores             *
+ *             error        - [OUT] error message in the case of failure      *
  *                                                                            *
  * Return value: SUCCEED - the access state was updated successfully          *
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
 int	vmware_hv_ds_access_update(zbx_vmware_service_t *service, CURL *easyhandle, const char *hv_uuid,
-		const char *hv_id, const zbx_vector_str_t *hv_dss, zbx_vector_vmware_datastore_t *dss, char **error)
+		const char *hv_id, const zbx_vector_str_t *hv_dss, zbx_vector_vmware_datastore_ptr_t *dss, char **error)
 {
 #	define ZBX_POST_HV_DS_ACCESS 									\
 		ZBX_POST_VSPHERE_HEADER									\

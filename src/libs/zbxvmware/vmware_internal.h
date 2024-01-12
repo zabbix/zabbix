@@ -104,7 +104,7 @@ ZBX_PTR_VECTOR_DECL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
 
 typedef struct
 {
-	zbx_vector_vmware_alarm_t		*alarms;
+	zbx_vector_vmware_alarm_ptr_t		*alarms;
 	zbx_vector_vmware_alarm_details_t	details;
 }
 zbx_vmware_alarms_data_t;
