@@ -26,16 +26,10 @@
  * @var array $data
  */
 
-if (array_key_exists('itemid', $data['fields'])) {
-	$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
-		->setPopupParameter('numeric', true);
+$field_itemid = (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))->setPopupParameter('numeric', true);
 
-	if (!$data['fields']['itemid']->isTemplateDashboard()) {
-		$field_itemid->setPopupParameter('with_simple_graph_items', true);
-	}
-}
-else {
-	$field_itemid = null;
+if (!$data['fields']['itemid']->isTemplateDashboard()) {
+	$field_itemid->setPopupParameter('with_simple_graph_items', true);
 }
 
 (new CWidgetFormView($data))
@@ -43,10 +37,7 @@ else {
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
 	->addField(($field_itemid)->addRowClass('js-item-multiselect'))
-	->addField(array_key_exists('graphid', $data['fields'])
-		? (new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('js-graph-multiselect')
-		: null
-	)
+	->addField((new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('js-graph-multiselect'))
 	->addField(
 		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)
