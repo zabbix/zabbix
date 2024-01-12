@@ -268,6 +268,30 @@ static void	get_trap_hash(const char *trap, char *hash)
 	zbx_sha512_hash(trap, hash);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Delays SNMP trapper file related issue log entries for 60 seconds *
+ *          unless this is the first time this issue has occurred.            *
+ *                                                                            *
+ * Parameters: error     - [IN] string containing log entry text              *
+ *             log_level - [IN]                                               *
+ *                                                                            *
+ ******************************************************************************/
+static void	delay_trap_logs(char *error, int log_level)
+{
+	static int		lastlogtime = 0;
+	static zbx_hash_t	last_error_hash = 0;
+	int			now = (int)time(NULL);
+	zbx_hash_t		error_hash = zbx_default_string_hash_func(error);
+
+	if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || last_error_hash != error_hash)
+	{
+		zabbix_log(log_level, "%s", error);
+		lastlogtime = now;
+		last_error_hash = error_hash;
+	}
+}
+
 static void	db_update_snmp_id(const char *date, const char *trap)
 {
 	time_t	timestamp;
@@ -275,7 +299,10 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 	size_t	sql_alloc = 0, sql_offset = 0;
 
 	if (FAIL == zbx_iso8601_utc(date, &timestamp))
+	{
 		timestamp = 0;
+		delay_trap_logs("SNMP trapper log contains non ISO 8601 or invalid timestamp", LOG_LEVEL_WARNING);
+	}
 
 	get_trap_hash(trap, hash_bin);
 
@@ -295,6 +322,8 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 
 	zbx_db_commit();
 }
+
+
 
 static void	compare_trap(const char *date, const char *trap, int snmp_timestamp, const char *snmp_id_bin, int *skip)
 {
@@ -483,30 +512,6 @@ static void	parse_traps(int flag, int snmp_timestamp, const char *snmp_id_bin, i
 			offset = 0;
 			*buffer = '\0';
 		}
-	}
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: Delays SNMP trapper file related issue log entries for 60 seconds *
- *          unless this is the first time this issue has occurred.            *
- *                                                                            *
- * Parameters: error     - [IN] string containing log entry text              *
- *             log_level - [IN]                                               *
- *                                                                            *
- ******************************************************************************/
-static void	delay_trap_logs(char *error, int log_level)
-{
-	static int		lastlogtime = 0;
-	static zbx_hash_t	last_error_hash = 0;
-	int			now = (int)time(NULL);
-	zbx_hash_t		error_hash = zbx_default_string_hash_func(error);
-
-	if (ZBX_LOG_ENTRY_INTERVAL_DELAY <= now - lastlogtime || last_error_hash != error_hash)
-	{
-		zabbix_log(log_level, "%s", error);
-		lastlogtime = now;
-		last_error_hash = error_hash;
 	}
 }
 
@@ -712,7 +717,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 						parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
 				}
 
-				if (1 == skip)
+				if (1 == skip && 0 != trap_lastsize)
 				{
 					zabbix_log(LOG_LEVEL_INFORMATION, "cannot resume SNMP traps processing from"
 							" last record");
