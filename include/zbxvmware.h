@@ -72,7 +72,9 @@ typedef struct
 }
 zbx_vmware_perf_counter_t;
 
-/* an entity monitored with performance counters */
+ZBX_PTR_VECTOR_DECL(vmware_perf_counter_ptr, zbx_vmware_perf_counter_t *)
+
+/* an entity monitored with performance counters*/
 typedef struct
 {
 	/* entity type: HostSystem or VirtualMachine */
@@ -90,7 +92,7 @@ typedef struct
 	time_t			last_seen;
 
 	/* the performance counters to monitor */
-	zbx_vector_ptr_t	counters;
+	zbx_vector_vmware_perf_counter_ptr_t	counters;
 
 #define ZBX_VMWARE_PERF_QUERY_ALL		"*"
 #define ZBX_VMWARE_PERF_QUERY_TOTAL		""

@@ -50,6 +50,7 @@ VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_entity_tags_t*, vmware_entity_
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_custquery_param_t*, custquery_param)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_ptr_t*, ptr)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_tag_t*, vmware_tag)
+VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_perf_counter_ptr)
 
 /******************************************************************************
  *                                                                            *
@@ -69,16 +70,17 @@ void	vmware_shmem_perf_counter_free(zbx_vmware_perf_counter_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: creates a new performance counter object in shared memory and     *
- *          adds to the specified vector                                      *
+ * Purpose: creates new performance counter object in shared memory and       *
+ *          adds it to specified vector                                       *
  *                                                                            *
- * Parameters: counters  - [IN/OUT] the vector the created performance        *
- *                                  counter object should be added to         *
- *             counterid - [IN] the performance counter id                    *
- *             state     - [IN] the performance counter first state           *
+ * Parameters: counters  - [IN/OUT] vector, created performance counter       *
+ *                                  object should be added to                 *
+ *             counterid - [IN] performance counter id                        *
+ *             state     - [IN] performance counter first state               *
  *                                                                            *
  ******************************************************************************/
-void	vmware_perf_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t counterid, unsigned char state)
+void	vmware_perf_counters_add_new(zbx_vector_vmware_perf_counter_ptr_t *counters, zbx_uint64_t counterid,
+		unsigned char state)
 {
 	zbx_vmware_perf_counter_t	*counter;
 
@@ -91,12 +93,12 @@ void	vmware_perf_counters_add_new(zbx_vector_ptr_t *counters, zbx_uint64_t count
 
 	VMWARE_VECTOR_CREATE(&counter->values, str_uint64_pair);
 
-	zbx_vector_ptr_append(counters, counter);
+	zbx_vector_vmware_perf_counter_ptr_append(counters, counter);
 }
 
 void	vmware_perf_counters_vector_ptr_create_ext(zbx_vmware_perf_entity_t *pentity)
 {
-	VMWARE_VECTOR_CREATE(&pentity->counters, ptr);
+	VMWARE_VECTOR_CREATE(&pentity->counters, vmware_perf_counter_ptr);
 }
 
 /******************************************************************************

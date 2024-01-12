@@ -88,6 +88,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_dvswitch, zbx_vmware_dvswitch_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_alarm, zbx_vmware_alarm_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_diskinfo, zbx_vmware_diskinfo_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_cluster_ptr, zbx_vmware_cluster_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_perf_counter_ptr, zbx_vmware_perf_counter_t *)
 
 zbx_vmware_service_objects_t	*get_vmware_service_objects(void)
 {
