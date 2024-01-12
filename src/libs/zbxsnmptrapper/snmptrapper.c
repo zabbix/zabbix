@@ -275,7 +275,7 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 	size_t	sql_alloc = 0, sql_offset = 0;
 
 	if (FAIL == zbx_iso8601_utc(date, &timestamp))
-		return;
+		timestamp = 0;
 
 	get_trap_hash(trap, hash_bin);
 
@@ -298,13 +298,12 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 
 static void	compare_trap(const char *date, const char *trap, int snmp_timestamp, const char *snmp_id_bin, int *skip)
 {
-	time_t	timestamp;
+	time_t	timestamp = 0;
 
-	if (FAIL == zbx_iso8601_utc(date, &timestamp))
+	if (0 != snmp_timestamp && FAIL == zbx_iso8601_utc(date, &timestamp))
 	{
 		/* skip records with old or invalid timestamp until correct one is found */
-		zabbix_log(LOG_LEVEL_TRACE, "skipping invalid timestamp");
-		return;
+		zabbix_log(LOG_LEVEL_TRACE, "SNMP trapper log contains invalid timestamp '%s'", date);
 	}
 
 	if (NULL == snmp_id_bin)
@@ -312,28 +311,42 @@ static void	compare_trap(const char *date, const char *trap, int snmp_timestamp,
 		if (timestamp >= snmp_timestamp)
 		{
 			*skip = 0;
-			zabbix_log(LOG_LEVEL_WARNING, "SNMP trapper log does not contain last processed record,"
-					" trap data might be missing");
+			zabbix_log(LOG_LEVEL_WARNING, "SNMP traps processing resumed from last timestamp");
 		}
 
 		return;
 	}
 
-	if (timestamp > snmp_timestamp + SEC_PER_MIN)
+	if (0 != timestamp)
 	{
-		zabbix_log(LOG_LEVEL_TRACE, "skipping past timestamp");
-	}
-	else if (timestamp > snmp_timestamp - SEC_PER_MIN)
-	{
-		char	hash_bin[ZBX_SHA512_BINARY_LENGTH];
-
-		get_trap_hash(trap, hash_bin);
-
-		if (0 == memcmp(hash_bin, snmp_id_bin, ZBX_SHA512_BINARY_LENGTH))
+		if (timestamp > snmp_timestamp + SEC_PER_MIN)
 		{
-			*skip = 0;
-			zabbix_log(LOG_LEVEL_TRACE, "found record using hash");
+			zabbix_log(LOG_LEVEL_TRACE, "skipping records past timestamp");
+			return;
 		}
+
+		if (timestamp < snmp_timestamp - SEC_PER_MIN)
+		{
+			zabbix_log(LOG_LEVEL_TRACE, "skipping records before timestamp");
+			return;
+		}
+	}
+
+	char	hash_bin[ZBX_SHA512_BINARY_LENGTH];
+
+	get_trap_hash(trap, hash_bin);
+
+	if (0 == memcmp(hash_bin, snmp_id_bin, ZBX_SHA512_BINARY_LENGTH))
+	{
+		*skip = 0;
+
+		if (0 != timestamp)
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "SNMP traps processing resumed from last record and"
+					" timestamp");
+		}
+		else
+			zabbix_log(LOG_LEVEL_WARNING, "SNMP traps processing resumed from last record");
 	}
 }
 
@@ -661,8 +674,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 
 	if (NULL != config_node_name)
 	{
-		if (NULL != snmp_id && 0 != snmp_timestamp && NULL != snmp_node &&
-				0 != strcmp(config_node_name, snmp_node))
+		if (NULL != snmp_id && '\0' != *snmp_id && NULL != snmp_node && 0 != strcmp(config_node_name, snmp_node))
 		{
 			int	skip = 1;
 
@@ -688,7 +700,7 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 						parse_traps(1, snmp_timestamp, snmp_id_bin, &skip, config_node_name);
 				}
 
-				if (1 == skip)
+				if (1 == skip && 0 != snmp_timestamp)
 				{
 					trap_lastsize = 0;
 
@@ -698,6 +710,12 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 
 					if (0 != offset)
 						parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
+				}
+
+				if (1 == skip)
+				{
+					zabbix_log(LOG_LEVEL_INFORMATION, "cannot resume SNMP traps processing from"
+							" last record");
 				}
 
 				db_update_lastsize();
@@ -811,7 +829,10 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 
 	zbx_thread_snmptrapper_args	*snmptrapper_args_in = (zbx_thread_snmptrapper_args *)
 			(((zbx_thread_args_t *)args)->args);
-	zabbix_increase_log_level();zabbix_increase_log_level();
+
+	if (NULL != snmptrapper_args_in->config_ha_node_name && '\0' == *snmptrapper_args_in->config_ha_node_name)
+		snmptrapper_args_in->config_ha_node_name = NULL;
+
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
 
