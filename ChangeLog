@@ -1,11 +1,17 @@
 Changes for 6.0.26rc1
 
 New features:
+.........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
 .........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
+.......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
+...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+.........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
 .........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
 .........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
 .........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
