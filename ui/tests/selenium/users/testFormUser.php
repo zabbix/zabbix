@@ -47,7 +47,7 @@ class testFormUser extends CWebTest {
 				'idp_type' => IDP_TYPE_LDAP,
 				'name' => 'LDAP server #1',
 				'host' => 'LDAP host',
-				'port' => '389',
+				'port' => 389,
 				'base_dn' => 'ou=Users,dc=example,dc=org',
 				'bind_dn' => 'cn=ldap_search,dc=example,dc=org',
 				'bind_password' => 'ldapsecretpassword',
@@ -111,8 +111,10 @@ class testFormUser extends CWebTest {
 					],
 					'disabled' => ['id:autologout'],
 					'enabled_buttons' => ['Add', 'Cancel', 'Select'],
-					'hintbox_warning' => 'You are not able to choose some of the languages,'.
-							' because locales for them are not installed on the web server.'
+					'hintbox_warning' => [
+						'Language' => 'You are not able to choose some of the languages,'.
+								' because locales for them are not installed on the web server.'
+					]
 				]
 			],
 			[
@@ -129,6 +131,7 @@ class testFormUser extends CWebTest {
 						'Rows per page' => '50',
 						'URL (after login)' => ''
 					],
+					// TODO: xpath should be replaced after ZBX-23936 fix.
 					'disabled' => ['Username', 'button:Change password', 'xpath:.//button[@id="label-lang"]/..',
 						'xpath:.//button[@id="label-timezone"]/..', 'xpath:.//button[@id="label-theme"]/..'
 					],
@@ -138,7 +141,9 @@ class testFormUser extends CWebTest {
 						'id:label-theme' => 'System default'
 					],
 					'enabled_buttons' => ['Update', 'Delete', 'Cancel', 'Select'],
-					'hintbox_warning' => 'Password can only be changed for users using the internal Zabbix authentication.'
+					'hintbox_warning' => [
+						'Password' => 'Password can only be changed for users using the internal Zabbix authentication.'
+					]
 				]
 			],
 			[
@@ -166,8 +171,10 @@ class testFormUser extends CWebTest {
 					],
 					'disabled' => ['id:autologout', 'button:Delete'],
 					'enabled_buttons' => ['Update', 'Cancel', 'Select'],
-					'hintbox_warning' => 'You are not able to choose some of the languages,'.
-							' because locales for them are not installed on the web server.'
+					'hintbox_warning' => [
+						'Language' => 'You are not able to choose some of the languages,'.
+								' because locales for them are not installed on the web server.'
+					]
 				]
 			]
 		];
@@ -271,9 +278,12 @@ class testFormUser extends CWebTest {
 		}
 
 		// Check hintbox contains correct text message.
-		$this->assertEquals($data['hintbox_warning'], $this->query('xpath://button[contains(@data-hintbox-contents, '.
-				CXPathHelper::escapeQuotes($data['hintbox_warning']).')]')->one()->getAttribute('data-hintbox-contents')
-		);
+		foreach ($data['hintbox_warning'] as $field => $text) {
+			$form->getField($field)->query('xpath:./..//button[@data-hintbox]')->one()->waitUntilClickable()->click();
+			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilReady()->one();
+			$this->assertEquals($text, $hint->getText());
+			$hint->close();
+		}
 
 		// Check required fields.
 		$this->assertEquals($data['required'], $form->getRequiredLabels());
