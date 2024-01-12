@@ -738,11 +738,11 @@ static int	zbx_get_snmp_response_error(const zbx_snmp_sess_t ssp, const zbx_dc_i
 	else if (STAT_ERROR == status)
 	{
 		char	*tmp_err_str;
-		int		snmp_errno;
+		int	snmp_err;
 
-		snmp_sess_error(ssp, NULL, &snmp_errno, &tmp_err_str);
+		snmp_sess_error(ssp, NULL, &snmp_err, &tmp_err_str);
 
-		if (SNMPERR_AUTHENTICATION_FAILURE == snmp_errno)
+		if (SNMPERR_AUTHENTICATION_FAILURE == snmp_err)
 		{
 			tmp_err_str = zbx_strdup(tmp_err_str, "Authentication failure (incorrect password, community, "
 					"key or duplicate engineID)");
