@@ -37,7 +37,7 @@ void	zbx_discovery_update_host(void *handle, zbx_uint64_t druleid, zbx_db_dhost 
 	ZBX_UNUSED(dhost);
 	ZBX_UNUSED(add_event_cb);
 
-	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now);
+	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, ip, dns, status, (int)now, "");
 }
 
 void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64_t dcheckid,
@@ -67,4 +67,15 @@ void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t 
 	ZBX_UNUSED(dhostid);
 	ZBX_UNUSED(now);
 	ZBX_UNUSED(dserviceids);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: send drule error info                                             *
+ *                                                                            *
+******************************************************************************/
+void	zbx_discovery_update_drule(void *handle, zbx_uint64_t druleid, const char *error, time_t now)
+{
+	zbx_pb_discovery_write_host((zbx_pb_discovery_data_t *)handle, druleid, "", "", DOBJECT_STATUS_FINALIZED,
+			(int)now, error);
 }

@@ -41,6 +41,14 @@ typedef struct
 }
 zbx_dservice_t;
 
+typedef struct
+{
+	zbx_uint64_t	druleid;
+	char		*error;
+}
+zbx_discoverer_drule_error_t;
+ZBX_PTR_VECTOR_DECL(discoverer_drule_error, zbx_discoverer_drule_error_t)
+
 void	zbx_discoverer_init(void);
 
 void	*zbx_discovery_open(void);
@@ -53,6 +61,7 @@ void	zbx_discovery_update_service(void *handle, zbx_uint64_t druleid, zbx_uint64
 		zbx_add_event_func_t add_event_cb);
 void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t now,
 		zbx_vector_uint64_t *dserviceids);
+void	zbx_discovery_update_drule(void *handle, zbx_uint64_t druleid, const char *error, time_t now);
 void	zbx_discovery_close(void *handle);
 
 void	zbx_discovery_dcheck_free(zbx_dc_dcheck_t *dcheck);
@@ -62,5 +71,6 @@ int	zbx_discovery_get_queue_size(zbx_uint64_t *size, char **error);
 zbx_uint32_t	zbx_discovery_pack_usage_stats(unsigned char **data, const zbx_vector_dbl_t *usage, int count);
 void	zbx_discovery_stats_ext_get(struct zbx_json *json, const void *arg);
 void	zbx_discovery_get_worker_info(zbx_process_info_t *info);
+void	zbx_discoverer_drule_error_free(zbx_discoverer_drule_error_t value);
 
 #endif

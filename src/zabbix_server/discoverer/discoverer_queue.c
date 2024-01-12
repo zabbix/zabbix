@@ -183,6 +183,9 @@ void	discoverer_queue_destroy(zbx_discoverer_queue_t *queue)
 	discoverer_queue_clear_jobs(&queue->jobs);
 	zbx_list_destroy(&queue->jobs);
 
+	zbx_vector_discoverer_drule_error_clear_ext(&queue->errors, zbx_discoverer_drule_error_free);
+	zbx_vector_discoverer_drule_error_destroy(&queue->errors);
+
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 }
 
@@ -251,6 +254,7 @@ int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_work
 	queue->pending_checks_count = 0;
 	queue->snmpv3_allowed_workers = snmpv3_allowed_workers;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
+	zbx_vector_discoverer_drule_error_create(&queue->errors);
 
 	zbx_list_create(&queue->jobs);
 
@@ -276,4 +280,26 @@ out:
 		discoverer_queue_destroy(queue);
 
 	return ret;
+}
+
+void	discoverer_queue_append_error(zbx_vector_discoverer_drule_error_t *errors, zbx_uint64_t druleid,
+		const char *error)
+{
+	zbx_discoverer_drule_error_t	*derror_ptr, derror = {.druleid = druleid};
+	int				i;
+
+	if (FAIL == (i = zbx_vector_discoverer_drule_error_search(errors, derror,
+			ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+	{
+		derror.error = zbx_strdup(NULL, error);
+		zbx_vector_discoverer_drule_error_append(errors, derror);
+		return;
+	}
+
+	derror_ptr = &errors->values[i];
+
+	if (NULL != strstr(derror_ptr->error, error))
+		return;
+
+	derror_ptr->error = zbx_dsprintf(derror_ptr->error, "%s\n%s", derror_ptr->error, error);
 }

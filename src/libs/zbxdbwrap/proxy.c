@@ -1880,27 +1880,29 @@ fail:
 static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const zbx_events_funcs_t *events_cbs,
 		char **error)
 {
-	zbx_db_result_t		result;
-	zbx_db_row_t		row;
-	zbx_uint64_t		dcheckid, druleid;
-	struct zbx_json_parse	jp_row;
-	int			status, ret = SUCCEED, i, j;
-	unsigned short		port;
-	const char		*p = NULL;
-	char			ip[ZBX_INTERFACE_IP_LEN_MAX], tmp[MAX_STRING_LEN],
-				dns[ZBX_INTERFACE_DNS_LEN_MAX], *value = NULL;
-	time_t			itemtime;
-	size_t			value_alloc = ZBX_MAX_DISCOVERED_VALUE_SIZE;
-	zbx_vector_ptr_t	drules;
-	zbx_drule_t		*drule;
-	zbx_drule_ip_t		*drule_ip;
-	zbx_dservice_t		*service;
+	zbx_db_result_t				result;
+	zbx_db_row_t				row;
+	zbx_uint64_t				dcheckid, druleid;
+	struct zbx_json_parse			jp_row;
+	int					status, ret = SUCCEED, i, j;
+	unsigned short				port;
+	const char				*p = NULL;
+	char					ip[ZBX_INTERFACE_IP_LEN_MAX], tmp[MAX_STRING_LEN],
+						dns[ZBX_INTERFACE_DNS_LEN_MAX], *value = NULL;
+	time_t					itemtime;
+	size_t					value_alloc = ZBX_MAX_DISCOVERED_VALUE_SIZE;
+	zbx_vector_ptr_t			drules;
+	zbx_drule_t				*drule;
+	zbx_drule_ip_t				*drule_ip;
+	zbx_dservice_t				*service;
+	zbx_vector_discoverer_drule_error_t	drule_errors;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	value = (char *)zbx_malloc(value, value_alloc);
 
 	zbx_vector_ptr_create(&drules);
+	zbx_vector_discoverer_drule_error_create(&drule_errors);
 
 	while (NULL != (p = zbx_json_next(jp_data, p)))
 	{
@@ -1916,6 +1918,25 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 			goto json_parse_error;
 
 		ZBX_STR2UINT64(druleid, tmp);
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
+			status = atoi(tmp);
+		else
+			status = 0;
+
+		if (DOBJECT_STATUS_FINALIZED == status)
+		{
+			zbx_discoverer_drule_error_t	dre_val = {.druleid = druleid, .error = NULL};
+
+			if (FAIL != zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_ERROR, tmp, sizeof(tmp), NULL) &&
+					'\0' != tmp[0])
+			{
+				dre_val.error = zbx_strdup(NULL, tmp);
+			}
+
+			zbx_vector_discoverer_drule_error_append(&drule_errors, dre_val);
+			continue;
+		}
 
 		if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_DCHECK, tmp, sizeof(tmp), NULL))
 			goto json_parse_error;
@@ -1956,11 +1977,6 @@ static int	process_discovery_data_contents(struct zbx_json_parse *jp_data, const
 			zabbix_log(LOG_LEVEL_WARNING, "%s(): \"%s\" is not a valid hostname", __func__, dns);
 			continue;
 		}
-
-		if (SUCCEED == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_STATUS, tmp, sizeof(tmp), NULL))
-			status = atoi(tmp);
-		else
-			status = 0;
 
 		if (FAIL == (i = zbx_vector_ptr_search(&drules, &druleid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 		{
@@ -2047,11 +2063,19 @@ json_parse_error:
 
 		zbx_db_commit();
 	}
+
+	for (i = 0; i < drule_errors.values_num; i++)
+	{
+		zbx_discovery_update_drule(NULL, drule_errors.values[i].druleid, drule_errors.values[i].error, 0);
+	}
+
 json_parse_return:
 	zbx_free(value);
 
 	zbx_vector_ptr_clear_ext(&drules, (zbx_clean_func_t)zbx_drule_free);
 	zbx_vector_ptr_destroy(&drules);
+	zbx_vector_discoverer_drule_error_clear_ext(&drule_errors, zbx_discoverer_drule_error_free);
+	zbx_vector_discoverer_drule_error_destroy(&drule_errors);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 

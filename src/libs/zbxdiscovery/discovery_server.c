@@ -599,6 +599,69 @@ void	zbx_discovery_update_service_down(const zbx_uint64_t dhostid, const time_t 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: update drule error info                                           *
+ *                                                                            *
+******************************************************************************/
+void	zbx_discovery_update_drule(void *handle, zbx_uint64_t druleid, const char *error, time_t now)
+{
+	char		buffer[MAX_STRING_LEN], *sql = NULL;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+	int		is_upd = (NULL == error ? 0 : 1);
+	size_t		err_len = strlen(ZBX_NULL2EMPTY_STR(error));
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() druleid:" ZBX_FS_UI64 " error len:%d", __func__, druleid, (int)err_len);
+
+	ZBX_UNUSED(handle);
+	ZBX_UNUSED(now);
+
+	zbx_snprintf(buffer, sizeof(buffer),
+			"select error"
+			" from drules"
+			" where druleid=" ZBX_FS_UI64
+				" and error<>''",
+			druleid);
+	result = zbx_db_select_n(buffer, 1);
+
+	if (NULL != (row = zbx_db_fetch(result)))
+	{
+		if (NULL == error)
+		{
+			sql = zbx_dsprintf(sql,
+					"update drules"
+					" set error=''"
+					" where druleid=" ZBX_FS_UI64,
+					druleid);
+		}
+
+		if (err_len == strlen(row[0]) && NULL != strstr(error, row[0]))
+			is_upd = 0;
+	}
+
+	zbx_db_free_result(result);
+
+	if (0 != is_upd)
+	{
+		char	*err_esc = zbx_db_dyn_escape_field("drules", "error", error);
+
+		sql = zbx_dsprintf(sql,
+				"update drules"
+				" set error='%s'"
+				" where druleid=" ZBX_FS_UI64,
+				err_esc, druleid);
+		zbx_free(err_esc);
+	}
+
+	if (NULL != sql)
+		zbx_db_execute("%s", sql);
+
+	zbx_free(sql);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 void	*zbx_discovery_open(void)
 {
 	return NULL;

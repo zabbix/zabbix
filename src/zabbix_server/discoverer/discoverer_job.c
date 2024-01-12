@@ -18,6 +18,7 @@
 **/
 
 #include "discoverer_job.h"
+#include "discoverer_queue.h"
 
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
@@ -143,4 +144,11 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc
 	job->ipranges = ipranges;
 
 	return job;
+}
+
+void	discoverer_job_abort(zbx_discoverer_job_t *job, zbx_uint64_t *pending_checks_count,
+		zbx_vector_discoverer_drule_error_t *errors, char *error)
+{
+	discoverer_queue_append_error(errors, job->druleid, error);
+	*pending_checks_count -= discoverer_job_tasks_free(job);
 }
