@@ -257,7 +257,7 @@ static void	zbx_clear_snmp_engineid_devices(zbx_vector_engineid_device_t *d)
 	zbx_vector_engineid_device_destroy(d);
 }
 
-void	zbx_clear_snmp_engineid_cache(int shutdown)
+void	zbx_clear_snmp_engineid_cache(void)
 {
 	zbx_hashset_iter_t		iter;
 	zbx_snmp_engineid_record_t	*engineid;
@@ -268,9 +268,12 @@ void	zbx_clear_snmp_engineid_cache(int shutdown)
 		zbx_clear_snmp_engineid_devices(&engineid->devices);
 		zbx_hashset_iter_remove(&iter);
 	}
+}
 
-	if (1 == shutdown)
-		zbx_hashset_destroy(&engineid_cache);
+void	zbx_destroy_snmp_engineid_cache(void)
+{
+	zbx_clear_snmp_engineid_cache();
+	zbx_hashset_destroy(&engineid_cache);
 }
 
 static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_context_t *item_context)
@@ -3554,7 +3557,7 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const cha
 	if (0 != snmp_rwlock_init_done)
 		zbx_init_library_mt_snmp(progname);
 
-	zbx_clear_snmp_engineid_cache(0);
+	zbx_clear_snmp_engineid_cache();
 
 	SNMP_MT_UNLOCK;
 }
