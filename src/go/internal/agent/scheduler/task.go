@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -244,6 +244,10 @@ func (t *exporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
 }
 
+func (t *exporterTask) Delay() string {
+	return t.item.delay
+}
+
 // directExporterTask provides access to plugin Exporter interaface.
 // It's used for non-recurring exporter requests - single passive checks
 // and internal requests to obtain HostnameItem, HostMetadataItem,
@@ -341,6 +345,10 @@ func (t *directExporterTask) Meta() (meta *plugin.Meta) {
 
 func (t *directExporterTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *directExporterTask) Delay() string {
+	return t.item.delay
 }
 
 // starterTask provides access to plugin Exporter interaface Start() method.
@@ -446,6 +454,10 @@ func (t *watcherTask) Meta() (meta *plugin.Meta) {
 
 func (t *watcherTask) GlobalRegexp() plugin.RegexpMatcher {
 	return t.client.GlobalRegexp()
+}
+
+func (t *watcherTask) Delay() string {
+	return ""
 }
 
 // configuratorTask provides access to plugin Configurator interaface.
