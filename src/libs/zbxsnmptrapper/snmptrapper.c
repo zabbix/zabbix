@@ -725,19 +725,25 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 			}
 		}
 
-		zbx_db_begin();
-		config_node_name_esc = zbx_db_dyn_escape_string(ZBX_NULL2EMPTY_STR(config_node_name));
-
-		if (NULL == snmp_node)
+		if (0 != zbx_strcmp_null(snmp_node, config_node_name))
 		{
-			zbx_db_execute("insert into globalvars (name,value) values ('snmp_node','%s')",
-					config_node_name_esc);
-		}
-		else
-			zbx_db_execute("update globalvars set value='%s' where name='snmp_node'", config_node_name_esc);
+			zbx_db_begin();
+			config_node_name_esc = zbx_db_dyn_escape_string(config_node_name);
 
-		zbx_free(config_node_name_esc);
-		zbx_db_commit();
+			if (NULL == snmp_node)
+			{
+				zbx_db_execute("insert into globalvars (name,value) values ('snmp_node','%s')",
+						config_node_name_esc);
+			}
+			else
+			{
+				zbx_db_execute("update globalvars set value='%s' where name='snmp_node'",
+						config_node_name_esc);
+			}
+
+			zbx_free(config_node_name_esc);
+			zbx_db_commit();
+		}
 	}
 
 	zbx_free(snmp_node);
