@@ -2468,6 +2468,19 @@ static int	DBpatch_6050179(void)
 	return DBdrop_table("globalvars_tmp");
 }
 
+static int	DBpatch_6050180(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("globalvars", "globalvars_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("globalvars", "globalvars_pkey1", "globalvars_pkey",
+			"name", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
 #endif
 
 DBPATCH_START(6050)
@@ -2652,5 +2665,6 @@ DBPATCH_ADD(6050176, 0, 1)
 DBPATCH_ADD(6050177, 0, 1)
 DBPATCH_ADD(6050178, 0, 1)
 DBPATCH_ADD(6050179, 0, 1)
+DBPATCH_ADD(6050180, 0, 1)
 
 DBPATCH_END()
