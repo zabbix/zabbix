@@ -268,273 +268,225 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		/*
-		 * Define values used to test preprocessing steps.
-		 * Steps array can be empty if only value conversion is tested.
-		 */
-		$preproc_test_data = [
-			'value' => $this->getInput('value', ''),
-			'steps' => $this->getInput('steps', []),
-			'single' => !$this->show_final_result,
-			'state' => self::SUPPORTED_STATE
+		$output = [
+			'user' => [
+				'debug_mode' => $this->getDebugMode()
+			]
+		];
+		$data = [
+			'options' => [
+				'single' => !$this->show_final_result,
+				'state' => self::SUPPORTED_STATE
+			]
 		];
 
-		// Get previous value and time.
 		if ($this->use_prev_value) {
 			$prev_value = $this->getInput('prev_value', '');
 			$prev_time = $this->getInput('prev_time', '');
 
 			if ($prev_value !== '' || $prev_time !== '') {
-				$preproc_test_data['history'] = [
+				$data['options']['history'] = [
 					'value' => $prev_value,
 					'timestamp' => $prev_time
 				];
 			}
 		}
 
-		$output = [
-			'steps' => [],
-			'user' => [
-				'debug_mode' => $this->getDebugMode()
-			]
-		];
-
-		$valuemap = ($this->getInput('valuemapid', 0) != 0)
-			? API::ValueMap()->get([
-				'output' => [],
-				'selectMappings' => ['type', 'newvalue', 'value'],
-				'valuemapids' => $this->getInput('valuemapid')
-			])[0]
-			: [];
-
-		// Get value from host.
 		if ($this->get_value_from_host) {
-			// Get post data for particular item type.
-			$item_test_data = $this->getItemTestProperties($this->getInputAll(), true);
+			$this->prepareTestData($data);
+		}
+		else {
+			$data['item']['value'] = $this->getInput('value', '');
+			$data['options']['state'] = (int) $this->getInput('not_supported', self::SUPPORTED_STATE);
 
-			// Apply effective macros values to properties.
-			$item_test_data = $this->resolveItemPropertyMacros($item_test_data);
-
-			// Rename fields according protocol.
-			$item_test_data = CArrayHelper::renameKeys($item_test_data, [
-				'params_ap' => 'params',
-				'params_es' => 'params',
-				'params_f' => 'params',
-				'script' => 'params',
-				'http_username' => 'username',
-				'http_password' => 'password',
-				'http_authtype' => 'authtype',
-				'item_type' => 'type'
-			]);
-
-			if (array_key_exists('parameters', $item_test_data)) {
-				$item_test_data['parameters'] = $this->transformParametersFields($item_test_data['parameters']);
+			if ($data['options']['state'] == self::NOT_SUPPORTED_STATE) {
+				$data['options']['runtime_error'] = $this->getInput('runtime_error', '');
 			}
+		}
 
-			if ($item_test_data['type'] == ITEM_TYPE_CALCULATED) {
-				$item_test_data['host']['hostid'] = $this->getInput('hostid');
-			}
+		$data['item']['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
 
-			// Only non-empty fields need to be sent to server.
-			$item_test_data = $this->unsetEmptyValues($item_test_data);
+		// Steps array can be empty if only value conversion is tested.
+		$steps_data = $this->resolvePreprocessingStepMacros((array) $this->getInput('steps', []));
 
-			self::transformHttpFields($item_test_data);
+		if ($steps_data) {
+			$data['item']['steps'] = $steps_data;
+		}
 
-			/*
-			 * Server will turn off status code check if field value is empty. If field is not present, then server will
-			 * default to check if status code is 200.
-			 */
-			if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $item_test_data)) {
-				$item_test_data['status_codes'] = '';
-			}
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+		$result = $server->testItem(self::adjustFieldTypes($data), CSessionHelper::getId());
 
-			if ($this->item_type != ITEM_TYPE_CALCULATED) {
-				unset($item_test_data['value_type']);
-			}
-
-			// Send test to be executed on Zabbix server.
-			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-			);
-			$result = $server->testItem($item_test_data, CSessionHelper::getId());
-
-			// Handle the response.
+		try {
 			if ($result === false) {
-				error($server->getError());
+				throw new ErrorException($server->getError(), 70);
 			}
-			elseif (is_array($result)) {
-				if (array_key_exists('result', $result)) {
-					// Move current value to previous value field.
-					if ($this->use_prev_value && $preproc_test_data['value'] !== '') {
-						$preproc_test_data['history']['value'] = $preproc_test_data['value'];
-						$preproc_test_data['history']['timestamp'] = $this->getPrevTime();
 
-						$output['prev_value'] = $preproc_test_data['value'];
-						$output['prev_time'] = $preproc_test_data['history']['timestamp'];
+			if (array_key_exists('error', $result)) {
+				throw new ErrorException($result['error'], 70);
+			}
+
+			if (!array_key_exists('item', $result)) {
+				throw new ErrorException('', 70);
+			}
+
+			if ($steps_data && !array_key_exists('preprocessing', $result)) {
+				throw new ErrorException('', 70);
+			}
+
+			$result_item = $result['item'];
+			$result_preproc = (array_key_exists('preprocessing', $result) ? $result['preprocessing'] : [])
+				+ ['steps' => []];
+
+			if ($this->get_value_from_host) {
+				if (array_key_exists('error', $result_item) && $result_item['error'] !== '') {
+					if ($steps_data	&& $steps_data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+						$output['runtime_error'] = $result_item['error'];
+						$output['not_supported'] = self::NOT_SUPPORTED_STATE;
+					}
+					else {
+						throw new ErrorException($result_item['error'], 70);
+					}
+				}
+				elseif (array_key_exists('result', $result_item)) {
+					$output['value'] = $result_item['result'];
+					$output['eol'] = $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
+
+					// Move current value to previous value field.
+					if ($this->use_prev_value && $result_item['result'] !== '') {
+						$output['prev_value'] = $result_item['result'];
+						$output['prev_time'] = $this->getPrevTime();
 					}
 
-					// Apply new value to preprocessing test.
-					$preproc_test_data['value'] = $result['result'];
-					$output['value'] = $result['result'];
-					$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
+					if (array_key_exists('truncated', $result_item) && $result_item['truncated']) {
+						$output['value_warning'] = _s('First %1$s of %2$s shown.',
+							convertUnits(['value' => strlen($result_item['result']), 'units' => 'B']),
+							convertUnits(['value' => $result_item['original_size'], 'units' => 'B'])
+						);
+					}
+				}
+			}
 
-					if (array_key_exists('truncated', $result) && $result['truncated']) {
-						$output['warning'] = _s('First %1$s of %2$s shown.',
-							convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
-							convertUnits(['value' => $result['original_size'], 'units' => 'B'])
+			$test_outcome = ['action' => ZBX_PREPROC_FAIL_DEFAULT];
+			$test_failed = false;
+
+			foreach ($result_preproc['steps'] as $i => &$step) {
+				// If test considered failed, further steps are skipped.
+				if ($test_failed) {
+					unset($result_preproc['steps'][$i]);
+					continue;
+				}
+
+				if (array_key_exists($i, $result_preproc['steps'])) {
+					$step += $result['steps'][$i];
+
+					// If error happened and no value override set, frontend shows 'No value'.
+					if (array_key_exists('error', $step)) {
+						if (array_key_exists('action', $step)) {
+							switch ($step['action']) {
+								case ZBX_PREPROC_FAIL_DISCARD_VALUE:
+									unset($step['result']);
+									$test_failed = true;
+								break;
+
+								case ZBX_PREPROC_FAIL_SET_VALUE:
+									// Code is not missing here.
+									break;
+
+								case ZBX_PREPROC_FAIL_SET_ERROR:
+									$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
+									break;
+							}
+						}
+						else {
+							unset($step['result']);
+							$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
+						}
+					}
+					elseif (array_key_exists('truncated', $step) && $step['truncated']) {
+						$step['warning'] = _s('First %1$s of %2$s shown.',
+							convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
+							convertUnits(['value' => $step['original_size'], 'units' => 'B'])
 						);
 					}
 				}
 
-				if (array_key_exists('error', $result) && $result['error'] !== '') {
-					if ($preproc_test_data['steps']
-							&& $preproc_test_data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-						$preproc_test_data['runtime_error'] = $result['error'];
-						$preproc_test_data['state'] = self::NOT_SUPPORTED_STATE;
+				$step = array_diff_key($step, array_flip(['type', 'params', 'error_handler', 'error_handler_params',
+					'truncated', 'original_size'
+				]));
 
-						$output['not_supported'] = self::NOT_SUPPORTED_STATE;
-						$output['runtime_error'] = $result['error'];
-					}
-					else {
-						error($result['error']);
-					}
-				}
+				// Latest executed step due to the error or end of preprocessing.
+				$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
+			}
+			unset($step);
+
+			$output['steps'] = $result_preproc['steps'];
+
+			if (array_key_exists('error', $result_preproc)) {
+				throw new ErrorException($result_preproc['error'] === ''
+					? _('<empty string>')
+					: $result_preproc['error'],
+				70);
 			}
 
-			if ($messages = get_and_clear_messages()) {
-				$output['error']['messages'] = array_column($messages, 'message');
+			if ($this->show_final_result) {
+				if (array_key_exists('result', $result_preproc)) {
+					$output['final'] = [
+						'action' => _s('Result converted to %1$s', itemValueTypeString($data['item']['value_type'])),
+						'result' => $result_preproc['result']
+					];
+
+					if (array_key_exists('truncated', $result_preproc) && $result_preproc['truncated']) {
+						$output['final']['warning'] = _s('First %1$s of %2$s shown.',
+							convertUnits(['value' => strlen($result_preproc['result']), 'units' => 'B']),
+							convertUnits(['value' => $result_preproc['original_size'], 'units' => 'B'])
+						);
+					}
+
+					$valuemap = $this->getInput('valuemapid', 0) == 0
+						? []
+						: API::ValueMap()->get([
+							'output' => [],
+							'selectMappings' => ['type', 'newvalue', 'value'],
+							'valuemapids' => $this->getInput('valuemapid')
+						])[0];
+
+					if ($valuemap) {
+						$output['mapped_value'] = CValueMapHelper::applyValueMap($data['item']['value_type'],
+							$result_preproc['result'], $valuemap
+						);
+					}
+				}
+				elseif (array_key_exists('error', $result_preproc)) {
+					$output['final'] = [
+						'action' => $test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR
+							? _('Set error to')
+							: '',
+						'error' => $result_preproc['error']
+					];
+				}
+
+				if (array_key_exists('final', $output) && $output['final']['action'] !== '') {
+					$output['final']['action'] = (new CSpan($output['final']['action']))
+						->addClass(ZBX_STYLE_GREY)
+						->toString();
+				}
 			}
 		}
-		else {
-			$preproc_test_data['state'] = $this->getInput('not_supported', self::SUPPORTED_STATE);
+		catch (ErrorException $exception) {
+			if ($exception->getCode() != 70) {
+				throw $exception;
+			}
 
-			if ($preproc_test_data['state'] == self::NOT_SUPPORTED_STATE) {
-				$preproc_test_data['runtime_error'] = $this->getInput('runtime_error', '');
+			if ($exception->getMessage() !== '') {
+				error($exception->getMessage());
 			}
 		}
 
-		// Test preprocessing steps.
-		$this->eol = parent::getInput('eol', ZBX_EOL_LF);
-
-		if (!array_key_exists('error', $output)) {
-			$preproc_test_data['value_type'] = $this->getInput('value_type', ITEM_VALUE_TYPE_STR);
-
-			$preproc_test_data['steps'] = $this->resolvePreprocessingStepMacros($preproc_test_data['steps']);
-
-			// Send test details to Zabbix server.
-			$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-				timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-			);
-			$result = $server->testPreprocessingSteps($preproc_test_data, CSessionHelper::getId());
-
-			if ($result === false) {
-				error($server->getError());
-			}
-			elseif (is_array($result)) {
-				$test_outcome = [];
-				$test_failed = false;
-
-				foreach ($preproc_test_data['steps'] as $i => &$step) {
-					// If test considered failed, further steps are skipped.
-					if ($test_failed) {
-						unset($preproc_test_data['steps'][$i]);
-						continue;
-					}
-
-					if (array_key_exists($i, $result['steps'])) {
-						$step += $result['steps'][$i];
-
-						// If error happened and no value override set, frontend shows 'No value'.
-						if (array_key_exists('error', $step)) {
-							if (array_key_exists('action', $step)) {
-								switch ($step['action']) {
-									case ZBX_PREPROC_FAIL_DISCARD_VALUE:
-										unset($step['result']);
-										$test_failed = true;
-									break;
-
-									case ZBX_PREPROC_FAIL_SET_VALUE:
-										// Code is not missing here.
-										break;
-
-									case ZBX_PREPROC_FAIL_SET_ERROR:
-										$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
-										break;
-								}
-							}
-							else {
-								unset($step['result']);
-								$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
-							}
-						}
-						else {
-							if (array_key_exists('truncated', $step) && $step['truncated']) {
-								$step['warning'] = _s('First %1$s of %2$s shown.',
-									convertUnits(['value' => strlen($step['result']), 'units' => 'B']),
-									convertUnits(['value' => $step['original_size'], 'units' => 'B'])
-								);
-							}
-						}
-					}
-
-					unset($step['type'], $step['params'], $step['error_handler'], $step['error_handler_params'],
-						$step['truncated'], $step['original_size']
-					);
-
-					// Latest executed step due to the error or end of preprocessing.
-					$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
-				}
-				unset($step);
-
-				if (array_key_exists('error', $result)) {
-					error($result['error'] === '' ? _('<empty string>') : $result['error']);
-				}
-				elseif ($this->show_final_result) {
-					if (array_key_exists('result', $result)) {
-						$output['final'] = [
-							'action' => _s('Result converted to %1$s',
-								itemValueTypeString($preproc_test_data['value_type'])
-							),
-							'result' => $result['result']
-						];
-
-						if (array_key_exists('truncated', $result) && $result['truncated']) {
-							$output['final']['warning'] = _s('First %1$s of %2$s shown.',
-								convertUnits(['value' => strlen($result['result']), 'units' => 'B']),
-								convertUnits(['value' => $result['original_size'], 'units' => 'B'])
-							);
-						}
-
-						if ($valuemap) {
-							$output['mapped_value'] = CValueMapHelper::applyValueMap($preproc_test_data['value_type'],
-								$result['result'], $valuemap
-							);
-						}
-					}
-					elseif (array_key_exists('error', $result)) {
-						$output['final'] = [
-							'action' => ($test_outcome['action'] == ZBX_PREPROC_FAIL_SET_ERROR)
-								? _('Set error to')
-								: '',
-							'error' => $result['error']
-						];
-					}
-
-					if ($output['final']['action'] !== '') {
-						$output['final']['action'] = (new CSpan($output['final']['action']))
-							->addClass(ZBX_STYLE_GREY)
-							->toString();
-					}
-				}
-
-				$output['steps'] = $preproc_test_data['steps'];
-			}
-
-			if ($messages = get_and_clear_messages()) {
-				$output['error']['messages'] = array_column($messages, 'message');
-			}
+		if ($messages = get_and_clear_messages()) {
+			$output['error']['messages'] = array_column($messages, 'message');
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($output)]));

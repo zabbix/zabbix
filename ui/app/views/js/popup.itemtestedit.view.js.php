@@ -392,6 +392,7 @@ function processItemPreprocessingTestResults(steps) {
 					break;
 
 				case <?= ZBX_PREPROC_FAIL_SET_VALUE ?>:
+					step.result = step.result === '' ? <?= json_encode(_('<empty string>')) ?> : step.result;
 					step.action = jQuery(tmpl_act_done.evaluate(jQuery.extend(<?= json_encode([
 						'action_name' => _('Set value to')
 					]) ?>, {failed: step.result, failed_hint: escapeHtml(step.result)})));
