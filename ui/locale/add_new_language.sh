@@ -3,7 +3,7 @@
 function run
 {
 	local workdir=$(realpath $(dirname $0))
-	local potfile=${workdir}/en/LC_MESSAGES/frontend.pot
+	local potfile=${workdir}/en_US/LC_MESSAGES/frontend.pot
 
 	[[ -n "$1" ]] ||
 		die "specify language code!"
