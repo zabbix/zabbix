@@ -475,7 +475,10 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
-	time_t				last_stat_time, last_snmp_engineid_hk_time = 0;
+	time_t				last_stat_time;
+#ifdef HAVE_NETSNMP
+	time_t				last_snmp_engineid_hk_time = 0;
+#endif
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -493,8 +496,6 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 #define	STAT_INTERVAL	5	/* if a process is busy and does not sleep then update status not faster than */
 				/* once in STAT_INTERVAL seconds */
-
-#define	SNMP_ENGINEID_HK_INTERVAL	86400
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "%s #%d started [%s #%d]", get_program_type_string(info->program_type),
 			server_num, get_process_type_string(process_type), process_num);
@@ -533,11 +534,13 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	{
 		async_poller_dns_init(&poller_config, poller_args_in);
 
+#ifdef HAVE_NETSNMP
 		if (ZBX_POLLER_TYPE_SNMP == poller_type)
 		{
 			zbx_init_snmp_engineid_cache();
 			last_snmp_engineid_hk_time = time(NULL);
 		}
+#endif
 	}
 
 	while (ZBX_IS_RUNNING())
@@ -594,18 +597,24 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 #endif
 		}
 
+#ifdef HAVE_NETSNMP
+#define	SNMP_ENGINEID_HK_INTERVAL	86400
 		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
 				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
 		{
 			last_snmp_engineid_hk_time = time(NULL);
 			zbx_housekeep_snmp_engineid_cache();
 		}
+#undef SNMP_ENGINEID_HK_INTERVAL
+#endif
 	}
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
 	{
+#ifdef HAVE_NETSNMP
 		if (ZBX_POLLER_TYPE_SNMP == poller_type)
 			zbx_destroy_snmp_engineid_cache();
+#endif
 
 		async_poller_dns_destroy(&poller_config);
 	}
@@ -628,5 +637,4 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
 #undef STAT_INTERVAL
-#undef SNMP_ENGINEID_HK_INTERVAL
 }
