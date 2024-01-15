@@ -32,35 +32,65 @@ class testPermissions extends CIntegrationTest {
 	const HOST_NAME_01 = 'h01';
 	const HOST_NAME_02 = 'h02';
 	const HOST_NAME_03 = 'h03';
+	const HOST_NAME_11 = 'h11';
+	const HOST_NAME_12 = 'h12';
+	const HOST_NAME_13 = 'h13';
+	const HOST_NAME_14 = 'h14';
 
 	const HOSTGROUP_NAME_01 = 'hg01';
 	const HOSTGROUP_NAME_02 = 'hg02';
 	const HOSTGROUP_NAME_03 = 'hg03';
+	const HOSTGROUP_NAME_11 = 'hg11';
+	const HOSTGROUP_NAME_12 = 'hg12';
+	const HOSTGROUP_NAME_13 = 'hg13';
+	const HOSTGROUP_NAME_14 = 'hg14';
 
 	const USER_NAME_01 = 'u01';
 	const USER_NAME_02 = 'u02';
 	const USER_NAME_03 = 'u03';
+	const USER_NAME_11 = 'u11';
+	const USER_NAME_12 = 'u12';
 
 	const USERGROUP_NAME_01 = 'ug01';
 	const USERGROUP_NAME_02 = 'ug02';
 	const USERGROUP_NAME_03 = 'ug03';
+	const USERGROUP_NAME_11 = 'ug11';
+	const USERGROUP_NAME_12 = 'ug12';
 
 	const HOST_METADATA1 = 'host metadata autoreg host';
 	const HOST_METADATA2 = 'host metadata add group';
 	const HOST_METADATA3 = 'host metadata remove group';
+	const HOST_METADATA4 = 'host metadata autoreg host for lld';
+	const HOST_METADATA5 = 'host metadata delete autoreg host for lld';
 
-	const AUTOREG_ACTION_HOST_ADD = 'Test autoregistration action: add host';
-	const AUTOREG_ACTION_HOSTGROUP_ADD = 'Test autoregistration action: add host group';
-	const AUTOREG_ACTION_HOSTGROUP_REMOVE = 'Test autoregistration action: remove host group';
+	const AUTOREG_ACTION_01_HOST_ADD = 'Test autoregistration action: add host';
+	const AUTOREG_ACTION_01_HOSTGROUP_ADD = 'Test autoregistration action: add host group';
+	const AUTOREG_ACTION_01_HOSTGROUP_REMOVE = 'Test autoregistration action: remove host group';
 	const TRIGGER_ACTION_NAME = 'Test trigger action';
 
-	const TEMPLATE_NAME = 'Template with item and trigger';
+	const AUTOREG_ACTION_02_HOST_ADD = 'Test autoregistration action: add host with lld';
+	const AUTOREG_ACTION_02_HOST_DEL = 'Test autoregistration action: remove host with lld';
+
+	const TEMPLATE_NAME_01 = 'Template with item and trigger';
 	const ITEM_NAME = 'trap_001';
 	const TRIGGER_NAME = 'Trigger to test permissions';
-	const TRIGGER_EXPRESSION = 'last(/'.self::TEMPLATE_NAME.'/'.self::ITEM_NAME.')='.TRIGGER_VALUE_TRUE;
+	const TRIGGER_EXPRESSION = 'last(/'.self::TEMPLATE_NAME_01.'/'.self::ITEM_NAME.')='.TRIGGER_VALUE_TRUE;
+
+	const TEMPLATE_NAME_02 = 'Template with lld';
+	const LLD_NAME = 'lld_001';
+	const LLD_MACRO_HP = '{#LLD.HP}';
+	const LLD_MACRO_GP = '{#LLD.GP}';
+	const LLD_HP_PREFIX_01 = 'hp01';
+	const LLD_GP_PREFIX_01 = 'gp01';
+	const LLD_GP_PREFIX_02 = 'gp02';
+	const HP01_HOST_NAME_01 = self::LLD_HP_PREFIX_01.self::HOST_NAME_01;
+	const HP01_HOSTGROUP_NAME_01 = self::LLD_GP_PREFIX_01.self::HOSTGROUP_NAME_01;
+	const HP01_HOSTGROUP_NAME_02 = self::LLD_GP_PREFIX_02.self::HOSTGROUP_NAME_01;
 
 	private static $discovered_hostgroupid;
 	private static $triggerid;
+	private static $lldid;
+	private static $hpid;
 	private static $ts = 0;
 
 	private static $userids = [];
@@ -70,6 +100,7 @@ class testPermissions extends CIntegrationTest {
 	private static $templateids = [];
 
 	public static $HOST_METADATA = self::HOST_METADATA1;
+	public static $LLD_HOST_METADATA = self::HOST_METADATA4;
 
 	/**
 	 * @inheritdoc
@@ -106,6 +137,14 @@ class testPermissions extends CIntegrationTest {
 		$response = $this->call('host.get', []);
 		$this->assertCount(0, $response['result']);
 
+		// Get discovered hosts hostgroup ID
+		$response = $this->call('settings.get', [
+			'output' => [ 'discovery_groupid' ]
+		]);
+
+		$this->assertCount(1, $response['result']);
+		self::$discovered_hostgroupid = $response['result']['discovery_groupid'];
+
 		// Get template group ID
 		$response = $this->call('templategroup.get', [
 			'filter' => [
@@ -119,7 +158,13 @@ class testPermissions extends CIntegrationTest {
 		// Create templates
 		$templates = [
 			[
-				'host' => self::TEMPLATE_NAME,
+				'host' => self::TEMPLATE_NAME_01,
+				'groups' => [
+					'groupid' => $templategroupid
+				]
+			],
+			[
+				'host' => self::TEMPLATE_NAME_02,
 				'groups' => [
 					'groupid' => $templategroupid
 				]
@@ -139,7 +184,7 @@ class testPermissions extends CIntegrationTest {
 			[
 				'name' => self::ITEM_NAME,
 				'key_' => self::ITEM_NAME,
-				'hostid' => self::$templateids[self::TEMPLATE_NAME],
+				'hostid' => self::$templateids[self::TEMPLATE_NAME_01],
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64
 			]
@@ -162,6 +207,39 @@ class testPermissions extends CIntegrationTest {
 		$this->assertCount(1, $response['result']['triggerids']);
 		self::$triggerid = $response['result']['triggerids'][0];
 
+		// Create lld with host prototype and group prototypes
+		$response = $this->call('discoveryrule.create', [
+			'name' => self::LLD_NAME,
+			'key_' => self::LLD_NAME,
+			'hostid' => self::$templateids[self::TEMPLATE_NAME_02],
+			'type' => ITEM_TYPE_TRAPPER
+		]);
+
+		$this->assertCount(1, $response['result']['itemids']);
+		self::$lldid = $response['result']['itemids'][0];
+
+		// Create host prototype.
+		$response = $this->call('hostprototype.create', [
+			'ruleid' => self::$lldid,
+			'host' => self::LLD_HP_PREFIX_01.self::LLD_MACRO_HP,
+			'groupLinks' => [
+				[
+					'groupid' => self::$discovered_hostgroupid
+				]
+			],
+			'groupPrototypes' => [
+				[
+					'name' => self::LLD_GP_PREFIX_01.self::LLD_MACRO_GP
+				],
+				[
+					'name' => self::LLD_GP_PREFIX_02.self::LLD_MACRO_GP
+				]
+			]
+		]);
+
+		$this->assertCount(1, $response['result']['hostids']);
+		self::$hpid = $response['result']['hostids'][0];
+
 		// Create host groups
 		$hostgroups = [
 			[
@@ -172,6 +250,12 @@ class testPermissions extends CIntegrationTest {
 			],
 			[
 				'name' => self::HOSTGROUP_NAME_03
+			],
+			[
+				'name' => self::HOSTGROUP_NAME_11
+			],
+			[
+				'name' => self::HOSTGROUP_NAME_12
 			]
 		];
 		$response = $this->call('hostgroup.create', $hostgroups);
@@ -194,7 +278,7 @@ class testPermissions extends CIntegrationTest {
 				],
 				'templates' => [
 					[
-						'templateid' => self::$templateids[self::TEMPLATE_NAME]
+						'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
 					]
 				]
 			],
@@ -210,7 +294,7 @@ class testPermissions extends CIntegrationTest {
 				],
 				'templates' => [
 					[
-						'templateid' => self::$templateids[self::TEMPLATE_NAME]
+						'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
 					]
 				]
 			]
@@ -224,14 +308,6 @@ class testPermissions extends CIntegrationTest {
 
 		foreach ($hosts as $i => $host)
 			self::$hostids[$host['host']] = $hostids[$i];
-
-		// Get discovered hosts hostgroup ID
-		$response = $this->call('settings.get', [
-			'output' => [ 'discovery_groupid' ]
-		]);
-
-		$this->assertCount(1, $response['result']);
-			self::$discovered_hostgroupid = $response['result']['discovery_groupid'];
 
 		// Create users
 		$users = [
@@ -259,6 +335,28 @@ class testPermissions extends CIntegrationTest {
 			],
 			[
 				'username' => self::USER_NAME_03,
+				'passwd' => '123QWErty!',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'medias' => [
+					[
+						'mediatypeid' => $mediatypeid,
+						'sendto' => 'example@example.com'
+					]
+				]
+			],
+			[
+				'username' => self::USER_NAME_11,
+				'passwd' => '123QWErty!',
+				'roleid' => USER_TYPE_ZABBIX_ADMIN,
+				'medias' => [
+					[
+						'mediatypeid' => $mediatypeid,
+						'sendto' => 'example@example.com'
+					]
+				]
+			],
+			[
+				'username' => self::USER_NAME_12,
 				'passwd' => '123QWErty!',
 				'roleid' => USER_TYPE_ZABBIX_ADMIN,
 				'medias' => [
@@ -345,7 +443,7 @@ class testPermissions extends CIntegrationTest {
 		// Create actions
 		$response = $this->call('action.create', [
 		[
-			'name' => self::AUTOREG_ACTION_HOST_ADD,
+			'name' => self::AUTOREG_ACTION_01_HOST_ADD,
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
@@ -368,7 +466,7 @@ class testPermissions extends CIntegrationTest {
 					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
 					'optemplate' => [
 						[
-							'templateid' => self::$templateids[self::TEMPLATE_NAME]
+							'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
 						]
 					]
 				],
@@ -391,7 +489,7 @@ class testPermissions extends CIntegrationTest {
 			]
 		],
 		[
-			'name' => self::AUTOREG_ACTION_HOSTGROUP_ADD,
+			'name' => self::AUTOREG_ACTION_01_HOSTGROUP_ADD,
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
@@ -421,7 +519,7 @@ class testPermissions extends CIntegrationTest {
 			]
 		],
 		[
-			'name' => self::AUTOREG_ACTION_HOSTGROUP_REMOVE,
+			'name' => self::AUTOREG_ACTION_01_HOSTGROUP_REMOVE,
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => ACTION_STATUS_ENABLED,
 			'filter' => [
@@ -482,8 +580,69 @@ class testPermissions extends CIntegrationTest {
 						],
 						[
 							'userid' => self::$userids[self::USER_NAME_03]
+						],
+						[
+							'userid' => self::$userids[self::USER_NAME_11]
+						],
+						[
+							'userid' => self::$userids[self::USER_NAME_12]
 						]
 					]
+				]
+			]
+		],
+[
+			'name' => self::AUTOREG_ACTION_02_HOST_ADD,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'filter' => [
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => self::HOST_NAME_11
+					],
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_HOST_METADATA,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => self::HOST_METADATA4
+					]
+				],
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+			],
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_TEMPLATE_ADD,
+					'optemplate' => [
+						[
+							'templateid' => self::$templateids[self::TEMPLATE_NAME_02]
+						]
+					]
+				]
+			]
+		],
+		[
+			'name' => self::AUTOREG_ACTION_02_HOST_DEL,
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => ACTION_STATUS_ENABLED,
+			'filter' => [
+				'conditions' => [
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_HOST_NAME,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => self::HOST_NAME_11
+					],
+					[
+						'conditiontype' => ZBX_CONDITION_TYPE_HOST_METADATA,
+						'operator' => CONDITION_OPERATOR_LIKE,
+						'value' => self::HOST_METADATA5
+					]
+				],
+				'evaltype' => CONDITION_EVAL_TYPE_AND_OR
+			],
+			'operations' => [
+				[
+					'operationtype' => OPERATION_TYPE_HOST_REMOVE
 				]
 			]
 		]
@@ -492,10 +651,54 @@ class testPermissions extends CIntegrationTest {
 		$this->assertArrayHasKey('result', $response);
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$actionids = $response['result']['actionids'];
-		$this->assertCount(4, $actionids);
+		$this->assertCount(6, $actionids);
 	}
 
-	private function waitForAutoregHost($hostname, $expected_hostgroups = null) {
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function agentConfigurationProvider() {
+		return [
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::HOST_NAME_01,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'HostMetadata' => self::$HOST_METADATA
+			]
+		];
+	}
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function agentConfigurationProviderLld() {
+		return [
+			self::COMPONENT_AGENT => [
+				'Hostname' => self::HOST_NAME_11,
+				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
+				'HostMetadata' => self::$LLD_HOST_METADATA
+			]
+		];
+	}
+
+	/**
+	 * Component configuration provider for agent related tests.
+	 *
+	 * @return array
+	 */
+	public function serverConfigurationProvider() {
+		return [
+			self::COMPONENT_SERVER => [
+				'DebugLevel' => 4,
+				'LogFileSize' => 50
+			]
+		];
+	}
+
+	private function waitForHost($hostname, $expected_hostgroups = null) {
 		$max_attempts = 5;
 		$sleep_time = 2;
 
@@ -543,33 +746,31 @@ class testPermissions extends CIntegrationTest {
 		return $autoreg_host['hostid'];
 	}
 
-	/**
-	 * Component configuration provider for agent related tests.
-	 *
-	 * @return array
-	 */
-	public function agentConfigurationProvider() {
-		return [
-			self::COMPONENT_AGENT => [
-				'Hostname' => self::HOST_NAME_01,
-				'ServerActive' => '127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'),
-				'HostMetadata' => self::$HOST_METADATA
-			]
-		];
-	}
+	private function waitForHostRemoved($hostname) {
+		$max_attempts = 5;
+		$sleep_time = 2;
 
-	/**
-	 * Component configuration provider for agent related tests.
-	 *
-	 * @return array
-	 */
-	public function serverConfigurationProvider() {
-		return [
-			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
-				'LogFileSize' => 50
+		$request = [
+			'filter' => [
+				'host' => [
+						$hostname
+				]
 			]
 		];
+
+		for ($i = 0; $i < $max_attempts; $i++) {
+			try {
+				$response = $this->call('host.get', $request);
+				$this->assertCount(0, $response['result'], 'Failed to remove host before timeout');
+
+				break;
+			} catch (Exception $e) {
+				if ($i == $max_attempts - 1)
+					throw $e;
+				else
+					sleep($sleep_time);
+			}
+		}
 	}
 
 	private function getTriggerId($hostid) {
@@ -581,14 +782,51 @@ class testPermissions extends CIntegrationTest {
 		return $response['result'][0]['triggerid'];
 	}
 
-	private function validateTriggerStatus($triggerid, $expected_state, $expected_value) {
-		$response = $this->call('trigger.get', [
-			'triggerids' => [$triggerid]
-		]);
+	private function waitForTriggersStatus($triggerids, $expected_state, $expected_value) {
+		$max_attempts = 10;
+		$sleep_time = 1;
+		$err_msg = 'Failed to set trigger';
 
-		$this->assertArrayHasKey(0, $response['result']);
-		$this->assertEquals($expected_state, $response['result'][0]['state']);
-		$this->assertEquals($expected_value, $response['result'][0]['value']);
+		for ($i = 0; $i < $max_attempts; $i++) {
+			try {
+				$response = $this->call('trigger.get', [
+					'triggerids' => $triggerids
+				]);
+
+				$this->assertCount(count($triggerids), $response['result'], $err_msg);
+
+				foreach ($triggerids as $i)
+				{
+					$this->assertEquals($expected_state, $response['result'][$i]['state']);
+					$this->assertEquals($expected_value, $response['result'][$i]['value']);
+				}
+
+				break;
+			} catch (Exception $e) {
+				if ($i == $max_attempts - 1)
+					throw $e;
+				else
+					sleep($sleep_time);
+			}
+		}
+	}
+
+	private function setTriggers($hosts, $fire = true, $triggerids = null) {
+		if ($fire === true)
+			$value = TRIGGER_VALUE_TRUE;
+		else
+			$value = TRIGGER_VALUE_FALSE;
+
+		foreach ($hosts as $host) {
+			$this->sendSenderValue($host, self::ITEM_NAME, $value);
+
+			if ($triggerids === null)
+				$triggerids[] = $this->getTriggerId(self::$hostids[$host]);
+		}
+
+		$this->waitForTriggersStatus($triggerids, TRIGGER_STATE_NORMAL, $value);
+
+		return $triggerids;
 	}
 
 	private function checkAlert($userid, $hostid, $count, $ts = 0) {
@@ -605,25 +843,18 @@ class testPermissions extends CIntegrationTest {
 		$this->assertCount($count, $response['result']);
 	}
 
-	private function setTriggers($hosts, $fire = true, $triggerids = null) {
-		if ($fire === true)
-			$value = TRIGGER_VALUE_TRUE;
-		else
-			$value = TRIGGER_VALUE_FALSE;
+	private function getHostGroupId($hostGroupName) {
+		$response = $this->call('hostgroup.get', [
+			'filter' => [
+				'name' => [
+					$hostGroupName
+				]
+			]
+		]);
 
-		foreach ($hosts as $host) {
-			$this->sendSenderValue($host, self::ITEM_NAME, $value);
+		$this->assertCount(1, $response['result']);
 
-			if ($triggerids === null)
-				$triggerids[] = $this->getTriggerId(self::$hostids[$host]);
-		}
-
-		sleep(5);
-
-		foreach ($triggerids as $triggerid)
-			$this->validateTriggerStatus($triggerid, TRIGGER_STATE_NORMAL, $value);
-
-		return $triggerids;
+		return $response['result'][0]['groupid'];
 	}
 
 	/**
@@ -632,9 +863,8 @@ class testPermissions extends CIntegrationTest {
 	 */
 	public function testPermissions_initial()
 	{
-		self::$hostids[self::HOST_NAME_01] = $this->waitForAutoregHost(self::HOST_NAME_01);
+		self::$hostids[self::HOST_NAME_01] = $this->waitForHost(self::HOST_NAME_01);
 		$this->reloadConfigurationCache();
-		sleep(3);
 
 		$hosts = [
 			self::HOST_NAME_01,
@@ -674,13 +904,12 @@ class testPermissions extends CIntegrationTest {
 	 */
 	public function testPermissions_addGroup()
 	{
-		$hostid = $this->waitForAutoregHost(self::HOST_NAME_01, [
+		self::$hostids[self::HOST_NAME_01] = $this->waitForHost(self::HOST_NAME_01, [
 			['name' => self::HOSTGROUP_NAME_01],
 			['name' => self::HOSTGROUP_NAME_03]
 		]);
 
 		$this->reloadConfigurationCache();
-		sleep(3);
 
 		$hosts = [
 			self::HOST_NAME_01,
@@ -724,12 +953,11 @@ class testPermissions extends CIntegrationTest {
 	 */
 	public function testPermissions_removeGroup()
 	{
-		$hostid = $this->waitForAutoregHost(self::HOST_NAME_01, [
+		$this->waitForHost(self::HOST_NAME_01, [
 			['name' => self::HOSTGROUP_NAME_01]
 		]);
 
 		$this->reloadConfigurationCache();
-		sleep(3);
 
 		$hosts = [
 			self::HOST_NAME_01,
@@ -744,14 +972,217 @@ class testPermissions extends CIntegrationTest {
 		]);
 		$this->assertCount(6, $response['result']);
 
-		$this->checkAlert(self::$userids[self::USER_NAME_01], self::$hostids[self::HOST_NAME_01], 1, self::$ts);
-		$this->checkAlert(self::$userids[self::USER_NAME_01], self::$hostids[self::HOST_NAME_02], 1, self::$ts);
-		$this->checkAlert(self::$userids[self::USER_NAME_01], self::$hostids[self::HOST_NAME_03], 1, self::$ts);
+		$ts = self::$ts;
 
-		$this->checkAlert(self::$userids[self::USER_NAME_02], self::$hostids[self::HOST_NAME_03], 1, self::$ts);
+		foreach ($response['result'] as $alert) {
+			if ($alert['clock'] > self::$ts)
+				self::$ts = $alert['clock'];
+		}
 
-		$this->checkAlert(self::$userids[self::USER_NAME_03], self::$hostids[self::HOST_NAME_01], 1, self::$ts);
-		$this->checkAlert(self::$userids[self::USER_NAME_03], self::$hostids[self::HOST_NAME_02], 1, self::$ts);
+		self::$ts++;
+
+		$this->checkAlert(self::$userids[self::USER_NAME_01], self::$hostids[self::HOST_NAME_01], 1, $ts);
+		$this->checkAlert(self::$userids[self::USER_NAME_01], self::$hostids[self::HOST_NAME_02], 1, $ts);
+		$this->checkAlert(self::$userids[self::USER_NAME_01], self::$hostids[self::HOST_NAME_03], 1, $ts);
+
+		$this->checkAlert(self::$userids[self::USER_NAME_02], self::$hostids[self::HOST_NAME_03], 1, $ts);
+
+		$this->checkAlert(self::$userids[self::USER_NAME_03], self::$hostids[self::HOST_NAME_01], 1, $ts);
+		$this->checkAlert(self::$userids[self::USER_NAME_03], self::$hostids[self::HOST_NAME_02], 1, $ts);
+
+		$this->setTriggers($hosts, false, $triggerids);
+	}
+
+	/**
+	 * @required-components agent
+	 * @configurationDataProvider agentConfigurationProviderLld
+	 * @depends testPermissions_removeGroup
+	 */
+	public function testPermissions_addLldHost()
+	{
+		self::$hostids[self::HOST_NAME_11] = $this->waitForHost(self::HOST_NAME_11);
+		$this->reloadConfigurationCache();
+
+		$this->sendSenderValue(self::HOST_NAME_11, self::LLD_NAME, ['data' => [[self::LLD_MACRO_HP => self::HOST_NAME_01], [self::LLD_MACRO_GP => self::HOSTGROUP_NAME_01]]]);
+		$this->waitForHost(self::HP01_HOST_NAME_01);
+
+		self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01] = $this->getHostGroupId(self::HP01_HOSTGROUP_NAME_01);
+		self::$hostgroupids[self::HP01_HOSTGROUP_NAME_02] = $this->getHostGroupId(self::HP01_HOSTGROUP_NAME_02);
+
+		$hosts = [
+			[
+				'host' => self::HOST_NAME_12,
+				'groups' => [
+					[
+						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_11]
+					],
+					[
+						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_12]
+					],
+					[
+						'groupid' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01]
+					]
+				],
+				'templates' => [
+					[
+						'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
+					]
+				]
+			],
+			[
+				'host' => self::HOST_NAME_13,
+				'groups' => [
+					[
+						'groupid' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01]
+					],
+					[
+						'groupid' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_02]
+					],
+					[
+						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_11]
+					]
+				],
+				'templates' => [
+					[
+						'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
+					]
+				]
+			],
+			[
+				'host' => self::HOST_NAME_14,
+				'groups' => [
+					[
+						'groupid' => self::$hostgroupids[self::HOSTGROUP_NAME_11]
+					]
+				],
+				'templates' => [
+					[
+						'templateid' => self::$templateids[self::TEMPLATE_NAME_01]
+					]
+				]
+			]
+		];
+
+		$response = $this->call('host.create', $hosts);
+		$this->assertCount(count($hosts), $response['result']['hostids']);
+		$hostids = $response['result']['hostids'];
+
+		foreach ($hosts as $i => $host)
+			self::$hostids[$host['host']] = $hostids[$i];
+
+		$usergroups = [
+			[
+				'name' => self::USERGROUP_NAME_11,
+				'hostgroup_rights' => [
+					[
+						'id' => self::$hostgroupids[self::HOSTGROUP_NAME_11],
+						'permission' => PERM_READ_WRITE
+					],
+					[
+						'id' => self::$hostgroupids[self::HOSTGROUP_NAME_12],
+						'permission' => PERM_DENY
+					],
+					[
+						'id' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01],
+						'permission' => PERM_READ_WRITE
+					]
+				],
+				'users' => [
+					[
+						'userid' => self::$userids[self::USER_NAME_11]
+					]
+				]
+			],
+			[
+				'name' => self::USERGROUP_NAME_12,
+				'hostgroup_rights' => [
+					[
+						'id' => self::$hostgroupids[self::HOSTGROUP_NAME_12],
+						'permission' => PERM_READ
+					],
+					[
+						'id' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_01],
+						'permission' => PERM_DENY
+					],
+					[
+						'id' => self::$hostgroupids[self::HP01_HOSTGROUP_NAME_02],
+						'permission' => PERM_READ
+					]
+				],
+				'users' => [
+					[
+						'userid' => self::$userids[self::USER_NAME_12]
+					]
+				]
+			]
+		];
+
+		$response = $this->call('usergroup.create', $usergroups);
+		$this->assertCount(count($usergroups), $response['result']['usrgrpids']);
+		$usergroupids = $response['result']['usrgrpids'];
+
+		foreach ($usergroups as $i => $usergroup)
+			self::$usergroupids[$usergroup['name']] = $usergroupids[$i];
+
+		$this->reloadConfigurationCache();
+
+		$hosts = [
+			self::HOST_NAME_12,
+			self::HOST_NAME_13,
+			self::HOST_NAME_14
+		];
+
+		$triggerids = $this->setTriggers($hosts);
+
+		$response = $this->call('alert.get', [
+			'time_from' => self::$ts
+		]);
+		$this->assertCount(2, $response['result']);
+
+		$ts = self::$ts;
+
+		foreach ($response['result'] as $alert) {
+			if ($alert['clock'] > self::$ts)
+				self::$ts = $alert['clock'];
+		}
+
+		self::$ts++;
+
+		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HOST_NAME_13], 1, $ts);
+		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HOST_NAME_14], 1, $ts);
+
+		$this->setTriggers($hosts, false, $triggerids);
+
+		self::$LLD_HOST_METADATA = self::HOST_METADATA5;
+	}
+
+	/**
+	 * @required-components agent
+	 * @configurationDataProvider agentConfigurationProviderLld
+	 * @depends testPermissions_addLldHost
+	 */
+	public function testPermissions_removeLldHost()
+	{
+		$this->waitForHostRemoved(self::HOST_NAME_11);
+		$this->reloadConfigurationCache();
+
+		$hosts = [
+			self::HOST_NAME_12,
+			self::HOST_NAME_13,
+			self::HOST_NAME_14
+		];
+
+		$triggerids = $this->setTriggers($hosts);
+
+		$response = $this->call('alert.get', [
+			'time_from' => self::$ts
+		]);
+		$this->assertCount(3, $response['result']);
+
+		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HOST_NAME_13], 1, self::$ts);
+		$this->checkAlert(self::$userids[self::USER_NAME_11], self::$hostids[self::HOST_NAME_14], 1, self::$ts);
+
+		$this->checkAlert(self::$userids[self::USER_NAME_12], self::$hostids[self::HOST_NAME_12], 1, self::$ts);
 
 		$this->setTriggers($hosts, false, $triggerids);
 	}
