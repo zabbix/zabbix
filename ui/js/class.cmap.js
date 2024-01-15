@@ -2069,8 +2069,8 @@ ZABBIX.apps.map = (function($) {
 					shiftY = Math.round(dims.height / 2),
 					newX = x,
 					newY = y,
-					newWidth = dims.width,
-					newHeight = dims.height,
+					newWidth = Math.round(dims.width),
+					newHeight = Math.round(dims.height),
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 				// Lines should not be aligned

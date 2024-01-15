@@ -1,1 +1,0 @@
-A......... [ZBX-23262] fixed inability to log in using user.login API method if user has a user group with disabled frontend access (epulke, vmaksimovs)

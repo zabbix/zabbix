@@ -16,13 +16,22 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+#ifndef ZABBIX_VMWARE_VM_H
+#define ZABBIX_VMWARE_VM_H
 
-#ifndef ZABBIX_COUNT_PATTERN_H
-#define ZABBIX_COUNT_PATTERN_H
+#include "config.h"
 
-#include "count_pattern.h"
+#if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-void	zbx_clear_count_pattern(zbx_eval_count_pattern_data_t *pdata);
-int	zbx_count_var_vector_with_pattern(zbx_eval_count_pattern_data_t *pdata, char *pattern, zbx_vector_var_t *values,
-		int limit, int *count, char **error);
-#endif
+#include "zbxvmware.h"
+#include "vmware_internal.h"
+
+void	vmware_vm_shared_free(zbx_vmware_vm_t *vm);
+void	vmware_vm_free(zbx_vmware_vm_t *vm);
+zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *easyhandle,
+		const char *id, zbx_vector_vmware_resourcepool_t *rpools, zbx_vector_cq_value_t *cq_values,
+		zbx_vmware_alarms_data_t *alarms_data, char **error);
+
+#endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
+
+#endif	/* ZABBIX_VMWARE_VM_H */
