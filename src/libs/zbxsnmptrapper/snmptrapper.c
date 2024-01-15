@@ -308,7 +308,7 @@ static void	db_update_snmp_id(const char *date, const char *trap)
 	if (FAIL == zbx_iso8601_utc(date, &timestamp))
 	{
 		timestamp = 0;
-		delay_trap_logs("SNMP trapper log contains non ISO 8601 or invalid timestamp", LOG_LEVEL_WARNING);
+		delay_trap_logs("Cannot find valid ISO 8601 timestamp in SNMP trapper log", LOG_LEVEL_WARNING);
 	}
 
 	get_trap_hash(trap, hash_bin);
@@ -337,7 +337,7 @@ static void	compare_trap(const char *date, const char *trap, int snmp_timestamp,
 	if (0 != snmp_timestamp && FAIL == zbx_iso8601_utc(date, &timestamp))
 	{
 		/* skip records with old or invalid timestamp until correct one is found */
-		zabbix_log(LOG_LEVEL_TRACE, "SNMP trapper log contains invalid timestamp '%s'", date);
+		delay_trap_logs("SNMP trapper log contains non ISO 8601 or invalid timestamp", LOG_LEVEL_WARNING);
 	}
 
 	if (NULL == snmp_id_bin)
@@ -622,12 +622,22 @@ out:
 	return trap_fd;
 }
 
+static void	read_all_traps(const char *config_snmptrap_file, int snmp_timestamp, const char *snmp_id_bin,
+		int *skip, const char *config_node_name)
+{
+	while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, skip, config_node_name))
+		;
+
+	if (0 != offset)
+		parse_traps(1, snmp_timestamp, snmp_id_bin, skip, config_node_name);
+}
+
 static void	DBget_lastsize(const char *config_node_name, const char *config_snmptrap_file)
 {
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 	int		snmp_timestamp = 0;
-	char		*snmp_id = NULL, *snmp_node = NULL, *config_node_name_esc;
+	char		*snmp_id = NULL, *snmp_node = NULL;
 
 	zbx_db_begin();
 
@@ -694,30 +704,31 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 				{
 					trap_lastsize = 0;
 
-					while (0 < read_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip,
-							config_node_name))
-						;
-
-					if (0 != offset)
-						parse_traps(1, snmp_timestamp, snmp_id_bin, &skip, config_node_name);
+					read_all_traps(config_snmptrap_file, snmp_timestamp, snmp_id_bin, &skip,
+							config_node_name);
 				}
 
-				if (1 == skip && 0 != snmp_timestamp)
+				if (0 != snmp_timestamp)
 				{
-					trap_lastsize = 0;
+					if (1 == skip)
+					{
+						trap_lastsize = 0;
 
-					while (0 < read_traps(config_snmptrap_file, snmp_timestamp, NULL, &skip,
-							config_node_name))
-						;
+						read_all_traps(config_snmptrap_file, snmp_timestamp, NULL, &skip,
+								config_node_name);
+					}
 
-					if (0 != offset)
-						parse_traps(1, snmp_timestamp, NULL, &skip, config_node_name);
+					if (1 == skip && 0 != trap_lastsize)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "cannot resume SNMP traps processing from"
+								" last position: timestamp and record not found");
+					}
 				}
-
-				if (1 == skip && 0 != trap_lastsize)
+				else if (1 == skip && 0 != trap_lastsize)
 				{
-					zabbix_log(LOG_LEVEL_INFORMATION, "cannot resume SNMP traps processing from"
-							" last record");
+					zabbix_log(LOG_LEVEL_WARNING, "cannot resume SNMP traps processing from"
+							" last position: record is not found and timestamp is"
+							" not available");
 				}
 
 				db_update_lastsize();
@@ -727,20 +738,26 @@ static void	DBget_lastsize(const char *config_node_name, const char *config_snmp
 		if (0 != zbx_strcmp_null(snmp_node, config_node_name))
 		{
 			zbx_db_begin();
-			config_node_name_esc = zbx_db_dyn_escape_string(config_node_name);
 
 			if (NULL == snmp_node)
 			{
-				zbx_db_execute("insert into globalvars (name,value) values ('snmp_node','%s')",
-						config_node_name_esc);
+				zbx_db_insert_t	db_insert;
+
+				zbx_db_insert_prepare(&db_insert, "globalvars", "name", "value", (char *)NULL);
+				zbx_db_insert_add_values(&db_insert, "snmp_node", config_node_name);
+				zbx_db_insert_execute(&db_insert);
+				zbx_db_insert_clean(&db_insert);
 			}
 			else
 			{
+				char	*config_node_name_esc;
+
+				config_node_name_esc = zbx_db_dyn_escape_string(config_node_name);
 				zbx_db_execute("update globalvars set value='%s' where name='snmp_node'",
 						config_node_name_esc);
+				zbx_free(config_node_name_esc);
 			}
 
-			zbx_free(config_node_name_esc);
 			zbx_db_commit();
 		}
 	}
@@ -776,23 +793,14 @@ static int	get_latest_data(const char *config_snmptrap_file, const char *config_
 						config_snmptrap_file, zbx_strerror(errno));
 			}
 
-			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, config_node_name))
-				;
-
-			if (0 != offset)
-				parse_traps(1, 0, NULL, NULL, config_node_name);
+			read_all_traps(config_snmptrap_file, 0, NULL, NULL, config_node_name);
 
 			close_trap_file();
 		}
 		else if (file_buf.st_ino != trap_ino || file_buf.st_size < trap_lastsize)
 		{
 			/* file has been rotated, process the current file */
-
-			while (0 < read_traps(config_snmptrap_file, 0, NULL, NULL, config_node_name))
-				;
-
-			if (0 != offset)
-				parse_traps(1, 0, NULL, NULL, config_node_name);
+			read_all_traps(config_snmptrap_file, 0, NULL, NULL, config_node_name);
 
 			close_trap_file();
 		}
