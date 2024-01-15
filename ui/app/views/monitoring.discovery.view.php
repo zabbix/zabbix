@@ -26,6 +26,7 @@
 $this->addJsFile('gtlc.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('layout.mode.js');
+
 $this->includeJsFile('monitoring.discovery.view.js.php');
 
 $this->enableLayoutModes();

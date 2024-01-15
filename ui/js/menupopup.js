@@ -1640,10 +1640,11 @@ function getMenuPopupDRule(options) {
 	config_urls.push({
 		label: t('Discovery rule'),
 		disabled: !options.allowed_ui_conf_drules,
-		clickCallback: () => {
-			view.editDRule({
-				druleid: options.druleid
-			});
+		clickCallback: function(e) {
+			e.preventDefault();
+			jQuery(this).closest('.menu-popup').menuPopup('close', null);
+
+			view.editDRule({druleid: options.druleid});
 		}
 	});
 
