@@ -95,7 +95,7 @@ class JMXItemChecker extends ItemChecker
 
 					if (!rmiProtocol.equals("rmi"))
 					{
-						throw new ZabbixException("usupported JNDI service provider, \"%s\"",
+						throw new ZabbixException("unsupported JNDI service provider, \"%s\"",
 								rmiProtocol);
 					}
 				}
