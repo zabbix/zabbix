@@ -449,7 +449,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 
 		$form->fill([
 			'Name' => $new_name,
-			'Refresh interval' => '15 minutes',
+			'Refresh interval' => '15 minutes'
 		]);
 
 		// Save or cancel widget.
@@ -517,7 +517,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 						'Discovery rule' => self::DISCOVERY_RULE_5,
 						'Up' => '',
 						'Down' => '100'
-					],
+					]
 				]
 			]
 		];
