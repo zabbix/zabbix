@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @backup widget, profiles
  *
  * @onBefore prepareDiscoveryStatusWidgetData
+ *
+ * @dataSource Proxies
  */
 
 class testDashboardDiscoveryStatusWidget extends CWebTest {
