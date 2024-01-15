@@ -560,7 +560,8 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		$this->assertEquals(2, $widget_data->query('class:red')->all()->count());
 		$this->assertEquals(2, $widget_data->query('class:green')->all()->count());
 
-		$drules = [[$drule_id_1, $drule_id_2, $drule_id_3, $drule_id_4, $drule_id_5, $drule_id_6],
+		$drules = [
+			[$drule_id_1, $drule_id_2, $drule_id_3, $drule_id_4, $drule_id_5, $drule_id_6],
 			[self::DISCOVERY_RULE_1, self::DISCOVERY_RULE_2, self::DISCOVERY_RULE_3, self::DISCOVERY_RULE_4,
 				self::DISCOVERY_RULE_5, 'Discovery rule for proxy delete test']
 		];
@@ -590,6 +591,9 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 		// Check the table content.
 		$this->assertEquals($widget_data->getHeadersText(), ['Discovery rule', 'Up', 'Down']);
 		$this->assertEquals('No data found.', $widget_data->query('class:nothing-to-show')->one()->getText());
+
+		// Enable back the rule for proxy test.
+		DBexecute('UPDATE drules SET status=0 WHERE name='.zbx_dbstr('Discovery rule for proxy delete test'));
 	}
 
 	protected function checkWidgetForm($data, $update = false) {
