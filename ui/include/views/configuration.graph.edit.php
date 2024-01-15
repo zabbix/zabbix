@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -439,7 +439,8 @@ $items_table->addRow(
 					(new CButton('add_item', _('Add')))
 						->onClick(
 							'return PopUp("popup.generic",
-								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam())
+								jQuery.extend('.json_encode($parameters_add).', view.getOnlyHostParam()),
+								{dialogue_class: "modal-popup-generic", trigger_element: this}
 							);'
 						)
 						->addClass(ZBX_STYLE_BTN_LINK),

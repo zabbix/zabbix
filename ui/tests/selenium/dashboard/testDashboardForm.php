@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -856,7 +856,7 @@ class testDashboardForm extends CWebTest {
 
 				$db_names = CDBHelper::getAll($query);
 
-				// Database reult format is [['username' => 'Admin'], ['username' => 'Tag-user']]
+				// Database result format is [['username' => 'Admin'], ['username' => 'Tag-user']]
 				foreach ($db_names as $array) {
 					// Result format should be ['Admin', 'Tag-user'] to compare with table result in UI.
 					$result[] = $array[$key];

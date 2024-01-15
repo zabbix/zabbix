@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,7 +73,8 @@ window.widget_tophosts_form = new class {
 			case 'add':
 				this._column_index = this._list_columns.querySelectorAll('tr').length;
 
-				column_popup = PopUp('popup.tophosts.column.edit', {}).$dialogue[0];
+				column_popup = PopUp('popup.tophosts.column.edit', {}, {dialogue_class: 'modal-popup-generic'})
+					.$dialogue[0];
 				column_popup.addEventListener('dialogue.submit', (e) => this.updateColumns(e));
 				column_popup.addEventListener('overlay.close', this.removeColorpicker);
 				break;

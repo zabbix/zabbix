@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
+#	include <libxml/parser.h>
 #endif
 
 #include "../zbxalgo/vectorimpl.h"
@@ -234,7 +235,7 @@ int	zbx_query_xpath(zbx_variant_t *value, const char *params, char **errmsg)
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
-	xmlErrorPtr	pErr;
+	const xmlError	*pErr;
 	xmlBufferPtr	xmlBufferLocal;
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
@@ -583,7 +584,7 @@ static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *js
  ******************************************************************************/
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg)
 {
-	xmlErrorPtr	pErr;
+	const xmlError	*pErr;
 
 	if (NULL == (*xml_doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, options)))
 	{
@@ -639,7 +640,7 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
  ******************************************************************************/
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg)
 {
-	xmlErrorPtr	pErr;
+	const xmlError	*pErr;
 
 	if (NULL == mem)
 	{
@@ -894,7 +895,7 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	int			size, ret = FAIL;
 	struct zbx_json_parse	jp;
 	xmlDoc			*doc = NULL;
-	xmlErrorPtr		pErr;
+	const xmlError		*pErr;
 	xmlChar			*xmem;
 
 	if (NULL == (doc = xmlNewDoc(BAD_CAST XML_DEFAULT_VERSION)))

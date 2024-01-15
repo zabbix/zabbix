@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,6 @@ import (
 
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
-	"git.zabbix.com/ap/plugin-support/tlsconfig"
 	"git.zabbix.com/ap/plugin-support/uri"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/omeid/go-yarn"
@@ -49,26 +48,20 @@ type Plugin struct {
 var impl Plugin
 
 // Export implements the Exporter interface.
-func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (result interface{}, err error) {
+func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider) (any, error) {
 	params, extraParams, hc, err := metrics[key].EvalParams(rawParams, p.options.Sessions)
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	err = metric.SetDefaults(params, hc, p.options.Default)
 	if err != nil {
-		return nil, err
-	}
-
-	details, err := tlsconfig.CreateDetails(params["sessionName"], params["TLSConnect"],
-		params["TLSCAFile"], params["TLSCertFile"], params["TLSKeyFile"], params["URI"])
-	if err != nil {
-		return nil, zbxerr.ErrorInvalidConfiguration.Wrap(err)
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	uri, err := uri.NewWithCreds(params["URI"], params["User"], params["Password"], uriDefaults)
 	if err != nil {
-		return nil, err
+		return nil, zbxerr.ErrorInvalidParams.Wrap(err)
 	}
 
 	handleMetric := getHandlerFunc(key)
@@ -76,7 +69,7 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 		return nil, zbxerr.ErrorUnsupportedMetric
 	}
 
-	conn, err := p.connMgr.GetConnection(*uri, details)
+	conn, err := p.connMgr.GetConnection(*uri, params)
 	if err != nil {
 		// Special logic of processing connection errors should be used if mysql.ping is requested
 		// because it must return pingFailed if any error occurred.
@@ -86,18 +79,17 @@ func (p *Plugin) Export(key string, rawParams []string, _ plugin.ContextProvider
 
 		p.Errf(err.Error())
 
-		return nil, err
+		return nil, zbxerr.ErrorConnectionFailed.Wrap(err)
 	}
 
-	ctx := context.Background()
-
-	result, err = handleMetric(ctx, conn, params, extraParams...)
-
+	result, err := handleMetric(context.Background(), conn, params, extraParams...)
 	if err != nil {
 		p.Errf(err.Error())
+
+		return nil, zbxerr.ErrorCannotFetchData.Wrap(err)
 	}
 
-	return result, err
+	return result, nil
 }
 
 // Start implements the Runner interface and performs initialization when plugin is activated.
@@ -108,6 +100,7 @@ func (p *Plugin) Start() {
 		time.Duration(p.options.CallTimeout)*time.Second,
 		hkInterval*time.Second,
 		p.setCustomQuery(),
+		p.Logger,
 	)
 }
 

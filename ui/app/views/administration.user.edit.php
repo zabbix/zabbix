@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -276,7 +276,7 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
-		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6))
+		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)
@@ -357,7 +357,12 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 					new CHorList([
 						(new CButton(null, _('Edit')))
 							->addClass(ZBX_STYLE_BTN_LINK)
-							->onClick('return PopUp("popup.media", '.json_encode($parameters).');'),
+							->onClick(
+								'return PopUp("popup.media", '.
+									json_encode($parameters).
+									', {dialogue_class: "modal-popup-generic"}
+								);'
+							),
 						(new CButton(null, _('Remove')))
 							->addClass(ZBX_STYLE_BTN_LINK)
 							->onClick('javascript: removeMedia('.$index.');')
@@ -371,7 +376,12 @@ if ($data['action'] === 'user.edit' || CWebUser::$data['type'] > USER_TYPE_ZABBI
 		(new CDiv([
 			$media_table_info,
 			(new CButton(null, _('Add')))
-				->onClick('return PopUp("popup.media", '.json_encode(['dstfrm' => $user_form->getName()]).');')
+				->onClick(
+					'return PopUp("popup.media", '.
+						json_encode(['dstfrm' => $user_form->getName()]).
+						', {dialogue_class: "modal-popup-generic"}
+					);'
+				)
 				->addClass(ZBX_STYLE_BTN_LINK)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)

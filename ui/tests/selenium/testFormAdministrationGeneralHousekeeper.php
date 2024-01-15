@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=housekeeping.edit';
-	public $form_selector = 'id:housekeeping';
+	public $form_selector = 'id:housekeeping-form';
 
 	public $default_values = [
 		// Events and alerts.
@@ -170,8 +170,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Unchecked checkboxes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => false,
 						// Services.
@@ -199,8 +198,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Valid zero values without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
 						'id:hk_history' => '0',
@@ -219,8 +217,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Valid zero values with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
 						'id:hk_history' => '0s',
@@ -239,8 +236,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Valid zero values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
 						'id:hk_history' => '0m',
@@ -259,8 +255,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Valid zero values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
 						'id:hk_history' => '0h',
@@ -279,8 +274,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Valid zero values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
 						'id:hk_history' => '0d',
@@ -299,8 +293,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Valid zero values in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// History.
 						'id:hk_history_global' => true,
 						'id:hk_history' => '0w',
@@ -319,8 +312,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Minimal valid values in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86400',
@@ -364,8 +356,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Minimal valid values in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86400s',
@@ -405,8 +396,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Minimal valid values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1440m',
@@ -446,8 +436,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Minimal valid values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '24h',
@@ -487,8 +476,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Minimal valid values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1d',
@@ -523,8 +511,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Maximal valid values in seconds without 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400000',
@@ -564,8 +551,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Maximal valid values in seconds with 's'.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400000s',
@@ -605,8 +591,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Maximal valid values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '13140000m',
@@ -646,8 +631,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Maximal valid values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '219000h',
@@ -687,8 +671,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Maximal valid values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '9125d',
@@ -728,7 +711,6 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			// Maximal valid values in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' =>  [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
@@ -770,7 +752,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0',
@@ -798,7 +780,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0s',
@@ -826,7 +808,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0m',
@@ -854,7 +836,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0h',
@@ -882,7 +864,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0d',
@@ -910,7 +892,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0w',
@@ -938,7 +920,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0M',
@@ -974,7 +956,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '0y',
@@ -1010,7 +992,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86399s',
@@ -1046,7 +1028,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '86399',
@@ -1082,7 +1064,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1439m',
@@ -1118,7 +1100,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '23h',
@@ -1150,7 +1132,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '99999999999999999999999999999999',
@@ -1186,7 +1168,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400001s',
@@ -1222,7 +1204,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '788400001',
@@ -1258,7 +1240,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '13140001m',
@@ -1294,7 +1276,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '219001h',
@@ -1330,7 +1312,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '9126d',
@@ -1366,7 +1348,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '1304w',
@@ -1402,7 +1384,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '301M',
@@ -1438,7 +1420,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '26y',
@@ -1474,7 +1456,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => 'text',
@@ -1510,7 +1492,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '!@#$%^&*()_+',
@@ -1546,7 +1528,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '',
@@ -1582,7 +1564,7 @@ class testFormAdministrationGeneralHousekeeper extends testFormAdministrationGen
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						// Events and alerts.
 						'id:hk_events_mode' => true,
 						'id:hk_events_trigger' => '-1',

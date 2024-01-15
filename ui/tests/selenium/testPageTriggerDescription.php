@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,14 +27,14 @@ class testPageTriggerDescription extends CWebTest {
 			// Trigger without description.
 			[
 				[
-					'Trigger name' => '1_trigger_Disaster',
+					'Event name' => '1_trigger_Disaster',
 					'event_url' => 'tr_events.php?triggerid=100036&eventid=9004'
 				]
 			],
 			// Trigger with plain text in the description.
 			[
 				[
-					'Trigger name' => '1_trigger_High',
+					'Event name' => '1_trigger_High',
 					'description' => 'Non-clickable description',
 					'event_url' => 'tr_events.php?triggerid=100035&eventid=9003'
 				]
@@ -42,7 +42,7 @@ class testPageTriggerDescription extends CWebTest {
 			// Trigger with only 1 url in description.
 			[
 				[
-					'Trigger name' => '1_trigger_Average',
+					'Event name' => '1_trigger_Average',
 					'description' => 'https://zabbix.com',
 					'event_url' => 'tr_events.php?triggerid=100034&eventid=9002'
 				]
@@ -50,7 +50,7 @@ class testPageTriggerDescription extends CWebTest {
 			// Trigger with text and url in description.
 			[
 				[
-					'Trigger name' => '1_trigger_Warning',
+					'Event name' => '1_trigger_Warning',
 					'description' => 'The following url should be clickable: https://zabbix.com',
 					'event_url' => 'tr_events.php?triggerid=100033&eventid=9001'
 				]
@@ -58,7 +58,7 @@ class testPageTriggerDescription extends CWebTest {
 			// Trigger with multiple urls in description.
 			[
 				[
-					'Trigger name' => '2_trigger_Information',
+					'Event name' => '2_trigger_Information',
 					'description' => 'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact',
 					'event_url' => 'tr_events.php?triggerid=100037&eventid=9005'
 				]
@@ -66,7 +66,7 @@ class testPageTriggerDescription extends CWebTest {
 			// Trigger with macro in description.
 			[
 				[
-					'Trigger name' => '1_trigger_Not_classified',
+					'Event name' => '1_trigger_Not_classified',
 					'description' => 'Macro should be resolved, host IP should be visible here: 127.0.0.1',
 					'event_url' => 'tr_events.php?triggerid=100032&eventid=9000'
 				]
@@ -74,7 +74,7 @@ class testPageTriggerDescription extends CWebTest {
 			// Trigger with url and macro in description.
 			[
 				[
-					'Trigger name' => '3_trigger_Average',
+					'Event name' => '3_trigger_Average',
 					'description' => 'Macro - resolved, URL - clickable: 3_Host_to_check_Monitoring_Overview, https://zabbix.com',
 					'event_url' => 'tr_events.php?triggerid=100038&eventid=9006'
 				]
@@ -90,7 +90,7 @@ class testPageTriggerDescription extends CWebTest {
 
 		// Find rows from the data provider and check the description if such should exist.
 		$table = $this->query('class:list-table')->asTable()->one();
-		$row = $table->findRow('Problem', $data['Trigger name'], true);
+		$row = $table->findRow('Problem', $data['Event name'], true);
 
 		if (CTestArrayHelper::get($data, 'description', false)) {
 			$row->query('xpath:.//a[contains(@class, "icon-description")]')->one()->click();

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1171,6 +1171,17 @@ reduce_max_vars:
 			goto next;
 		}
 
+		if (NULL == response->variables)
+		{
+			if (1 >= level && 1 < max_vars)
+				goto reduce_max_vars;
+
+			zbx_strlcpy(error, "No values received.", max_error_len);
+			ret = NOTSUPPORTED;
+			running = 0;
+			goto next;
+		}
+
 		/* process response */
 		for (num_vars = 0, var = response->variables; NULL != var; num_vars++, var = var->next_variable)
 		{
@@ -2123,6 +2134,9 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	sigprocmask(SIG_BLOCK, &mask, &orig_mask);
 
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_LOAD, 1);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_SAVE, 1);
+
 	init_snmp(progname);
 	zbx_snmp_init_done = 1;
 
@@ -2226,7 +2240,6 @@ void	zbx_clear_cache_snmp(unsigned char process_type, int process_num)
 	if (0 == zbx_snmp_init_done)
 		return;
 
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 	zbx_shutdown_snmp();
 }
 

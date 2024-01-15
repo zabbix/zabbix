@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
@@ -43,18 +44,6 @@ const (
 	maxChassisTypeLen = 36
 	minChassisTypelen = 1
 )
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-	options Options
-}
-
-// Options -
-type Options struct {
-	plugin.SystemOptions `conf:"optional,name=System"`
-	Timeout              int
-}
 
 var impl Plugin
 
@@ -96,6 +85,29 @@ var chassisTypes = []string{
 	"Embedded PC",
 	"Mini PC",
 	"Stick PC",
+}
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	options Options
+}
+
+// Options -
+type Options struct {
+	plugin.SystemOptions `conf:"optional,name=System"`
+	Timeout              int
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Hw",
+		"system.hw.chassis", "Chassis information.",
+		"system.hw.devices", "Listing of PCI or USB devices.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
 }
 
 // Configure -
@@ -163,8 +175,8 @@ func updateStartCounter(content []byte, start int) int {
 func getChassisValues(content []byte, flags, start int) (string, int) {
 	var value string
 
-	var positionNumbers = []int{4, 5, 7}
-	var types = []int{chassisVendor, chassisModel, chassisSerial}
+	positionNumbers := []int{4, 5, 7}
+	types := []int{chassisVendor, chassisModel, chassisSerial}
 
 	if content[start] == 1 {
 		for i, nr := range positionNumbers {
@@ -290,11 +302,4 @@ func getDeviceCmd(params []string) (string, error) {
 	default:
 		return "", zbxerr.ErrorTooManyParameters
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Hw",
-		"system.hw.chassis", "Chassis information.",
-		"system.hw.devices", "Listing of PCI or USB devices.",
-	)
 }

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -304,6 +304,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 			break;
 		case ZBX_VMWARE_UNIT_JOULE:
 		case ZBX_VMWARE_UNIT_MEGAHERTZ:
+		case ZBX_VMWARE_UNIT_NANOSECOND:
 		case ZBX_VMWARE_UNIT_MICROSECOND:
 		case ZBX_VMWARE_UNIT_MILLISECOND:
 		case ZBX_VMWARE_UNIT_NUMBER:
@@ -2572,8 +2573,13 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			goto unlock;
 		}
 
-		if (SYSINFO_RET_OK != (ret = vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
-				counterid, datastore->uuid, 1, unit, result)))
+		ds_count++;
+
+		if (0 == strcmp(hv->props[ZBX_VMWARE_HVPROP_MAINTENANCE], "true"))
+			continue;
+
+		if (SYSINFO_RET_OK != vmware_service_get_counter_value_by_id(service, "HostSystem", hv->id,
+				counterid, datastore->uuid, 1, unit, result))
 		{
 			char	*err, *msg = *GET_MSG_RESULT(result);
 
@@ -2585,8 +2591,6 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 			SET_MSG_RESULT(result, err);
 			goto unlock;
 		}
-
-		ds_count++;
 
 		if (0 == ISSET_VALUE(result))
 			continue;
@@ -2612,6 +2616,7 @@ static int	check_vcenter_datastore_latency(AGENT_REQUEST *request, const char *u
 		latency = latency / count;
 
 	SET_UI64_RESULT(result, latency);
+	ret = SYSINFO_RET_OK;
 unlock:
 	zbx_vmware_unlock();
 out:

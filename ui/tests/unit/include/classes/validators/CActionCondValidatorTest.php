@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -132,7 +132,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 				'value' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			]],
 			[[], [
-				'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+				'conditiontype' => CONDITION_TYPE_EVENT_NAME,
 				'value' => 'abc'
 			]],
 			[[], [
@@ -366,7 +366,7 @@ class CActionCondValidatorTest extends CValidatorTest {
 			],
 			[[],
 				[
-					'conditiontype' => CONDITION_TYPE_TRIGGER_NAME,
+					'conditiontype' => CONDITION_TYPE_EVENT_NAME,
 					'value' => ''
 				],
 				'Incorrect value for field "value": cannot be empty.'

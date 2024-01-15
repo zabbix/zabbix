@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,14 +22,12 @@
 /**
  * @var CPartial $this
  */
-$table = (new CTableInfo())
-	->makeVerticalRotation()
-	->setHeadingColumn(0);
+$table = (new CTableInfo())->setHeadingColumn(0);
 
 $headings[] = _('Hosts');
 foreach ($data['triggers_by_name'] as $trigname => $host_to_trig) {
-	$headings[] = (new CColHeader($trigname))
-		->addClass('vertical_rotation')
+	$headings[] = (new CSpan($trigname))
+		->addClass(ZBX_STYLE_TEXT_VERTICAL)
 		->setTitle($trigname);
 }
 

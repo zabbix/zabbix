@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 // Host groups.
 <?php if (CWebUser::getType() == USER_TYPE_SUPER_ADMIN): ?>
 (() => {
-	const groups_elem = document.querySelector('#groups-div');
+	const groups_elem = document.querySelector('#groups-field');
 
 	if (groups_elem === null) {
 		return false;
@@ -63,7 +63,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Macros.
 (() => {
-	const macros_elem = document.querySelector('#macros-div');
+	const macros_elem = document.querySelector('#macros-field');
 	if (!macros_elem) {
 		return false;
 	}
@@ -106,7 +106,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Tags.
 (() => {
-	const tags_elem = document.querySelector('#tags-div');
+	const tags_elem = document.querySelector('#tags-field');
 	if (!tags_elem) {
 		return false;
 	}
@@ -128,7 +128,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Linked templates.
 (() => {
-	const template_visible = document.querySelector('#linked-templates-div');
+	const template_visible = document.querySelector('#linked-templates-field');
 
 	if (!template_visible) {
 		return false;
@@ -203,7 +203,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Encryption.
 (() => {
-	const encryption = document.querySelector('#encryption_div');
+	const encryption = document.querySelector('#encryption-field');
 	if (!encryption) {
 		return false;
 	}
@@ -292,7 +292,7 @@ $('#tabs').on('tabsactivate', (event, ui) => {
 
 // Value maps.
 (() => {
-	const valuemap = document.querySelector('#valuemap-div');
+	const valuemap = document.querySelector('#valuemap-field');
 
 	if (!valuemap) {
 		return false;

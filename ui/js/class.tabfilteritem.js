@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CTabFilterItem extends CBaseComponent {
 		this.updateUnsavedState();
 
 		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
-			{dialogueid: 'tabfilter_dialogue', trigger_element}
+			{dialogueid: 'tabfilter_dialogue', dialogue_class: 'modal-popup-generic', trigger_element}
 		);
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "log.h"
+#include "zbxeval.h"
 
 extern unsigned char	program_type;
 
@@ -510,6 +511,135 @@ static int	DBpatch_6000043(void)
 	return DBcreate_index("users", "users_3", "roleid", 0);
 }
 
+static int	DBpatch_6000044(void)
+{
+/* -------------------------------------------------------*/
+/* Formula:                                               */
+/* aggregate_function(last_foreach(filter))               */
+/* aggregate_function(last_foreach(filter,time))          */
+/*--------------------------------------------------------*/
+/* Relative positioning of tokens on a stack              */
+/*----------------------------+---------------------------*/
+/* Time is present in formula | Time is absent in formula */
+/*----------------------------+---------------------------*/
+/* [i-2] filter               |                           */
+/* [i-1] time                 | [i-1] filter              */
+/*   [i] last_foreach         |   [i] last_foreach        */
+/* [i+2] aggregate function   | [i+2]                     */
+/*----------------------------+---------------------------*/
+
+/* Offset in stack of tokens is relative to last_foreach() history function token, */
+/* assuming that time is present in formula. */
+#define OFFSET_TIME	(-1)
+#define TOKEN_LEN(loc)	(loc->r - loc->l + 1)
+#define LAST_FOREACH	"last_foreach"
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = SUCCEED;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL, *params = NULL;
+	zbx_eval_context_t	ctx;
+	zbx_vector_uint64_t	del_idx;
+
+	zbx_eval_init(&ctx);
+	zbx_vector_uint64_create(&del_idx);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_CALCULATED = 15 */
+	result = DBselect("select itemid,params from items where type=15 and params like '%%%s%%'", LAST_FOREACH);
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		int	i;
+		char	*esc, *error = NULL;
+
+		zbx_eval_clear(&ctx);
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: error parsing calculated item formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_vector_uint64_clear(&del_idx);
+
+		for (i = 0; i < ctx.stack.values_num; i++)
+		{
+			int		sec;
+			zbx_strloc_t	*loc;
+
+			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i].type)
+				continue;
+
+			loc = &ctx.stack.values[i].loc;
+
+			if (0 != strncmp(LAST_FOREACH, &ctx.expression[loc->l], TOKEN_LEN(loc)))
+				continue;
+
+			/* if time is absent in formula */
+			if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_ARG_NULL == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			loc = &ctx.stack.values[i + OFFSET_TIME].loc;
+
+			if (FAIL == is_time_suffix(&ctx.expression[loc->l], &sec, (int)TOKEN_LEN(loc)) || 0 != sec)
+			{
+				continue;
+			}
+
+			zbx_vector_uint64_append(&del_idx, (zbx_uint32_t)(i + OFFSET_TIME));
+		}
+
+		if (0 == del_idx.values_num)
+			continue;
+
+		params = zbx_strdup(params, ctx.expression);
+
+		for (i = del_idx.values_num - 1; i >= 0; i--)
+		{
+			size_t		l, r;
+			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_idx.values[i]].loc;
+
+			for (l = loc->l - 1; ',' != params[l]; l--) {}
+			for (r = loc->r + 1; ')' != params[r]; r++) {}
+
+			memmove(&params[l], &params[r], strlen(params) - r + 1);
+		}
+
+		esc = DBdyn_escape_string(params);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_eval_clear(&ctx);
+	zbx_vector_uint64_destroy(&del_idx);
+
+	zbx_free(sql);
+	zbx_free(params);
+
+	return ret;
+#undef OFFSET_TIME
+#undef TOKEN_LEN
+#undef LAST_FOREACH
+}
 #endif
 
 DBPATCH_START(6000)
@@ -560,5 +690,6 @@ DBPATCH_ADD(6000040, 0, 0)
 DBPATCH_ADD(6000041, 0, 0)
 DBPATCH_ADD(6000042, 0, 0)
 DBPATCH_ADD(6000043, 0, 0)
+DBPATCH_ADD(6000044, 0, 0)
 
 DBPATCH_END()

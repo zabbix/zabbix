@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,8 +83,9 @@ class C52AggregateItemKeyConverter extends CConverter {
 		unset($host_group);
 
 		$item_key = '/*/'.trim($this->item_key_parser->getParam(1)).'?[group='.implode(' or group=', $host_groups).']';
-		$func_foreach = $this->item_key_parser->getParam(2).'_foreach';
-		$timeperiod = $this->item_key_parser->getParam(3);
+		$func = $this->item_key_parser->getParam(2);
+		$func_foreach = $func.'_foreach';
+		$timeperiod = $func === 'last' ? null : $this->item_key_parser->getParam(3);
 		$new_value = substr($this->item_key_parser->getKey(), 3).'('.$func_foreach.'('.$item_key;
 
 		if ($timeperiod !== null) {

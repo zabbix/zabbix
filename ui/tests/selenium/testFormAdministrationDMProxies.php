@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+
+require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
 define('PROXY_GOOD', 0);
 define('PROXY_BAD', 1);
@@ -29,7 +31,7 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup hosts
  */
-class testFormAdministrationDMProxies extends CLegacyWebTest {
+class testFormAdministrationDMProxies extends CLegacyWebTest  {
 	private $proxy_name = 'proxy_name_1';
 	private $new_proxy_name = 'proxy_name_new';
 	private $cloned_proxy_name = 'proxy_name_new_clone';
@@ -334,43 +336,113 @@ class testFormAdministrationDMProxies extends CLegacyWebTest {
 		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Proxy name has not been updated');
 	}
 
-	public static function dataClone() {
-		// Name, clone name
+	public function getCloneData() {
 		return [
-			['Active proxy 1', 'Active proxy 1 cloned'],
-			['Passive proxy 1', 'Passive proxy 1 cloned']
+			[
+				[
+					'proxy' => 'Active proxy 2'
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2'
+				]
+			],
+			[
+				[
+					'proxy' => 'Active proxy to delete',
+					'encryption_fields' => [
+						'id:tls_in_none' => true,
+						'id:tls_in_psk' => true,
+						'id:tls_in_cert' => true,
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'PSK',
+						'PSK identity' => "~`!@#$%^&*()_+-=”№;:?Х[]{}|\\|//",
+						'PSK' => '41b4d07b27a8efdcc15d4742e03857eba377fe010853a1499b0522df171282cb'
+					]
+				]
+			],
+			[
+				[
+					'proxy' => 'Passive proxy 2',
+					'encryption_fields' => [
+						'Connections to proxy' => 'Certificate',
+						'Issuer' => 'test test',
+						'Subject' => 'test test'
+					]
+				]
+			]
 		];
 	}
 
+	/**
+	 * @dataProvider getCloneData
+	 */
+	public function testFormAdministrationDMProxies_Clone($data) {
+		$this->page->login()->open('zabbix.php?action=proxy.list')->waitUntilReady();
+		$this->query('link', $data['proxy'])->one()->waitUntilClickable()->click();
+
+		$form = $this->query('id:proxy-form')->asForm()->one();
+		$original_fields = $form->getFields()->asValues();
+
+		// Get original passive proxy interface fields.
+		if (str_contains($data['proxy'], 'Passive')) {
+			$original_fields = $this->getInterfaceValues($form, $original_fields);
+		}
+
+		$new_name = 'Cloned proxy '.microtime();
+
+		$this->query('button:Clone')->waitUntilClickable()->one()->click();
+		$form->fill(['Proxy name' => $new_name]);
+		$form->submit();
+		$this->assertMessage(TEST_GOOD, 'Proxy added');
+
+		// Check cloned proxy form fields.
+		$this->query('link', $new_name)->one()->waitUntilClickable()->click();
+		$original_fields['Proxy name'] = $new_name;
+		$cloned_fields = $form->getFields()->asValues();
+
+		// Get cloned passive proxy interface fields.
+		if (str_contains($data['proxy'], 'Passive')) {
+			$cloned_fields = $this->getInterfaceValues($form, $cloned_fields);
+		}
+
+		$this->assertEquals($original_fields, $cloned_fields);
+
+		// Check "Encryption" tabs functionality.
+		if (CTestArrayHelper::get($data, 'encryption_fields')) {
+			$form->selectTab('Encryption');
+			$form->fill($data['encryption_fields'])->waitUntilReady();
+			$form->submit();
+			$this->assertMessage(TEST_GOOD, 'Proxy updated');
+		}
+	}
 
 	/**
-	 * @dataProvider dataClone
+	 * Function for returning interface fields.
+	 *
+	 * @param COverlayDialogElement    $dialog    proxy form overlay dialog
+	 * @param array                    $fields	  passive proxy interface fields
+	 *
+	 * @return array
 	 */
-	public function testFormAdministrationDMProxies_Clone($name, $newname) {
+	private function getInterfaceValues($dialog, $fields) {
+		foreach (['ip', 'dns', 'port'] as $id) {
+			$fields[$id] = $dialog->query('id', $id)->one()->getValue();
+		}
+		$fields['useip'] = $dialog->query('id:useip')->one()->asSegmentedRadio()->getValue();
 
-		$this->zbxTestLogin('zabbix.php?action=proxy.list');
-		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestCheckHeader('Proxies');
-		$this->zbxTestClickLinkText($name);
-		$this->zbxTestCheckHeader('Proxies');
-
-		$this->zbxTestAssertElementPresentXpath("//button[@value='proxy.update']");
-		$this->zbxTestAssertElementPresentId('clone');
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Delete']");
-		$this->zbxTestAssertElementPresentXpath("//button[text()='Cancel']");
-
-		$this->zbxTestClickWait('clone');
-		$this->page->waitUntilReady();
-		$this->zbxTestTextPresent('Proxy');
-		$this->zbxTestInputTypeOverwrite('host', $newname);
-		$this->zbxTestClickButton('proxy.create');
-		$this->assertMessage(TEST_GOOD, 'Proxy added');
-		$this->zbxTestCheckTitle('Configuration of proxies');
-		$this->zbxTestCheckHeader('Proxies');
-		$this->zbxTestTextPresent($newname);
-
-		$sql = "SELECT * FROM hosts WHERE host='$newname' AND status in (".HOST_STATUS_PROXY_ACTIVE.",".HOST_STATUS_PROXY_PASSIVE.")";
-		$this->assertEquals(1, CDBHelper::getCount($sql), 'Chuck Norris: Proxy has not been created');
+		return $fields;
 	}
 
 	public static function dataDelete() {

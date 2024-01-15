@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -153,7 +153,7 @@ class testAuditlogAction extends testAuditlogCommon {
 						[
 							'conditiontype' => 3,
 							'operator' => 2,
-							'value' => 'Trigger name'
+							'value' => 'Event name'
 						]
 					]
 				],
@@ -199,7 +199,7 @@ class testAuditlogAction extends testAuditlogCommon {
 			'action.filter.evaltype' => ['update', '2', '0'],
 			'action.filter.conditions['.$conditiodid['conditionid'].'].conditiontype' => ['add', '3'],
 			'action.filter.conditions['.$conditiodid['conditionid'].'].operator' => ['add', '2'],
-			'action.filter.conditions['.$conditiodid['conditionid'].'].value' => ['add', 'Trigger name'],
+			'action.filter.conditions['.$conditiodid['conditionid'].'].value' => ['add', 'Event name'],
 			'action.filter.conditions['.$conditiodid['conditionid'].'].conditionid' => ['add', $conditiodid['conditionid']],
 			'action.operations['.$operationid['operationid'].']' => ['update'],
 			'action.operations['.$operationid['operationid'].'].esc_period' => ['update', '1000', '0'],

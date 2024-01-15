@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,6 @@
 #ifndef ZABBIX_MOCK_HELPER_H
 #define ZABBIX_MOCK_HELPER_H
 
-char		*zbx_yaml_assemble_binary_sequence(const char *path, size_t expected);
+char		*zbx_yaml_assemble_binary_sequence(const char *path, size_t *expected);
 
 #endif

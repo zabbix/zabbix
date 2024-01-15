@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -280,6 +280,6 @@
 			show_final_result: show_final_result ? 1 : 0,
 			get_value: get_value ? 1 : 0,
 			data: cached_values
-		}), {dialogueid: 'item-test', trigger_element});
+		}), {dialogueid: 'item-test', dialogue_class: 'modal-popup-generic', trigger_element});
 	}
 </script>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class CAction extends CApiService {
 	 */
 	private const VALID_CONDITION_TYPES = [
 		EVENT_SOURCE_TRIGGERS => [
-			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TRIGGER_NAME,
+			CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_EVENT_NAME,
 			CONDITION_TYPE_TRIGGER_SEVERITY, CONDITION_TYPE_TIME_PERIOD, CONDITION_TYPE_TEMPLATE,
 			CONDITION_TYPE_SUPPRESSED, CONDITION_TYPE_EVENT_TAG, CONDITION_TYPE_EVENT_TAG_VALUE
 		],
@@ -2212,7 +2212,7 @@ class CAction extends CApiService {
 			case EVENT_SOURCE_TRIGGERS:
 				$value_rules = [
 					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_HOST_GROUP, CONDITION_TYPE_HOST, CONDITION_TYPE_TRIGGER, CONDITION_TYPE_TEMPLATE])], 'type' => API_ID, 'flags' => API_REQUIRED],
-					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_TRIGGER_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
+					['if' => ['field' => 'conditiontype', 'in' => implode(',', [CONDITION_TYPE_EVENT_NAME, CONDITION_TYPE_EVENT_TAG])], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_TIME_PERIOD, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('conditions', 'value')],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_TAG_VALUE], 'type' => API_STRING_UTF8, 'length' => DB::getFieldLength('conditions', 'value')],
@@ -2223,7 +2223,7 @@ class CAction extends CApiService {
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_HOST], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_HOST))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TEMPLATE], 'type' => API_INT32,'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TEMPLATE))],
-					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER_NAME))],
+					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_EVENT_NAME], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_EVENT_NAME))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TRIGGER_SEVERITY], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TRIGGER_SEVERITY))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_TIME_PERIOD], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_TIME_PERIOD))],
 					['if' => ['field' => 'conditiontype', 'in' => CONDITION_TYPE_SUPPRESSED], 'type' => API_INT32, 'in' => implode(',', get_operators_by_conditiontype(CONDITION_TYPE_SUPPRESSED))],

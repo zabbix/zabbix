@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -387,7 +387,6 @@ class CScreenHistory extends CScreenBase {
 			 */
 			elseif ($this->action === HISTORY_LATEST) {
 				$history_table = (new CTableInfo())
-					->makeVerticalRotation()
 					->setHeader([(new CColHeader(_('Timestamp')))->addClass(ZBX_STYLE_CELL_WIDTH), _('Value')]);
 
 				$items_by_type = [];
@@ -454,8 +453,8 @@ class CScreenHistory extends CScreenBase {
 						['field' => 'ns', 'order' => ZBX_SORT_DOWN]
 					]);
 
-					$table_header[] = (new CColHeader($item['name']))
-						->addClass('vertical_rotation')
+					$table_header[] = (new CSpan($item['name']))
+						->addClass(ZBX_STYLE_TEXT_VERTICAL)
 						->setTitle($item['name']);
 					$history_data_index = 0;
 
@@ -491,7 +490,7 @@ class CScreenHistory extends CScreenBase {
 					new CUrl($this->page_file)
 				);
 
-				$history_table = (new CTableInfo())->makeVerticalRotation()->setHeader($table_header);
+				$history_table = (new CTableInfo())->setHeader($table_header);
 
 				foreach ($history_data as $history_data_row) {
 					$row = [(new CCol(zbx_date2str(DATE_TIME_FORMAT_SECONDS, $history_data_row['clock'])))

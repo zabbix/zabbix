@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -198,7 +198,7 @@ func GetCounterDouble(path string) (value *float64, err error) {
 	if err = win32.PdhCollectQueryData(query); err != nil {
 		return
 	}
-	return win32.PdhGetFormattedCounterValueDouble(counter)
+	return win32.PdhGetFormattedCounterValueDouble(counter, 2)
 }
 
 func GetCounterInt64(path string) (value *int64, err error) {

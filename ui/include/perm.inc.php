@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,39 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
-/**
- * Get permission label.
- *
- * @param int $permission
- *
- * @return string
- */
-function permission2str($permission) {
-	$permissions = [
-		PERM_READ_WRITE => _('Read-write'),
-		PERM_READ => _('Read only'),
-		PERM_DENY => _('Deny')
-	];
-
-	return $permissions[$permission];
-}
-
-/**
- * Get authentication label.
- *
- * @param int $type
- *
- * @return string
- */
-function authentication2str($type) {
-	$authentications = [
-		ZBX_AUTH_INTERNAL => _('Zabbix internal authentication'),
-		ZBX_AUTH_LDAP => _('LDAP authentication')
-	];
-
-	return $authentications[$type];
-}
 
 /***********************************************
 	CHECK USER ACCESS TO SYSTEM STATUS
@@ -76,17 +43,6 @@ function check_perm2system($userid) {
 }
 
 /**
- * Checking user permissions to login in frontend.
- *
- * @param string $userId
- *
- * @return bool
- */
-function check_perm2login($userId) {
-	return (getUserGuiAccess($userId) != GROUP_GUI_ACCESS_DISABLED);
-}
-
-/**
  * Get user gui access.
  *
  * @param string $userid
@@ -106,139 +62,6 @@ function getUserGuiAccess(string $userid): int {
 	));
 
 	return $gui_access ? $gui_access['gui_access'] : GROUP_GUI_ACCESS_SYSTEM;
-}
-
-/**
- * Get user authentication type.
- *
- * @param int $gui_access  Frontend access. GROUP_GUI_ACCESS_*
- *
- * @return int
- */
-function getUserAuthenticationType($gui_access) {
-	switch ($gui_access) {
-		case GROUP_GUI_ACCESS_SYSTEM:
-			return CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
-
-		case GROUP_GUI_ACCESS_INTERNAL:
-			return ZBX_AUTH_INTERNAL;
-
-		case GROUP_GUI_ACCESS_LDAP:
-			return ZBX_AUTH_LDAP;
-
-		default:
-			return CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE);
-	}
-}
-
-/***********************************************
-	GET ACCESSIBLE RESOURCES BY RIGHTS
-************************************************/
-/* NOTE: right structure is
-	$rights[i]['type']	= type of resource
-	$rights[i]['permission']= permission for resource
-	$rights[i]['id']	= resource id
-*/
-function get_accessible_hosts_by_rights(&$rights, $user_type, $perm) {
-	$result = [];
-	$res_perm = [];
-
-	foreach ($rights as $id => $right) {
-		$res_perm[$right['id']] = $right['permission'];
-	}
-
-	$host_perm = [];
-	$where = [];
-
-	array_push($where, 'h.status in ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.','.HOST_STATUS_TEMPLATE.')');
-	array_push($where, dbConditionInt('h.flags', [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_CREATED]));
-
-	$where = count($where) ? $where = ' WHERE '.implode(' AND ', $where) : '';
-
-	$perm_by_host = [];
-
-	$dbHosts = DBselect(
-		'SELECT hg.groupid AS groupid,h.hostid,h.host,h.name AS host_name,h.status'.
-		' FROM hosts h'.
-			' LEFT JOIN hosts_groups hg ON hg.hostid=h.hostid'.
-			$where
-	);
-	while ($dbHost = DBfetch($dbHosts)) {
-		if (isset($dbHost['groupid']) && isset($res_perm[$dbHost['groupid']])) {
-			if (!isset($perm_by_host[$dbHost['hostid']])) {
-				$perm_by_host[$dbHost['hostid']] = [];
-			}
-			$perm_by_host[$dbHost['hostid']][] = $res_perm[$dbHost['groupid']];
-			$host_perm[$dbHost['hostid']][$dbHost['groupid']] = $res_perm[$dbHost['groupid']];
-		}
-		$host_perm[$dbHost['hostid']]['data'] = $dbHost;
-	}
-
-	foreach ($host_perm as $hostid => $dbHost) {
-		$dbHost = $dbHost['data'];
-
-		// select min rights from groups
-		if (USER_TYPE_SUPER_ADMIN == $user_type) {
-			$dbHost['permission'] = PERM_READ_WRITE;
-		}
-		else {
-			if (isset($perm_by_host[$hostid])) {
-				$dbHost['permission'] = (min($perm_by_host[$hostid]) == PERM_DENY)
-					? PERM_DENY
-					: max($perm_by_host[$hostid]);
-			}
-			else {
-				$dbHost['permission'] = PERM_DENY;
-			}
-		}
-
-		if ($dbHost['permission'] < $perm) {
-			continue;
-		}
-
-		$result[$dbHost['hostid']] = $dbHost;
-	}
-
-	CArrayHelper::sort($result, [
-		['field' => 'host_name', 'order' => ZBX_SORT_UP]
-	]);
-
-	return $result;
-}
-
-function get_accessible_groups_by_rights(&$rights, $user_type, $perm) {
-	$result = [];
-
-	$group_perm = [];
-	foreach ($rights as $right) {
-		$group_perm[$right['id']] = $right['permission'];
-	}
-
-	$dbHostGroups = DBselect('SELECT g.*,'.PERM_DENY.' AS permission FROM hstgrp g');
-
-	while ($dbHostGroup = DBfetch($dbHostGroups)) {
-		if ($user_type == USER_TYPE_SUPER_ADMIN) {
-			$dbHostGroup['permission'] = PERM_READ_WRITE;
-		}
-		elseif (isset($group_perm[$dbHostGroup['groupid']])) {
-			$dbHostGroup['permission'] = $group_perm[$dbHostGroup['groupid']];
-		}
-		else {
-			$dbHostGroup['permission'] = PERM_DENY;
-		}
-
-		if ($dbHostGroup['permission'] < $perm) {
-			continue;
-		}
-
-		$result[$dbHostGroup['groupid']] = $dbHostGroup;
-	}
-
-	CArrayHelper::sort($result, [
-		['field' => 'name', 'order' => ZBX_SORT_UP]
-	]);
-
-	return $result;
 }
 
 /**

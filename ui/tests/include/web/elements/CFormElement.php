@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -491,7 +491,13 @@ class CFormElement extends CElement {
 	 * @throws Exception
 	 */
 	protected function checkFieldValue($field, $values, $raise_exception = true) {
-		$classes = [CMultifieldTableElement::class, CMultiselectElement::class, CCheckboxListElement::class, CHostInterfaceElement::class];
+		$classes = [
+			CMultifieldTableElement::class,
+			CFormElement::class,
+			CMultiselectElement::class,
+			CCheckboxListElement::class,
+			CHostInterfaceElement::class
+		];
 		$element = $this->getField($field);
 
 		if (is_array($values) && !in_array(get_class($element), $classes)) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@ typedef struct
 zbx_event_severity_t;
 
 void	zbx_service_serialize(unsigned char **data, size_t *data_alloc, size_t *data_offset, zbx_uint64_t eventid,
-		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags);
+		int clock, int ns, int value, int severity, const zbx_vector_ptr_t *tags, int suppressed);
 void	zbx_service_deserialize(const unsigned char *data, zbx_uint32_t size, zbx_vector_ptr_t *events);
 void	zbx_service_serialize_problem_tags(unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		zbx_uint64_t eventid, const zbx_vector_tags_t *tags);

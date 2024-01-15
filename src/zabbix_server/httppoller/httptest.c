@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 
 #include "httptest.h"
 
+#include "common.h"
 #include "log.h"
 #include "preproc.h"
 #include "daemon.h"
@@ -38,44 +39,6 @@ typedef struct
 	ZBX_CURLINFO_SPEED_DOWNLOAD_TYPE	speed_download;
 }
 zbx_httpstat_t;
-
-
-typedef struct
-{
-	char	*data;
-	size_t	allocated;
-	size_t	offset;
-}
-zbx_httppage_t;
-
-static zbx_httppage_t	page;
-
-static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	size_t	r_size = size * nmemb;
-
-	ZBX_UNUSED(userdata);
-
-	/* first piece of data */
-	if (NULL == page.data)
-	{
-		page.allocated = MAX(8096, r_size);
-		page.offset = 0;
-		page.data = (char *)zbx_malloc(page.data, page.allocated);
-	}
-
-	zbx_strncpy_alloc(&page.data, &page.allocated, &page.offset, (char *)ptr, r_size);
-
-	return r_size;
-}
-
-static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	ZBX_UNUSED(ptr);
-	ZBX_UNUSED(userdata);
-
-	return size * nmemb;
-}
 
 #endif	/* HAVE_LIBCURL */
 
@@ -610,21 +573,22 @@ out:
  ******************************************************************************/
 static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 {
-	DB_RESULT	result;
-	DB_HTTPSTEP	db_httpstep;
-	char		*err_str = NULL, *buffer = NULL;
-	int		lastfailedstep = 0;
-	zbx_timespec_t	ts;
-	int		delay;
-	double		speed_download = 0;
-	int		speed_download_num = 0;
+	DB_RESULT		result;
+	DB_HTTPSTEP		db_httpstep;
+	char			*err_str = NULL, *buffer = NULL;
+	int			lastfailedstep = 0;
+	zbx_timespec_t		ts;
+	int			delay;
+	double			speed_download = 0;
+	int			speed_download_num = 0;
 #ifdef HAVE_LIBCURL
-	DB_ROW		row;
-	zbx_httpstat_t	stat;
-	char		errbuf[CURL_ERROR_SIZE];
-	CURL		*easyhandle = NULL;
-	CURLcode	err;
-	zbx_httpstep_t	httpstep;
+	DB_ROW			row;
+	zbx_httpstat_t		stat;
+	char			errbuf[CURL_ERROR_SIZE];
+	CURL			*easyhandle = NULL;
+	CURLcode		err;
+	zbx_httpstep_t		httpstep;
+	zbx_http_response_t	body = {0}, header = {0};
 #endif
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() httptestid:" ZBX_FS_UI64 " name:'%s'",
@@ -664,7 +628,6 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROXY, httptest->httptest.http_proxy)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_COOKIEFILE, "")) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERAGENT, httptest->httptest.agent)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ERRORBUFFER, errbuf)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		err_str = zbx_strdup(err_str, curl_easy_strerror(err));
@@ -699,8 +662,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 	{
 		struct curl_slist	*headers_slist = NULL;
 		char			*header_cookie = NULL;
-		size_t			(*curl_header_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
-		size_t			(*curl_body_cb)(void *ptr, size_t size, size_t nmemb, void *userdata);
+		zbx_curl_cb_t		curl_body_cb, curl_header_cb;
 
 		/* NOTE: do not break or return from this block! */
 		/*       process_step_data() call is required! */
@@ -817,15 +779,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		switch (db_httpstep.retrieve_mode)
 		{
 			case ZBX_RETRIEVE_MODE_CONTENT:
-				curl_header_cb = curl_ignore_cb;
-				curl_body_cb = curl_write_cb;
+				curl_header_cb = zbx_curl_ignore_cb;
+				curl_body_cb = zbx_curl_write_cb;
 				break;
 			case ZBX_RETRIEVE_MODE_BOTH:
-				curl_header_cb = curl_body_cb = curl_write_cb;
+				curl_header_cb = curl_body_cb = zbx_curl_write_cb;
 				break;
 			case ZBX_RETRIEVE_MODE_HEADERS:
-				curl_header_cb = curl_write_cb;
-				curl_body_cb = curl_ignore_cb;
+				curl_header_cb = zbx_curl_write_cb;
+				curl_body_cb = zbx_curl_ignore_cb;
 				break;
 			default:
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -833,10 +795,9 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 				goto httpstep_error;
 		}
 
-		if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION, curl_body_cb)) ||
-				CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADERFUNCTION, curl_header_cb)))
+		if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, curl_header_cb, curl_body_cb,
+				errbuf, &err_str))
 		{
-			err_str = zbx_strdup(err_str, curl_easy_strerror(err));
 			goto httpstep_error;
 		}
 
@@ -866,13 +827,13 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 		/* try to retrieve page several times depending on number of retries */
 		do
 		{
-			memset(&page, 0, sizeof(page));
 			errbuf[0] = '\0';
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 				break;
 
-			zbx_free(page.data);
+			zbx_free(body.data);
+			zbx_free(header.data);
 		}
 		while (0 < --httptest->httptest.retries);
 
@@ -880,9 +841,29 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 		if (CURLE_OK == err)
 		{
-			char	*var_err_str = NULL;
+			char	*var_err_str = NULL, *data = NULL;
 
-			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __func__, httpstep.url, page.data);
+			if (NULL != body.data)
+			{
+				zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
+				data = body.data;
+			}
+
+			if (NULL != header.data)
+			{
+				if (NULL != body.data)
+				{
+					zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data,
+							body.offset);
+				}
+
+				data = header.data;
+			}
+
+			if (NULL == data)
+				data = "";
+
+			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __func__, httpstep.url, data);
 
 			/* first get the data that is needed even if step fails */
 			if (CURLE_OK != (err = curl_easy_getinfo(easyhandle, CURLINFO_RESPONSE_CODE, &stat.rspcode)))
@@ -915,15 +896,15 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 
 			/* required pattern */
 			if (NULL == err_str && '\0' != *db_httpstep.required &&
-					NULL == zbx_regexp_match(page.data, db_httpstep.required, NULL))
+					NULL == zbx_regexp_match(data, db_httpstep.required, NULL))
 			{
 				err_str = zbx_dsprintf(err_str, "required pattern \"%s\" was not found on %s",
 						db_httpstep.required, httpstep.url);
 			}
 
 			/* variables defined in scenario */
-			if (NULL == err_str && FAIL == http_process_variables(httptest, &httptest->variables, page.data,
-					&var_err_str))
+			if (NULL == err_str && FAIL == http_process_variables(httptest, &httptest->variables,
+					data, &var_err_str))
 			{
 				char	*variables = NULL;
 				size_t	alloc_len = 0, offset;
@@ -937,7 +918,7 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			}
 
 			/* variables defined in a step */
-			if (NULL == err_str && FAIL == http_process_variables(httptest, &httpstep.variables, page.data,
+			if (NULL == err_str && FAIL == http_process_variables(httptest, &httpstep.variables, data,
 					&var_err_str))
 			{
 				char	*variables = NULL;
@@ -956,7 +937,8 @@ static void	process_httptest(DC_HOST *host, zbx_httptest_t *httptest)
 			zbx_timespec(&ts);
 			process_step_data(db_httpstep.httpstepid, &stat, &ts);
 
-			zbx_free(page.data);
+			zbx_free(header.data);
+			zbx_free(body.data);
 		}
 		else
 			err_str = zbx_dsprintf(err_str, "%s", 0 < strlen(errbuf) ? errbuf : curl_easy_strerror(err));

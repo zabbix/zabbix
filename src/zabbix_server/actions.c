@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -569,7 +569,7 @@ static int	check_trigger_id_condition(const zbx_vector_ptr_t *esc_events, zbx_co
 
 /******************************************************************************
  *                                                                            *
- * Purpose: check trigger name condition                                      *
+ * Purpose: check event name condition                                        *
  *                                                                            *
  * Parameters: esc_events - [IN] events to check                              *
  *             condition  - [IN/OUT] condition for matching, outputs          *
@@ -579,7 +579,7 @@ static int	check_trigger_id_condition(const zbx_vector_ptr_t *esc_events, zbx_co
  *               NOTSUPPORTED - not supported operator                        *
  *                                                                            *
  ******************************************************************************/
-static int	check_trigger_name_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
+static int	check_event_name_condition(const zbx_vector_ptr_t *esc_events, zbx_condition_t *condition)
 {
 	int	i;
 
@@ -897,8 +897,8 @@ static void	check_trigger_condition(const zbx_vector_ptr_t *esc_events, zbx_cond
 		case CONDITION_TYPE_TRIGGER:
 			ret = check_trigger_id_condition(esc_events, condition);
 			break;
-		case CONDITION_TYPE_TRIGGER_NAME:
-			ret = check_trigger_name_condition(esc_events, condition);
+		case CONDITION_TYPE_EVENT_NAME:
+			ret = check_event_name_condition(esc_events, condition);
 			break;
 		case CONDITION_TYPE_TRIGGER_SEVERITY:
 			ret = check_trigger_severity_condition(esc_events, condition);

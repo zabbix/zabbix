@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -636,7 +636,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 	{
 		if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+			SET_MSG_RESULT(result, zbx_strdup(NULL,
+					"Cannot decode DNS response: cannot expand domain name."));
 			ret = SYSINFO_RET_FAIL;
 			goto clean;
 		}
@@ -648,6 +649,13 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		msg_ptr += INT32SZ;		/* skipping TTL */
 		GETSHORT(q_len, msg_ptr);
 		offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %-8s", decode_type(q_type));
+
+		if (msg_ptr + q_len > msg_end)
+		{
+			SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response: record overflow."));
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
+		}
 
 		switch (q_type)
 		{
@@ -693,8 +701,40 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_PTR:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+#define ERR_MSG_PREFIX	"Cannot decode DNS response: cannot expand "
+					const char	*err_msg = NULL;
+
+					switch (q_type)
+					{
+						case T_NS:
+							err_msg = ERR_MSG_PREFIX "name server name.";
+							break;
+						case T_CNAME:
+							err_msg = ERR_MSG_PREFIX "canonical name.";
+							break;
+						case T_MB:
+							err_msg = ERR_MSG_PREFIX "mailbox name.";
+							break;
+						case T_MD:
+							err_msg = ERR_MSG_PREFIX "mail destination name.";
+							break;
+						case T_MF:
+							err_msg = ERR_MSG_PREFIX "mail forwarder name.";
+							break;
+						case T_MG:
+							err_msg = ERR_MSG_PREFIX "mail group name.";
+							break;
+						case T_MR:
+							err_msg = ERR_MSG_PREFIX "renamed mailbox name.";
+							break;
+						case T_PTR:
+							err_msg = ERR_MSG_PREFIX "PTR name.";
+							break;
+					}
+
+					SET_MSG_RESULT(result, zbx_strdup(NULL, err_msg));
 					return SYSINFO_RET_FAIL;
+#undef ERR_MSG_PREFIX
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 				break;
@@ -704,7 +744,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* exchange */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" cannot expand mail exchange name."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -713,14 +754,16 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_SOA:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* source host */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" cannot expand source nameserver name."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* administrator */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" cannot expand administrator mailbox name."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -748,7 +791,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_WKS:
 				if (INT32SZ + 1 > q_len)
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" malformed WKS resource record."));
 					return SYSINFO_RET_FAIL;
 				}
 
@@ -814,14 +858,16 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 			case T_MINFO:
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox responsible for mailing lists */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" cannot expand mailbox responsible for mailing lists."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* mailbox for error messages */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" cannot expand mailbox for error messages."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);
@@ -852,7 +898,8 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 				if (NULL == (name = get_name(answer.buffer, msg_end, &msg_ptr)))	/* target */
 				{
-					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response."));
+					SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot decode DNS response:"
+							" cannot expand service target hostname."));
 					return SYSINFO_RET_FAIL;
 				}
 				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, " %s", name);

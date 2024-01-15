@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,14 +35,6 @@ extern int	CONFIG_TIMEOUT;
 #else
 
 #define HTTPS_SCHEME_STR	"https://"
-
-typedef struct
-{
-	char	*data;
-	size_t	allocated;
-	size_t	offset;
-}
-http_response_t;
 
 #endif
 
@@ -126,31 +118,13 @@ static int	check_common_params(const char *host, const char *path, char **error)
 }
 
 #ifdef HAVE_LIBCURL
-static size_t	curl_write_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	size_t		r_size = size * nmemb;
-	http_response_t	*response;
-
-	response = (http_response_t*)userdata;
-	zbx_str_memcpy_alloc(&response->data, &response->allocated, &response->offset, (const char *)ptr, r_size);
-
-	return r_size;
-}
-
-static size_t	curl_ignore_cb(void *ptr, size_t size, size_t nmemb, void *userdata)
-{
-	ZBX_UNUSED(ptr);
-	ZBX_UNUSED(userdata);
-
-	return size * nmemb;
-}
-
 static int	curl_page_get(char *url, char **buffer, char **error)
 {
 	CURLcode		err;
-	http_response_t		page = {0};
 	CURL			*easyhandle;
 	int			ret = SYSINFO_RET_FAIL;
+	zbx_http_response_t	body = {0}, header = {0};
+	char			errbuf[CURL_ERROR_SIZE];
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -163,10 +137,6 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEFUNCTION,
-			NULL != buffer ? curl_write_cb : curl_ignore_cb)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_WRITEDATA, &page)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
 			(NULL != CONFIG_SOURCE_IP &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP))) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_TIMEOUT, (long)CONFIG_TIMEOUT)) ||
@@ -174,6 +144,23 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option: %s.", curl_easy_strerror(err));
 		goto out;
+	}
+
+	if (NULL != buffer)
+	{
+		if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_write_cb,
+				zbx_curl_write_cb, errbuf, error))
+		{
+			goto out;
+		}
+	}
+	else
+	{
+		if (SUCCEED != zbx_http_prepare_callbacks(easyhandle, &header, &body, zbx_curl_ignore_cb,
+				zbx_curl_ignore_cb, errbuf, error))
+		{
+			goto out;
+		}
 	}
 
 #if LIBCURL_VERSION_NUM >= 0x071304
@@ -189,22 +176,31 @@ static int	curl_page_get(char *url, char **buffer, char **error)
 		goto out;
 	}
 #endif
-
+	*errbuf = '\0';
 	if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
 	{
 		if (NULL != buffer)
-			*buffer = page.data;
+		{
+			if (NULL != body.data)
+			{
+				zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
+				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
+			}
+			*buffer = header.data;
+			header.data = NULL;
+		}
 
 		ret = SYSINFO_RET_OK;
 	}
 	else
 	{
-		zbx_free(page.data);
-		*error = zbx_dsprintf(*error, "Cannot perform cURL request: %s.", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "Cannot perform request: %s", '\0' == *errbuf ?
+				curl_easy_strerror(err) : errbuf);
 	}
-
 out:
 	curl_easy_cleanup(easyhandle);
+	zbx_free(header.data);
+	zbx_free(body.data);
 
 	return ret;
 }

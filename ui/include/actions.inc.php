@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ function condition_operator2str($operator) {
 function condition_type2str($type) {
 	$types = [
 		CONDITION_TYPE_SUPPRESSED => _('Problem is suppressed'),
-		CONDITION_TYPE_TRIGGER_NAME => _('Trigger name'),
+		CONDITION_TYPE_EVENT_NAME => _('Event name'),
 		CONDITION_TYPE_TRIGGER_SEVERITY => _('Trigger severity'),
 		CONDITION_TYPE_TRIGGER => _('Trigger'),
 		CONDITION_TYPE_HOST_NAME => _('Host name'),
@@ -143,7 +143,7 @@ function actionConditionValueToString(array $actions) {
 					break;
 
 				// return values as is for following condition types
-				case CONDITION_TYPE_TRIGGER_NAME:
+				case CONDITION_TYPE_EVENT_NAME:
 				case CONDITION_TYPE_HOST_METADATA:
 				case CONDITION_TYPE_HOST_NAME:
 				case CONDITION_TYPE_TIME_PERIOD:
@@ -881,7 +881,7 @@ function getActionOperationDescriptions(int $eventsource, array $actions, int $t
  */
 function get_conditions_by_eventsource($eventsource) {
 	$conditions[EVENT_SOURCE_TRIGGERS] = [
-		CONDITION_TYPE_TRIGGER_NAME,
+		CONDITION_TYPE_EVENT_NAME,
 		CONDITION_TYPE_TRIGGER,
 		CONDITION_TYPE_TRIGGER_SEVERITY,
 		CONDITION_TYPE_HOST,
@@ -1100,7 +1100,7 @@ function get_operators_by_conditiontype($conditiontype) {
 		CONDITION_OPERATOR_EQUAL,
 		CONDITION_OPERATOR_NOT_EQUAL
 	];
-	$operators[CONDITION_TYPE_TRIGGER_NAME] = [
+	$operators[CONDITION_TYPE_EVENT_NAME] = [
 		CONDITION_OPERATOR_LIKE,
 		CONDITION_OPERATOR_NOT_LIKE
 	];

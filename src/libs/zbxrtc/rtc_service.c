@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -383,11 +383,11 @@ void	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: wait for configuration sync notification while optionally         *
- *          dispatching runtime control commands                              *
+ * Purpose: wait for sync notification while optionally dispatching runtime   *
+ * control commands                                                           *
  *                                                                            *
  ******************************************************************************/
-int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
+int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc)
 {
 	zbx_timespec_t	rtc_timeout = {1, 0};
 	int		sync = 0;
@@ -404,6 +404,7 @@ int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc)
 			switch (message->code)
 			{
 				case ZBX_RTC_CONFIG_SYNC_NOTIFY:
+				case ZBX_RTC_SERVICE_SYNC_NOTIFY:
 					sync = 1;
 					break;
 				case ZBX_RTC_LOG_LEVEL_DECREASE:

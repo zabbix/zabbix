@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,13 +20,10 @@
 package docker
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
-
-type metricMeta struct {
-	path string
-}
 
 const (
 	keyContainerInfo       = "docker.container_info"
@@ -83,6 +80,13 @@ var metrics = metric.MetricSet{
 	keyPing: metric.New("Pings the server and returns 0 or 1.", nil, false),
 }
 
+type metricMeta struct {
+	path string
+}
+
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
 }

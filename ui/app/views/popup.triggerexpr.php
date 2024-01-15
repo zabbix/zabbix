@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,7 +74,12 @@ if ($data['item_required']) {
 		(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
 		(new CButton('select', _('Select')))
 			->addClass(ZBX_STYLE_BTN_GREY)
-			->onClick('return PopUp("popup.generic", '.json_encode($popup_options).');')
+			->onClick(
+				'return PopUp("popup.generic", '.
+					json_encode($popup_options).
+					', {dialogue_class: "modal-popup-generic"}
+				);'
+			)
 	];
 
 	if ($data['parent_discoveryid'] !== '') {

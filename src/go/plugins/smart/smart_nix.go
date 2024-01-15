@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ package smart
 
 import (
 	"fmt"
+	"os/exec"
 	"time"
 
 	"zabbix.com/pkg/zbxcmd"
@@ -38,6 +39,11 @@ func (p *Plugin) executeSmartctl(args string, strict bool) ([]byte, error) {
 
 	var out string
 	var err error
+
+	_, err = exec.LookPath(path)
+	if err != nil {
+		return nil, err
+	}
 
 	executable := fmt.Sprintf("sudo -n %s %s", path, args)
 

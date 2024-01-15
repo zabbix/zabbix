@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,14 @@ package file
 
 import (
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
+)
+
+var (
+	impl  Plugin
+	stdOs std.Os
 )
 
 type Options struct {
@@ -37,7 +43,27 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	stdOs = std.NewOs()
+
+	err := plugin.RegisterMetrics(
+		&impl, "File",
+		"vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.",
+		"vfs.file.contents", "Retrieves contents of the file.",
+		"vfs.file.exists", "Returns if file exists or not.",
+		"vfs.file.time", "Returns file time information.",
+		"vfs.file.size", "Returns file size.",
+		"vfs.file.regexp", "Find string in a file.",
+		"vfs.file.regmatch", "Find string in a file.",
+		"vfs.file.md5sum", "Returns MD5 checksum of file.",
+		"vfs.file.owner", "Returns the ownership of a file.",
+		"vfs.file.permissions", "Returns 4-digit string containing octal number with Unix permissions.",
+		"vfs.file.get", "Return json object with information about a file.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -81,22 +107,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 	return conf.Unmarshal(options, &o)
-}
-
-var stdOs std.Os
-
-func init() {
-	stdOs = std.NewOs()
-	plugin.RegisterMetrics(&impl, "File",
-		"vfs.file.cksum", "Returns File checksum, calculated by the UNIX cksum algorithm.",
-		"vfs.file.contents", "Retrieves contents of the file.",
-		"vfs.file.exists", "Returns if file exists or not.",
-		"vfs.file.time", "Returns file time information.",
-		"vfs.file.size", "Returns file size.",
-		"vfs.file.regexp", "Find string in a file.",
-		"vfs.file.regmatch", "Find string in a file.",
-		"vfs.file.md5sum", "Returns MD5 checksum of file.",
-		"vfs.file.owner", "Returns the ownership of a file.",
-		"vfs.file.permissions", "Returns 4-digit string containing octal number with Unix permissions.",
-		"vfs.file.get", "Return json object with information about a file.")
 }

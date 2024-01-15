@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -424,17 +424,19 @@
 			dcheck['key_'] = dcheck['snmp_oid'];
 		}
 
+		const check_fields = fields.filter((field) => field in dcheck);
+
 		for (const zbx_dcheckid in ZBX_CHECKLIST) {
 			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
 				continue;
 			}
 
 			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
-				const duplicate_fields = fields
+				const duplicate_fields = check_fields
 					.map((value) => ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value])
 					.filter((value) => !!value);
 
-				if (duplicate_fields.length === fields.length) {
+				if (duplicate_fields.length === check_fields.length) {
 					return true;
 				}
 			}

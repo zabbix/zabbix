@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,14 +52,14 @@ zbx_rtc_t;
 /* provider API */
 int	zbx_rtc_init(zbx_rtc_t *rtc ,char **error);
 void 	zbx_rtc_dispatch(zbx_rtc_t *rtc, zbx_ipc_client_t *client, zbx_ipc_message_t *message);
-int	zbx_rtc_wait_config_sync(zbx_rtc_t *rtc);
+int	zbx_rtc_wait_for_sync_finish(zbx_rtc_t *rtc);
 void	zbx_rtc_shutdown_subs(zbx_rtc_t *rtc);
 void	zbx_rtc_reset(zbx_rtc_t *rtc);
 
 /* client API */
 int	zbx_rtc_process(const char *option, char **error);
 int	zbx_rtc_open(zbx_ipc_async_socket_t *asocket, int timeout, char **error);
-void	zbx_rtc_notify_config_sync(zbx_ipc_async_socket_t *rtc);
+void	zbx_rtc_notify_finished_sync(zbx_ipc_async_socket_t *rtc, zbx_uint32_t code, const char *process_name);
 
 void	zbx_rtc_subscribe(zbx_ipc_async_socket_t *rtc, unsigned char proc_type, int proc_num);
 int	zbx_rtc_wait(zbx_ipc_async_socket_t *rtc, zbx_uint32_t *cmd, unsigned char **data, int timeout);

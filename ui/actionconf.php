@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -623,7 +623,7 @@ if (hasRequest('form')) {
 
 	// Add default values for new condition.
 	$data['new_condition'] += [
-		'conditiontype'	=> CONDITION_TYPE_TRIGGER_NAME,
+		'conditiontype'	=> CONDITION_TYPE_EVENT_NAME,
 		'operator'		=> CONDITION_OPERATOR_LIKE,
 		'value'			=> ''
 	];

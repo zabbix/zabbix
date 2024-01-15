@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -376,6 +376,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 				curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != request->data)
+		zbx_http_convert_to_utf8(request->handle, &request->data, &request->data_offset, &request->data_alloc);
 out:
 	zbx_free(url);
 	zbx_free(contents);

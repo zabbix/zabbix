@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -64,7 +64,7 @@ $media_types = array_column($db_media_types, 'name', 'mediatypeid');
 $widget = (new CWidget())->setTitle(_('Notifications'));
 
 if ($media_types) {
-	$table = (new CTableInfo())->makeVerticalRotation();
+	$table = new CTableInfo();
 
 	// Fetch the year of the first alert.
 	if (($first_alert = DBfetch(DBselect('SELECT MIN(a.clock) AS clock FROM alerts a'))) && $first_alert['clock']) {
@@ -136,8 +136,8 @@ if ($media_types) {
 
 	foreach ($db_users as $user_data) {
 		$full_name = getUserFullname($user_data);
-		$header[] = (new CColHeader($full_name))
-			->addClass('vertical_rotation')
+		$header[] = (new CSpan($full_name))
+			->addClass(ZBX_STYLE_TEXT_VERTICAL)
 			->setTitle($full_name);
 		$users[] = $user_data['userid'];
 	}

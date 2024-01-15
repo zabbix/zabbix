@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2301,6 +2301,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			unit = ZBX_VMWARE_UNIT_MEGABYTESPERSECOND;				\
 		else if (0 == strcmp("megaHertz",val))						\
 			unit = ZBX_VMWARE_UNIT_MEGAHERTZ;					\
+		else if (0 == strcmp("nanosecond",val))						\
+			unit = ZBX_VMWARE_UNIT_NANOSECOND;					\
 		else if (0 == strcmp("microsecond",val))					\
 			unit = ZBX_VMWARE_UNIT_MICROSECOND;					\
 		else if (0 == strcmp("millisecond",val))					\
@@ -7052,7 +7054,11 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error(void *user_data, const xmlError *err)
+#endif
 {
 	ZBX_UNUSED(user_data);
 	ZBX_UNUSED(err);
