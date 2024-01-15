@@ -152,12 +152,11 @@ class CScreenDiscovery extends CScreenBase {
 
 				foreach ($dhosts[$dhost['dhostid']]['dservices'] as $dservice) {
 					$dservice = $dservices[$dservice['dserviceid']];
-
 					$host_name = '';
 					$hostid = '';
 					$host_status = HOST_STATUS_NOT_MONITORED;
-
 					$host = reset($dservices[$dservice['dserviceid']]['hosts']);
+
 					if ($host) {
 						$host_name = $host['name'];
 						$hostid = $host['hostid'];

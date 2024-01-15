@@ -980,7 +980,7 @@ class CControllerMenuPopup extends CController {
 		return $menu_data;
 	}
 
-	private static function getMenuDataDRule(array $data) {
+	private static function getMenuDataDRule(array $data): ?array {
 		$db_drules_count = API::DRule()->get([
 			'output' => [],
 			'druleids' => $data['druleid'],

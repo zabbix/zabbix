@@ -26,8 +26,6 @@
 
 <script>
 	const view = new class {
-		init() {
-		}
 
 		#edit(parameters = {}) {
 			const overlay = PopUp('discovery.edit', parameters, {
