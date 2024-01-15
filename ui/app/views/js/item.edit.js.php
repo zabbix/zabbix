@@ -96,6 +96,8 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 
 		this.initial_form_fields = this.#getFormFields(this.form);
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	initForm(field_switches) {

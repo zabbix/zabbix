@@ -29,7 +29,8 @@ $form = (new CForm())
 	->setId('maintenance-form')
 	->setName('maintenance_form')
 	->addVar('maintenanceid', $data['maintenanceid'] ?: 0)
-	->addItem(getMessages());
+	->addItem(getMessages())
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

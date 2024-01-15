@@ -29,7 +29,8 @@ $form = (new CForm())
 	->setName('action.edit')
 	->setId('action-form')
 	->addVar('actionid', $data['actionid'] ?: 0)
-	->addVar('eventsource', $data['eventsource']);
+	->addVar('eventsource', $data['eventsource'])
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

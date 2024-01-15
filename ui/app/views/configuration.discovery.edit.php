@@ -30,7 +30,8 @@ $csrf_token = CCsrfTokenHelper::get('discovery');
 $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, $csrf_token))->removeId())
 	->setId('discoveryForm')
-	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+	->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN))
+	->addStyle('display: none;');
 
 if ($this->data['drule']['druleid'] !== null) {
 	$form->addVar('druleid', $this->data['drule']['druleid']);
