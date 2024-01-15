@@ -86,7 +86,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-					'type' => 4		// Check: HTTP
+						'type' => 4		// Check: HTTP
 					]
 				]
 			],
@@ -95,7 +95,7 @@ class testDashboardDiscoveryStatusWidget extends CWebTest {
 				'iprange' => '192.168.1.1-255',
 				'dchecks' => [
 					[
-					'type' => 4		// Check: HTTP
+						'type' => 4		// Check: HTTP
 					]
 				]
 			],
