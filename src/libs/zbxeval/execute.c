@@ -19,7 +19,6 @@
 
 #include "zbxeval.h"
 #include "eval.h"
-#include "count_pattern.h"
 
 #include "zbxalgo.h"
 #include "zbxvariant.h"

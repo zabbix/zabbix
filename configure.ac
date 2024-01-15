@@ -2056,6 +2056,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
+	src/libs/zbxvmware/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
 	src/libs/zbxsysinfo/aix/Makefile
@@ -2128,7 +2129,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/vmware/Makefile
 	man/Makefile
 	])
 AC_OUTPUT
