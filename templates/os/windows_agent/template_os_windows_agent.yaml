@@ -925,12 +925,12 @@ zabbix_export:
               parameters:
                 - |
                   output = JSON.parse(value).map(function(net){
-                      return {
-                          "{#IFNAME}": net.Name,
-                          "{#IFDESCR}": net.Description,
-                          "{#IFALIAS}": net.NetConnectionID,
-                          "{#IFGUID}": net.GUID
-                      }})
+                  	return {
+                  		"{#IFNAME}": net.Name,
+                  		"{#IFDESCR}": net.Description,
+                  		"{#IFALIAS}": net.NetConnectionID,
+                  		"{#IFGUID}": net.GUID
+                  	}})
                   return JSON.stringify({"data": output})
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1380,12 +1380,12 @@ zabbix_export:
                   var filesystems = JSON.parse(value);
                   
                   result = filesystems.map(function (filesystem) {
-                      return {
-                          'fsname': filesystem.fsname,
-                          'fstype': filesystem.fstype,
-                          'fslabel': filesystem.fslabel,
-                          'fsdrivetype': filesystem.fsdrivetype
-                      };
+                  	return {
+                  		'fsname': filesystem.fsname,
+                  		'fstype': filesystem.fstype,
+                  		'fslabel': filesystem.fslabel,
+                  		'fsdrivetype': filesystem.fsdrivetype
+                  	};
                   });
                   
                   return JSON.stringify(result);

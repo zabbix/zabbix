@@ -98,7 +98,7 @@ zabbix_export:
                 - |
                   var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/)
                   if (a) {
-                      return a[1]-a[2]
+                  	return a[1]-a[2]
                   }
             - type: CHANGE_PER_SECOND
               parameters:

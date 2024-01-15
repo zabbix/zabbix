@@ -35,14 +35,14 @@ zabbix_export:
                     var result = [];
                   
                     function getNodes(nodes, state) {
-                        Object.keys(nodes).forEach(function (field) {
-                            var Node = {};
-                            Node['HostName'] = field || '';
-                            Node['adminState'] = nodes[field].adminState || '';
-                            Node['operState'] = state || '';
-                            Node['version'] = nodes[field].version || '';
-                            result.push(Node);
-                        });
+                  	  Object.keys(nodes).forEach(function (field) {
+                  		  var Node = {};
+                  		  Node['HostName'] = field || '';
+                  		  Node['adminState'] = nodes[field].adminState || '';
+                  		  Node['operState'] = state || '';
+                  		  Node['version'] = nodes[field].version || '';
+                  		  result.push(Node);
+                  	  });
                     }
                   
                     getNodes(JSON.parse(parsed.beans[0].LiveNodes), 'Live');
@@ -1068,12 +1068,12 @@ zabbix_export:
                     var result = [];
                   
                     function getNodes(nodes) {
-                        Object.keys(nodes).forEach(function (field) {
-                            var Node = {};
-                            Node['{#HOSTNAME}'] = field || '';
-                            Node['{#INFOADDR}'] = nodes[field].infoAddr || '';
-                            result.push(Node);
-                        });
+                  	  Object.keys(nodes).forEach(function (field) {
+                  		  var Node = {};
+                  		  Node['{#HOSTNAME}'] = field || '';
+                  		  Node['{#INFOADDR}'] = nodes[field].infoAddr || '';
+                  		  result.push(Node);
+                  	  });
                     }
                   
                     getNodes(JSON.parse(parsed.beans[0].LiveNodes));
@@ -1358,12 +1358,12 @@ zabbix_export:
                     var result = [];
                   
                     function getNodes(nodes) {
-                        Object.keys(nodes).forEach(function (field) {
-                            var Node = {};
-                            Node['{#HOSTNAME}'] = nodes[field].HostName || '';
-                            Node['{#NODEHTTPADDRESS}'] = nodes[field].NodeHTTPAddress || '';
-                            result.push(Node);
-                        });
+                  	  Object.keys(nodes).forEach(function (field) {
+                  		  var Node = {};
+                  		  Node['{#HOSTNAME}'] = nodes[field].HostName || '';
+                  		  Node['{#NODEHTTPADDRESS}'] = nodes[field].NodeHTTPAddress || '';
+                  		  result.push(Node);
+                  	  });
                     }
                   
                     getNodes(JSON.parse(parsed.beans[0].LiveNodeManagers));

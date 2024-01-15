@@ -967,19 +967,19 @@ zabbix_export:
                 - |
                   var inArray = JSON.parse(value);
                   var nameMap = {
-                      'Temperature': '°C',
-                      'Voltage': 'V',
-                      'TxBias': 'mA',
-                      'TxPower': 'dbm',
-                      'RxPower': 'dbm'
+                  	'Temperature': '°C',
+                  	'Voltage': 'V',
+                  	'TxBias': 'mA',
+                  	'TxPower': 'dbm',
+                  	'RxPower': 'dbm'
                   };
                   var outArr = [];
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SFP.PORT}'] = item['{#SNMPINDEX}'].split('.')[0];
-                      item['{#ZYXEL.SFP.UNIT}'] = nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']] === undefined ? "" : nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']];
-                      item['{#ZYXEL.SFP.WARN.MAX}'] /= 100;
-                      item['{#ZYXEL.SFP.WARN.MIN}'] /= 100;
-                      outArr.push(item)
+                  	item['{#ZYXEL.SFP.PORT}'] = item['{#SNMPINDEX}'].split('.')[0];
+                  	item['{#ZYXEL.SFP.UNIT}'] = nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']] === undefined ? "" : nameMap[item['{#ZYXEL.SFP.DESCRIPTION}']];
+                  	item['{#ZYXEL.SFP.WARN.MAX}'] /= 100;
+                  	item['{#ZYXEL.SFP.WARN.MIN}'] /= 100;
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
         - uuid: e780a6c3b3db45d9b539bba14ca89ef9

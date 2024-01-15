@@ -116,16 +116,16 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var data = JSON.parse(value);
+                  	var data = JSON.parse(value);
                   }
                   catch (error) {
-                      throw 'Failed to parse JSON of Arista sensor discovery.';
+                  	throw 'Failed to parse JSON of Arista sensor discovery.';
                   }
                   var fields = ['{#SNMPINDEX}','{#SENSOR_TYPE}','{#SENSOR_INFO}','{#SENSOR_PRECISION}','{#THRESHOLD_LO_WARN}','{#THRESHOLD_LO_CRIT}','{#THRESHOLD_HI_WARN}','{#THRESHOLD_HI_CRIT}'];
                   data.forEach(function (element) {
-                      fields.forEach(function (field) {
-                          element[field] = element[field] || '';
-                      });
+                  	fields.forEach(function (field) {
+                  		element[field] = element[field] || '';
+                  	});
                   });
                   return JSON.stringify(data);
           tags:
@@ -1061,16 +1061,16 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var data = JSON.parse(value);
+                  	var data = JSON.parse(value);
                   }
                   catch (error) {
-                      throw 'Failed to parse JSON of EtherLike-MIB discovery.';
+                  	throw 'Failed to parse JSON of EtherLike-MIB discovery.';
                   }
                   var fields = ['{#SNMPVALUE}','{#IFOPERSTATUS}','{#IFALIAS}','{#IFNAME}','{#IFDESCR}'];
                   data.forEach(function (element) {
-                      fields.forEach(function (field) {
-                          element[field] = element[field] || '';
-                      });
+                  	fields.forEach(function (field) {
+                  		element[field] = element[field] || '';
+                  	});
                   });
                   return JSON.stringify(data);
         - uuid: 01b83e46160a437da4345824f472cc3b
