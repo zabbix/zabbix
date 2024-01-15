@@ -241,6 +241,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 				{
 					case ZBX_TOKEN_FUNC_MACRO:
 						macro_function = ZBX_EVAL_MACRO_FUNCTION;
+						ZBX_FALLTHROUGH;
 					case ZBX_TOKEN_MACRO:
 					case ZBX_TOKEN_SIMPLE_MACRO:
 						type = ZBX_EVAL_TOKEN_VAR_MACRO;
