@@ -51,7 +51,7 @@ window.action_edit_popup = new class {
 			});
 		}
 
-		this.form.removeAttribute('style');
+		this.form.style.display = '';
 		this.overlay.recoverFocus();
 	}
 

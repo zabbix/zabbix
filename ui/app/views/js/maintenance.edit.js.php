@@ -73,7 +73,7 @@ window.maintenance_edit = new class {
 			this._update();
 		}
 
-		this._form.removeAttribute('style');
+		this._form.style.display = '';
 		this._overlay.recoverFocus();
 	}
 

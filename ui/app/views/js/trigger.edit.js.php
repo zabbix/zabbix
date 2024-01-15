@@ -61,7 +61,7 @@ window.trigger_edit_popup = new class {
 			this.#loadDependencyTable(this.dependencies);
 		}
 
-		this.form.removeAttribute('style');
+		this.form.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
