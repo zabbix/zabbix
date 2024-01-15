@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-11-03 14:01+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-01-12 04:01+0000\n"
+"Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
@@ -2044,7 +2044,7 @@ msgstr "По нижнему краю"
 
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
-msgstr "По нижнему краю"
+msgstr "Последние N"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -20091,7 +20091,7 @@ msgstr "Топ 100 триггеров"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
-msgstr "Топ N"
+msgstr "Первые N"
 
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"
