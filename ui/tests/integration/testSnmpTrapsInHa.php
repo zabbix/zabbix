@@ -119,7 +119,6 @@ class testSnmpTrapsInHa extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, '"'.self::NODE2_NAME.'" node started in "standby" mode', true, 3, 3);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'PDU INFO', true, 30, 3);
-		sleep(1);
 
 		$ha1_timestamps = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER));
 		$ha2_timestamps = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER_HANODE1));
@@ -129,7 +128,6 @@ class testSnmpTrapsInHa extends CIntegrationTest {
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, 'PDU INFO', true, 30, 3);
-		sleep(1);
 
 		$ha2_ts = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER_HANODE1));
 		$this->assertCount(1, $ha2_ts);
@@ -149,7 +147,6 @@ class testSnmpTrapsInHa extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, '"'.self::NODE2_NAME.'" node started in "standby" mode', true, 3, 3);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'PDU INFO', true, 30, 3);
-		sleep(1);
 
 		$ha1_timestamps = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER));
 		$ha2_timestamps = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER_HANODE1));
@@ -158,7 +155,6 @@ class testSnmpTrapsInHa extends CIntegrationTest {
 
 		$this->stopComponent(self::COMPONENT_SERVER);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, 'PDU INFO', true, 30, 3);
-		sleep(1);
 
 		$ha2_ts = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER_HANODE1));
 		$this->assertCount(1, $ha2_ts);
