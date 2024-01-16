@@ -146,7 +146,7 @@ class testSnmpTrapsInHa extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '"'.self::NODE1_NAME.'" node started in "active" mode', true, 3, 3);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER_HANODE1, '"'.self::NODE2_NAME.'" node started in "standby" mode', true, 3, 3);
 
-		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'PDU INFO', true, 30, 3);
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, '2024-01-11T15:28:47+0200 PDU INFO', true, 30, 3);
 
 		$ha1_timestamps = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER));
 		$ha2_timestamps = $this->getTrapTs(self::getLogPath(self::COMPONENT_SERVER_HANODE1));
