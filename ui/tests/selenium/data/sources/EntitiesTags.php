@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -464,8 +464,8 @@ class EntitiesTags {
 			[
 				'hostid' => $hosts['hostids']['Host for tags testing'],
 				'ruleid' => $hosts['discoveryruleids']['Host for tags testing:trap_discovery'],
-				'name' => 'Item prototype for removig tags: {#KEY}',
-				'key_' => 'remving.tags_trap[{#KEY}]',
+				'name' => 'Item prototype for removing tags: {#KEY}',
+				'key_' => 'removing.tags_trap[{#KEY}]',
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'tags' => [

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2129,7 +2129,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Data set' => [
 						'host' => 'Zabbix*, new widget',
-						'item' => 'Agetn*, new widget'
+						'item' => 'Agent*, new widget'
 					]
 				]
 			],
