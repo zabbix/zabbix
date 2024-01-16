@@ -1,0 +1,5 @@
+build
+vendor
+*.swp
+*.swo
+.idea

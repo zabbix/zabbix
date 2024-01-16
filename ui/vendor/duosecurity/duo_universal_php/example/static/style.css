@@ -1,0 +1,56 @@
+body, input {
+  font: 17px arial, sans-serif;
+}
+
+.content,
+.input-form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+img {
+  padding: 20px; 
+  height: 84px;
+  margin-top: 40px;
+}
+
+input {
+  width: 250px;
+  padding: 12px;
+  margin-top: 10px;
+}
+
+input[type=text] {
+  margin-left: 44px;
+}
+
+input[type=password] {
+  margin-left: 10px;
+}
+
+h3 {
+  margin-top: 23px;
+}
+
+pre.language-json {
+  font-size: 20px;
+}
+
+div.success {
+  margin-top: 20px;
+}
+
+pre.auth-token {
+  display: inline-block;
+  text-align: left;
+}
+
+button {
+  background-color: #6BBF4E;
+  color: white;
+  border: none;
+  padding: 9px 18px;
+  margin-top: 17px;
+  border-radius: 4px;
+}
