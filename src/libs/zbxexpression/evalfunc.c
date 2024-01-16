@@ -1970,9 +1970,15 @@ static int	evaluate_BITAND(zbx_variant_t *value, const zbx_dc_evaluate_item_t *i
 		goto clean;
 	}
 
-	/* prepare the 1st and the 3rd parameter for passing to evaluate_LAST() */
-	last_parameters = zbx_function_get_param_dyn(parameters, 1);
+	if (NULL == (last_parameters = zbx_function_get_param_dyn(parameters, 1)))
+	{
+		*error = zbx_strdup(*error, "invalid second parameter");
+		goto clean;
+	}
 
+	/* bitand(<item_key>,#0,1)                                                       */
+	/* First parameter is the item name, second is history count, third is the mask. */
+	/* First and second parameters are resent to evaluate_LAST().                    */
 	if (SUCCEED == evaluate_LAST(value, item, last_parameters, ts, error))
 	{
 		/* the evaluate_LAST() should return uint64 value, but just to be sure try to convert it */
@@ -3597,8 +3603,13 @@ int	evaluate_function(zbx_variant_t *value, const zbx_dc_evaluate_item_t *item, 
 		ret = FAIL;
 	}
 
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s' of type:'%s'", __func__, zbx_result_string(ret),
-			zbx_variant_value_desc(value), zbx_variant_type_desc(value));
+	if (SUCCEED == ret)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s value:'%s' of type:'%s'", __func__, zbx_result_string(ret),
+				zbx_variant_value_desc(value), zbx_variant_type_desc(value));
+	}
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
 }
