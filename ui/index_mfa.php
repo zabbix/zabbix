@@ -22,11 +22,6 @@
 require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
 require_once dirname(__FILE__).'/include/config.inc.php';
 
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
-
 CMessageHelper::clear();
 
 // VAR	TYPE	OPTIONAL	FLAGS	VALIDATION	EXCEPTION
@@ -82,19 +77,11 @@ if ($error) {
 }
 
 if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
-	$writer = new Writer(new ImageRenderer(new RendererStyle(TOTP_QR_CODE_SIZE), new ImagickImageBackEnd()));
-
-	// First time enrollment to TOTP.
-	if (!hasRequest('enter') && array_key_exists('qr_code_url', $confirm_data)) {
-		$qr_code_image = base64_encode($writer->writeString($confirm_data['qr_code_url']));
-		$confirm_data['qr_code'] = 'data:image/png;base64,' . $qr_code_image;
-	}
-
 	// Check of submitted verification code.
 	if (hasRequest('enter')) {
 		$data_to_check = array_merge($session_data, $confirm_data);
 		$data_to_check['verification_code'] = getRequest('verification_code', '');
-		unset($data_to_check['mfaid'], $data_to_check['qr_code_url']);
+		unset($data_to_check['mfaid'], $data_to_check['qr_code_url'], $data_to_check['theme']);
 
 		if (hasRequest('totp_secret')) {
 			$data_to_check['totp_secret'] = getRequest('totp_secret');
@@ -116,10 +103,9 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
 			redirect(reset($redirect));
 		}
 		elseif(hasRequest('qr_code_url')) {
+			// Show QR code and TOTP secret again, in initial setup verification code was incorrect.
 			$confirm_data['qr_code_url'] = getRequest('qr_code_url');
 			$confirm_data['totp_secret'] = getRequest('totp_secret');
-			$qr_code_image = base64_encode($writer->writeString($confirm_data['qr_code_url']));
-			$confirm_data['qr_code'] = 'data:image/png;base64,' . $qr_code_image;
 		}
 	}
 

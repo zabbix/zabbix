@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,9 @@
  * @var CView $this
  */
 
-require_once dirname(__FILE__).'/../page_header.php';
+require_once __DIR__.'/../page_header.php';
+require_once __DIR__.'/js/mfa.login.js.php';
+
 $error = null;
 
 if (array_key_exists('error', $data) && $data['error']) {
@@ -42,7 +44,7 @@ if ($data['mfa']['type'] == MFA_TYPE_DUO) {
 }
 
 if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
-	if (array_key_exists('qr_code', $data)) {
+	if (array_key_exists('qr_code_url', $data)) {
 		switch ($data['mfa']['hash_function']) {
 			case TOTP_HASH_SHA256:
 				$hash_function = 'SHA256';
@@ -63,7 +65,7 @@ if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
 			->addItem([
 				(new CDiv(_('Scan this QR code')))->setAttribute('style', 'text-align: center; font-size: 20px'),
 				new CDiv(_('Please scan and get your verification code displayed in your authenticator app.')),
-				(new CImg($data['qr_code']))->setAttribute('style', ' margin-left: auto; margin-right: auto;'),
+				(new CDiv())->setId('qr-code'),
 				new CDiv(
 					_s('Unable to scan? You can use %1$s secret key to manually configure your authenticator app:',
 						$hash_function)),
@@ -121,5 +123,26 @@ if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
 ]))
 	->addClass(ZBX_STYLE_LAYOUT_WRAPPER)
 	->show();
+
+$qr_code_color_dark = '#000000';
+$qr_code_color_light = 'ffffff';
+
+if ($data['theme'] == 'dark-theme' || $data['theme'] == 'hc-dark') {
+	$qr_code_color_dark = '#ffffff';
+	$qr_code_color_light = '#000000';
+}
+
+if (array_key_exists('qr_code_url', $data) && $data['qr_code_url']) {
+	(new CScriptTag('
+		view.init('.json_encode([
+			'qr_code_url' => $data['qr_code_url'],
+			'qr_code_color_dark' => $qr_code_color_dark,
+			'qr_code_color_light' => $qr_code_color_light
+		]).');
+	'))
+		->setOnDocumentReady()
+		->show();
+}
+
 ?>
 </body>
