@@ -139,18 +139,27 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	header.appendChild(controls);
 	header.appendChild(this.btn_close);
 
+	let username = '';
+
+	// Retrieve username of logged-in user from session storage
+	const sessionKey = ZBX_LocalStorage.sessionid + ':notifications.user_settings';
+
+	if (sessionStorage.getItem(sessionKey)) {
+		username = JSON.parse(sessionStorage.getItem(sessionKey)).payload?.username;
+	}
+
 	this.btn_snooze = this.makeToggleBtn(
 		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL]},
 		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL_OFF]}
 	);
-	this.btn_snooze.setAttribute('title', locale['S_SNOOZE']);
+	this.btn_snooze.setAttribute('title', t('Snooze for %1$s').replace('%1$s', username));
 
 	const li_btn_snooze = document.createElement('li');
 	li_btn_snooze.appendChild(this.btn_snooze);
 
 	this.btn_mute = this.makeToggleBtn(
-		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER, title: locale['S_MUTE']},
-		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER_OFF, title: locale['S_UNMUTE']}
+		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER, title: t('Mute for %1$s').replace('%1$s', username)},
+		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER_OFF, title: t('Unmute for %1$s').replace('%1$s', username)}
 	);
 
 	const li_btn_mute = document.createElement('li');
@@ -267,7 +276,17 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * @param {ZBX_NotificationsAlarm} alarm_state
  */
 ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state) {
-	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList()));
+	let snoozed_eventid = 0;
+
+	// Retrieve value of latest snoozed event ID.
+	const sessionKey = ZBX_LocalStorage.sessionid + ':notifications.user_settings';
+
+	if (sessionStorage.getItem(sessionKey)) {
+		snoozed_eventid = JSON.parse(sessionStorage.getItem(sessionKey)).payload.snoozed_eventid;
+	}
+
+	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList(), snoozed_eventid));
+
 	if (alarm_state.supported) {
 		this.btn_mute.renderState(alarm_state.muted);
 	}

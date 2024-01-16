@@ -275,16 +275,18 @@ class CControllerNotificationsGet extends CController {
 		return json_encode([
 			'notifications' => $this->notifications,
 			'settings' => [
+				'username' => CApiService::$userData['username'],
 				'enabled' => (bool) $this->settings['enabled'],
 				'alarm_timeout' => (int) $this->settings['sounds.repeat'],
 				'msg_recovery_timeout' => $this->settings['ok_timeout'],
 				'msg_timeout' => $this->settings['timeout'],
 				'muted' => (bool) $this->settings['sounds.mute'],
+				'snoozed_eventid' => $this->settings['snoozed.eventid'],
 				'severity_styles' => [
 					-1 => ZBX_STYLE_NORMAL_BG,
 					TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
 					TRIGGER_SEVERITY_DISASTER => ZBX_STYLE_DISASTER_BG,
-					TRIGGER_SEVERITY_HIGH  => ZBX_STYLE_HIGH_BG,
+					TRIGGER_SEVERITY_HIGH => ZBX_STYLE_HIGH_BG,
 					TRIGGER_SEVERITY_INFORMATION => ZBX_STYLE_INFO_BG,
 					TRIGGER_SEVERITY_NOT_CLASSIFIED => ZBX_STYLE_NA_BG,
 					TRIGGER_SEVERITY_WARNING => ZBX_STYLE_WARNING_BG

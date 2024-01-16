@@ -448,21 +448,47 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
 };
 
 /**
- * @param {MouseEvent} e
+ * Handles snooze button click event.
  */
-ZBX_Notifications.prototype.handleSnoozeClicked = function(e) {
-	if (this.alarm.isSnoozed(this._cached_list)) {
+ZBX_Notifications.prototype.handleSnoozeClicked = function() {
+	if (this.alarm.isSnoozed(this._cached_list, this._cached_user_settings.snoozed_eventid)) {
 		return;
 	}
 
-	this.collection.map(function(notif) {
-		notif.updateRaw({snoozed: true});
-	});
+	this
+		.fetch('notifications.snooze', {eventid: this.collection.getRawList()[0].eventid})
+		.then((resp) => {
+			if ('error' in resp) {
+				throw {error: resp.error};
+			}
+
+			this._cached_user_settings.snoozed_eventid = resp.snoozed;
+			this.pushUpdates();
+			this.render();
+
+			this.collection.map(function(notif) {
+				notif.updateRaw({snoozed_eventid: resp.snoozed});
+			});
+		})
+		.catch((exception) => {
+			clearMessages();
+
+			let title, messages;
+
+			if (typeof exception === 'object' && 'error' in exception) {
+				title = exception.error.title;
+				messages = exception.error.messages;
+			}
+			else {
+				messages = [t('Unexpected server error.')];
+			}
+
+			const message_box = makeMessageBox('bad', messages, title);
+
+			addMessage(message_box);
+		});
 
 	this.consumeList(this.collection.getRawList());
-
-	this.pushUpdates();
-	this.render();
 };
 
 /**
@@ -822,18 +848,19 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
 };
 
 /**
- * @param {array} list  List of raw notifications.
+ * @param {array}  list        List of raw notifications.
+ * @param {string} snoozed_id  Last snoozed event ID.
  *
- * @return {bool}
+ * @return {boolean}
  */
-ZBX_NotificationsAlarm.prototype.isSnoozed = function(list) {
-	for (var i = 0; i < list.length; i++) {
-		if (!list[i].snoozed) {
-			return false;
+ZBX_NotificationsAlarm.prototype.isSnoozed = function(list, snoozed_id) {
+	for (const item of list) {
+		if (parseInt(item.eventid) <= parseInt(snoozed_id)) {
+			item.snoozed = true;
 		}
 	}
 
-	return (list.length == 0) ? false : true;
+	return list.length > 0 ? !list.some(item => !item.snoozed) : false;
 };
 
 /**
@@ -882,7 +909,7 @@ ZBX_NotificationsAlarm.prototype.unmute = function() {
 ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	user_settings.muted ? this.mute() : this.unmute();
 
-	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list)) {
+	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list, user_settings.snoozed_eventid)) {
 		return this.player.stop();
 	}
 

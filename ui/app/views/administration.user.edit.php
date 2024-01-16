@@ -727,7 +727,7 @@ if ($data['action'] === 'user.edit') {
 // Messaging tab.
 if ($data['action'] !== 'user.edit') {
 	$messaging_form_list = (new CFormList())
-		->addRow(_('Frontend messaging'),
+		->addRow(_('Frontend notifications'),
 			(new CCheckBox('messages[enabled]'))
 				->setChecked($data['messages']['enabled'] == 1)
 				->setUncheckedValue(0)
@@ -822,7 +822,7 @@ if ($data['action'] !== 'user.edit') {
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 		);
 
-	$tabs->addTab('messagingTab', _('Messaging'), $messaging_form_list, TAB_INDICATOR_FRONTEND_MESSAGE);
+	$tabs->addTab('messagingTab', _('Frontend notifications'), $messaging_form_list, TAB_INDICATOR_FRONTEND_MESSAGE);
 }
 
 // Append buttons to form.
