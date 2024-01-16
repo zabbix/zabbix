@@ -122,6 +122,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldIntegerBox('primary_label_decimal_places', _('Decimal places'), 0, 6))
 					->setDefault(2)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->prefixLabel(_('Primary label'))
 			)
 			->addField(
 				(new CWidgetFieldTextArea('primary_label', _('Text')))
@@ -168,6 +169,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldIntegerBox('secondary_label_decimal_places', _('Decimal places'), 0, 6))
 					->setDefault(2)
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY)
+					->prefixLabel(_('Secondary label'))
 			)
 			->addField(
 				(new CWidgetFieldTextArea('secondary_label', _('Text')))
