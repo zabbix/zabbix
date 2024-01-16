@@ -789,7 +789,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 				"sntasmedia, sntjmicron[,NSID], sntrealtek, " +
 				"intelliprop,N[+TYPE], jmb39x[-q],N[,sLBA][,force][+TYPE], " +
 				"jms56x,N[,sLBA][,force][+TYPE], aacraid,H,L,ID, areca,N[/E], " +
-				"auto, test <=======",
+				"auto, test <=======.",
 		},
 		{
 			"+rawRespNoErr",
@@ -811,7 +811,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 				},
 			},
 			true,
-			"barfoo",
+			"Barfoo.",
 		},
 		{
 			"-error_status_one",
@@ -821,7 +821,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 				},
 			},
 			true,
-			"barfoo",
+			"Barfoo.",
 		},
 		{
 			"-error_status_two",
@@ -831,7 +831,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 				},
 			},
 			true,
-			"foobar",
+			"Foobar.",
 		},
 		{
 			"-two_err",
@@ -841,7 +841,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 				},
 			},
 			true,
-			"foobar, barfoo",
+			"Foobar, barfoo.",
 		},
 		{
 			"-unknown_err/no message",
@@ -851,7 +851,7 @@ func Test_deviceParser_checkErr(t *testing.T) {
 				},
 			},
 			true,
-			"unknown error from smartctl",
+			"Unknown error from smartctl.",
 		},
 	}
 

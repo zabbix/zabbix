@@ -708,26 +708,26 @@ func (r *runner) parseOutput(jsonRunner bool) {
 	}
 }
 
-func (dp *deviceParser) checkErr() (err error) {
+func (dp *deviceParser) checkErr() error {
 	if (parseError|openError)&dp.Smartctl.ExitStatus == 0 {
-		return
+		return nil
 	}
 
-	for _, m := range dp.Smartctl.Messages {
-		if err == nil {
-			err = errs.New(m.Str)
+	messages := make([]string, 0, len(dp.Smartctl.Messages))
 
+	for _, m := range dp.Smartctl.Messages {
+		if m.Str == "" {
 			continue
 		}
 
-		err = errs.Errorf("%s, %s", err.Error(), m.Str)
+		messages = append(messages, m.Str)
 	}
 
-	if err == nil {
-		err = errs.New("unknown error from smartctl")
+	if len(messages) == 0 {
+		return errs.New("unknown error from smartctl")
 	}
 
-	return
+	return errs.New(strings.Join(messages, ", "))
 }
 
 // getDevices returns a parsed slices of all devices returned by smartctl scan.
