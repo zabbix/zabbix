@@ -25,3 +25,40 @@
  * @var CView $this
  * @var array $data
  */
+
+$form = new CWidgetFormView($data);
+
+$form
+	->addField(array_key_exists('groupids', $data['fields'])
+		? new CWidgetFieldMultiSelectGroupView($data['fields']['groupids'])
+		: null
+	)
+	->addField(array_key_exists('hosts', $data['fields'])
+		? (new CWidgetFieldHostPatternSelectView($data['fields']['hosts']))->setPlaceholder(_('host pattern'))
+		: null
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['status'])
+	)
+	->addField(array_key_exists('evaltype', $data['fields'])
+		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype'])
+		: null
+	)
+	->addField(array_key_exists('tags', $data['fields'])
+		? new CWidgetFieldTagsView($data['fields']['tags'])
+		: null
+	)
+	->addField(
+		new CWidgetFieldSeveritiesView($data['fields']['severities'])
+	)
+	->addField(
+		new CWidgetFieldCheckBoxView($data['fields']['maintenance'])
+	)
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['problems'])
+	)
+	->addField(
+		new CWidgetFieldIntegerBoxView($data['fields']['limit'])
+	)
+	->includeJsFile('widget.edit.js.php')
+	->show();
