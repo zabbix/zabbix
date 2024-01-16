@@ -224,7 +224,6 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 	zbx_token_t		tok;
 	size_t			offset = pos;
 	zbx_token_type_t	type = 0, last_type = 0;
-	zbx_uint32_t		macro_function = 0;
 
 	do
 	{
@@ -239,10 +238,8 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 			{
 				switch (tok.type)
 				{
-					case ZBX_TOKEN_FUNC_MACRO:
-						macro_function = ZBX_EVAL_MACRO_FUNCTION;
-						ZBX_FALLTHROUGH;
 					case ZBX_TOKEN_MACRO:
+					case ZBX_TOKEN_FUNC_MACRO:
 					case ZBX_TOKEN_SIMPLE_MACRO:
 						type = ZBX_EVAL_TOKEN_VAR_MACRO;
 						break;
@@ -304,7 +301,6 @@ out:
 		eval_update_const_variable(ctx, token);
 
 	token->type = type;
-	token->macro_function = macro_function;
 	token->loc.l = pos;
 	token->loc.r = offset - 1;
 

@@ -175,11 +175,10 @@ size_t	zbx_eval_serialize(const zbx_eval_context_t *ctx, zbx_mem_malloc_func_t m
 		const zbx_eval_token_t	*token = &ctx->stack.values[i];
 
 		/* reserve space for maximum possible worst case scenario with empty variant:         */
-		/*  4 bytes token type, 6 bytes per compact uint31 and 1 byte empty variant (4+4*6+1) */
-		reserve_buffer(&buffer, &buffer_size, 29, &ptr);
+		/*  4 bytes token type, 6 bytes per compact uint31 and 1 byte empty variant (4+3*6+1) */
+		reserve_buffer(&buffer, &buffer_size, 23, &ptr);
 
 		ptr += zbx_serialize_value(ptr, token->type);
-		ptr += zbx_serialize_uint31_compact(ptr, token->macro_function);
 		ptr += zbx_serialize_uint31_compact(ptr, token->opt);
 		ptr += zbx_serialize_uint31_compact(ptr, token->loc.l);
 		ptr += zbx_serialize_uint31_compact(ptr, token->loc.r);
@@ -232,7 +231,6 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 		zbx_eval_token_t	*token = &ctx->stack.values[i];
 
 		data += zbx_deserialize_value(data, &token->type);
-		data += zbx_deserialize_uint31_compact(data, &token->macro_function);
 		data += zbx_deserialize_uint31_compact(data, &token->opt);
 
 		data += zbx_deserialize_uint31_compact(data, &pos);
@@ -591,10 +589,6 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 
 		switch (token->type)
 		{
-			case ZBX_EVAL_TOKEN_VAR_MACRO:
-				if (0 == token->macro_function)
-					continue;
-				ZBX_FALLTHROUGH;
 			case ZBX_EVAL_TOKEN_VAR_USERMACRO:
 				value = zbx_substr_unquote(ctx->expression, token->loc.l, token->loc.r);
 				ret = um_expand_cb(data, &value, hostids, hostids_num, error);

@@ -77,8 +77,6 @@
 #define ZBX_EVAL_TOKEN_PROP_GROUP	(30 | ZBX_EVAL_CLASS_PROPERTY)
 #define ZBX_EVAL_TOKEN_EXCEPTION	(31 | ZBX_EVAL_CLASS_FUNCTION)
 
-#define ZBX_EVAL_MACRO_FUNCTION		1
-
 /* token parsing rules */
 
 #define ZBX_EVAL_PARSE_MACRO		__UINT64_C(0x00000001)
@@ -192,7 +190,6 @@ typedef struct
 	zbx_token_type_t	type;
 	zbx_uint32_t		opt;
 	zbx_strloc_t		loc;
-	zbx_uint32_t		macro_function;
 	zbx_variant_t		value;
 }
 zbx_eval_token_t;

@@ -32,7 +32,6 @@ static void	mock_read_token(zbx_eval_token_t *token, zbx_mock_handle_t htoken)
 
 	token->type = (zbx_uint32_t)zbx_mock_get_object_member_uint64(htoken, "type");
 	token->opt = (zbx_uint32_t)zbx_mock_get_object_member_uint64(htoken, "opt");
-	token->macro_function = 0;
 
 	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(htoken, "value", &hvalue))
 	{
