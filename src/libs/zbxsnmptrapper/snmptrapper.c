@@ -316,7 +316,6 @@ static void	parse_traps(int flag)
 			*pzaddr = '\0';
 
 			process_trap(addr, begin, end);
-			end = NULL;
 		}
 
 		/* parse the current trap */

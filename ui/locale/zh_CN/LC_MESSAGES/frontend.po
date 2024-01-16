@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-06 03:19+0000\n"
+"PO-Revision-Date: 2024-01-16 00:52+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -3393,7 +3393,7 @@ msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为其父模板�
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为其父模板“%3$s”将链接到模板“%4$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:866
 #, c-format
@@ -5225,11 +5225,11 @@ msgstr "创建触发器原型"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
-msgstr ""
+msgstr "从禁用的选定原型创建触发器？"
 
 #: app/views/js/trigger.prototype.list.js.php:110
 msgid "Create triggers from selected prototype as enabled?"
-msgstr ""
+msgstr "从启用的选定原型创建触发器？"
 
 #: app/views/js/trigger.prototype.list.js.php:126
 msgid "Create triggers from selected prototypes as disabled?"
@@ -5915,7 +5915,7 @@ msgstr "删除并清除"
 
 #: app/views/js/template.list.js.php:130
 msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "删除并清除所选的模板? (警告: 所有链接的主机将被清除!)"
 
 #: app/views/js/template.list.js.php:127
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
@@ -6752,39 +6752,39 @@ msgstr "自动发现对象"
 
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 集群，\"url\" - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 数据存储，\"url\" - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1953
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现 VMware hypervisor数据存储，“url” - VMware 服务 URL，”uuid“ - VMware hypervisor全局唯一标识。返回 JSON"
 
 #: include/classes/data/CItemData.php:2107
 msgid "Discovery of VMware hypervisor network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现VMware hypervisor网络接口，“url”- VMware 服务 URL，“uuid”- VMware hypervisor全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:1995
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware hypervisor, \"url\" - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:2541
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现的VMware虚拟机磁盘设备，\"url\" - VMware服务URL，\"uuid\" - VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2562
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现 VMware虚拟机文件系统，\"url\" - VMware服务URL，\"uuid\" - VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2408
 msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware发现的虚拟机网络接口，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2310
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的虚拟机，“url” - VMware 服务 URL。返回 JSON"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285

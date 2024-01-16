@@ -72,6 +72,9 @@ window.maintenance_edit = new class {
 
 			this._update();
 		}
+
+		this._form.style.display = '';
+		this._overlay.recoverFocus();
 	}
 
 	_update () {
@@ -165,6 +168,8 @@ window.maintenance_edit = new class {
 
 		this._overlay.unsetLoading();
 		this._overlay.setProperties({title, buttons});
+		this._overlay.recoverFocus();
+		this._overlay.containFocus();
 	}
 
 	delete() {
