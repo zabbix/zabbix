@@ -50,8 +50,7 @@ $form
 		? new CWidgetFieldRadioButtonListView($data['fields']['evaltype_host'])
 		: null
 	)
-	->addField(
-		array_key_exists('host_tags', $data['fields'])
+	->addField(array_key_exists('host_tags', $data['fields'])
 		? new CWidgetFieldTagsView($data['fields']['host_tags'])
 		: null
 	)
