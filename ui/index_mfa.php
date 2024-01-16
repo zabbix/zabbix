@@ -81,7 +81,7 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
 	if (hasRequest('enter')) {
 		$data_to_check = array_merge($session_data, $confirm_data);
 		$data_to_check['verification_code'] = getRequest('verification_code', '');
-		unset($data_to_check['mfaid'], $data_to_check['qr_code_url'], $data_to_check['theme']);
+		unset($data_to_check['mfaid'], $data_to_check['qr_code_url']);
 
 		if (hasRequest('totp_secret')) {
 			$data_to_check['totp_secret'] = getRequest('totp_secret');

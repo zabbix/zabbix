@@ -28,19 +28,18 @@
 <script>
 	const view = {
 
-		init({qr_code_url, qr_code_color_dark, qr_code_color_light}) {
-			const qr_code_div = document.getElementById('qr-code');
+		init({qr_code_url}) {
+			const qr_code_div = document.querySelector('.qr-code');
+			const styles = getComputedStyle(qr_code_div);
 
 			new QRCode(qr_code_div, {
 				text: qr_code_url,
 				width: 190,
 				height: 190,
-				colorDark : qr_code_color_dark,
-				colorLight : qr_code_color_light,
+				colorDark : styles.getPropertyValue('--qr-color'),
+				colorLight : styles.getPropertyValue('--qr-bgcolor'),
 				correctLevel : QRCode.CorrectLevel.H
 			});
-
-			qr_code_div.querySelector('img').setAttribute('class', 'signin-qr-code');
 		}
 	}
 </script>

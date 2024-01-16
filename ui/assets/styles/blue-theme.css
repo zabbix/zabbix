@@ -5604,11 +5604,13 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   padding: 9px 5px;
   width: 100%; }
 
-.signin-qr-code {
-  margin-left: auto;
-  margin-right: auto;
-  padding-top: 8px;
-  padding-bottom: 8px; }
+.qr-code {
+  --qr-bgcolor: #ffffff;
+  --qr-color: #1f2c33;
+  padding: 8px; }
+
+.qr-code img {
+  margin: 0 auto; }
 
 .menu-popup-overlay {
   position: fixed;

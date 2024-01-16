@@ -2826,13 +2826,6 @@ class CUser extends CApiService {
 				$data['qr_code_url'] = $totp_generator->getQRCodeUrl('Zabbix', $data['mfa']['name'],
 					$data['totp_secret']
 				);
-
-				$db_user_theme = DB::select('users', [
-					'output' => ['theme'],
-					'filter' => ['userid' => $userid]
-				]);
-
-				$data['theme'] = getUserTheme($db_user_theme[0]);
 			}
 		}
 

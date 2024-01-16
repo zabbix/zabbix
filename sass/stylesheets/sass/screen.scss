@@ -1613,11 +1613,15 @@ select {
 	width: 100%;
 }
 
-.signin-qr-code {
-	margin-left: auto;
-	margin-right: auto;
-	padding-top: 8px;
-	padding-bottom: 8px;
+.qr-code {
+	--qr-bgcolor: #{$ui-bg-color};
+	--qr-color: #{$font-color};
+
+	padding: 8px;
+}
+
+.qr-code img {
+	margin: 0 auto;
 }
 
 // Action Menus, Pop-up Menus.
