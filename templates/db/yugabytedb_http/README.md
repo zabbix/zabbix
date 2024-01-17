@@ -20,24 +20,25 @@ This template has been tested on:
 
 ## Setup
 
-1. Set you account ID as value of {$ACCOUNT.ID} macro. The account ID is the unique identifier for your customer account in YugabyteDB Managed. You can access the account ID from your profile in the YugabyteDB Managed user interface. To get your account ID, log in to YugabyteDB Managed and click the user profile icon. See [YugabyteDB documentation](https://yugabyte.stoplight.io/docs/managed-apis/tvsjh28t5ivmw-getting-started#account-id) for instructions.
+1. Set you account ID as value of {$YUGABYTEDB.ACCOUNT.ID} macro. The account ID is the unique identifier for your customer account in YugabyteDB Managed. You can access the account ID from your profile in the YugabyteDB Managed user interface. To get your account ID, log in to YugabyteDB Managed and click the user profile icon. See [YugabyteDB documentation](https://yugabyte.stoplight.io/docs/managed-apis/tvsjh28t5ivmw-getting-started#account-id) for instructions.
 
-2. Set you project ID as value of {$PROJECT.ID} macro. The project ID is the unique identifier for a YugabyteDB Managed project. You can access the project ID from your profile in the YugabyteDB Managed user interface (along with the account ID). See [YugabyteDB documentation](https://yugabyte.stoplight.io/docs/managed-apis/tvsjh28t5ivmw-getting-started#project-id) for instructions.
+2. Set you project ID as value of {$YUGABYTEDB.PROJECT.ID} macro. The project ID is the unique identifier for a YugabyteDB Managed project. You can access the project ID from your profile in the YugabyteDB Managed user interface (along with the account ID). See [YugabyteDB documentation](https://yugabyte.stoplight.io/docs/managed-apis/tvsjh28t5ivmw-getting-started#project-id) for instructions.
 
-3. Generate API and put as value of {$ACCESS.TOKEN} macro. See [YugabyteDB documentation](https://docs.yugabyte.com/preview/yugabyte-cloud/managed-automation/managed-apikeys/#create-an-api-key) for instructions.
+3. Generate API and put as value of {$YUGABYTEDB.ACCESS.TOKEN} macro. See [YugabyteDB documentation](https://docs.yugabyte.com/preview/yugabyte-cloud/managed-automation/managed-apikeys/#create-an-api-key) for instructions.
 
 **IMPORTANT**
 
-  Value of {$ACCESS.TOKEN} macro is stored as plain (not secret) text by default.
+  Value of {$YUGABYTEDB.ACCESS.TOKEN} macro is stored as plain (not secret) text by default.
 
 
 ### Macros used
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$ACCOUNT.ID}|<p>YugabyteDB account ID.</p>|`<Put your account ID here>`|
-|{$PROJECT.ID}|<p>YugabyteDB project ID.</p>|`<Put your project ID here>`|
-|{$ACCESS.TOKEN}|<p>Access token for YugabyteDB API.</p>|`<Put your access token here>`|
+|{$YUGABYTEDB.ACCOUNT.ID}|<p>YugabyteDB account ID.</p>|`<Put your account ID here>`|
+|{$YUGABYTEDB.PROJECT.ID}|<p>YugabyteDB project ID.</p>|`<Put your project ID here>`|
+|{$YUGABYTEDB.ACCESS.TOKEN}|<p>Access token for YugabyteDB API.</p>|`<Put your access token here>`|
+|{$YUGABYTEDB.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 
 ### Items
 
@@ -64,19 +65,19 @@ This template has been tested on:
 
 |Name|Description|Default|
 |----|-----------|-------|
-|{$CLUSTER.NAME}|<p>Name of cluster.</p>|`<Put your cluster name here>`|
-|{$CLUSTER.ID}|<p>ID of cluster.</p>|`<Put your cluster ID here>`|
-|{$MEMORY.NODE.UTILIZATION.WARN}|<p>The percentage of using memory on the node - for the Warning trigger expression.</p>|`70`|
-|{$MEMORY.NODE.UTILIZATION.CRIT}|<p>The percentage of using memory on the node - for the High trigger expression.</p>|`90`|
-|{$MEMORY.CLUSTER.UTILIZATION.WARN}|<p>The percentage of using memory on the cluster - for the Warning trigger expression.</p>|`70`|
-|{$MEMORY.CLUSTER.UTILIZATION.CRIT}|<p>The percentage of using memory on the cluster - for the High trigger expression.</p>|`90`|
-|{$DISK.UTILIZATION.WARN}|<p>The percentage of using disk in the cluster - for the Warning trigger expression.</p>|`75`|
-|{$DISK.UTILIZATION.CRIT}|<p>The percentage of using disk in the cluster - for the High trigger expression.</p>|`90`|
-|{$CONNECTION.UTILIZATION.WARN}|<p>The percentage of using connection in the cluster - for the Warning trigger expression.</p>|`75`|
-|{$CONNECTION.UTILIZATION.CRIT}|<p>The percentage of using connection in the cluster - for the High trigger expression.</p>|`90`|
-|{$CPU.UTIL.CRIT}|<p>Threshold of CPU utilization for warning trigger in %.</p>|`90`|
-|{$IOPS.UTILIZATION.WARN}|<p>The percentage of using IOPS on the node - for the Warning trigger expression.</p>|`75`|
-|{$IOPS.UTILIZATION.CRIT}|<p>The percentage of using IOPS on the node - for the High trigger expression.</p>|`90`|
+|{$YUGABYTEDB.CLUSTER.NAME}|<p>Name of cluster.</p>|`<Put your cluster name here>`|
+|{$YUGABYTEDB.CLUSTER.ID}|<p>ID of cluster.</p>|`<Put your cluster ID here>`|
+|{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}|<p>The percentage of using memory on the cluster - for the Warning trigger expression.</p>|`70`|
+|{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}|<p>The percentage of using memory on the cluster - for the High trigger expression.</p>|`90`|
+|{$YUGABYTEDB.DISK.UTILIZATION.WARN}|<p>The percentage of using disk in the cluster - for the Warning trigger expression.</p>|`75`|
+|{$YUGABYTEDB.DISK.UTILIZATION.CRIT}|<p>The percentage of using disk in the cluster - for the High trigger expression.</p>|`90`|
+|{$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}|<p>The percentage of using connection in the cluster - for the Warning trigger expression.</p>|`75`|
+|{$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}|<p>The percentage of using connection in the cluster - for the High trigger expression.</p>|`90`|
+|{$YUGABYTEDB.CPU.UTILIZATION.CRIT}|<p>Threshold of CPU utilization for high trigger in %.</p>|`90`|
+|{$YUGABYTEDB.CPU.UTILIZATION.WARN}|<p>Threshold of CPU utilization for warning trigger in %.</p>|`75`|
+|{$YUGABYTEDB.IOPS.UTILIZATION.WARN}|<p>The percentage of using IOPS on the node - for the Warning trigger expression.</p>|`75`|
+|{$YUGABYTEDB.IOPS.UTILIZATION.CRIT}|<p>The percentage of using IOPS on the node - for the High trigger expression.</p>|`90`|
+|{$YUGABYTEDB.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 
 ### Items
 
@@ -92,11 +93,11 @@ This template has been tested on:
 |YugabyteDB Cluster: Get cluster metrics item error|<p>Item for gathering all the data item errors.</p>|Dependent item|yugabytedb.cluster.metric.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |YugabyteDB Cluster: Get cluster query statistic|<p>Getting SQL statistic for cluster.</p>|Script|yugabytedb.cluster.query.statistic.get|
 |YugabyteDB Cluster: Get cluster query statistic item error|<p>Item for gathering all the data item errors.</p>|Dependent item|yugabytedb.cluster.query.statistic.get.errors<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.error`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|YugabyteDB Cluster: State|<p> The current state of the cluster. One of following:</p><p> - INVALID</p><p> - QUEUED</p><p> - INIT</p><p> - BOOTSTRAPPING</p><p> - VPC_PEERING</p><p> - NETWORK_CREATING</p><p> - PROVISIONING</p><p> - CONFIGURING</p><p> - CREATING_LB</p><p> - UPDATING_LB</p><p> - ACTIVE</p><p> - PAUSING</p><p> - PAUSED</p><p> - RESUMING</p><p> - UPDATING</p><p> - MAINTENANCE</p><p> - RESTORE</p><p> - FAILED</p><p> - CREATE_FAILED</p><p> - DELETING</p><p> - STARTING_NODE</p><p> - STOPPING_NODE</p><p> - REBOOTING_NODE</p><p> - CREATE_READ_REPLICA_FAILED</p><p> - DELETE_READ_REPLICA_FAILED</p><p> - DELETE_CLUSTER_FAILED</p><p> - EDIT_CLUSTER_FAILED</p><p> - EDIT_READ_REPLICA_FAILED</p><p> - PAUSE_CLUSTER_FAILED</p><p> - RESUME_CLUSTER_FAILED</p><p> - RESTORE_BACKUP_FAILED</p><p> - CERTIFICATE_ROTATION_FAILED</p><p> - UPGRADE_CLUSTER_FAILED</p><p> - UPGRADE_CLUSTER_GFLAGS_FAILED</p><p> - UPGRADE_CLUSTER_OS_FAILED</p><p> - UPGRADE_CLUSTER_SOFTWARE_FAILED</p><p> - START_NODE_FAILED</p><p> - STOP_NODE_FAILED</p><p> - REBOOT_NODE_FAILED</p><p> - CONFIGURE_CMK</p><p> - ENABLING_CMK</p><p> - DISABLING_CMK</p><p> - UPDATING_CMK</p><p> - ROTATING_CMK</p><p> - STOPPING_METRICS_EXPORTER</p><p> - STARTING_METRICS_EXPORTER</p><p> - CONFIGURING_METRICS_EXPORTER</p><p> - STOP_METRICS_EXPORTER_FAILED</p><p> - START_METRICS_EXPORTER_FAILED</p><p> - CONFIGURE_METRICS_EXPORTER_FAILED</p><p> - REMOVING_METRICS_EXPORTER</p><p> - REMOVE_METRICS_EXPORTER_FAILED</p>|Dependent item|yugabytedb.cluster.state<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|YugabyteDB Cluster: State|<p> The current state of the cluster. One of following:</p><p> - INVALID</p><p> - QUEUED</p><p> - INIT</p><p> - BOOTSTRAPPING</p><p> - VPC_PEERING</p><p> - NETWORK_CREATING</p><p> - PROVISIONING</p><p> - CONFIGURING</p><p> - CREATING_LB</p><p> - UPDATING_LB</p><p> - ACTIVE</p><p> - PAUSING</p><p> - PAUSED</p><p> - RESUMING</p><p> - UPDATING</p><p> - MAINTENANCE</p><p> - RESTORE</p><p> - FAILED</p><p> - CREATE_FAILED</p><p> - DELETING</p><p> - STARTING_NODE</p><p> - STOPPING_NODE</p><p> - REBOOTING_NODE</p><p> - CREATE_READ_REPLICA_FAILED</p><p> - DELETE_READ_REPLICA_FAILED</p><p> - DELETE_CLUSTER_FAILED</p><p> - EDIT_CLUSTER_FAILED</p><p> - EDIT_READ_REPLICA_FAILED</p><p> - PAUSE_CLUSTER_FAILED</p><p> - RESUME_CLUSTER_FAILED</p><p> - RESTORE_BACKUP_FAILED</p><p> - CERTIFICATE_ROTATION_FAILED</p><p> - UPGRADE_CLUSTER_FAILED</p><p> - UPGRADE_CLUSTER_GFLAGS_FAILED</p><p> - UPGRADE_CLUSTER_OS_FAILED</p><p> - UPGRADE_CLUSTER_SOFTWARE_FAILED</p><p> - START_NODE_FAILED</p><p> - STOP_NODE_FAILED</p><p> - REBOOT_NODE_FAILED</p><p> - CONFIGURE_CMK</p><p> - ENABLING_CMK</p><p> - DISABLING_CMK</p><p> - UPDATING_CMK</p><p> - ROTATING_CMK</p><p> - STOPPING_METRICS_EXPORTER</p><p> - STARTING_METRICS_EXPORTER</p><p> - CONFIGURING_METRICS_EXPORTER</p><p> - STOP_METRICS_EXPORTER_FAILED</p><p> - START_METRICS_EXPORTER_FAILED</p><p> - CONFIGURE_METRICS_EXPORTER_FAILED</p><p> - REMOVING_METRICS_EXPORTER</p><p> - REMOVE_METRICS_EXPORTER_FAILED</p>|Dependent item|yugabytedb.cluster.state<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |YugabyteDB Cluster: Type|<p>The kind of cluster deployment: SYNCHRONOUS or GEO_PARTITIONED.</p>|Dependent item|yugabytedb.cluster.type<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.cluster_type`</p></li><li><p>Replace: `SYNCHRONOUS -> 0`</p></li><li><p>Replace: `GEO_PARTITIONED -> 1`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|YugabyteDB Cluster: Number of nodes|<p>How many nodes are in the cluster.</p>|Dependent item|yugabytedb.cluster.node.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.num_nodes`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|YugabyteDB Cluster: Software version|<p>The current version of YugabyteDB installed on the cluster.</p>|Dependent item|yugabytedb.cluster.software.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.info.software_version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|YugabyteDB Cluster: YB controller version|<p>The current version of YB controller installed on the cluster.</p>|Dependent item|yugabytedb.cluster.ybc.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.info.ybc_version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|YugabyteDB Cluster: Number of nodes|<p>How many nodes are in the cluster.</p>|Dependent item|yugabytedb.cluster.node.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.num_nodes`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|YugabyteDB Cluster: Software version|<p>The current version of YugabyteDB installed on the cluster.</p>|Dependent item|yugabytedb.cluster.software.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.info.software_version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|YugabyteDB Cluster: YB controller version|<p>The current version of YB controller installed on the cluster.</p>|Dependent item|yugabytedb.cluster.ybc.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.info.ybc_version`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |YugabyteDB Cluster: Health state|<p>Current state regarding the health of the cluster:</p><p> - HEALTHY</p><p> - NEEDS_ATTENTION</p><p> - UNHEALTHY</p><p> - UNKNOWN</p>|Dependent item|yugabytedb.cluster.health.state<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |YugabyteDB Cluster: CPU usage|<p>The percentage of CPU use being consumed by the tablet or master server Yugabyte processes, as well as other processes, if any.</p>|Dependent item|yugabytedb.cluster.cpu.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.CPU_USAGE`</p></li></ul>|
 |YugabyteDB Cluster: Disk size usage|<p>Shows the amount of disk space used by the cluster.</p>|Dependent item|yugabytedb.cluster.disk.usage<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.DISK_USAGE_GB`</p></li><li><p>Custom multiplier: `1073741824`</p></li></ul>|
@@ -154,13 +155,14 @@ This template has been tested on:
 |YugabyteDB Cluster: Cluster software version has changed|<p>YugabyteDB Cluster cluster software version has changed. Acknowledge to close the problem manually.</p>|`last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version,#1) <> last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version,#2) and length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version)) > 0`|Info|**Manual close**: Yes|
 |YugabyteDB Cluster: YB controller version has changed|<p>YugabyteDB Cluster YB controller version has changed. Acknowledge to close the problem manually.</p>|`last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version,#1) <> last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version,#2) and length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version)) > 0`|Info|**Manual close**: Yes|
 |YugabyteDB Cluster: Cluster is not healthy|<p>YugabyteDB Cluster is not healthy.</p>|`last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.health.state,#1) <> 0`|Average||
-|YugabyteDB Cluster: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$CPU.UTIL.CRIT}`|Warning||
-|YugabyteDB Cluster: Storage space is low|<p>Node [{#CLUSTER.NAME}] uses more than {$DISK.UTILIZATION.WARN}% of disk space.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$DISK.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Cluster: Storage space is critically low</li></ul>|
-|YugabyteDB Cluster: Storage space is critically low|<p>Node [{#CLUSTER.NAME}] uses more than {$DISK.UTILIZATION.CRIT}% of disk space.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$DISK.UTILIZATION.CRIT}`|High||
-|YugabyteDB Cluster: Average number of connections is too high|<p>Cluster [{#CLUSTER.NAME}] uses more than {$CONNECTION.UTILIZATION.WARN}% of connection limit.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$CONNECTION.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Cluster: Average number of connections is critically high</li></ul>|
-|YugabyteDB Cluster: Average number of connections is critically high|<p>Cluster [{#CLUSTER.NAME}] uses more than {$CONNECTION.UTILIZATION.CRIT}% of connection limit.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$CONNECTION.UTILIZATION.CRIT}`|High||
-|YugabyteDB Cluster: Memory utilization is too high|<p>Cluster uses more than {$MEMORY.CLUSTER.UTILIZATION.WARN}% of memory.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$MEMORY.CLUSTER.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Cluster: Memory utilization is too high</li></ul>|
-|YugabyteDB Cluster: Memory utilization is too high|<p>Cluster uses more than {$MEMORY.CLUSTER.UTILIZATION.CRIT}% of memory.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$MEMORY.CLUSTER.UTILIZATION.CRIT}`|High||
+|YugabyteDB Cluster: CPU utilization is too high|<p>Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.CRIT}%. The system might be slow to respond.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}`|High||
+|YugabyteDB Cluster: CPU utilization is high|<p>Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.WARN}%. The system might be slow to respond.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.WARN}`|Warning||
+|YugabyteDB Cluster: Storage space is low|<p>Node [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.DISK.UTILIZATION.WARN}% of disk space.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$YUGABYTEDB.DISK.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Cluster: Storage space is too low</li></ul>|
+|YugabyteDB Cluster: Storage space is too low|<p>Node [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.DISK.UTILIZATION.CRIT}% of disk space.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}`|High||
+|YugabyteDB Cluster: Average number of connections is high|<p>Cluster [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% of connection limit.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Cluster: Average number of connections is too high</li></ul>|
+|YugabyteDB Cluster: Average number of connections is too high|<p>Cluster [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% of connection limit.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}`|High||
+|YugabyteDB Cluster: Memory utilization is high|<p>Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}% of memory.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Cluster: Memory utilization is too high</li></ul>|
+|YugabyteDB Cluster: Memory utilization is too high|<p>Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}% of memory.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}`|High||
 
 ### LLD rule Keyspace discovery
 
@@ -188,10 +190,10 @@ This template has been tested on:
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |YugabyteDB Node [{#NODE.NAME}]: Get node info|<p>Get raw data about the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.get[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.nodes.[?(@.name=='{#NODE.NAME}')].first()`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|YugabyteDB Node [{#NODE.NAME}]: Limit disk IOPS|<p>The IOPS to provision for the node [{#NODE.NAME}] for each disk.</p>|Dependent item|yugabytedb.node.disk.iops[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.disk_iops`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|YugabyteDB Node [{#NODE.NAME}]: Total disk size|<p>The size of disk (GB) for the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.disk.size.total[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.disk_size_gb`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|YugabyteDB Node [{#NODE.NAME}]: Total memory, bytes|<p>The amount of RAM for the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.memory.total[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.memory_mb`</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|YugabyteDB Node [{#NODE.NAME}]: Total CPU cores|<p>The number of cores for the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.cpu.num.cores[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.num_cores`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|YugabyteDB Node [{#NODE.NAME}]: Limit disk IOPS|<p>The IOPS to provision for the node [{#NODE.NAME}] for each disk.</p>|Dependent item|yugabytedb.node.disk.iops[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.disk_iops`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|YugabyteDB Node [{#NODE.NAME}]: Total disk size|<p>The size of disk (GB) for the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.disk.size.total[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.disk_size_gb`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|YugabyteDB Node [{#NODE.NAME}]: Total memory, bytes|<p>The amount of RAM for the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.memory.total[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.memory_mb`</p></li><li><p>Custom multiplier: `1048576`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|YugabyteDB Node [{#NODE.NAME}]: Total CPU cores|<p>The number of cores for the node [{#NODE.NAME}].</p>|Dependent item|yugabytedb.node.cpu.num.cores[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.spec.cluster_info.node_info.num_cores`</p></li><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |YugabyteDB Node [{#NODE.NAME}]: Region|<p>The cloud information for the node [{#NODE.NAME}] about the region.</p>|Dependent item|yugabytedb.node.region[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cloud_info.region`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |YugabyteDB Node [{#NODE.NAME}]: Zone|<p>The cloud information for the node [{#NODE.NAME}] about the region.</p>|Dependent item|yugabytedb.node.zone[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.cloud_info.zone`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |YugabyteDB Node [{#NODE.NAME}]: Total SST file size|<p>The size of all SST files.</p>|Dependent item|yugabytedb.node.sst.file.size.total[{#NODE.NAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.metrics.total_sst_file_size_bytes`</p></li></ul>|
@@ -208,8 +210,8 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|YugabyteDB Node [{#NODE.NAME}]: High node disk IOPS utilization|<p>IOPS utilization on the node [{#NODE.NAME}] more than {$IOPS.UTILIZATION.WARN}% of provisioned IOPS.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Node [{#NODE.NAME}]: High node disk IOPS utilization</li></ul>|
-|YugabyteDB Node [{#NODE.NAME}]: High node disk IOPS utilization|<p>IOPS utilization on the node [{#NODE.NAME}] more than {$IOPS.UTILIZATION.CRIT}% of provisioned IOPS.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$IOPS.UTILIZATION.CRIT}`|High||
+|YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is high|<p>IOPS utilization on the node [{#NODE.NAME}] more than {$YUGABYTEDB.IOPS.UTILIZATION.WARN}% of provisioned IOPS.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.WARN}`|Warning|**Depends on**:<br><ul><li>YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is too high</li></ul>|
+|YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is too high|<p>IOPS utilization on the node [{#NODE.NAME}] more than {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}% of provisioned IOPS.</p>|`min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}`|High||
 |YugabyteDB Node [{#NODE.NAME}]: Node is down|<p>The node [{#NODE.NAME}] is down.</p>|`max(/YugabyteDB Cluster by HTTP/yugabytedb.node.status[{#NODE.NAME}],3m) = 0`|Average||
 
 ## Feedback
