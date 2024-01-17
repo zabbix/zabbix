@@ -27,9 +27,10 @@
 <script>
 	const view = new class {
 
-		init({templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status}) {
+		init({templategroup_rights, hostgroup_rights, tag_filters, ldap_status, mfa_status, can_update_group}) {
 			this.tag_filters = tag_filters;
 			this.templategroup_rights = templategroup_rights;
+			this.can_update_group = can_update_group;
 			this.ldap_status = ldap_status;
 			this.mfa_status = mfa_status;
 			this.template_permission_template = new Template(
@@ -77,7 +78,7 @@
 
 			document.getElementById('user-group-form').addEventListener('change', event => {
 				if (event.target.name == 'gui_access') {
-					this.#toggleUserdirectory(event.target.value);
+					this.#toggleUserdirectoryAndMfa(event.target.value);
 				}
 				if (event.target.name == 'mfaid') {
 					this.#toggleMfaWarningIcon(event.target.value);
@@ -90,9 +91,12 @@
 			this.#setMultiselectDisabling('userids', true);
 			this.#setMultiselectDisabling('ms_hostgroup');
 			this.#setMultiselectDisabling('ms_templategroup');
-			this.#toggleUserdirectory(document.querySelector('[name="gui_access"]').value);
-			this.#toggleMfaWarningIcon(document.querySelector('[name="mfaid"]').value);
-			this.#toggleLdapWarningIcon(document.querySelector('[name="userdirectoryid"]').value);
+
+			if (this.can_update_group) {
+				this.#toggleUserdirectoryAndMfa(document.querySelector('[name="gui_access"]').value);
+				this.#toggleMfaWarningIcon(document.querySelector('[name="mfaid"]').value);
+				this.#toggleLdapWarningIcon(document.querySelector('[name="userdirectoryid"]').value);
+			}
 		}
 
 		/**
@@ -285,7 +289,7 @@
 			});
 		}
 
-		#toggleUserdirectory(gui_access) {
+		#toggleUserdirectoryAndMfa(gui_access) {
 			const userdirectory = document.querySelector('[name="userdirectoryid"]');
 			const mfa = document.querySelector('[name="mfaid"]');
 

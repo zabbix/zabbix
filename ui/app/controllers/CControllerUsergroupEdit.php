@@ -160,15 +160,14 @@ class CControllerUsergroupEdit extends CController {
 			$data['userdirectories'] = array_column($userdirectories, 'name', 'userdirectoryid');
 
 			$data['ldap_status'] = CAuthenticationHelper::get(CAuthenticationHelper::LDAP_AUTH_ENABLED);
-
-			$mfas = API::Mfa()->get([
-				'output' => ['mfaid', 'name'],
-				'sortfield' => ['name']
-			]);
-			$data['mfas'] = array_column($mfas, 'name', 'mfaid');
-
-			$data['mfa_config_status'] = $mfa_config_status;
 		}
+
+		$mfas = API::Mfa()->get([
+			'output' => ['mfaid', 'name'],
+			'sortfield' => ['name']
+		]);
+		$data['mfas'] = array_column($mfas, 'name', 'mfaid');
+		$data['mfa_config_status'] = $mfa_config_status;
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of user groups'));

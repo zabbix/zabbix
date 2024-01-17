@@ -75,6 +75,19 @@ $form_grid = (new CFormGrid())
 		)
 	]);
 
+// If MFA is enabled, default option for new user groups should be 0 - 'Default' , otherwise -1 - 'Disabled' .
+if ($data['usrgrpid']) {
+	if ($data['group_mfa_status'] == GROUP_MFA_ENABLED) {
+		$mfa_index = $data['mfaid'] ?: 0;
+	}
+	else {
+		$mfa_index = -1;
+	}
+}
+else {
+	$mfa_index = $data['mfa_config_status'] == MFA_ENABLED ? 0 : -1;
+}
+
 if ($data['can_update_group']) {
 	$select_gui_access = (new CSelect('gui_access'))
 		->setValue($data['gui_access'])
@@ -95,32 +108,20 @@ if ($data['can_update_group']) {
 
 	$ldap_warning = (makeWarningIcon(_('LDAP authentication is disabled system-wide.')))->setId('ldap-warning');
 
-	if ($data['usrgrpid']) {
-		if ($data['group_mfa_status'] == GROUP_MFA_ENABLED) {
-			$mfa = $data['mfaid'] ?: 0;
-		}
-		else {
-			$mfa = -1;
-		}
-	}
-	else {
-		$mfa = $data['mfa_config_status'] == MFA_ENABLED ? 0 : -1;
-	}
-
 	$mfa_warning = (makeWarningIcon(_('Multi-factor authentication is disabled system-wide.')))->setId('mfa-warning');
-	$mfas = (new CSelect('mfaid'))
-		->setValue($mfa)
+	$mfa = (new CSelect('mfaid'))
+		->setValue($mfa_index)
 		->setFocusableElementId('mfaid')
 		->addOptions(CSelect::createOptionsFromArray($data['mfas']))
 		->setAdaptiveWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
 	if ($data['mfa_config_status'] == MFA_ENABLED && !$data['usrgrpid']) {
-		$mfas
+		$mfa
 			->addOption((new CSelectOption(-1, _('Disabled'))))
 			->addOption((new CSelectOption(0, _('Default')))->addClass(ZBX_STYLE_DEFAULT_OPTION));
 	}
 	else {
-		$mfas
+		$mfa
 			->addOption((new CSelectOption(-1, _('Disabled')))->addClass(ZBX_STYLE_DEFAULT_OPTION))
 			->addOption((new CSelectOption(0, _('Default'))));
 	}
@@ -135,8 +136,8 @@ if ($data['can_update_group']) {
 			new CFormField($userdirectory)
 		])
 		->addItem([
-			(new CLabel([_('Multi-factor authentication'), $mfa_warning], $mfas->getFocusableElementId())),
-			new CFormField($mfas)
+			(new CLabel([_('Multi-factor authentication'), $mfa_warning], $mfa->getFocusableElementId())),
+			new CFormField($mfa)
 		])
 		->addItem([
 			new CLabel(_('Enabled'), 'users_status'),
@@ -148,11 +149,26 @@ if ($data['can_update_group']) {
 		]);
 }
 else {
+	if (array_key_exists($data['mfaid'], $data['mfas'])) {
+		$mfa_name = $data['mfas'][$data['mfaid']];
+	}
+	else {
+		$mfa_name = $mfa_index == -1 ? 'Disabled' : 'Default';
+	}
+
 	$form_grid
 		->addItem([
 			new CLabel(_('Frontend access')),
 			new CFormField(
 				(new CSpan(user_auth_type2str($data['gui_access'])))
+					->addClass('text-field')
+					->addClass('green')
+			)
+		])
+		->addItem([
+			new CLabel(_('Multi-factor authentication')),
+			new CFormField(
+				(new CSpan($mfa_name))
 					->addClass('text-field')
 					->addClass('green')
 			)
@@ -347,7 +363,8 @@ $form
 			'templategroup_rights' => $data['templategroup_rights'],
 			'hostgroup_rights' => $data['hostgroup_rights'],
 			'tag_filters' => $data['tag_filters'],
-			'ldap_status' => $data['ldap_status'],
+			'can_update_group' => $data['can_update_group'],
+			'ldap_status' => array_key_exists('ldap_status', $data) ? $data['ldap_status'] : 0,
 			'mfa_status' => $data['mfa_config_status']
 		]).');'))->setOnDocumentReady()
 	);
