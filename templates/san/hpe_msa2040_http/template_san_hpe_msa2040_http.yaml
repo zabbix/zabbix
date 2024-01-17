@@ -115,7 +115,7 @@ zabbix_export:
             	data = {};
             
             fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
+            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             		throw 'Required param is not set: "' + field + '".';
             	}
             });
@@ -145,7 +145,7 @@ zabbix_export:
             }
             
             if (return_code != '1') {
-            	throw 'Authentication failed.'
+            	throw 'Authentication failed.';
             }
             else if (session_key === '') {
             	throw 'Failed to retrieve session key from authentication response.';
@@ -181,7 +181,7 @@ zabbix_export:
             						value = property['#text'] || '';
             						data_tmp[name] = value;
             					});
-            	
+            
             					if (method == 'controller-statistics') {
             						data_tmp['durable-id'] = data_tmp['durable-id'].toLowerCase();
             					}

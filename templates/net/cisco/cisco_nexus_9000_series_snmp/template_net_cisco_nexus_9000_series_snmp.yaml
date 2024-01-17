@@ -1377,9 +1377,9 @@ zabbix_export:
                   	throw "Failed to parse JSON of temperature discovery.";
                   }
                   
-                  var scales = {'9': 1, '8': 0.001, '7': 0.000001};
-                  var result = sensors.filter(function (sensor) {	  
-                  	if (sensor['{#SENSOR_TYPE}'] !== '8' || typeof(scales[sensor['{#SENSOR_SCALE}']]) === 'undefined') {
+                  var scales = { '9': 1, '8': 0.001, '7': 0.000001 };
+                  var result = sensors.filter(function (sensor) {
+                  	if (sensor['{#SENSOR_TYPE}'] !== '8' || typeof (scales[sensor['{#SENSOR_SCALE}']]) === 'undefined') {
                   		return false;
                   	}
                   	sensor['{#SENSOR_SCALE}'] = scales[sensor['{#SENSOR_SCALE}']];

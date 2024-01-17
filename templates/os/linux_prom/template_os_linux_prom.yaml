@@ -1712,14 +1712,14 @@ zabbix_export:
                     - |
                       var inode_free;
                       var inode_total;
-                      JSON.parse(value).forEach(function(metric) {
-                        if (metric['name'] == 'node_filesystem_files'){
-                      	  inode_total = metric['value'];
-                        } else if (metric['name'] == 'node_filesystem_files_free'){
-                      	  inode_free = metric['value'];
-                        }
+                      JSON.parse(value).forEach(function (metric) {
+                      	if (metric['name'] == 'node_filesystem_files') {
+                      		inode_total = metric['value'];
+                      	} else if (metric['name'] == 'node_filesystem_files_free') {
+                      		inode_free = metric['value'];
+                      	}
                       });
-                      return (inode_free/inode_total)*100;
+                      return (inode_free / inode_total) * 100;
               master_item:
                 key: node_exporter.get
               tags:

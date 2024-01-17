@@ -155,8 +155,7 @@ zabbix_export:
             				throw 'Failed response parse. Check debug log for more information.';
             			data[key].Refs.forEach(function (field) {
             				data[field.Name] = Veeam.request(field.Href)
-            			})
-            		
+            			})		
             		})
             		return data;
             	}

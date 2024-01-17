@@ -995,7 +995,7 @@ zabbix_export:
                       const idx = [
                       	'Command',
                       	'Script',
-                      	'File Transfer',// 2 — performs file transfer.
+                      	'File Transfer',
                       	'File Watcher',
                       	'Database',
                       	'Hadoop',

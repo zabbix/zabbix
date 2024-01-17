@@ -345,18 +345,18 @@ zabbix_export:
                   	consul_api_port = '{$CONSUL.API.PORT}',
                   	result = [];
                   
-                  data.forEach(function(instance) {
+                  data.forEach(function (instance) {
                   	if (instance["ID"] != '') {
-                  	  result.push({
-                  	  '{#NODE_NAME}': instance["Node"],
-                  	  '{#NODE_ADDRESS}': instance["Address"],
-                  	  '{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
-                  	  '{#NODE_DATACENTER}': instance["Datacenter"]
-                  	  });
+                  		result.push({
+                  			'{#NODE_NAME}': instance["Node"],
+                  			'{#NODE_ADDRESS}': instance["Address"],
+                  			'{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
+                  			'{#NODE_DATACENTER}': instance["Datacenter"]
+                  		});
                   	}
-                    });
+                  });
                   
-                  return JSON.stringify(result)
+                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h

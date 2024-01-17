@@ -60,12 +60,12 @@ zabbix_export:
             	error_locations = [],
             	unique_errors,
             	new_error_msg;
-              
+            
             function getHttpData(query) {
             	url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
             	response = request.get(url);
             	Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-              
+            
             	if (response !== null) {
             		try {
             			response = JSON.parse(response);
@@ -74,7 +74,7 @@ zabbix_export:
             			throw 'Failed to parse response.';
             		}
             	}
-              
+            
             	if (request.getStatus() !== 200) {
             		if (response.error && response.error.message) {
             			throw response.error.message;
@@ -85,7 +85,7 @@ zabbix_export:
             	}
             	return response;
             }
-              
+            
             switch (params.units) {
             	case 'metric':
             		measurement = 'metric';
@@ -102,7 +102,7 @@ zabbix_export:
             		temp_unit = 'K';
             		wind_unit = 'meter/sec';
             }
-              
+            
             locations = params.location.split('|');
             for (var i in locations) {
             	try {
@@ -143,13 +143,12 @@ zabbix_export:
             	unique_errors = errors_only.filter(function (value, index, self) {
             		return self.indexOf(value) == index;
             	});
-              
+            
             	if (unique_errors.length === 1) {
             		for (var j in error_msg) {
             			error_locations.push(error_msg[j].location);
             		}
             		new_error_msg = 'Failed to retrieve data for the following locations: ' + error_locations + '. ' + unique_errors[0];
-            	  
             		return JSON.stringify({
             			'data': data,
             			'errors': new_error_msg

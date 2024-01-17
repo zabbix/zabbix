@@ -96,15 +96,15 @@ zabbix_export:
             		}
             		login.addHeader('Content-Type: application/x-www-form-urlencoded');
             		login.addHeader('x-api-version: 1.0-rev2');
-            		resp = login.post(Veeam.params.api_endpoint+ 'api/oauth2/token',
-            		'grant_type=password&username=' + encodeURIComponent(Veeam.params.user) + '&password='+ encodeURIComponent(Veeam.params.password));
+            		resp = login.post(Veeam.params.api_endpoint + 'api/oauth2/token',
+            			'grant_type=password&username=' + encodeURIComponent(Veeam.params.user) + '&password=' + encodeURIComponent(Veeam.params.password));
             
             		if (login.getStatus() !== 200 || resp === null) {
             			throw 'Login failed with status code ' + login.getStatus() + ': ' + resp;
             		}
             
             		try {
-            			resp =  JSON.parse(resp);
+            			resp = JSON.parse(resp);
             		}
             		catch (error) {
             			throw 'Failed to parse authentication token for the logon session.';
@@ -112,12 +112,12 @@ zabbix_export:
             		if (!resp.hasOwnProperty('access_token')) {
             			throw 'Auth response does not contain access token.';
             		}
-            		Veeam.token = resp['access_token']
+            		Veeam.token = resp['access_token'];
             
             	},
             
             	request: function (url) {
-              
+            
             		var response, request = new HttpRequest();
             		if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
             			request.setProxy(Veeam.params.http_proxy);
@@ -138,7 +138,7 @@ zabbix_export:
             		}
             	},
             
-            	getMetricsData: function() {
+            	getMetricsData: function () {
             		var data = {};
             		ms = 86400000;
             		start_date = new Date((new Date().getTime()) - ms * Veeam.params.created_after).toISOString().replace(/\.\d+/, '');
@@ -166,7 +166,7 @@ zabbix_export:
             catch (error) {
             	error += (String(error).endsWith('.')) ? '' : '.';
             	Zabbix.log(3, '[ VEEAM ] ERROR: ' + error);
-            	return JSON.stringify({'error': error});
+            	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$VEEAM.DATA.TIMEOUT}'
@@ -733,11 +733,10 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  obj = JSON.parse(value, function(key, value)
-                  	{
-                  	  if (key == 'creationTime') return new Date(value).toDateString();
-                  	  return value;
-                  	});
+                  obj = JSON.parse(value, function (key, value) {
+                  	if (key == 'creationTime') return new Date(value).toDateString();
+                  	return value;
+                  });
                   return JSON.stringify(obj);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

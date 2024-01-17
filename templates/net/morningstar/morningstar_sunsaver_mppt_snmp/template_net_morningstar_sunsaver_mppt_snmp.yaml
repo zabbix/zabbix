@@ -396,28 +396,28 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'rtsOpen',
-                    'rtsShorted',
-                    'rtsDisconnected',
-                    'heatsinkTempSensorOpen',
-                    'heatsinkTempSensorShorted',
-                    'sspptHot',
-                    'currentLimit',
-                    'currentOffset',
-                    'undefined',
-                    'undefined1',
-                    'uncalibrated',
-                    'rtsMiswire',
-                    'undefined12',
-                    'undefined123',
-                    'systemMiswire',
-                    'mosfetSOpen',
-                    'p12VoltageReferenceOff',
-                    'highVaCurrentLimit',
+                  	'rtsOpen',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
+                  	'heatsinkTempSensorOpen',
+                  	'heatsinkTempSensorShorted',
+                  	'sspptHot',
+                  	'currentLimit',
+                  	'currentOffset',
+                  	'undefined',
+                  	'undefined1',
+                  	'uncalibrated',
+                  	'rtsMiswire',
+                  	'undefined12',
+                  	'undefined123',
+                  	'systemMiswire',
+                  	'mosfetSOpen',
+                  	'p12VoltageReferenceOff',
+                  	'highVaCurrentLimit',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
                   	if (flags & f) {
@@ -554,19 +554,19 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'overcurrent',
-                    'mosfetSShorted',
-                    'softwareFault',
-                    'batteryHvd',
-                    'arrayHvd',
-                    'customSettingsEdit',
-                    'rtsShorted',
-                    'rtsNoLongerValid',
-                    'localTempSensorDamaged',
+                  	'overcurrent',
+                  	'mosfetSShorted',
+                  	'softwareFault',
+                  	'batteryHvd',
+                  	'arrayHvd',
+                  	'customSettingsEdit',
+                  	'rtsShorted',
+                  	'rtsNoLongerValid',
+                  	'localTempSensorDamaged',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
                   	if (flags & f) {
@@ -691,18 +691,18 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'externalShortCircuit',
-                    'overcurrent',
-                    'mosfetShorted',
-                    'software',
-                    'loadHvd',
-                    'highTempDisconnect',
-                    'customSettingsEdit',
-                    'unknownLoadFault'
+                  	'externalShortCircuit',
+                  	'overcurrent',
+                  	'mosfetShorted',
+                  	'software',
+                  	'loadHvd',
+                  	'highTempDisconnect',
+                  	'customSettingsEdit',
+                  	'unknownLoadFault'
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
                   	if (flags & f) {
@@ -1024,11 +1024,11 @@ zabbix_export:
               parameters:
                 - |
                   var v_range = [
-                  	  [[0, 18], [12, 15, 11.5, 15.5]],
-                  	  [[18, 36], [24, 30, 23, 31]],
-                  	  [[36, 99], [48, 60, 46, 62]],
-                    ],
-                    result = [];
+                  	[[0, 18], [12, 15, 11.5, 15.5]],
+                  	[[18, 36], [24, 30, 23, 31]],
+                  	[[36, 99], [48, 60, 46, 62]],
+                  ],
+                  	result = [];
                   
                   for (var idx in v_range) {
                   	if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {

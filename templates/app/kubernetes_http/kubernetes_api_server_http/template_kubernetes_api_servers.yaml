@@ -806,14 +806,14 @@ zabbix_export:
                   	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                  	if (item.name === "apiserver_client_certificate_expiration_seconds_count"){
+                  	if (item.name === "apiserver_client_certificate_expiration_seconds_count") {
                   		result.push({
                   			'{#TYPE}': 'totals',
                   			'{#SINGLETON}': ''
                   		});
                   
-                  	  }
-                  	else if  (item.name === "apiserver_client_certificate_expiration_seconds_bucket"){
+                  	}
+                  	else if (item.name === "apiserver_client_certificate_expiration_seconds_bucket") {
                   		result.push({
                   			'{#TYPE}': 'buckets',
                   			'{#LE}': item.labels.le
@@ -1208,8 +1208,8 @@ zabbix_export:
                   			'{#VERB}': label_verb
                   		});
                   
-                  	  }
-                  	else if  (item.name === 'apiserver_request_duration_seconds_bucket') {
+                  	}
+                  	else if (item.name === 'apiserver_request_duration_seconds_bucket') {
                   		var labels = item.labels.verb + item.labels.le;
                   
                   		if (lookup_histogram[labels]) {

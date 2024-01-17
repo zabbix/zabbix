@@ -113,7 +113,7 @@ zabbix_export:
             	data = {};
             
             fields.forEach(function (field) {
-            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
+            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
             		throw 'Required param is not set: "' + field + '".';
             	}
             });
@@ -138,7 +138,7 @@ zabbix_export:
             		auth_data = JSON.parse(response);
             	}
             	catch (error) {
-            	   throw 'Failed to parse authentication response received from device API.';
+            		throw 'Failed to parse authentication response received from device API.';
             	}
             }
             
@@ -151,7 +151,7 @@ zabbix_export:
             methods.forEach(function (method) {
             	response = request.get(params.base_url + 'api/show/' + method);
             	method_error = '';
-            	
+            
             	if (request.getStatus() < 200 || request.getStatus() >= 300) {
             		method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
             		data.errors.push(method_error);
