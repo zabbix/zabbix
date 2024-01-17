@@ -68,7 +68,6 @@ class CControllerMfaEdit extends CController {
 			'code_length' => TOTP_CODE_LENGTH_6,
 			'api_hostname' => '',
 			'clientid' => '',
-			'client_secret' => '',
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			],
@@ -76,6 +75,10 @@ class CControllerMfaEdit extends CController {
 		];
 
 		$this->getInputs($data, array_keys($data));
+
+		if ($this->hasInput('client_secret')) {
+			$data['client_secret'] = $this->getInput('client_secret');
+		}
 
 		if ($this->hasInput('mfaid')) {
 			$data['mfaid'] = $this->getInput('mfaid');

@@ -48,6 +48,10 @@ window.mfa_edit = new class {
 				this.#toggleMfaType(e.target.value);
 			}
 		})
+
+		if (document.getElementById('client-secret-btn') !== null) {
+			document.getElementById('client-secret-btn').addEventListener('click', this.#showClientSecretField);
+		}
 	}
 
 	#toggleMfaType(type) {
@@ -74,6 +78,20 @@ window.mfa_edit = new class {
 			this.form.querySelector('#' + field_to_show).style.display = '';
 			this.form.querySelector('label[for="' + field_to_show + '"]').style.display = '';
 		});
+	}
+
+	#showClientSecretField(e) {
+		const form_field = e.target.parentNode;
+		const client_secret_field = form_field.querySelector('[name="client_secret"][type="password"]');
+		const client_secret_var = form_field.querySelector('[name="client_secret"][type="hidden"]');
+
+		client_secret_field.style.display = '';
+		client_secret_field.disabled = false;
+
+		if (client_secret_var !== null) {
+			form_field.removeChild(client_secret_var);
+		}
+		form_field.removeChild(e.target);
 	}
 
 	submit() {

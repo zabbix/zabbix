@@ -102,8 +102,20 @@ $form
 		])
 		->addItem([
 			(new CLabel(_('Client secret'), 'client_secret')),
-			(new CFormField(
-				(new CTextBox('client_secret', $data['client_secret'], false, DB::getFieldLength('mfa', 'client_secret')))
+			(new CFormField($data['add_mfa_method'] == 0
+				? [
+					array_key_exists('client_secret', $data)
+						? (new CVar('client_secret', $data['client_secret']))->removeId()
+						: null,
+					(new CSimpleButton(_('Change client secret')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->setId('client-secret-btn'),
+					(new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
+						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
+						->addStyle('display: none;')
+						->setAttribute('disabled', 'disabled')
+				]
+				: (new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			))->setId('client_secret')
 		])
