@@ -1,0 +1,14 @@
+2024-01-11T15:28:47+0200 ZBXTRAP 127.0.0.1
+PDU INFO:
+  requestid                      1195137066
+  messageid                      0
+  transactionid                  3
+  errorindex                     0
+  receivedfrom                   UDP: [127.0.0.1]:57259->[127.0.0.1]:162
+  errorstatus                    0
+  version                        1
+  community                      public
+  notificationtype               TRAP
+VARBINDS:
+  DISMAN-EVENT-MIB::sysUpTimeInstance type=67 value=Timeticks: (894080) 2:29:00.80
+  SNMPv2-MIB::snmpTrapOID.0      type=6  value=OID: IF-MIB::linkUp.0
