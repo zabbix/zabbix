@@ -29,6 +29,10 @@ class CUserDirectory extends CApiService {
 		'test' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
+	public const MEDIA_OUTPUT_FIELDS = [
+		'userdirectory_mediaid', 'mediatypeid', 'name', 'attribute', 'active', 'severity', 'period'
+	];
+
 	protected $tableName = 'userdirectory';
 	protected $tableAlias = 'ud';
 	protected $sortColumns = ['name'];
@@ -199,7 +203,7 @@ class CUserDirectory extends CApiService {
 			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $output_fields), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
-			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'mediatypeid', 'attribute']), 'default' => null],
+			'selectProvisionMedia' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', static::MEDIA_OUTPUT_FIELDS), 'default' => null],
 			'selectProvisionGroups' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name', 'roleid', 'user_groups']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
@@ -289,7 +293,7 @@ class CUserDirectory extends CApiService {
 		unset($row);
 
 		if ($options['selectProvisionMedia'] === API_OUTPUT_EXTEND) {
-			$options['selectProvisionMedia'] = ['name', 'mediatypeid', 'attribute'];
+			$options['selectProvisionMedia'] = static::MEDIA_OUTPUT_FIELDS;
 		}
 
 		$db_provisioning_media = DB::select('userdirectory_media', [
@@ -298,10 +302,11 @@ class CUserDirectory extends CApiService {
 				'userdirectoryid' => array_keys($result)
 			]
 		]);
+		$requested_output = array_flip($options['selectProvisionMedia']);
 
 		foreach ($db_provisioning_media as $db_provisioning_media) {
 			$result[$db_provisioning_media['userdirectoryid']]['provision_media'][]
-				= array_diff_key($db_provisioning_media, array_flip(['userdirectoryid']));
+				= array_intersect_key($db_provisioning_media, $requested_output);
 		}
 	}
 
@@ -689,19 +694,12 @@ class CUserDirectory extends CApiService {
 		}
 
 		$db_provision_media = DB::select('userdirectory_media', [
-			'output' => ['userdirectory_mediaid', 'userdirectoryid', 'mediatypeid', 'name', 'attribute'],
-			'filter' => [
-				'userdirectoryid' => array_keys($affected_userdirectoryids)
-			]
+			'output' => array_merge(static::MEDIA_OUTPUT_FIELDS, ['userdirectoryid']),
+			'filter' => ['userdirectoryid' => array_keys($affected_userdirectoryids)]
 		]);
 
 		foreach ($db_provision_media as $media) {
-			$db_userdirectories[$media['userdirectoryid']]['provision_media'][] = [
-				'userdirectory_mediaid' => $media['userdirectory_mediaid'],
-				'mediatypeid' => $media['mediatypeid'],
-				'name' => $media['name'],
-				'attribute' => $media['attribute']
-			];
+			$db_userdirectories[$media['userdirectoryid']]['provision_media'][] = $media;
 		}
 	}
 
@@ -1069,7 +1067,7 @@ class CUserDirectory extends CApiService {
 						'user_ref_attr', 'user_username', 'user_lastname'
 					],
 					'userdirectoryids' => $userdirectory['userdirectoryid'],
-					'selectProvisionMedia' => ['name', 'mediatypeid', 'attribute'],
+					'selectProvisionMedia' => static::MEDIA_OUTPUT_FIELDS,
 					'selectProvisionGroups' => ['name', 'roleid', 'user_groups']
 				])[0];
 			}
@@ -1097,9 +1095,13 @@ class CUserDirectory extends CApiService {
 			'idp_type' =>			['type' => API_INT32, 'in' => implode(',', [IDP_TYPE_LDAP]), 'default' => IDP_TYPE_LDAP],
 			'provision_media' =>	['type' => API_MULTIPLE, 'rules' => [
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
-											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
-											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
+											'userdirectory_mediaid' =>	['type' => API_ID],
+											'name' =>					['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
+											'mediatypeid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+											'attribute' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')],
+											'active' =>					['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), 'default' => DB::getDefault('userdirectory_media', 'active')],
+											'severity' =>				['type' => API_INT32, 'in' => '0:63', 'default' => DB::getDefault('userdirectory_media', 'severity')],
+											'period' =>					['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -1125,65 +1127,82 @@ class CUserDirectory extends CApiService {
 	}
 
 	/**
-	 * @param array      $userdirectories
+	 * Update provision_media objects in database.
+	 * Set 'userdirectory_mediaid' to created media in $userdirectories provision_media object.
+	 *
+	 * @param array $userdirectories
+	 * @param array $userdirectories[]['provision_media']                               (optional)
+	 * @param array $db_userdirectories
+	 * @param array $db_userdirectories[]['provision_media']                            (optional) Should be set if $userdirectories[]['provision_media'] is set
+	 * @param int   $db_userdirectories[]['provision_media'][]['userdirectory_mediaid']
 	 */
 	private static function updateProvisionMedia(array &$userdirectories, array $db_userdirectories): void {
-		$userdirectoryids = array_keys(array_column($userdirectories, 'provision_media', 'userdirectoryid'));
-		$provision_media_remove = array_fill_keys($userdirectoryids, []);
-		$provision_media_insert = array_fill_keys($userdirectoryids, []);
+		$ins_provision_medias = [];
+		$upd_provision_medias = [];
+		$del_provision_mediaids = [];
+		$db_provision_medias = [];
+		$userdirectoryid_index_newids = [];
 
-		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($db_userdirectories[$userdirectoryid]['provision_media'] as $media) {
-				$provision_media_remove[$userdirectoryid][$media['userdirectory_mediaid']] = [
-					'userdirectoryid' => $userdirectoryid
-				] + array_intersect_key($media, array_flip(['name', 'mediatypeid', 'attribute']));
-			}
-
-			foreach ($userdirectories[$userdirectoryid]['provision_media'] as $index => $media) {
-				$provision_media_insert[$userdirectoryid][$index] = ['userdirectoryid' => $userdirectoryid] + $media;
-			}
+		foreach (array_column($db_userdirectories, 'provision_media') as $provision_medias) {
+			$db_provision_medias += array_column($provision_medias, null, 'userdirectory_mediaid');
 		}
 
-		foreach ($userdirectoryids as $userdirectoryid) {
-			foreach ($provision_media_insert[$userdirectoryid] as $index => $new_media) {
-				foreach ($provision_media_remove[$userdirectoryid] as $db_mediaid => $db_media) {
-					if ($db_media == $new_media) {
-						unset($provision_media_remove[$userdirectoryid][$db_mediaid]);
-						unset($provision_media_insert[$userdirectoryid][$index]);
+		foreach ($userdirectories as &$userdirectory) {
+			if (!array_key_exists('provision_media', $userdirectory)) {
+				continue;
+			}
 
-						$userdirectories[$userdirectoryid]['provision_media'][$index]['userdirectory_mediaid']
-							= $db_mediaid;
-					}
+			$indexes = [];
+
+			foreach ($userdirectory['provision_media'] as $i => $provision_media) {
+				if (!array_key_exists('userdirectory_mediaid', $provision_media)) {
+					$provision_media['userdirectoryid'] = $userdirectory['userdirectoryid'];
+					$ins_provision_medias[] = $provision_media;
+					$indexes[] = $i;
+
+					continue;
 				}
-			}
-		}
 
-		// Remove old provision media records.
-		if ($provision_media_remove) {
-			$provision_mediaids_remove = [];
-			foreach ($provision_media_remove as $media_remove) {
-				$provision_mediaids_remove = array_merge($provision_mediaids_remove, array_keys($media_remove));
-			}
+				$db_mediaid = $db_provision_medias[$provision_media['userdirectory_mediaid']]['userdirectory_mediaid'];
+				$upd_values = DB::getUpdatedValues('userdirectory_media',
+					$provision_media,
+					$db_provision_medias[$provision_media['userdirectory_mediaid']]
+				);
 
-			DB::delete('userdirectory_media', ['userdirectory_mediaid' => $provision_mediaids_remove]);
-		}
-
-		// Record new provision media records.
-		$provision_media_insert_rows = [];
-		foreach ($provision_media_insert as $userdirectory_media) {
-			$provision_media_insert_rows = array_merge($provision_media_insert_rows, $userdirectory_media);
-		}
-
-		if ($provision_media_insert_rows) {
-			$new_provision_mediaids = DB::insert('userdirectory_media', $provision_media_insert_rows);
-
-			foreach ($userdirectoryids as $userdirectoryid) {
-				foreach ($userdirectories[$userdirectoryid]['provision_media'] as &$new_media) {
-					if (!array_key_exists('userdirectory_mediaid', $new_media)) {
-						$new_media['userdirectory_mediaid'] = array_shift($new_provision_mediaids);
-					}
+				if ($upd_values) {
+					$upd_provision_medias[] = [
+						'values' => $upd_values,
+						'where' => ['userdirectory_mediaid' => $db_mediaid]
+					];
 				}
-				unset($new_media);
+
+				$userdirectory['provision_media'][$i]['userdirectory_mediaid'] = $db_mediaid;
+				unset($db_provision_medias[$db_mediaid]);
+			}
+
+			$userdirectoryid_index_newids[$userdirectory['userdirectoryid']] = $indexes;
+		}
+		unset($userdirectory);
+
+		$del_provision_mediaids = array_column($db_provision_medias, 'userdirectory_mediaid');
+
+		if ($del_provision_mediaids) {
+			DB::delete('userdirectory_media', ['userdirectory_mediaid' => $del_provision_mediaids]);
+		}
+
+		if ($upd_provision_medias) {
+			DB::update('userdirectory_media', $upd_provision_medias);
+		}
+
+		if ($ins_provision_medias) {
+			$new_ids = DB::insert('userdirectory_media', $ins_provision_medias);
+
+			foreach ($userdirectoryid_index_newids as $userdirectoryid => $indexes) {
+				foreach ($indexes as $i) {
+					$userdirectories[$userdirectoryid]['provision_media'][$i]['userdirectory_mediaid'] = array_shift(
+						$new_ids
+					);
+				}
 			}
 		}
 	}
@@ -1411,7 +1430,10 @@ class CUserDirectory extends CApiService {
 										['if' => ['field' => 'provision_status', 'in' => implode(',', [JIT_PROVISIONING_ENABLED])], 'type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['mediatypeid', 'attribute']], 'fields' => [
 											'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'name')],
 											'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
-											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')]
+											'attribute' =>		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('userdirectory_media', 'attribute')],
+											'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED]), 'default' => DB::getDefault('userdirectory_media', 'active')],
+											'severity' =>		['type' => API_INT32, 'in' => '0:63', 'default' => DB::getDefault('userdirectory_media', 'severity')],
+											'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('userdirectory_media', 'period'), 'default' => DB::getDefault('userdirectory_media', 'period')]
 										]],
 										['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 			]],
@@ -1449,6 +1471,9 @@ class CUserDirectory extends CApiService {
 			unset($field);
 
 			$api_input_rules['fields']['userdirectoryid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
+			$api_input_rules['fields']['provision_media']['rules'][0]['fields'] += [
+				'userdirectory_mediaid' => ['type' => API_ID]
+			];
 		}
 
 		return $api_input_rules;

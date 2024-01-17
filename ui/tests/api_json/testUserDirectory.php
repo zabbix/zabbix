@@ -28,6 +28,11 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
  */
 class testUserDirectory extends CAPITest {
 
+	public static $data = [
+		'usrgrpid' => [],
+		'userdirectoryid' => []
+	];
+
 	public static function createValidDataProvider() {
 		return [
 			'Create LDAP userdirectories' => [
@@ -55,6 +60,30 @@ class testUserDirectory extends CAPITest {
 					'provision_media' => [
 						['name' => 'SMS', 'mediatypeid' => 1, 'attribute' => 'attr_sms'],
 						['name' => 'Email', 'mediatypeid' => 1, 'attribute' => 'attr_email']
+					]
+				]],
+				'expected_error' => null
+			],
+			'Create LDAP userdirectories with provisioning groups and media with additional fields' => [
+				'userdirectories' => [[
+					'name' => 'LDAP #4',
+					'idp_type' => IDP_TYPE_LDAP,
+					'host' => 'ldap.forumsys.com',
+					'port' => 389,
+					'base_dn' => 'dc=example,dc=com',
+					'search_attribute' => 'uid',
+					'provision_status' => JIT_PROVISIONING_ENABLED,
+					'provision_groups' => [
+						['name' => 'zabbix-devs', 'roleid' => 1, 'user_groups' => [['usrgrpid' => 7]]]
+					],
+					'provision_media' => [
+						['name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'active, severity, period set default'],
+						['name' => 'Media #2', 'mediatypeid' => 1, 'attribute' => 'attr_media2', 'active' => MEDIA_STATUS_ACTIVE],
+						['name' => 'Media #3', 'mediatypeid' => 1, 'attribute' => 'attr_media3', 'severity' => 3],
+						['name' => 'Media #4', 'mediatypeid' => 1, 'attribute' => 'attr_media4', 'period' => '2-5,09:00-15:00'],
+						['name' => 'Media #5', 'mediatypeid' => 1, 'attribute' => 'attr_media5', 'period' => '{$MACRO}'],
+						['name' => 'Media #6', 'mediatypeid' => 1, 'attribute' => 'attr_media6', 'period' => '{$MACRO:A}'],
+						['name' => 'Media #7', 'mediatypeid' => 1, 'attribute' => 'attr_media7', 'period' => '{{$MACRO}.func()}']
 					]
 				]],
 				'expected_error' => null
@@ -313,6 +342,98 @@ class testUserDirectory extends CAPITest {
 					]]
 				]],
 				'expected_error' => 'Invalid parameter "/1/provision_media/1/mediatypeid": referred object does not exist.'
+			],
+			'Test invalid provision media active' => [
+				'userdirectories' => [[
+					'name' => 'LDAP #3',
+					'idp_type' => IDP_TYPE_LDAP,
+					'host' => 'ldap.forumsys.com',
+					'port' => 389,
+					'base_dn' => 'dc=example,dc=com',
+					'search_attribute' => 'uid',
+					'provision_status' => JIT_PROVISIONING_ENABLED,
+					'provision_groups' => [[
+						'name' => 'provision group pattern',
+						'roleid' => 1,
+						'user_groups' => [['usrgrpid' => 7]]
+					]],
+					'provision_media' => [[
+						'name' => 'name',
+						'mediatypeid' => 0,
+						'attribute' => 'attr',
+						'active' => 2
+					]]
+				]],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/active": value must be one of 0, 1.'
+			],
+			'Test invalid provision media severity' => [
+				'userdirectories' => [[
+					'name' => 'LDAP #3',
+					'idp_type' => IDP_TYPE_LDAP,
+					'host' => 'ldap.forumsys.com',
+					'port' => 389,
+					'base_dn' => 'dc=example,dc=com',
+					'search_attribute' => 'uid',
+					'provision_status' => JIT_PROVISIONING_ENABLED,
+					'provision_groups' => [[
+						'name' => 'provision group pattern',
+						'roleid' => 1,
+						'user_groups' => [['usrgrpid' => 7]]
+					]],
+					'provision_media' => [[
+						'name' => 'name',
+						'mediatypeid' => 0,
+						'attribute' => 'attr',
+						'severity' => 64
+					]]
+				]],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/severity": value must be one of 0-63.'
+			],
+			'Test invalid provision media period' => [
+				'userdirectories' => [[
+					'name' => 'LDAP #3',
+					'idp_type' => IDP_TYPE_LDAP,
+					'host' => 'ldap.forumsys.com',
+					'port' => 389,
+					'base_dn' => 'dc=example,dc=com',
+					'search_attribute' => 'uid',
+					'provision_status' => JIT_PROVISIONING_ENABLED,
+					'provision_groups' => [[
+						'name' => 'provision group pattern',
+						'roleid' => 1,
+						'user_groups' => [['usrgrpid' => 7]]
+					]],
+					'provision_media' => [[
+						'name' => 'name',
+						'mediatypeid' => 0,
+						'attribute' => 'attr',
+						'period' => 'malformed period'
+					]]
+				]],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/period": a time period is expected.'
+			],
+			'Test invalid provision media empty period' => [
+				'userdirectories' => [[
+					'name' => 'LDAP #3',
+					'idp_type' => IDP_TYPE_LDAP,
+					'host' => 'ldap.forumsys.com',
+					'port' => 389,
+					'base_dn' => 'dc=example,dc=com',
+					'search_attribute' => 'uid',
+					'provision_status' => JIT_PROVISIONING_ENABLED,
+					'provision_groups' => [[
+						'name' => 'provision group pattern',
+						'roleid' => 1,
+						'user_groups' => [['usrgrpid' => 7]]
+					]],
+					'provision_media' => [[
+						'name' => 'name',
+						'mediatypeid' => 0,
+						'attribute' => 'attr',
+						'period' => ''
+					]]
+				]],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/period": cannot be empty.'
 			]
 		];
 	}
@@ -416,6 +537,15 @@ class testUserDirectory extends CAPITest {
 					['userdirectoryid' => 'API SAML', 'sp_entityid' => 'saml.sp.entityid']
 				],
 				'expected_error' => null
+			],
+			'Test provisioned media fields active, severity and period are optional' => [
+				'userdirectories' => [[
+					'userdirectoryid' => 'LDAP #3',
+					'provision_media' => [
+						['name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1']
+					]
+				]],
+				'expected_error' => null
 			]
 		];
 	}
@@ -484,6 +614,39 @@ class testUserDirectory extends CAPITest {
 					]
 				]],
 				'expected_error' => 'Invalid parameter "/1/provision_media/2/mediatypeid": referred object does not exist.'
+			],
+			'Set incorrect provision media active' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'LDAP #3',
+						'provision_media' => [
+							['name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1', 'active' => 7]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/active": value must be one of 0, 1.'
+			],
+			'Set incorrect provision media severity' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'LDAP #3',
+						'provision_media' => [
+							['name' => 'Media #2', 'mediatypeid' => 1, 'attribute' => 'attr_media2', 'severity' => 64]
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/severity": value must be one of 0-63.'
+			],
+			'Set incorrect provision media period' => [
+				'userdirectories' => [
+					[
+						'userdirectoryid' => 'LDAP #3',
+						'provision_media' => [
+							['name' => 'Media #3', 'mediatypeid' => 1, 'attribute' => 'attr_media3', 'period' => 'malformed period']
+						]
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1/provision_media/1/period": a time period is expected.'
 			],
 			'Test invalid SAML Encrypt assertions' => [
 				'userdirectories' => [[
@@ -567,6 +730,66 @@ class testUserDirectory extends CAPITest {
 		}
 	}
 
+	/**
+	 * Test userdirectory provision_media fields 'userdirectory_mediaid', when passed, allow to update media mapping
+	 * instead of delete + create operation.
+	 */
+	public function testProvisionMediaUpdateFieldUserdirectoryMediaId() {
+		$userdirectory = [
+			'name' => 'Validate provision media mapping update',
+			'idp_type' => IDP_TYPE_LDAP,
+			'host' => 'ldap.forumsys.com',
+			'port' => 389,
+			'base_dn' => 'dc=example,dc=com',
+			'search_attribute' => 'uid',
+			'provision_status' => JIT_PROVISIONING_ENABLED,
+			'provision_groups' => [
+				['name' => 'zabbix-devs', 'roleid' => 1, 'user_groups' => [['usrgrpid' => 7]]]
+			],
+			'provision_media' => [
+				['name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1', 'active' => 1, 'severity' => 1, 'period' => '{$A}'],
+				['name' => 'Media #2', 'mediatypeid' => 1, 'attribute' => 'attr_media2', 'active' => 1, 'severity' => 1, 'period' => '{$A}']
+			]
+		];
+		$input = self::resolveIds([$userdirectory]);
+
+		// Create test userdirectory.
+		['result' => $result] = $this->call('userdirectory.create', $input);
+		$userdirectoryid = reset($result['userdirectoryids']);
+
+		// Get 'userdirectory_mediaid' of created media before update operation.
+		$db_userdirectory = $this->call('userdirectory.get', [
+			'output' => [],
+			'selectProvisionMedia' => API_OUTPUT_EXTEND,
+			'userdirectoryids' => [$userdirectoryid]
+		]);
+		$db_userdirectory = reset($db_userdirectory['result']);
+		$db_media = array_column($db_userdirectory['provision_media'], 'userdirectory_mediaid', 'name');
+
+		$this->call('userdirectory.update', [
+			'userdirectoryid' => $userdirectoryid,
+			'provision_media' => [
+				['userdirectory_mediaid' => $db_media['Media #1'], 'name' => 'Media #1', 'mediatypeid' => 1, 'attribute' => 'attr_media1', 'active' => 0],
+				['name' => 'Media #2', 'mediatypeid' => 1, 'attribute' => 'attr_media3', 'active' => 0]
+			]
+		]);
+
+		// Get 'userdirectory_mediaid' of created media after update operation.
+		$db_userdirectory = $this->call('userdirectory.get', [
+			'output' => [],
+			'selectProvisionMedia' => API_OUTPUT_EXTEND,
+			'userdirectoryids' => [$userdirectoryid]
+		]);
+		$db_userdirectory = reset($db_userdirectory['result']);
+		$db_media_updated = array_column($db_userdirectory['provision_media'], 'userdirectory_mediaid', 'name');
+
+		$this->assertTrue($db_media['Media #1'] === $db_media_updated['Media #1'], 'Property userdirectory_mediaid should not change after update operation if where passed');
+		$this->assertTrue($db_media['Media #2'] !== $db_media_updated['Media #2'], 'Property userdirectory_mediaid should change after update operation if where not passed');
+
+		// Deleting test data.
+		$this->call('userdirectory.delete', [$userdirectoryid]);
+	}
+
 	public static function deleteValidDataProvider() {
 		return [
 			'Test delete userdirectory' => [
@@ -618,6 +841,7 @@ class testUserDirectory extends CAPITest {
 
 	/**
 	 * Default userdirectory can be deleted only when there are no userdirectories and ldap_auth_enabled=0.
+	 * This test requires to one userdirectory exists therefor it removes all avaiable userdirectories and should be ran last.
 	 */
 	public function testDeleteDefault() {
 		// Delete user group to allow to delete userdirectory linked to user group.
@@ -638,11 +862,6 @@ class testUserDirectory extends CAPITest {
 		$this->call('authentication.update', ['ldap_auth_enabled' => ZBX_AUTH_LDAP_DISABLED]);
 		$this->call('userdirectory.delete', array_values(self::$data['userdirectoryid']));
 	}
-
-	public static $data = [
-		'usrgrpid' => [],
-		'userdirectoryid' => []
-	];
 
 	/**
 	 * Replace name by value for property names in self::$data.
