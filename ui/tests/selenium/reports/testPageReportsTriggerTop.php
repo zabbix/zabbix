@@ -706,8 +706,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'date' => [
-						'from' => 'now-1y/y',
-						'to' => 'now-1y/y'
+						'from' => 'now-10y/y',
+						'to' => 'now-10y/y'
 					],
 					'expected' => []
 				]
