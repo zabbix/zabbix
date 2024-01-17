@@ -611,7 +611,7 @@ in:
   expression: '{{$USERMACRO}.regsub("App([0-9]) ([a-z]+)","App\1")}'
 out:
   return: SUCCEED
-  token_type: ZBX_TOKEN_FUNC_MACRO
+  token_type: ZBX_TOKEN_USER_FUNC_MACRO
   token_l: 0
   token_r: 51
   macro_l: 1

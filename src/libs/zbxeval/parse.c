@@ -243,6 +243,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 					case ZBX_TOKEN_SIMPLE_MACRO:
 						type = ZBX_EVAL_TOKEN_VAR_MACRO;
 						break;
+					case ZBX_TOKEN_USER_FUNC_MACRO:
 					case ZBX_TOKEN_USER_MACRO:
 						type = ZBX_EVAL_TOKEN_VAR_USERMACRO;
 						break;

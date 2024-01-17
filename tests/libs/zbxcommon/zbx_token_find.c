@@ -207,6 +207,7 @@ void	zbx_mock_test_entry(void **state)
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				compare_token_lld_func_macro_values(expression, &token);
 				break;
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 			case ZBX_TOKEN_FUNC_MACRO:
 				compare_token_func_macro_values(expression, &token);
 				break;
