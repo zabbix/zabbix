@@ -729,7 +729,7 @@ static int	am_db_flush_results(zbx_am_db_t *amdb)
 
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, " where alertid=" ZBX_FS_UI64 ";\n",
 						result->alertid);
-				zabbix_log(LOG_LEVEL_INFORMATION, "result->source:%d", result->source);
+
 				if ((EVENT_SOURCE_TRIGGERS == result->source ||
 						EVENT_SOURCE_SERVICE == result->source) && NULL != result->value)
 				{
