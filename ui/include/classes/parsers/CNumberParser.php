@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,7 +69,7 @@ class CNumberParser extends CParser {
 	public function __construct(array $options = []) {
 		$this->options = array_replace($this->options, array_intersect_key($options, $this->options));
 
-		if ($this->options['with_size_suffix'] && $this->options['with_year']) {
+		if (!$this->options['with_time_suffix'] && $this->options['with_year']) {
 			throw new Exception('Ambiguous options.');
 		}
 

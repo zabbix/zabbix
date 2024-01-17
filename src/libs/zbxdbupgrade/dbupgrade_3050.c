@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1343,7 +1343,8 @@ static int	DBpatch_3050122(void)
 		/* copy leading whitespace (if any) or empty string */
 		zbx_strncpy_alloc(&processed_parameter, &param_alloc, &param_offset, orig_param, param_pos);
 
-		unquoted_parameter = zbx_function_param_unquote_dyn(orig_param + param_pos, param_len, &was_quoted);
+		unquoted_parameter = zbx_function_param_unquote_dyn_compat(orig_param + param_pos, param_len,
+				&was_quoted);
 
 		zbx_regexp_escape(&unquoted_parameter);
 
@@ -1354,7 +1355,7 @@ static int	DBpatch_3050122(void)
 		DBpatch_3050122_add_anchors(unquoted_parameter, parameter_anchored, current_len);
 		zbx_free(unquoted_parameter);
 
-		if (SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted))
+		if (SUCCEED != zbx_function_param_quote(&parameter_anchored, was_quoted, 0))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot convert parameter \"%s\" of trigger function"
 					" logsource (functionid: %s) to regexp during database upgrade. The"

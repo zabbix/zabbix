@@ -1323,28 +1323,22 @@ zabbix_export:
               value: application
         - uuid: 04c0b90a0a7c4d6a95f51d006a65a530
           name: 'Oracle: Version'
-          type: DEPENDENT
-          key: oracle.version
-          delay: '0'
+          key: 'oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+          delay: 15m
           history: 7d
           trends: '0'
           value_type: CHAR
           description: 'The Oracle Server version.'
           preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.version
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 1d
-          master_item:
-            key: 'oracle.instance.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]'
+                - 12h
           tags:
             - tag: component
               value: application
           triggers:
             - uuid: 4a68bcb6149c4c839e263c949343add8
-              expression: 'last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0'
+              expression: 'last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],#2) and length(last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]))>0'
               name: 'Oracle: Version has changed'
               event_name: 'Oracle: Version has changed (new version value received: {ITEM.VALUE})'
               priority: INFO

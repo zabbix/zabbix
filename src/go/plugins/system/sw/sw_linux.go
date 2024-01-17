@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -234,9 +234,21 @@ func dpkgDetails(manager string, in []string, regex string) (out string, err err
 
 		var size uint64
 
-		size, err = strconv.ParseUint(split[4], 10, 64)
-		if err != nil {
-			return
+		// According to the Debian project's Policy Manual on Binary package
+		// control files[1], the Installed-Size field[2] is not mandatory in
+		// the stanza. The query for such packages would return an empty value,
+		// which strconv obviously fails to parse into an Uint.
+		//
+		// When that is the case, we simply report the size as 0.
+		//
+		// [1]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#binary-package-control-files-debian-control
+		// [2]: https://www.debian.org/doc/debian-policy/ch-controlfields.html#s-f-installed-size
+
+		if split[4] != "" {
+			size, err = strconv.ParseUint(split[4], 10, 64);
+			if err != nil {
+				return "", err
+			}
 		}
 
 		// the reported size is in kB, we want bytes

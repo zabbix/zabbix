@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,3 +68,8 @@ const KEY_PAGE_DOWN = 34;
 const KEY_END = 35;
 const KEY_HOME = 36;
 const KEY_SPACE = 32;
+
+const PAGE_TYPE_TEXT_RETURN_JSON = 11;
+
+const ZBX_SCRIPT_MANUALINPUT_DISABLED = 0;
+const ZBX_SCRIPT_MANUALINPUT_ENABLED = 1;

@@ -1799,4 +1799,98 @@ in:
   expression: '((),9'
 out:
   result: FAIL
+---
+test case: Succeed 'count(//trap[1],#5,"str\\arg",0)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,"str\\arg",0)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"str\\arg"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Fail 'count(//trap[1],#5,"str\arg",0)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,"str\arg",0)'
+out:
+  result: FAIL
+---
+test case: Succeed 'count(//trap[1],#5,"str\"arg",0)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,"str\"arg",0)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"str\"arg"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Succeed 'count(//trap[1],#5,"str\\",0)'
+in:
+  rules: [ZBX_EVAL_PARSE_ITEM_QUERY,ZBX_EVAL_PARSE_FUNCTION,ZBX_EVAL_PARSE_GROUP,ZBX_EVAL_PARSE_VAR]
+  expression: 'count(//trap[1],#5,"str\\",0)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"str\\"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Succeed v64 compat 'count(//trap[1],#5,"str\arg",0)'
+in:
+  rules:
+  - ZBX_EVAL_PARSE_ITEM_QUERY
+  - ZBX_EVAL_PARSE_FUNCTION
+  - ZBX_EVAL_PARSE_GROUP
+  - ZBX_EVAL_PARSE_VAR
+  - ZBX_EVAL_PARSE_STR_V64_COMPAT
+  expression: 'count(//trap[1],#5,"str\arg",0)'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"str\arg"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_NUM, token: '0', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
+---
+test case: Fail v64 compat 'count(//trap[1],#5,"str\\",0)'
+in:
+  rules:
+  - ZBX_EVAL_PARSE_ITEM_QUERY
+  - ZBX_EVAL_PARSE_FUNCTION
+  - ZBX_EVAL_PARSE_GROUP
+  - ZBX_EVAL_PARSE_VAR
+  - ZBX_EVAL_PARSE_STR_V64_COMPAT
+  expression: 'count(//trap[1],#5,"str\\",0)'
+out:
+  result: FAIL
+---
+test case: 'Succeed ''count(//trap[1],#5,{$MACRO: "a,)b\c"},"rfsdg")'''
+in:
+  rules:
+  - ZBX_EVAL_PARSE_ITEM_QUERY
+  - ZBX_EVAL_PARSE_FUNCTION
+  - ZBX_EVAL_PARSE_GROUP
+  - ZBX_EVAL_PARSE_VAR
+  - ZBX_EVAL_PARSE_USERMACRO
+  expression: 'count(//trap[1],#5,{$MACRO: "a,)b\c"},"rfsdg")'
+out:
+  stack:
+  - {type: ZBX_EVAL_TOKEN_ARG_QUERY, token: '//trap[1]', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_ARG_PERIOD, token: '#5', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_USERMACRO, token: '{$MACRO: "a,)b\c"}', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_VAR_STR, token: '"rfsdg"', opt: 0}
+  - {type: ZBX_EVAL_TOKEN_HIST_FUNCTION, token: 'count', opt: 4}
+  result: SUCCEED
 ...

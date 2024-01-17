@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -282,6 +282,14 @@ $select_hgstype = (new CSelect('hgstype'))
 	->addOption(new CSelectOption(0, _('All')))
 	->addOption(new CSelectOption(1, _('Selected')));
 
+$validation_rule = $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_STRING
+	? $data['manualinput_validator']
+	: '';
+
+$dropdown_options = $data['manualinput_validator_type'] == ZBX_SCRIPT_MANUALINPUT_TYPE_LIST
+	? $data['manualinput_validator']
+	: '';
+
 $form_grid
 	->addItem([
 		new CLabel(_('Host group'), $select_hgstype->getFocusableElementId()),
@@ -302,8 +310,7 @@ $form_grid
 						'dstfld1' => 'groupid'
 					]
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 		))->setId('host-group-selection')
 	)
 	->addItem([
@@ -320,27 +327,78 @@ $form_grid
 				->setId('host-access')
 		))->setId('host-access-field')
 	])
-	->addItem([
-		(new CLabel(_('Enable confirmation'), 'enable-confirmation'))->setId('enable-confirmation-label'),
-		(new CFormField(
-			(new CCheckBox('enable_confirmation'))
-				->setChecked($data['enable_confirmation'])
-				->setId('enable-confirmation')
-		))->setId('enable-confirmation-field')
-	])
-	->addItem([
-		(new CLabel(_('Confirmation text'), 'confirmation'))->setId('confirmation-label'),
-		(new CFormField([
-			(new CTextBox('confirmation', $data['confirmation'], false, DB::getFieldLength('scripts', 'confirmation')))
-				->setAttribute('disabled', $data['enable_confirmation'])
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
-			NBSP(),
-			(new CButton('testConfirmation', _('Test confirmation')))
-				->addClass(ZBX_STYLE_BTN_GREY)
-				->setAttribute('disabled', $data['enable_confirmation'])
-				->setId('test-confirmation')
-		]))->setId('confirmation-field')
-	]);
+	->addItem((new CFormFieldsetCollapsible(_('Advanced configuration')))
+		->setId('advanced-configuration')
+		->addItem([
+			(new CLabel(_('Enable user input'), 'manualinput')),
+			new CFormField(
+				(new CCheckBox('manualinput'))->setChecked($data['manualinput'] == ZBX_SCRIPT_MANUALINPUT_ENABLED)
+			)
+		])
+		->addItem([
+			(new CLabel(_('Input prompt'), 'manualinput_prompt')),
+			new CFormField([
+				(new CTextBox('manualinput_prompt', $data['manualinput_prompt'], false,
+					DB::getFieldLength('scripts', 'manualinput_prompt')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				NBSP(),
+				(new CButton('test_user_input', _('Test user input')))->addClass(ZBX_STYLE_BTN_GREY)
+			])
+		])
+		->addItem([
+			(new CLabel(_('Input type'), 'manualinput_validator_type')),
+			new CFormField(
+				(new CRadioButtonList('manualinput_validator_type', (int) $data['manualinput_validator_type']))
+					->addValue(_('String'), ZBX_SCRIPT_MANUALINPUT_TYPE_STRING)
+					->addValue(_('Dropdown'), ZBX_SCRIPT_MANUALINPUT_TYPE_LIST)
+					->setModern()
+			)
+		])
+		->addItem([
+			new CLabel(_('Default input string'), 'manualinput_default_value'),
+			new CFormField([
+				(new CTextBox('manualinput_default_value', $data['manualinput_default_value'], false,
+					DB::getFieldLength('scripts', 'manualinput_default_value')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			])
+		])
+		->addItem([
+			new CLabel(_('Dropdown options'), 'dropdown_options'),
+			new CFormField([
+				(new CTextBox('dropdown_options', $dropdown_options, false,
+					DB::getFieldLength('scripts', 'manualinput_validator')
+				))
+					->setAttribute('placeholder', _('comma-separated list'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			])
+		])
+		->addItem([
+			new CLabel(_('Input validation rule'), 'manualinput_validator'),
+			new CFormField([
+				(new CTextBox('manualinput_validator', $validation_rule, false,
+					DB::getFieldLength('scripts', 'manualinput_validator')
+				))
+					->setAttribute('placeholder', _('regular expression'))
+					->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			])
+		])
+		->addItem([
+			(new CLabel(_('Enable confirmation'), 'enable_confirmation')),
+			new CFormField(
+				(new CCheckBox('enable_confirmation'))->setChecked($data['enable_confirmation'])
+			)
+		])
+		->addItem([
+			(new CLabel(_('Confirmation text'), 'confirmation')),
+			new CFormField([
+				(new CTextBox('confirmation', $data['confirmation'], false,
+					DB::getFieldLength('scripts', 'confirmation')
+				))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH),
+				NBSP(),
+				(new CButton('test_confirmation', _('Test confirmation')))->addClass(ZBX_STYLE_BTN_GREY)
+			])
+		])
+	);
 
 if ($data['scriptid'] === null) {
 	$buttons = [

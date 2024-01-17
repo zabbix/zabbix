@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -60,6 +60,9 @@ window.trigger_edit_popup = new class {
 		if (this.dependencies) {
 			this.#loadDependencyTable(this.dependencies);
 		}
+
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	#initActions() {

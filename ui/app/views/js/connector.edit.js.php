@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -47,6 +47,9 @@ window.connector_edit_popup = new class {
 		this._updateForm();
 
 		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
+
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	_updateForm() {
@@ -87,6 +90,8 @@ window.connector_edit_popup = new class {
 
 		this.overlay.unsetLoading();
 		this.overlay.setProperties({title, buttons});
+		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {
