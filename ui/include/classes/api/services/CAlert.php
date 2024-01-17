@@ -241,7 +241,10 @@ class CAlert extends CApiService {
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
 			$sql_parts['from'][] = 'users_groups ug';
 			$sql_parts['where'][] = '(a.userid IS NULL'.
-				' OR '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).')';
+				' OR (a.userid=ug.userid'.
+					' AND '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
+				')'.
+			')';
 		}
 
 		// groupids
