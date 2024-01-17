@@ -78,155 +78,155 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Primera = {
-                params: {},
-                session_key: null,
+            	params: {},
+            	session_key: null,
             
-                setParams: function (params) {
-                    ['username', 'password', 'base_url'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['username', 'password', 'base_url'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    Primera.params = params;
-                    if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
-                        Primera.params.base_url += '/';
-                    }
-                },
+            		Primera.params = params;
+            		if (typeof Primera.params.base_url === 'string' && !Primera.params.base_url.endsWith('/')) {
+            			Primera.params.base_url += '/';
+            		}
+            	},
             
-                login: function () {
-                    if (Primera.session_key !== null) {
-                        return;
-                    }
+            	login: function () {
+            		if (Primera.session_key !== null) {
+            			return;
+            		}
             
-                    var response, request = new HttpRequest();
-                    request.addHeader('Content-Type: application/json');
+            		var response, request = new HttpRequest();
+            		request.addHeader('Content-Type: application/json');
             
-                    response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
-                        'user': Primera.params.username,
-                        'password': Primera.params.password
-                    }));
+            		response = request.post(Primera.params.base_url + 'api/v1/credentials', JSON.stringify({
+            			'user': Primera.params.username,
+            			'password': Primera.params.password
+            		}));
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (response !== null) {
-                        try {
-                            auth_data = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse auth response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by auth request.'
-                    }
+            		if (response !== null) {
+            			try {
+            				auth_data = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse auth response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by auth request.'
+            		}
             
-                    if ('key' in auth_data) {
-                        Primera.session_key = auth_data['key'];
-                    } else {
-                        throw 'Auth response does not contain session key.'
-                    }
-                },
+            		if ('key' in auth_data) {
+            			Primera.session_key = auth_data['key'];
+            		} else {
+            			throw 'Auth response does not contain session key.'
+            		}
+            	},
             
-                logout: function () {
-                    if (Primera.session_key !== null) {
-                        (new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
-                    }
-                },
+            	logout: function () {
+            		if (Primera.session_key !== null) {
+            			(new HttpRequest()).delete(Primera.params.base_url + 'api/v1/credentials/' + Primera.session_key);
+            		}
+            	},
             
-                requestData: function (method) {
-                    if (Primera.session_key === null) {
-                        return;
-                    }
+            	requestData: function (method) {
+            		if (Primera.session_key === null) {
+            			return;
+            		}
             
-                    request = new HttpRequest();
-                    request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
+            		request = new HttpRequest();
+            		request.addHeader('X-HP3PAR-WSAPI-SessionKey: ' + Primera.session_key);
             
-                    raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
+            		raw_data = request.get(Primera.params.base_url + 'api/v1/' + method);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (raw_data !== null) {
-                        try {
-                            return JSON.parse(raw_data);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by ' + method + ' request.';
-                    }
-                }
+            		if (raw_data !== null) {
+            			try {
+            				return JSON.parse(raw_data);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by ' + method + ' request.';
+            		}
+            	}
             };
             
             var methods = ['disks', 'cpgs', 'hosts', 'ports', 'system', 'tasks', 'volumes'],
-                data = {};
+            	data = {};
             
             data['errors'] = {};
             
             try {
-                Primera.setParams(JSON.parse(value));
+            	Primera.setParams(JSON.parse(value));
             
-                try {
-                    Primera.login();
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            	try {
+            		Primera.login();
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors)) {
-                    for (var i in methods) {
-                        try {
-                            if (methods[i] === 'tasks') {
-                                var result = [],
-                                    tmp_tasks = {};
+            	if (!('auth' in data.errors)) {
+            		for (var i in methods) {
+            			try {
+            				if (methods[i] === 'tasks') {
+            					var result = [],
+            						tmp_tasks = {};
             
-                                tasks = Primera.requestData(methods[i]);
+            					tasks = Primera.requestData(methods[i]);
             
-                                tasks.members.forEach(function (task) {
-                                    tmp_tasks[task.name] = task;
-                                });
+            					tasks.members.forEach(function (task) {
+            						tmp_tasks[task.name] = task;
+            					});
             
-                                for (var task in tmp_tasks) {
-                                    result.push(tmp_tasks[task]);
-                                }
+            					for (var task in tmp_tasks) {
+            						result.push(tmp_tasks[task]);
+            					}
             
-                                data[methods[i]] = result;
-                            }
-                            else {
-                                data[methods[i]] = Primera.requestData(methods[i]);
-                            }
-                        }
-                        catch (error) {
-                            data.errors[methods[i]] = error.toString();
-                        }
-                    }
-                }
+            					data[methods[i]] = result;
+            				}
+            				else {
+            					data[methods[i]] = Primera.requestData(methods[i]);
+            				}
+            			}
+            			catch (error) {
+            				data.errors[methods[i]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             try {
-                Primera.logout();
+            	Primera.logout();
             }
             catch (error) {
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);

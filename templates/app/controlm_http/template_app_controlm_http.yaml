@@ -319,12 +319,11 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      // value list might be incomplete
-                      const idx = [       // 10 - (default)
-                          'Not Ok',       // 0
-                          'Ok',           // 1
-                          'Completed Ok', // 2
-                          'Ended Late'    // 3
+                      const idx = [
+                      	'Not Ok',
+                      	'Ok',
+                      	'Completed Ok',
+                      	'Ended Late'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -636,9 +635,9 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [   // 10 - Unknown (default)
-                      'Down',     // 0
-                      'Up',       // 1
+                  const idx = [
+                  	'Down',
+                  	'Up',
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -741,12 +740,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [       // 10 - Unknown (default)
-                          'Available',    // 0
-                          'Unavailable',  // 1
-                          'Disabled',     // 2
-                          'Disable',      // 3
-                          'Discovering',  // 4
+                      const idx = [
+                      	'Available',
+                      	'Unavailable',
+                      	'Disabled',
+                      	'Disable',
+                      	'Discovering',
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -870,9 +869,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'false',    // 0
-                          'true',     // 1
+                      const idx = [
+                      	'false',
+                      	'true',
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
               master_item:
@@ -942,15 +941,15 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [           // 10 - (default)
-                          'Ended OK',         // 0 — completed successfully.
-                          'Ended Not OK',     // 1 — ended in failure.
-                          'Wait User',        // 2 — waiting for user confirmation.
-                          'Wait Resource',    // 3 — waiting on a resource to be available.
-                          'Wait Host',        // 4 — waiting on an agent or remote host to be available.
-                          'Wait Workload',    // 5 — waiting due to a workload limit.
-                          'Wait Condition',   // 6 — waiting for a condition.
-                          'Executing'         // 7 — currently executing.
+                      const idx = [
+                      	'Ended OK',
+                      	'Ended Not OK',
+                      	'Wait User',
+                      	'Wait Resource',
+                      	'Wait Host',
+                      	'Wait Workload',
+                      	'Wait Condition',
+                      	'Executing'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -993,16 +992,16 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [       // 10 - (default)
-                          'Command',      // 0 — runs a platform command line option.
-                          'Script',       // 1 — runs a script.
-                          'File Transfer',// 2 — performs file transfer.
-                          'File Watcher', // 3 — monitors file activity.
-                          'Database',     // 4 — runs an SQL script.
-                          'Hadoop',       // 5 — runs a job based on Hadoop objects.
-                          'Dummy',        // 6 — always ends successfully without running any commands.
-                          'Folder',       // 7 — displays a job folder, rather than a job.
-                          'Job'           // 8
+                      const idx = [
+                      	'Command',
+                      	'Script',
+                      	'File Transfer',
+                      	'File Watcher',
+                      	'Database',
+                      	'Hadoop',
+                      	'Dummy',
+                      	'Folder',
+                      	'Job'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT

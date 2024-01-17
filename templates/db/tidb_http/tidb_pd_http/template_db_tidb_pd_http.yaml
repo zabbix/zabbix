@@ -245,9 +245,7 @@ zabbix_export:
                 - $.start_timestamp
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //use boottime to calculate uptime
-                  return (Math.floor(Date.now()/1000)-Number(value));
+                - 'return (Math.floor(Date.now() / 1000) - Number(value));'
           master_item:
             key: pd.get_status
           tags:
@@ -621,7 +619,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+                - 'return JSON.stringify(value != "[]" ? [{ ''{#SINGLETON}'': '''' }] : []);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -661,15 +659,15 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      var grpc_method = item.labels.grpc_method;
-                      if (!(lookup[grpc_method])) {
-                          lookup[grpc_method] = 1;
-                          result.push({ "{#GRPC_METHOD}": grpc_method });
-                      }
-                  })
+                  	var grpc_method = item.labels.grpc_method;
+                  	if (!(lookup[grpc_method])) {
+                  		lookup[grpc_method] = 1;
+                  		result.push({ "{#GRPC_METHOD}": grpc_method });
+                  	}
+                  });
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -805,15 +803,15 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      var address = item.labels.address;
-                      if (!(lookup[address])) {
-                          lookup[address] = 1;
-                          result.push({ "{#STORE_ADDRESS}": address });
-                      }
-                  })
+                  	var address = item.labels.address;
+                  	if (!(lookup[address])) {
+                  		lookup[address] = 1;
+                  		result.push({ "{#STORE_ADDRESS}": address });
+                  	}
+                  });
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -851,11 +849,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  output = JSON.parse(value).map(function (item) {
+                  	return {
+                  		"{#TYPE}": item.labels.type,
+                  	};
+                  });
+                  return JSON.stringify({ "data": output });
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -911,11 +910,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  output = JSON.parse(value).map(function (item) {
+                  	return {
+                  		"{#TYPE}": item.labels.type,
+                  	};
+                  });
+                  return JSON.stringify({ "data": output });
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -980,11 +980,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#KIND}": item.labels.kind,
-                       }})
-                   return JSON.stringify({"data": output})
+                  output = JSON.parse(value).map(function (item) {
+                  	return {
+                  		"{#KIND}": item.labels.kind,
+                  	};
+                  });
+                  return JSON.stringify({ "data": output });
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
