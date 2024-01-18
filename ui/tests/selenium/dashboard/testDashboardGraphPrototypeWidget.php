@@ -382,7 +382,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$type = array_key_exists('Item prototype', $data['fields']) ? 'Item prototype' : 'Graph prototype';
 
 		if (!array_key_exists('Graph prototype', $data['fields']) && !array_key_exists('Item prototype', $data['fields'])) {
-			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->asMultiselect()->one()->clear();
+			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->all()->filter(CElementFilter::VISIBLE)
+					->asMultiselect()->clear();
 		}
 
 		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();

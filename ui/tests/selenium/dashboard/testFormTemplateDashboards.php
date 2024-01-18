@@ -3142,7 +3142,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Graph widget with empty item',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
+						'Source' => 'Simple graph',
 						'Item' => ''
 					],
 					'error_message' => 'Invalid parameter "Item": cannot be empty.'
@@ -3169,7 +3169,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph (classic)'),
 						'Name' => 'Simple graph without legend',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph'),
+						'Source' => 'Simple graph',
 						'Item' => self::TEMPLATE_ITEM,
 						'Show legend' => false
 					],
@@ -3204,7 +3204,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Graph prototype widget with empty item prototype',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
+						'Source' => 'Simple graph prototype',
 						'Item prototype' => ''
 					],
 					'error_message' => 'Invalid parameter "Item prototype": cannot be empty.'
@@ -3275,7 +3275,7 @@ class testFormTemplateDashboards extends CWebTest {
 					'fields' => [
 						'Type' => CFormElement::RELOADABLE_FILL('Graph prototype'),
 						'Name' => 'Simple Graph prototype without legend',
-						'Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype'),
+						'Source' => 'Simple graph prototype',
 						'Item prototype' => 'ItemProto ZBX6663 Second',
 						'Show legend' => false,
 						'Columns' => 1,

@@ -70,7 +70,7 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Graph prototype':
-				$widget_dialog->fill(['Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype')]);
+				$widget_dialog->fill(['Source' => 'Simple graph prototype']);
 				$this->assertTrue($widget_dialog->getField('Item prototype')->isVisible());
 
 				// For Graph prototype only numeric item prototypes are available.
