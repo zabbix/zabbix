@@ -42,17 +42,30 @@ class CControllerUserResetTotp extends CController {
 	protected function doAction(): void {
 		$userids = $this->getInput('userids');
 
+		$users_with_totp_secret = DB::select('mfa_totp_secret', [
+			'output' => ['userid', 'totp_secret'],
+			'filter' => ['userid' => $userids]
+		]);
+
 		$users_to_update = [];
 		foreach ($userids as $userid) {
-			$users_to_update[] = [
-				'userid' => $userid,
-				'mfa_totp_secrets' => []
-			];
+			if (in_array($userid, array_column($users_with_totp_secret, 'userid'))) {
+				$users_to_update[] = [
+					'userid' => $userid,
+					'mfa_totp_secrets' => []
+				];
+			}
 		}
 
 		$result = API::User()->update($users_to_update);
-
 		$resetids = $result ? $result['userids'] : [];
+
+		unset($resetids[CWebUser::$data['userid']]);
+
+		DB::update('sessions', [
+			'values' => ['status' => ZBX_SESSION_PASSIVE],
+			'where' => ['userid' => $resetids]
+		]);
 
 		$response = new CControllerResponseRedirect(
 			(new CUrl('zabbix.php'))
