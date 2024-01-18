@@ -1123,14 +1123,15 @@ class CTestDataHelper {
 			return [];
 		}
 
-		foreach ($guest['usrgrps'] as $i => $group) {
+		foreach ($guest['usrgrps'] as $i => &$group) {
 			if ($group['name'] === 'Disabled') {
 				unset($guest['usrgrps'][$i]);
 				continue;
 			}
 
-			$guest['usrgrps'][$i] = ['usrgrpid' => $group['usrgrpid']];
+			$group = ['usrgrpid' => $group['usrgrpid']];
 		}
+		unset($group);
 
 		return $guest;
 	}
@@ -1146,12 +1147,12 @@ class CTestDataHelper {
 			return [];
 		}
 
-		$group = CDataHelper::call('usergroup.get', [
+		$groups = CDataHelper::call('usergroup.get', [
 			'output' => ['usrgrpid', 'name'],
 			'filter' => ['name' => 'Disabled']
 		]);
 
-		$guest['usrgrps'] = array_merge($guest['usrgrps'] , $group);
+		$guest['usrgrps'] = array_merge($guest['usrgrps'] , $groups);
 
 		foreach ($guest['usrgrps'] as &$group) {
 			$group = ['usrgrpid' => $group['usrgrpid']];
