@@ -139,27 +139,16 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 	header.appendChild(controls);
 	header.appendChild(this.btn_close);
 
-	let username = '';
-
-	// Retrieve username of logged-in user from session storage
-	const sessionKey = ZBX_LocalStorage.sessionid + ':notifications.user_settings';
-
-	if (sessionStorage.getItem(sessionKey)) {
-		username = JSON.parse(sessionStorage.getItem(sessionKey)).payload?.username;
-	}
-
 	this.btn_snooze = this.makeToggleBtn(
 		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL]},
 		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL_OFF]}
 	);
-	this.btn_snooze.setAttribute('title', t('Snooze for %1$s').replace('%1$s', username));
-
 	const li_btn_snooze = document.createElement('li');
 	li_btn_snooze.appendChild(this.btn_snooze);
 
 	this.btn_mute = this.makeToggleBtn(
-		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER, title: t('Mute for %1$s').replace('%1$s', username)},
-		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER_OFF, title: t('Unmute for %1$s').replace('%1$s', username)}
+		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER},
+		{class: ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_SPEAKER_OFF}
 	);
 
 	const li_btn_mute = document.createElement('li');
@@ -271,19 +260,20 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 /**
  * Notification sequence is maintained in DOM, in server response notifications must be ordered.
  * Shows or hides list node, updates and appends notification nodes, then deligates to remove dangling nodes.
+ * Updates button tooltip text based on actual data.
  *
- * @param {object} severity_styles
- * @param {ZBX_NotificationsAlarm} alarm_state
+ * @param {object}                  Severity_styles.
+ * @param {ZBX_NotificationsAlarm}  Alarm_state.
+ * @param {username}                Username of logged-in user.
+ * @param {muted}                   Indicator whether notifications are muted.
+ * @param {snoozed_eventid}         Latest snoozed event ID.
  */
-ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state) {
-	let snoozed_eventid = 0;
-
-	// Retrieve value of latest snoozed event ID.
-	const sessionKey = ZBX_LocalStorage.sessionid + ':notifications.user_settings';
-
-	if (sessionStorage.getItem(sessionKey)) {
-		snoozed_eventid = JSON.parse(sessionStorage.getItem(sessionKey)).payload.snoozed_eventid;
-	}
+ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state, username, muted, snoozed_eventid) {
+	this.btn_snooze.setAttribute('title', t('Snooze for %1$s').replace('%1$s', username));
+	this.btn_mute.setAttribute('title', muted
+		? t('Unmute for %1$s').replace('%1$s', username)
+		: t('Mute for %1$s').replace('%1$s', username)
+	);
 
 	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList(), snoozed_eventid));
 

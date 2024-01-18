@@ -21,7 +21,7 @@
 /**
  * Default value in seconds, for poller interval.
  */
-ZBX_Notifications.POLL_INTERVAL = 30;
+ZBX_Notifications.POLL_INTERVAL = 5;
 
 ZBX_Notifications.ALARM_SEVERITY_RESOLVED = -1;
 ZBX_Notifications.ALARM_INFINITE_SERVER = -1;
@@ -455,8 +455,10 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 		return;
 	}
 
+	const latest_event = Math.max(...this.collection.getRawList().map(event => parseInt(event.eventid, 10)));
+
 	this
-		.fetch('notifications.snooze', {eventid: this.collection.getRawList()[0].eventid})
+		.fetch('notifications.snooze', {eventid: latest_event})
 		.then((resp) => {
 			if ('error' in resp) {
 				throw {error: resp.error};
@@ -560,7 +562,9 @@ ZBX_Notifications.prototype.handleAlarmStateChanged = function(alarm_state) {
  * user configuration, the list state to be rendered, has been consumed by collection before.
  */
 ZBX_Notifications.prototype.renderCollection = function() {
-	this.collection.render(this._cached_user_settings.severity_styles, this.alarm);
+	this.collection.render(this._cached_user_settings.severity_styles, this.alarm, this._cached_user_settings.username,
+		this._cached_user_settings.muted, this._cached_user_settings.snoozed_eventid
+	);
 };
 
 /**
