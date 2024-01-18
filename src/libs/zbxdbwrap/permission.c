@@ -18,6 +18,7 @@
 **/
 
 #include "zbxdbwrap.h"
+
 #include "zbxtypes.h"
 #include "zbxdbhigh.h"
 

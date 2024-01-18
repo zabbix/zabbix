@@ -19,6 +19,8 @@
 
 #include "template.h"
 #include "zbxdbwrap.h"
+#include "trigger_linking.h"
+#include "graph_linking.h"
 
 #include "zbxcacheconfig.h"
 #include "zbxexpression.h"
@@ -28,8 +30,6 @@
 #include "audit/zbxaudit_httptest.h"
 #include "audit/zbxaudit_graph.h"
 #include "audit/zbxaudit.h"
-#include "trigger_linking.h"
-#include "graph_linking.h"
 #include "zbxnum.h"
 #include "zbx_host_constants.h"
 
