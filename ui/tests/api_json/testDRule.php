@@ -88,14 +88,6 @@ class testDRule extends CAPITest {
 				['name' => 'perm.users.enabled', 'users_status' => GROUP_STATUS_ENABLED]
 			],
 			'roles' => [
-				[
-					'name' => 'perm.guest.role',
-					'type' => USER_TYPE_ZABBIX_USER,
-					'rules' => [
-						'api.access' => 1,
-						'actions.default_access' => 0
-					]
-				],
 				['name' => 'perm.user.role', 'type' => USER_TYPE_ZABBIX_USER],
 				['name' => 'perm.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN]
 			],

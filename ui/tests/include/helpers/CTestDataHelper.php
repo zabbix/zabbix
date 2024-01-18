@@ -1112,29 +1112,51 @@ class CTestDataHelper {
 		self::$objectids = [];
 	}
 
-	private static function getGuestUserData(): array {
+	private static function prepareEnabledGuestUser(): array {
 		$guest = CDataHelper::call('user.get', [
-			'output' => [],
+			'output' => ['userid'],
 			'filter' => ['username' => 'guest'],
-			'selectUsrgrps' => ['name']
+			'selectUsrgrps' => ['usrgrpid', 'name']
 		])[0];
 
 		if (!in_array('Disabled', array_column($guest['usrgrps'], 'name'))) {
-			$group = CDataHelper::call('usergroup.get', [
-				'output' => ['name'],
-				'filter' => ['name' => 'Disabled']
-			]);
-
-			$guest['usrgrps'] = array_merge($guest['usrgrps'] , $group);
+			return [];
 		}
 
-		foreach ($guest['usrgrps'] as $group) {
-			$guest['groups_include_disabled'][] = ['usrgrpid' => $group['usrgrpid']];
-
-			if ($group['name'] !== 'Disabled') {
-				$guest['groups_exclude_disabled'][] = ['usrgrpid' => $group['usrgrpid']];
+		foreach ($guest['usrgrps'] as $i => $group) {
+			if ($group['name'] === 'Disabled') {
+				unset($guest['usrgrps'][$i]);
+				continue;
 			}
+
+			$guest['usrgrps'][$i] = ['usrgrpid' => $group['usrgrpid']];
 		}
+
+		return $guest;
+	}
+
+	private static function prepareDisabledGuestUser(): array {
+		$guest = CDataHelper::call('user.get', [
+			'output' => ['userid'],
+			'filter' => ['username' => 'guest'],
+			'selectUsrgrps' => ['usrgrpid', 'name']
+		])[0];
+
+		if (in_array('Disabled', array_column($guest['usrgrps'], 'name'))) {
+			return [];
+		}
+
+		$group = CDataHelper::call('usergroup.get', [
+			'output' => ['usrgrpid', 'name'],
+			'filter' => ['name' => 'Disabled']
+		]);
+
+		$guest['usrgrps'] = array_merge($guest['usrgrps'] , $group);
+
+		foreach ($guest['usrgrps'] as &$group) {
+			$group = ['usrgrpid' => $group['usrgrpid']];
+		}
+		unset($group);
 
 		return $guest;
 	}
@@ -1143,23 +1165,21 @@ class CTestDataHelper {
 	 * Removes the 'Disabled' user group from guest user, keeping the others.
 	 */
 	public static function enableGuestUser(): void {
-		$guest = self::getGuestUserData();
+		$guest= self::prepareEnabledGuestUser();
 
-		CDataHelper::call('user.update', [
-			'userid' => $guest['userid'],
-			'usrgrps' => $guest['groups_exclude_disabled']
-		]);
+		if ($guest) {
+			CDataHelper::call('user.update', $guest);
+		}
 	}
 
 	/**
 	 * Assigns the 'Disabled' user group to guest user, keeping the others.
 	 */
 	public static function disableGuestUser(): void {
-		$guest = self::getGuestUserData();
+		$guest = self::prepareDisabledGuestUser();
 
-		CDataHelper::call('user.update', [
-			'userid' => $guest['userid'],
-			'usrgrps' => $guest['groups_include_disabled']
-		]);
+		if ($guest) {
+			CDataHelper::call('user.update', $guest);
+		}
 	}
 }
