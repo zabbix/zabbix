@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -706,8 +706,8 @@ class testPageReportsTriggerTop extends CWebTest {
 			[
 				[
 					'date' => [
-						'from' => 'now-1y/y',
-						'to' => 'now-1y/y'
+						'from' => 'now-10y/y',
+						'to' => 'now-10y/y'
 					],
 					'expected' => []
 				]

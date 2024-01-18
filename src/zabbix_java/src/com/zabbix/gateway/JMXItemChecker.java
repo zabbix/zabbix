@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,6 +80,26 @@ class JMXItemChecker extends ItemChecker
 			url = new JMXServiceURL(jmx_endpoint);
 			jmxc = null;
 			mbsc = null;
+
+			// "rmi" is the only JNDI service provider we support, for security reasons
+			// e. g. the second "rmi" in service:jmx:rmi:///jndi/rmi://
+			String[] parts = url.getURLPath().split(":", 2);
+
+			if (0 != parts.length)
+			{
+				parts = parts[0].split("/", 0);
+
+				if (0 != parts.length)
+				{
+					String rmiProtocol = parts[parts.length - 1];
+
+					if (!rmiProtocol.equals("rmi"))
+					{
+						throw new ZabbixException("unsupported JNDI service provider, \"%s\"",
+								rmiProtocol);
+					}
+				}
+			}
 
 			username = request.optString(JSON_TAG_USERNAME, null);
 			password = request.optString(JSON_TAG_PASSWORD, null);

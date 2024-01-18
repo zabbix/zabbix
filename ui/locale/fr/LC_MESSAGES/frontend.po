@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-12-14 19:47+0000\n"
+"PO-Revision-Date: 2023-12-18 21:04+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -202,12 +202,12 @@ msgstr[1] "%1$s de %2$s éléments en défaut"
 #: app/views/administration.miscconfig.edit.php:119
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s ou %2$s - permet à la page d'être affichée uniquement dans un cadre sur la même origine que la page elle-même"
 
 #: app/views/administration.miscconfig.edit.php:122
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s ou %2$s - empêche la page d'être affichée dans un cadre, quel que soit le site qui tente de le faire"
 
 #: jsLoader.php:348
 #, c-format
@@ -13131,7 +13131,7 @@ msgstr "Non supporté"
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Notez que %1$s ou %2$s seront considérés comme des noms d'hôtes s'ils sont utilisés sans guillemets."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19228,7 +19228,7 @@ msgstr "Fonctionnement/Arrêt"
 
 #: app/views/administration.miscconfig.edit.php:115
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "Utiliser l'en-tête HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20634,7 +20634,7 @@ msgstr "En-tête HTTP X-Frame-Options"
 
 #: app/views/administration.miscconfig.edit.php:117
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "Valeurs prises en charge de l'en-tête HTTP X-Frame-Options :"
 
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
@@ -21059,7 +21059,7 @@ msgstr "un caractère spécial"
 #: app/views/administration.miscconfig.edit.php:125
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "une chaîne de noms d'hôtes séparés par des espaces ; l'ajout de %1$s à la liste permet d'afficher la page dans un cadre sur la même origine que la page elle-même"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"

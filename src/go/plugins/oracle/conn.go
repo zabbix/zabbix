@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,9 +28,8 @@ import (
 	"sync"
 	"time"
 
-	"git.zabbix.com/ap/plugin-support/uri"
-
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/uri"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/godror/godror"
 	"github.com/omeid/go-yarn"
@@ -69,7 +68,8 @@ func (conn *OraConn) Query(ctx context.Context, query string, args ...interface{
 
 // Query executes a query from queryStorage by its name and returns multiple rows.
 func (conn *OraConn) QueryByName(ctx context.Context, queryName string,
-	args ...interface{}) (rows *sql.Rows, err error) {
+	args ...interface{},
+) (rows *sql.Rows, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
@@ -92,7 +92,8 @@ func (conn *OraConn) QueryRow(ctx context.Context, query string, args ...interfa
 
 // Query executes a query from queryStorage by its name and returns a single row.
 func (conn *OraConn) QueryRowByName(ctx context.Context, queryName string,
-	args ...interface{}) (row *sql.Row, err error) {
+	args ...interface{},
+) (row *sql.Row, err error) {
 	if sql, ok := (*conn.queryStorage).Get(queryName + sqlExt); ok {
 		normalizedSQL := strings.TrimRight(strings.TrimSpace(sql), ";")
 
@@ -131,7 +132,8 @@ type connDetails struct {
 
 // NewConnManager initializes connManager structure and runs Go Routine that watches for unused connections.
 func NewConnManager(keepAlive, connectTimeout, callTimeout,
-	hkInterval time.Duration, queryStorage yarn.Yarn) *ConnManager {
+	hkInterval time.Duration, queryStorage yarn.Yarn,
+) *ConnManager {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	connMgr := &ConnManager{

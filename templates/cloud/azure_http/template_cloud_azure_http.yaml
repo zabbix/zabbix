@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-23T08:52:39Z'
+  date: '2023-12-28T08:16:20Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -814,7 +814,7 @@ zabbix_export:
         - uuid: 3b9bde32dd6b4e3aa2dd8d7949f655e9
           name: 'Storage accounts discovery'
           type: DEPENDENT
-          key: azure.starage.acc.discovery
+          key: azure.storage.acc.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -2240,6 +2240,60 @@ zabbix_export:
                   item:
                     host: 'Azure by HTTP'
                     key: 'azure.storage.queue.capacity[{#NAME}]'
+            - uuid: 6bae0cf983104e0fada61468902949e1
+              name: 'Azure: Storage account [{#NAME}] egress'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.engress[{#NAME}]'
+                - sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.blob.engress[{#NAME}]'
+                - sortorder: '2'
+                  color: 00611C
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.table.engress[{#NAME}]'
+                - sortorder: '3'
+                  color: F7941D
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.file.engress[{#NAME}]'
+                - sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.queue.engress[{#NAME}]'
+            - uuid: 8860c37426104045a7f9feb6cc370db4
+              name: 'Azure: Storage account [{#NAME}] ingress'
+              graph_items:
+                - color: 199C0D
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.ingress[{#NAME}]'
+                - sortorder: '1'
+                  color: F63100
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.blob.ingress[{#NAME}]'
+                - sortorder: '2'
+                  color: 00611C
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.table.ingress[{#NAME}]'
+                - sortorder: '3'
+                  color: F7941D
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.file.ingress[{#NAME}]'
+                - sortorder: '4'
+                  color: FC6EA3
+                  item:
+                    host: 'Azure by HTTP'
+                    key: 'azure.storage.queue.ingress[{#NAME}]'
             - uuid: 9c87dfb9ed7e4c1ea32c8e35c6e23381
               name: 'Azure: Transactions by storage [{#NAME}]'
               graph_items:
@@ -2472,6 +2526,52 @@ zabbix_export:
         - macro: '{$AZURE.VM.NAME.NOT.MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in virtual machines discovery rule.'
+      dashboards:
+        - uuid: d30c78be41fe421cb98cedd7683a11f0
+          name: 'Overview Azure Storage accounts'
+          pages:
+            - name: 'Storage transactions'
+              widgets:
+                - type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '25'
+                  fields:
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'Azure by HTTP'
+                        name: 'Azure: Transactions by storage [{#NAME}]'
+                    - type: INTEGER
+                      name: rows
+                      value: '6'
+            - name: 'Storage engress'
+              widgets:
+                - type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '25'
+                  fields:
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'Azure by HTTP'
+                        name: 'Azure: Storage account [{#NAME}] egress'
+                    - type: INTEGER
+                      name: rows
+                      value: '6'
+            - name: 'Storage ingress'
+              widgets:
+                - type: GRAPH_PROTOTYPE
+                  width: '24'
+                  height: '20'
+                  fields:
+                    - type: GRAPH_PROTOTYPE
+                      name: graphid
+                      value:
+                        host: 'Azure by HTTP'
+                        name: 'Azure: Storage account [{#NAME}] ingress'
+                    - type: INTEGER
+                      name: rows
+                      value: '5'
     - uuid: 29325098807848aa928b4192ad5e020f
       template: 'Azure Cosmos DB for MongoDB by HTTP'
       name: 'Azure Cosmos DB for MongoDB by HTTP'
@@ -2549,7 +2649,7 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            var AzureCosmoDB = {
+            var AzureCosmosDB = {
                 params: {},
                 token: null,
             
@@ -2560,18 +2660,18 @@ zabbix_export:
                         }
                     });
             
-                    AzureCosmoDB.params = params;
+                    AzureCosmosDB.params = params;
                 },
             
                 login: function () {
                     var response, login = new HttpRequest();
-                    if (typeof AzureCosmoDB.params.proxy !== 'undefined' && AzureCosmoDB.params.proxy !== '') {
-                        login.setProxy(AzureCosmoDB.params.proxy);
+                    if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
+                        login.setProxy(AzureCosmosDB.params.proxy);
                     }
                     login.addHeader('Content-Type: application/x-www-form-urlencoded');
                     response = login.post(
-                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmoDB.params.tenant_id) + '/oauth2/token',
-                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmoDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmoDB.params.password)
+                        'https://login.microsoftonline.com/' + encodeURIComponent(AzureCosmosDB.params.tenant_id) + '/oauth2/token',
+                        'grant_type=client_credentials&resource=' + encodeURIComponent('https://management.azure.com/') + '&client_id=' + encodeURIComponent(AzureCosmosDB.params.app_id) + '&client_secret=' + encodeURIComponent(AzureCosmosDB.params.password)
                     );
             
                     if (login.getStatus() !== 200) {
@@ -2586,20 +2686,20 @@ zabbix_export:
                     if (!response.hasOwnProperty('access_token')) {
                         throw 'Authentication response does not contain access token.';
                     }
-                    AzureCosmoDB.token = response['access_token'];
+                    AzureCosmosDB.token = response['access_token'];
                 },
             
                 request: function (url) {
                     var response, request = new HttpRequest();
-                    if (typeof AzureCosmoDB.params.proxy !== 'undefined' && AzureCosmoDB.params.proxy !== '') {
-                        request.setProxy(AzureCosmoDB.params.proxy);
+                    if (typeof AzureCosmosDB.params.proxy !== 'undefined' && AzureCosmosDB.params.proxy !== '') {
+                        request.setProxy(AzureCosmosDB.params.proxy);
                     }
-                    if (!AzureCosmoDB.token) {
+                    if (!AzureCosmosDB.token) {
                         throw 'Request does not contain access token.';
                     }
                     request.addHeader('Accept: application/json');
-                    request.addHeader('Authorization: Bearer ' + AzureCosmoDB.token);
-                    Zabbix.log(4, '[ AzureCosmoDB ] request url: ' + url);
+                    request.addHeader('Authorization: Bearer ' + AzureCosmosDB.token);
+                    Zabbix.log(4, '[ AzureCosmosDB ] request url: ' + url);
                     response = request.get(url);
             
                     if (request.getStatus() !== 200) {
@@ -2639,17 +2739,17 @@ zabbix_export:
                     Object.keys(endpoints).forEach(function (field) {
                         data[field] = {};
                         try {
-                            metrics = AzureCosmoDB.request('https://management.azure.com' + AzureCosmoDB.params.resource_id + endpoints[field]);
+                            metrics = AzureCosmosDB.request('https://management.azure.com' + AzureCosmosDB.params.resource_id + endpoints[field]);
                             if (!metrics.hasOwnProperty('value')) {
                                 throw 'Failed getting required field. Check debug log for more information.';
                             }
             
                             for (k in metrics.value) {
-                                key = AzureCosmoDB.getField(metrics.value[k], 'name.value')
+                                key = AzureCosmosDB.getField(metrics.value[k], 'name.value')
                                 if (metrics.value[k].timeseries.length === 0) {
                                     metrics.value[k].timeseries.push({ 'data': ['nodata'] })
                                 }
-                                data[field][key] = AzureCosmoDB.getField(metrics.value[k], 'timeseries.0.data.0');
+                                data[field][key] = AzureCosmosDB.getField(metrics.value[k], 'timeseries.0.data.0');
                             }
                         }
                         catch (error) {
@@ -2662,13 +2762,13 @@ zabbix_export:
             };
             
             try {
-                AzureCosmoDB.setParams(JSON.parse(value));
-                AzureCosmoDB.login();
-                return JSON.stringify(AzureCosmoDB.getMetricsData());
+                AzureCosmosDB.setParams(JSON.parse(value));
+                AzureCosmosDB.login();
+                return JSON.stringify(AzureCosmosDB.getMetricsData());
             }
             catch (error) {
                 error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AzureCosmoDB ] ERROR: ' + error);
+                Zabbix.log(3, '[ AzureCosmosDB ] ERROR: ' + error);
                 return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
@@ -3065,7 +3165,7 @@ zabbix_export:
           description: 'Microsoft Azure tenant ID.'
       dashboards:
         - uuid: 323fb91b388a44bfbd4b7d634f6e6b6c
-          name: 'Overview Cosmos DB for MongoDB'
+          name: 'Overview Azure Cosmos DB for MongoDB'
           pages:
             - widgets:
                 - type: ITEM
@@ -4894,6 +4994,342 @@ zabbix_export:
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        - uuid: 72b6f0916b9245adadb3445327aed633
+          name: 'Overview Azure Microsoft SQL Database'
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: Deadlocks
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.deadlocks
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'SQL Server process memory percent'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.server.memory.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'CPU limit'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.cpu.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data space allocated'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.storage.allocated
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections successful'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.connections.successful
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: ITEM
+                  name: 'SQL Server process core percent'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.server.cpu.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'CPU used'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.cpu.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data space used'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.storage.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections failed: System errors'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.connections.failed.system
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '8'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
+                - type: ITEM
+                  name: 'Sessions count'
+                  x: '8'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.sessions.count
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: GRAPH_CLASSIC
+                  name: 'Percentage CPU'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        name: 'Azure Microsoft SQL: CPU usage'
+                - type: GRAPH_CLASSIC
+                  name: 'Storage utilization'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        name: 'Azure Microsoft SQL: Storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: Connections
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        name: 'Azure Microsoft SQL: Connections'
+                - type: ITEM
+                  name: 'Workers percentage'
+                  x: '12'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.workers.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Full backup storage size'
+                  x: '16'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.storage.backup.size
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data IO percentage'
+                  x: '20'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Database by HTTP'
+                        key: azure.db.mssql.data.read.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
       valuemaps:
         - uuid: 6f9c01899d9e45c9a1316ee081718e9e
           name: 'Azure resource health state'
@@ -5732,6 +6168,348 @@ zabbix_export:
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        - uuid: 7a1b55d933ba4a529f2fccef44e5cff7
+          name: 'Overview Azure Microsoft SQL Serverless Database'
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: Deadlocks
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: INTEGER
+                      name: decimal_places
+                      value: '0'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.deadlocks
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'SQL Server process memory percent'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.server.memory.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'CPU limit'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.cpu.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data space allocated'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.storage.allocated
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections successful'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.connections.successful
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: ITEM
+                  name: 'SQL Server process core percent'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.server.cpu.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'CPU used'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.cpu.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data space used'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.storage.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections failed: System errors'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.connections.failed.system
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '8'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
+                - type: ITEM
+                  name: 'Sessions percentage'
+                  x: '8'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.sessions.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: GRAPH_CLASSIC
+                  name: 'Percentage CPU'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        name: 'Azure Microsoft SQL: CPU usage'
+                - type: GRAPH_CLASSIC
+                  name: 'Storage utilization'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        name: 'Azure Microsoft SQL: Storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: Connections
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        name: 'Azure Microsoft SQL: Connections'
+                - type: ITEM
+                  name: 'Workers percentage'
+                  x: '12'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.workers.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'App memory percentage'
+                  x: '16'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.app.memory.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Data IO percentage'
+                  x: '20'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Microsoft SQL Serverless Database by HTTP'
+                        key: azure.db.mssql.data.read.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
       valuemaps:
         - uuid: c87b2eaeb88c4932ad63c73fcafa5331
           name: 'Azure resource health state'
@@ -6435,6 +7213,347 @@ zabbix_export:
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        - uuid: 12974ad6fc5a42ba9683af06f9166cef
+          name: 'Overview Azure MySQL Flexible Server'
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: 'Memory utilization'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.memory.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'CPU credits consumed'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.cpu.credits.consumed
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage used'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.storage.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Network in'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.network.ingress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections active'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.connections.active
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Percentage CPU'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.cpu.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'CPU credits remaining'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.cpu.credits.remaining
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage limit'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.storage.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Network out'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.network.egress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections total'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.connections.total
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '8'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: ITEM
+                  name: 'Backup storage used'
+                  x: '8'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.storage.backup.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: GRAPH_CLASSIC
+                  name: 'Storage utilization'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        name: 'Azure MySQL: Storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: 'Network traffic'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        name: 'Azure MySQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  name: Connections
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        name: 'Azure MySQL: Connections'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '12'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
+                - type: ITEM
+                  name: Queries
+                  x: '12'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.queries
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'IO consumption percent'
+                  x: '16'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.io.consumption.percent
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Replication lag'
+                  x: '20'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Flexible Server by HTTP'
+                        key: azure.db.mysql.replication.lag
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
       valuemaps:
         - uuid: 4eec167b4d69441398b96b8e375d6825
           name: 'Azure resource health state'
@@ -7137,6 +8256,281 @@ zabbix_export:
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        - uuid: 8760f5409fbd488d8b8e8ba24d9077ae
+          name: 'Overview Azure MySQL Single Server'
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: 'Memory utilization'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.memory.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Network in'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.network.ingress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Server log storage limit'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.storage.server.log.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage limit'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.storage.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections active'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.connections.active
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Percentage CPU'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.cpu.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Network out'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.network.egress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Server log storage used'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.storage.server.log.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage used'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.storage.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections failed'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.connections.failed
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '8'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: GRAPH_CLASSIC
+                  name: 'Network traffic'
+                  x: '8'
+                  'y': '3'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        name: 'Azure MySQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  name: 'Server log storage utilization'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        name: 'Azure MySQL: Server log storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: 'Storage utilization'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        name: 'Azure MySQL: Storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: Connections
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        name: 'Azure MySQL: Connections'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '12'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure MySQL Single Server by HTTP'
+                        key: azure.db.mysql.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
       valuemaps:
         - uuid: 323a5259fb854724891515767f341540
           name: 'Azure resource health state'
@@ -7948,6 +9342,341 @@ zabbix_export:
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        - uuid: 89588d831e7348b6b41b47a2cca79190
+          name: 'Overview Azure PostgreSQL Flexible Server'
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: 'Memory utilization'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.memory.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Data disk queue depth'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.disk.queue.depth
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage free'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.storage.free
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Network in'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.network.ingress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections active'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.connections.active
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Percentage CPU'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.cpu.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Data disk IOPS'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.iops
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage used'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.storage.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Network out'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.network.egress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections failed'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.connections.failed
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '8'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: ITEM
+                  name: 'Data disk read IOPS'
+                  x: '8'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.iops.read
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: GRAPH_CLASSIC
+                  name: 'Storage utilization'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        name: 'Azure PostgreSQL: Storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: 'Network traffic'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        name: 'Azure PostgreSQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  name: Connections
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        name: 'Azure PostgreSQL: Connections'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '12'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
+                - type: ITEM
+                  name: 'Data disk write IOPS'
+                  x: '12'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.iops.write
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data disk read Bps'
+                  x: '16'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.disk.bps.read
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Data disk write Bps'
+                  x: '20'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Flexible Server by HTTP'
+                        key: azure.db.pgsql.disk.bps.write
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
       valuemaps:
         - uuid: f208cf6141c44659a2c6904ec4cd7ac3
           name: 'Azure resource health state'
@@ -8657,6 +10386,281 @@ zabbix_export:
           description: 'Microsoft Azure subscription ID.'
         - macro: '{$AZURE.TENANT.ID}'
           description: 'Microsoft Azure tenant ID.'
+      dashboards:
+        - uuid: 9ef73571560743379fa0b4929370e1b4
+          name: 'Overview Azure PostgreSQL Single Server'
+          pages:
+            - widgets:
+                - type: ITEM
+                  name: 'Memory utilization'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.memory.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Network in'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.network.ingress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Server log storage limit'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.storage.server.log.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage limit'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.storage.limit
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections active'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.connections.active
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Percentage CPU'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.cpu.percentage
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: units
+                      value: '%'
+                - type: ITEM
+                  name: 'Network out'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.network.egress
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Server log storage used'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.storage.server.log.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Storage used'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.storage.used
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Connections failed'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.connections.failed
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '8'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: GRAPH_CLASSIC
+                  name: 'Network traffic'
+                  x: '8'
+                  'y': '3'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        name: 'Azure PostgreSQL: Network traffic'
+                - type: GRAPH_CLASSIC
+                  name: 'Server log storage utilization'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        name: 'Azure PostgreSQL: Server log storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: 'Storage utilization'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        name: 'Azure PostgreSQL: Storage utilization'
+                - type: GRAPH_CLASSIC
+                  name: Connections
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        name: 'Azure PostgreSQL: Connections'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '12'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure PostgreSQL Single Server by HTTP'
+                        key: azure.db.pgsql.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
       valuemaps:
         - uuid: 61fc206aaae04abda4012e031f0e27ac
           name: 'Azure resource health state'
@@ -9960,6 +11964,304 @@ zabbix_export:
         - macro: '{$AZURE.VM.CPU.UTIL.CRIT}'
           value: '90'
           description: 'The critical threshold of CPU utilization, expressed in %.'
+      dashboards:
+        - uuid: 527e3c432d3842d0968480d8f91a712e
+          name: 'Overview Azure Virtual Machine'
+          pages:
+            - widgets:
+                - type: CLOCK
+                  name: 'Local time'
+                  width: '4'
+                  height: '3'
+                - type: ITEM
+                  name: 'CPU credits consumed'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.cpu.credits.consumed
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Network in'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.network.in.total
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Disk read rate'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.disk.read.bytes
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'OS disk read operations/sec'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.os.disk.read.ops
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Inbound flows'
+                  'y': '15'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.flows.inbound
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Available memory'
+                  x: '4'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.memory.available
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'CPU credits remaining'
+                  x: '4'
+                  'y': '3'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.cpu.credits.remaining
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Network out'
+                  x: '4'
+                  'y': '6'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.network.out.total
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Disk write rate'
+                  x: '4'
+                  'y': '9'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.disk.write.bytes
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'OS disk write operations/sec'
+                  x: '4'
+                  'y': '12'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.os.disk.write.ops
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Outbound flows'
+                  x: '4'
+                  'y': '15'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.flows.outbound
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
+                  name: 'Availability state'
+                  x: '8'
+                  width: '4'
+                  height: '3'
+                  fields:
+                    - type: INTEGER
+                      name: adv_conf
+                      value: '1'
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.availability.state
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                    - type: STRING
+                      name: up_color
+                      value: FF0000
+                - type: GRAPH_CLASSIC
+                  name: 'Percentage CPU'
+                  x: '8'
+                  'y': '3'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        name: 'Azure: Percentage CPU'
+                - type: GRAPH_CLASSIC
+                  name: 'Network traffic'
+                  x: '8'
+                  'y': '6'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        name: 'Azure: Network traffic'
+                - type: GRAPH_CLASSIC
+                  name: 'Disk read/write bytes'
+                  x: '8'
+                  'y': '9'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        name: 'Azure: Disk read/write bytes'
+                - type: GRAPH_CLASSIC
+                  name: 'OS disk read/write rates'
+                  x: '8'
+                  'y': '12'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        name: 'Azure: OS disk read/write rates'
+                - type: GRAPH_CLASSIC
+                  name: Flows
+                  x: '8'
+                  'y': '15'
+                  width: '16'
+                  height: '3'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        name: 'Azure: Flows'
+                - type: PLAIN_TEXT
+                  name: 'Availability status detailed'
+                  x: '12'
+                  width: '12'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemids
+                      value:
+                        host: 'Azure Virtual Machine by HTTP'
+                        key: azure.vm.availability.details
+                    - type: INTEGER
+                      name: show_as_html
+                      value: '1'
       valuemaps:
         - uuid: 38c8ce1516704ec2a6f1ea9686db56b9
           name: 'Azure resource health state'
@@ -10079,6 +12381,13 @@ zabbix_export:
           item:
             host: 'Azure Virtual Machine by HTTP'
             key: azure.vm.os.disk.write.ops
+    - uuid: 39ca70fc12cf4c6d9fdc23e8562b2f13
+      name: 'Azure: Percentage CPU'
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Azure Virtual Machine by HTTP'
+            key: azure.vm.cpu.percentage
     - uuid: 3051d683b44b48ee94030465254abc7f
       name: 'Azure: Premium data disk cache read'
       graph_items:

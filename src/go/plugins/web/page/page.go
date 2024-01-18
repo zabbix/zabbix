@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,11 +28,14 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/web"
 	"zabbix.com/pkg/zbxregexp"
 )
+
+var impl Plugin
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -44,7 +47,17 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "WebPage",
+		"web.page.get", "Get content of a web page.",
+		"web.page.perf", "Loading time of full web page (in seconds).",
+		"web.page.regexp", "Find string on a web page.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 	if err := conf.Unmarshal(options, &p.options); err != nil {
@@ -154,12 +167,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 
 		return web.Get(params[0], time.Duration(p.options.Timeout)*time.Second, true)
 	}
-
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WebPage",
-		"web.page.get", "Get content of a web page.",
-		"web.page.perf", "Loading time of full web page (in seconds).",
-		"web.page.regexp", "Find string on a web page.")
 }

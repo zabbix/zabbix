@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:46:39Z'
+  date: '2023-12-28T08:16:12Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1824,7 +1824,7 @@ zabbix_export:
           key: vault.metrics.token.by_auth
           delay: '0'
           history: 7d
-          description: 'Total number of service tokens that were created by a auth method.'
+          description: 'Total number of service tokens that were created by an auth method.'
           preprocessing:
             - type: PROMETHEUS_TO_JSON
               parameters:

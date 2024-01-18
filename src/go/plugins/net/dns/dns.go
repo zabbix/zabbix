@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"github.com/miekg/dns"
@@ -84,6 +85,17 @@ var dnsTypes = map[string]uint16{
 	"TXT":   dns.TypeTXT,
 	"AAAA":  dns.TypeAAAA,
 	"SRV":   dns.TypeSRV,
+}
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "DNS",
+		"net.dns", "Checks if DNS service is up.",
+		"net.dns.record", "Performs a DNS query.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metric"))
+	}
 }
 
 // Export -
@@ -260,7 +272,6 @@ func getNULLString(in *dns.NULL) string {
 
 func getHINFOString(in *dns.HINFO) string {
 	return parseTXT(in.Cpu, in.Os)
-
 }
 
 func getMINFOString(in *dns.MINFO) string {
@@ -497,11 +508,4 @@ func runQuery(resolver, domain, net string, record uint16, timeout time.Duration
 	r, _, err := c.Exchange(m, resolver)
 
 	return r, err
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "DNS",
-		"net.dns", "Checks if DNS service is up.",
-		"net.dns.record", "Performs a DNS query.",
-	)
 }

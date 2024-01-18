@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
@@ -53,6 +54,8 @@ const (
 	ntpScale            = 4294967296.0
 )
 
+var impl Plugin
+
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
 	Timeout              int `conf:"optional,range=1:30"`
@@ -64,7 +67,17 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "UDP",
+		"net.udp.service", "Checks if service is running and responding to UDP requests.",
+		"net.udp.service.perf", "Checks performance of UDP service.",
+		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) createRequest(req []byte) {
 	// NTP configure request settings by specifying the first byte as
@@ -134,7 +147,7 @@ func (p *Plugin) validateResponse(rsp []byte, ln int, req []byte) int {
 	return 1
 }
 
-func (p *Plugin) udpExpect(service string, address string) (result int) {
+func (p *Plugin) udpExpect(address string) (result int) {
 	var conn net.Conn
 	var err error
 
@@ -183,7 +196,7 @@ func (p *Plugin) exportNetService(params []string) int {
 		port = service
 	}
 
-	return p.udpExpect(service, net.JoinHostPort(ip, port))
+	return p.udpExpect(net.JoinHostPort(ip, port))
 }
 
 func toFixed(num float64, precision int) float64 {
@@ -257,11 +270,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
 func (p *Plugin) Validate(options interface{}) error {
 	var o Options
 	return conf.Unmarshal(options, &o)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "UDP",
-		"net.udp.service", "Checks if service is running and responding to UDP requests.",
-		"net.udp.service.perf", "Checks performance of UDP service.",
-		"net.udp.socket.count", "Returns number of TCP sockets that match parameters.")
 }

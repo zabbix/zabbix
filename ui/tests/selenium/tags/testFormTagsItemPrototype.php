@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ class testFormTagsItemPrototype extends testFormTags {
 
 	public $update_name = 'Item prototype with tags for updating: {#KEY}';
 	public $clone_name = 'Item prototype with tags for cloning: {#KEY}';
-	public $remove_name = 'Item prototype for removig tags: {#KEY}';
+	public $remove_name = 'Item prototype for removing tags: {#KEY}';
 	public $link;
 	public $saved_link;
 	public $host = 'Host for tags testing';
