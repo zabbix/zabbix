@@ -642,11 +642,11 @@ zabbix_export:
                   var result = [];
                   
                   JSON.parse(value).orgs.forEach(function (e) {
-                      result.push({
-                          "{#ORG_ID}": e.id,
-                          "{#ORG_NAME}": e.name,
-                          "{#ORG_DESCRIPTION}": e.description
-                      });
+                  	result.push({
+                  		"{#ORG_ID}": e.id,
+                  		"{#ORG_NAME}": e.name,
+                  		"{#ORG_DESCRIPTION}": e.description
+                  	});
                   });
                   
                   return JSON.stringify(result)

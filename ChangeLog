@@ -1,12 +1,29 @@
 Changes for 7.0.0beta1
 
 New features:
+.........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
+..F.I..... [ZBXNEXT-8496] added aggregations for Item value widget and time period functionality for Top hosts and Item value widgets (averza, esekace, kkuzmina, MVekslers)
 .......P.. [ZBXNEXT-8724] improved error messages when proxy is starting up (dimir)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
 .........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
+.......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
+..F....... [ZBX-23874] fixed undefined array key error for map elements wih URL (esekace, Ivo)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+.........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
+..F....... [ZBX-23883] fixed PHP runtime error while using "/d", "/m" or "/h" modifiers in the time selector with some time zones (Sasha)
+A......... [ZBX-23262] fixed inability to log in using user.login API method if user has a user group with disabled frontend access (epulke, vmaksimovs)
+...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
+.......PS. [ZBX-23914] fixed use of uninitialized protocol version variable during snmp checks (vso)
+A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
+.........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
+.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+.......PS. [ZBX-23906] fixed Zabbix server and proxy crash when executing SNMP agent item (arimdjonoks)
+..F....... [ZBX-23562] fixed time period selector validation for maximum time period (averza, esekace)
+...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
 .........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
@@ -465,11 +482,22 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.11rc1
 
 New features:
+.........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
 .........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
+.......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
+...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+.........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
+A......... [ZBX-23262] fixed inability to log in using user.login API method if user has a user group with disabled frontend access (epulke, vmaksimovs)
+A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
+.........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
+.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
 .........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
 .......PS. [ZBX-23631] removed tag 'tags' in case of an error collecting tags from *discovery items (MVekslers)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
@@ -2045,11 +2073,19 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.26rc1
 
 New features:
+.........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
 .........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+.......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
+.......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
+...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+.........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
+.........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
+.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
 .........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
 ...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
@@ -4925,6 +4961,7 @@ Changes for 5.0.41rc1
 New features:
 
 Bug fixes:
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
 ..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
 
 --------------------------------------------------------------------------------

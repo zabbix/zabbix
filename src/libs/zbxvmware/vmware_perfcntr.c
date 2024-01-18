@@ -23,8 +23,8 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
+#include "zbxvmware.h"
 #include "vmware_shmem.h"
-#include "vmware.h"
 #include "vmware_internal.h"
 
 #include "zbxnum.h"

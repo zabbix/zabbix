@@ -42,84 +42,84 @@ zabbix_export:
             request.addHeader('User-Agent: ZabbixServer/1.1 Zabbix');
             
             var response,
-                error_msg = '',
-                organizations = [],
-                devices = [];
+            	error_msg = '',
+            	organizations = [],
+            	devices = [];
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            		}
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (response.errors) {
-                        throw response.errors.join(', ');
-                    } else {
-                        throw 'Failed to receive data: invalid response status code.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (response.errors) {
+            			throw response.errors.join(', ');
+            		} else {
+            			throw 'Failed to receive data: invalid response status code.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-                }
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
-                    request.setProxy(params.httpproxy);
-                }
+            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
             
-                organizations = getHttpData(params.url + 'organizations');
+            	organizations = getHttpData(params.url + 'organizations');
             
-                if (Array.isArray(organizations) && organizations.length > 0) {
-                    for (i in organizations) {
-                        if ('id' in organizations[i]) {
-                            organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
+            	if (Array.isArray(organizations) && organizations.length > 0) {
+            		for (i in organizations) {
+            			if ('id' in organizations[i]) {
+            				organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(organizations[i].id) + '/devices/statuses');
             
-                            if (Array.isArray(organization_devices) && organization_devices.length > 0) {
-                                for (j in organization_devices) {
-                                    organization_devices[j].organizationId = organizations[i].id;
-                                    if (!organization_devices[j].name) {
-                                        organization_devices[j].name = organization_devices[j].serial;
-                                    }
-                                    devices.push(organization_devices[j]);
-                                }
-                            }
-                        }
-                    }
-                }
+            				if (Array.isArray(organization_devices) && organization_devices.length > 0) {
+            					for (j in organization_devices) {
+            						organization_devices[j].organizationId = organizations[i].id;
+            						if (!organization_devices[j].name) {
+            							organization_devices[j].name = organization_devices[j].serial;
+            						}
+            						devices.push(organization_devices[j]);
+            					}
+            				}
+            			}
+            		}
+            	}
             
             } catch (error) {
-                error_msg = error;
+            	error_msg = error;
             };
             
             return JSON.stringify({
-                'organizations': organizations,
-                'devices': devices,
-                'error': error_msg.toString()
+            	'organizations': organizations,
+            	'devices': devices,
+            	'error': error_msg.toString()
             });
           description: 'Item for gathering all the organizations and devices from Meraki API.'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
@@ -390,14 +390,14 @@ zabbix_export:
               parameters:
                 - |
                   switch (value) {
-                      case 'offline':
-                          return 0
-                      case 'online':
-                          return 1
-                      case 'dormant':
-                          return 2
-                      default:
-                          return 10
+                  	case 'offline':
+                  		return 0
+                  	case 'online':
+                  		return 1
+                  	case 'dormant':
+                  		return 2
+                  	default:
+                  		return 10
                   }
           master_item:
             key: meraki.device.get.status
@@ -429,89 +429,89 @@ zabbix_export:
             request.addHeader('User-Agent: ZabbixServer/1.1 Zabbix');
             
             var response,
-                error_msg = '',
-                device = [],
-                uplinksLL = [];
+            	error_msg = '',
+            	device = [],
+            	uplinksLL = [];
             
             function isFloat(n) {
-                n = parseFloat(n);
-                return Number(n) === n && n % 1 !== 0;
+            	n = parseFloat(n);
+            	return Number(n) === n && n % 1 !== 0;
             };
             
             function checkNumber(string) {
-                if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
-                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
-                }
-                return string;
+            	if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+            		throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
+            	}
+            	return string;
             };
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            		}
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (response.errors) {
-                        throw response.errors.join(', ');
-                    } else {
-                        throw 'Failed to receive data: invalid response status code.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (response.errors) {
+            			throw response.errors.join(', ');
+            		} else {
+            			throw 'Failed to receive data: invalid response status code.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-                }
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
-                    request.setProxy(params.httpproxy);
-                }
+            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
             
-                timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
+            	timespan = checkNumber('{$MERAKI.UPLINK.LL.TIMESPAN}');
             
-                if (timespan > 86400 || timespan < 1) {
-                    throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
-                }
+            	if (timespan > 86400 || timespan < 1) {
+            		throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
+            	}
             
-                uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=' + timespan);
+            	uplinksLL = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/uplinksLossAndLatency?timespan=' + timespan);
             
-                if (uplinksLL.length > 0) {
-                    uplinksLL = uplinksLL.filter(function (device) {
-                        return device.serial == params.serial;
-                    });
-                }
+            	if (uplinksLL.length > 0) {
+            		uplinksLL = uplinksLL.filter(function (device) {
+            			return device.serial == params.serial;
+            		});
+            	}
             
             } catch (error) {
-                error_msg = error;
+            	error_msg = error;
             };
             
             return JSON.stringify({
-                'uplinksLL': uplinksLL,
-                'error': error_msg.toString()
+            	'uplinksLL': uplinksLL,
+            	'error': error_msg.toString()
             });
           description: 'Item for gathering device data from Meraki API.'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
@@ -923,100 +923,100 @@ zabbix_export:
             request.addHeader('User-Agent: ZabbixServer/1.1 Zabbix');
             
             var response,
-                error_msg = '',
-                organization_devices = [],
-                licenses = [];
+            	error_msg = '',
+            	organization_devices = [],
+            	licenses = [];
             
             function getField(data, path) {
-                var steps = path.split('.');
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field was not found: ' + path;
-                    }
-                    data = data[step];
-                }
+            	var steps = path.split('.');
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field was not found: ' + path;
+            		}
+            		data = data[step];
+            	}
             
-                return data;
+            	return data;
             
             };
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            		}
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (response.errors) {
-                        throw response.errors.join(', ');
-                    } else {
-                        throw 'Failed to receive data: invalid response status code.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (response.errors) {
+            			throw response.errors.join(', ');
+            		} else {
+            			throw 'Failed to receive data: invalid response status code.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-                }
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
-                    request.setProxy(params.httpproxy);
-                }
+            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
             
-                licenses = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/licenses');
+            	licenses = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/licenses');
             
-                organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses');
+            	organization_devices = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/devices/statuses');
             
-                licenses.forEach(function (license) {
+            	licenses.forEach(function (license) {
             
-                    license.deviceName = getField(license, 'deviceSerial');
+            		license.deviceName = getField(license, 'deviceSerial');
             
-                    for (i in organization_devices) {
+            		for (i in organization_devices) {
             
-                        if (getField(license, 'deviceSerial') === getField(organization_devices[i], 'serial')) {
+            			if (getField(license, 'deviceSerial') === getField(organization_devices[i], 'serial')) {
             
-                            device_name = getField(organization_devices[i], 'name');
+            				device_name = getField(organization_devices[i], 'name');
             
-                            if (!device_name) {
-                                device_name = getField(organization_devices[i], 'serial');
-                            }
-                            license.deviceName = device_name;
-                        }
-                    }
-                });
+            				if (!device_name) {
+            					device_name = getField(organization_devices[i], 'serial');
+            				}
+            				license.deviceName = device_name;
+            			}
+            		}
+            	});
             
             
             } catch (error) {
-                error_msg = error;
+            	error_msg = error;
             };
             
             return JSON.stringify({
-                'licenses': licenses,
-                'error': error_msg.toString()
+            	'licenses': licenses,
+            	'error': error_msg.toString()
             });
           description: 'Return list of the licenses for the organization.'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
@@ -1069,96 +1069,96 @@ zabbix_export:
             request.addHeader('User-Agent: ZabbixServer/1.1 Zabbix');
             
             var response,
-                error_msg = '',
-                networks = [],
-                uplinks = [];
+            	error_msg = '',
+            	networks = [],
+            	uplinks = [];
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            		}
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (response.errors) {
-                        throw response.errors.join(', ');
-                    } else {
-                        throw 'Failed to receive data: invalid response status code.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (response.errors) {
+            			throw response.errors.join(', ');
+            		} else {
+            			throw 'Failed to receive data: invalid response status code.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-                }
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
-                    request.setProxy(params.httpproxy);
-                }
+            	if (typeof params.httpproxy !==  'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
             
-                networks = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/networks');
+            	networks = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/networks');
             
-                responseUplinks = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/uplink/statuses');
+            	responseUplinks = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/uplink/statuses');
             
-                if (typeof responseUplinks !== 'undefined' && Array.isArray(responseUplinks)) {
-                    for (var i in responseUplinks) {
-                        if ('networkId' in responseUplinks[i] && typeof networks !== 'undefined' && Array.isArray(networks)) {
-                            network = networks.filter(function (x) { return x.id == responseUplinks[i].networkId; });
-                        }
+            	if (typeof responseUplinks !== 'undefined' && Array.isArray(responseUplinks)) {
+            		for (var i in responseUplinks) {
+            			if ('networkId' in responseUplinks[i] && typeof networks !== 'undefined' && Array.isArray(networks)) {
+            				network = networks.filter(function (x) { return x.id == responseUplinks[i].networkId; });
+            			}
             
-                        if (typeof responseUplinks[i].uplinks !== 'undefined' && Array.isArray(responseUplinks[i].uplinks)) {
-                            for (var p in responseUplinks[i].uplinks) {
-                                if (typeof network[0].name !== 'undefined') {
-                                    responseUplinks[i].uplinks[p].networkName = network[0].name;
-                                }
-                                if (typeof network[0].timeZone !== 'undefined') {
-                                    responseUplinks[i].uplinks[p].timeZone = network[0].timeZone;
-                                }
-                                if ('highAvailability' in responseUplinks[i] && 'role' in responseUplinks[i].highAvailability) {
-                                    responseUplinks[i].uplinks[p].role = responseUplinks[i].highAvailability.role;
-                                }
-                                if ('serial' in responseUplinks[i]) {
-                                    responseUplinks[i].uplinks[p].serial = responseUplinks[i].serial;
-                                }
+            			if (typeof responseUplinks[i].uplinks !== 'undefined' && Array.isArray(responseUplinks[i].uplinks)) {
+            				for (var p in responseUplinks[i].uplinks) {
+            					if (typeof network[0].name !== 'undefined') {
+            						responseUplinks[i].uplinks[p].networkName = network[0].name;
+            					}
+            					if (typeof network[0].timeZone !== 'undefined') {
+            						responseUplinks[i].uplinks[p].timeZone = network[0].timeZone;
+            					}
+            					if ('highAvailability' in responseUplinks[i] && 'role' in responseUplinks[i].highAvailability) {
+            						responseUplinks[i].uplinks[p].role = responseUplinks[i].highAvailability.role;
+            					}
+            					if ('serial' in responseUplinks[i]) {
+            						responseUplinks[i].uplinks[p].serial = responseUplinks[i].serial;
+            					}
             
-                                uplinks.push(responseUplinks[i].uplinks[p]);
-                            }
-                        }
-                    }
-                }
+            					uplinks.push(responseUplinks[i].uplinks[p]);
+            				}
+            			}
+            		}
+            	}
             
             
             } catch (error) {
-                error_msg = error;
+            	error_msg = error;
             };
             
             return JSON.stringify({
-                'uplinks': uplinks,
-                'networks': networks,
-                'error': error_msg.toString()
+            	'uplinks': uplinks,
+            	'networks': networks,
+            	'error': error_msg.toString()
             });
           description: 'Item for gathering all the networks of organization from Meraki API.'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
@@ -1267,120 +1267,120 @@ zabbix_export:
             request.addHeader('User-Agent: ZabbixServer/1.1 Zabbix');
             
             var response,
-                error_msg = '',
-                vpnStats = [],
-                vpnStatuses = [],
-                result = [];
+            	error_msg = '',
+            	vpnStats = [],
+            	vpnStatuses = [],
+            	result = [];
             
             function isFloat(n) {
-                n = parseFloat(n);
-                return Number(n) === n && n % 1 !== 0;
+            	n = parseFloat(n);
+            	return Number(n) === n && n % 1 !== 0;
             };
             
             function checkNumber(string) {
-                if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
-                    throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
-                }
-                return string;
+            	if (typeof string !== "string" || isNaN(string) || isFloat(string)) {
+            		throw 'Incorrect "timespan" parameter given: ' + string + ' Must be an unsigned number';
+            	}
+            	return string;
             };
             
             function getHttpData(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Meraki API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Meraki API. Check debug log for more information.';
+            		}
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (response.errors) {
-                        throw response.errors.join(', ');
-                    } else {
-                        throw 'Failed to receive data: invalid response status code.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (response.errors) {
+            			throw response.errors.join(', ');
+            		} else {
+            			throw 'Failed to receive data: invalid response status code.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                if (params.token === '{' + '$MERAKI.TOKEN}') {
-                    throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
-                }
+            	if (params.token === '{' + '$MERAKI.TOKEN}') {
+            		throw 'Please change {' + '$MERAKI.TOKEN} macro to the proper value.';
+            	}
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
-                    request.setProxy(params.httpproxy);
-                }
+            	if (typeof params.httpproxy !== 'undefined' && params.httpproxy !== '') {
+            		request.setProxy(params.httpproxy);
+            	}
             
-                timespan = checkNumber('{$MERAKI.VPN.STATS.TIMESPAN}');
+            	timespan = checkNumber('{$MERAKI.VPN.STATS.TIMESPAN}');
             
-                if (timespan > 86400 || timespan < 1) {
-                    throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
-                }
+            	if (timespan > 86400 || timespan < 1) {
+            		throw 'Incorrect "timespan" parameter given: ' + timespan + ' Must be between 1 and 86400 seconds.';
+            	}
             
-                vpnStats = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats?timespan=' + timespan);
+            	vpnStats = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/stats?timespan=' + timespan);
             
-                for (i in vpnStats) {
-                    if (typeof vpnStats[i].merakiVpnPeers !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers)) {
-                        for (u in vpnStats[i].merakiVpnPeers) {
-                            if (typeof vpnStats[i].merakiVpnPeers[u].latencySummaries !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers[u].latencySummaries)) {
-                                vpn_stats = vpnStats[i].merakiVpnPeers[u].latencySummaries.map(function (x) {
+            	for (i in vpnStats) {
+            		if (typeof vpnStats[i].merakiVpnPeers !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers)) {
+            			for (u in vpnStats[i].merakiVpnPeers) {
+            				if (typeof vpnStats[i].merakiVpnPeers[u].latencySummaries !== 'undefined' && Array.isArray(vpnStats[i].merakiVpnPeers[u].latencySummaries)) {
+            					vpn_stats = vpnStats[i].merakiVpnPeers[u].latencySummaries.map(function (x) {
             
-                                    lps = vpnStats[i].merakiVpnPeers[u].lossPercentageSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                    js = vpnStats[i].merakiVpnPeers[u].jitterSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                    ms = vpnStats[i].merakiVpnPeers[u].mosSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
-                                    Object.assign(x, lps[0], js[0], ms[0]);
+            						lps = vpnStats[i].merakiVpnPeers[u].lossPercentageSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+            						js = vpnStats[i].merakiVpnPeers[u].jitterSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+            						ms = vpnStats[i].merakiVpnPeers[u].mosSummaries.filter(function (y) { return y.senderUplink == x.senderUplink && y.receiverUplink == x.receiverUplink; });
+            						Object.assign(x, lps[0], js[0], ms[0]);
             
-                                    if ('networkId' in vpnStats[i]) {
-                                        x.networkId = vpnStats[i].networkId;
-                                    }
-                                    if ('networkName' in vpnStats[i]) {
-                                        x.networkName = vpnStats[i].networkName;
-                                    }
+            						if ('networkId' in vpnStats[i]) {
+            							x.networkId = vpnStats[i].networkId;
+            						}
+            						if ('networkName' in vpnStats[i]) {
+            							x.networkName = vpnStats[i].networkName;
+            						}
             
-                                    if ('networkId' in vpnStats[i].merakiVpnPeers[u]) {
-                                        x.peerNetworkId = vpnStats[i].merakiVpnPeers[u].networkId;
-                                    }
-                                    if ('networkName' in vpnStats[i].merakiVpnPeers[u]) {
-                                        x.peerNetworkName = vpnStats[i].merakiVpnPeers[u].networkName;
-                                    }
+            						if ('networkId' in vpnStats[i].merakiVpnPeers[u]) {
+            							x.peerNetworkId = vpnStats[i].merakiVpnPeers[u].networkId;
+            						}
+            						if ('networkName' in vpnStats[i].merakiVpnPeers[u]) {
+            							x.peerNetworkName = vpnStats[i].merakiVpnPeers[u].networkName;
+            						}
             
-                                    return x;
-                                });
-                                result = result.concat(vpn_stats);
-                            }
-                        }
-                    }
-                }
+            						return x;
+            					});
+            					result = result.concat(vpn_stats);
+            				}
+            			}
+            		}
+            	}
             
-                vpnStatuses = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/statuses');
+            	vpnStatuses = getHttpData(params.url + 'organizations/' + encodeURIComponent(params.organizationId) + '/appliance/vpn/statuses');
             
             } catch (error) {
-                error_msg = error;
+            	error_msg = error;
             };
             
             return JSON.stringify({
-                'vpnStats': result,
-                'vpnStatuses': vpnStatuses,
-                'error': error_msg.toString()
+            	'vpnStats': result,
+            	'vpnStatuses': vpnStatuses,
+            	'error': error_msg.toString()
             });
           description: 'Item for gathering all the VPN stats of the organization.'
           timeout: '{$MERAKI.DATA.TIMEOUT}'
@@ -1460,20 +1460,20 @@ zabbix_export:
               parameters:
                 - |
                   function parseDate(date) {
-                      months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-                      date = date.split(',');
-                      date[1] = date[1].match(/[0-9]{4}/)[0];
-                      date = date.concat(date[0].split(' '));
-                      month = 1 + months.indexOf(date[2]);
-                      return Date.parse(date[1] + "-" + month + "-" + date[3]);
+                  	months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+                  	date = date.split(',');
+                  	date[1] = date[1].match(/[0-9]{4}/)[0];
+                  	date = date.concat(date[0].split(' '));
+                  	month = 1 + months.indexOf(date[2]);
+                  	return Date.parse(date[1] + "-" + month + "-" + date[3]);
                   }
                   
                   if (value === "N/A") {
-                      return -1;
+                  	return -1;
                   } else {
-                      value = parseDate(value);
-                      now = Date.now();
-                      return Math.floor((value - now) / 1000);
+                  	value = parseDate(value);
+                  	now = Date.now();
+                  	return Math.floor((value - now) / 1000);
                   }
           master_item:
             key: meraki.get.licenses
@@ -1505,12 +1505,12 @@ zabbix_export:
               parameters:
                 - |
                   switch (value) {
-                      case 'License Required':
-                          return 0
-                      case 'OK':
-                          return 1
-                      default:
-                          return 10
+                  	case 'License Required':
+                  		return 0
+                  	case 'OK':
+                  		return 1
+                  	default:
+                  		return 10
                   }
           master_item:
             key: meraki.get.licenses
@@ -2324,16 +2324,16 @@ zabbix_export:
                   parameters:
                     - |
                       switch (value) {
-                          case 'failed':
-                              return 0
-                          case 'active':
-                              return 1
-                          case 'ready':
-                              return 2
-                          case 'not connected':
-                              return 3
-                          default:
-                              return 10
+                      	case 'failed':
+                      		return 0
+                      	case 'active':
+                      		return 1
+                      	case 'ready':
+                      		return 2
+                      	case 'not connected':
+                      		return 3
+                      	default:
+                      		return 10
                       }
               master_item:
                 key: meraki.get.networks

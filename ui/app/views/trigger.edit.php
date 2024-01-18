@@ -33,7 +33,8 @@ $trigger_form = (new CForm())
 	->addVar('context', $data['context'])
 	->addVar('expr_temp', $data['expr_temp'], 'expr_temp')
 	->addVar('recovery_expr_temp', $data['recovery_expr_temp'], 'recovery_expr_temp')
-	->addVar('triggerid', $data['triggerid']);
+	->addVar('triggerid', $data['triggerid'])
+	->addStyle('display: none;');
 
 // Enable form submitting on Enter.
 $trigger_form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));

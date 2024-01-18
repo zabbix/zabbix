@@ -1,1 +1,0 @@
-A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
