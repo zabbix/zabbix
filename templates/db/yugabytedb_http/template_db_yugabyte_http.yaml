@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-17T11:14:27Z'
+  date: '2024-01-18T21:14:28Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -24,6 +24,8 @@ zabbix_export:
         3. Generate API and put as value of {$YUGABYTEDB.ACCESS.TOKEN} macro. 
         See YugabyteDB documentation for instructions:
         https://docs.yugabyte.com/preview/yugabyte-cloud/managed-automation/managed-apikeys/#create-an-api-key
+        
+        NOTE: If needed, you can specify an HTTP proxy for the template to use by changing the value of {$YUGABYTEDB.PROXY} user macro.
         
         IMPORTANT! Value of {$YUGABYTEDB.ACCESS.TOKEN} macro is stored as plain (not secret) text by default.  
         
@@ -229,7 +231,7 @@ zabbix_export:
         - name: Templates/Databases
       items:
         - uuid: 4872cb50f8284ff6aa07c530156f324e
-          name: 'YugabyteDB Cluster: YSQL average connection'
+          name: 'YugabyteDB Cluster: YSQL connections average used'
           type: DEPENDENT
           key: yugabytedb.cluster.connection.count
           delay: '0'
@@ -247,7 +249,7 @@ zabbix_export:
             - tag: component
               value: connection
         - uuid: 5bfd7adb38334116a5a54e2a0e2847f9
-          name: 'YugabyteDB Cluster: YSQL connection limit'
+          name: 'YugabyteDB Cluster: YSQL connections limit'
           type: DEPENDENT
           key: yugabytedb.cluster.connection.limit
           delay: '0'
@@ -268,7 +270,7 @@ zabbix_export:
             - tag: component
               value: connection
         - uuid: 187e373dd49a4214b1862393538ff209
-          name: 'YugabyteDB Cluster: YSQL maximum used connection'
+          name: 'YugabyteDB Cluster: YSQL connections maximum used'
           type: DEPENDENT
           key: yugabytedb.cluster.connection.max
           delay: '0'
@@ -286,9 +288,9 @@ zabbix_export:
             - tag: component
               value: connection
         - uuid: a7c388d2e66b48469e47a55cbb6ec614
-          name: 'YugabyteDB Cluster: YSQL average used connection, percent'
+          name: 'YugabyteDB Cluster: YSQL connections utilization'
           type: CALCULATED
-          key: yugabytedb.cluster.connection.pused
+          key: yugabytedb.cluster.connection.utilization
           history: 7d
           value_type: FLOAT
           units: '%'
@@ -301,23 +303,25 @@ zabbix_export:
               value: connection
           triggers:
             - uuid: 5caf42a5309a4f0f834b6058f4741a44
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: Average number of connections is high'
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.utilization,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}'
+              name: 'YugabyteDB Cluster: Average utilization of connections is high'
+              event_name: 'YugabyteDB Cluster: Average utilization of connections is high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% for 5m)'
               opdata: 'Current connections utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Cluster [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% of connection limit.'
+              description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.WARN}% of connection limit.'
               dependencies:
-                - name: 'YugabyteDB Cluster: Average number of connections is too high'
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}'
+                - name: 'YugabyteDB Cluster: Average utilization of connections is too high'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.utilization,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: 68d2710963394afe8218178c98e88c62
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.pused,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: Average number of connections is too high'
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.connection.utilization,5m) > {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}'
+              name: 'YugabyteDB Cluster: Average utilization of connections is too high'
+              event_name: 'YugabyteDB Cluster: Average utilization of connections is too high (over {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% for 5m)'
               opdata: 'Current connections utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Cluster [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% of connection limit.'
+              description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.CONNECTION.UTILIZATION.CRIT}% of connection limit.'
               tags:
                 - tag: scope
                   value: performance
@@ -345,23 +349,28 @@ zabbix_export:
             - uuid: 22340ce9ea2e457fa4270498bfc53666
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.WARN}'
               name: 'YugabyteDB Cluster: CPU utilization is high'
+              event_name: 'YugabyteDB Cluster: CPU utilization is high (over {$YUGABYTEDB.CPU.UTILIZATION.WARN}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: WARNING
-              description: 'Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.WARN}%. The system might be slow to respond.'
+              description: 'YugabyteDB Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.WARN}%. The system might be slow to respond.'
+              dependencies:
+                - name: 'YugabyteDB Cluster: CPU utilization is too high'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: ed88478e0a784c8dbbe95c20b08c167e
               expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
               name: 'YugabyteDB Cluster: CPU utilization is too high'
+              event_name: 'YugabyteDB Cluster: CPU utilization is too high (over {$YUGABYTEDB.CPU.UTILIZATION.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
               priority: HIGH
-              description: 'Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.CRIT}%. The system might be slow to respond.'
+              description: 'YugabyteDB Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.CRIT}%. The system might be slow to respond.'
               tags:
                 - tag: scope
                   value: performance
         - uuid: 03b2e6e400334c0eb6e6b2c7efe8ddcf
-          name: 'YugabyteDB Cluster: Disk size provisioned'
+          name: 'YugabyteDB Cluster: Disk space provisioned'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.provisioned
           delay: '0'
@@ -386,46 +395,10 @@ zabbix_export:
               value: cluster
             - tag: component
               value: storage
-        - uuid: b2de999838914ca2bfc2c4fdfd22db74
-          name: 'YugabyteDB Cluster: Disk size usage, percent'
-          type: CALCULATED
-          key: yugabytedb.cluster.disk.pused
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          params: '(last(//yugabytedb.cluster.disk.usage)/last(//yugabytedb.cluster.disk.provisioned))*100'
-          description: 'Shows the amount of disk space used by the cluster in percent.'
-          tags:
-            - tag: component
-              value: cluster
-            - tag: component
-              value: storage
-          triggers:
-            - uuid: 21623809368a43b0bdfb127f2fdea22c
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$YUGABYTEDB.DISK.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: Storage space is low'
-              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-              priority: WARNING
-              description: 'Node [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.DISK.UTILIZATION.WARN}% of disk space.'
-              dependencies:
-                - name: 'YugabyteDB Cluster: Storage space is too low'
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}'
-              tags:
-                - tag: scope
-                  value: capacity
-            - uuid: 3571704c29e040b198a6e72d7526c98a
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.pused,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: Storage space is too low'
-              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-              priority: HIGH
-              description: 'Node [{#CLUSTER.NAME}] uses more than {$YUGABYTEDB.DISK.UTILIZATION.CRIT}% of disk space.'
-              tags:
-                - tag: scope
-                  value: capacity
         - uuid: 2e59d947823e4e6b8a3eb9cd28cb8602
           name: 'YugabyteDB Cluster: Disk read, Bps'
           type: DEPENDENT
-          key: yugabytedb.cluster.disk.read.bytes
+          key: yugabytedb.cluster.disk.read.bps
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -445,8 +418,28 @@ zabbix_export:
               value: cluster
             - tag: component
               value: storage
+        - uuid: 7a7c47740d01462f82ccb8649de19a23
+          name: 'YugabyteDB Cluster: Disk read OPS'
+          type: DEPENDENT
+          key: yugabytedb.cluster.disk.read.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!OPS'
+          description: 'The number of read operations per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.READ_OPS_PER_SEC
+          master_item:
+            key: yugabytedb.cluster.metric.get
+          tags:
+            - tag: component
+              value: cluster
+            - tag: component
+              value: performance
         - uuid: 03cd79b37aa543d4ba3ce9fb154513f2
-          name: 'YugabyteDB Cluster: Disk size usage'
+          name: 'YugabyteDB Cluster: Disk space usage'
           type: DEPENDENT
           key: yugabytedb.cluster.disk.usage
           delay: '0'
@@ -468,10 +461,46 @@ zabbix_export:
               value: cluster
             - tag: component
               value: storage
+        - uuid: b2de999838914ca2bfc2c4fdfd22db74
+          name: 'YugabyteDB Cluster: Disk space utilization'
+          type: CALCULATED
+          key: yugabytedb.cluster.disk.utilization
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: '(last(//yugabytedb.cluster.disk.usage)/last(//yugabytedb.cluster.disk.provisioned))*100'
+          description: 'Shows the amount of disk space used by the cluster in percent.'
+          tags:
+            - tag: component
+              value: cluster
+            - tag: component
+              value: storage
+          triggers:
+            - uuid: 3571704c29e040b198a6e72d7526c98a
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.utilization,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}'
+              name: 'YugabyteDB Cluster: Storage space is critically low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.DISK.UTILIZATION.CRIT}% of disk space.'
+              tags:
+                - tag: scope
+                  value: capacity
+            - uuid: 21623809368a43b0bdfb127f2fdea22c
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.utilization,5m) > {$YUGABYTEDB.DISK.UTILIZATION.WARN}'
+              name: 'YugabyteDB Cluster: Storage space is low'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.DISK.UTILIZATION.WARN}% of disk space.'
+              dependencies:
+                - name: 'YugabyteDB Cluster: Storage space is critically low'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.disk.utilization,5m) > {$YUGABYTEDB.DISK.UTILIZATION.CRIT}'
+              tags:
+                - tag: scope
+                  value: capacity
         - uuid: c528c1692fe84e7c85ec99f5802dea15
           name: 'YugabyteDB Cluster: Disk write, Bps'
           type: DEPENDENT
-          key: yugabytedb.cluster.disk.write.bytes
+          key: yugabytedb.cluster.disk.write.bps
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -491,6 +520,26 @@ zabbix_export:
               value: cluster
             - tag: component
               value: storage
+        - uuid: 0badafcd38d34e4faa70f95ba501658a
+          name: 'YugabyteDB Cluster: Disk write OPS'
+          type: DEPENDENT
+          key: yugabytedb.cluster.disk.write.ops
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: '!OPS'
+          description: 'The number of write operations per second.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.metrics.WRITE_OPS_PER_SEC
+          master_item:
+            key: yugabytedb.cluster.metric.get
+          tags:
+            - tag: component
+              value: cluster
+            - tag: component
+              value: performance
         - uuid: d8f71197e0e147fea4de2a17d4b1ad81
           name: 'YugabyteDB Cluster: Get cluster'
           type: SCRIPT
@@ -648,44 +697,8 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: availability
-        - uuid: 18e6de024a7a4ae48901f455dbd0a373
-          name: 'YugabyteDB Cluster: Usage memory, percent'
-          type: CALCULATED
-          key: yugabytedb.cluster.memory.pused
-          history: 7d
-          value_type: FLOAT
-          units: '%'
-          params: '(last(//yugabytedb.cluster.memory.usage)/last(//yugabytedb.cluster.memory.total))*100'
-          description: 'Shows the amount of RAM used on the cluster in percent.'
-          tags:
-            - tag: component
-              value: cluster
-            - tag: component
-              value: memory
-          triggers:
-            - uuid: 5614204dbeca4b799989a13717824f07
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}'
-              name: 'YugabyteDB Cluster: Memory utilization is high'
-              opdata: 'Current memory utilization: {ITEM.LASTVALUE1}'
-              priority: WARNING
-              description: 'Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}% of memory.'
-              dependencies:
-                - name: 'YugabyteDB Cluster: Memory utilization is too high'
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}'
-              tags:
-                - tag: scope
-                  value: performance
-            - uuid: 27a8c6b07e474581be53f5d896387f45
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.pused,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}'
-              name: 'YugabyteDB Cluster: Memory utilization is too high'
-              opdata: 'Current memory utilization: {ITEM.LASTVALUE1}'
-              priority: HIGH
-              description: 'Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}% of memory.'
-              tags:
-                - tag: scope
-                  value: performance
         - uuid: 955291127a4e483693c1db6690a1beab
-          name: 'YugabyteDB Cluster: Total memory'
+          name: 'YugabyteDB Cluster: Memory total'
           type: DEPENDENT
           key: yugabytedb.cluster.memory.total
           delay: '0'
@@ -711,7 +724,7 @@ zabbix_export:
             - tag: component
               value: memory
         - uuid: 682d46a939cf4ec186d4081e7a8eee42
-          name: 'YugabyteDB Cluster: Usage memory'
+          name: 'YugabyteDB Cluster: Memory usage'
           type: DEPENDENT
           key: yugabytedb.cluster.memory.usage
           delay: '0'
@@ -733,6 +746,44 @@ zabbix_export:
               value: cluster
             - tag: component
               value: memory
+        - uuid: 18e6de024a7a4ae48901f455dbd0a373
+          name: 'YugabyteDB Cluster: Memory utilization'
+          type: CALCULATED
+          key: yugabytedb.cluster.memory.utilization
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: '(last(//yugabytedb.cluster.memory.usage)/last(//yugabytedb.cluster.memory.total))*100'
+          description: 'Shows the amount of RAM used on the cluster in percent.'
+          tags:
+            - tag: component
+              value: cluster
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: 5614204dbeca4b799989a13717824f07
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.utilization,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}'
+              name: 'YugabyteDB Cluster: Memory utilization is high'
+              event_name: 'YugabyteDB Cluster: Memory utilization is high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN} for 5m)'
+              opdata: 'Current memory utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.WARN}% of memory.'
+              dependencies:
+                - name: 'YugabyteDB Cluster: Memory utilization is too high'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.utilization,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}'
+              tags:
+                - tag: scope
+                  value: performance
+            - uuid: 27a8c6b07e474581be53f5d896387f45
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.memory.utilization,5m) > {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}'
+              name: 'YugabyteDB Cluster: Memory utilization is too high'
+              event_name: 'YugabyteDB Cluster: Memory utilization is too high (>{$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT} for 5m)'
+              opdata: 'Current memory utilization: {ITEM.LASTVALUE1}'
+              priority: HIGH
+              description: 'YugabyteDB Cluster uses more than {$YUGABYTEDB.MEMORY.CLUSTER.UTILIZATION.CRIT}% of memory.'
+              tags:
+                - tag: scope
+                  value: performance
         - uuid: 9c51b3d15ac448388e23c74d4e5bba3a
           name: 'YugabyteDB Cluster: Get cluster metrics'
           type: SCRIPT
@@ -898,7 +949,7 @@ zabbix_export:
         - uuid: 91ace5e3a9a3428eb209e539c25f43b4
           name: 'YugabyteDB Cluster: Network receive, Bps'
           type: DEPENDENT
-          key: yugabytedb.cluster.network.receive.bytes
+          key: yugabytedb.cluster.network.receive.bps
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -919,13 +970,13 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 3503d33b5c35433093565aac0890c717
-          name: 'YugabyteDB Cluster: Network receive, error per second'
+          name: 'YugabyteDB Cluster: Network receive error, rate'
           type: DEPENDENT
-          key: yugabytedb.cluster.network.receive.error
+          key: yugabytedb.cluster.network.receive.error.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of network packets received to the server per second, averaged over nodes.'
+          description: 'The number of errors related to network packets received per second, averaged over nodes'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -940,7 +991,7 @@ zabbix_export:
         - uuid: 51e7acc58c824737af2b48475ede228d
           name: 'YugabyteDB Cluster: Network transmit, Bps'
           type: DEPENDENT
-          key: yugabytedb.cluster.network.transmit.bytes
+          key: yugabytedb.cluster.network.transmit.bps
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -961,13 +1012,13 @@ zabbix_export:
             - tag: component
               value: network
         - uuid: 86c23bbe2d29444b85a6435508c53e28
-          name: 'YugabyteDB Cluster: Network transmit, error per second'
+          name: 'YugabyteDB Cluster: Network transmit error, rate'
           type: DEPENDENT
-          key: yugabytedb.cluster.network.transmit.error
+          key: yugabytedb.cluster.network.transmit.error.rate
           delay: '0'
           history: 7d
           value_type: FLOAT
-          description: 'The count of network packets transmitted from the server per second, averaged over nodes.'
+          description: 'The number of errors related to network packets transmitted per second, averaged over nodes'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1211,26 +1262,6 @@ zabbix_export:
               value: cluster
             - tag: component
               value: performance
-        - uuid: 7a7c47740d01462f82ccb8649de19a23
-          name: 'YugabyteDB Cluster: Disk read OPS'
-          type: DEPENDENT
-          key: yugabytedb.cluster.read.ops
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: '!OPS'
-          description: 'The number of read operations per second.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.metrics.READ_OPS_PER_SEC
-          master_item:
-            key: yugabytedb.cluster.metric.get
-          tags:
-            - tag: component
-              value: cluster
-            - tag: component
-              value: performance
         - uuid: 4fd495d88f824bd2b18a3c885dc45d28
           name: 'YugabyteDB Cluster: Software version'
           type: DEPENDENT
@@ -1256,9 +1287,10 @@ zabbix_export:
             - uuid: 27fdbe72229343029ede51c7705c28c4
               expression: 'last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version,#1) <> last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version,#2) and length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.software.version)) > 0'
               name: 'YugabyteDB Cluster: Cluster software version has changed'
+              event_name: 'YugabyteDB Cluster: Cluster software version has changed (new version: {ITEM.VALUE})'
               opdata: 'Current version: {ITEM.LASTVALUE1}'
               priority: INFO
-              description: 'YugabyteDB Cluster cluster software version has changed. Acknowledge to close the problem manually.'
+              description: 'YugabyteDB Cluster software version has changed. Acknowledge to close the problem manually.'
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1448,26 +1480,6 @@ zabbix_export:
               value: cluster
             - tag: component
               value: performance
-        - uuid: 0badafcd38d34e4faa70f95ba501658a
-          name: 'YugabyteDB Cluster: Disk write OPS'
-          type: DEPENDENT
-          key: yugabytedb.cluster.write.ops
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: '!OPS'
-          description: 'The number of write operations per second.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.metrics.WRITE_OPS_PER_SEC
-          master_item:
-            key: yugabytedb.cluster.metric.get
-          tags:
-            - tag: component
-              value: cluster
-            - tag: component
-              value: performance
         - uuid: 6e303d8bbd3540dcba8e6336e395df01
           name: 'YugabyteDB Cluster: YB controller version'
           type: DEPENDENT
@@ -1493,6 +1505,7 @@ zabbix_export:
             - uuid: d927b0d668fc413db697a2360ac806a6
               expression: 'last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version,#1) <> last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version,#2) and length(last(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.ybc.version)) > 0'
               name: 'YugabyteDB Cluster: YB controller version has changed'
+              event_name: 'YugabyteDB Cluster: YB controller version has changed (new version: {ITEM.VALUE})'
               opdata: 'Current version: {ITEM.LASTVALUE1}'
               priority: INFO
               description: 'YugabyteDB Cluster YB controller version has changed. Acknowledge to close the problem manually.'
@@ -2451,28 +2464,6 @@ zabbix_export:
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
-            - uuid: 9fa8a6a8476e485c8eebeeaa5763c3c5
-              name: 'YugabyteDB Node [{#NODE.NAME}]: Limit disk IOPS'
-              type: DEPENDENT
-              key: 'yugabytedb.node.disk.iops[{#NODE.NAME}]'
-              delay: '0'
-              history: 7d
-              units: '!IOPS'
-              description: 'The IOPS to provision for the node [{#NODE.NAME}] for each disk.'
-              preprocessing:
-                - type: JSONPATH
-                  parameters:
-                    - $.data.spec.cluster_info.node_info.disk_iops
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 12h
-              master_item:
-                key: yugabytedb.cluster.get
-              tags:
-                - tag: component
-                  value: node
-                - tag: node
-                  value: '{#NODE.NAME}'
             - uuid: 0a540fa45f33410fb93fd750717ae431
               name: 'YugabyteDB Node [{#NODE.NAME}]: Total disk size'
               type: DEPENDENT
@@ -2575,14 +2566,36 @@ zabbix_export:
                   value: node
                 - tag: node
                   value: '{#NODE.NAME}'
+            - uuid: 9fa8a6a8476e485c8eebeeaa5763c3c5
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Disk IOPS limit'
+              type: DEPENDENT
+              key: 'yugabytedb.node.ops.limit[{#NODE.NAME}]'
+              delay: '0'
+              history: 7d
+              units: '!IOPS'
+              description: 'The IOPS to provision for the node [{#NODE.NAME}] for each disk.'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.data.spec.cluster_info.node_info.disk_iops
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
+              master_item:
+                key: yugabytedb.cluster.get
+              tags:
+                - tag: component
+                  value: node
+                - tag: node
+                  value: '{#NODE.NAME}'
             - uuid: 27e087e59b0f425584f57fda13398ea0
-              name: 'YugabyteDB Node [{#NODE.NAME}]: Disk IOPS utilization, percent'
+              name: 'YugabyteDB Node [{#NODE.NAME}]: Disk IOPS utilization'
               type: CALCULATED
-              key: 'yugabytedb.node.ops.pused[{#NODE.NAME}]'
+              key: 'yugabytedb.node.ops.utilization[{#NODE.NAME}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: '((last(//yugabytedb.node.read.ops.per.sec[{#NODE.NAME}]) + last(//yugabytedb.node.write.ops.per.sec[{#NODE.NAME}]))/last(//yugabytedb.node.disk.iops[{#NODE.NAME}]))*100'
+              params: '((last(//yugabytedb.node.read.ops[{#NODE.NAME}]) + last(//yugabytedb.node.write.ops[{#NODE.NAME}]))/last(//yugabytedb.node.ops.limit[{#NODE.NAME}]))*100'
               description: 'Shows the utilization of provisioned IOPS.'
               tags:
                 - tag: component
@@ -2591,20 +2604,22 @@ zabbix_export:
                   value: '{#NODE.NAME}'
               trigger_prototypes:
                 - uuid: c19790737c854c8e8848781b5ccf5b1f
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.WARN}'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.utilization[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.WARN}'
                   name: 'YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is high'
+                  event_name: 'YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is high (over {$YUGABYTEDB.IOPS.UTILIZATION.WARN} for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'IOPS utilization on the node [{#NODE.NAME}] more than {$YUGABYTEDB.IOPS.UTILIZATION.WARN}% of provisioned IOPS.'
                   dependencies:
                     - name: 'YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is too high'
-                      expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}'
+                      expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.utilization[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}'
                   tags:
                     - tag: scope
                       value: performance
                 - uuid: 27f43e701e4e47c4aad2fa6c9a118fb1
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.pused[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.node.ops.utilization[{#NODE.NAME}],5m) > {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}'
                   name: 'YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is too high'
+                  event_name: 'YugabyteDB Node [{#NODE.NAME}]: Node disk IOPS utilization is too high (over {$YUGABYTEDB.IOPS.UTILIZATION.CRIT} for 5m)'
                   opdata: 'Current utilization: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'IOPS utilization on the node [{#NODE.NAME}] more than {$YUGABYTEDB.IOPS.UTILIZATION.CRIT}% of provisioned IOPS.'
@@ -2614,7 +2629,7 @@ zabbix_export:
             - uuid: 03a684fb8e824ae2a21af206f03c06e3
               name: 'YugabyteDB Node [{#NODE.NAME}]: Read OPS'
               type: DEPENDENT
-              key: 'yugabytedb.node.read.ops.per.sec[{#NODE.NAME}]'
+              key: 'yugabytedb.node.read.ops[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2806,7 +2821,7 @@ zabbix_export:
             - uuid: f11fcb4fd9184a74bfd1081c10124735
               name: 'YugabyteDB Node [{#NODE.NAME}]: Write OPS'
               type: DEPENDENT
-              key: 'yugabytedb.node.write.ops.per.sec[{#NODE.NAME}]'
+              key: 'yugabytedb.node.write.ops[{#NODE.NAME}]'
               delay: '0'
               history: 7d
               value_type: FLOAT
@@ -2855,17 +2870,17 @@ zabbix_export:
                   yaxisside: RIGHT
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.ops.pused[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.ops.utilization[{#NODE.NAME}]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.read.ops.per.sec[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.read.ops[{#NODE.NAME}]'
                 - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'YugabyteDB Cluster by HTTP'
-                    key: 'yugabytedb.node.write.ops.per.sec[{#NODE.NAME}]'
+                    key: 'yugabytedb.node.write.ops[{#NODE.NAME}]'
             - uuid: e8020fae71e54c98bc3c5ed9b585fead
               name: 'YugabyteDB Node [{#NODE.NAME}]: SST size'
               graph_items:
@@ -3015,7 +3030,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        key: yugabytedb.cluster.memory.pused
+                        key: yugabytedb.cluster.memory.utilization
                     - type: INTEGER
                       name: show
                       value: '1'
@@ -3047,7 +3062,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        key: yugabytedb.cluster.disk.pused
+                        key: yugabytedb.cluster.disk.utilization
                     - type: INTEGER
                       name: show
                       value: '1'
@@ -3452,7 +3467,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        key: yugabytedb.cluster.disk.pused
+                        key: yugabytedb.cluster.disk.utilization
                     - type: INTEGER
                       name: show
                       value: '1'
@@ -3953,7 +3968,7 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.connection.pused
+            key: yugabytedb.cluster.connection.utilization
     - uuid: 67ada72929dd445c96687b1782ff773e
       name: 'YugabyteDB Cluster: CPU usage'
       ymin_type_1: FIXED
@@ -3986,7 +4001,7 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.disk.pused
+            key: yugabytedb.cluster.disk.utilization
     - uuid: f0983e69bb504ff6afe07d09bf5cb5a2
       name: 'YugabyteDB Cluster: Disk operations number'
       graph_items:
@@ -3994,13 +4009,13 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.write.ops
+            key: yugabytedb.cluster.disk.write.ops
         - sortorder: '1'
           drawtype: BOLD_LINE
           color: F63100
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.read.ops
+            key: yugabytedb.cluster.disk.read.ops
     - uuid: 2ed45b6d26874d30abc14ba798b73cb1
       name: 'YugabyteDB Cluster: Disk usage rate'
       graph_items:
@@ -4008,13 +4023,13 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.disk.write.bytes
+            key: yugabytedb.cluster.disk.write.bps
         - sortorder: '1'
           drawtype: BOLD_LINE
           color: F63100
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.disk.read.bytes
+            key: yugabytedb.cluster.disk.read.bps
     - uuid: fb9ea2cc4af642f19ce384764838fce7
       name: 'YugabyteDB Cluster: Memory usage'
       graph_items:
@@ -4038,19 +4053,19 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.memory.pused
+            key: yugabytedb.cluster.memory.utilization
     - uuid: c845efa993de438899899f722f02cb11
       name: 'YugabyteDB Cluster: Network error'
       graph_items:
         - color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.network.transmit.error
+            key: yugabytedb.cluster.network.transmit.error.rate
         - sortorder: '1'
           color: F63100
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.network.receive.error
+            key: yugabytedb.cluster.network.receive.error.rate
     - uuid: 50d707e6f8584688a52049df58ad39d4
       name: 'YugabyteDB Cluster: Network rate'
       graph_items:
@@ -4058,13 +4073,13 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.network.transmit.bytes
+            key: yugabytedb.cluster.network.transmit.bps
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: F63100
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.network.receive.bytes
+            key: yugabytedb.cluster.network.receive.bps
     - uuid: d69b497ed5204b07994128984c776102
       name: 'YugabyteDB Cluster: YCQL latency'
       graph_items:
