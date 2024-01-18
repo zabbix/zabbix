@@ -2364,7 +2364,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				foreach (['id:from' => 'now-1h', 'id:to' => 'now'] as $selector => $value) {
 					$input = $this->query($selector)->one();
 					$this->assertEquals($value, $input->getValue());
-					$this->assertEquals(19, $input->getAttribute('maxlength'));
+					$this->assertEquals(255, $input->getAttribute('maxlength'));
 				}
 
 				$buttons = [
