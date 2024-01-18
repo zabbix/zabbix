@@ -2817,7 +2817,6 @@ static int	DBpatch_6050183(void)
 	zbx_db_free_result(result);
 out:
 	return ret;
-
 }
 #endif
 
