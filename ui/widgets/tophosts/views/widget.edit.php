@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,14 +55,14 @@ $form
 	->addField(
 		(new CWidgetFieldColumnsListView($data['fields']['columns']))->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
 	)
-	->addField(
-		new CWidgetFieldRadioButtonListView($data['fields']['order'])
-	)
 	->addItem([
 		$column->getLabel(),
 		(new CFormField($data['fields']['column']->getValues() ? $column->getView() : _('Add a column')))
 			->addClass($column->isDisabled() ? ZBX_STYLE_DISABLED : null)
 	])
+	->addField(
+		new CWidgetFieldRadioButtonListView($data['fields']['order'])
+	)
 	->addField(array_key_exists('show_lines', $data['fields'])
 		? new CWidgetFieldIntegerBoxView($data['fields']['show_lines'])
 		: null

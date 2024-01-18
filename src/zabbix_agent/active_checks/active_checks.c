@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -106,6 +106,11 @@ static ZBX_THREAD_LOCAL zbx_vector_pre_persistent_t	pre_persistent_vec;	/* used 
 										/* into persistent files */
 /* used for deleting inactive persistent files */
 static ZBX_THREAD_LOCAL zbx_vector_persistent_inactive_t	persistent_inactive_vec;
+
+#define ZBX_HISTORY_UPLOAD_ENABLED	0
+#define ZBX_HISTORY_UPLOAD_DISABLED	(-1)
+
+static ZBX_THREAD_LOCAL int	history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
 
 typedef struct
 {
@@ -501,6 +506,14 @@ static int	parse_list_of_checks(char *str, const char *host, unsigned short port
 		zabbix_log(LOG_LEVEL_WARNING, "\"%s\" is not a valid revision", tmp);
 		goto out;
 	}
+
+	if (FAIL != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, tmp, sizeof(tmp), NULL) &&
+			0 == strcmp(tmp, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+	}
+	else
+		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
 
 	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
@@ -1022,6 +1035,15 @@ static int	check_response(const char *response)
 	if (SUCCEED == ret && SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_INFO, info, sizeof(info), NULL))
 		zabbix_log(LOG_LEVEL_DEBUG, "info from server: '%s'", info);
 
+	if (FAIL != zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_HISTORY_UPLOAD, value, sizeof(value), NULL) &&
+			0 == strcmp(value, ZBX_PROTO_VALUE_HISTORY_UPLOAD_DISABLED))
+	{
+		history_upload = ZBX_HISTORY_UPLOAD_DISABLED;
+	}
+	else
+		history_upload = ZBX_HISTORY_UPLOAD_ENABLED;
+
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
@@ -1033,6 +1055,12 @@ static int	format_metric_results(struct zbx_json *json, int now, int config_buff
 	int			i, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (ZBX_HISTORY_UPLOAD_ENABLED != history_upload)
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot send buffer: server has paused history upload");
+		goto ret;
+	}
 
 	if (config_buffer_size / 2 > buffer.pcount && config_buffer_size > buffer.count &&
 			config_buffer_send > now - buffer.lastsent)

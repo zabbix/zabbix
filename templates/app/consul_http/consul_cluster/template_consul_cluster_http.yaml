@@ -341,22 +341,22 @@ zabbix_export:
               parameters:
                 - |
                   var data = JSON.parse(value),
-                      consul_api_scheme = '{$CONSUL.API.SCHEME}',
-                      consul_api_port = '{$CONSUL.API.PORT}',
-                      result = [];
+                  	consul_api_scheme = '{$CONSUL.API.SCHEME}',
+                  	consul_api_port = '{$CONSUL.API.PORT}',
+                  	result = [];
                   
-                  data.forEach(function(instance) {
-                      if (instance["ID"] != '') {
-                        result.push({
-                        '{#NODE_NAME}': instance["Node"],
-                        '{#NODE_ADDRESS}': instance["Address"],
-                        '{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
-                        '{#NODE_DATACENTER}': instance["Datacenter"]
-                        });
-                      }
-                    });
+                  data.forEach(function (instance) {
+                  	if (instance["ID"] != '') {
+                  		result.push({
+                  			'{#NODE_NAME}': instance["Node"],
+                  			'{#NODE_ADDRESS}': instance["Address"],
+                  			'{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
+                  			'{#NODE_DATACENTER}': instance["Datacenter"]
+                  		});
+                  	}
+                  });
                   
-                  return JSON.stringify(result)
+                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -482,7 +482,7 @@ zabbix_export:
                   var data = [];
                   
                   Object.keys(JSON.parse(value)).forEach(function (v) {
-                      data.push({ '{#SERVICE_NAME}': v })
+                  	data.push({ '{#SERVICE_NAME}': v })
                   });
                   
                   return JSON.stringify(data);

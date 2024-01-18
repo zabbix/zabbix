@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,20 +189,10 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			'item_type' => 'type'
 		]);
 
-		if (array_key_exists('headers', $data)) {
-			$data['headers'] = $this->transformHeaderFields($data['headers']);
-		}
-
-		if (array_key_exists('query_fields', $data)) {
-			$data['query_fields'] = $this->transformQueryFields($data['query_fields']);
-		}
-
-		if (array_key_exists('parameters', $data)) {
-			$data['parameters'] = $this->transformParametersFields($data['parameters']);
-		}
-
 		// Only non-empty fields need to be sent to server.
 		$data = $this->unsetEmptyValues($data);
+
+		self::transformFields($data);
 
 		/*
 		 * Server will turn off status code check if field value is empty. If field is not present, then server will

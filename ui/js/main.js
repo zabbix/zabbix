@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -285,7 +285,11 @@ var hintBox = {
 				e.preventDefault();
 			}
 
-			if ($target.data('hintbox-preload') && $target.data('hintbox-contents') === '') {
+			if ($target[0].dataset.hintboxPreload !== '' && $target[0].dataset.hintboxContents === '') {
+				if (e.type === 'mousemove') {
+					return;
+				}
+
 				clearTimeout(hintBox.preload_hint_timer);
 
 				// Manually trigger preloaderCloseHandler for the previous preloader.
@@ -871,6 +875,8 @@ function getConditionFormula(conditions, evalType) {
 	 * - counter 				- number to start row enumeration from
 	 * - dataCallback			- function to generate the data passed to the template
 	 * - remove_next_sibling	- remove also next element
+	 * - sortable				- enable jQuery UI sortable initialization
+	 * - sortableOptions		- additional options to pass to jQuery UI sortable initialization
 	 *
 	 * Triggered events:
 	 * - tableupdate.dynamicRows 	- after adding or removing a row.
@@ -894,15 +900,82 @@ function getConditionFormula(conditions, evalType) {
 			rows: [],
 			dataCallback: function(data) {
 				return {};
-			}
+			},
+			sortable: false,
+			sortableOptions: {}
 		}, options);
+
+		if (options.sortable) {
+			options.sortableOptions = $.extend({}, {
+				disabled: false,
+				items: options.row,
+				axis: 'y',
+				containment: 'parent',
+				cursor: 'grabbing',
+				handle: '.drag-icon',
+				tolerance: 'pointer',
+				opacity: 0.6,
+				helper: function(e, ui) {
+					for (let td of ui.find('>td')) {
+						const $td = jQuery(td);
+						$td.attr('width', $td.width());
+					}
+
+					// When dragging element on safari, it jumps out of the table.
+					if (SF) {
+						// Move back draggable element to proper position.
+						ui.css('left', (ui.offset().left - 2) + 'px');
+					}
+
+					return ui;
+				},
+				start: function(e, ui) {
+					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
+				},
+				stop: function(e, ui) {
+					ui.item.find('>td').removeAttr('style');
+					ui.item.removeAttr('style');
+				}
+			}, options.sortableOptions);
+		}
 
 		return this.each(function() {
 			var table = $(this);
 
 			// If options.remove_next_sibling is true, counter counts each row making the next index twice as large (bug).
 			table.data('dynamicRows', {
-				counter: (options.counter !== null) ? options.counter : $(options.row, table).length
+				counter: (options.counter !== null) ? options.counter : $(options.row, table).length,
+				addRows: (rows) => {
+					const local_options = $.extend({}, options, {
+						dataCallback: (data) => options.dataCallback($.extend(data, rows.shift()))
+					});
+					const beforeRow = (options['beforeRow'] !== null)
+						? $(options['beforeRow'], table)
+						: $(options.add, table).closest('tr');
+
+					table.trigger('beforeadd.dynamicRows', options);
+
+					while (rows.length > 0) {
+						addRow(table, beforeRow, local_options);
+					}
+
+					table.trigger('afteradd.dynamicRows', options);
+					table.trigger('change');
+
+					return table;
+				},
+				removeRows: (filter) => {
+					for (const row of $(options.row, table)) {
+						if (filter === undefined || filter(row)) {
+							removeRow(table, row, options);
+						}
+					}
+
+					table.trigger('afterremove.dynamicRows', options);
+					table.trigger('change');
+
+					return table;
+				}
 			});
 
 			// add buttons
@@ -917,6 +990,10 @@ function getConditionFormula(conditions, evalType) {
 
 				if (!options.allow_empty) {
 					$(options.remove, table).attr('disabled', false);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 
 				table.trigger('afteradd.dynamicRows', options);
@@ -934,6 +1011,10 @@ function getConditionFormula(conditions, evalType) {
 					$(options.remove, table).attr('disabled', true);
 
 					table.trigger('afteradd.dynamicRows', options);
+				}
+
+				if (options.sortable) {
+					table.sortable($(options.row, table).length > 1 ? 'enable' : 'disable');
 				}
 			});
 
@@ -954,6 +1035,22 @@ function getConditionFormula(conditions, evalType) {
 					? $(options['beforeRow'], table)
 					: $(options.add, table).closest('tr');
 				initRows(table, before_row, options);
+			}
+
+			if (options.sortable) {
+				table
+					.sortable(options.sortableOptions)
+					.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
+						const drag_icons = table[0].querySelectorAll(options.sortableOptions.handle);
+						const disabled = drag_icons.length < 2;
+
+						for (const drag_icon of drag_icons) {
+							drag_icon.classList.toggle('disabled', disabled);
+						}
+
+						table.sortable({disabled});
+					})
+					.trigger('afteradd.dynamicRows');
 			}
 		});
 	};
@@ -1044,72 +1141,6 @@ function getConditionFormula(conditions, evalType) {
 }(jQuery));
 
 jQuery(function ($) {
-	var verticalHeaderTables = {};
-
-	$.fn.makeVerticalRotation = function() {
-		this.each(function(i) {
-			var table = $(this);
-
-			if (table.data('rotated') == 1) {
-				return;
-			}
-			table.data('rotated', 1);
-
-			var cellsToRotate = $('.vertical_rotation', table),
-				betterCells = [];
-
-			// insert spans
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					text = $('<span>', {
-						text: cell.html()
-					}).css({'white-space': 'nowrap'});
-
-				cell.text('').append(text);
-			});
-
-			// rotate cells
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					span = cell.children(),
-					height = cell.height(),
-					width = span.width(),
-					transform = (width / 2) + 'px ' + (width / 2) + 'px';
-
-				var css = {};
-
-				css['transform-origin'] = transform;
-				css['-webkit-transform-origin'] = transform;
-				css['-moz-transform-origin'] = transform;
-				css['-o-transform-origin'] = transform;
-
-				var divInner = $('<div>', {
-					'class': 'vertical_rotation_inner'
-				})
-					.css(css)
-					.append(span.text());
-
-				var div = $('<div>', {
-					height: width,
-					width: height
-				})
-					.append(divInner);
-
-				betterCells.push(div);
-			});
-
-			cellsToRotate.each(function(i) {
-				$(this).html(betterCells[i]);
-			});
-
-			table.on('remove', function() {
-				delete verticalHeaderTables[table.attr('id')];
-			});
-
-			verticalHeaderTables[table.attr('id')] = table;
-		});
-	};
-
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
 		$('.wrapper').scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');

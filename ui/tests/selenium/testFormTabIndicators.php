@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -225,7 +225,8 @@ class testFormTabIndicators extends CWebTest {
 			// Item configuration form tab data.
 			[
 				[
-					'url' => 'items.php?form=create&context=host&hostid=10084',
+					'url' => 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]=10084',
+					'create_button' => 'Create item',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -252,7 +253,8 @@ class testFormTabIndicators extends CWebTest {
 			// Item prototype configuration form tab data.
 			[
 				[
-					'url' => 'disc_prototypes.php?form=create&parent_discoveryid=42275&context=host',
+					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
+					'create_button' => 'Create item prototype',
 					'form' => 'name:itemForm',
 					'tabs' => [
 						[
@@ -673,7 +675,7 @@ class testFormTabIndicators extends CWebTest {
 	public function testFormTabIndicators_CheckGeneralForms($data) {
 		$this->page->login()->open($data['url'])->waitUntilReady();
 
-		// Open widget configuration form if indicator check is performed on dachboard.
+		// Open widget configuration form if indicator check is performed on dashboard.
 		if ($data['url'] === 'zabbix.php?action=dashboard.view') {
 			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();

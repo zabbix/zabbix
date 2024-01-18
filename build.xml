@@ -67,6 +67,12 @@
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DATA_SOURCES_DIR}" value="${basedir}/ui/tests/selenium/data/sources/"/>
 	</target>
 
+	<target name="show-browser-info">
+		<exec executable="php" failonerror="on">
+			<arg line="ui/tests/browser.php"/>
+		</exec>
+	</target>
+
 	<target name="create-saml-configs">
 		<property name="phpunit_simplesaml_baseurl" value="${PHPUNIT_SIMPLESAML_BASEURL}"/>
 		<property name="phpunit_sp_entity_id" value="${PHPUNIT_SP_ENTITY_ID}"/>
@@ -135,6 +141,35 @@
 			<arg line="-j4"/>
 			<arg line="-s"/>
 			<arg line="gettext"/>
+		</exec>
+	</target>
+
+	<target name="make-binary-agent-3.0">
+		<exec executable="git" outputproperty="git.initial_rev" failonerror="on">
+			<arg value="rev-parse"/>
+			<arg value="--verify"/>
+			<arg value="HEAD"/>
+		</exec>
+		<exec executable="git" failonerror="on">
+			<arg line="checkout"/>
+			<arg line="df9ee823715d4caccf63f402a126d2f039b31057"/>
+		</exec>
+		<exec executable="./bootstrap.sh" failonerror="on"/>
+		<exec executable="./configure" failonerror="on">
+			<arg line="--quiet"/>
+			<arg line="--enable-agent"/>
+			<arg line="--prefix=${basedir}"/>
+		</exec>
+		<exec executable="make" failonerror="on">
+			<arg line="-j4"/>
+			<arg line="-s"/>
+			<arg line="install"/>
+		</exec>
+		<move file="${basedir}/conf/zabbix_agentd.conf" tofile="${basedir}/conf/zabbix_agentd_3.0.conf"/>
+		<move file="${basedir}/sbin/zabbix_agentd" tofile="${basedir}/sbin/zabbix_agentd_3.0"/>
+		<exec executable="git" failonerror="on">
+			<arg line="checkout"/>
+			<arg line="${git.initial_rev}"/>
 		</exec>
 	</target>
 
@@ -313,7 +348,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binaries-postgresql,create-db-postgresql,init-proxy-postgresql">
+	<target name="init-integration-postgresql" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-postgresql,init-proxy-postgresql">
 		<exec executable="psql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="PGPASSWORD" value="${dbpassword}"/>
 			<arg line="-q"/>
@@ -326,7 +361,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql">
+	<target name="init-integration-tsdb" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-postgresql,create-db-tsdb,init-proxy-postgresql">
 	</target>
 
 	<target name="init-dast-postgresql" depends="create-frontend-configs,make-dbschema,create-db-postgresql"/>
@@ -448,7 +483,7 @@
 		</exec>
 	</target>
 
-	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
+	<target name="init-integration-mysql" depends="create-configs,init-integration,make-binary-agent-3.0,make-binaries-mysql,create-db-mysql,init-proxy-mysql">
 		<exec executable="mysql" input="ui/tests/integration/data/data_test.sql" failonerror="on">
 			<env key="MYSQL_PWD" value="${dbpassword}"/>
 			<arg line="--host=${dbhost}"/>
@@ -502,8 +537,8 @@
 	</target>
 
 	<target name="build-phpunit" depends="test-phpunit"/>
-	<target name="build-mysql" depends="init-frontend-mysql,test-frontend"/>
-	<target name="build-postgresql" depends="init-frontend-postgresql,test-frontend"/>
+	<target name="build-mysql" depends="init-frontend-mysql,show-browser-info,test-frontend"/>
+	<target name="build-postgresql" depends="init-frontend-postgresql,show-browser-info,test-frontend"/>
 	<target name="build-api-mysql" depends="init-api-mysql,test-api"/>
 	<target name="build-api-postgresql" depends="init-api-postgresql,test-api"/>
 	<target name="build-integration-mysql" depends="init-integration-mysql,test-integration"/>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -321,11 +321,11 @@ class testDashboardTopTriggersWidget extends CWebTest {
 			'id:tags_0_tag' => '',
 			'id:tags_0_operator' => 'Contains',
 			'id:tags_0_value' => '',
-			'Trigger count' => 10
+			'Trigger limit' => 10
 		];
 
 		$form->checkValue($default_state);
-		$this->assertEquals(['Trigger count'], $form->getRequiredLabels());
+		$this->assertEquals(['Trigger limit'], $form->getRequiredLabels());
 
 		// Check attributes of input elements.
 		$inputs = [
@@ -350,7 +350,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				'maxlength' => 255,
 				'placeholder' => 'value'
 			],
-			'Trigger count' => [
+			'Trigger limit' => [
 				'maxlength' => 3
 			]
 		];
@@ -393,45 +393,45 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Trigger count' => ''
+						'Trigger limit' => ''
 					],
-					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Trigger count' => ' '
+						'Trigger limit' => ' '
 					],
-					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Trigger count' => '0'
+						'Trigger limit' => '0'
 					],
-					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Trigger count' => '101'
+						'Trigger limit' => '101'
 					],
-					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
 			[
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Trigger count' => 'x'
+						'Trigger limit' => 'x'
 					],
-					'error' => 'Invalid parameter "Trigger count": value must be one of 1-100.'
+					'error' => 'Invalid parameter "Trigger limit": value must be one of 1-100.'
 				]
 			],
 			[
@@ -542,7 +542,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Problem tags' => 'Or',
-						'Trigger count' => '1'
+						'Trigger limit' => '1'
 					]
 				]
 			],
@@ -551,7 +551,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Problem tags' => 'And/Or',
-						'Trigger count' => '100'
+						'Trigger limit' => '100'
 					]
 				]
 			],
@@ -575,7 +575,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						'id:tags_0_tag' => STRING_255,
 						'id:tags_0_operator' => 'Does not contain',
 						'id:tags_0_value' => STRING_255,
-						'Trigger count' => '99'
+						'Trigger limit' => '99'
 					]
 				]
 			],
@@ -584,14 +584,14 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'expected' => TEST_GOOD,
 					'fields' => [
 						'Name' => ' Test trailing spaces ',
-						'Trigger count' => ' 1 ',
+						'Trigger limit' => ' 1 ',
 						'Problem' => ' BOOM ',
 						'id:tags_0_tag' => ' Trigger ',
 						'id:tags_0_operator' => 'Does not equal',
 						'id:tags_0_value' => ' test ',
 						'Problem tags' => 'And/Or'
 					],
-					'trim' => ['Name', 'Problem', 'Trigger count', 'id:tags_0_tag', 'id:tags_0_value']
+					'trim' => ['Name', 'Problem', 'Trigger limit', 'id:tags_0_tag', 'id:tags_0_value']
 				]
 			],
 			[
@@ -1170,7 +1170,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						'High' => false,
 						'Average' => false,
 						'Disaster' => false,
-						'Trigger count' => '2'
+						'Trigger limit' => '2'
 					],
 					'trigger_data' => [
 						[
@@ -1230,7 +1230,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 					'tags' => true,
 					'fields' => [
 						'Warning' => true,
-						'Trigger count' => '10',
+						'Trigger limit' => '10',
 						'id:tags_0_tag' => 'test1',
 						'id:tags_0_value' => 'tag1'
 					],
@@ -1416,9 +1416,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Trigger' => 'menu-popup-item',
-					'Items' => ['Linux: Number of processes' => 'items.php?form=update&itemid=42253&context=host'.
-						'&backurl=zabbix.php%3Faction%3Ddashboard.view'
-					]
+					'Items' => ['Linux: Number of processes' => 'menu-popup-item']
 				]
 			],
 			'host_menu' => [
@@ -1432,7 +1430,7 @@ class testDashboardTopTriggersWidget extends CWebTest {
 				],
 				'CONFIGURATION' => [
 					'Host' => 'zabbix.php?action=host.edit&hostid=10084',
-					'Items' => 'items.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
+					'Items' => 'zabbix.php?action=item.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Triggers' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Graphs' => 'graphs.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
 					'Discovery' => 'host_discovery.php?filter_set=1&filter_hostids%5B%5D=10084&context=host',
@@ -1475,7 +1473,9 @@ class testDashboardTopTriggersWidget extends CWebTest {
 						// Check 2-level menu links.
 						$item_link = $popup->getItem($menu_level1)->query('xpath:./../ul//a')->one();
 						$this->assertEquals($menu_level2, $item_link->getText());
-						$this->assertStringContainsString($attribute, $item_link->getAttribute('href'));
+						$this->assertStringContainsString($attribute,
+								$item_link->getAttribute(($attribute === 'menu-popup-item') ? 'class' : 'href')
+						);
 					}
 				}
 				else {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,10 +29,6 @@ class CUrlFactory {
 	 * @var array
 	 */
 	protected static $contextConfigs = [
-		'disc_prototypes.php' => [
-			'remove' => ['itemid'],
-			'add' => ['hostid', 'parent_discoveryid']
-		],
 		'graphs.php' => [
 			'remove' => ['graphid'],
 			'add' => ['hostid', 'parent_discoveryid']
@@ -47,9 +43,6 @@ class CUrlFactory {
 		],
 		'httpconf.php' => [
 			'remove' => ['httptestid']
-		],
-		'items.php' => [
-			'remove' => ['itemid']
 		],
 		'sysmaps.php' => [
 			'remove' => ['sysmapid']

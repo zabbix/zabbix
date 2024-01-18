@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -532,7 +532,8 @@ function validateNumber($value, $min = null, $max = null) {
 }
 
 function validateUserMacro($value) {
-	return ((new CUserMacroParser())->parse($value) == CParser::PARSE_SUCCESS);
+	return (new CUserMacroParser())->parse($value) == CParser::PARSE_SUCCESS
+		|| (new CUserMacroFunctionParser())->parse($value) == CParser::PARSE_SUCCESS;
 }
 
 /**

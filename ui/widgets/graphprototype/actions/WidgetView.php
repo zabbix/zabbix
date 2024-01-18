@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -241,7 +241,7 @@ class WidgetView extends CControllerWidgetIterator {
 		// Do not collect items while editing a template dashboard.
 		if (!$this->isTemplateDashboard() || $this->fields_values['override_hostid']) {
 			$items_created_all = API::Item()->get([
-				'output' => ['itemid', 'name'],
+				'output' => ['itemid', 'name_resolved'],
 				'hostids' => [$item_prototype['discoveryRule']['hostid']],
 				'selectItemDiscovery' => ['itemid', 'parent_itemid'],
 				'filter' => ['flags' => ZBX_FLAG_DISCOVERY_CREATED]
@@ -256,8 +256,8 @@ class WidgetView extends CControllerWidgetIterator {
 			}
 			foreach ($items_created as $item) {
 				$items_collected[$item['itemid']] = $this->isTemplateDashboard()
-					? $item['name']
-					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name'];
+					? $item['name_resolved']
+					: $item_prototype['hosts'][0]['name'].NAME_DELIMITER.$item['name_resolved'];
 			}
 			natsort($items_collected);
 		}

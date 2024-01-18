@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 	public const DEFAULT_VIEW = \CWidgetFieldCheckBoxListView::class;
 	public const DEFAULT_VALUE = [];
 
+	public const EMPTY_VALUE = '';
+
 	private array $values;
 
 	public function __construct(string $name, string $label = null, array $values = []) {
@@ -38,7 +40,7 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 		$this
 			->setDefault(self::DEFAULT_VALUE)
 			->setSaveType(ZBX_WIDGET_FIELD_TYPE_INT32)
-			->setValidationRules(['type' => API_INTS32]);
+			->setValidationRules(['type' => API_INTS32, 'in' => implode(',', array_keys($this->values)), 'uniq' => true]);
 	}
 
 	public function getValues(): array {
@@ -46,13 +48,17 @@ class CWidgetFieldCheckBoxList extends CWidgetField {
 	}
 
 	public function setValue($value): self {
-		$this->value = (array) $value;
+		$this->value = $value === self::EMPTY_VALUE ? [] : (array) $value;
+
+		sort($this->value);
 
 		return $this;
 	}
 
 	public function setDefault($value): self {
 		$this->default = (array) $value;
+
+		sort($this->default);
 
 		return $this;
 	}

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -69,14 +69,16 @@ class testFormConnectors extends CWebTest {
 	 */
 	public function testFormConnectors_Layout() {
 		$default_labels = [
-			'fields' => ['Name', 'Protocol', 'Data type', 'URL', 'Tag filter', 'HTTP authentication', 'Advanced configuration',
-				'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout', 'HTTP proxy', 'SSL verify peer',
-				'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password', 'Description', 'Enabled'
+			'fields' => ['Name', 'Protocol', 'Data type', 'URL', 'Tag filter', 'Type of information', 'HTTP authentication',
+				'Advanced configuration', 'Max records per message', 'Concurrent sessions', 'Attempts', 'Attempt interval',
+				'Timeout', 'HTTP proxy', 'SSL verify peer',	'SSL verify host', 'SSL certificate file', 'SSL key file',
+				'SSL key password', 'Description', 'Enabled'
 			],
 			'advanced_fields' => ['Max records per message', 'Concurrent sessions', 'Attempts','Timeout', 'HTTP proxy',
 				'SSL verify peer', 'SSL verify host', 'SSL certificate file', 'SSL key file', 'SSL key password'
 			],
-			'required' => ['Name', 'URL', 'Max records per message', 'Concurrent sessions', 'Attempts', 'Timeout'],
+			'required' => ['Name', 'URL', 'Type of information', 'Max records per message', 'Concurrent sessions',
+				'Attempts', 'Attempt interval', 'Timeout'],
 			'default' => [
 				'Data type' => 'Item values',
 				'Tag filter' => 'And/Or',
@@ -84,6 +86,7 @@ class testFormConnectors extends CWebTest {
 				'Max records per message' => 'Unlimited',
 				'Concurrent sessions' => '1',
 				'Attempts' => '1',
+				'Attempt interval' => '5s',
 				'Timeout' => '5s',
 				'SSL verify peer' => true,
 				'SSL verify host' => true,
@@ -1107,7 +1110,7 @@ class testFormConnectors extends CWebTest {
 		// Change valid URI schemes on "Other configuration parameters" page.
 		$this->page->open('zabbix.php?action=miscconfig.edit');
 		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
-		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->fill(['id:validate_uri_schemes' => true, 'id:uri_valid_schemes' => 'dns,message']);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
@@ -1117,7 +1120,7 @@ class testFormConnectors extends CWebTest {
 
 		// Disable URI scheme validation.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-		$config_form->fill(['Validate URI schemes' => false]);
+		$config_form->fill(['id:validate_uri_schemes' => false]);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 

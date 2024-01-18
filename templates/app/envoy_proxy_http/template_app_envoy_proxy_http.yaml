@@ -1128,18 +1128,18 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                          var envoy_cluster_name = item.labels.envoy_cluster_name;
+                  		var envoy_cluster_name = item.labels.envoy_cluster_name;
                   
-                          if (lookup[envoy_cluster_name]) {
-                              return;
-                          }
-                          lookup[envoy_cluster_name] = 1;
-                          result.push({
-                              '{#CLUSTER_NAME}': envoy_cluster_name
-                          });
+                  		if (lookup[envoy_cluster_name]) {
+                  			return;
+                  		}
+                  		lookup[envoy_cluster_name] = 1;
+                  		result.push({
+                  			'{#CLUSTER_NAME}': envoy_cluster_name
+                  		});
                   });
                   
                   return JSON.stringify(result);
@@ -1339,18 +1339,18 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                          var envoy_http_conn_manager_prefix = item.labels.envoy_http_conn_manager_prefix;
+                  		var envoy_http_conn_manager_prefix = item.labels.envoy_http_conn_manager_prefix;
                   
-                          if (lookup[envoy_http_conn_manager_prefix]) {
-                              return;
-                          }
-                          lookup[envoy_http_conn_manager_prefix] = 1;
-                          result.push({
-                              '{#CONN_MANAGER}': envoy_http_conn_manager_prefix
-                          });
+                  		if (lookup[envoy_http_conn_manager_prefix]) {
+                  			return;
+                  		}
+                  		lookup[envoy_http_conn_manager_prefix] = 1;
+                  		result.push({
+                  			'{#CONN_MANAGER}': envoy_http_conn_manager_prefix
+                  		});
                   });
                   
                   return JSON.stringify(result);
@@ -1437,18 +1437,18 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                          var envoy_listener_address = item.labels.envoy_listener_address;
+                  		var envoy_listener_address = item.labels.envoy_listener_address;
                   
-                          if (lookup[envoy_listener_address]) {
-                              return;
-                          }
-                          lookup[envoy_listener_address] = 1;
-                          result.push({
-                              '{#LISTENER_ADDRESS}': envoy_listener_address
-                          });
+                  		if (lookup[envoy_listener_address]) {
+                  			return;
+                  		}
+                  		lookup[envoy_listener_address] = 1;
+                  		result.push({
+                  			'{#LISTENER_ADDRESS}': envoy_listener_address
+                  		});
                   });
                   
                   return JSON.stringify(result);

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -374,13 +374,11 @@ foreach ($data['inventory_fields'] as $inventory_no => $inventory_field) {
 	if (array_key_exists($inventory_no, $data['inventory_items'])) {
 		$item_name = $data['inventory_items'][$inventory_no]['name'];
 
-		$link = (new CLink($item_name,
-			(new CUrl('items.php'))
-				->setArgument('form', 'update')
-				->setArgument('itemid', $data['inventory_items'][$inventory_no]['itemid'])
-				->setArgument('context', 'host')
-				->getUrl()
-		))->setTitle(_s('This field is automatically populated by item "%1$s".', $item_name));
+		$link = (new CLink($item_name))
+			->setTitle(_s('This field is automatically populated by item "%1$s".', $item_name))
+			->setAttribute('data-itemid', $data['inventory_items'][$inventory_no]['itemid'])
+			->setAttribute('data-context', 'host')
+			->addClass('js-update-item');
 
 		$inventory_item = (new CSpan([' ', LARR(), ' ', $link]))->addClass('populating_item');
 		$input_field->addClass('linked_to_item');

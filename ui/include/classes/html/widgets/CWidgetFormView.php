@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,7 +179,7 @@ class CWidgetFormView {
 					// Submit button is needed to enable submit event on Enter on inputs.
 					->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN)),
 				implode('', $this->templates),
-				$this->javascript ? new CScriptTag($this->javascript) : ''
+				(new CScriptTag('ZABBIX.Dashboard.initWidgetPropertiesForm();'))->addItem($this->javascript)
 			]),
 			'buttons' => [
 				[

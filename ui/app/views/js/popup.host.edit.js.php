@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,8 @@
 /**
  * @var CView $this
  */
-?>
 
+?>
 window.host_edit_popup = {
 	overlay: null,
 	dialogue: null,
@@ -35,6 +35,7 @@ window.host_edit_popup = {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		history.replaceState({}, '', popup_url);
+
 		host_edit.init({form_name, host_interfaces, host_is_discovered});
 
 		if (warnings.length) {
@@ -47,23 +48,26 @@ window.host_edit_popup = {
 			this.form.parentNode.insertBefore(message_box, this.form);
 		}
 
-		this.form.addEventListener('click', (e) => {
-			if (e.target.classList.contains('js-edit-linked-template')) {
+		this.initial_form_fields = getFormFields(this.form);
+		this.initEvents();
+	},
 
+	initEvents() {
+		this.form.addEventListener('click', (e) => {
+			const target = e.target;
+
+			if (target.classList.contains('js-edit-linked-template')) {
 				this.editTemplate({templateid: e.target.dataset.templateid});
 			}
-		})
-
-		this.initial_form_fields = getFormFields(this.form);
+			else if (target.classList.contains('js-update-item')) {
+				this.editItem(target, target.dataset);
+			}
+		});
 	},
 
 	editTemplate(parameters) {
-		const form_fields = getFormFields(this.form);
-
-		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
-			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
-				return;
-			}
+		if (!this.isConfirmed()) {
+			return;
 		}
 
 		overlayDialogueDestroy(this.overlay.dialogueid);
@@ -77,6 +81,37 @@ window.host_edit_popup = {
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
 			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail}))
 		);
+	},
+
+	editItem(target, data) {
+		if (!this.isConfirmed()) {
+			return;
+		}
+
+		overlayDialogueDestroy(this.overlay.dialogueid);
+
+		const overlay = PopUp('item.edit', data, {
+			dialogueid: 'item-edit',
+			dialogue_class: 'modal-popup-large',
+			trigger_element: target
+		});
+
+		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) =>
+			this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: e.detail})),
+			{once: true}
+		);
+	},
+
+	isConfirmed() {
+		const form_fields = getFormFields(this.form);
+
+		if (JSON.stringify(this.initial_form_fields) !== JSON.stringify(form_fields)) {
+			if (!window.confirm(<?= json_encode(_('Any changes made in the current form will be lost.')) ?>)) {
+				return false;
+			}
+		}
+
+		return true;
 	},
 
 	submit() {
@@ -152,11 +187,7 @@ window.host_edit_popup = {
 
 				overlayDialogueDestroy(this.overlay.dialogueid);
 
-				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {
-					detail: {
-						success: response.success
-					}
-				}));
+				this.dialogue.dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {

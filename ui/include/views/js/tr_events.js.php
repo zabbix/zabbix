@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,16 @@
 				postMessageOk(response.success.title);
 				location.href = location.href;
 			});
+		},
+
+		editItem(target, data) {
+			const overlay = PopUp('item.edit', data, {
+				dialogueid: 'item-edit',
+				dialogue_class: 'modal-popup-large',
+				trigger_element: target
+			});
+
+			overlay.$dialogue[0].addEventListener('dialogue.submit', this.events.elementSuccess, {once: true});
 		},
 
 		editHost(hostid) {
@@ -77,6 +87,7 @@
 
 		events: {
 			elementSuccess(e) {
+				let new_href = location.href;
 				const data = e.detail;
 
 				if ('success' in data) {
@@ -85,9 +96,17 @@
 					if ('messages' in data.success) {
 						postMessageDetails('success', data.success.messages);
 					}
+
+					if (data.success.action === 'delete') {
+						// If item or trigger is deleted redirect to problems page.
+						let list_url = new Curl('zabbix.php');
+
+						list_url.setArgument('action', 'problem.view');
+						new_href = list_url.getUrl();
+					}
 				}
 
-				location.href = location.href;
+				location.href = new_href;
 			}
 		}
 	};

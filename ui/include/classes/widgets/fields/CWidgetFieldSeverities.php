@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,7 @@ class CWidgetFieldSeverities extends CWidgetFieldCheckBoxList {
 
 	public const DEFAULT_VIEW = \CWidgetFieldSeveritiesView::class;
 
-	protected function getValidationRules(bool $strict = false): array {
-		return parent::getValidationRules($strict)
-			+ ['in' => implode(',', range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1))];
+	public function __construct(string $name, string $label = null) {
+		parent::__construct($name, $label, range(TRIGGER_SEVERITY_NOT_CLASSIFIED, TRIGGER_SEVERITY_COUNT - 1));
 	}
 }

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,7 +147,25 @@ class CRouter {
 		'image.edit'								=> ['CControllerImageEdit',								'layout.htmlpage',		'administration.image.edit'],
 		'image.list'								=> ['CControllerImageList',								'layout.htmlpage',		'administration.image.list'],
 		'image.update'								=> ['CControllerImageUpdate',							null,					null],
-		'item.masscheck_now'						=> ['CControllerItemMassCheckNow',						'layout.json',			null],
+		'item.clear'								=> ['CControllerItemClear',								'layout.json',			null],
+		'item.create'								=> ['CControllerItemCreate',							'layout.json',			null],
+		'item.delete'								=> ['CControllerItemDelete',							'layout.json',			null],
+		'item.disable'								=> ['CControllerItemDisable',							'layout.json',			null],
+		'item.edit'									=> ['CControllerItemEdit',								'layout.json',			'item.edit'],
+		'item.enable'								=> ['CControllerItemEnable',							'layout.json',			null],
+		'item.execute'								=> ['CControllerItemExecuteNow',						'layout.json',			null],
+		'item.list'									=> ['CControllerItemList',								'layout.htmlpage',		'item.list'],
+		'item.massupdate'							=> ['CControllerItemMassupdate',						'layout.json',			'item.massupdate'],
+		'item.update'								=> ['CControllerItemUpdate',							'layout.json',			null],
+		'item.prototype.create'						=> ['CControllerItemPrototypeCreate',					'layout.json',			null],
+		'item.prototype.delete'						=> ['CControllerItemPrototypeDelete',					'layout.json',			null],
+		'item.prototype.disable'					=> ['CControllerItemPrototypeDisable',					'layout.json',			null],
+		'item.prototype.edit'						=> ['CControllerItemPrototypeEdit',						'layout.json',			'item.prototype.edit'],
+		'item.prototype.enable'						=> ['CControllerItemPrototypeEnable',					'layout.json',			null],
+		'item.prototype.list'						=> ['CControllerItemPrototypeList',						'layout.htmlpage',		'item.prototype.list'],
+		'item.prototype.massupdate'					=> ['CControllerItemMassupdate',						'layout.json',			'item.massupdate'],
+		'item.prototype.update'						=> ['CControllerItemPrototypeUpdate',					'layout.json',			null],
+		'item.tags.list'							=> ['CControllerItemTagsList',							'layout.json',			'item.tags.list'],
 		'latest.view'								=> ['CControllerLatestView',							'layout.htmlpage',		'monitoring.latest.view'],
 		'latest.view.refresh'						=> ['CControllerLatestViewRefresh',						'layout.json',			'monitoring.latest.view.refresh'],
 		'macros.edit'								=> ['CControllerMacrosEdit',							'layout.htmlpage',		'administration.macros.edit'],
@@ -208,8 +226,6 @@ class CRouter {
 		'popup.lldoperation'						=> ['CControllerPopupLldOperation',						'layout.json',			'popup.lldoperation'],
 		'popup.lldoverride'							=> ['CControllerPopupLldOverride',						'layout.json',			'popup.lldoverride'],
 		'popup.massupdate.host'						=> ['CControllerPopupMassupdateHost',					'layout.json',			'popup.massupdate.host'],
-		'popup.massupdate.item'						=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
-		'popup.massupdate.itemprototype'			=> ['CControllerPopupMassupdateItem',					'layout.json',			'popup.massupdate.item'],
 		'popup.massupdate.service'					=> ['CControllerPopupMassupdateService',				'layout.json',			'popup.massupdate.service'],
 		'popup.media'								=> ['CControllerPopupMedia',							'layout.json',			'popup.media'],
 		'popup.mediatypemapping.check'				=> ['CControllerPopupMediaTypeMappingCheck',			'layout.json',			null],
@@ -271,6 +287,8 @@ class CRouter {
 		'script.edit'								=> ['CControllerScriptEdit',							'layout.json',			'administration.script.edit'],
 		'script.list'								=> ['CControllerScriptList',							'layout.htmlpage',		'administration.script.list'],
 		'script.update'								=> ['CControllerScriptUpdate',							'layout.json',			null],
+		'script.userinput.edit'						=> ['CControllerScriptUserInputEdit',					'layout.json',			'script.userinput.edit'],
+		'script.userinput.check'					=> ['CControllerScriptUserInputCheck',					'layout.json',			null],
 		'search'									=> ['CControllerSearch',								'layout.htmlpage',		'search'],
 		'service.create'							=> ['CControllerServiceCreate',							'layout.json',			null],
 		'service.delete'							=> ['CControllerServiceDelete',							'layout.json',			null],
@@ -372,7 +390,6 @@ class CRouter {
 		'chart4.php'					=> ['CLegacyAction', null, null],
 		'chart6.php'					=> ['CLegacyAction', null, null],
 		'chart7.php'					=> ['CLegacyAction', null, null],
-		'disc_prototypes.php'			=> ['CLegacyAction', null, null],
 		'graphs.php'					=> ['CLegacyAction', null, null],
 		'history.php'					=> ['CLegacyAction', null, null],
 		'host_discovery.php'			=> ['CLegacyAction', null, null],
@@ -386,7 +403,6 @@ class CRouter {
 		'index.php'						=> ['CLegacyAction', null, null],
 		'index_http.php'				=> ['CLegacyAction', null, null],
 		'index_sso.php'					=> ['CLegacyAction', null, null],
-		'items.php'						=> ['CLegacyAction', null, null],
 		'jsrpc.php'						=> ['CLegacyAction', null, null],
 		'map.php'						=> ['CLegacyAction', null, null],
 		'report2.php'					=> ['CLegacyAction', null, null],

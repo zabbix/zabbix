@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,7 +40,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	}
 
 	private function getTableSelector() {
-		return 'xpath://table['.CXPathHelper::fromClass('overflow-ellipsis').']';
+		return 'xpath://table['.CXPathHelper::fromClass('list-table fixed').']';
 	}
 
 	private function getTable() {
@@ -471,7 +471,7 @@ class testPageMonitoringLatestData extends CWebTest {
 	public function testPageMonitoringLatestData_Filter($data) {
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+		$table = $this->getTable()->waitUntilPresent();
 
 		// Reset filter in case if some filtering remained before ongoing test case.
 		$this->query('button:Reset')->one()->click();
@@ -480,7 +480,7 @@ class testPageMonitoringLatestData extends CWebTest {
 		// Fill filter form with data.
 		$form->fill(CTestArrayHelper::get($data, 'filter'));
 
-		// If data contains Tags and their settings, fill them separataly, because tags form is more complicated.
+		// If data contains Tags and their settings, fill them separately, because tags form is more complicated.
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			$form->getField('id:evaltype_0')->asSegmentedRadio()->fill(CTestArrayHelper::get($data, 'Tags.Evaluation', 'And/Or'));
 			$form->getField('id:tags_0')->asMultifieldTable()->fill(CTestArrayHelper::get($data, 'Tags.tags', []));
@@ -828,7 +828,7 @@ class testPageMonitoringLatestData extends CWebTest {
 
 		$this->page->login()->open('zabbix.php?action=latest.view')->waitUntilReady();
 		$form = $this->query('name:zbx_filter')->asForm()->one();
-		$table = $this->query('xpath://table[contains(@class, "overflow-ellipsis")]')->asTable()->waitUntilPresent()->one();
+		$table = $this->getTable()->waitUntilPresent();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$form->fill(['Name' => '4_item'])->submit();

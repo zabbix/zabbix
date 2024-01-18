@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,7 +52,6 @@ class CControllerHostViewRefresh extends CControllerHostView {
 		else {
 			$this->getInputs($filter, array_keys($filter));
 			$filter = $this->cleanInput($filter);
-			$prepared_data = $this->getData($filter);
 
 			$view_url = (new CUrl())
 				->setArgument('action', 'host.view')
@@ -65,7 +64,7 @@ class CControllerHostViewRefresh extends CControllerHostView {
 				'sortorder' => $filter['sortorder'],
 				'allowed_ui_latest_data' => $this->checkAccess(CRoleHelper::UI_MONITORING_LATEST_DATA),
 				'allowed_ui_problems' => $this->checkAccess(CRoleHelper::UI_MONITORING_PROBLEMS)
-			] + $prepared_data;
+			] + $this->getData($filter);
 
 			$response = new CControllerResponseData($data);
 			$this->setResponse($response);

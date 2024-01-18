@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,8 @@ $fields = [
 	'items' =>			[T_ZBX_STR,			O_OPT, P_ONLY_TD_ARRAY,	null,			null],
 	'i' =>				[T_ZBX_STR,			O_OPT, P_ONLY_ARRAY,	null,			null],
 	'onlyHeight' =>		[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
-	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null]
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null],
+	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,		IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	session_write_close();
@@ -82,9 +83,11 @@ if ($httptestid = getRequest('httptestid', false)) {
 	$hosts = zbx_toHash($httptests[0]['hosts'], 'hostid');
 
 	$dbItems = DBselect(
-		'SELECT i.itemid,i.type,i.name,i.delay,i.units,i.hostid,i.history,i.trends,i.value_type,i.key_'.
-		' FROM httpstepitem hi,items i,httpstep hs'.
+		'SELECT i.itemid,i.type,ir.name_resolved AS name,i.delay,i.units,i.hostid,i.history,i.trends,i.value_type,'.
+			'i.key_'.
+		' FROM httpstepitem hi,items i,item_rtname ir,httpstep hs'.
 		' WHERE i.itemid=hi.itemid'.
+			' AND i.itemid=ir.itemid'.
 			' AND hs.httptestid='.zbx_dbstr($httptestid).
 			' AND hs.httpstepid=hi.httpstepid'.
 			' AND hi.type='.zbx_dbstr(getRequest('http_item_type', HTTPSTEP_ITEM_TYPE_TIME)).
@@ -111,25 +114,42 @@ elseif (hasRequest('i') || hasRequest('items')) {
 
 	CArrayHelper::sort($items, ['sortorder']);
 
-	$dbItems = API::Item()->get([
-		'itemids' => zbx_objectValues($items, 'itemid'),
-		'output' => ['itemid', 'type', 'master_itemid', 'name', 'delay', 'units', 'hostid', 'history', 'trends',
-			'value_type', 'key_'
+	$resolve_macros = (bool) getRequest('resolve_macros', 0);
+
+	$options = [
+		'output' => ['itemid', 'type', 'name', 'master_itemid', 'delay', 'units', 'hostid', 'history', 'trends',
+			'value_type', 'key_', 'flags'
 		],
 		'selectHosts' => ['hostid', 'name', 'host'],
+		'itemids' => array_column($items, 'itemid'),
 		'filter' => [
 			'flags' => [ZBX_FLAG_DISCOVERY_NORMAL, ZBX_FLAG_DISCOVERY_PROTOTYPE, ZBX_FLAG_DISCOVERY_CREATED]
 		],
 		'webitems' => true,
 		'preservekeys' => true
-	]);
+	];
+
+	if ($resolve_macros) {
+		$options['output'][] = 'name_resolved';
+	}
+
+	$db_items = API::Item()->get($options);
+
+	if ($resolve_macros) {
+		foreach ($db_items as &$item) {
+			if ($item['flags'] == ZBX_FLAG_DISCOVERY_NORMAL || $item['flags'] == ZBX_FLAG_DISCOVERY_CREATED) {
+				$item = CArrayHelper::renameKeys($item, ['name_resolved' => 'name']);
+			}
+		}
+		unset($item);
+	}
 
 	foreach ($items as $item) {
-		if (!array_key_exists($item['itemid'], $dbItems)) {
+		if (!array_key_exists($item['itemid'], $db_items)) {
 			access_deny();
 		}
-		$host = reset($dbItems[$item['itemid']]['hosts']);
-		$graph_items[] = $dbItems[$item['itemid']] + $item + [
+		$host = reset($db_items[$item['itemid']]['hosts']);
+		$graph_items[] = $db_items[$item['itemid']] + $item + [
 			'host' => $host['host'],
 			'hostname' => $host['name']
 		];

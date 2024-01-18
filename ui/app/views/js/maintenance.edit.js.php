@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,9 @@ window.maintenance_edit = new class {
 
 			this._update();
 		}
+
+		this._form.style.display = '';
+		this._overlay.recoverFocus();
 	}
 
 	_update () {
@@ -165,6 +168,8 @@ window.maintenance_edit = new class {
 
 		this._overlay.unsetLoading();
 		this._overlay.setProperties({title, buttons});
+		this._overlay.recoverFocus();
+		this._overlay.containFocus();
 	}
 
 	delete() {

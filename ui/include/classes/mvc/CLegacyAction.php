@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,9 +57,8 @@ class CLegacyAction extends CAction {
 		 * Overwrite legacy action in case user is located in sub-section like items, triggers etc. That will make
 		 * sure to hide left menu and display error in case user has no access to templates or hosts.
 		 */
-		if (in_array(getRequest('context', ''), ['host', 'template']) && in_array($action, ['items.php',
-				'graphs.php', 'host_discovery.php', 'httpconf.php', 'disc_prototypes.php',
-				'host_prototypes.php'])) {
+		if (in_array(getRequest('context', ''), ['host', 'template'])
+				&& in_array($action, ['graphs.php', 'host_discovery.php', 'httpconf.php', 'host_prototypes.php'])) {
 			$action = (getRequest('context') === 'host') ? 'host.list' : 'template.list';
 		}
 
@@ -71,8 +70,8 @@ class CLegacyAction extends CAction {
 		}
 
 		if ($user_type < USER_TYPE_ZABBIX_ADMIN) {
-			$denied = array_merge($denied, ['disc_prototypes.php', 'graphs.php', 'host_discovery.php',
-				'host_prototypes.php', 'host.list', 'httpconf.php', 'items.php', 'report4.php', 'template.list'
+			$denied = array_merge($denied, ['graphs.php', 'host_discovery.php', 'host_prototypes.php', 'host.list',
+				'httpconf.php', 'report4.php', 'template.list'
 			]);
 		}
 

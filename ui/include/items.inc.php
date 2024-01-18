@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -558,13 +558,15 @@ function makeItemTemplatePrefix($itemid, array $parent_templates, $flag, bool $p
 				->setArgument('context', 'template');
 		}
 		elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-			$url = (new CUrl('disc_prototypes.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.prototype.list')
 				->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
 				->setArgument('context', 'template');
 		}
 		// ZBX_FLAG_DISCOVERY_NORMAL
 		else {
-			$url = (new CUrl('items.php'))
+			$url = (new CUrl('zabbix.php'))
+				->setArgument('action', 'item.list')
 				->setArgument('filter_set', '1')
 				->setArgument('filter_hostids', [$template['hostid']])
 				->setArgument('context', 'template');
@@ -602,23 +604,23 @@ function makeItemTemplatesHtml($itemid, array $parent_templates, $flag, bool $pr
 					->setArgument('form', 'update')
 					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
 					->setArgument('context', 'template');
+				$name = new CLink($template['name'], $url);
 			}
 			elseif ($flag == ZBX_FLAG_DISCOVERY_PROTOTYPE) {
-				$url = (new CUrl('disc_prototypes.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.prototype.edit')
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-parent_discoveryid', $parent_templates['links'][$itemid]['lld_ruleid'])
+					->setAttribute('data-context', 'template');
 			}
 			// ZBX_FLAG_DISCOVERY_NORMAL
 			else {
-				$url = (new CUrl('items.php'))
-					->setArgument('form', 'update')
-					->setArgument('itemid', $parent_templates['links'][$itemid]['itemid'])
-					->setArgument('context', 'template');
+				$name = (new CLink($template['name']))
+					->setAttribute('data-action', 'item.edit')
+					->setAttribute('data-hostid', $parent_templates['links'][$itemid]['hostid'])
+					->setAttribute('data-itemid', $parent_templates['links'][$itemid]['itemid'])
+					->setAttribute('data-context', 'template');
 			}
-
-			$name = new CLink($template['name'], $url);
 		}
 		else {
 			$name = (new CSpan($template['name']))->addClass(ZBX_STYLE_GREY);
@@ -732,8 +734,8 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		$hostids = array_keys($db_hosts);
 	}
 
-	$db_items = API::Item()->get([
-		'output' => ['itemid', 'hostid', 'name', 'value_type', 'units', 'valuemapid'],
+	$db_items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+		'output' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'units', 'valuemapid'],
 		'selectHosts' => ['name'],
 		'selectValueMap' => ['mappings'],
 		'hostids' => $hostids,
@@ -743,7 +745,7 @@ function getDataOverviewItems(?array $groupids, ?array $hostids, ?array $tags, i
 		'monitored' => true,
 		'webitems' => true,
 		'preservekeys' => true
-	]);
+	]), ['name_resolved' => 'name']);
 
 	CArrayHelper::sort($db_items, [
 		['field' => 'name', 'order' => ZBX_SORT_UP],
@@ -1016,6 +1018,105 @@ function getItemDataOverviewCell(array $item, ?array $trigger = null): CCol {
 }
 
 /**
+ * Prepare aggregated item value for displaying, apply value map and/or convert units if appropriate for the aggregation
+ * function.
+ *
+ * @see formatAggregatedHistoryValueRaw
+ *
+ * @param int|float|string $value
+ * @param array            $item
+ * @param int              $function         Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX,
+ *                                           AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST,
+ *                                           AGGREGATE_LAST).
+ * @param bool             $force_units      Whether to keep units despite the aggregation function not supporting it.
+ * @param bool             $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array            $convert_options  Options for unit conversion. See @convertUnitsRaw.
+ *
+ * @return string
+ */
+function formatAggregatedHistoryValue($value, array $item, int $function, bool $force_units = false, bool $trim = true,
+		array $convert_options = []): string {
+	$formatted_value = formatAggregatedHistoryValueRaw($value, $item, $function, $force_units, $trim, $convert_options);
+
+	return $formatted_value['value'].($formatted_value['units'] !== '' ? ' '.$formatted_value['units'] : '');
+}
+
+/**
+ * Prepare aggregated item value for displaying, apply value map and/or convert units if appropriate for the aggregation
+ * function.
+ *
+ * @param int|float|string $value
+ * @param array            $item
+ * @param int              $function         Aggregation function (AGGREGATE_NONE, AGGREGATE_MIN, AGGREGATE_MAX,
+ *                                           AGGREGATE_AVG, AGGREGATE_COUNT, AGGREGATE_SUM, AGGREGATE_FIRST,
+ *                                           AGGREGATE_LAST).
+ * @param bool             $force_units      Whether to keep units despite the aggregation function not supporting it.
+ * @param bool             $trim             Whether to trim non-numeric value to a length of 20 characters.
+ * @param array            $convert_options  Options for unit conversion. See @convertUnitsRaw.
+ *
+ * @return array
+ */
+function formatAggregatedHistoryValueRaw($value, array $item, int $function, bool $force_units = false,
+		bool $trim = true, array $convert_options = []): array {
+	$is_numeric_item = in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]);
+	$is_numeric_data = $is_numeric_item || CAggFunctionData::isNumericResult($function);
+
+	if ($is_numeric_data) {
+		$display_value = $value;
+	}
+	else {
+		switch ($item['value_type']) {
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_LOG:
+				$display_value = $trim && mb_strlen($value) > 20 ? mb_substr($value, 0, 20).'...' : $value;
+				break;
+
+			case ITEM_VALUE_TYPE_BINARY:
+				$display_value = _('binary value');
+				break;
+
+			default:
+				$display_value = _('Unknown value type');
+		}
+	}
+
+	if (in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_STR])
+			&& CAggFunctionData::preservesValueMapping($function)) {
+		$mapped_value = CValueMapHelper::getMappedValue($item['value_type'], $value, $item['valuemap']);
+
+		if ($mapped_value !== false) {
+			return [
+				'value' => $mapped_value.' ('.$display_value.')',
+				'units' => '',
+				'is_mapped' => true
+			];
+		}
+	}
+
+	$units = $force_units || CAggFunctionData::preservesUnits($function) ? $item['units'] : '';
+
+	if ($is_numeric_data) {
+		$converted_value = convertUnitsRaw([
+			'value' => $value,
+			'units' => $units
+		] + $convert_options);
+
+		return [
+			'value' => $converted_value['value'],
+			'units' => $converted_value['units'],
+			'is_mapped' => false
+		];
+	}
+
+	return [
+		'value' => $display_value,
+		'units' => $units,
+		'is_mapped' => false
+	];
+}
+
+/**
  * Prepare item value for displaying, apply value map and/or convert units.
  *
  * @see formatHistoryValueRaw
@@ -1062,15 +1163,6 @@ function formatHistoryValueRaw($value, array $item, bool $trim = true, array $co
 					'value' => $mapped_value.' ('.$value.')',
 					'units' => '',
 					'is_mapped' => true
-				];
-			}
-
-			if ($item['units'] === 's' && array_key_exists('decimals', $convert_options)
-					&& $convert_options['decimals'] != 0) {
-				return [
-					'value' => convertUnitSWithDecimals($value, false, $convert_options['decimals'], true),
-					'units' => '',
-					'is_mapped' => false
 				];
 			}
 
@@ -1173,24 +1265,21 @@ function isBinaryUnits(string $units): bool {
 }
 
 /**
- * Retrieves from DB historical data for items and applies functional calculations.
- * If fails for some reason, returns null.
+ * Get item functional value for use in expression macros. Will return null on errors.
  *
- * @param array		$item
- * @param string	$item['itemid']		ID of item
- * @param string	$item['value_type']	type of item, allowed: ITEM_VALUE_TYPE_FLOAT and ITEM_VALUE_TYPE_UINT64
- * @param string	$function			function to apply to time period from param, allowed: min, max and avg
- * @param string	$parameter			formatted parameter for function, example: "2w" meaning 2 weeks
+ * @param array  $item
+ *               $item['itemid']     Item ID.
+ *               $item['value_type'] Item value type (either ITEM_VALUE_TYPE_FLOAT or ITEM_VALUE_TYPE_UINT64).
+ * @param string $function           Aggregation function (either 'min', 'max' or 'avg').
+ * @param string $parameter          Time shift for aggregation (like '1h' or '2w').
  *
- * @return string|null item functional value from history
+ * @return string|null
  */
-function getItemFunctionalValue($item, $function, $parameter) {
-	// Check whether function is allowed and parameter is specified.
+function getItemFunctionalValue(array $item, string $function, string $parameter): ?string {
 	if (!in_array($function, ['min', 'max', 'avg']) || $parameter === '') {
 		return null;
 	}
 
-	// Check whether item type is allowed for min, max and avg functions.
 	if ($item['value_type'] != ITEM_VALUE_TYPE_FLOAT && $item['value_type'] != ITEM_VALUE_TYPE_UINT64) {
 		return null;
 	}
@@ -1201,15 +1290,23 @@ function getItemFunctionalValue($item, $function, $parameter) {
 		return null;
 	}
 
-	$parameter = $number_parser->calcValue();
+	$time_shift = $number_parser->calcValue();
 
-	$time_from = time() - $parameter;
+	$time_from = time() - $time_shift;
 
 	if ($time_from < 0 || $time_from > ZBX_MAX_DATE) {
 		return null;
 	}
 
-	return Manager::History()->getAggregatedValue($item, $function, $time_from);
+	$aggregated_data = Manager::History()->getAggregatedValues([['source' => 'history'] + $item],
+		CItemHelper::resolveAggregateFunction($function), $time_from
+	);
+
+	if (!$aggregated_data) {
+		return null;
+	}
+
+	return $aggregated_data[$item['itemid']]['value'];
 }
 
 /**
@@ -2184,23 +2281,15 @@ function prepareLldOverrides(array $overrides, ?array $db_item): array {
  * @return array
  */
 function prepareItemQueryFields(array $query_fields): array {
-	if ($query_fields) {
-		$_query_fields = [];
+	foreach ($query_fields as $i => $query_field) {
+		unset($query_fields[$i]['sortorder']);
 
-		foreach ($query_fields['name'] as $index => $key) {
-			$value = $query_fields['value'][$index];
-			$sortorder = $query_fields['sortorder'][$index];
-
-			if ($key !== '' || $value !== '') {
-				$_query_fields[$sortorder] = [$key => $value];
-			}
+		if ($query_field['name'] === '' && $query_field['value'] === '') {
+			unset($query_fields[$i]);
 		}
-
-		ksort($_query_fields);
-		$query_fields = array_values($_query_fields);
 	}
 
-	return $query_fields;
+	return array_values($query_fields);
 }
 
 /**
@@ -2211,23 +2300,15 @@ function prepareItemQueryFields(array $query_fields): array {
  * @return array
  */
 function prepareItemHeaders(array $headers): array {
-	if ($headers) {
-		$_headers = [];
+	foreach ($headers as $i => $header) {
+		unset($headers[$i]['sortorder']);
 
-		foreach ($headers['name'] as $i => $name) {
-			$value = $headers['value'][$i];
-
-			if ($name === '' && $value === '') {
-				continue;
-			}
-
-			$_headers[$name] = $value;
+		if ($header['name'] === '' && $header['value'] === '') {
+			unset($headers[$i]);
 		}
-
-		$headers = $_headers;
 	}
 
-	return $headers;
+	return array_values($headers);
 }
 
 /**
@@ -2238,22 +2319,13 @@ function prepareItemHeaders(array $headers): array {
  * @return array
  */
 function prepareItemParameters(array $parameters): array {
-	$_parameters = [];
-
-	if (is_array($parameters) && array_key_exists('name', $parameters)
-			&& array_key_exists('value', $parameters)) {
-		foreach ($parameters['name'] as $index => $name) {
-			if (array_key_exists($index, $parameters['value'])
-					&& ($name !== '' || $parameters['value'][$index] !== '')) {
-				$_parameters[] = [
-					'name' => $name,
-					'value' => $parameters['value'][$index]
-				];
-			}
+	foreach ($parameters as $i => $parameter) {
+		if ($parameter['name'] === '' && $parameter['value'] === '') {
+			unset($parameters[$i]);
 		}
 	}
 
-	return $_parameters;
+	return array_values($parameters);
 }
 
 /**
@@ -2594,33 +2666,3 @@ function getInheritedTimeouts(string $proxyid): array {
 		]
 	];
 }
-
-/**
- * Prioritize ZBX_PREPROC_VALIDATE_NOT_SUPPORTED checks, with "match any error" being the last of them.
- *
- * @param array $steps
- *
- * @return array
- */
-function sortPreprocessingSteps(array $steps): array {
-	$ns_regex = [];
-	$ns_any = [];
-	$other = [];
-
-	foreach ($steps as $step) {
-		if ($step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-			$other[] = $step;
-			continue;
-		}
-
-		if ($step['params'][0] == ZBX_PREPROC_MATCH_ERROR_ANY) {
-			$ns_any[] = $step;
-		}
-		else {
-			$ns_regex[] = $step;
-		}
-	}
-
-	return array_merge($ns_regex, $ns_any, $other);
-}
-

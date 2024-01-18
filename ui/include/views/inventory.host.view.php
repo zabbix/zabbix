@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -179,7 +179,8 @@ if ($data['allowed_ui_conf_hosts'] && $data['rwHost']) {
 		->setAttribute('data-hostid', $data['host']['hostid'])
 		->onClick('view.editHost({hostid: this.dataset.hostid});');
 	$itemsLink = new CLink(_('Items'),
-		(new CUrl('items.php'))
+		(new CUrl('zabbix.php'))
+			->setArgument('action', 'item.list')
 			->setArgument('filter_set', '1')
 			->setArgument('filter_hostids', [$data['host']['hostid']])
 			->setArgument('context', 'host')

@@ -33,97 +33,97 @@ zabbix_export:
           params: |
             try {
             
-                const js_start = new Date().getTime();
+            	const js_start = new Date().getTime();
             
-                var params = JSON.parse(value);
-                var result = {
-                    status: 0,
-                    data: {}
-                };
+            	var params = JSON.parse(value);
+            	var result = {
+            		status: 0,
+            		data: {}
+            	};
             
-                var req = new HttpRequest();
+            	var req = new HttpRequest();
             
-                var out = {};
-                var queue = [];
+            	var out = {};
+            	var queue = [];
             
-                var node;
-                var obj_iter_by_name;
-                var cpath;
+            	var node;
+            	var obj_iter_by_name;
+            	var cpath;
             
-                var current_folder;
-                var child_folders;
-                var child_files;
-                var obj_iter_file;
+            	var current_folder;
+            	var child_folders;
+            	var child_files;
+            	var obj_iter_file;
             
-                req.addHeader('Accept: application/json; odata=verbose');
-                req.setHttpAuth(HTTPAUTH_NTLM, params.user, params.password);
-                queue.push({
-                    patch: params.root,
-                    json: []
-                });
+            	req.addHeader('Accept: application/json; odata=verbose');
+            	req.setHttpAuth(HTTPAUTH_NTLM, params.user, params.password);
+            	queue.push({
+            		patch: params.root,
+            		json: []
+            	});
             
-                while (queue.length) {
-                    node = queue.pop();
-                    obj_iter_by_name = out;
-                    cpath = node.json.slice()
+            	while (queue.length) {
+            		node = queue.pop();
+            		obj_iter_by_name = out;
+            		cpath = node.json.slice()
             
-                    current_folder = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')")));
+            		current_folder = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')")));
             
-                    result.status = req.getStatus();
-                    if (result.status != 200) {
-                        throw result.status;
-                    }
+            		result.status = req.getStatus();
+            		if (result.status != 200) {
+            			throw result.status;
+            		}
             
-                    cpath.forEach(function (nd) {
-                        obj_iter_by_name = obj_iter_by_name[nd]
-                    });
+            		cpath.forEach(function (nd) {
+            			obj_iter_by_name = obj_iter_by_name[nd]
+            		});
             
-                    obj_iter_by_name[current_folder.d.Name] = {
-                        meta: {
-                            size: 0,
-                            created: Math.round(new Date(current_folder.d.TimeCreated).getTime() / 1000),
-                            modified: Math.round(new Date(current_folder.d.TimeLastModified).getTime() / 1000)
-                        },
-                        data: {}
-                    }
+            		obj_iter_by_name[current_folder.d.Name] = {
+            			meta: {
+            				size: 0,
+            				created: Math.round(new Date(current_folder.d.TimeCreated).getTime() / 1000),
+            				modified: Math.round(new Date(current_folder.d.TimeLastModified).getTime() / 1000)
+            			},
+            			data: {}
+            		}
             
-                    child_folders = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Folders")));
+            		child_folders = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Folders")));
             
-                    cpath.push(current_folder.d.Name, "data");
-                    child_folders.d.results.forEach(function (dir) {
-                        queue.push({
-                            patch: dir.ServerRelativeUrl,
-                            json: cpath
-                        });
-                    });
+            		cpath.push(current_folder.d.Name, "data");
+            		child_folders.d.results.forEach(function (dir) {
+            			queue.push({
+            				patch: dir.ServerRelativeUrl,
+            				json: cpath
+            			});
+            		});
             
-                    child_files = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Files")));
-                    child_files.d.results.forEach(function (file) {
-                        obj_iter_by_name[current_folder.d.Name].data[file.Name] = {
-                            meta: {
-                                size: file.Length,
-                                created: Math.round(new Date(file.TimeCreated).getTime() / 1000),
-                                modified: Math.round(new Date(file.TimeLastModified).getTime() / 1000)
-                            }
-                        };
+            		child_files = JSON.parse(req.get(encodeURI(params.url + "/_api/web/GetFolderByServerRelativeUrl('" + node.patch.replace("'", "''") + "')/Files")));
+            		child_files.d.results.forEach(function (file) {
+            			obj_iter_by_name[current_folder.d.Name].data[file.Name] = {
+            				meta: {
+            					size: file.Length,
+            					created: Math.round(new Date(file.TimeCreated).getTime() / 1000),
+            					modified: Math.round(new Date(file.TimeLastModified).getTime() / 1000)
+            				}
+            			};
             
-                        obj_iter_file = out;
-                        cpath.forEach(function (nd) {
-                            obj_iter_file = obj_iter_file[nd];
-                            if (nd != "data") {
-                                obj_iter_file.meta.size += +file.Length;
-                            }
-                        });
-                    });
+            			obj_iter_file = out;
+            			cpath.forEach(function (nd) {
+            				obj_iter_file = obj_iter_file[nd];
+            				if (nd != "data") {
+            					obj_iter_file.meta.size += +file.Length;
+            				}
+            			});
+            		});
             
-                }
+            	}
             
-                result.data = out;
+            	result.data = out;
             
             } catch (error) {
-                Zabbix.log(3, "Sharepoint fs scan failed: " + params.url + " Error: " + error);
-                if (!Number.isInteger(error))
-                    result.status = 520;
+            	Zabbix.log(3, "Sharepoint fs scan failed: " + params.url + " Error: " + error);
+            	if (!Number.isInteger(error))
+            		result.status = 520;
             }
             
             result.time = new Date().getTime() - js_start;
@@ -241,7 +241,7 @@ zabbix_export:
               value: health
           triggers:
             - uuid: 3a0451e3edda4a73aded57aa254fd813
-              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"'
+              expression: 'last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALTH_SCORE}"'
               name: 'Sharepoint: Bad health score'
               priority: AVERAGE
               tags:
@@ -478,7 +478,7 @@ zabbix_export:
           description: 'Filter to exclude discovered types.'
         - macro: '{$SHAREPOINT.LLD_INTERVAL}'
           value: 3h
-        - macro: '{$SHAREPOINT.MAX_HEALT_SCORE}'
+        - macro: '{$SHAREPOINT.MAX_HEALTH_SCORE}'
           value: '5'
           description: |
             Must be in the range from 0 to 10

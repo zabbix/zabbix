@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,6 @@
 #define ZBX_MULTIPART_MIXED_BOUNDARY	"MULTIPART-MIXED-BOUNDARY"
 
 #define OK_250	"250"
-
-extern char	*CONFIG_SSL_CA_LOCATION;
 
 /* SMTP security options */
 #define SMTP_SECURITY_NONE	0
@@ -723,7 +721,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		const char *mailsubject, const char *mailbody, unsigned char smtp_security, unsigned char
 		smtp_verify_peer, unsigned char smtp_verify_host, unsigned char smtp_authentication,
 		const char *username, const char *password, unsigned char content_type, int timeout,
-		const char *config_source_ip, char *error, size_t max_error_len)
+		const char *config_source_ip, const char *config_ssl_ca_location, char *error, size_t max_error_len)
 {
 #ifdef HAVE_SMTP_AUTHENTICATION
 	int			ret = FAIL, i;
@@ -804,9 +802,9 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 			goto error;
 		}
 
-		if (0 != smtp_verify_peer && NULL != CONFIG_SSL_CA_LOCATION)
+		if (0 != smtp_verify_peer && NULL != config_ssl_ca_location)
 		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, CONFIG_SSL_CA_LOCATION)))
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_CAPATH, config_ssl_ca_location)))
 				goto error;
 		}
 
@@ -916,6 +914,7 @@ out:
 	ZBX_UNUSED(content_type);
 	ZBX_UNUSED(timeout);
 	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
 
 	zbx_strlcpy(error, "Support for SMTP authentication was not compiled in", max_error_len);
 	return FAIL;
@@ -940,8 +939,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 		const char *mailto, const char *inreplyto, const char *mailsubject, const char *mailbody,
 		unsigned char smtp_security, unsigned char smtp_verify_peer, unsigned char smtp_verify_host,
 		unsigned char smtp_authentication, const char *username, const char *password,
-		unsigned char content_type, int timeout, const char *config_source_ip, char *error,
-		size_t max_error_len)
+		unsigned char content_type, int timeout, const char *config_source_ip,
+		const char *config_ssl_ca_location, char *error, size_t max_error_len)
 {
 	int			ret = FAIL;
 	zbx_vector_ptr_t	from_mails, to_mails;
@@ -971,7 +970,8 @@ int	send_email(const char *smtp_server, unsigned short smtp_port, const char *sm
 	{
 		ret = send_email_curl(smtp_server, smtp_port, smtp_helo, &from_mails, &to_mails, inreplyto, mailsubject,
 				mailbody, smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication,
-				username, password, content_type, timeout, config_source_ip, error, max_error_len);
+				username, password, content_type, timeout, config_source_ip, config_ssl_ca_location,
+				error, max_error_len);
 	}
 
 clean:

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -85,7 +85,7 @@ class testPageNetworkDiscovery extends CWebTest {
 
 		// Check if filter collapses/ expands.
 		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_RIGHT);
-		$filter_tab->isExpanded();
+		$this->assertTrue($filter_tab->isExpanded());
 
 		// Check that filter is collapsing/expanding on click.
 		foreach ([false, true] as $status) {

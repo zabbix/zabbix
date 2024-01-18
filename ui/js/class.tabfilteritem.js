@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ class CTabFilterItem extends CBaseComponent {
 		this.updateUnsavedState();
 
 		return PopUp('popup.tabfilter.edit', { ...defaults, ...params },
-			{dialogueid: 'tabfilter_dialogue', trigger_element}
+			{dialogueid: 'tabfilter_dialogue', dialogue_class: 'modal-popup-generic', trigger_element}
 		);
 	}
 
@@ -303,6 +303,15 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Get custom time label.
+	 *
+	 * @returns {string}
+	 */
+	getCustomTimeLabel() {
+		return this.hasCustomTime() ? this._data.filter_custom_time_label : '';
+	}
+
+	/**
 	 * Update tab filter configuration: name, show_counter, custom_time. Set browser URL according new values.
 	 *
 	 * @param {object} data  Updated tab properties object.
@@ -316,6 +325,7 @@ class CTabFilterItem extends CBaseComponent {
 			};
 
 		if (data.filter_custom_time) {
+			this._data.filter_custom_time_label = data.filter_custom_time_label;
 			this._data.from = data.from;
 			this._data.to = data.to;
 		}

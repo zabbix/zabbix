@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,10 @@
 #include "zbxcommshigh.h"
 #include "cfg.h"
 
-const char	*progname = NULL;
-const char	title_message[] = "";
-const char	*usage_message[] = {NULL};
-
-const char	*help_message[] = {NULL};
+static const char	*progname = NULL;
+static const char	title_message[] = "";
+static const char	*usage_message[] = {NULL};
+static const char	*help_message[] = {NULL};
 
 unsigned char	program_type	= ZBX_PROGRAM_TYPE_SENDER;
 

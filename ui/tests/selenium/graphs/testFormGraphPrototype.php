@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testFormGraphs.php';
  *
  * @onAfter clearData
  *
- * @dataSource WebScenarios
+ * @dataSource WebScenarios, AllItemValueTypes
  */
 class testFormGraphPrototype extends testFormGraphs {
 
@@ -681,6 +681,16 @@ class testFormGraphPrototype extends testFormGraphs {
 
 	public function testFormGraphPrototype_Delete() {
 		$this->checkDelete();
+	}
+
+	/**
+	 * Test for checking that only permitted item types are accessible for graph prototype creation.
+	 */
+	public function testFormGraphPrototype_CheckAvailableItems() {
+		$lldid = CDBHelper::getValue('SELECT itemid FROM items WHERE name='.zbx_dbstr(self::LLD_WITH_ITEMS));
+		$url = 'graphs.php?form=create&parent_discoveryid='.$lldid.'&context=host';
+
+		$this->checkAvailableItems($url);
 	}
 
 	public static function getTextItemPrototypesData() {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,7 +45,7 @@ jQuery(function($) {
 		ui_disabled = false;
 
 	endpoint.setArgument('action', 'timeselector.update');
-	endpoint.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+	endpoint.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
 
 	$.subscribe('timeselector.rangechange timeselector.decrement timeselector.increment timeselector.zoomout' +
 		' timeselector.rangeoffset',

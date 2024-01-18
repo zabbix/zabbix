@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,24 +229,27 @@ int	zbx_rtc_parse_options(const char *opt, zbx_uint32_t *code, struct zbx_json *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: notify RTC service about finishing initial configuration sync     *
+ * Purpose: notify RTC service about finishing initial sync                   *
  *                                                                            *
  * Parameters:                                                                *
  *      config_timeout - [IN]                                                 *
+ *      code           - [IN]  the RTC code to be sent                        *
+ *      process_name   - [IN]  the process name to be logged                  *
  *      rtc            - [OUT] the RTC notification subscription socket       *
  *                                                                            *
  ******************************************************************************/
-void	zbx_rtc_notify_config_sync(int config_timeout, zbx_ipc_async_socket_t *rtc)
+void	zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, const char *process_name,
+		zbx_ipc_async_socket_t *rtc)
 {
-	if (FAIL == zbx_ipc_async_socket_send(rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY, NULL, 0))
+	if (FAIL == zbx_ipc_async_socket_send(rtc, code, NULL, 0))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot send configuration syncer notification");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot send %s notification", process_name);
 		exit(EXIT_FAILURE);
 	}
 
 	if (FAIL == zbx_ipc_async_socket_flush(rtc, config_timeout))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "cannot flush configuration syncer notification");
+		zabbix_log(LOG_LEVEL_CRIT, "cannot flush %s notification", process_name);
 		exit(EXIT_FAILURE);
 	}
 }

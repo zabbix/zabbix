@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,29 +39,35 @@ type activeConnection struct {
 	session   string
 }
 
-func (c *activeConnection) Write(data []byte, timeout time.Duration) []error {
+func (c *activeConnection) Write(data []byte, timeout time.Duration) (bool, []error) {
+	upload := true
+
 	b, errs, _ := zbxcomms.Exchange(&c.addresses, &c.localAddr, timeout, time.Second*time.Duration(c.timeout),
 		data, c.tlsConfig)
 	if errs != nil {
-		return errs
+		return upload, errs
 	}
 
 	var response agentDataResponse
 
 	err := json.Unmarshal(b, &response)
 	if err != nil {
-		return []error{err}
+		return upload, []error{err}
+	}
+
+	if response.HistoryUpload == "disabled" {
+		upload = false
 	}
 
 	if response.Response != "success" {
 		if len(response.Info) != 0 {
-			return []error{fmt.Errorf("%s", response.Info)}
+			return upload, []error{fmt.Errorf("%s", response.Info)}
 		}
 
-		return []error{errors.New("unsuccessful response")}
+		return upload, []error{errors.New("unsuccessful response")}
 	}
 
-	return nil
+	return upload, nil
 }
 
 func (c *activeConnection) Addr() (s string) {

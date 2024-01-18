@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -176,7 +176,7 @@ class testFormAdministrationMediaTypes extends CWebTest {
 
 		foreach ($session_settings as $setting => $visible) {
 			$concurrent_sessions->fill($setting);
-			$maxsessions = $concurrent_sessions->query('xpath:./../../input[@id="maxsessions"]')->one();
+			$maxsessions = $form->getFieldContainer('Concurrent sessions')->query('id:maxsessions')->one();
 			$this->assertTrue($maxsessions->isVisible($visible));
 
 			if ($visible) {

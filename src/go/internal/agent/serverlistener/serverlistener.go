@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ func (sl *ServerListener) processConnection(conn *zbxcomms.Connection) (err erro
 	log.Debugf("received passive check request: '%s' from '%s'", string(data), conn.RemoteIP())
 
 	response := passiveCheck{conn: &passiveConnection{conn: conn}, scheduler: sl.scheduler}
-	go response.handleCheck(data, conn.ReservedData())
+	go response.handleCheck(data)
 
 	return nil
 }

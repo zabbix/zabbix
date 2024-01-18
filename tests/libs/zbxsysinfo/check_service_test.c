@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,9 @@
 #include "../../../src/libs/zbxsysinfo/simple/simple.h"
 #include "../../../include/zbxsysinfo.h"
 #include "../../../src/libs/zbxsysinfo/sysinfo.h"
+
+int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
+		int (*validate_func)(const char *), const char *sendtoclose, int *value_int);
 
 int	__wrap_tcp_expect(const char *host, unsigned short port, int timeout, const char *request,
 		int (*validate_func)(const char *), const char *sendtoclose, int *value_int)

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class testCalculatedFormula extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'formula' => '',
-					'error' => 'Incorrect value for field "Formula": cannot be empty.'
+					'error' => 'Invalid parameter "/1/params": cannot be empty.'
 				]
 			],
 			[
@@ -3564,7 +3564,8 @@ class testCalculatedFormula extends CWebTest {
 		}
 
 		$this->page->login()->open($this->url)->waitUntilReady();
-		$form = $this->query('name:itemForm')->asForm()->waitUntilVisible()->one();
+		$this->query('button:'.($prototype ? 'Create item prototype' : 'Create item'))->one()->click();
+		$form = COverlayDialogElement::find()->one()->waitUntilReady()->asForm();
 		$key = 'calc'.microtime(true).'[{#KEY}]';
 
 		$form->fill([
@@ -3577,10 +3578,7 @@ class testCalculatedFormula extends CWebTest {
 		$form->submit();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_BAD) {
-			$title = (CTestArrayHelper::get($data, 'formula') === '')
-				? 'Page received incorrect data'
-				: ($prototype ? 'Cannot add item prototype' : 'Cannot add item');
-
+			$title = $prototype  ? 'Cannot add item prototype' : 'Cannot add item';
 			$this->assertMessage(TEST_BAD, $title, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM items WHERE key_='.zbx_dbstr($key)));
 			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM items ORDER BY itemid'));

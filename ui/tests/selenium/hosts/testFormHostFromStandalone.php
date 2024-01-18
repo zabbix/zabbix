@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -104,8 +104,8 @@ class testFormHostFromStandalone extends testFormHost {
 	public function testFormHostFromStandalone_DiscoveredHostLinkedTemplates() {
 		$filtered_results = [
 			[
-				'type' => 'items.php?',
-				'form' => 'items',
+				'type' => 'zabbix.php?action=item.list&',
+				'form' => 'item_list',
 				'objects' => [
 					'before_unlink' => [
 						'Test of discovered host 1 template for unlink: Template1 item1',

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -80,7 +80,7 @@ window.ldap_edit_popup = new class {
 					this.editProvisionMediaType(e.target.closest('tr'));
 				}
 				else if (e.target.classList.contains('js-remove')) {
-					e.target.closest('tr').remove()
+					e.target.closest('tr').remove();
 				}
 			});
 
@@ -133,7 +133,9 @@ window.ldap_edit_popup = new class {
 		let fields = {...{provision_status: <?= JIT_PROVISIONING_DISABLED ?>}, ...getFormFields(this.form)};
 		fields = this.preprocessFormFields(fields);
 
-		const test_overlay = PopUp('popup.ldap.test.edit', fields, {dialogueid: 'ldap_test_edit'});
+		const test_overlay = PopUp('popup.ldap.test.edit', fields,
+			{dialogueid: 'ldap_test_edit', dialogue_class: 'modal-popup-medium'}
+		);
 		test_overlay.xhr.then(() => this.overlay.unsetLoading());
 	}
 
@@ -257,7 +259,9 @@ window.ldap_edit_popup = new class {
 
 		popup_params.idp_type = <?= IDP_TYPE_LDAP ?>;
 
-		const overlay = PopUp('popup.usergroupmapping.edit', popup_params, {dialogueid: 'user_group_edit'});
+		const overlay = PopUp('popup.usergroupmapping.edit', popup_params,
+			{dialogueid: 'user_group_edit', dialogue_class: 'modal-popup-medium'}
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const new_row = this._renderProvisionGroupRow({...e.detail, ...{row_index}});
@@ -294,7 +298,9 @@ window.ldap_edit_popup = new class {
 			};
 		}
 
-		const overlay = PopUp('popup.mediatypemapping.edit', popup_params, {dialogueid: 'media_type_mapping_edit'});
+		const overlay = PopUp('popup.mediatypemapping.edit', popup_params,
+			{dialogueid: 'media_type_mapping_edit', dialogue_class: 'modal-popup-medium'}
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const mapping = {...e.detail, ...{row_index: row_index}};

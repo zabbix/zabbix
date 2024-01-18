@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/common/testFormAdministrationGeneral.php';
 
 /**
@@ -30,13 +31,19 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	public $default_values = [
 		'Enable audit logging' => true,
 		'Enable internal housekeeping' => true,
-		'Data storage period' => '365d'
+		'Data storage period' => '31d'
 	];
 
 	public $custom_values = [
 		'Enable audit logging' => true,
 		'Enable internal housekeeping' => true,
 		'Data storage period' => '400d'
+	];
+
+	public $db_default_values = [
+		'auditlog_enabled' => 1,
+		'hk_audit_mode' => 1,
+		'hk_audit' => '31d'
 	];
 
 	/**
@@ -97,274 +104,275 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 
 	public static function getUpdateValueData() {
 		return [
+			// #0.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => false
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '0',
-						'hk_audit' => '365d'
+						'hk_audit' => '31d'
 					]
 				]
 			],
+			// #1.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => false
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '0',
-						'hk_audit' => '365d'
+						'hk_audit' => '31d'
 					]
 				]
 			],
+			// #2.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '365d'
 					]
 				]
 			],
+			// #3.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '365d'
 					]
 				]
 			],
+			// #4.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1440m'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1440m'
 					]
 				]
 			],
+			// #5.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13140000m'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '13140000m'
 					]
 				]
 			],
+			// #6.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13139999m'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '13139999m'
 					]
 				]
 			],
+			// #7.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '24h'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '24h'
 					]
 				]
 			],
+			// #8.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '219000h'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '219000h'
 					]
 				]
 			],
+			// #9.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '218999h'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '218999h'
 					]
 				]
 			],
+			// #10.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1d'
 					]
 				]
 			],
+			// #11.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1w'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1w'
 					]
 				]
 			],
+			// #12.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86400s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '86400s'
 					]
 				]
 			],
+			// #13.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788400000s'
 					]
 				]
 			],
+			// #14.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788400000s'
 					]
 				]
 			],
+			// #15.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788399999s'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788399999s'
 					]
 				]
 			],
+			// #16.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '9125d'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '9125d'
 					]
 				]
 			],
+			// #17.
 			[
 				[
-					'expected' => TEST_GOOD,
 					'fields' => [
 						'Enable audit logging' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1303w'
 					],
-					'db_check' => [
+					'db' => [
 						'auditlog_enabled' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1303w'
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -376,6 +384,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -387,6 +396,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -398,6 +408,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -409,6 +420,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -420,6 +432,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -431,6 +444,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -442,6 +456,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -453,6 +468,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -464,6 +480,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -475,6 +492,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -486,6 +504,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -497,6 +516,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -508,6 +528,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -519,6 +540,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #32.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -530,6 +552,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": value must be one of 86400-788400000.'
 				]
 			],
+			// #33.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -541,6 +564,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #34.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -552,6 +576,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #35.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -563,6 +588,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #36.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -574,6 +600,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'details' => 'Incorrect value for field "hk_audit": a time unit is expected.'
 				]
 			],
+			// #37.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -596,30 +623,6 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * @dataProvider getUpdateValueData
 	 */
 	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
-		if ($data['expected'] === TEST_BAD) {
-			$old_hash = CDBHelper::getHash('SELECT * FROM config');
-		}
-
-		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
-		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
-		$form->fill($data['fields']);
-		$form->submit()->waitUntilReloaded();
-
-		if ($data['expected'] === TEST_GOOD) {
-			$this->assertMessage(TEST_GOOD, 'Configuration updated');
-			$form->checkValue($data['fields']);
-
-			// Check DB configuration.
-			$this->assertEquals($data['db_check'],  CDBHelper::getRow('SELECT auditlog_enabled, hk_audit_mode, hk_audit FROM config'));
-
-			// Reset back to default values.
-			$form->query('id:resetDefaults')->one()->click();
-			COverlayDialogElement::find()->waitUntilVisible()->one()->query('button:Reset defaults')->one()->click();
-			$form->submit()->waitUntilReloaded();
-		}
-		else {
-			$this->assertMessage(TEST_BAD, 'Cannot update configuration', $data['details']);
-			$this->assertEquals($old_hash, CDBHelper::getHash('SELECT * FROM config'));
-		}
+		$this->executeCheckForm($data);
 	}
 }

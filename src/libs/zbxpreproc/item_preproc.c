@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@
 #include "zbxxml.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
+#	include <libxml/parser.h>
 #endif
 
 #include "zbxnum.h"
@@ -117,7 +118,15 @@ int	zbx_item_preproc_convert_value_to_numeric(zbx_variant_t *value_num, const zb
 	}
 
 	if (ZBX_VARIANT_NONE != (type_hint = item_preproc_numeric_type_hint(value_type)))
-		zbx_variant_convert(value_num, type_hint);
+	{
+		if (FAIL == zbx_variant_convert(value_num, type_hint))
+		{
+			*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+					zbx_variant_type_desc(value_num), zbx_get_variant_type_desc(type_hint));
+			zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+			return FAIL;
+		}
+	}
 
 	return SUCCEED;
 }
@@ -279,14 +288,54 @@ int	item_preproc_delta(unsigned char value_type, zbx_variant_t *value, const zbx
 
 		if (ZBX_VARIANT_DBL == value->type || ZBX_VARIANT_DBL == history_value->type)
 		{
-			zbx_variant_convert(value, ZBX_VARIANT_DBL);
-			zbx_variant_convert(history_value, ZBX_VARIANT_DBL);
+			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_DBL))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
+			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_DBL))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(history_value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_DBL));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
 			ret = item_preproc_delta_float(value, ts, op_type, history_value, history_ts);
 		}
 		else
 		{
-			zbx_variant_convert(value, ZBX_VARIANT_UI64);
-			zbx_variant_convert(history_value, ZBX_VARIANT_UI64);
+			if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_UI64))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
+			if (FAIL == zbx_variant_convert(history_value, ZBX_VARIANT_UI64))
+			{
+				*errmsg = zbx_dsprintf(*errmsg, "cannot convert value from %s to %s",
+						zbx_variant_type_desc(history_value),
+						zbx_get_variant_type_desc(ZBX_VARIANT_UI64));
+
+				zabbix_log(LOG_LEVEL_CRIT, *errmsg);
+				THIS_SHOULD_NEVER_HAPPEN;
+				return FAIL;
+			}
+
 			ret = item_preproc_delta_uint64(value, ts, op_type, history_value, history_ts);
 		}
 
@@ -902,7 +951,7 @@ int	item_preproc_get_error_from_xml(const zbx_variant_t *value, const char *para
 	xmlDoc			*doc = NULL;
 	xmlXPathContext		*xpathCtx = NULL;
 	xmlXPathObject		*xpathObj = NULL;
-	xmlErrorPtr		pErr;
+	const xmlError		*pErr;
 	xmlBufferPtr		xmlBufferLocal;
 
 	zbx_variant_copy(&value_str, value);

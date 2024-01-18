@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -133,14 +133,6 @@ class Template {
 
 		data = data === undefined || data === null ? '' : `${data}`;
 
-		return before + (escape
-			? data
-				.replace(/&/g,'&amp;')
-				.replace(/</g,'&lt;')
-				.replace(/>/g,'&gt;')
-				.replace(/\"/g,'&quot;')
-				.replace(/\'/g,'&apos;')
-			: data
-		);
+		return before + (escape ? escapeHtml(data) : data);
 	}
 }

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,7 +188,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps = sortPreprocessingSteps($this->getInput('steps', []));
+		$preprocessing_steps = CItemGeneralHelper::sortPreprocessingSteps((array) $this->getInput('steps', []));
 		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
@@ -280,19 +280,27 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					$texts_having_macros = array_filter($inputs[$field][$key], function($str) {
-						return (strstr($str, '{') !== false);
-					});
+				foreach ($inputs[$field] as $num => $row) {
+					if ($row['name'] === '') {
+						unset($inputs[$field][$num]);
+					}
+				}
 
-					if ($texts_having_macros) {
-						$supported_macros = array_merge_recursive($supported_macros, $macros);
-						$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
-						$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+				$texts_having_macros = array_merge(
+					array_column($inputs[$field], 'name'),
+					array_column($inputs[$field], 'value')
+				);
+				$texts_having_macros = array_filter($texts_having_macros, static function(string $str): bool {
+					return (strstr($str, '{') !== false);
+				});
 
-						if ($support_lldmacros) {
-							$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
-						}
+				if ($texts_having_macros) {
+					$supported_macros = array_merge_recursive($supported_macros, $macros);
+					$texts_support_macros = array_merge($texts_support_macros, $texts_having_macros);
+					$texts_support_user_macros = array_merge($texts_support_user_macros, $texts_having_macros);
+
+					if ($support_lldmacros) {
+						$texts_support_lld_macros = array_merge($texts_support_lld_macros, $texts_having_macros);
 					}
 				}
 			}

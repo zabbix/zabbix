@@ -200,6 +200,7 @@ tests/libs/zbxeval/zbx_eval_parse_expression
 tests/libs/zbxeval/zbx_eval_parse_query
 tests/libs/zbxeval/zbx_eval_prepare_filter
 tests/libs/zbxeval/zbx_eval_serialize
+tests/libs/zbxfile/zbx_buf_readln
 tests/libs/zbxhistory/zbx_history_get_values
 tests/libs/zbxicmpping/get_interval_option
 tests/libs/zbxicmpping/line_process
@@ -253,10 +254,11 @@ tests/libs/zbxtrends/zbx_baseline_get_data
 tests/libs/zbxtrends/zbx_trends_parse_range
 tests/libs/zbxsysinfo/process_http
 tests/zabbix_server/pinger/zbx_pinger_test
-tests/zabbix_server/poller/zbx_poller_test
+tests/libs/zbxpoller/zbx_poller_test
 tests/libs/zbxpreproc/item_preproc_csv_to_json
 tests/libs/zbxpreproc/item_preproc_xpath
 tests/libs/zbxpreproc/zbx_item_preproc
+tests/libs/zbxhttp/zbx_determine_charset
 tests/zabbix_server/service/service_get_rootcause_eventids
 tests/zabbix_server/service/service_get_main_status
 tests/zabbix_server/service/service_get_rule_status

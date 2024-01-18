@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,8 +51,6 @@
 #ifdef HAVE_OPENSSL
 extern ZBX_THREAD_LOCAL char	info_buf[256];
 #endif
-
-extern int	CONFIG_TCP_MAX_BACKLOG_SIZE;
 
 static int	socket_set_nonblocking(ZBX_SOCKET s);
 static void	tcp_set_socket_strerror_from_getaddrinfo(const char *ip);
@@ -216,6 +214,38 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen)
 out:
 	if (NULL != ai)
 		freeaddrinfo(ai);
+}
+
+int	zbx_inet_pton(int af, const char *src, void *dst)
+{
+	if (AF_INET == af)
+	{
+		memset(dst, 0, sizeof(struct in_addr *));
+
+		if (0 >= inet_pton(AF_INET, src, (struct in_addr *)dst))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv4 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+	else if (AF_INET6 == af)
+	{
+		memset(dst, 0, sizeof(struct in6_addr));
+
+		if (0 >= inet_pton(AF_INET6, src, (struct in6_addr *)dst))
+		{
+			zabbix_log(LOG_LEVEL_DEBUG, "cannot get ip from IPv6 address: %s", zbx_strerror(errno));
+			return FAIL;
+		}
+
+		return SUCCEED;
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Fail to parse IP: '%s'", src);
+
+	return FAIL;
 }
 
 int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len)
@@ -617,7 +647,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
+	if (SUCCEED != zbx_is_ip(ip))
 		server_name = ip;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
@@ -765,14 +795,14 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
 	{
 		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
-				" size " ZBX_FS_UI64 " bytes.", len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
+				" size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
 
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
 	{
 		zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
-				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", reserved,
+				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)reserved,
 				ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
@@ -1283,13 +1313,14 @@ static int	tcp_err_in_use(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create socket for listening                                       *
+ * Purpose: creates socket for listening                                      *
  *                                                                            *
  * Return value: SUCCEED - success                                            *
- *               FAIL - an error occurred                                     *
+ *               FAIL - error occurred                                        *
  *                                                                            *
  ******************************************************************************/
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout)
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,
+		int config_tcp_max_backlog_size)
 {
 	struct addrinfo	hints, *ai = NULL, *current_ai;
 	char		port[8], *ip, *ips, *delim;
@@ -1446,7 +1477,7 @@ int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen
 					goto out;
 			}
 
-			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], CONFIG_TCP_MAX_BACKLOG_SIZE))
+			if (ZBX_PROTO_ERROR == listen(s->sockets[s->num_socks], config_tcp_max_backlog_size))
 			{
 				zbx_set_socket_strerror("listen() for [[%s]:%s] failed: %s",
 						NULL != ip ? ip : "-", port,
@@ -2025,11 +2056,6 @@ ssize_t	zbx_tcp_recv_context(zbx_socket_t *s, zbx_tcp_recv_context_t *context, u
 				memcpy(&len32_le, s->buf_stat + context->offset, sizeof(len32_le));
 				context->offset += sizeof(len32_le);
 				context->reserved = zbx_letoh_uint32(len32_le);
-
-				if (0 == flags && ZBX_TCP_PROTOCOL == context->protocol_version)
-					s->reserved_payload = context->reserved;
-				else
-					s->reserved_payload = 0;
 			}
 
 			if (context->max_len < context->expected_len)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -807,7 +807,7 @@ void	zbx_pb_flush(void)
  ******************************************************************************/
 int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error)
 {
-	if (ZBX_MUTEX_NULL == pb_data->mutex)
+	if (ZBX_PB_MODE_DISK == pb_data->mode)
 	{
 		*error = zbx_strdup(NULL, "Proxy memory buffer is disabled.");
 		return FAIL;
@@ -830,7 +830,7 @@ int	zbx_pb_get_mem_info(zbx_pb_mem_info_t *info, char **error)
  ******************************************************************************/
 void	zbx_pb_get_state_info(zbx_pb_state_info_t *info)
 {
-	if (ZBX_MUTEX_NULL == pb_data->mutex)
+	if (ZBX_PB_MODE_DISK == pb_data->mode)
 	{
 		info->changes_num = 0;
 		info->state = 0;

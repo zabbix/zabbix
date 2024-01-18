@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,12 +114,12 @@ class CAbsoluteTimeParser extends CParser {
 	/**
 	 * Get DateTime object with its value set to either start or end of the period derived from the date/time specified.
 	 *
-	 * @param                   $is_start
+	 * @param bool              $is_start
 	 * @param DateTimeZone|null $timezone
 	 *
 	 * @return DateTime|null
 	 */
-	public function getDateTime($is_start, DateTimeZone $timezone = null): ?DateTime {
+	public function getDateTime(bool $is_start, DateTimeZone $timezone = null): ?DateTime {
 		if ($this->date === '') {
 			return null;
 		}

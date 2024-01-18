@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,12 +39,14 @@ window.script_edit_popup = new class {
 		for (const parameter of script.parameters) {
 			this.#addParameter(parameter);
 		}
+
+		new CFormFieldsetCollapsible(document.getElementById('advanced-configuration'));
 	}
 
 	#initActions() {
 		this.form.querySelector('#scope').dispatchEvent(new Event('change'));
 		this.form.querySelector('#type').dispatchEvent(new Event('change'));
-		this.form.querySelector('#enable-confirmation').dispatchEvent(new Event('change'));
+		this.form.querySelector('#enable_confirmation').dispatchEvent(new Event('change'));
 
 		this.form.querySelector('.js-parameter-add').addEventListener('click', () => {
 			const template = new Template(this.form.querySelector('#script-parameter-template').innerHTML);
@@ -87,32 +89,96 @@ window.script_edit_popup = new class {
 		const type = this.form.querySelector('#type');
 
 		// Load scope fields.
-		this.form.querySelector('#scope').onchange = (e) => {
+		this.form.querySelector('#scope').addEventListener('change', (e) => {
 			this.#hideFormFields('all');
 			this.#loadScopeFields(e);
 			type.dispatchEvent(new Event('change'));
-		};
+		});
 
 		// Load type fields.
-		type.onchange = (e) => this.#loadTypeFields(script, e);
+		type.addEventListener('change', (e) => this.#loadTypeFields(script, e));
+
+		// Update user input fields.
+		this.form.querySelector('#manualinput').addEventListener('change', (e) => this.#loadUserInputFields(e));
+		this.form.querySelector('#manualinput').dispatchEvent(new Event('change'));
+
 
 		// Update confirmation fields.
-		this.form.querySelector('#enable-confirmation').onchange = (e) => this.#loadConfirmationFields(e);
+		this.form.querySelector('#enable_confirmation').addEventListener('change', (e) =>
+			this.#loadConfirmationFields(e)
+		);
+
+		// Test user input button.
+		this.form.querySelector('#test_user_input').addEventListener('click', () => this.#openManualinputTestPopup());
 
 		// Test confirmation button.
-		this.form.querySelector('#test-confirmation').addEventListener('click', (e) =>
-			executeScript(null, this.form.querySelector('#confirmation').value, e.target)
-		);
+		this.form.querySelector('#test_confirmation').addEventListener('click', (e) => {
+			if (this.form.querySelector('input[name="type"]:checked').value == <?= ZBX_SCRIPT_TYPE_URL ?>) {
+				Script.openUrl(null, this.form.querySelector('#confirmation').value, e.target);
+			}
+			else {
+				Script.execute(null, this.form.querySelector('#confirmation').value, e.target)
+			}
+		});
 
 		// Host group selection.
 		const hgstype = this.form.querySelector('#hgstype-select');
 		const hostgroup_selection = this.form.querySelector('#host-group-selection');
 
-		hgstype.onchange = () => hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none';
+		hgstype.addEventListener('change', () =>
+			hostgroup_selection.style.display = hgstype.value === '1' ? '' : 'none'
+		);
 
 		hgstype.dispatchEvent(new Event('change'));
 		this.form.removeAttribute('style');
 		this.overlay.recoverFocus();
+
+		// Load manual input fields based on input type.
+		const input_prompt = this.form.querySelector('#manualinput_prompt');
+		const test_user_input = this.form.querySelector('#test_user_input');
+		const dropdown_options = this.form.querySelector('#dropdown_options');
+
+		for (const button of document.querySelectorAll('[name="manualinput_validator_type"]')) {
+			button.addEventListener('click', (e) => {
+				if (e.target.value != undefined) {
+					this.input_type = e.target.value;
+				}
+
+				if (this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>) {
+					this.#updateManualinputFields(test_user_input, input_prompt,
+						this.form.querySelector('#manualinput_validator'), this.input_type
+					);
+				}
+				else {
+					dropdown_options.disabled = !this.user_input_checked;
+
+					this.#updateManualinputFields(test_user_input, input_prompt, dropdown_options, this.input_type);
+				}
+			});
+		}
+	}
+
+	#openManualinputTestPopup() {
+		const input_validation = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
+			? this.form.querySelector('#manualinput_validator').value
+			: this.form.querySelector('#dropdown_options').value;
+
+		const default_input = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
+			? this.form.querySelector('#manualinput_default_value').value
+			: '';
+
+		const parameters = {
+			manualinput_prompt: this.form.querySelector('#manualinput_prompt').value,
+			manualinput_default_value: default_input,
+			manualinput_validator_type: this.input_type,
+			manualinput_validator: input_validation,
+			test: 1
+		};
+
+		PopUp('script.userinput.edit', parameters, {
+			dialogueid: 'script-userinput-form',
+			dialogue_class: 'modal-popup-small'
+		});
 	}
 
 	clone({title, buttons}) {
@@ -229,8 +295,7 @@ window.script_edit_popup = new class {
 			case <?= ZBX_SCRIPT_SCOPE_EVENT ?>:
 				const show_fields = [
 					'#menu-path', '#menu-path-label', '#usergroup-label', '#usergroup', '#host-access-label',
-					'#host-access-field', '#enable-confirmation-label', '#enable-confirmation-field',
-					'#confirmation-label', '#confirmation-field'
+					'#host-access-field', '#advanced-configuration'
 				];
 
 				show_fields.forEach((field) => {
@@ -322,7 +387,7 @@ window.script_edit_popup = new class {
 
 				const authtype = this.form.querySelector('#authtype');
 
-				authtype.onchange = (e) => this.#loadAuthFields(e);
+				authtype.addEventListener('change', (e) => this.#loadAuthFields(e));
 				authtype.dispatchEvent(new Event('change'));
 				break;
 
@@ -386,8 +451,87 @@ window.script_edit_popup = new class {
 	}
 
 	/**
+	 * Displays or hides and enables or disables user input fields in the Advanced configuration.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_EVENTS.
+	 *
+	 * @param {object} event  The event object.
+	 */
+	#loadUserInputFields(event) {
+		if (event.target.value) {
+			this.user_input_checked = event.target.checked;
+		}
+
+		const input_prompt = this.form.querySelector('#manualinput_prompt');
+		const test_user_input = this.form.querySelector('#test_user_input');
+		const input_type = this.form.querySelector('#manualinput_validator_type');
+		const default_input = this.form.querySelector('#manualinput_default_value');
+		const input_validation = this.form.querySelector('#manualinput_validator');
+		const dropdown_options = this.form.querySelector('#dropdown_options');
+
+		this.input_type = this.form.querySelector('input[name="manualinput_validator_type"]:checked').value;
+
+		this.#updateManualinputFields(test_user_input, input_prompt, input_validation, this.input_type);
+
+		const elements = [input_prompt, test_user_input, default_input, input_validation, dropdown_options];
+
+		elements.forEach(element => element.disabled = !this.user_input_checked);
+		input_type.querySelectorAll('input').forEach((element) => element.disabled = !this.user_input_checked);
+
+		if (this.user_input_checked) {
+			this.form.querySelector('label[for="manualinput_prompt"]').classList
+				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+		}
+		else {
+			this.form.querySelector('label[for="manualinput_prompt"]').classList
+				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+		}
+
+		const validator = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_DISABLED ?>
+			? this.form.querySelector('#manualinput_validator')
+			: this.form.querySelector('#dropdown_options');
+
+		this.#updateManualinputFields(test_user_input, input_prompt, validator, this.input_type);
+	}
+
+	#updateManualinputFields(test_user_input, input_prompt, validator) {
+		const is_input_type_string = this.input_type == <?= ZBX_SCRIPT_MANUALINPUT_TYPE_STRING ?>
+
+		this.form.querySelector('label[for=manualinput_default_value]').style.display = is_input_type_string
+			? ''
+			: 'none';
+		this.form.querySelector('#manualinput_default_value').parentNode.style.display = is_input_type_string
+			? ''
+			: 'none';
+
+		this.form.querySelector('label[for=manualinput_validator]').style.display = is_input_type_string ? '' : 'none';
+		this.form.querySelector('#manualinput_validator').parentNode.style.display = is_input_type_string ? '' : 'none';
+
+		this.form.querySelector('label[for=dropdown_options]').style.display = is_input_type_string ? 'none' : '';
+		this.form.querySelector('#dropdown_options').parentNode.style.display = is_input_type_string ? 'none' : '';
+
+		if (this.user_input_checked) {
+			document.querySelector(`label[for="${validator.name}"]`).classList
+				.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+		}
+		else {
+			document.querySelector(`label[for="${validator.name}"]`).classList
+				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+		}
+
+		const updateTestUserInput = () => test_user_input.disabled = !(
+			input_prompt.value.trim() !== '' && validator.value.trim() !== '' && this.user_input_checked
+		);
+
+		input_prompt.onkeyup = updateTestUserInput;
+		validator.onkeyup = updateTestUserInput;
+
+		input_prompt.dispatchEvent(new Event('keyup'));
+		validator.dispatchEvent(new Event('keyup'));
+	}
+
+	/**
 	 * Displays or hides confirmation fields in the popup based on the value of selected scope.
-	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_ACTION.
+	 * This is relevant only when scope value is ZBX_SCRIPT_SCOPE_HOST or ZBX_SCRIPT_SCOPE_EVENT.
 	 *
 	 * @param {object} event  The event object.
 	 */
@@ -397,9 +541,11 @@ window.script_edit_popup = new class {
 		}
 
 		const confirmation = this.form.querySelector('#confirmation');
-		const test_confirmation = this.form.querySelector('#test-confirmation');
+		const test_confirmation = this.form.querySelector('#test_confirmation');
 
 		if (this.confirmation) {
+			this.form.querySelector('label[for="confirmation"]').classList.add('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
+
 			confirmation.removeAttribute('disabled');
 
 			confirmation.onkeyup = () => confirmation.value !== ''
@@ -409,6 +555,8 @@ window.script_edit_popup = new class {
 			confirmation.dispatchEvent(new Event('keyup'));
 		}
 		else {
+			this.form.querySelector('label[for="confirmation"]').classList
+				.remove('<?= ZBX_STYLE_FIELD_LABEL_ASTERISK ?>');
 			confirmation.setAttribute('disabled', 'disabled');
 			test_confirmation.setAttribute('disabled', 'disabled');
 		}
@@ -441,7 +589,7 @@ window.script_edit_popup = new class {
 				'#password-label', '#password-field', '#port-label', '#port-field', '#publickey-label',
 				'#publickey-field', '#privatekey-label', '#privatekey-field', '#passphrase-label', '#passphrase-field',
 				'#usergroup-label', '#usergroup', '#host-access-label', '#host-access-field',
-				'#enable-confirmation-label', '#enable-confirmation-field', '#confirmation-label', '#confirmation-field'
+				'#advanced-configuration'
 			];
 		}
 

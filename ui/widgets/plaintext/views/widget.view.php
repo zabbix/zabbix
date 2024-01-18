@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -36,13 +36,11 @@ else {
 	$names_at_top = ($data['style'] == STYLE_TOP && count($data['items']) > 1);
 
 	if ($names_at_top) {
-		$table->makeVerticalRotation();
-
 		foreach ($data['items'] as $item) {
-			$table_header[] = (new CColHeader(
+			$table_header[] = (new CSpan(
 				($data['same_host'] ? '' : $item['hosts'][0]['name'].NAME_DELIMITER).$item['name']
 			))
-				->addClass('vertical_rotation')
+				->addClass(ZBX_STYLE_TEXT_VERTICAL)
 				->setTitle($item['name']);
 		}
 	}

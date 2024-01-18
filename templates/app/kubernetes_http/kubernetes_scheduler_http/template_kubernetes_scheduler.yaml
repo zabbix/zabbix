@@ -514,29 +514,29 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "scheduler_e2e_scheduling_duration_seconds_count"){
-                          var label_result = item.labels.result;
+                  	if (item.name === "scheduler_e2e_scheduling_duration_seconds_count"){
+                  		var label_result = item.labels.result;
                   
-                          if (lookup[label_result]) {
-                              return;
-                          }
-                          lookup[label_result] = 1;
-                          result.push({
-                              '{#TYPE}': 'totals',
-                              '{#RESULT}': label_result
-                          });
+                  		if (lookup[label_result]) {
+                  			return;
+                  		}
+                  		lookup[label_result] = 1;
+                  		result.push({
+                  			'{#TYPE}': 'totals',
+                  			'{#RESULT}': label_result
+                  		});
                   
-                        }
-                      else if  (item.name === "scheduler_e2e_scheduling_duration_seconds_bucket"){
-                          result.push({
-                              '{#TYPE}': 'buckets',
-                              '{#RESULT}': item.labels.result,
-                              '{#LE}': item.labels.le
-                          });
-                      }
+                  	  }
+                  	else if  (item.name === "scheduler_e2e_scheduling_duration_seconds_bucket"){
+                  		result.push({
+                  			'{#TYPE}': 'buckets',
+                  			'{#RESULT}': item.labels.result,
+                  			'{#LE}': item.labels.le
+                  		});
+                  	}
                   });
                   
                   return JSON.stringify(result);
@@ -682,21 +682,21 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "scheduler_binding_duration_seconds_count"){
-                          result.push({
-                              '{#TYPE}': 'totals',
-                              '{#SINGLETON}': ''
-                          });
+                  	if (item.name === "scheduler_binding_duration_seconds_count"){
+                  		result.push({
+                  			'{#TYPE}': 'totals',
+                  			'{#SINGLETON}': ''
+                  		});
                   
-                        }
-                      else if  (item.name === "scheduler_binding_duration_seconds_bucket"){
-                          result.push({
-                              '{#TYPE}': 'buckets',
-                              '{#LE}': item.labels.le
-                          });
-                      }
+                  	  }
+                  	else if  (item.name === "scheduler_binding_duration_seconds_bucket"){
+                  		result.push({
+                  			'{#TYPE}': 'buckets',
+                  			'{#LE}': item.labels.le
+                  		});
+                  	}
                   });
                   
                   return JSON.stringify(result);
@@ -842,21 +842,21 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === "scheduler_scheduling_algorithm_duration_seconds_count"){
-                          result.push({
-                              '{#TYPE}': 'totals',
-                              '{#SINGLETON}': ''
-                          });
+                  	if (item.name === "scheduler_scheduling_algorithm_duration_seconds_count"){
+                  		result.push({
+                  			'{#TYPE}': 'totals',
+                  			'{#SINGLETON}': ''
+                  		});
                   
-                        }
-                      else if  (item.name === "scheduler_scheduling_algorithm_duration_seconds_bucket"){
-                          result.push({
-                              '{#TYPE}': 'buckets',
-                              '{#LE}': item.labels.le
-                          });
-                      }
+                  	  }
+                  	else if  (item.name === "scheduler_scheduling_algorithm_duration_seconds_bucket"){
+                  		result.push({
+                  			'{#TYPE}': 'buckets',
+                  			'{#LE}': item.labels.le
+                  		});
+                  	}
                   });
                   
                   return JSON.stringify(result);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -52,14 +52,15 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100035',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => '',
-						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'Trigger' => 'menu-popup-item',
+						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
-						'Trigger URL' => 'tr_events.php?triggerid=100035&eventid=9003',
-						'Unique webhook url' => 'zabbix.php?action=mediatype.list&ddreset=1',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
+						'Trigger URL' => 'menu-popup-item',
+						'Unique webhook url' => 'menu-popup-item',
+						'Webhook url for all' => 'menu-popup-item'
 					],
+					'expected_url' => 'tr_events.php?triggerid=100035&eventid=9003',
 					'background' => "high-bg"
 				]
 			],
@@ -69,13 +70,14 @@ class testPageTriggerUrl extends CWebTest {
 					'links' => [
 						'Problems' => 'zabbix.php?action=problem.view&filter_set=1&triggerids%5B%5D=100032',
 						'History' => ['1_item' => 'history.php?action=showgraph&itemids%5B%5D=99086'],
-						'Trigger' => '',
-						'Items' => ['1_item' => 'items.php?form=update&itemid=99086&context=host'],
+						'Trigger' => 'menu-popup-item',
+						'Items' => ['1_item' => 'menu-popup-item'],
 						'Mark as cause' => '',
 						'Mark selected as symptoms' => '',
-						'URL name for menu' => 'tr_events.php?triggerid=100032&eventid=9000',
-						'Webhook url for all' => 'zabbix.php?action=mediatype.edit&mediatypeid=101'
+						'URL name for menu' => 'menu-popup-item',
+						'Webhook url for all' => 'menu-popup-item'
 					],
+					'expected_url' => 'tr_events.php?triggerid=100032&eventid=9000',
 					'background' => 'na-bg'
 				]
 			]
@@ -152,9 +154,7 @@ class testPageTriggerUrl extends CWebTest {
 	public function testPageTriggerUrl_EventDetails($data) {
 		// Prepare data provider.
 		unset($data['links']['Mark selected as symptoms']);
-		$option = array_key_exists('Trigger URL', $data['links']) ? 'Trigger URL' : self::$custom_name;
-
-		$this->page->login()->open($data['links'][$option]);
+		$this->page->login()->open($data['expected_url']);
 		$this->query('link', $data['trigger'])->waitUntilPresent()->one()->click();
 		$this->checkTriggerUrl($data);
 	}
@@ -178,12 +178,16 @@ class testPageTriggerUrl extends CWebTest {
 			if (is_array($links)) {
 				$item_link = $trigger_popup->getItem($menu)->query('xpath:./../ul//a')->one();
 				$this->assertEquals(array_keys($links), [$item_link->getText()]);
-				$this->assertStringContainsString(array_values($links)[0], $item_link->getAttribute('href'));
+				$this->assertStringContainsString(array_values($links)[0],
+						$item_link->getAttribute((array_values($links)[0] === 'menu-popup-item') ? 'class' : 'href')
+				);
 			}
 			else {
 				// Check 1-level menu links.
 				if ($links !== '') {
-					$this->assertStringContainsString($links, $trigger_popup->getItem($menu)->getAttribute('href'));
+					$this->assertStringContainsString($links,
+							$trigger_popup->getItem($menu)->getAttribute($links === 'menu-popup-item' ? 'class' : 'href')
+					);
 				}
 			}
 		}
@@ -193,6 +197,6 @@ class testPageTriggerUrl extends CWebTest {
 
 		// Check opened page.
 		$this->assertEquals('Event details', $this->query('tag:h1')->waitUntilVisible()->one()->getText());
-		$this->assertStringContainsString($data['links'][$option], $this->page->getCurrentUrl());
+		$this->assertStringContainsString($data['expected_url'], $this->page->getCurrentUrl());
 	}
 }

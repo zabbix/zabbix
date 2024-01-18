@@ -9,17 +9,17 @@ SUBDIRS = \
 	httppoller \
 	pinger \
 	poller \
-	snmptrapper \
 	timer \
 	trapper \
 	escalator \
+	operations \
+	postinit \
 	proxypoller \
-	vmware \
 	taskmanager \
-	ipmi \
 	stats \
 	preproc \
 	connector \
+	dbconfigworker \
 	lld \
 	reporter \
 	service \
@@ -35,10 +35,6 @@ libzbxserver_a_SOURCES = \
 	db_lengths.h \
 	actions.c \
 	actions.h \
-	operations.c \
-	operations.h \
-	postinit.c \
-	postinit.h \
 	zbxreport.h
 
 libzbxserver_a_CFLAGS = \
@@ -67,13 +63,13 @@ zabbix_server_LDADD = \
 	trapper/libzbxtrapper_server.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
-	snmptrapper/libzbxsnmptrapper.a \
+	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \
 	httppoller/libzbxhttppoller.a \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	vmware/libzbxvmware.a \
-	taskmanager/libzbxtaskmanager.a \
+	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
+	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
 	service/libservice.a \
 	$(top_builddir)/src/libs/zbxscripts/libzbxscripts.a \
@@ -85,6 +81,8 @@ zabbix_server_LDADD = \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
+	postinit/libzbxpostinit.a \
+	operations/libzbxoperations.a \
 	stats/libzbxserver_server.a \
 	ha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \
@@ -108,6 +106,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_builddir)/src/libs/zbxvariant/libzbxvariant.a \
 	$(top_builddir)/src/libs/zbxeval/libzbxeval.a \
+	dbconfigworker/libdbconfigworker.a \
 	$(top_builddir)/src/libs/zbxserialize/libzbxserialize.a \
 	$(top_builddir)/src/libs/zbxhistory/libzbxhistory.a \
 	$(top_builddir)/src/libs/zbxshmem/libzbxshmem.a \
@@ -151,6 +150,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_builddir)/src/libs/zbxavailability/libzbxavailability.a \
 	$(top_builddir)/src/libs/zbxconnector/libzbxconnector.a \
+	$(top_builddir)/src/libs/zbxdbconfigworker/libzbxdbconfigworker.a \
 	$(top_builddir)/src/libs/zbxaudit/libzbxaudit.a \
 	$(top_builddir)/src/libs/zbxservice/libzbxservice.a \
 	$(top_builddir)/src/libs/zbxfile/libzbxfile.a \
@@ -163,9 +163,11 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_builddir)/src/libs/zbxversion/libzbxversion.a \
 	$(top_builddir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
-	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a
+	$(top_builddir)/src/libs/zbxasynchttppoller/libzbxasynchttppoller.a \
+	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
+	$(top_builddir)/src/libs/zbxagentget/libzbxagentget.a
 if HAVE_IPMI
-zabbix_server_LDADD += ipmi/libipmi.a
+zabbix_server_LDADD += $(top_builddir)/src/libs/zbxipmi/libzbxipmi.a
 endif
 
 zabbix_server_LDADD += $(SERVER_LIBS)

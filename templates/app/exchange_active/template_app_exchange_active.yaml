@@ -485,12 +485,12 @@ zabbix_export:
                   var data = JSON.parse(value);
                   
                   data.forEach(function(instance) {
-                      if (instance["{#INSTANCE}"] === '_total') {
-                          instance["{#INF.STORE}"] = 'Information Store';
-                      }
-                      else {
-                          instance["{#INF.STORE}"] = 'Information Store - ' + instance["{#INSTANCE}"];
-                      }
+                  	if (instance["{#INSTANCE}"] === '_total') {
+                  		instance["{#INF.STORE}"] = 'Information Store';
+                  	}
+                  	else {
+                  		instance["{#INF.STORE}"] = 'Information Store - ' + instance["{#INSTANCE}"];
+                  	}
                   })
                   
                   return JSON.stringify(data);

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -639,6 +639,7 @@ class DB {
 			$row += $mandatory_fields;
 
 			self::checkValueTypes($table_schema, $row);
+			self::uppercaseValues($table, $row);
 		}
 		unset($row);
 
@@ -675,6 +676,8 @@ class DB {
 			if (empty($row['values'])) {
 				self::exception(self::DBEXECUTE_ERROR, _s('Cannot perform update statement on table "%1$s" without values.', $table));
 			}
+
+			self::uppercaseValues($table, $row['values']);
 
 			// set creation
 			$sqlSet = '';
@@ -991,7 +994,23 @@ class DB {
 			return $table_alias.'.name_upper';
 		}
 
+		if ($field_name === 'name_resolved' && self::hasField($table_name, 'name_resolved_upper')) {
+			return $table_alias.'.name_resolved_upper';
+		}
+
 		return 'UPPER('.$table_alias.'.'.$field_name.')';
+	}
+
+	/**
+	 * Convert field values to uppercase.
+	 *
+	 * @param string $table_name
+	 * @param array  $row
+	 */
+	public static function uppercaseValues(string $table_name, array &$row): void {
+		if (array_key_exists('name_resolved', $row) && self::hasField($table_name, 'name_resolved_upper')) {
+			$row['name_resolved_upper'] = 'UPPER('.$row['name_resolved'].')';
+		}
 	}
 
 	/**

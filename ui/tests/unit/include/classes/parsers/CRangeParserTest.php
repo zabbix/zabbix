@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -143,6 +143,22 @@ class CRangeParserTest extends TestCase {
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{$M}',
 					'range' => ['{$M}']
+				]
+			],
+			[
+				'{{$M}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}',
+					'range' => ['{{$M}.regsub("^([0-9]+)", \1)}']
+				]
+			],
+			[
+				'{{$M: "context"}.regsub("^([0-9]+)", \1)}', 0, ['usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M: "context"}.regsub("^([0-9]+)", \1)}',
+					'range' => ['{{$M: "context"}.regsub("^([0-9]+)", \1)}']
 				]
 			],
 			[

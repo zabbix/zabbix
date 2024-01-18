@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,6 +59,15 @@
 			this.#context = context;
 
 			this.#initTemplates();
+
+			this.#form.addEventListener('click', e => {
+				const target = e.target;
+
+				if (target.matches('.js-edit-template')) {
+					e.preventDefault();
+					this.#openTemplatePopup(target.dataset);
+				}
+			});
 
 			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
@@ -284,13 +293,6 @@
 			this.#openHostPopup(host_data);
 		}
 
-		editTemplate(e, templateid) {
-			e.preventDefault();
-			const template_data = {templateid};
-
-			this.#openTemplatePopup(template_data);
-		}
-
 		#openHostPopup(host_data) {
 			const original_url = location.href;
 			const overlay = PopUp('popup.host.edit', host_data, {
@@ -305,6 +307,13 @@
 			overlay.$dialogue[0].addEventListener('dialogue.close', () => {
 				history.replaceState({}, '', original_url);
 			}, {once: true});
+		}
+
+		editTemplate(e, templateid) {
+			e.preventDefault();
+			const template_data = {templateid};
+
+			this.#openTemplatePopup(template_data);
 		}
 
 		#openTemplatePopup(template_data) {
