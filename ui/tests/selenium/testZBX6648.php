@@ -66,39 +66,35 @@ class testZBX6648 extends CLegacyWebTest {
 	 * @dataProvider zbx_data
 	 */
 	public function testZBX6648_eventFilter($zbx_data) {
+		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+
 		$this->page->login()->open('zabbix.php?action=problem.view')->waitUntilReady();
 		$this->zbxTestClickButtonMultiselect('triggerids_0');
 		$this->zbxTestLaunchOverlayDialog('Triggers');
-		$host_overlay = COverlayDialogElement::find()->one()->waitUntilReady()
-				->asForm(['normalized' => true])->getField('Host')->edit();
 
 		switch ($zbx_data['triggers']) {
 			case 'both' :
 			case 'enabled' :
-				// TODO: DEV-2703 Unstable test on Jenkins with slow connection "Cannot reload stalled element"
-				// if use setDataContext() method or code are:
-//				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')
-//					->asMultiselect()->one()->waitUntilVisible();
-//				$host->fill([
-//					'values' => $zbx_data['host'],
-//					'context' => $zbx_data['hostgroup']
-//				]);
-
-				$host_overlay->asForm(['normalized' => true])->getField('Host group')->select($zbx_data['hostgroup']);
-				$host_overlay->waitUntilReady()->query('link', $zbx_data['host'])->waitUntilClickable()->one()->click();
-				$host_overlay->waitUntilNotVisible();
+				$host = COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-control')
+						->asMultiselect()->one()->waitUntilVisible();
+				$host->fill([
+					'values' => $zbx_data['host'],
+					'context' => $zbx_data['hostgroup']
+				]);
 				$this->zbxTestLaunchOverlayDialog('Triggers');
 				break;
 			case 'disabled' :
 			case 'no hosts' :
+				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Hosts');
 				COverlayDialogElement::find()->all()->last()->waitUntilReady()->query('class:multiselect-button')->one()->click();
 				$this->zbxTestLaunchOverlayDialog('Host groups');
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
 				break;
 			case 'no triggers' :
-				$host_overlay->asForm(['normalized' => true])->getField('Host group')->select($zbx_data['hostgroup']);
-				$this->assertEquals('Hosts', $host_overlay->waitUntilReady()->getTitle());
+				COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-button')->one()->click();
+				COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($zbx_data['hostgroup']);
+				$this->zbxTestLaunchOverlayDialog('Hosts');
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');
 				break;
 		}
