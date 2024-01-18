@@ -301,7 +301,7 @@ class testPageReportsTriggerTop extends CWebTest {
 			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
 		}
 
-		foreach (['id:from' => 16, 'id:to' => 16] as $input => $value) {
+		foreach (['id:from' => 255, 'id:to' => 255] as $input => $value) {
 			$this->assertEquals($value, $form->getField($input)->getAttribute('maxlength'));
 		}
 
