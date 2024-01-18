@@ -500,7 +500,11 @@ SVGMap.prototype.update = function (options, incremental) {
 
 			const readiness = [];
 
-			this.options.container.querySelectorAll('image').forEach(image => {
+			const container = typeof this.options.container !== 'object'
+				? document.querySelector(this.options.container)
+				: this.options.container;
+
+			container.querySelectorAll('image').forEach(image => {
 				readiness.push(new Promise(resolve => image.addEventListener('load', resolve)));
 			});
 
