@@ -21,11 +21,9 @@
 
 class ItemValueWidget {
 
-	const OLD_NAME = 'New widget';
-
 	public static function load() {
 		// Create host for aggregation data tests.
-		CDataHelper::createHosts([
+		$hosts = CDataHelper::createHosts([
 			[
 				'host' => 'Simple host with items for item value widget test',
 				'interfaces' => [
@@ -76,11 +74,71 @@ class ItemValueWidget {
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_TEXT,
 						'delay' => '30'
+					],
+					[
+						'name' => 'Item with units',
+						'key_' => 'vm.memory.size[pavailable]',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_FLOAT,
+						'units' => '%',
+						'delay' => '30'
+					]
+				]
+			],
+			[
+				'host' => 'Host for valuemapping test',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.0.9.8',
+						'dns' => '',
+						'port' => '10012'
+					]
+				],
+				'groups' => [
+					'groupid' => '4'
+				],
+				'items' => [
+					[
+						'name' => 'Value mapping',
+						'key_' => 'agent.ping',
+						'type' => ITEM_TYPE_ZABBIX,
+						'value_type' => ITEM_VALUE_TYPE_UINT64,
+						'delay' => '30'
 					]
 				]
 			]
 		]);
 		$itemids = CDataHelper::getIds('name');
+
+		CDataHelper::call('valuemap.create', [
+			[
+				'name' => 'Value mapping for item value widget',
+				'hostid' => $hosts['hostids']['Host for valuemapping test'],
+				'mappings' => [
+					[
+						'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+						'value' => '1',
+						'newvalue' => 'Up'
+					],
+					[
+						'type' => VALUEMAP_MAPPING_TYPE_EQUAL,
+						'value' => '0',
+						'newvalue' => 'Down'
+					]
+				]
+			]
+		]);
+		$valuemapids = CDataHelper::getIds('name');
+
+		CDataHelper::call('item.update', [
+			[
+				'itemid' => $itemids['Value mapping'],
+				'valuemapid' => $valuemapids['Value mapping for item value widget']
+			]
+		]);
 
 		$response = CDataHelper::call('dashboard.create', [
 			[
@@ -91,7 +149,7 @@ class ItemValueWidget {
 						'widgets' => [
 							[
 								'type' => 'item',
-								'name' => self::OLD_NAME,
+								'name' => 'New widget',
 								'x' => 0,
 								'y' => 0,
 								'width' => 12,
@@ -218,16 +276,43 @@ class ItemValueWidget {
 						'name' => 'Page with widgets'
 					]
 				]
+			],
+			[
+				'name' => 'Dashboard for aggregation function data check',
+				'pages' => [
+					[
+						'name' => 'Page with widgets',
+						'widgets' => [
+							[
+								'type' => 'item',
+								'name' => 'Widget for aggregation function data check',
+								'x' => 0,
+								'y' => 0,
+								'width' => 12,
+								'height' => 4,
+								'fields' => [
+									[
+										'type' => ZBX_WIDGET_FIELD_TYPE_ITEM,
+										'name' => 'itemid.0',
+										'value' => 42230 // Linux: CPU user time.
+									]
+								]
+							]
+						]
+					]
+				]
 			]
 		]);
 		$dashboardid = $response['dashboardids'][0];
 		$dashboard_zoom = $response['dashboardids'][1];
 		$dashboard_threshold = $response['dashboardids'][2];
+		$dashboard_aggregation = $response['dashboardids'][3];
 
 		return [
 			'dashboardid' => $dashboardid,
 			'dashboard_zoom' => $dashboard_zoom,
 			'dashboard_threshold' => $dashboard_threshold,
+			'dashboard_aggregation' => $dashboard_aggregation,
 			'itemids' => $itemids
 		];
 	}

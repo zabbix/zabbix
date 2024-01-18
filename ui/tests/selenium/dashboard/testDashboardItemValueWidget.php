@@ -51,8 +51,10 @@ class testDashboardItemValueWidget extends testWidgets {
 	protected static $dashboardid;
 	protected static $dashboard_zoom;
 	protected static $dashboard_threshold;
+	protected static $dashboard_aggregation;
 	protected static $old_name = 'New widget';
 	protected static $threshold_widget = 'Widget with thresholds';
+	const DATA_WIDET = 'Widget for aggregation function data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -92,6 +94,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		self::$dashboardid = CDataHelper::get('ItemValueWidget.dashboardid');
 		self::$dashboard_zoom = CDataHelper::get('ItemValueWidget.dashboard_zoom');
 		self::$dashboard_threshold = CDataHelper::get('ItemValueWidget.dashboard_threshold');
+		self::$dashboard_aggregation = CDataHelper::get('ItemValueWidget.dashboard_aggregation');
 		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
 	}
 
@@ -439,7 +442,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:show_1' => false, // Description.
 						'id:show_2' => false, // Value.
 						'id:show_3' => false, // Time.
-						'id:show_4' => false  // Change indicator.
+						'id:show_4' => false // Change indicator.
 					],
 					'item' => [
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
@@ -2955,6 +2958,715 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Necessary action for avoiding problems with next test.
 		$dashboard->save();
+	}
+
+	public static function getAggregationFunctionData() {
+		return [
+			// Item with value mapping, aggregation function 'min' and default Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom'
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'time' => strtotime('now')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-61 minute')
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Down (0)',
+					'arrow' => 'up-down' // Item value has changed comparing with previous hour.
+				]
+			],
+			// Item with value mapping and aggregation function 'max'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2h',
+						'id:time_period_to' => 'now-1h'
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'time' => strtotime('-1 minute')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-62 minutes')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-122 minutes')
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)',
+					'arrow' => 'up-down'
+				]
+			],
+			// Item with value mapping, aggregation function 'avg' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-7d',
+						'id:time_period_to' => 'now-5d'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => strtotime('-6 days')
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)'
+				]
+			],
+			// Item with value mapping, aggregation function 'avg' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-4d',
+						'id:time_period_to' => 'now-2d'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => strtotime('-3 days')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-63 hours')
+						]
+					],
+					'expected_value' => '0.50' // Value mapping is ignored if value doesn't equals 0 or 1.
+				]
+			],
+			// Item with value mapping and aggregation function 'count'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-5h-30m',
+						'id:time_period_to' => 'now-14400' // -4 hours.
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => strtotime('-270 minutes')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-275 minutes')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-276 minutes')
+						]
+					],
+					'expected_value' => '3.00' // Mapping is not used if aggregation function is 'sum' or 'count'.
+				]
+			],
+			// Item with value mapping and aggregation function 'sum'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-360m',
+						'id:time_period_to' => 'now-240m' // - 4 hours.
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => strtotime('-270 minutes')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-275 minutes')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-280 minutes')
+						]
+					],
+					'expected_value' => '2.00' // Mapping is not used if aggregation function is 'sum' or 'count'.
+				]
+			],
+			// Item with value mapping and aggregation function 'first'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-30m',
+						'id:time_period_to' => 'now-30m'
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'time' => strtotime('-45 minutes')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-50 minutes')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-2 hours')
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)',
+					'arrow' => 'up-down'
+				]
+			],
+			// Item with value mapping and aggregation function 'last'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-600s',
+						'id:time_period_to' => 'now-1800s'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => strtotime('-15 minutes')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-45 minutes')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-50 minutes')
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Down (0)'
+				]
+			],
+			// Item with value mapping and aggregation function 'not used'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'not used'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => strtotime('-15 minutes')
+						],
+						[
+							'value' => '0',
+							'time' => strtotime('-45 minutes')
+						],
+						[
+							'value' => '1',
+							'time' => strtotime('-50 minutes')
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)',
+					'arrow' => 'up-down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'min', decimal places and default Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Decimal places' => '9',
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom'
+					],
+					'item_data' => [
+						[
+							'value' => '5',
+							'time' => strtotime('-5 minutes')
+						],
+						[
+							'value' => '4',
+							'time' => strtotime('-30 minutes')
+						],
+						[
+							'value' => '10',
+							'time' => strtotime('-61 minute')
+						]
+					],
+					'expected_value' => '4.000000000',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (float) item with aggregation function 'max', decimal places and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Decimal places' => '3',
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-3h',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '7.76',
+							'time' => strtotime('-5 minutes')
+						],
+						[
+							'value' => '7.77',
+							'time' => strtotime('-90 minutes')
+						],
+						[
+							'value' => '7.78',
+							'time' => strtotime('-5 hours')
+						]
+					],
+					'expected_value' => '7.770',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'avg', default decimal places and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Decimal places' => '2',
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-30m',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => strtotime('-30 seconds')
+						],
+						[
+							'value' => '3',
+							'time' => strtotime('-45 seconds')
+						],
+						[
+							'value' => '10',
+							'time' => strtotime('-60 seconds')
+						],
+						[
+							'value' => '15',
+							'time' => strtotime('-90 seconds')
+						]
+					],
+					'expected_value' => '7.50'
+				]
+			],
+			// Item with units, aggregation function 'count' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with units',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-30s',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => strtotime('-10 minutes')
+						],
+						[
+							'value' => '95',
+							'time' => strtotime('-15 minutes')
+						]
+					],
+					// Item units are not shown if aggregation function is 'count' except when units are set in widget configuration.
+					'expected_value' => '2.00',
+					'arrow' => 'up'
+				]
+			],
+			// Item with units, aggregation function 'count', widget units override and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with units',
+						'Advanced configuration' => true,
+						'id:units' => '$',
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-30s',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => strtotime('-10 minutes')
+						],
+						[
+							'value' => '95',
+							'time' => strtotime('-15 minutes')
+						]
+					],
+					// Item units are not shown if aggregation function is 'count' except when units are set in widget configuration.
+					'units' => true,
+					'expected_value' => '2.00$',
+					'arrow' => 'up'
+				]
+			],
+			// Item with units, aggregation function 'sum' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with units',
+						'Advanced configuration' => true,
+						'id:units' => '',
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-30s',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => strtotime('-10 minutes')
+						],
+						[
+							'value' => '95',
+							'time' => strtotime('-15 minutes')
+						]
+					],
+					'units' => true,
+					'expected_value' => '97.00%'
+				]
+			],
+			// Numeric (float) item with aggregation function 'first' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2M',
+						'id:time_period_to' => 'now-1M'
+					],
+					'item_data' => [
+						[
+							'value' => '11.11',
+							'time' => strtotime('-10 days')
+						],
+						[
+							'value' => '12.55',
+							'time' => strtotime('-40 days')
+						],
+						[
+							'value' => '12.01',
+							'time' => strtotime('-45 days')
+						],
+						[
+							'value' => '12.99',
+							'time' => strtotime('-50 days')
+						],
+						[
+							'value' => '121.12',
+							'time' => strtotime('-70 days')
+						]
+					],
+					'expected_value' => '12.99'
+				]
+			],
+			// Numeric (float) item with aggregation function 'last' and Custom time period with absolute time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => '2024-01-17 00:00:00',
+						'id:time_period_to' => '2024-01-18 00:00:00'
+					],
+					'item_data' => [
+						[
+							'value' => '12.33',
+							'time' => 1705464000 // 2024-01-17 04:00:00 GMT+0000
+						],
+						[
+							'value' => '12.55',
+							'time' => 1705478400 // 2024-01-17 08:00:00 GMT+0000
+						],
+						[
+							'value' => '12.99',
+							'time' => 1705489200 // 2024-01-17 11:00:00 GMT+0000
+						],
+						[
+							'value' => '11.99',
+							'time' => 1705492800 // 2024-01-17 12:00:00 GMT+0000
+						]
+					],
+					'expected_value' => '11.99'
+				]
+			],
+			// Non numeric (text) item with aggregation function 'count' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2y-1M-2w-1d-10h-30m-20s',
+						'id:time_period_to' => 'now-1y-1M-2w-1d-10h-30m-20s'
+					],
+					'item_data' => [
+						[
+							'value' => 'text 1',
+							'time' => strtotime('-1 year -1 month -2 weeks -2 days -10 hours -30 minutes -20 seconds')
+						],
+						[
+							'value' => 'text 2',
+							'time' => strtotime('-1 year -1 month -2 weeks -1 day -20 hours -30 minutes -20 seconds')
+						],
+						[
+							'value' => 'text 3',
+							'time' => strtotime('-1 year -1 month -3 weeks -2 days -10 hours -30 minutes -20 seconds')
+						],
+						[
+							'value' => 'text 4',
+							'time' => strtotime('-1 year -2 month -2 weeks -2 days -10 hours -30 minutes -20 seconds')
+						]
+					],
+					'expected_value' => '4.00',
+					'arrow' => 'up'
+				]
+			],
+			// Non numeric (Log) item with aggregation function 'min' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2y',
+						'id:time_period_to' => 'now-1y'
+					],
+					'item_data' => [
+						[
+							'value' => 'log 1',
+							'time' => strtotime('-15 month')
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non numeric (Character) item with aggregation function 'max' and Custom time period with absolute time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => '2023-12-12 00:00:00',
+						'id:time_period_to' => '2023-12-12 10:00:00'
+					],
+					'item_data' => [
+						[
+							'value' => 'Character 1',
+							'time' => 1702357200 // 2023-12-12 05:00:00 GMT+0000
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non numeric (Text) item with aggregation function 'avg' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1d',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'Text 1',
+							'time' => strtotime('-1 hour')
+						],
+						[
+							'value' => 'Text 2',
+							'time' => strtotime('-1 day -1 hour')
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non numeric (Log) item with aggregation function 'sum' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1d',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'Log 1',
+							'time' => strtotime('-1 hour')
+						],
+						[
+							'value' => 'Log 2',
+							'time' => strtotime('-1 day -1 hour')
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non numeric (Character) item with aggregation function 'first' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1d',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'Character 1',
+							'time' => strtotime('-1 hour')
+						],
+						[
+							'value' => 'Character 2',
+							'time' => strtotime('-10 hours')
+						],
+						[
+							'value' => 'Character 3',
+							'time' => strtotime('-1 day -1 hour')
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'Character 2',
+					'arrow' => 'up-down'
+				]
+			],
+			// Non numeric (Text) item with aggregation function 'last' and Custom time period.
+
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1w',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'text 2',
+							'time' => strtotime('-1 hour')
+						],
+						[
+							'value' => 'text 1',
+							'time' => strtotime('-1 hour -1 minute')
+						],
+						[
+							'value' => 'text 3',
+							'time' => strtotime('-8 days')
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'text 2',
+					'arrow' => 'up-down'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
+	 *
+	 * @dataProvider getAggregationFunctionData
+	 */
+	public function testDashboardItemValueWidget_AggregationFunctionData($data) {
+		foreach ($data['item_data'] as $params) {
+			CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $params['value'], $params['time']);
+		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_aggregation)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady();
+
+		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
+		$form->fill($data['fields']);
+		$form->submit();
+		$dashboard->save();
+		$dashboard->waitUntilReady();
+		$content = $dashboard->getWidget(self::DATA_WIDET)->getContent();
+		$item_value = $content->query('class:value')->one()->getText();
+
+		if (array_key_exists('units', $data)) {
+			$widget_value = $item_value.$content->query('class:decimals')->one()->getText().$content->query('class:units')->one()->getText();
+		}
+		else {
+			$widget_value = (array_key_exists('value_mapping', $data) || array_key_exists('non_numeric', $data))
+				? $item_value
+				: $item_value.$content->query('class:decimals')->one()->getText();
+		}
+
+		$this->assertEquals($data['expected_value'], $widget_value);
+
+		if (array_key_exists('arrow', $data)) {
+			$this->assertTrue($this->query('class:svg-arrow-'.$data['arrow'])->one()->isVisible());
+		}
 	}
 
 	/**
