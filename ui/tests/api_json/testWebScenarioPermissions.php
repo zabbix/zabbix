@@ -46,8 +46,9 @@ class testWebScenarioPermissions extends CAPITest {
 				['name' => 'perm.ht.hosts.n']
 			],
 			'hosts' => [
-				'Read-Write host' => [
+				[
 					'host' => 'perm.ht.host.rw',
+					'description' => 'Read-Write host',
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.rw'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.rw'] + $steps,
@@ -61,8 +62,9 @@ class testWebScenarioPermissions extends CAPITest {
 						['name' => 'perm.ht.user.upd.mixed.rw'] + $steps
 					]
 				],
-				'Read-only host' => [
+				[
 					'host' => 'perm.ht.host.r',
+					'description' => 'Read-only host',
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.r'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.r'] + $steps,
@@ -75,8 +77,9 @@ class testWebScenarioPermissions extends CAPITest {
 						['name' => 'perm.ht.user.upd.mixed.r'] + $steps
 					]
 				],
-				'Denied host' => [
+				[
 					'host' => 'perm.ht.host.d',
+					'description' => 'Denied host',
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.d'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.d'] + $steps,
@@ -87,8 +90,9 @@ class testWebScenarioPermissions extends CAPITest {
 						['name' => 'perm.ht.user.upd.d'] + $steps
 					]
 				],
-				'Host not linked to user groups' => [
+				[
 					'host' => 'perm.ht.host.n',
+					'description' => 'Host not linked to user groups',
 					'groups' => ['groupid' => ':host_group:perm.ht.hosts.n'],
 					'httptests' => [
 						['name' => 'perm.ht.super-admin.del.n'] + $steps,

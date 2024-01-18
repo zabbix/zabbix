@@ -255,10 +255,6 @@ INSERT INTO sysmaps_elements (selementid, sysmapid, elementid, elementtype, icon
 INSERT INTO interface (interfaceid,hostid,main,type,useip,ip,dns,port) values (99004,10084,1,2,1,'127.0.0.1','','161');
 INSERT INTO interface_snmp (interfaceid, version, bulk, community) values (99004, 2, 1, '{$SNMP_COMMUNITY}');
 
--- autoregistration action
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (53, 'action-user', '$2a$10$gFL5ORa/Ml0VBDGraHI3tuE1WuiKOX8ef497bAfzNiSXUx4Vrrn.y', 0, 0, 'en_US', '30s', 1, 'default', 0, 0, 50);
-INSERT INTO users (userid, username, passwd, autologin, autologout, lang, refresh, roleid, theme, attempt_failed, attempt_clock, rows_per_page) VALUES (54, 'action-admin', '$2a$10$P8CZ/rs94pLp177hh27KheWKAKa6GXZLFhOE8ymd/QlEKT2FDngZe', 0, 0, 'en_US', '30s', 2, 'default', 0, 0, 50);
-
 -- event correlation
 INSERT INTO correlation (correlationid, name, description, evaltype, status, formula) VALUES (99000, 'Event correlation for delete', 'Test description delete', 0, 0, '');
 INSERT INTO corr_condition (corr_conditionid, correlationid, type) VALUES (99000, 99000, 0);

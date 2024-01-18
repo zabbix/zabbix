@@ -28,6 +28,8 @@ require_once __DIR__.'/../include/helpers/CTestDataHelper.php';
 class testDRule extends CAPITest {
 
 	public static function prepareTestData(): void {
+		CTestDataHelper::enableGuestUser();
+
 		CTestDataHelper::createObjects([
 			'template_groups' => [
 				['name' => 'drule.template.group']
@@ -80,9 +82,43 @@ class testDRule extends CAPITest {
 				]
 			]
 		]);
+
+		CTestDataHelper::createObjects([
+			'user_groups' => [
+				['name' => 'perm.users.enabled', 'users_status' => GROUP_STATUS_ENABLED]
+			],
+			'roles' => [
+				[
+					'name' => 'perm.guest.role',
+					'type' => USER_TYPE_ZABBIX_USER,
+					'rules' => [
+						'api.access' => 1,
+						'actions.default_access' => 0
+					]
+				],
+				['name' => 'perm.user.role', 'type' => USER_TYPE_ZABBIX_USER],
+				['name' => 'perm.admin.role', 'type' => USER_TYPE_ZABBIX_ADMIN]
+			],
+			'users' => [
+				[
+					'username' => 'perm.user',
+					'passwd' => 'zabbix!password',
+					'roleid' => ':role:perm.user.role',
+					'usrgrps' => [['usrgrpid' => ':user_group:perm.users.enabled']]
+				],
+				[
+					'username' => 'perm.admin',
+					'passwd' => 'zabbix!password',
+					'roleid' => ':role:perm.admin.role',
+					'usrgrps' => [['usrgrpid' => ':user_group:perm.users.enabled']]
+				]
+			]
+		]);
 	}
 
 	public static function cleanTestData(): void {
+		CTestDataHelper::disableGuestUser();
+
 		CTestDataHelper::cleanUp();
 	}
 
@@ -170,17 +206,17 @@ class testDRule extends CAPITest {
 				'expected_error' => 'No permissions to call "drule.delete".'
 			],
 			[
-				'login' => ['user' => 'action-user', 'password' => 'zabbix'],
+				'login' => ['user' => 'perm.user', 'password' => 'zabbix!password'],
 				'drule' => [':drule:drule.perm.del'],
 				'expected_error' => 'No permissions to call "drule.delete".'
 			],
 			[
-				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],
+				'login' => ['user' => 'perm.admin', 'password' => 'zabbix!password'],
 				'drule' => ['123456'],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
 			[
-				'login' => ['user' => 'action-admin', 'password' => 'zabbix'],
+				'login' => ['user' => 'perm.admin', 'password' => 'zabbix!password'],
 				'drule' => [':drule:drule.perm.del'],
 				'expected_error' => null
 			]
@@ -188,9 +224,6 @@ class testDRule extends CAPITest {
 	}
 
 	/**
-	 * @onBefore removeGuestFromDisabledGroup
-	 * @onAfter addGuestToDisabledGroup
-	 *
 	 * @dataProvider getDRuleUserPermissionsData
 	 */
 	public function testDRule_Permissions(array $login, array $druleids, ?string $expected_error) {
@@ -218,16 +251,5 @@ class testDRule extends CAPITest {
 		else {
 			$this->assertEquals($old_drule, CDBHelper::getHash($sql));
 		}
-	}
-
-	/**
-	 * Guest user needs to be out of "Disabled" group to have access to frontend.
-	 */
-	public static function removeGuestFromDisabledGroup() {
-		DBexecute('DELETE FROM users_groups WHERE userid=2 AND usrgrpid=9');
-	}
-
-	public function addGuestToDisabledGroup() {
-		DBexecute('INSERT INTO users_groups (id, usrgrpid, userid) VALUES (150, 9, 2)');
 	}
 }

@@ -973,24 +973,24 @@ class testDependentItems extends CAPITest {
 		}
 
 		$api_object = substr($method, 0, strpos($method, '.'));
-		$request = array_key_exists(0, $params) ? $params : [$params];
+		$params = array_key_exists(0, $params) ? $params : [$params];
 
-		foreach ($request as &$object) {
+		foreach ($params as &$param) {
 			if ($api_object === 'host') {
-				CTestDataHelper::convertHostReferences($object);
+				CTestDataHelper::convertHostReferences($param);
 			}
 			elseif ($api_object === 'item') {
-				CTestDataHelper::convertItemReferences($object);
+				CTestDataHelper::convertItemReferences($param);
 			}
 			elseif ($api_object === 'itemprototype') {
-				CTestDataHelper::convertItemPrototypeReferences($object);
+				CTestDataHelper::convertItemPrototypeReferences($param);
 			}
 			elseif ($api_object === 'discoveryrule') {
-				CTestDataHelper::convertLldRuleReferences($object);
+				CTestDataHelper::convertLldRuleReferences($param);
 			}
 		}
-		unset($object);
+		unset($param);
 
-		return $this->call($method, $request, $error);
+		return $this->call($method, $params, $error);
 	}
 }

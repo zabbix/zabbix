@@ -37,23 +37,23 @@ class CTestDataHelper {
 	 * @param array $objects
 	 */
 	public static function createObjects(array $objects): void {
-		$objects += array_fill_keys(['actions', 'drules', 'host_groups', 'hosts', 'proxies', 'roles', 'scripts',
-			'template_groups', 'templates', 'triggers', 'user_groups', 'users'
+		$objects += array_fill_keys(['template_groups', 'host_groups', 'templates', 'proxies', 'hosts', 'triggers',
+			'roles', 'user_groups', 'users', 'scripts',  'drules', 'actions'
 		], []);
 
 		try {
-			self::createTemplateGroups(array_values($objects['template_groups']));
-			self::createHostGroups(array_values($objects['host_groups']));
-			self::createProxies(array_values($objects['proxies']));
-			self::createTemplates(array_values($objects['templates']));
-			self::createHosts(array_values($objects['hosts']));
+			self::createTemplateGroups($objects['template_groups']);
+			self::createHostGroups($objects['host_groups']);
+			self::createTemplates($objects['templates']);
+			self::createProxies($objects['proxies']);
+			self::createHosts($objects['hosts']);
 			self::createTriggers($objects['triggers']);
-			self::createRoles(array_values($objects['roles']));
-			self::createUserGroups(array_values($objects['user_groups']));
-			self::createUsers(array_values($objects['users']));
-			self::createScripts(array_values($objects['scripts']));
-			self::createDrules(array_values($objects['drules']));
-			self::createActions(array_values($objects['actions']));
+			self::createRoles($objects['roles']);
+			self::createUserGroups($objects['user_groups']);
+			self::createUsers($objects['users']);
+			self::createScripts($objects['scripts']);
+			self::createDrules($objects['drules']);
+			self::createActions($objects['actions']);
 		}
 		catch (Exception $e) {
 			self::cleanUp();
@@ -427,40 +427,11 @@ class CTestDataHelper {
 		self::createItemPrototypes($item_prototypes);
 	}
 
-	private static function createHttptests(array $httptests): void {
-		if (!$httptests) {
-			return;
-		}
-
-		$host_refs = [];
-
-		foreach ($httptests as $i => &$httptest) {
-			$host_refs[$i] = $httptest['hostid'];
-		}
-		unset($httptest);
-
-		self::convertHttptestReferences($httptests);
-
-		$result = CDataHelper::call('httptest.create', $httptests);
-
-		foreach ($httptests as $i => $httptest) {
-			self::$objectids['httptest'][$httptest['name']][$host_refs[$i]] = array_shift($result['httptestids']);
-		}
-	}
-
 	public static function convertLldRuleReferences(array &$lld_rules): void {
 		self::convertPropertyReference($lld_rules, 'itemid');
 		self::convertPropertyReference($lld_rules, 'hostid');
 		self::convertPropertyReference($lld_rules, 'interfaceid');
 		self::convertPropertyReference($lld_rules, 'master_itemid');
-	}
-
-	/**
-	 * @param array $httptest
-	 */
-	public static function convertHttptestReferences(array &$httptest): void {
-		self::convertPropertyReference($httptest, 'httptestid');
-		self::convertPropertyReference($httptest, 'hostid');
 	}
 
 	/**
@@ -501,6 +472,35 @@ class CTestDataHelper {
 		}
 
 		return $lld_rules;
+	}
+
+	private static function createHttptests(array $httptests): void {
+		if (!$httptests) {
+			return;
+		}
+
+		$host_refs = [];
+
+		foreach ($httptests as $i => &$httptest) {
+			$host_refs[$i] = $httptest['hostid'];
+		}
+		unset($httptest);
+
+		self::convertHttptestReferences($httptests);
+
+		$result = CDataHelper::call('httptest.create', $httptests);
+
+		foreach ($httptests as $i => $httptest) {
+			self::$objectids['httptest'][$httptest['name']][$host_refs[$i]] = array_shift($result['httptestids']);
+		}
+	}
+
+	/**
+	 * @param array $httptest
+	 */
+	public static function convertHttptestReferences(array &$httptest): void {
+		self::convertPropertyReference($httptest, 'httptestid');
+		self::convertPropertyReference($httptest, 'hostid');
 	}
 
 	/**
@@ -768,8 +768,6 @@ class CTestDataHelper {
 			return;
 		}
 
-		self::convertUserReferences($users);
-
 		foreach ($users as &$user) {
 			$user += [
 				'roleid' => end(self::$objectids['role']),
@@ -779,6 +777,8 @@ class CTestDataHelper {
 			];
 		}
 		unset($user);
+
+		self::convertUserReferences($users);
 
 		$result = CDataHelper::call('user.create', $users);
 
@@ -811,37 +811,6 @@ class CTestDataHelper {
 		self::convertPropertyReference($scripts, 'scriptid');
 		self::convertPropertyReference($scripts, 'groupid');
 		self::convertPropertyReference($scripts, 'usrgrpid');
-	}
-
-	private static function createActions(array $actions): void {
-		if (!$actions) {
-			return;
-		}
-
-		foreach ($actions as &$action) {
-			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
-				$referenced_condition_types = [ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST,
-					ZBX_CONDITION_TYPE_TRIGGER, ZBX_CONDITION_TYPE_TEMPLATE, ZBX_CONDITION_TYPE_DRULE,
-					ZBX_CONDITION_TYPE_PROXY
-				];
-
-				foreach ($action['filter']['conditions'] as &$condition) {
-					if (in_array($condition['conditiontype'], $referenced_condition_types)) {
-						self::convertPropertyReference($condition, 'value');
-					}
-				}
-				unset($condition);
-			}
-		}
-		unset($action);
-
-		self::convertActionReferences($actions);
-
-		$result = CDataHelper::call('action.create', $actions);
-
-		foreach ($actions as $action) {
-			self::$objectids['action'][$action['name']] = array_shift($result['actionids']);
-		}
 	}
 
 	private static function createDrules(array $drules): void {
@@ -886,6 +855,37 @@ class CTestDataHelper {
 	public static function convertDruleReferences(array &$drules): void {
 		self::convertPropertyReference($drules, 'druleid');
 		self::convertPropertyReference($drules, 'proxyid');
+	}
+
+	private static function createActions(array $actions): void {
+		if (!$actions) {
+			return;
+		}
+
+		foreach ($actions as &$action) {
+			if (array_key_exists('filter', $action) && array_key_exists('conditions', $action['filter'])) {
+				$referenced_condition_types = [ZBX_CONDITION_TYPE_HOST_GROUP, ZBX_CONDITION_TYPE_HOST,
+					ZBX_CONDITION_TYPE_TRIGGER, ZBX_CONDITION_TYPE_TEMPLATE, ZBX_CONDITION_TYPE_DRULE,
+					ZBX_CONDITION_TYPE_PROXY
+				];
+
+				foreach ($action['filter']['conditions'] as &$condition) {
+					if (in_array($condition['conditiontype'], $referenced_condition_types)) {
+						self::convertPropertyReference($condition, 'value');
+					}
+				}
+				unset($condition);
+			}
+		}
+		unset($action);
+
+		self::convertActionReferences($actions);
+
+		$result = CDataHelper::call('action.create', $actions);
+
+		foreach ($actions as $action) {
+			self::$objectids['action'][$action['name']] = array_shift($result['actionids']);
+		}
 	}
 
 	public static function convertActionReferences(array &$actions): void {
@@ -1069,6 +1069,10 @@ class CTestDataHelper {
 			CDataHelper::call('action.delete', array_values(self::$objectids['action']));
 		}
 
+		if (array_key_exists('drule', self::$objectids)) {
+			CDataHelper::call('drule.delete', array_values(self::$objectids['drule']));
+		}
+
 		if (array_key_exists('script', self::$objectids)) {
 			CDataHelper::call('script.delete', array_values(self::$objectids['script']));
 		}
@@ -1093,10 +1097,6 @@ class CTestDataHelper {
 			CDataHelper::call('host.delete', array_values(self::$objectids['host']));
 		}
 
-		if (array_key_exists('drule', self::$objectids)) {
-			CDataHelper::call('drule.delete', array_values(self::$objectids['drule']));
-		}
-
 		if (array_key_exists('proxy', self::$objectids)) {
 			CDataHelper::call('proxy.delete', array_values(self::$objectids['proxy']));
 		}
@@ -1110,5 +1110,56 @@ class CTestDataHelper {
 		}
 
 		self::$objectids = [];
+	}
+
+	private static function getGuestUserData(): array {
+		$guest = CDataHelper::call('user.get', [
+			'output' => [],
+			'filter' => ['username' => 'guest'],
+			'selectUsrgrps' => ['name']
+		])[0];
+
+		if (!in_array('Disabled', array_column($guest['usrgrps'], 'name'))) {
+			$group = CDataHelper::call('usergroup.get', [
+				'output' => ['name'],
+				'filter' => ['name' => 'Disabled']
+			]);
+
+			$guest['usrgrps'] = array_merge($guest['usrgrps'] , $group);
+		}
+
+		foreach ($guest['usrgrps'] as $group) {
+			$guest['groups_include_disabled'][] = ['usrgrpid' => $group['usrgrpid']];
+
+			if ($group['name'] !== 'Disabled') {
+				$guest['groups_exclude_disabled'][] = ['usrgrpid' => $group['usrgrpid']];
+			}
+		}
+
+		return $guest;
+	}
+
+	/**
+	 * Removes the 'Disabled' user group from guest user, keeping the others.
+	 */
+	public static function enableGuestUser(): void {
+		$guest = self::getGuestUserData();
+
+		CDataHelper::call('user.update', [
+			'userid' => $guest['userid'],
+			'usrgrps' => $guest['groups_exclude_disabled']
+		]);
+	}
+
+	/**
+	 * Assigns the 'Disabled' user group to guest user, keeping the others.
+	 */
+	public static function disableGuestUser(): void {
+		$guest = self::getGuestUserData();
+
+		CDataHelper::call('user.update', [
+			'userid' => $guest['userid'],
+			'usrgrps' => $guest['groups_include_disabled']
+		]);
 	}
 }
