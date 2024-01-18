@@ -157,10 +157,6 @@
 #	include <fcntl.h>
 #endif
 
-#ifdef HAVE_KNLIST_H
-#	include <knlist.h>
-#endif
-
 #ifdef HAVE_KSTAT_H
 #	include <kstat.h>
 #endif
@@ -182,10 +178,6 @@
 
 #ifdef HAVE_MACH_MACH_HOST_H
 #	include <mach/mach_host.h>
-#endif
-
-#ifdef HAVE_MTENT_H
-#	include <mtent.h>
 #endif
 
 #ifdef HAVE_NETDB_H

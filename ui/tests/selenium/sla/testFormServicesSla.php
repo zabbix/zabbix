@@ -350,7 +350,7 @@ class testFormServicesSla extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Non-nuneric SLO',
+						'Name' => 'Non-numeric SLO',
 						'SLO' => '123abc',
 						'id:service_tags_0_tag' => 'tag'
 					],

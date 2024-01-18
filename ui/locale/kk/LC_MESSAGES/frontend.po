@@ -1,21 +1,21 @@
-# Croatian translations for Zabbix package.
-# Copyright (C) 2023 Zabbix SIA
+# Kazakh translations for Zabbix package.
+# Copyright (C) 2024 Zabbix SIA
 # This file is distributed under the same license as the Zabbix package.
-# Automatically generated, 2023.
+# Automatically generated, 2024.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: Zabbix 6.0.14\n"
+"Project-Id-Version: Zabbix 6.4.11rc1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
 "PO-Revision-Date: 2022-03-02 16:36+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
-"Language: hr\n"
+"Language: kk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: app/controllers/CControllerSlaReportList.php:181
 #: include/classes/widgets/forms/CWidgetFormSlaReport.php:104
@@ -90,7 +90,6 @@ msgid "%1$d day"
 msgid_plural "%1$d days"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: jsLoader.php:347
 #, c-format
@@ -104,7 +103,6 @@ msgid "%1$d of %3$d%2$s problem is shown"
 msgid_plural "%1$d of %3$d%2$s problems are shown"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupAcknowledgeEdit.php:117
 #, c-format
@@ -134,7 +132,6 @@ msgid "%1$s action"
 msgid_plural "%1$s actions"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: jsLoader.php:328
 #, c-format
@@ -153,7 +150,6 @@ msgid "%1$s event"
 msgid_plural "%1$s events"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/maps.inc.php:410
 #, c-format
@@ -161,7 +157,6 @@ msgid "%1$s host in maintenance"
 msgid_plural "%1$s hosts in maintenance"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/func.inc.php:2549
 #, c-format
@@ -169,7 +164,6 @@ msgid "%1$s hour"
 msgid_plural "%1$s hours"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerWidgetPlainTextView.php:126
 #: app/controllers/CControllerWidgetPlainTextView.php:127
@@ -179,7 +173,6 @@ msgid "%1$s item"
 msgid_plural "%1$s items"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/actions.inc.php:1731
 #, c-format
@@ -188,7 +181,6 @@ msgid "%1$s message"
 msgid_plural "%1$s messages"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/widgets/CWidgetConfig.php:308
 #: include/classes/widgets/CWidgetConfig.php:309
@@ -200,7 +192,6 @@ msgid "%1$s minute"
 msgid_plural "%1$s minutes"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/helpers/CMapHelper.php:316
 #, c-format
@@ -208,7 +199,6 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.miscconfig.edit.php:119
 #, c-format
@@ -233,7 +223,6 @@ msgid "%1$s problem"
 msgid_plural "%1$s problems"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
@@ -241,7 +230,6 @@ msgid "%1$s problem in total"
 msgid_plural "%1$s problems in total"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/monitoring.widget.actionlog.view.php:45
 #: include/actions.inc.php:2172
@@ -251,7 +239,6 @@ msgid "%1$s retry left"
 msgid_plural "%1$s retries left"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.user.edit.php:667
 #: include/classes/widgets/CWidgetConfig.php:306
@@ -262,7 +249,6 @@ msgid "%1$s second"
 msgid_plural "%1$s seconds"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/maps.inc.php:368 include/maps.inc.php:371 include/maps.inc.php:378
 #: include/maps.inc.php:383
@@ -271,7 +257,6 @@ msgid "%1$s unacknowledged problem"
 msgid_plural "%1$s unacknowledged problems"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:108
 #: app/views/monitoring.widget.problems.view.php:207
@@ -298,7 +283,6 @@ msgid "%4$s failed login attempt logged. Last failed attempt was from %1$s on %2
 msgid_plural "%4$s failed login attempts logged. Last failed attempt was from %1$s on %2$s at %3$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/screens/CScreenDiscovery.php:213
 #, c-format
@@ -306,7 +290,6 @@ msgid "%d device"
 msgid_plural "%d devices"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/users.inc.php:143
 #, c-format
@@ -441,21 +424,18 @@ msgid "API token deleted"
 msgid_plural "API tokens deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/clients/CLocalApiClient.php:198
 msgid "API token expired."
@@ -653,14 +633,12 @@ msgid "Action disabled"
 msgid_plural "Actions disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: actionconf.php:490
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: auditacts.php:27 include/classes/helpers/CMenuHelper.php:151
 #: include/classes/helpers/CRoleHelper.php:383
@@ -1357,7 +1335,6 @@ msgid "At %1$s:%2$s %3$s of every week"
 msgid_plural "At %1$s:%2$s %3$s of every %4$s weeks"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/maintenances.inc.php:50
 #, c-format
@@ -1365,7 +1342,6 @@ msgid "At %1$s:%2$s every day"
 msgid_plural "At %1$s:%2$s every %3$s days"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/maintenances.inc.php:112
 #, c-format
@@ -2042,7 +2018,6 @@ msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2179,21 +2154,18 @@ msgid "Cannot copy graph"
 msgid_plural "Cannot copy graphs"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: items.php:965
 msgid "Cannot copy item"
 msgid_plural "Cannot copy items"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: triggers.php:538
 msgid "Cannot copy trigger"
 msgid_plural "Cannot copy triggers"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/triggers.inc.php:246
 #, c-format
@@ -2260,14 +2232,12 @@ msgid "Cannot delete API token"
 msgid_plural "Cannot delete API tokens"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerSlaDelete.php:79
 msgid "Cannot delete SLA"
 msgid_plural "Cannot delete SLAs"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CUser.php:1257
 #, c-format
@@ -2288,7 +2258,6 @@ msgid "Cannot delete correlation"
 msgid_plural "Cannot delete correlations"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerDashboardDelete.php:63
 #: app/controllers/CControllerTemplateDashboardDelete.php:61
@@ -2296,7 +2265,6 @@ msgid "Cannot delete dashboard"
 msgid_plural "Cannot delete dashboards"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CTrigger.php:882
 #: include/classes/api/services/CTriggerPrototype.php:570
@@ -2308,7 +2276,6 @@ msgid "Cannot delete discovery rule"
 msgid_plural "Cannot delete discovery rules"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: host_discovery.php:780
 msgid "Cannot delete discovery rules"
@@ -2335,7 +2302,6 @@ msgid "Cannot delete group"
 msgid_plural "Cannot delete groups"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerHostMassDelete.php:74
 msgid "Cannot delete host"
@@ -2347,7 +2313,6 @@ msgid "Cannot delete host %1$s because maintenance \"%2$s\" must contain at leas
 msgid_plural "Cannot delete hosts %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CHostGroup.php:849
 #, c-format
@@ -2355,7 +2320,6 @@ msgid "Cannot delete host group %1$s because maintenance \"%2$s\" must contain a
 msgid_plural "Cannot delete host groups %1$s because maintenance \"%2$s\" must contain at least one host or host group."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: host_prototypes.php:147 host_prototypes.php:356
 msgid "Cannot delete host prototypes"
@@ -2403,7 +2367,6 @@ msgid "Cannot delete media type"
 msgid_plural "Cannot delete media types"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleScan.php:118
 #, c-format
@@ -2411,7 +2374,6 @@ msgid "Cannot delete module: %1$s."
 msgid_plural "Cannot delete modules: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: sysmaps.php:261
 msgid "Cannot delete network map"
@@ -2422,7 +2384,6 @@ msgid "Cannot delete proxy"
 msgid_plural "Cannot delete proxies"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CRole.php:369
 #, c-format
@@ -2434,21 +2395,18 @@ msgid "Cannot delete regular expression"
 msgid_plural "Cannot delete regular expressions"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScheduledReportDelete.php:71
 msgid "Cannot delete scheduled report"
 msgid_plural "Cannot delete scheduled reports"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScriptDelete.php:69
 msgid "Cannot delete script"
 msgid_plural "Cannot delete scripts"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CScript.php:877
 #, c-format
@@ -2464,7 +2422,6 @@ msgid "Cannot delete service"
 msgid_plural "Cannot delete services"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CService.php:455
 #: include/classes/api/services/CService.php:470
@@ -2532,21 +2489,18 @@ msgid "Cannot delete user"
 msgid_plural "Cannot delete users"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerUsergroupDelete.php:59
 msgid "Cannot delete user group"
 msgid_plural "Cannot delete user groups"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerUserroleDelete.php:59
 msgid "Cannot delete user role"
 msgid_plural "Cannot delete user roles"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: httpconf.php:177 httpconf.php:442
 msgid "Cannot delete web scenario"
@@ -2557,35 +2511,30 @@ msgid "Cannot disable API token"
 msgid_plural "Cannot disable API tokens"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerSlaDisable.php:88
 msgid "Cannot disable SLA"
 msgid_plural "Cannot disable SLAs"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: actionconf.php:499
 msgid "Cannot disable action"
 msgid_plural "Cannot disable actions"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationDisable.php:75
 msgid "Cannot disable correlation"
 msgid_plural "Cannot disable correlations"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerDiscoveryDisable.php:74 host_discovery.php:770
 msgid "Cannot disable discovery rule"
 msgid_plural "Cannot disable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:447
 #: app/controllers/CControllerProxyHostDisable.php:80 hostgroups.php:197
@@ -2593,28 +2542,24 @@ msgid "Cannot disable host"
 msgid_plural "Cannot disable hosts"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: items.php:925
 msgid "Cannot disable item"
 msgid_plural "Cannot disable items"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeDisable.php:75
 msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:148
 msgid "Cannot disable module"
 msgid_plural "Cannot disable modules"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
@@ -2622,28 +2567,24 @@ msgid "Cannot disable module: %1$s."
 msgid_plural "Cannot disable modules: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScheduledReportDisable.php:78
 msgid "Cannot disable scheduled report"
 msgid_plural "Cannot disable scheduled reports"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: triggers.php:490
 msgid "Cannot disable trigger"
 msgid_plural "Cannot disable triggers"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: httpconf.php:416
 msgid "Cannot disable web scenario"
 msgid_plural "Cannot disable web scenarios"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerQueueDetails.php:55
 #: app/controllers/CControllerQueueOverview.php:53
@@ -2660,35 +2601,30 @@ msgid "Cannot enable API token"
 msgid_plural "Cannot enable API tokens"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerSlaEnable.php:88
 msgid "Cannot enable SLA"
 msgid_plural "Cannot enable SLAs"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: actionconf.php:498
 msgid "Cannot enable action"
 msgid_plural "Cannot enable actions"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationEnable.php:76
 msgid "Cannot enable correlation"
 msgid_plural "Cannot enable correlations"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerDiscoveryEnable.php:75 host_discovery.php:769
 msgid "Cannot enable discovery rule"
 msgid_plural "Cannot enable discovery rules"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:446
 #: app/controllers/CControllerProxyHostEnable.php:80 hostgroups.php:196
@@ -2696,28 +2632,24 @@ msgid "Cannot enable host"
 msgid_plural "Cannot enable hosts"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: items.php:924
 msgid "Cannot enable item"
 msgid_plural "Cannot enable items"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeEnable.php:75
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:143
 msgid "Cannot enable module"
 msgid_plural "Cannot enable modules"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2725,28 +2657,24 @@ msgid "Cannot enable module: %1$s."
 msgid_plural "Cannot enable modules: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:78
 msgid "Cannot enable scheduled report"
 msgid_plural "Cannot enable scheduled reports"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: triggers.php:489
 msgid "Cannot enable trigger"
 msgid_plural "Cannot enable triggers"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: httpconf.php:415
 msgid "Cannot enable web scenario"
 msgid_plural "Cannot enable web scenarios"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupTestTriggerExpr.php:199
 msgid "Cannot evaluate expression"
@@ -2910,7 +2838,6 @@ msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist.
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
 msgid "Cannot insert trigger expression"
@@ -3075,7 +3002,6 @@ msgid "Cannot load module at: %1$s."
 msgid_plural "Cannot load modules at: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CUser.php:1449
 msgid "Cannot log out."
@@ -3208,7 +3134,6 @@ msgid "Cannot unblock user"
 msgid_plural "Cannot unblock users"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CHostGeneral.php:719
 #: include/classes/api/services/CHostGeneral.php:1356
@@ -3382,7 +3307,6 @@ msgid "Cannot update event"
 msgid_plural "Cannot update events"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: graphs.php:239 graphs.php:292
 msgid "Cannot update graph"
@@ -3415,7 +3339,6 @@ msgid "Cannot update host prototype"
 msgid_plural "Cannot update host prototypes"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:465
 msgid "Cannot update hosts"
@@ -3445,7 +3368,6 @@ msgid "Cannot update item prototype"
 msgid_plural "Cannot update item prototypes"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateItem.php:316
 msgid "Cannot update item prototypes"
@@ -3559,7 +3481,6 @@ msgid "Cannot update trigger prototype"
 msgid_plural "Cannot update trigger prototypes"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CTriggerGeneral.php:1722
 #, c-format
@@ -3584,7 +3505,6 @@ msgid "Cannot update user group"
 msgid_plural "Cannot update user groups"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerUserroleUpdate.php:106
 #: app/controllers/CControllerUserroleUpdate.php:176
@@ -4482,21 +4402,18 @@ msgid "Correlation deleted"
 msgid_plural "Correlations deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationDisable.php:72
 msgid "Correlation disabled"
 msgid_plural "Correlations disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerCorrelationEnable.php:73
 msgid "Correlation enabled"
 msgid_plural "Correlations enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/events.inc.php:228
 msgid "Correlation rule"
@@ -4950,7 +4867,6 @@ msgid "Dashboard deleted"
 msgid_plural "Dashboards deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/dashboard.page.properties.edit.php:60
 msgid "Dashboard page properties"
@@ -6099,21 +6015,18 @@ msgid "Discovery rule deleted"
 msgid_plural "Discovery rules deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerDiscoveryDisable.php:71 host_discovery.php:767
 msgid "Discovery rule disabled"
 msgid_plural "Discovery rules disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerDiscoveryEnable.php:72 host_discovery.php:766
 msgid "Discovery rule enabled"
 msgid_plural "Discovery rules enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerDiscoveryUpdate.php:95 host_discovery.php:731
 msgid "Discovery rule updated"
@@ -6881,7 +6794,6 @@ msgid "Event updated"
 msgid_plural "Events updated"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.housekeeping.edit.php:41
 msgid "Events and alerts"
@@ -7700,7 +7612,6 @@ msgid "Graph copied"
 msgid_plural "Graphs copied"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: graphs.php:279
 msgid "Graph deleted"
@@ -7858,7 +7769,6 @@ msgid "Group deleted"
 msgid_plural "Groups deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.miscconfig.edit.php:39
 msgid "Group for discovered hosts"
@@ -8189,7 +8099,6 @@ msgid "Host"
 msgid_plural "Hosts"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CHost.php:999
 #: include/classes/import/importers/CHostImporter.php:71
@@ -8250,7 +8159,6 @@ msgid "Host disabled"
 msgid_plural "Hosts disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupMassupdateHost.php:440
 #: app/controllers/CControllerProxyHostEnable.php:77 hostgroups.php:193
@@ -8258,7 +8166,6 @@ msgid "Host enabled"
 msgid_plural "Hosts enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/monitoring.charts.view.php:83
 msgid "Host graphs"
@@ -8423,7 +8330,6 @@ msgid "Host prototype updated"
 msgid_plural "Host prototypes updated"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CHostPrototype.php:999
 #, c-format
@@ -8780,7 +8686,6 @@ msgid "If at least %2$s child service has %1$s status or above"
 msgid_plural "If at least %2$s child services have %1$s status or above"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/helpers/CServiceHelper.php:35
 #, c-format
@@ -8803,7 +8708,6 @@ msgid "If less than %2$s child service has %1$s status or below"
 msgid_plural "If less than %2$s child services have %1$s status or below"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/helpers/CServiceHelper.php:45
 #, c-format
@@ -10524,7 +10428,6 @@ msgid "Item copied"
 msgid_plural "Items copied"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.proxy.list.php:82
 msgid "Item count"
@@ -10539,14 +10442,12 @@ msgid "Item disabled"
 msgid_plural "Items disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: items.php:921
 msgid "Item enabled"
 msgid_plural "Items enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/actions.inc.php:1265
 msgid "Item in \"not supported\" state"
@@ -10597,7 +10498,6 @@ msgid "Item prototype updated"
 msgid_plural "Item prototypes updated"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CDashboardGeneral.php:474
 #: include/classes/api/services/CDashboardGeneral.php:482
@@ -10944,7 +10844,6 @@ msgid "Last %1$d day"
 msgid_plural "Last %1$d days"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/func.inc.php:2514
 #, c-format
@@ -10952,7 +10851,6 @@ msgid "Last %1$d hour"
 msgid_plural "Last %1$d hours"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/func.inc.php:2507
 #, c-format
@@ -10960,7 +10858,6 @@ msgid "Last %1$d minute"
 msgid_plural "Last %1$d minutes"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/func.inc.php:2523
 #, c-format
@@ -10968,7 +10865,6 @@ msgid "Last %1$d month"
 msgid_plural "Last %1$d months"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/func.inc.php:2500
 #, c-format
@@ -10976,7 +10872,6 @@ msgid "Last %1$d second"
 msgid_plural "Last %1$d seconds"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/func.inc.php:2526
 #, c-format
@@ -10984,7 +10879,6 @@ msgid "Last %1$d year"
 msgid_plural "Last %1$d years"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/partials/administration.ha.nodes.php:28
 msgid "Last access"
@@ -11760,7 +11654,6 @@ msgid "Maximum time period to display is %1$s day."
 msgid_plural "Maximum time period to display is %1$s days."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CUser.php:941
 #, c-format
@@ -11805,21 +11698,18 @@ msgid "Media type deleted"
 msgid_plural "Media types deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeDisable.php:72
 msgid "Media type disabled"
 msgid_plural "Media types disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerMediatypeEnable.php:72
 msgid "Media type enabled"
 msgid_plural "Media types enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupMediatypeTestSend.php:45
 #: app/controllers/CControllerPopupMediatypeTestSend.php:145
@@ -12014,7 +11904,6 @@ msgid "Minimum time period to display is %1$s minute."
 msgid_plural "Minimum time period to display is %1$s minutes."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/popup.maintenance.period.php:175
 #: app/views/popup.sla.excludeddowntime.edit.php:73
@@ -12078,7 +11967,6 @@ msgid "Module added: %1$s."
 msgid_plural "Modules added: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleScan.php:113
 #, c-format
@@ -12086,14 +11974,12 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:134
 msgid "Module disabled"
 msgid_plural "Modules disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
@@ -12101,14 +11987,12 @@ msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:131
 msgid "Module enabled"
 msgid_plural "Modules enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
@@ -12116,7 +12000,6 @@ msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:128
 msgid "Module updated"
@@ -13631,7 +13514,6 @@ msgid "Only selected problem"
 msgid_plural "Only selected problems"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/service.list.edit.php:86
 msgid "Only services without children"
@@ -14873,7 +14755,6 @@ msgid "Proxy deleted"
 msgid_plural "Proxies deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.proxy.edit.php:70
 msgid "Proxy mode"
@@ -15151,7 +15032,6 @@ msgid "Regular expression deleted"
 msgid_plural "Regular expressions deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerRegExTest.php:72
 msgid "Regular expression must be a string"
@@ -15837,21 +15717,18 @@ msgid "SLA deleted"
 msgid_plural "SLAs deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerSlaDisable.php:73
 msgid "SLA disabled"
 msgid_plural "SLAs disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerSlaEnable.php:73
 msgid "SLA enabled"
 msgid_plural "SLAs enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/monitoring.widget.slareport.view.php:33
 msgid "SLA is disabled."
@@ -16156,21 +16033,18 @@ msgid "Scheduled report deleted"
 msgid_plural "Scheduled reports deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScheduledReportDisable.php:74
 msgid "Scheduled report disabled"
 msgid_plural "Scheduled reports disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScheduledReportEnable.php:74
 msgid "Scheduled report enabled"
 msgid_plural "Scheduled reports enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerScheduledReportUpdate.php:147
 msgid "Scheduled report updated"
@@ -16234,7 +16108,6 @@ msgid "Script deleted"
 msgid_plural "Scripts deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/js/popup.scriptexec.js.php:47
 msgid "Script execution log"
@@ -16529,7 +16402,6 @@ msgid "Service deleted"
 msgid_plural "Services deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.userrole.edit.php:144
 #: app/views/administration.userrole.edit.php:185
@@ -18016,7 +17888,6 @@ msgid "The image is used in icon map %1$s."
 msgid_plural "The image is used in icon maps %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CImage.php:591
 #, c-format
@@ -18024,7 +17895,6 @@ msgid "The image is used in map %1$s."
 msgid_plural "The image is used in maps %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/html.inc.php:745
 #, c-format
@@ -18511,7 +18381,6 @@ msgid "Trigger copied"
 msgid_plural "Triggers copied"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.housekeeping.edit.php:49
 msgid "Trigger data storage period"
@@ -18530,7 +18399,6 @@ msgid "Trigger disabled"
 msgid_plural "Triggers disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.trigdisplay.edit.php:31
 #: app/views/administration.trigdisplay.edit.php:165
@@ -18543,7 +18411,6 @@ msgid "Trigger enabled"
 msgid_plural "Triggers enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CHostBase.php:1189
 #, c-format
@@ -18682,7 +18549,6 @@ msgid "Trigger prototype updated"
 msgid_plural "Trigger prototypes updated"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerPopupGeneric.php:183
 #: app/controllers/CControllerPopupImportCompare.php:174
@@ -19181,7 +19047,6 @@ msgid "Unsupported charset or collation for table: %1$s."
 msgid_plural "Unsupported charset or collation for tables: %1$s."
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/import/readers/CImportReaderFactory.php:79
 #, c-format
@@ -19470,7 +19335,6 @@ msgid "User deleted"
 msgid_plural "Users deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerAuditLogList.php:245
 #: app/partials/js/scheduledreport.subscription.js.php:83
@@ -19516,7 +19380,6 @@ msgid "User group deleted"
 msgid_plural "User groups deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/views/administration.miscconfig.edit.php:64
 msgid "User group for database down message"
@@ -19534,7 +19397,6 @@ msgid "User group updated"
 msgid_plural "User groups updated"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/api/services/CDashboard.php:482
 #: include/classes/api/services/CReport.php:463
@@ -19608,7 +19470,6 @@ msgid "User role deleted"
 msgid_plural "User roles deleted"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerUserroleUpdate.php:168
 msgid "User role updated"
@@ -19654,7 +19515,6 @@ msgid "User unblocked"
 msgid_plural "Users unblocked"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: app/controllers/CControllerUserProfileUpdate.php:118
 #: app/controllers/CControllerUserUpdate.php:124
@@ -20574,14 +20434,12 @@ msgid "Web scenario disabled"
 msgid_plural "Web scenarios disabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: httpconf.php:412
 msgid "Web scenario enabled"
 msgid_plural "Web scenarios enabled"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: httpconf.php:193
 msgid "Web scenario updated"
@@ -23286,7 +23144,6 @@ msgid "value must be %1$s"
 msgid_plural "value must be one of %1$s"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/validators/CActionCondValidator.php:171
 #: include/classes/validators/CApiInputValidator.php:2566
@@ -23304,7 +23161,6 @@ msgid "value must be empty or %1$s"
 msgid_plural "value must be empty or one of %1$s"
 msgstr[0] ""
 msgstr[1] ""
-msgstr[2] ""
 
 #: include/classes/validators/CNewValidator.php:208
 #, c-format

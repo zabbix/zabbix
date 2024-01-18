@@ -331,7 +331,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Existen visible name',
+						'Host name' => 'Existed visible name',
 						'Groups' => 'Zabbix servers',
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
