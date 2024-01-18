@@ -66,11 +66,11 @@ $duo_redirect_uri = ((new CUrl($_SERVER['REQUEST_URI']))
 	->toString();
 
 $session_data['redirect_uri'] = implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri]);
-$confirm_data = API::User()->getConfirmData(
-	array_intersect_key($session_data, array_flip(['sessionid', 'mfaid', 'redirect_uri']))
-);
+$session_data_required = array_intersect_key($session_data, array_flip(['sessionid', 'mfaid', 'redirect_uri']));
+$confirm_data = API::User()->getConfirmData($session_data_required);
 
 $error = array_column(get_and_clear_messages(), 'message');
+
 if ($error) {
 	redirectToGeneralWarningPage($error, $redirect_to);
 	exit;
@@ -79,7 +79,7 @@ if ($error) {
 if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
 	// Check of submitted verification code.
 	if (hasRequest('enter')) {
-		$data_to_check = array_merge($session_data, $confirm_data);
+		$data_to_check = array_merge($session_data_required, $confirm_data);
 		$data_to_check['verification_code'] = getRequest('verification_code', '');
 		unset($data_to_check['mfaid'], $data_to_check['qr_code_url']);
 
@@ -135,6 +135,9 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_DUO) {
 				'duo_code' => getRequest('duo_code'),
 				'duo_state' => getRequest('state')
 			];
+			$session_data_required['state'] = $session_data['state'];
+			$session_data_required['username'] = $session_data['username'];
+
 			$data_to_check = array_merge($input_data, $confirm_data, $session_data);
 			unset($data_to_check['mfaid'], $data_to_check['prompt_uri']);
 
