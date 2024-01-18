@@ -21,7 +21,6 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -29,6 +28,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxflag"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -37,6 +37,8 @@ import (
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 )
+
+const usageMessageExampleConfPath = `C:\zabbix\zabbix_agent2.conf`
 
 var (
 	serviceName = "Zabbix Agent 2"
@@ -59,41 +61,55 @@ var (
 	stopChan      = make(chan bool)
 )
 
-func loadOSDependentFlags() {
-	const (
-		svcInstallDefault     = false
-		svcInstallDescription = "Install Zabbix agent 2 as service"
-	)
-	flag.BoolVar(&svcInstallFlag, "install", svcInstallDefault, svcInstallDescription)
-	flag.BoolVar(&svcInstallFlag, "i", svcInstallDefault, svcInstallDescription+" (shorthand)")
-
-	const (
-		svcUninstallDefault     = false
-		svcUninstallDescription = "Uninstall Zabbix agent 2 from service"
-	)
-	flag.BoolVar(&svcUninstallFlag, "uninstall", svcUninstallDefault, svcUninstallDescription)
-	flag.BoolVar(&svcUninstallFlag, "d", svcUninstallDefault, svcUninstallDescription+" (shorthand)")
-
-	const (
-		svcStartDefault     = false
-		svcStartDescription = "Start Zabbix agent 2 service"
-	)
-	flag.BoolVar(&svcStartFlag, "start", svcStartDefault, svcStartDescription)
-	flag.BoolVar(&svcStartFlag, "s", svcStartDefault, svcStartDescription+" (shorthand)")
-
-	const (
-		svcStopDefault     = false
-		svcStopDescription = "Stop Zabbix agent 2 service"
-	)
-	flag.BoolVar(&svcStopFlag, "stop", svcStopDefault, svcStopDescription)
-	flag.BoolVar(&svcStopFlag, "x", svcStopDefault, svcStopDescription+" (shorthand)")
-
-	const (
-		svcMultipleDefault     = false
-		svcMultipleDescription = "For -i -d -s -x functions service name will\ninclude Hostname parameter specified in\nconfiguration file"
-	)
-	flag.BoolVar(&svcMultipleAgentFlag, "multiple-agents", svcMultipleDefault, svcMultipleDescription)
-	flag.BoolVar(&svcMultipleAgentFlag, "m", svcMultipleDefault, svcMultipleDescription+" (shorthand)")
+func osDependentFlags() zbxflag.Flags {
+	return zbxflag.Flags{
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "install",
+				Shorthand:   "i",
+				Description: "Install Zabbix agent 2 as service",
+			},
+			Default: false,
+			Dest:    &svcInstallFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "uninstall",
+				Shorthand:   "d",
+				Description: "Uninstall Zabbix agent 2 from service",
+			},
+			Default: false,
+			Dest:    &svcUninstallFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "start",
+				Shorthand:   "s",
+				Description: "Start Zabbix agent 2 service",
+			},
+			Default: false,
+			Dest:    &svcStartFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "stop",
+				Shorthand:   "x",
+				Description: "Stop Zabbix agent 2 service",
+			},
+			Default: false,
+			Dest:    &svcStopFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:      "multiple-agents",
+				Shorthand: "m",
+				Description: "For -i -d -s -x functions service name will " +
+					"include Hostname parameter specified in configuration file",
+			},
+			Default: false,
+			Dest:    &svcMultipleAgentFlag,
+		},
+	}
 }
 
 func isWinLauncher() bool {

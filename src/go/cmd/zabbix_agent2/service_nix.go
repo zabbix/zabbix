@@ -22,7 +22,11 @@
 
 package main
 
-func loadOSDependentFlags() {}
+import "git.zabbix.com/ap/plugin-support/zbxflag"
+
+const usageMessageExampleConfPath = `/etc/zabbix/zabbix_agent2.conf`
+
+func osDependentFlags() zbxflag.Flags { return zbxflag.Flags{} }
 
 func setServiceRun(fourground bool) {}
 

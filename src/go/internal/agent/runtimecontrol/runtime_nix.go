@@ -1,3 +1,6 @@
+//go:build !windows
+// +build !windows
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -17,17 +20,17 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-package remotecontrol
+package runtimecontrol
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net"
 	"os"
+	"syscall"
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
-	"github.com/Microsoft/go-winio"
 )
 
 func New(path string, timeout time.Duration) (conn *Conn, err error) {
@@ -35,13 +38,18 @@ func New(path string, timeout time.Duration) (conn *Conn, err error) {
 	if path != "" {
 		if _, tmperr := os.Stat(path); !os.IsNotExist(tmperr) {
 			if _, err = SendCommand(path, "version", timeout); err == nil {
-				return nil, fmt.Errorf("An agent is already using control pipe %s", path)
+				return nil, fmt.Errorf(
+					"An agent is already using control socket %s",
+					path,
+				)
 			}
 			if err = os.Remove(path); err != nil {
 				return
 			}
 		}
-		if c.listener, err = winio.ListenPipe(path, nil); err != nil {
+		mask := syscall.Umask(0077)
+		defer syscall.Umask(mask)
+		if c.listener, err = net.Listen("unix", path); err != nil {
 			return
 		}
 		c.sink = make(chan *Client)
@@ -50,22 +58,28 @@ func New(path string, timeout time.Duration) (conn *Conn, err error) {
 	return &c, nil
 }
 
-func SendCommand(path string, command string, timeout time.Duration) (reply string, err error) {
-	var conn net.Conn
-	if conn, err = winio.DialPipe(path, &timeout); err != nil {
-		return
+func SendCommand(path, command string, timeout time.Duration) (string, error) {
+	conn, err := net.DialTimeout("unix", path, timeout)
+	if err != nil {
+		return "", err
 	}
+
 	defer conn.Close()
 
-	if err = conn.SetDeadline(time.Now().Add(timeout)); err != nil {
-		return
+	err = conn.SetDeadline(time.Now().Add(timeout))
+	if err != nil {
+		return "", err
 	}
-	if _, err = conn.Write([]byte(command + "\n")); err != nil {
-		return
+
+	_, err = conn.Write([]byte(command + "\n"))
+	if err != nil {
+		return "", err
 	}
-	var b []byte
-	if b, err = ioutil.ReadAll(conn); err != nil {
-		return
+
+	b, err := io.ReadAll(conn)
+	if err != nil {
+		return "", err
 	}
+
 	return string(b), nil
 }
