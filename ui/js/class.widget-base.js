@@ -1337,7 +1337,11 @@ class CWidgetBase {
 
 				if (this.#ready_promise === null) {
 					this.#ready_promise = this.promiseReady();
-					this.#ready_promise.then(() => this.fire(CWidgetBase.EVENT_READY));
+					this.#ready_promise.then(() => {
+						if (this._state !== WIDGET_STATE_DESTROYED) {
+							this.fire(CWidgetBase.EVENT_READY);
+						}
+					});
 				}
 			})
 			.catch((exception) => {
