@@ -1658,9 +1658,8 @@ class CUser extends CApiService {
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
-		self::getMfa($db_user);
 
-		if ($db_user['attempt_failed'] != 0) {
+		if ($db_user['attempt_failed'] != 0 && $db_user['mfaid'] === null) {
 			self::resetFailedLoginAttempts($db_user);
 		}
 
@@ -1864,21 +1863,25 @@ class CUser extends CApiService {
 		$db_user['debug_mode'] = GROUP_DEBUG_MODE_DISABLED;
 		$db_user['deprovisioned'] = false;
 		$db_user['gui_access'] = GROUP_GUI_ACCESS_SYSTEM;
+		$db_user['mfaid'] = null;
 
 		$group_auth_type = self::getAuthTypeByGuiAccess($db_user['gui_access']);
 		$group_status = GROUP_STATUS_ENABLED;
 		$group_userdirectoryid = 0;
 
 		$result = DBselect(
-			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid'.
+			'SELECT g.usrgrpid,g.debug_mode,g.users_status,g.gui_access,g.userdirectoryid,g.mfa_status,g.mfaid'.
 			' FROM users_groups ug,usrgrp g'.
 			' WHERE ug.usrgrpid=g.usrgrpid'.
 				' AND '.dbConditionId('ug.userid', [$db_user['userid']])
 		);
 
 		$deprovision_groupid = CAuthenticationHelper::get(CAuthenticationHelper::DISABLED_USER_GROUPID);
+		$mfa_status = CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS);
+		$default_mfaid = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
 
 		$userdirectoryids = [];
+		$mfaids = [];
 
 		while ($row = DBfetch($result)) {
 			if ($row['debug_mode'] == GROUP_DEBUG_MODE_ENABLED) {
@@ -1900,6 +1903,15 @@ class CUser extends CApiService {
 
 			if ($group_auth_type == ZBX_AUTH_LDAP) {
 				$userdirectoryids[$row['userdirectoryid']] = true;
+			}
+
+			if ($mfa_status == MFA_ENABLED && $row['mfa_status'] == GROUP_MFA_ENABLED) {
+				if ($row['mfaid'] == 0) {
+					$db_user['mfaid'] = $default_mfaid;
+				}
+				else {
+					$mfaids[$row['mfaid']] = true;
+				}
 			}
 		}
 
@@ -1926,6 +1938,18 @@ class CUser extends CApiService {
 			elseif ($userdirectoryids) {
 				$group_userdirectoryid = key($userdirectoryids);
 			}
+		}
+
+		if ($mfa_status == MFA_ENABLED && $db_user['mfaid'] === null && $mfaids) {
+			$db_mfas = DB::select('mfa', [
+				'output' => ['mfaid', 'name'],
+				'mfaids' => array_keys($mfaids),
+				'sortfield' => ['name'],
+				'limit' => 1,
+				'preservekeys' => true
+			]);
+
+			$db_user['mfaid'] = key($db_mfas);
 		}
 	}
 
@@ -2089,12 +2113,17 @@ class CUser extends CApiService {
 	private static function createSession(array &$db_user): void {
 		$db_user['sessionid'] = CEncryptHelper::generateKey();
 		$db_user['secret'] = CEncryptHelper::generateKey();
+		$session_status = ZBX_SESSION_ACTIVE;
+
+		if (array_key_exists('mfaid', $db_user) && $db_user['mfaid'] !== null) {
+			$session_status = ZBX_SESSION_VERIFICATION_REQUIRED;
+		}
 
 		DB::insert('sessions', [[
 			'sessionid' => $db_user['sessionid'],
 			'userid' => $db_user['userid'],
 			'lastaccess' => time(),
-			'status' => ZBX_SESSION_ACTIVE,
+			'status' => $session_status,
 			'secret' => $db_user['secret']
 		]], false);
 
@@ -2698,56 +2727,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Collects information on user's MFA method. Adds 'mfaid' parameter, which is empty if MFA is not enabled for
-	 * this user.
-	 *
-	 * @param array $db_user
-	 */
-	private static function getMfa(array &$db_user): void {
-		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_DISABLED) {
-			$db_user['mfaid'] = null;
-			return;
-		}
-
-		$user_groups = API::UserGroup()->get([
-			'output' => ['mfaid'],
-			'userids' => $db_user['userid'],
-			'filter' => ['mfa_status' => GROUP_MFA_ENABLED]
-		]);
-
-		if (!$user_groups) {
-			$db_user['mfaid'] = null;
-			return;
-		}
-
-		DB::update('sessions', [
-			'values' => ['status' => ZBX_SESSION_VERIFICATION_REQUIRED],
-			'where' => ['sessionid' => $db_user['sessionid']]
-		]);
-
-		$mfaids = array_unique(array_column($user_groups, 'mfaid'));
-
-		if (in_array('0', $mfaids)) {
-			$db_user['mfaid'] = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
-			return;
-		}
-
-		$mfas = API::Mfa()->get([
-			'output' => API_OUTPUT_EXTEND,
-			'mfaids' => $mfaids,
-			'preservekeys' => true
-		]);
-
-		if (!$mfas) {
-			$db_user['mfaid'] = null;
-			return;
-		}
-
-		CArrayHelper::sort($mfas, ['name']);
-		$db_user['mfaid'] = reset($mfas)['mfaid'];
-	}
-
-	/**
 	 * Returns data necessary for user.confirm method.
 	 *
 	 * @param array $session_data
@@ -2776,16 +2755,24 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		[$userid] = DB::select('sessions', [
+			'output' => ['userid'],
+			'filter' => ['sessionid' => $session_data['sessionid']]
+		]);
+
+		[$failed_login_data] = DB::select('users', [
+			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
+			'userids' => $userid,
+			'limit' => 1
+		]);
+
+		self::checkLoginTemporarilyBlocked($failed_login_data);
+
 		[$mfa] = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
 				'client_secret'
 			],
 			'filter' => ['mfaid' => $session_data['mfaid']]
-		]);
-
-		[$userid] = DB::select('sessions', [
-			'output' => ['userid'],
-			'filter' => ['sessionid' => $session_data['sessionid']]
 		]);
 
 		$data = [
@@ -2794,27 +2781,7 @@ class CUser extends CApiService {
 		];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			// Prepare TOTP generator.
-			$totp_generator = new Google2FA();
-
-			switch ($mfa['hash_function']) {
-				case TOTP_HASH_SHA256:
-					$totp_generator->setAlgorithm(Constants::SHA256);
-					break;
-
-				case TOTP_HASH_SHA512:
-					$totp_generator->setAlgorithm(Constants::SHA512);
-					break;
-
-				default:
-					$totp_generator->setAlgorithm(Constants::SHA1);
-			}
-
-			$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
-
-			if ($mfa['code_length'] == TOTP_CODE_LENGTH_8) {
-				$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
-			}
+			$totp_generator = $this->createTotpGenerator($data);
 
 			$user_totp_secret = DB::select('mfa_totp_secret', [
 				'output' => ['totp_secret'],
@@ -2887,28 +2854,14 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
+		[$failed_login_data] = DB::select('users', [
+			'output' => ['userid', 'username', 'attempt_failed'],
+			'userids' => $data['userid'],
+			'limit' => 1
+		]);
+
 		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
-			// Prepare TOTP generator.
-			$totp_generator = new Google2FA();
-
-			switch ($data['mfa']['hash_function']) {
-				case TOTP_HASH_SHA256:
-					$totp_generator->setAlgorithm(Constants::SHA256);
-					break;
-
-				case TOTP_HASH_SHA512:
-					$totp_generator->setAlgorithm(Constants::SHA512);
-					break;
-
-				default:
-					$totp_generator->setAlgorithm(Constants::SHA1);
-			}
-
-			$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
-
-			if ($data['mfa']['code_length'] == TOTP_CODE_LENGTH_8) {
-				$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
-			}
+			$totp_generator = $this->createTotpGenerator($data);
 
 			if ($data['totp_secret'] == '') {
 				$user_totp_secret = DB::select('mfa_totp_secret', [
@@ -2933,6 +2886,8 @@ class CUser extends CApiService {
 				}
 			}
 			else {
+				self::increaseFailedLoginAttempts($failed_login_data);
+
 				throw new Exception(_('The verification code was incorrect, please try again.'));
 			}
 		}
@@ -2951,8 +2906,7 @@ class CUser extends CApiService {
 					$data['mfa']['api_hostname'], $data['redirect_uri']
 				);
 
-				$duo_client->exchangeAuthorizationCodeFor2FAResult($data['duo_code'],
-					$data['username']);
+				$duo_client->exchangeAuthorizationCodeFor2FAResult($data['duo_code'], $data['username']);
 			} catch (DuoException $e) {
 				throw new Exception(_('Error decoding Duo result.'));
 			}
@@ -2970,6 +2924,40 @@ class CUser extends CApiService {
 			zbx_dbstr(ZBX_SESSION_VERIFICATION_REQUIRED).' AND lastaccess>'.zbx_dbstr($outdated)
 		);
 
+		CWebUser::checkAuthentication($data['sessionid']);
+		self::resetFailedLoginAttempts($failed_login_data);
+
 		return true;
+	}
+
+	/**
+	 * Returns Google2FA library instance for TOTP secret creation and code verification.
+	 *
+	 * @param $data
+	 * @return Google2FA
+	 */
+	private function createTotpGenerator($data): Google2FA {
+		$totp_generator = new Google2FA();
+
+		switch ($data['mfa']['hash_function']) {
+			case TOTP_HASH_SHA256:
+				$totp_generator->setAlgorithm(Constants::SHA256);
+				break;
+
+			case TOTP_HASH_SHA512:
+				$totp_generator->setAlgorithm(Constants::SHA512);
+				break;
+
+			default:
+				$totp_generator->setAlgorithm(Constants::SHA1);
+		}
+
+		$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
+
+		if ($data['mfa']['code_length'] == TOTP_CODE_LENGTH_8) {
+			$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
+		}
+
+		return $totp_generator;
 	}
 }
