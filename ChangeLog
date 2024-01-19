@@ -2073,12 +2073,17 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.26rc1
 
 New features:
+.......PS. [ZBXNEXT-8891] updated max supported MySQL version to 8.2 (mprihodko)
 .........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
 .........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+........S. [ZBX-22371] fixed process tags option not adding tags for service events (vso)
+...G...... [ZBX-17208] fix Zabbix agent 2 invalid command line flag handling (rzvejs)
+.........T [ZBX-23937] fixed JavaScript for AWS EC2 instances discovery (egordymov)
+..F....... [ZBX-22715] fixed map shape dimension changes on resizing in scaled browser mode (ddauksa)
 .......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
 .......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
 ...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
