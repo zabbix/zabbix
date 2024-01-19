@@ -35,7 +35,7 @@ class CSVGHoneycomb {
 	static ID_COUNTER = 0;
 
 	static CELL_WIDTH_MIN = 50;
-	static LABEL_WIDTH_MIN = 70;
+	static LABEL_WIDTH_MIN = 65;
 	static FONT_SIZE_MIN = 12;
 
 	static EVENT_CELL_CLICK = 'cell.click';
@@ -595,7 +595,7 @@ class CSVGHoneycomb {
 			const lines_count = lines.length;
 
 			return {lines, lines_count, lines_max_count: 0,
-				font_size: (container_width - this.#cells_gap) * this.#container_params.scale > CSVGHoneycomb.LABEL_WIDTH_MIN
+				font_size: container_width * this.#container_params.scale > CSVGHoneycomb.LABEL_WIDTH_MIN
 					? this.#getFontSizeByWidth(lines, container_width, font_weight)
 					: 0,
 				font_weight: font_weight,
