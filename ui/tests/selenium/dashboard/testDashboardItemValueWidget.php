@@ -3578,7 +3578,6 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * @dataProvider getAggregationFunctionData
 	 */
 	public function testDashboardItemValueWidget_AggregationFunctionData($data) {
-
 		foreach ($data['item_data'] as $params) {
 			$params['time'] = strtotime($params['time']);
 			CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $params['value'], $params['time']);
