@@ -464,12 +464,12 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 				throw {error: resp.error};
 			}
 
-			this._cached_user_settings.snoozed_eventid = resp.snoozed;
+			this._cached_user_settings.snoozed_eventid = resp.snoozed_eventid;
 			this.pushUpdates();
 			this.render();
 
 			this.collection.map(function(notif) {
-				notif.updateRaw({snoozed_eventid: resp.snoozed});
+				notif.updateRaw({snoozed_eventid: resp.snoozed_eventid});
 			});
 		})
 		.catch((exception) => {

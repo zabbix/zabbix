@@ -55,7 +55,7 @@ class CControllerNotificationsSnooze extends CController {
 
 		updateMessageSettings($msg_settings);
 
-		$data = json_encode(['snoozed' => (int) $msg_settings['snoozed.eventid']]);
+		$data = json_encode(['snoozed_eventid' => (int) $msg_settings['snoozed.eventid']]);
 		$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 	}
 }
