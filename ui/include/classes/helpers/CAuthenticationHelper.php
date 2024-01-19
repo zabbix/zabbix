@@ -22,7 +22,7 @@
 /**
  * A class for accessing once loaded parameters of Authentication API object.
  */
-class CAuthenticationHelper extends CConfigGeneralHelper {
+class CAuthenticationHelper {
 
 	public const AUTHENTICATION_TYPE = 'authentication_type';
 	public const HTTP_AUTH_ENABLED = 'http_auth_enabled';
@@ -55,25 +55,37 @@ class CAuthenticationHelper extends CConfigGeneralHelper {
 	public const SAML_SSO_URL = 'saml_sso_url';
 	public const SAML_USERNAME_ATTRIBUTE = 'saml_username_attribute';
 
-	/**
-	 * Authentication API object parameters array.
-	 *
-	 * @static
-	 *
-	 * @var array
-	 */
 	protected static $params = [];
 
 	/**
-	 * @inheritdoc
+	 * Get the value of the given Authentication API object's field.
+	 *
+	 * @param string $field
+	 *
+	 * @throws Exception
+	 *
+	 * @return string|null
 	 */
-	protected static function loadParams(?string $param = null, bool $is_global = false): void {
+	public static function get(string $field): ?string {
 		if (!self::$params) {
-			self::$params = API::Authentication()->get(['output' => 'extend']);
+			self::$params = API::Authentication()->get([
+				'output' => [
+					'authentication_type', 'http_auth_enabled', 'http_login_form', 'http_strip_domains',
+					'http_case_sensitive', 'ldap_configured', 'ldap_host', 'ldap_port', 'ldap_base_dn',
+					'ldap_search_attribute', 'ldap_bind_dn', 'ldap_case_sensitive', 'ldap_bind_password',
+					'saml_auth_enabled', 'saml_idp_entityid', 'saml_sso_url', 'saml_slo_url', 'saml_username_attribute',
+					'saml_sp_entityid', 'saml_nameid_format', 'saml_sign_messages', 'saml_sign_assertions',
+					'saml_sign_authn_requests', 'saml_sign_logout_requests', 'saml_sign_logout_responses',
+					'saml_encrypt_nameid', 'saml_encrypt_assertions', 'saml_case_sensitive', 'passwd_min_length',
+					'passwd_check_rules'
+				]
+			]);
 
 			if (self::$params === false) {
 				throw new Exception(_('Unable to load authentication API parameters.'));
 			}
 		}
+
+		return array_key_exists($field, self::$params) ? self::$params[$field] : null;
 	}
 }
