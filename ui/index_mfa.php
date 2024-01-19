@@ -48,7 +48,6 @@ if ($request != '') {
 }
 
 $session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
-unset($session_data['sign']);
 
 // If MFA is not required - redirect to the main login page.
 if ($session_data['mfaid'] == '') {
@@ -138,7 +137,7 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_DUO) {
 			$session_data_required['state'] = $session_data['state'];
 			$session_data_required['username'] = $session_data['username'];
 
-			$data_to_check = array_merge($input_data, $confirm_data, $session_data);
+			$data_to_check = array_merge($input_data, $confirm_data, $session_data_required);
 			unset($data_to_check['mfaid'], $data_to_check['prompt_uri']);
 
 			$confirm = API::User()->confirm($data_to_check);

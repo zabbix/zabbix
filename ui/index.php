@@ -79,6 +79,12 @@ if (hasRequest('enter') && CWebUser::login(getRequest('name', ZBX_GUEST_USER), g
 
 	if (CWebUser::$data['mfaid']) {
 		CSessionHelper::set('mfaid', CWebUser::$data['mfaid']);
+
+		// In case user has not finished their Duo authentication, need to unset data saved into session by Duo.
+		if (CSessionHelper::has('state')) {
+			CSessionHelper::unset(['state', 'username']);
+		}
+
 		redirect((new CUrl('index_mfa.php'))->setArgument('request', $request)->toString());
 	}
 
