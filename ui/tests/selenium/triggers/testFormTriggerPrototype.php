@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/../../include/items.inc.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../../include/items.inc.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
@@ -420,12 +421,12 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 		$dialog_footer = $dialog->getFooter();
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->assertEquals(4, $dialog_footer->query('button',['Update', 'Clone', 'Delete', 'Cancel'])->all()
+			$this->assertEquals(4, $dialog_footer->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		elseif (isset($data['templatedHost'])) {
-			$this->assertEquals(3, $dialog_footer->query('button',['Update', 'Clone', 'Cancel'])->all()
+			$this->assertEquals(3, $dialog_footer->query('button', ['Update', 'Clone', 'Cancel'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 			$this->assertEquals(1, $dialog_footer->query('button:Delete')->all()
@@ -435,7 +436,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		}
 		else {
-			$this->assertEquals(2, $dialog_footer->query('button',['Add', 'Cancel'])->all()
+			$this->assertEquals(2, $dialog_footer->query('button', ['Add', 'Cancel'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
@@ -764,7 +765,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'description' => 'triggerSimple',
 					'expression' => 'default',
-					'formCheck' =>true,
+					'formCheck' => true,
 					'dbCheck' => true,
 					'remove' => true
 				]
@@ -781,7 +782,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'expected' => TEST_GOOD,
 					'description' => 'triggerRemove',
 					'expression' => 'default',
-					'formCheck' =>true,
+					'formCheck' => true,
 					'dbCheck' => true,
 					'remove' => true
 				]
@@ -890,13 +891,13 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 				$this->zbxTestAssertElementPresentXpath("//button[text()='Remove']");
 
 				if (isset($constructor['text'])) {
-					foreach($constructor['text'] as $txt) {
+					foreach ($constructor['text'] as $txt) {
 						$this->zbxTestTextPresent($txt);
 					}
 				}
 
 				if (isset($constructor['elements'])) {
-					foreach($constructor['elements'] as $elem) {
+					foreach ($constructor['elements'] as $elem) {
 						$this->zbxTestAssertElementPresentId($elem);
 					}
 				}
@@ -907,7 +908,7 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 							$this->query('xpath://button['.CXPathHelper::fromClass('zi-i-negative').']')->all()->count()
 					);
 					$text = $this->query('xpath://tr[1]//button[@data-hintbox]')->one()
-						->getAttribute('data-hintbox-contents');
+							->getAttribute('data-hintbox-contents');
 					foreach ($constructor['errors'] as $error) {
 						$this->assertStringContainsString($error, $text);
 					}
@@ -984,10 +985,10 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 	}
 
 	/**
-	* Function for filtering necessary hosts and opening their Web scenarios.
-	*
-	* @param string    $name    name of a host or template where triggers are opened
-	*/
+	 * Function for filtering necessary hosts and opening their Web scenarios.
+	 *
+	 * @param string $name name of a host or template where triggers are opened
+	 */
 	private function filterEntriesAndOpenDiscovery($name, $form) {
 		$this->query('button:Reset')->one()->click();
 		$form->fill(['Name' => $name]);

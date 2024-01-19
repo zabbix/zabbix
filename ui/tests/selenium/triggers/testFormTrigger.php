@@ -19,8 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 use Facebook\WebDriver\WebDriverKeys;
@@ -62,7 +62,7 @@ class testFormTrigger extends CLegacyWebTest {
 		$value_types = [
 			'Float' => ITEM_VALUE_TYPE_FLOAT,
 			'Character' => ITEM_VALUE_TYPE_STR,
-			'Unsigned' =>ITEM_VALUE_TYPE_UINT64,
+			'Unsigned' => ITEM_VALUE_TYPE_UINT64,
 			'Text' => ITEM_VALUE_TYPE_TEXT
 		];
 
@@ -295,7 +295,7 @@ class testFormTrigger extends CLegacyWebTest {
 			if (isset($data['templatedHost'])) {
 				$this->zbxTestAssertAttribute("//button[@name='insert']", 'disabled');
 			}
-			$this->assertEquals(0, $dialog->query('button',['id:add_expression', 'Edit', 'id:insert-macro'])->all()
+			$this->assertEquals(0, $dialog->query('button', ['id:add_expression', 'Edit', 'id:insert-macro'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
@@ -425,12 +425,12 @@ class testFormTrigger extends CLegacyWebTest {
 		$dialog_footer = $dialog->getFooter();
 
 		if (isset($data['form']) && !isset($data['templatedHost'])) {
-			$this->assertEquals(4, $dialog_footer->query('button',['Update', 'Clone', 'Delete', 'Cancel'])->all()
+			$this->assertEquals(4, $dialog_footer->query('button', ['Update', 'Clone', 'Delete', 'Cancel'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
 		elseif (isset($data['templatedHost'])) {
-			$this->assertEquals(3, $dialog_footer->query('button',['Update', 'Clone', 'Cancel'])->all()
+			$this->assertEquals(3, $dialog_footer->query('button', ['Update', 'Clone', 'Cancel'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 			$this->assertFalse($dialog_footer->query('button:Delete')->one()->isClickable());
@@ -438,7 +438,7 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->zbxTestAssertElementPresentXpath("//input[@id='recovery_mode_0'][@disabled]");
 		}
 		else {
-			$this->assertEquals(2, $dialog_footer->query('button',['Add', 'Cancel'])->all()
+			$this->assertEquals(2, $dialog_footer->query('button', ['Add', 'Cancel'])->all()
 					->filter(CElementFilter::CLICKABLE)->count()
 			);
 		}
@@ -1110,13 +1110,13 @@ class testFormTrigger extends CLegacyWebTest {
 				$this->zbxTestAssertVisibleXpath("//div[@id='expression-constructor-buttons']//button[@id='replace_expression']");
 
 				if (isset($constructor['text'])) {
-					foreach($constructor['text'] as $txt) {
+					foreach ($constructor['text'] as $txt) {
 						$this->query('xpath://div[@id="expression-table"]/div[1]')->waitUntilVisible()->one();
 						$this->zbxTestTextPresent($txt);
 					}
 				}
 				if (isset($constructor['elements'])) {
-					foreach($constructor['elements'] as $elem) {
+					foreach ($constructor['elements'] as $elem) {
 						$this->zbxTestAssertElementPresentId($elem);
 					}
 				}
@@ -1144,7 +1144,7 @@ class testFormTrigger extends CLegacyWebTest {
 			$this->page->waitUntilReady();
 			switch ($data['expected']) {
 				case TEST_GOOD:
-					$this->zbxTestWaitUntilMessageTextPresent('msg-good' ,'Trigger added');
+					$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Trigger added');
 					$this->zbxTestCheckTitle('Configuration of triggers');
 					$this->zbxTestAssertElementText("//tbody//a[text()='$description']", $description);
 					$this->zbxTestAssertElementText("//a[text()='$description']/ancestor::tr/td[6]", $expression);
@@ -1210,10 +1210,10 @@ class testFormTrigger extends CLegacyWebTest {
 	}
 
 	/**
-	* Function for filtering necessary hosts and opening their Web scenarios.
-	*
-	* @param string    $name    name of a host or template where triggers are opened
-	*/
+	 * Function for filtering necessary hosts and opening their Web scenarios.
+	 *
+	 * @param string $name name of a host or template where triggers are opened
+	 */
 	private function filterEntriesAndOpenTriggers($name, $form) {
 		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
 		$this->query('button:Reset')->one()->click();

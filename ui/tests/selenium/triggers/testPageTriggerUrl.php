@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__) . '/../include/CWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 
 /**
  * Test checks link from trigger URL field on different pages.
