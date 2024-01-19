@@ -33,6 +33,7 @@
 #include "zbxtrends.h"
 #include "zbxvault.h"
 #include "zbxserialize.h"
+#include "valuecache.h"
 
 int	sync_in_progress = 0;
 
@@ -60,6 +61,8 @@ int	sync_in_progress = 0;
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
+
+ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 
 /******************************************************************************
  *                                                                            *
@@ -2690,7 +2693,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_uint64_t *new_itemids)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2830,6 +2833,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 
 			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
+
+			if (NULL != new_itemids)
+				zbx_vector_uint64_append(new_itemids, itemid);
 		}
 		else
 		{
@@ -5976,7 +5982,9 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
 
-	zbx_hashset_t		trend_queue;
+	zbx_hashset_t			trend_queue;
+	zbx_vector_dc_item_ptr_t	new_items, *pnew_items = NULL;
+	zbx_vector_uint64_pair_t	vc_items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5988,6 +5996,11 @@ void	DCsync_configuration(unsigned char mode)
 	{
 		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		dc_load_trigger_queue(&trend_queue);
+	}
+	else
+	{
+		zbx_vector_dc_item_ptr_create(&new_items);
+		pnew_items = &new_items;
 	}
 
 	/* global configuration must be synchronized directly with database */
@@ -6218,7 +6231,7 @@ void	DCsync_configuration(unsigned char mode)
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, flags);
+	DCsync_items(&items_sync, flags, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6677,7 +6690,41 @@ out:
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
+	if (ZBX_DBSYNC_INIT != mode && 0 != new_items.values_num)
+	{
+		zbx_vector_uint64_pair_create(&vc_items);
+		zbx_vector_uint64_pair_reserve(&vc_items, new_items.values_num);
+
+		for (i = 0; i < new_items.values_num; i++)
+		{
+			if (NULL != new_items.values[i]->triggers)
+			{
+				zbx_uint64_pair_t	pair = {
+						.first = new_items.values[i]->itemid,
+						.second = (zbx_uint64_t)new_items.values[i]->value_type
+				};
+
+				zbx_vector_uint64_append_ptr(&vc_items, &pair);
+			}
+		}
+	}
+
 	FINISH_SYNC;
+
+	if (ZBX_DBSYNC_INIT == mode)
+	{
+		zbx_hashset_destroy(&trend_queue);
+	}
+	else
+	{
+		if (0 != new_items.values_num)
+		{
+			zbx_vc_add_new_items(&vc_items);
+			zbx_vector_uint64_pair_destroy(&vc_items);
+		}
+
+		zbx_vector_dc_item_ptr_destroy(&new_items);
+	}
 
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
@@ -6713,9 +6760,6 @@ out:
 	zbx_dbsync_clear(&maintenance_group_sync);
 	zbx_dbsync_clear(&maintenance_host_sync);
 	zbx_dbsync_clear(&hgroup_host_sync);
-
-	if (ZBX_DBSYNC_INIT == mode)
-		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
 

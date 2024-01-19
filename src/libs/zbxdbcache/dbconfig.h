@@ -316,6 +316,8 @@ typedef struct
 ZBX_DC_PSK;
 #endif
 
+ZBX_PTR_VECTOR_DECL(dc_item_ptr, ZBX_DC_ITEM *)
+
 #define ZBX_LOC_NOWHERE	0
 #define ZBX_LOC_QUEUE	1
 #define ZBX_LOC_POLLER	2
