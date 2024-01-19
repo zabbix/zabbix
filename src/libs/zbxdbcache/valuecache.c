@@ -2512,9 +2512,7 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 		{
 			zbx_vc_item_t	item_local = {
 					.itemid = h->itemid,
-					.value_type = h->value_type,
-					.status = ZBX_ITEM_STATUS_CACHED_ALL
-
+					.value_type = h->value_type
 			};
 
 			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
@@ -2868,7 +2866,7 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 
 		for (i = 0; i < items->values_num; i++)
 		{
-			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i]))
+			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i].first))
 				continue;
 
 			zbx_vc_item_t	item_local = {
