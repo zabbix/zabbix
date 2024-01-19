@@ -2299,10 +2299,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'AABBCC', 'threshold' => '1'],
 						['color' => 'CCDDAA', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => '1',
-						'time' => strtotime('now')
-					]
+					'value' => '1'
 				]
 			],
 			// Numeric (float) item with data and aggregation function not used.
@@ -2318,10 +2315,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'AABBCC', 'threshold' => '1.01'],
 						['color' => 'CCDDAA', 'threshold' => '2.01']
 					],
-					'item_data' => [
-						'value' => '1.02',
-						'time' => strtotime('now')
-					]
+					'value' => '1.02'
 				]
 			],
 			// Numeric (unsigned) item with data and aggregation function count.
@@ -2338,10 +2332,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'AABBCC', 'threshold' => '1'],
 						['color' => 'CCDDAA', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => '1',
-						'time' => strtotime('now')
-					]
+					'value' => '1'
 				]
 			],
 			// Numeric (float) item with data and aggregation function count.
@@ -2358,10 +2349,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'AABBCC', 'threshold' => '0.99'],
 						['color' => 'CCDDAA', 'threshold' => '1.99']
 					],
-					'item_data' => [
-						'value' => '1.02',
-						'time' => strtotime('now')
-					]
+					'value' => '1.02'
 				]
 			],
 			// Non numeric (Text) item with data and aggregation function count.
@@ -2377,10 +2365,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'DDAAFF', 'threshold' => '1'],
 						['color' => 'FFDDAA', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					]
+					'value' => 'test'
 				]
 			],
 			// Non numeric (Log) item with data and aggregation function count.
@@ -2396,10 +2381,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'DDAAFF', 'threshold' => '1'],
 						['color' => 'FFDDAA', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					]
+					'value' => 'test'
 				]
 			],
 			// Non numeric (Character) item with data and aggregation function count.
@@ -2415,10 +2397,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'DDAAFF', 'threshold' => '1'],
 						['color' => 'FFDDAA', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					]
+					'value' => 'test'
 				]
 			],
 			// Numeric (unsigned) item with data and aggregation function min.
@@ -2436,10 +2415,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'CCDDAA', 'threshold' => '2']
 					],
 					'expected_color' => 'AABBCC',
-					'item_data' => [
-						'value' => '1',
-						'time' => strtotime('now')
-					]
+					'value' => '1'
 				]
 			],
 			// Numeric (float) item with data and aggregation function max.
@@ -2457,10 +2433,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'FFF9C4', 'threshold' => '1.01']
 					],
 					'expected_color' => 'FFF9C4',
-					'item_data' => [
-						'value' => '1.01',
-						'time' => strtotime('now')
-					]
+					'value' => '1.01'
 				]
 			],
 			// Numeric (unsigned) item with data and aggregation function avg.
@@ -2478,10 +2451,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'FFF9C4', 'threshold' => '2']
 					],
 					'expected_color' => '7CB342',
-					'item_data' => [
-						'value' => '1',
-						'time' => strtotime('now')
-					]
+					'value' => '1'
 				]
 			],
 			// Numeric (float) item with data and aggregation function sum.
@@ -2499,10 +2469,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => '8BC34A', 'threshold' => '2.22']
 					],
 					'expected_color' => '8BC34A',
-					'item_data' => [
-						'value' => '2.22',
-						'time' => strtotime('now')
-					]
+					'value' => '2.22'
 				]
 			],
 			// Numeric (unsigned) item with data and aggregation function first.
@@ -2520,10 +2487,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => '8BC34A', 'threshold' => '1']
 					],
 					'expected_color' => 'D32F2F',
-					'item_data' => [
-						'value' => '0',
-						'time' => strtotime('now')
-					]
+					'value' => '0'
 				]
 			],
 			// Numeric (float) item with data and aggregation function last.
@@ -2541,10 +2505,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => '8BC34A', 'threshold' => '0.00']
 					],
 					'expected_color' => '8BC34A',
-					'item_data' => [
-						'value' => '0',
-						'time' => strtotime('now')
-					]
+					'value' => '0'
 				]
 			],
 			// Non numeric (Log) item with data and aggregation function min.
@@ -2559,10 +2520,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'thresholds' => [
 						['color' => 'DDAAFF', 'threshold' => '0']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2580,10 +2538,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'D32F2F', 'threshold' => '-1'],
 						['color' => '8BC34A', 'threshold' => '0']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2601,10 +2556,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'D1C4E9', 'threshold' => '1'],
 						['color' => '80CBC4', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2622,10 +2574,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						['color' => 'D1C4E9', 'threshold' => '1'],
 						['color' => '80CBC4', 'threshold' => '2']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2642,10 +2591,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'thresholds' => [
 						['color' => 'D1C4E9', 'threshold' => '0']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2662,10 +2608,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'thresholds' => [
 						['color' => 'D1C4E9', 'threshold' => '0']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2681,10 +2624,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'thresholds' => [
 						['color' => 'D1C4E9', 'threshold' => '0']
 					],
-					'item_data' => [
-						'value' => 'test',
-						'time' => strtotime('now')
-					],
+					'value' => 'test',
 					'expected_color' => '000000',
 					'opacity' => 'transparent'
 				]
@@ -2698,6 +2638,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * @dataProvider getThresholdData
 	 */
 	public function testDashboardItemValueWidget_ThresholdColor($data) {
+		$time = strtotime('now');
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_threshold);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -2714,14 +2655,14 @@ class testDashboardItemValueWidget extends testWidgets {
 		// Value for threshold trigger.
 		foreach ($data['thresholds'] as $threshold) {
 			// Insert item data.
-			if (array_key_exists('item_data', $data)) {
-				CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $data['item_data']['value'], $data['item_data']['time']);
+			if (array_key_exists('value', $data)) {
+				CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $data['value'], $time);
 
 				if (array_key_exists('numeric', $data)) {
-					$data['item_data']['value']++;
+					$data['value']++;
 				}
 
-				$data['item_data']['time']++;
+				$time++;
 			}
 
 			$this->page->refresh()->waitUntilReady();
