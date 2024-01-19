@@ -2915,11 +2915,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '0',
-							'time' => strtotime('now')
+							'time' => 'now'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-61 minute')
+							'time' => '-61 minute'
 						]
 					],
 					'value_mapping' => true,
@@ -2941,15 +2941,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '0',
-							'time' => strtotime('-1 minute')
+							'time' => '-1 minute'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-62 minutes')
+							'time' => '-62 minutes'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-122 minutes')
+							'time' => '-122 minutes'
 						]
 					],
 					'value_mapping' => true,
@@ -2971,7 +2971,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '1',
-							'time' => strtotime('-6 days')
+							'time' => '-6 days'
 						]
 					],
 					'value_mapping' => true,
@@ -2992,11 +2992,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '1',
-							'time' => strtotime('-3 days')
+							'time' => '-3 days'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-63 hours')
+							'time' => '-63 hours'
 						]
 					],
 					'expected_value' => '0.50' // Value mapping is ignored if value doesn't equals 0 or 1.
@@ -3016,15 +3016,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '1',
-							'time' => strtotime('-270 minutes')
+							'time' => '-270 minutes'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-275 minutes')
+							'time' => '-275 minutes'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-276 minutes')
+							'time' => '-276 minutes'
 						]
 					],
 					'expected_value' => '3.00' // Mapping is not used if aggregation function is 'sum' or 'count'.
@@ -3044,15 +3044,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '1',
-							'time' => strtotime('-270 minutes')
+							'time' => '-270 minutes'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-275 minutes')
+							'time' => '-275 minutes'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-280 minutes')
+							'time' => '-280 minutes'
 						]
 					],
 					'expected_value' => '2.00' // Mapping is not used if aggregation function is 'sum' or 'count'.
@@ -3072,15 +3072,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '0',
-							'time' => strtotime('-45 minutes')
+							'time' => '-45 minutes'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-50 minutes')
+							'time' => '-50 minutes'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-2 hours')
+							'time' => '-2 hours'
 						]
 					],
 					'value_mapping' => true,
@@ -3102,15 +3102,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '1',
-							'time' => strtotime('-15 minutes')
+							'time' => '-15 minutes'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-45 minutes')
+							'time' => '-45 minutes'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-50 minutes')
+							'time' => '-50 minutes'
 						]
 					],
 					'value_mapping' => true,
@@ -3128,15 +3128,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '1',
-							'time' => strtotime('-15 minutes')
+							'time' => '-15 minutes'
 						],
 						[
 							'value' => '0',
-							'time' => strtotime('-45 minutes')
+							'time' => '-45 minutes'
 						],
 						[
 							'value' => '1',
-							'time' => strtotime('-50 minutes')
+							'time' => '-50 minutes'
 						]
 					],
 					'value_mapping' => true,
@@ -3157,15 +3157,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '5',
-							'time' => strtotime('-5 minutes')
+							'time' => '-5 minutes'
 						],
 						[
 							'value' => '4',
-							'time' => strtotime('-30 minutes')
+							'time' => '-30 minutes'
 						],
 						[
 							'value' => '10',
-							'time' => strtotime('-61 minute')
+							'time' => '-61 minute'
 						]
 					],
 					'expected_value' => '4.000000000',
@@ -3187,15 +3187,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '7.76',
-							'time' => strtotime('-5 minutes')
+							'time' => '-5 minutes'
 						],
 						[
 							'value' => '7.77',
-							'time' => strtotime('-90 minutes')
+							'time' => '-90 minutes'
 						],
 						[
 							'value' => '7.78',
-							'time' => strtotime('-5 hours')
+							'time' => '-5 hours'
 						]
 					],
 					'expected_value' => '7.770',
@@ -3217,19 +3217,19 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '2',
-							'time' => strtotime('-30 seconds')
+							'time' => '-30 seconds'
 						],
 						[
 							'value' => '3',
-							'time' => strtotime('-45 seconds')
+							'time' => '-45 seconds'
 						],
 						[
 							'value' => '10',
-							'time' => strtotime('-60 seconds')
+							'time' => '-60 seconds'
 						],
 						[
 							'value' => '15',
-							'time' => strtotime('-90 seconds')
+							'time' => '-90 seconds'
 						]
 					],
 					'expected_value' => '7.50'
@@ -3249,11 +3249,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '2',
-							'time' => strtotime('-10 minutes')
+							'time' => '-10 minutes'
 						],
 						[
 							'value' => '95',
-							'time' => strtotime('-15 minutes')
+							'time' => '-15 minutes'
 						]
 					],
 					// Item units are not shown if aggregation function is 'count' except when units are set in widget configuration.
@@ -3276,11 +3276,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '2',
-							'time' => strtotime('-10 minutes')
+							'time' => '-10 minutes'
 						],
 						[
 							'value' => '95',
-							'time' => strtotime('-15 minutes')
+							'time' => '-15 minutes'
 						]
 					],
 					// Item units are not shown if aggregation function is 'count' except when units are set in widget configuration.
@@ -3304,11 +3304,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '2',
-							'time' => strtotime('-10 minutes')
+							'time' => '-10 minutes'
 						],
 						[
 							'value' => '95',
-							'time' => strtotime('-15 minutes')
+							'time' => '-15 minutes'
 						]
 					],
 					'units' => true,
@@ -3329,23 +3329,23 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '11.11',
-							'time' => strtotime('-10 days')
+							'time' => '-10 days'
 						],
 						[
 							'value' => '12.55',
-							'time' => strtotime('-40 days')
+							'time' => '-40 days'
 						],
 						[
 							'value' => '12.01',
-							'time' => strtotime('-45 days')
+							'time' => '-45 days'
 						],
 						[
 							'value' => '12.99',
-							'time' => strtotime('-50 days')
+							'time' => '-50 days'
 						],
 						[
 							'value' => '121.12',
-							'time' => strtotime('-70 days')
+							'time' => '-70 days'
 						]
 					],
 					'expected_value' => '12.99'
@@ -3365,19 +3365,19 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => '12.33',
-							'time' => 1705464000 // 2024-01-17 04:00:00 GMT+0000
+							'time' => '2024-01-17 04:00:00'
 						],
 						[
 							'value' => '12.55',
-							'time' => 1705478400 // 2024-01-17 08:00:00 GMT+0000
+							'time' => '2024-01-17 08:00:00'
 						],
 						[
 							'value' => '12.99',
-							'time' => 1705489200 // 2024-01-17 11:00:00 GMT+0000
+							'time' => '2024-01-17 11:00:00'
 						],
 						[
 							'value' => '11.99',
-							'time' => 1705492800 // 2024-01-17 12:00:00 GMT+0000
+							'time' => '2024-01-17 12:00:00'
 						]
 					],
 					'expected_value' => '11.99'
@@ -3397,19 +3397,19 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'text 1',
-							'time' => strtotime('-1 year -1 month -2 weeks -2 days -10 hours -30 minutes -20 seconds')
+							'time' => '-1 year -1 month -2 weeks -2 days -10 hours -30 minutes -20 seconds'
 						],
 						[
 							'value' => 'text 2',
-							'time' => strtotime('-1 year -1 month -2 weeks -1 day -20 hours -30 minutes -20 seconds')
+							'time' => '-1 year -1 month -2 weeks -1 day -20 hours -30 minutes -20 seconds'
 						],
 						[
 							'value' => 'text 3',
-							'time' => strtotime('-1 year -1 month -3 weeks -2 days -10 hours -30 minutes -20 seconds')
+							'time' => '-1 year -1 month -3 weeks -2 days -10 hours -30 minutes -20 seconds'
 						],
 						[
 							'value' => 'text 4',
-							'time' => strtotime('-1 year -2 month -2 weeks -2 days -10 hours -30 minutes -20 seconds')
+							'time' => '-1 year -2 month -2 weeks -2 days -10 hours -30 minutes -20 seconds'
 						]
 					],
 					'expected_value' => '4.00',
@@ -3430,7 +3430,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'log 1',
-							'time' => strtotime('-15 month')
+							'time' => '-15 month'
 						]
 					],
 					'non_numeric' => true,
@@ -3451,7 +3451,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'Character 1',
-							'time' => 1702357200 // 2023-12-12 05:00:00 GMT+0000
+							'time' => '2023-12-12 05:00:00'
 						]
 					],
 					'non_numeric' => true,
@@ -3472,11 +3472,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'Text 1',
-							'time' => strtotime('-1 hour')
+							'time' => '-1 hour'
 						],
 						[
 							'value' => 'Text 2',
-							'time' => strtotime('-1 day -1 hour')
+							'time' => '-1 day -1 hour'
 						]
 					],
 					'non_numeric' => true,
@@ -3497,11 +3497,11 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'Log 1',
-							'time' => strtotime('-1 hour')
+							'time' => '-1 hour'
 						],
 						[
 							'value' => 'Log 2',
-							'time' => strtotime('-1 day -1 hour')
+							'time' => '-1 day -1 hour'
 						]
 					],
 					'non_numeric' => true,
@@ -3522,15 +3522,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'Character 1',
-							'time' => strtotime('-1 hour')
+							'time' => '-1 hour'
 						],
 						[
 							'value' => 'Character 2',
-							'time' => strtotime('-10 hours')
+							'time' => '-10 hours'
 						],
 						[
 							'value' => 'Character 3',
-							'time' => strtotime('-1 day -1 hour')
+							'time' => '-1 day -1 hour'
 						]
 					],
 					'non_numeric' => true,
@@ -3553,15 +3553,15 @@ class testDashboardItemValueWidget extends testWidgets {
 					'item_data' => [
 						[
 							'value' => 'text 2',
-							'time' => strtotime('-1 hour')
+							'time' => '-1 hour'
 						],
 						[
 							'value' => 'text 1',
-							'time' => strtotime('-1 hour -1 minute')
+							'time' => '-1 hour -1 minute'
 						],
 						[
 							'value' => 'text 3',
-							'time' => strtotime('-8 days')
+							'time' => '-8 days'
 						]
 					],
 					'non_numeric' => true,
@@ -3578,7 +3578,9 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * @dataProvider getAggregationFunctionData
 	 */
 	public function testDashboardItemValueWidget_AggregationFunctionData($data) {
+
 		foreach ($data['item_data'] as $params) {
+			$params['time'] = strtotime($params['time']);
 			CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $params['value'], $params['time']);
 		}
 
