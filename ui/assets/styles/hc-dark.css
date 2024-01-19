@@ -3501,23 +3501,41 @@ section {
     height: 10px;
     margin-right: 10px; }
 
-.svg-honeycomb .svg-honeycomb-cell path {
-  fill: #335463; }
-.svg-honeycomb .svg-honeycomb-label {
-  color: #eeeeee;
-  text-align: center; }
-  .svg-honeycomb .svg-honeycomb-label .svg-honeycomb-label-line {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis; }
-.svg-honeycomb .svg-honeycomb-cell-no-data path,
-.svg-honeycomb .svg-honeycomb-cell-other path {
-  fill: #111111; }
-.svg-honeycomb .svg-honeycomb-cell-no-data text {
-  text-anchor: middle;
-  fill: #cacaca; }
-.svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
-  fill: #cacaca; }
+.svg-honeycomb {
+  --honeycomb-text-color: #eeeeee;
+  --honeycomb-fill-color: #335463;
+  --honeycomb-stroke-color: #335463;
+  --honeycomb-stroke-hover-color: #29434f;
+  --honeycomb-no-data-text-color: #cacaca;
+  --honeycomb-no-data-fill-color: #111111;
+  --honeycomb-no-data-stroke-color: #111111; }
+  .svg-honeycomb .svg-honeycomb-cell {
+    cursor: pointer; }
+    .svg-honeycomb .svg-honeycomb-cell path {
+      fill: var(--honeycomb-fill-color);
+      stroke: var(--honeycomb-stroke-color, var(--honeycomb-fill-color)); }
+    .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-content {
+      display: grid;
+      align-content: space-evenly;
+      height: 100%;
+      text-align: center;
+      line-height: 1.2;
+      color: var(--honeycomb-text-color); }
+    .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-label {
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap; }
+    .svg-honeycomb .svg-honeycomb-cell:hover {
+      --honeycomb-stroke-color: var(--honeycomb-stroke-hover-color); }
+  .svg-honeycomb .svg-honeycomb-cell-no-data,
+  .svg-honeycomb .svg-honeycomb-cell-other {
+    --honeycomb-text-color: var(--honeycomb-no-data-text-color);
+    --honeycomb-fill-color: var(--honeycomb-no-data-fill-color);
+    --honeycomb-stroke-color: var(--honeycomb-no-data-stroke-color);
+    --honeycomb-stroke-hover-color: var(--honeycomb-no-data-stroke-color);
+    cursor: default; }
+  .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
+    fill: var(--honeycomb-text-color); }
 
 .filter-container.tabfilter-container {
   padding: 0;

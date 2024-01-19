@@ -415,6 +415,9 @@ $translate_strings = [
 	'class.csvggauge.js' => [
 		'No data' => _('No data')
 	],
+	'class.svghoneycomb.js' => [
+		'No data' => _('No data')
+	],
 	'common.js' => [
 		'Cancel' => _('Cancel'),
 		'Ok' => _('Ok'),

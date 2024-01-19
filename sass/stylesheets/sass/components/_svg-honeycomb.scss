@@ -1,30 +1,77 @@
 .svg-honeycomb {
-	.svg-honeycomb-cell path {
-		fill: $honeycomb-cell-color;
-	}
+	--honeycomb-text-color: #{$honeycomb-label-color};
+	--honeycomb-fill-color: #{$honeycomb-cell-color};
+	--honeycomb-stroke-color: #{$honeycomb-cell-color};
+	--honeycomb-stroke-hover-color: #{darken($honeycomb-cell-color, 6%)};
+	--honeycomb-no-data-text-color: #{$honeycomb-no-data-label-color};
+	--honeycomb-no-data-fill-color: #{$honeycomb-no-data-cell-color};
+	--honeycomb-no-data-stroke-color: #{$honeycomb-no-data-cell-color};
 
-	.svg-honeycomb-label {
-		color: $honeycomb-label-color;
-		text-align: center;
+	.svg-honeycomb-cell {
+		cursor: pointer;
 
-		.svg-honeycomb-label-line {
-			white-space: nowrap;
-			overflow: hidden;
-			text-overflow: ellipsis;
+		@if $ui-transitions {
+			transition: transform $ui-transition-duration;
+		}
+
+		path {
+			fill: var(--honeycomb-fill-color);
+			stroke: var(--honeycomb-stroke-color, var(--honeycomb-fill-color));
+
+			@if $ui-transitions {
+				transition: d $ui-transition-duration,
+							fill $ui-transition-duration * 2,
+							stroke $ui-transition-duration;
+			}
+		}
+
+		foreignObject {
+			@if $ui-transitions {
+				transition: x $ui-transition-duration,
+							y $ui-transition-duration,
+							width $ui-transition-duration,
+							height $ui-transition-duration;
+			}
+
+			.svg-honeycomb-content {
+				display: grid;
+				align-content: space-evenly;
+				height: 100%;
+				text-align: center;
+				line-height: 1.2;
+				color: var(--honeycomb-text-color);
+			}
+
+			.svg-honeycomb-label {
+				overflow: hidden;
+				text-overflow: ellipsis;
+				white-space: nowrap;
+
+				@if $ui-transitions {
+					transition: max-height $ui-transition-duration,
+								font-size $ui-transition-duration;
+				}
+			}
+		}
+
+		&:hover {
+			--honeycomb-stroke-color: var(--honeycomb-stroke-hover-color);
 		}
 	}
 
-	.svg-honeycomb-cell-no-data path,
-	.svg-honeycomb-cell-other path {
-		fill: $honeycomb-cell-no-data-color;
+	.svg-honeycomb-cell-no-data,
+	.svg-honeycomb-cell-other {
+		--honeycomb-text-color: var(--honeycomb-no-data-text-color);
+		--honeycomb-fill-color: var(--honeycomb-no-data-fill-color);
+		--honeycomb-stroke-color: var(--honeycomb-no-data-stroke-color);
+		--honeycomb-stroke-hover-color: var(--honeycomb-no-data-stroke-color);
+
+		cursor: default;
 	}
 
-	.svg-honeycomb-cell-no-data text {
-		text-anchor: middle;
-		fill: $honeycomb-label-no-data-color;
-	}
-
-	.svg-honeycomb-cell-other-ellipsis circle {
-		fill: $honeycomb-label-no-data-color;
+	.svg-honeycomb-cell-other-ellipsis {
+		circle {
+			fill: var(--honeycomb-text-color);
+		}
 	}
 }

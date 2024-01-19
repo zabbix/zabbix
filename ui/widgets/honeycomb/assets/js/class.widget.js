@@ -28,6 +28,20 @@ class CWidgetHoneycomb extends CWidget {
 	 */
 	#honeycomb = null;
 
+	/**
+	 * @type {boolean}
+	 */
+	#user_interacting = false;
+
+	/**
+	 * @type {number}
+	 */
+	#interacting_timeout_id;
+
+	isUserInteracting() {
+		return this.#user_interacting || super.isUserInteracting();
+	}
+
 	onResize() {
 		if (this.getState() === WIDGET_STATE_ACTIVE && this.#honeycomb !== null) {
 			this.#honeycomb.setSize(super._getContentsSize());
@@ -62,13 +76,20 @@ class CWidgetHoneycomb extends CWidget {
 
 			this.#honeycomb.setSize(super._getContentsSize());
 
-			this.#honeycomb.getSVGElement().addEventListener('cell.pop.out',
-				(e) => this.broadcast({_hostid: e.detail.hostid, _itemid: e.detail.itemid})
-			);
+			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_CLICK, e => {
+				this.broadcast({_hostid: e.detail.hostid, _itemid: e.detail.itemid});
+			});
 
-			this.#honeycomb.getSVGElement().addEventListener('cell.pop.in',
-				() => this.broadcast({_hostid: null, _itemid: null})
-			);
+			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_ENTER, e => {
+				clearTimeout(this.#interacting_timeout_id);
+				this.#user_interacting = true;
+			});
+
+			this.#honeycomb.getSVGElement().addEventListener(CSVGHoneycomb.EVENT_CELL_LEAVE, e => {
+				this.#interacting_timeout_id = setTimeout(() => {
+					this.#user_interacting = false;
+				}, 1000)
+			});
 		}
 
 		this.#honeycomb.setValue({
