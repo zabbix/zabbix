@@ -125,11 +125,13 @@ class CDashboardPage {
 		}
 	}
 
-	#startWidget(widget) {
+	#startWidget(widget, {do_start = true} = {}) {
 		widget.on(CWidgetBase.EVENT_READY, this._events.widgetReady);
 		widget.on(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, this._events.widgetRequireDataSource);
 
-		widget.start();
+		if (do_start) {
+			widget.start();
+		}
 	}
 
 	activate() {
@@ -210,11 +212,13 @@ class CDashboardPage {
 		this._widgets.clear();
 	}
 
-	#destroyWidget(widget) {
+	#destroyWidget(widget, {do_destroy = true} = {}) {
 		widget.off(CWidgetBase.EVENT_READY, this._events.widgetReady);
 		widget.off(CWidgetBase.EVENT_REQUIRE_DATA_SOURCE, this._events.widgetRequireDataSource);
 
-		widget.destroy();
+		if (do_destroy) {
+			widget.destroy();
+		}
 	}
 
 	// External events management methods.
@@ -353,8 +357,8 @@ class CDashboardPage {
 	_doAddWidget(widget) {
 		this._widgets.set(widget, {is_ready: false});
 
-		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL && widget.getState() === WIDGET_STATE_INITIAL) {
-			widget.start();
+		if (this._state !== DASHBOARD_PAGE_STATE_INITIAL) {
+			this.#startWidget(widget, {do_start: widget.getState() === WIDGET_STATE_INITIAL});
 		}
 
 		if (this._state === DASHBOARD_PAGE_STATE_ACTIVE) {
@@ -373,9 +377,7 @@ class CDashboardPage {
 			this._deactivateWidget(widget);
 		}
 
-		if (do_destroy && widget.getState() !== WIDGET_STATE_INITIAL) {
-			widget.destroy();
-		}
+		this.#destroyWidget(widget, {do_destroy: do_destroy && widget.getState() !== WIDGET_STATE_INITIAL});
 
 		this._widgets.delete(widget);
 
