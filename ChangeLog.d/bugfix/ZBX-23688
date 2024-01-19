@@ -1,0 +1,1 @@
+........S. [ZBX-23688] improved new item value retrieval performance by adding such items to value cache after configuration sync (wiper)
