@@ -2836,7 +2836,7 @@ do													\
 while(0)
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids, zbx_vector_uint64_t *new_itemids)
+		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2977,8 +2977,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			item->preproc_item = NULL;
 			item->master_item = NULL;
 
-			if (NULL != new_itemids)
-				zbx_vector_uint64_append(new_itemids, itemid);
+			if (NULL != new_items)
+				zbx_vector_dc_item_ptr_append(new_items, item);
 		}
 		else
 		{
@@ -8244,7 +8244,7 @@ out:
 						.second = (zbx_uint64_t)new_items.values[i]->value_type
 				};
 
-				zbx_vector_uint64_append_ptr(&vc_items, &pair);
+				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
 			}
 		}
 	}

@@ -91,6 +91,8 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 			dst_item->trends_period = NULL;
 			dst_item->units = NULL;
 	}
+
+	dst_item->has_trigger = (NULL == src_item->triggers ? 0 : 1);
 }
 
 /******************************************************************************
