@@ -2693,7 +2693,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_uint64_t *new_itemids)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2834,8 +2834,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_uint64_t *new
 			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
 
-			if (NULL != new_itemids)
-				zbx_vector_uint64_append(new_itemids, itemid);
+			if (NULL != new_items)
+				zbx_vector_dc_item_ptr_append(new_items, item);
 		}
 		else
 		{
@@ -6704,7 +6704,7 @@ out:
 						.second = (zbx_uint64_t)new_items.values[i]->value_type
 				};
 
-				zbx_vector_uint64_append_ptr(&vc_items, &pair);
+				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
 			}
 		}
 	}
