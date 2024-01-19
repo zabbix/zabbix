@@ -41,7 +41,7 @@ $form
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT
 			])
-			->addRowClass('js-item-multiselect')
+			->addRowClass('js-row-itemid')
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['clock_type'])

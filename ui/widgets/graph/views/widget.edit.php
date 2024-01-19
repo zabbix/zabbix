@@ -36,8 +36,10 @@ if (!$data['fields']['itemid']->isTemplateDashboard()) {
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['source_type'])
 	)
-	->addField(($field_itemid)->addRowClass('js-item-multiselect'))
-	->addField((new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('js-graph-multiselect'))
+	->addField($field_itemid->addRowClass('js-row-itemid'))
+	->addField(
+		(new CWidgetFieldMultiSelectGraphView($data['fields']['graphid']))->addRowClass('js-row-graphid')
+	)
 	->addField(
 		(new CWidgetFieldTimePeriodView($data['fields']['time_period']))
 			->setDateFormat(ZBX_FULL_DATE_TIME)

@@ -23,22 +23,28 @@
 
 window.widget_graph_prototype_form = new class {
 
+	/**
+	 * @type {HTMLFormElement}
+	 */
+	#form;
+
 	init() {
+		this.#form = document.getElementById('widget-dialogue-form');
+
 		document.getElementById('source_type').addEventListener('change', () => this.#updateForm());
 
 		this.#updateForm();
 	}
 
 	#updateForm() {
-		const form = document.getElementById('widget-dialogue-form');
-		const is_graph_prototype = form.querySelector('#source_type input[name="source_type"]:checked').value
+		const is_graph_prototype = this.#form.querySelector('#source_type input[name="source_type"]:checked').value
 			== <?= ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE ?>;
 
-		form.querySelectorAll('.js-graph-prototype-multiselect').forEach(element => {
+		this.#form.querySelectorAll('.js-row-graphid').forEach(element => {
 			element.style.display = is_graph_prototype ? '' : 'none';
 		});
 
-		form.querySelectorAll('.js-item-prototype-multiselect').forEach(element => {
+		this.#form.querySelectorAll('.js-row-itemid').forEach(element => {
 			element.style.display = is_graph_prototype ? 'none' : '';
 		});
 

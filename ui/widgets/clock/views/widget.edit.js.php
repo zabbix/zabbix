@@ -56,7 +56,7 @@ window.widget_clock_form = new class {
 	}
 
 	updateForm() {
-		document.querySelectorAll('.js-item-multiselect').forEach(element => {
+		document.querySelectorAll('.js-row-itemid').forEach(element => {
 			element.style.display = this._time_type.value == <?= TIME_TYPE_HOST ?> ? '' : 'none'
 		});
 

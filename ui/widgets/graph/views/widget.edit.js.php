@@ -23,22 +23,28 @@
 
 window.widget_graph_form = new class {
 
+	/**
+	 * @type {HTMLFormElement}
+	 */
+	#form;
+
 	init() {
+		this.#form = document.getElementById('widget-dialogue-form');
+
 		document.getElementById('source_type').addEventListener('change', () => this.#updateForm());
 
 		this.#updateForm();
 	}
 
 	#updateForm() {
-		const form = document.getElementById('widget-dialogue-form');
-		const is_graph = form.querySelector('#source_type input[name="source_type"]:checked').value
+		const is_graph = this.#form.querySelector('#source_type input[name="source_type"]:checked').value
 			== <?= ZBX_WIDGET_FIELD_RESOURCE_GRAPH ?>;
 
-		form.querySelectorAll('.js-graph-multiselect').forEach(element => {
+		this.#form.querySelectorAll('.js-row-graphid').forEach(element => {
 			element.style.display = is_graph ? '' : 'none';
 		});
 
-		form.querySelectorAll('.js-item-multiselect').forEach(element => {
+		this.#form.querySelectorAll('.js-row-itemid').forEach(element => {
 			element.style.display = is_graph ? 'none' : '';
 		});
 
