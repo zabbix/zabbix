@@ -67,114 +67,114 @@ zabbix_export:
           value_type: TEXT
           params: |
             var auth_url = 'https://oauth2.googleapis.com/token',
-                issued = Math.floor(new Date().getTime() / 1000),
-                expires = issued + 3600,
-                endpoint = 'https://www.googleapis.com/auth/',
-                scopes = ['cloud-platform.read-only', 'monitoring', 'compute.readonly', 'sqlservice.admin'],
-                scope = scopes.map(function (path) { return endpoint + path; }).join(' ');
+            	issued = Math.floor(new Date().getTime() / 1000),
+            	expires = issued + 3600,
+            	endpoint = 'https://www.googleapis.com/auth/',
+            	scopes = ['cloud-platform.read-only', 'monitoring', 'compute.readonly', 'sqlservice.admin'],
+            	scope = scopes.map(function (path) { return endpoint + path; }).join(' ');
             
             function base64url(source) {
-                encodedSource = btoa(source);
-                encodedSource = encodedSource.replace(/=+$/, '');
-                encodedSource = encodedSource.replace(/\+/g, '-');
-                encodedSource = encodedSource.replace(/\//g, '_');
+            	encodedSource = btoa(source);
+            	encodedSource = encodedSource.replace(/=+$/, '');
+            	encodedSource = encodedSource.replace(/\+/g, '-');
+            	encodedSource = encodedSource.replace(/\//g, '_');
             
-                return encodedSource;
+            	return encodedSource;
             }
             
             function fromHex(hex) {
-                var utf8array = [];
+            	var utf8array = [];
             
-                if (hex.length % 2)
-                    throw 'Invalid length of a hex string!';
-                for (var i = 0; i < hex.length; i += 2) {
-                    utf8array.push(parseInt(hex.substr(i, 2), 16));
-                }
-                return new Uint8Array(utf8array);
+            	if (hex.length % 2)
+            		throw 'Invalid length of a hex string!';
+            	for (var i = 0; i < hex.length; i += 2) {
+            		utf8array.push(parseInt(hex.substr(i, 2), 16));
+            	}
+            	return new Uint8Array(utf8array);
             }
             
             function encodeJWT(headers, payload, secret) {
-                unsignedToken = base64url(JSON.stringify(headers)) + '.' + base64url(JSON.stringify(payload));
-                jwt = unsignedToken + '.' + base64url(fromHex(sign('sha256', secret, unsignedToken)));
-                return jwt;
+            	unsignedToken = base64url(JSON.stringify(headers)) + '.' + base64url(JSON.stringify(payload));
+            	jwt = unsignedToken + '.' + base64url(fromHex(sign('sha256', secret, unsignedToken)));
+            	return jwt;
             }
             
             function exchangeJwtForAccessToken(signed_jwt) {
             
-                var request = new HttpRequest(),
-                    params = {
-                        grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
-                        assertion: signed_jwt
-                    }
-                if (typeof script_params.proxy !== 'undefined' && script_params.proxy !== '') {
-                    request.setProxy(script_params.proxy);
-                };
-                var response = request.post(auth_url, JSON.stringify(params));
+            	var request = new HttpRequest(),
+            		params = {
+            			grant_type: 'urn:ietf:params:oauth:grant-type:jwt-bearer',
+            			assertion: signed_jwt
+            		}
+            	if (typeof script_params.proxy !== 'undefined' && script_params.proxy !== '') {
+            		request.setProxy(script_params.proxy);
+            	};
+            	var response = request.post(auth_url, JSON.stringify(params));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + auth_url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + auth_url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
             
             
-                if (typeof response.access_token !== 'undefined') {
-                    return response.access_token;
-                }
-                else {
-                    throw 'No access token in the JWT exchange request.';
-                }
+            	if (typeof response.access_token !== 'undefined') {
+            		return response.access_token;
+            	}
+            	else {
+            		throw 'No access token in the JWT exchange request.';
+            	}
             }
             
             function checkParams(params) {
-                ['pkey_id', 'private_key', 'email'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                return params;
+            	['pkey_id', 'private_key', 'email'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	return params;
             }
             
             var script_params = checkParams(JSON.parse(value)),
-                headers = {
-                    alg: 'RS256',
-                    kid: script_params.pkey_id,
-                    typ: 'JWT'
-                },
-                payload = {
-                    iss: script_params.email,
-                    sub: script_params.email,
-                    aud: auth_url,
-                    iat: issued,
-                    exp: expires,
-                    scope: scope
-                };
+            	headers = {
+            		alg: 'RS256',
+            		kid: script_params.pkey_id,
+            		typ: 'JWT'
+            	},
+            	payload = {
+            		iss: script_params.email,
+            		sub: script_params.email,
+            		aud: auth_url,
+            		iat: issued,
+            		exp: expires,
+            		scope: scope
+            	};
             
             try {
-                jwt = encodeJWT(headers, payload, script_params.private_key);
-                token = exchangeJwtForAccessToken(jwt);
-                return token;
+            	jwt = encodeJWT(headers, payload, script_params.private_key);
+            	token = exchangeJwtForAccessToken(jwt);
+            	return token;
             }
             catch (err) {
-                return JSON.stringify({ error: err });
+            	return JSON.stringify({ error: err });
             }
           description: |
             Google Cloud Platform REST authorization with service account authentication parameters and temporary-generated RSA-based JWT-token usage.
@@ -211,121 +211,121 @@ zabbix_export:
                   var token = value;
                   
                   function getField(data, path) {
-                      var steps = path.split('.');
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field "' + path + '" is not present in data received.';
-                          }
-                          data = data[step];
-                      }
-                      return data;
+                  	var steps = path.split('.');
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
                   }
                   
                   function getFieldBool(data, path) {
-                      var steps = path.split('.');
+                  	var steps = path.split('.');
                   
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
                   
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              return false;
-                          }
-                          data = data[step];
-                      }
-                      return true;
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			return false;
+                  		}
+                  		data = data[step];
+                  	}
+                  	return true;
                   }
                   
                   function getHttpData(url, token) {
-                      var request = new HttpRequest(),
-                          proxy = '{$GCP.PROXY}';
-                      if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
-                          request.setProxy(proxy);
-                      };
-                      request.addHeader('Authorization: Bearer ' + token);
-                      request.addHeader('Content-Type: application/json');
+                  	var request = new HttpRequest(),
+                  		proxy = '{$GCP.PROXY}';
+                  	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                  		request.setProxy(proxy);
+                  	};
+                  	request.addHeader('Authorization: Bearer ' + token);
+                  	request.addHeader('Content-Type: application/json');
                   
-                      var response = request.get(url);
+                  	var response = request.get(url);
                   
-                      Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                  	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+                  		}
+                  	}
                   
-                      if (typeof response !== 'object' || response === null) {
-                          throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                      }
+                  	if (typeof response !== 'object' || response === null) {
+                  		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+                  	}
                   
-                      if (request.getStatus() !== 200) {
-                          if (typeof (response.error && response.error.message) !== 'undefined') {
-                              throw response.error.message;
-                          }
-                          else {
-                              throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                          }
-                      }
-                      return response;
+                  	if (request.getStatus() !== 200) {
+                  		if (typeof (response.error && response.error.message) !== 'undefined') {
+                  			throw response.error.message;
+                  		}
+                  		else {
+                  			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                  		}
+                  	}
+                  	return response;
                   };
                   
                   var project = '{$GCP.PROJECT.ID}';
                   
                   if (!project || project === '{' + '$GCP.PROJECT.ID}') {
-                      throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
+                  	throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
                   }
                   
                   var inst_raw = getHttpData('https://sqladmin.googleapis.com/sql/v1beta4/projects/' + project + '/instances', token);
                   
                   if (Object.keys(inst_raw).length === 0) {
-                      return '[]';
+                  	return '[]';
                   }
                   
                   return JSON.stringify(getField(inst_raw, 'items').map(function (sql_inst) {
-                      obj = {
-                          name: getField(sql_inst, 'name'),
-                          token: value,
-                          zone: getField(sql_inst, 'settings.locationPreference.zone'),
-                          inst_type: getField(sql_inst, 'instanceType'),
-                          tier: getField(sql_inst, 'settings.tier'),
-                          project_id: getField(sql_inst, 'project'),
-                          db_type: getField(sql_inst, 'databaseInstalledVersion')
-                      };
+                  	obj = {
+                  		name: getField(sql_inst, 'name'),
+                  		token: value,
+                  		zone: getField(sql_inst, 'settings.locationPreference.zone'),
+                  		inst_type: getField(sql_inst, 'instanceType'),
+                  		tier: getField(sql_inst, 'settings.tier'),
+                  		project_id: getField(sql_inst, 'project'),
+                  		db_type: getField(sql_inst, 'databaseInstalledVersion')
+                  	};
                   
-                      obj.high_availability = (sql_inst.failoverReplica) ? true : false;
+                  	obj.high_availability = (sql_inst.failoverReplica) ? true : false;
                   
-                      if (obj.db_type.match(/SQLSERVER*/)) {
-                          var mssql_audit = getField(sql_inst, 'settings.sqlServerAuditConfig');
+                  	if (obj.db_type.match(/SQLSERVER*/)) {
+                  		var mssql_audit = getField(sql_inst, 'settings.sqlServerAuditConfig');
                   
-                          obj.audited = (mssql_audit.bucket) ? true : false;
-                      }
+                  		obj.audited = (mssql_audit.bucket) ? true : false;
+                  	}
                   
-                      if (obj.inst_type === 'READ_REPLICA_INSTANCE') {
-                          obj.master = getField(sql_inst, 'masterInstanceName');
-                      }
+                  	if (obj.inst_type === 'READ_REPLICA_INSTANCE') {
+                  		obj.master = getField(sql_inst, 'masterInstanceName');
+                  	}
                   
-                      if (Array.isArray(sql_inst.ipAddresses)) {
-                          var int_addresses = sql_inst.ipAddresses.filter(function (addr) {
-                              return addr.type === 'PRIVATE';
-                          });
+                  	if (Array.isArray(sql_inst.ipAddresses)) {
+                  		var int_addresses = sql_inst.ipAddresses.filter(function (addr) {
+                  			return addr.type === 'PRIVATE';
+                  		});
                   
-                          var ext_addresses = sql_inst.ipAddresses.filter(function (addr) {
-                              return addr.type === 'PRIMARY';
-                          });
+                  		var ext_addresses = sql_inst.ipAddresses.filter(function (addr) {
+                  			return addr.type === 'PRIMARY';
+                  		});
                   
-                          obj.ip = getFieldBool(int_addresses, '0.ipAddress') ? int_addresses[0].ipAddress : '0.0.0.0';
-                          obj.ext_ip = getFieldBool(ext_addresses, '0.ipAddress') ? ext_addresses[0].ipAddress : '0.0.0.0';
-                      }
-                      else {
-                          obj.ip = '0.0.0.0';
-                          obj.ext_ip = '0.0.0.0';
-                      }
+                  		obj.ip = getFieldBool(int_addresses, '0.ipAddress') ? int_addresses[0].ipAddress : '0.0.0.0';
+                  		obj.ext_ip = getFieldBool(ext_addresses, '0.ipAddress') ? ext_addresses[0].ipAddress : '0.0.0.0';
+                  	}
+                  	else {
+                  		obj.ip = '0.0.0.0';
+                  		obj.ext_ip = '0.0.0.0';
+                  	}
                   
-                      return obj;
+                  	return obj;
                   }));
           master_item:
             key: gcp.authorization
@@ -382,110 +382,110 @@ zabbix_export:
                 - |
                   var token = value;
                   function checkMacro(macro) {
-                      if (!macro || macro.match(/^\{\$.*\}$/)) {
-                          throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
-                      }
-                      return macro;
+                  	if (!macro || macro.match(/^\{\$.*\}$/)) {
+                  		throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
+                  	}
+                  	return macro;
                   }
                   
                   function getField(data, path) {
-                      var steps = path.split('.');
+                  	var steps = path.split('.');
                   
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
                   
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field "' + path + '" is not present in data received.';
-                          }
-                          data = data[step];
-                      }
-                      return data;
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.';
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
                   }
                   
                   function getFieldBool(data, path) {
-                      var steps = path.split('.');
+                  	var steps = path.split('.');
                   
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
                   
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              return false;
-                          }
-                          data = data[step];
-                      }
-                      return true;
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			return false;
+                  		}
+                  		data = data[step];
+                  	}
+                  	return true;
                   }
                   
                   
                   function getHttpData(url, token) {
-                      var request = new HttpRequest(),
-                          proxy = '{$GCP.PROXY}';
-                      if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
-                          request.setProxy(proxy);
-                      };
-                      request.addHeader('Authorization: Bearer ' + token);
-                      request.addHeader('Content-Type: application/json');
+                  	var request = new HttpRequest(),
+                  		proxy = '{$GCP.PROXY}';
+                  	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                  		request.setProxy(proxy);
+                  	};
+                  	request.addHeader('Authorization: Bearer ' + token);
+                  	request.addHeader('Content-Type: application/json');
                   
-                      var response = request.get(url);
+                  	var response = request.get(url);
                   
-                      Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                  	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+                  		}
+                  	}
                   
-                      if (typeof response !== 'object' || response === null) {
-                          throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                      }
+                  	if (typeof response !== 'object' || response === null) {
+                  		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+                  	}
                   
-                      if (request.getStatus() !== 200) {
-                          if (typeof (response.error && response.error.message) !== 'undefined') {
-                              throw response.error.message;
-                          }
-                          else {
-                              throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                          }
-                      }
-                      return response;
+                  	if (request.getStatus() !== 200) {
+                  		if (typeof (response.error && response.error.message) !== 'undefined') {
+                  			throw response.error.message;
+                  		}
+                  		else {
+                  			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                  		}
+                  	}
+                  	return response;
                   };
                   
                   var project = '{$GCP.PROJECT.ID}';
                   
                   if (!project || project === '{' + '$GCP.PROJECT.ID}') {
-                      throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
+                  	throw 'Error. Set the \{$GCP.PROJECT.ID\} macro value.';
                   }
                   
                   var result = getHttpData('https://compute.googleapis.com/compute/v1/projects/' + project + '/aggregated/instances', token),
-                      vms_raw = getField(result, 'items'),
-                      keys = Object.keys(vms_raw),
-                      arr = [];
+                  	vms_raw = getField(result, 'items'),
+                  	keys = Object.keys(vms_raw),
+                  	arr = [];
                   
                   for (var i in keys) {
-                      if (typeof vms_raw[keys[i]].instances !== 'undefined') {
-                          var vm_prop = vms_raw[keys[i]].instances.map(function setProp(inst) {
-                              obj = {
-                                  id: getField(inst, 'id'),
-                                  name: getField(inst, 'name'),
-                                  token: value,
-                                  zone: keys[i].replace(/zones\//, ''),
-                                  m_type: getField(inst, 'machineType').replace(/.*machineTypes\//g, ''),
-                                  state: getField(inst, 'status'),
-                                  project_id: '{$GCP.PROJECT.ID}',
-                                  ip: getField(inst, 'networkInterfaces.0.networkIP'),
-                                  integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
-                              };
+                  	if (typeof vms_raw[keys[i]].instances !== 'undefined') {
+                  		var vm_prop = vms_raw[keys[i]].instances.map(function setProp(inst) {
+                  			obj = {
+                  				id: getField(inst, 'id'),
+                  				name: getField(inst, 'name'),
+                  				token: value,
+                  				zone: keys[i].replace(/zones\//, ''),
+                  				m_type: getField(inst, 'machineType').replace(/.*machineTypes\//g, ''),
+                  				state: getField(inst, 'status'),
+                  				project_id: '{$GCP.PROJECT.ID}',
+                  				ip: getField(inst, 'networkInterfaces.0.networkIP'),
+                  				integrity: getField(inst, 'shieldedInstanceConfig.enableIntegrityMonitoring')
+                  			};
                   
-                              obj.ext_ip = getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP') ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
-                              obj.i_type = getFieldBool(inst, 'labels.container-vm') ? 'container-optimized' : 'regular';
-                              return obj;
-                          });
-                          arr = arr.concat(vm_prop);
-                      }
+                  			obj.ext_ip = getFieldBool(inst, 'networkInterfaces.0.accessConfigs.0.natIP') ? inst.networkInterfaces[0].accessConfigs[0].natIP : '0.0.0.0';
+                  			obj.i_type = getFieldBool(inst, 'labels.container-vm') ? 'container-optimized' : 'regular';
+                  			return obj;
+                  		});
+                  		arr = arr.concat(vm_prop);
+                  	}
                   }
                   return JSON.stringify(arr);
           master_item:
@@ -599,78 +599,78 @@ zabbix_export:
                   var token = value;
                   
                   function checkMacro(macro) {
-                      if (!macro || macro.match(/^\{\$.*\}$/)) {
-                          throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
-                      }
-                      return macro;
+                  	if (!macro || macro.match(/^\{\$.*\}$/)) {
+                  		throw 'The GCP project id is not defined. Please, set the value for the \{$GCP.PROJECT.ID\} macro.';
+                  	}
+                  	return macro;
                   }
                   
                   function getField(data, path) {
-                      var steps = path.split('.');
+                  	var steps = path.split('.');
                   
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
                   
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field "' + path + '" is not present in data received.'
-                          }
-                          data = data[step];
-                      }
-                      return data;
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field "' + path + '" is not present in data received.'
+                  		}
+                  		data = data[step];
+                  	}
+                  	return data;
                   }
                   
                   function getHttpData(url, token) {
-                      var request = new HttpRequest(),
-                          proxy = '{$GCP.PROXY}';
-                      if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
-                          request.setProxy(proxy);
-                      };
-                      request.addHeader('Authorization: Bearer ' + token);
-                      request.addHeader('Content-Type: application/json');
+                  	var request = new HttpRequest(),
+                  		proxy = '{$GCP.PROXY}';
+                  	if (proxy !== '{' + '$GCP.PROXY}' && proxy !== '') {
+                  		request.setProxy(proxy);
+                  	};
+                  	request.addHeader('Authorization: Bearer ' + token);
+                  	request.addHeader('Content-Type: application/json');
                   
-                      var response = request.get(url);
+                  	var response = request.get(url);
                   
-                      Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                  	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+                  		}
+                  	}
                   
-                      if (typeof response !== 'object' || response === null) {
-                          throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                      }
+                  	if (typeof response !== 'object' || response === null) {
+                  		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+                  	}
                   
-                      if (request.getStatus() !== 200) {
-                          if (typeof (response.error && response.error.message) !== 'undefined') {
-                              throw response.error.message;
-                          }
-                          else {
-                              throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                          }
-                      }
+                  	if (request.getStatus() !== 200) {
+                  		if (typeof (response.error && response.error.message) !== 'undefined') {
+                  			throw response.error.message;
+                  		}
+                  		else {
+                  			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                  		}
+                  	}
                   
-                      if (typeof response.quotas !== 'undefined') {
-                          return response;
-                      } else {
-                          throw 'No quotas array in API response';
-                      }
+                  	if (typeof response.quotas !== 'undefined') {
+                  		return response;
+                  	} else {
+                  		throw 'No quotas array in API response';
+                  	}
                   };
                   var project = checkMacro('{$GCP.PROJECT.ID}'),
-                      qts_raw = getHttpData('https://www.googleapis.com/compute/v1/projects/' + project, token),
-                      qts_lst = getField(qts_raw, 'quotas').map(function (qt) {
-                          obj = {
-                              metric: getField(qt, 'metric'),
-                              limit: getField(qt, 'limit'),
-                              usage: getField(qt, 'usage'),
-                              p_used: (qt.usage / qt.limit) * 100
-                          };
-                          return obj;
-                      });
+                  	qts_raw = getHttpData('https://www.googleapis.com/compute/v1/projects/' + project, token),
+                  	qts_lst = getField(qts_raw, 'quotas').map(function (qt) {
+                  		obj = {
+                  			metric: getField(qt, 'metric'),
+                  			limit: getField(qt, 'limit'),
+                  			usage: getField(qt, 'usage'),
+                  			p_used: (qt.usage / qt.limit) * 100
+                  		};
+                  		return obj;
+                  	});
                   
                   return JSON.stringify(qts_lst);
           master_item:
@@ -1847,92 +1847,92 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
-                arr = [],
-                base_paths = [
-                    'log_bytes_flushed_count',
-                    'transaction_count'
-                ];
+            	arr = [],
+            	base_paths = [
+            		'log_bytes_flushed_count',
+            		'transaction_count'
+            	];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                time_series = getField(raw, 'timeSeriesData');
+            	j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+            	metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	time_series = getField(raw, 'timeSeriesData');
             
             for (t in time_series) {
-                data = {
-                    database: getField(time_series[t], 'labelValues.3.stringValue'),
-                    metrics: {}
-                };
+            	data = {
+            		database: getField(time_series[t], 'labelValues.3.stringValue'),
+            		metrics: {}
+            	};
             
-                for (i in metrics) {
-                    re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
-                }
-                arr.push(data);
+            	for (i in metrics) {
+            		re = /(^t_\d+\.value(_|\.))/g;
+            		data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+            	}
+            	arr.push(data);
             }
             return JSON.stringify(arr);
           description: 'MSSQL databases data in raw format.'
@@ -2149,13 +2149,13 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'RUNNING',
-                      'SUSPENDED',
-                      'RUNNABLE',
-                      'PENDING_CREATE',
-                      'MAINTENANCE',
-                      'FAILED',
-                      'UNKNOWN_STATE'
+                  	'RUNNING',
+                  	'SUSPENDED',
+                  	'RUNNABLE',
+                  	'PENDING_CREATE',
+                  	'MAINTENANCE',
+                  	'FAILED',
+                  	'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -2491,191 +2491,191 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
-                mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
-                obj = {},
-                base_paths = [
-                    'cpu/reserved_cores',
-                    'cpu/usage_time',
-                    'cpu/utilization',
-                    'disk/read_ops_count',
-                    'disk/write_ops_count',
-                    'memory/quota',
-                    'memory/total_usage',
-                    'memory/usage',
-                    'network/connections',
-                    'network/received_bytes_count',
-                    'network/sent_bytes_count | map ignore [destination]'
-                ].map(function (path) { return base_path + path; }),
-                mssql_paths = [
-                    'connections/connection_reset_count',
-                    'connections/login_attempt_count',
-                    'connections/logout_count',
-                    'connections/processes_blocked',
-                    'memory/buffer_cache_hit_ratio',
-                    'memory/checkpoint_page_count',
-                    'memory/lazy_write_count',
-                    'memory/memory_grants_pending',
-                    'memory/page_life_expectancy',
-                    'memory/free_list_stall_count',
-                    'transactions/batch_request_count',
-                    'transactions/forwarded_record_count',
-                    'transactions/full_scan_count',
-                    'transactions/page_split_count',
-                    'transactions/probe_scan_count',
-                    'transactions/sql_compilation_count',
-                    'transactions/sql_recompilation_count'
-                ].map(function (path) { return mssql_path + path; }).concat(
-                    ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
-                value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            	mssql_path = 'cloudsql.googleapis.com/database/sqlserver/',
+            	obj = {},
+            	base_paths = [
+            		'cpu/reserved_cores',
+            		'cpu/usage_time',
+            		'cpu/utilization',
+            		'disk/read_ops_count',
+            		'disk/write_ops_count',
+            		'memory/quota',
+            		'memory/total_usage',
+            		'memory/usage',
+            		'network/connections',
+            		'network/received_bytes_count',
+            		'network/sent_bytes_count | map ignore [destination]'
+            	].map(function (path) { return base_path + path; }),
+            	mssql_paths = [
+            		'connections/connection_reset_count',
+            		'connections/login_attempt_count',
+            		'connections/logout_count',
+            		'connections/processes_blocked',
+            		'memory/buffer_cache_hit_ratio',
+            		'memory/checkpoint_page_count',
+            		'memory/lazy_write_count',
+            		'memory/memory_grants_pending',
+            		'memory/page_life_expectancy',
+            		'memory/free_list_stall_count',
+            		'transactions/batch_request_count',
+            		'transactions/forwarded_record_count',
+            		'transactions/full_scan_count',
+            		'transactions/page_split_count',
+            		'transactions/probe_scan_count',
+            		'transactions/sql_compilation_count',
+            		'transactions/sql_recompilation_count'
+            	].map(function (path) { return mssql_path + path; }).concat(
+            		['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
+            	value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function getFieldBool(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        return false;
-                    }
-                    data = data[step];
-                }
-                return true;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			return false;
+            		}
+            		data = data[step];
+            	}
+            	return true;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token', 'audited'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                if (params.audited !== 'true' && params.audited !== 'false') {
-                    throw 'Incorrect audit definition type. Valid definitions: true/false';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token', 'audited'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	if (params.audited !== 'true' && params.audited !== 'false') {
+            		throw 'Incorrect audit definition type. Valid definitions: true/false';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             function rawMap(raw, prefix) {
-                var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                    values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
-                    re = /(^t_\d+\.value\.)/g;
+            	var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            		values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
+            		re = /(^t_\d+\.value\.)/g;
             
-                for (i in keys) {
-                    var key = getField(keys[i], 'key').replace(re, '');
+            	for (i in keys) {
+            		var key = getField(keys[i], 'key').replace(re, '');
             
-                    for (v in value_types) {
-                        if (typeof values[i][value_types[v]] !== 'undefined') {
-                            if (prefix) {
-                                obj[prefix + key] = values[i][value_types[v]];
-                            }
-                            else {
-                                obj[key] = values[i][value_types[v]];
-                            }
+            		for (v in value_types) {
+            			if (typeof values[i][value_types[v]] !== 'undefined') {
+            				if (prefix) {
+            					obj[prefix + key] = values[i][value_types[v]];
+            				}
+            				else {
+            					obj[key] = values[i][value_types[v]];
+            				}
             
-                        }
-                    }
-                }
-                return obj;
+            			}
+            		}
+            	}
+            	return obj;
             }
             
             function singleMetrics(tsd) {
-                var result = {};
+            	var result = {};
             
-                for (t in tsd) {
-                    for (v in value_types) {
-                        if (getFieldBool(tsd[t], 'pointData.0.values.0.' + [value_types[v]])) {
-                            result['mssql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
-                            break;
-                        }
-                    }
-                }
-                return result;
+            	for (t in tsd) {
+            		for (v in value_types) {
+            			if (getFieldBool(tsd[t], 'pointData.0.values.0.' + [value_types[v]])) {
+            				result['mssql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
+            				break;
+            			}
+            		}
+            	}
+            	return result;
             }
             
             var params = checkParams(JSON.parse(value));
             
             if (params.audited === 'true') {
-                base_paths.push(mssql_path + 'audits_size');
+            	base_paths.push(mssql_path + 'audits_size');
             };
             
             var filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                queries = [
-                    { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
-                    { name: 'mssql_', data: { query: '{' + mssql_paths.join(';') + '}' + j_filter } }
-                ];
+            	j_filter = filter + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	queries = [
+            		{ name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
+            		{ name: 'mssql_', data: { query: '{' + mssql_paths.join(';') + '}' + j_filter } }
+            	];
             
             for (q in queries) {
-                raw = getHttpData(url, params.token, queries[q].data);
-                obj = Object.assign(obj, rawMap(raw, queries[q].name));
+            	raw = getHttpData(url, params.token, queries[q].data);
+            	obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
             obj.base_ram_pused = Math.floor(getField(obj, 'base_usage') / getField(obj, 'base_quota') * 100);
             
             var single_queries = [
-                { query: mssql_path + 'memory/page_operation_count' + filter }
+            	{ query: mssql_path + 'memory/page_operation_count' + filter }
             ];
             
             if (params.audited === 'true') {
-                single_queries.push({ query: mssql_path + 'audits_upload_count' + filter });
+            	single_queries.push({ query: mssql_path + 'audits_upload_count' + filter });
             }
             
             for (q in single_queries) {
-                raw = getHttpData(url, params.token, single_queries[q]);
-                Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
+            	raw = getHttpData(url, params.token, single_queries[q]);
+            	Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
             }
             
             return JSON.stringify(obj);
@@ -2770,93 +2770,93 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/transactions/',
-                arr = [],
-                base_paths = [
-                    'deadlock_count',
-                    'lock_wait_count',
-                    'lock_wait_time'
-                ];
+            	arr = [],
+            	base_paths = [
+            		'deadlock_count',
+            		'lock_wait_count',
+            		'lock_wait_time'
+            	];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                time_series = getField(raw, 'timeSeriesData');
+            	j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+            	metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	time_series = getField(raw, 'timeSeriesData');
             
             for (t in time_series) {
-                data = {
-                    resource: getField(time_series[t], 'labelValues.3.stringValue'),
-                    metrics: {}
-                };
+            	data = {
+            		resource: getField(time_series[t], 'labelValues.3.stringValue'),
+            		metrics: {}
+            	};
             
-                for (i in metrics) {
-                    re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
-                }
-                arr.push(data);
+            	for (i in metrics) {
+            		re = /(^t_\d+\.value(_|\.))/g;
+            		data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+            	}
+            	arr.push(data);
             }
             return JSON.stringify(arr);
           description: 'MSSQL resources data in raw format.'
@@ -2889,89 +2889,89 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/schedulers/',
-                arr = [],
-                base_paths = ['active_workers', 'current_tasks', 'current_workers', 'pending_disk_io', 'runnable_tasks', 'work_queue'];
+            	arr = [],
+            	base_paths = ['active_workers', 'current_tasks', 'current_workers', 'pending_disk_io', 'runnable_tasks', 'work_queue'];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                time_series = getField(raw, 'timeSeriesData');
+            	j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+            	metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	time_series = getField(raw, 'timeSeriesData');
             
             for (t in time_series) {
-                data = {
-                    scheduler: getField(time_series[t], 'labelValues.3.stringValue'),
-                    metrics: {}
-                };
+            	data = {
+            		scheduler: getField(time_series[t], 'labelValues.3.stringValue'),
+            		metrics: {}
+            	};
             
-                for (i in metrics) {
-                    re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
-                }
-                arr.push(data);
+            	for (i in metrics) {
+            		re = /(^t_\d+\.value(_|\.))/g;
+            		data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+            	}
+            	arr.push(data);
             }
             return JSON.stringify(arr);
           description: 'MSSQL schedulers data in raw format.'
@@ -3837,95 +3837,95 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/sqlserver/replication/',
-                obj = {},
-                base_paths = [
-                    'bytes_sent_to_replica_count | map ignore [replica_name]',
-                    'resent_message_count | map ignore [replica_name]',
-                    'log_apply_pending_queue',
-                    'log_bytes_received_count',
-                    'recovery_queue',
-                    'redone_bytes_count'
-                ];
+            	obj = {},
+            	base_paths = [
+            		'bytes_sent_to_replica_count | map ignore [replica_name]',
+            		'resent_message_count | map ignore [replica_name]',
+            		'log_apply_pending_queue',
+            		'log_bytes_received_count',
+            		'recovery_queue',
+            		'redone_bytes_count'
+            	];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                base_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                keys = getField(base_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                values = getField(base_raw, 'timeSeriesData.0.pointData.0.values'),
-                re = /(^t_\d+\.value\.)/g;
+            	filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
+            	j_filter = filter + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	base_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+            	keys = getField(base_raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	values = getField(base_raw, 'timeSeriesData.0.pointData.0.values'),
+            	re = /(^t_\d+\.value\.)/g;
             
             for (i in keys) {
-                var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            	var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
-                for (v in value_types) {
-                    if (typeof values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
-                    }
-                }
+            	for (v in value_types) {
+            		if (typeof values[i][value_types[v]] !== 'undefined') {
+            			obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
+            		}
+            	}
             }
             
             return JSON.stringify(obj);
@@ -4482,13 +4482,13 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'RUNNING',
-                      'SUSPENDED',
-                      'RUNNABLE',
-                      'PENDING_CREATE',
-                      'MAINTENANCE',
-                      'FAILED',
-                      'UNKNOWN_STATE'
+                  	'RUNNING',
+                  	'SUSPENDED',
+                  	'RUNNABLE',
+                  	'PENDING_CREATE',
+                  	'MAINTENANCE',
+                  	'FAILED',
+                  	'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -4671,135 +4671,135 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
-                mysql_path = 'cloudsql.googleapis.com/database/mysql/',
-                obj = {},
-                base_paths = [
-                    'cpu/reserved_cores',
-                    'cpu/usage_time',
-                    'cpu/utilization',
-                    'disk/read_ops_count',
-                    'disk/write_ops_count',
-                    'memory/quota',
-                    'memory/total_usage',
-                    'memory/usage',
-                    'network/connections',
-                    'network/received_bytes_count',
-                    'network/sent_bytes_count  | map ignore [destination]'
-                ].map(function (path) { return base_path + path; }),
-                mysql_paths = [
-                    'innodb_buffer_pool_pages_dirty',
-                    'innodb_buffer_pool_pages_free',
-                    'innodb_buffer_pool_pages_total',
-                    'innodb_data_fsyncs',
-                    'innodb_os_log_fsyncs',
-                    'innodb_pages_read',
-                    'innodb_pages_written',
-                    'queries',
-                    'questions',
-                    'received_bytes_count',
-                    'sent_bytes_count',
-                    'open_tables',
-                    'open_table_definitions'
-                ].map(function (path) { return mysql_path + path; }).concat(
-                    ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; }));
+            	mysql_path = 'cloudsql.googleapis.com/database/mysql/',
+            	obj = {},
+            	base_paths = [
+            		'cpu/reserved_cores',
+            		'cpu/usage_time',
+            		'cpu/utilization',
+            		'disk/read_ops_count',
+            		'disk/write_ops_count',
+            		'memory/quota',
+            		'memory/total_usage',
+            		'memory/usage',
+            		'network/connections',
+            		'network/received_bytes_count',
+            		'network/sent_bytes_count  | map ignore [destination]'
+            	].map(function (path) { return base_path + path; }),
+            	mysql_paths = [
+            		'innodb_buffer_pool_pages_dirty',
+            		'innodb_buffer_pool_pages_free',
+            		'innodb_buffer_pool_pages_total',
+            		'innodb_data_fsyncs',
+            		'innodb_os_log_fsyncs',
+            		'innodb_pages_read',
+            		'innodb_pages_written',
+            		'queries',
+            		'questions',
+            		'received_bytes_count',
+            		'sent_bytes_count',
+            		'open_tables',
+            		'open_table_definitions'
+            	].map(function (path) { return mysql_path + path; }).concat(
+            		['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; }));
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             function rawMap(raw, prefix) {
-                var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                    values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
-                    re = /(^t_\d+\.value\.)/g;
+            	var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            		values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
+            		re = /(^t_\d+\.value\.)/g;
             
-                for (i in keys) {
-                    var key = getField(keys[i], 'key').replace(re, ''),
-                        value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            	for (i in keys) {
+            		var key = getField(keys[i], 'key').replace(re, ''),
+            			value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
-                    for (v in value_types) {
-                        if (typeof values[i][value_types[v]] !== 'undefined') {
-                            if (prefix) {
-                                obj[prefix + key] = values[i][value_types[v]];
-                            }
-                            else {
-                                obj[key] = values[i][value_types[v]];
-                            }
+            		for (v in value_types) {
+            			if (typeof values[i][value_types[v]] !== 'undefined') {
+            				if (prefix) {
+            					obj[prefix + key] = values[i][value_types[v]];
+            				}
+            				else {
+            					obj[key] = values[i][value_types[v]];
+            				}
             
-                        }
-                    }
-                }
-                return obj;
+            			}
+            		}
+            	}
+            	return obj;
             }
             
             var params = checkParams(JSON.parse(value)),
-                j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                queries = [
-                    { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
-                    { name: 'mysql_', data: { query: '{' + mysql_paths.join(';') + '}' + j_filter } }
-                ];
+            	j_filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'" + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	queries = [
+            		{ name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
+            		{ name: 'mysql_', data: { query: '{' + mysql_paths.join(';') + '}' + j_filter } }
+            	];
             
             for (q in queries) {
-                raw = getHttpData(url, params.token, queries[q].data);
-                obj = Object.assign(obj, rawMap(raw, queries[q].name));
+            	raw = getHttpData(url, params.token, queries[q].data);
+            	obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
             obj.base_ram_pused = Math.floor(getField(obj, 'base_usage') / getField(obj, 'base_quota') * 100);
@@ -5271,112 +5271,112 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/replication/',
-                mysql_path = 'cloudsql.googleapis.com/database/mysql/replication/',
-                raw_metrics,
-                obj = {},
-                base_paths = ['network_lag', 'replica_lag'].map(function (path) { return base_path + path; }),
-                mysql_paths = [
-                    'last_io_errno',
-                    'last_sql_errno',
-                    'slave_io_running',
-                    'slave_sql_running'].map(function (path) { return mysql_path + path; }).concat(
-                        ['network_lag', 'replica_lag'].map(function (path) { return base_path + path; }));
+            	mysql_path = 'cloudsql.googleapis.com/database/mysql/replication/',
+            	raw_metrics,
+            	obj = {},
+            	base_paths = ['network_lag', 'replica_lag'].map(function (path) { return base_path + path; }),
+            	mysql_paths = [
+            		'last_io_errno',
+            		'last_sql_errno',
+            		'slave_io_running',
+            		'slave_sql_running'].map(function (path) { return mysql_path + path; }).concat(
+            			['network_lag', 'replica_lag'].map(function (path) { return base_path + path; }));
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                metric_raw = getHttpData(url, params.token, { query: '{' + mysql_paths.join(';') + '}' + j_filter }),
-                metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
-                re = /(^t_\d+\.value\.)/g;
+            	filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
+            	j_filter = filter + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	metric_raw = getHttpData(url, params.token, { query: '{' + mysql_paths.join(';') + '}' + j_filter }),
+            	metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
+            	re = /(^t_\d+\.value\.)/g;
             
             for (i in metric_keys) {
-                var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            	var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
-                for (v in value_types) {
-                    if (typeof metric_values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(metric_keys[i], 'key').replace(re, "")] = metric_values[i][value_types[v]];
-                    }
-                }
+            	for (v in value_types) {
+            		if (typeof metric_values[i][value_types[v]] !== 'undefined') {
+            			obj[getField(metric_keys[i], 'key').replace(re, "")] = metric_values[i][value_types[v]];
+            		}
+            	}
             }
             
             var state_raw = getHttpData(url, params.token, { query: base_path + 'state' + filter }),
-                state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                state_tsd = getField(state_raw, 'timeSeriesData');
+            	state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	state_tsd = getField(state_raw, 'timeSeriesData');
             
             for (i in state_keys) {
-                var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
+            	var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
             
-                obj[state_key] = 'undefined';
-                for (t in state_tsd) {
-                    if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
-                        obj[state_key] = getField(state_tsd[t], 'labelValues.3.stringValue');
-                        break;
-                    }
-                }
+            	obj[state_key] = 'undefined';
+            	for (t in state_tsd) {
+            		if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
+            			obj[state_key] = getField(state_tsd[t], 'labelValues.3.stringValue');
+            			break;
+            		}
+            	}
             }
             
             return JSON.stringify(obj);
@@ -5457,9 +5457,9 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'No',
-                      'Yes',
-                      'Connecting',
+                  	'No',
+                  	'Yes',
+                  	'Connecting',
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -5510,11 +5510,11 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'Running',
-                      'Syncing',
-                      'Unsynced',
-                      'Stopped',
-                      'Error',
+                  	'Running',
+                  	'Syncing',
+                  	'Unsynced',
+                  	'Stopped',
+                  	'Error',
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -5944,13 +5944,13 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'RUNNING',
-                      'SUSPENDED',
-                      'RUNNABLE',
-                      'PENDING_CREATE',
-                      'MAINTENANCE',
-                      'FAILED',
-                      'UNKNOWN_STATE'
+                  	'RUNNING',
+                  	'SUSPENDED',
+                  	'RUNNABLE',
+                  	'PENDING_CREATE',
+                  	'MAINTENANCE',
+                  	'FAILED',
+                  	'UNKNOWN_STATE'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -6133,147 +6133,147 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/',
-                pgsql_path = 'cloudsql.googleapis.com/database/postgresql/',
-                obj = {},
-                value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/',
+            	obj = {},
+            	value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             function rawMap(raw, prefix) {
-                var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                    values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
-                    re = /(^t_\d+\.value(_|\.)|_sum$)/g;
+            	var keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            		values = getField(raw, 'timeSeriesData.0.pointData.0.values'),
+            		re = /(^t_\d+\.value(_|\.)|_sum$)/g;
             
-                for (i in keys) {
-                    var key = getField(keys[i], 'key').replace(re, '');
+            	for (i in keys) {
+            		var key = getField(keys[i], 'key').replace(re, '');
             
-                    for (v in value_types) {
-                        if (typeof values[i][value_types[v]] !== 'undefined') {
-                            if (prefix) {
-                                obj[prefix + key] = values[i][value_types[v]];
-                            } else {
-                                obj[key] = values[i][value_types[v]];
-                            }
+            		for (v in value_types) {
+            			if (typeof values[i][value_types[v]] !== 'undefined') {
+            				if (prefix) {
+            					obj[prefix + key] = values[i][value_types[v]];
+            				} else {
+            					obj[key] = values[i][value_types[v]];
+            				}
             
-                        }
-                    }
-                }
-                return obj;
+            			}
+            		}
+            	}
+            	return obj;
             }
             
             function singleMetrics(tsd) {
-                result = {};
-                for (t in tsd) {
-                    for (v in value_types) {
-                        if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
-                            result['pgsql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
-                        }
-                    }
-                }
-                return result;
+            	result = {};
+            	for (t in tsd) {
+            		for (v in value_types) {
+            			if (typeof tsd[t].pointData[0].values[0][value_types[v]] !== 'undefined') {
+            				result['pgsql_' + getField(tsd[t], 'labelValues.3.stringValue').toLowerCase()] = tsd[t].pointData[0].values[0][value_types[v]];
+            			}
+            		}
+            	}
+            	return result;
             }
             
             var params = checkParams(JSON.parse(value)),
-                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                base_paths = [
-                    'cpu/reserved_cores',
-                    'cpu/usage_time',
-                    'cpu/utilization',
-                    'disk/read_ops_count',
-                    'disk/write_ops_count',
-                    'memory/quota',
-                    'memory/total_usage',
-                    'memory/usage',
-                    'network/received_bytes_count',
-                    'network/sent_bytes_count | map ignore [destination]'
-                ].map(function (path) { return base_path + path; }),
-                pgsql_paths = [
-                    'transaction_id_utilization ' + filter,
-                    'temp_bytes_written_count' + filter + ' | sum',
-                    'temp_files_written_count' + filter + ' | sum',
-                    'num_backends' + filter + ' | sum'
-                ].map(function (path) { return pgsql_path + path; }).concat(
-                    ['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
-                queries = [
-                    { name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
-                    { name: 'pgsql_', data: { query: '{' + pgsql_paths.join(';') + '}' + '| within ' + params.time_window + '| join' } }
-                ];
+            	filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
+            	j_filter = filter + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	base_paths = [
+            		'cpu/reserved_cores',
+            		'cpu/usage_time',
+            		'cpu/utilization',
+            		'disk/read_ops_count',
+            		'disk/write_ops_count',
+            		'memory/quota',
+            		'memory/total_usage',
+            		'memory/usage',
+            		'network/received_bytes_count',
+            		'network/sent_bytes_count | map ignore [destination]'
+            	].map(function (path) { return base_path + path; }),
+            	pgsql_paths = [
+            		'transaction_id_utilization ' + filter,
+            		'temp_bytes_written_count' + filter + ' | sum',
+            		'temp_files_written_count' + filter + ' | sum',
+            		'num_backends' + filter + ' | sum'
+            	].map(function (path) { return pgsql_path + path; }).concat(
+            		['disk/bytes_used', 'disk/utilization', 'disk/quota'].map(function (path) { return base_path + path; })),
+            	queries = [
+            		{ name: 'base_', data: { query: '{' + base_paths.join(';') + '}' + j_filter } },
+            		{ name: 'pgsql_', data: { query: '{' + pgsql_paths.join(';') + '}' + '| within ' + params.time_window + '| join' } }
+            	];
             
             for (q in queries) {
-                raw = getHttpData(url, params.token, queries[q].data);
-                obj = Object.assign(obj, rawMap(raw, queries[q].name));
+            	raw = getHttpData(url, params.token, queries[q].data);
+            	obj = Object.assign(obj, rawMap(raw, queries[q].name));
             }
             
             obj.base_ram_pused = Math.floor((getField(obj, 'base_usage') / getField(obj, 'base_quota')) * 100);
             
             var single_paths = ['transaction_id_count', 'vacuum/oldest_transaction_age'],
-                single_queries = single_paths.map(function (path) { return { query: pgsql_path + path + filter }; });
+            	single_queries = single_paths.map(function (path) { return { query: pgsql_path + path + filter }; });
             
             for (q in single_queries) {
-                raw = getHttpData(url, params.token, single_queries[q]);
-                Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
+            	raw = getHttpData(url, params.token, single_queries[q]);
+            	Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
             }
             
             return JSON.stringify(obj);
@@ -6601,105 +6601,105 @@ zabbix_export:
               value_type: TEXT
               params: |
                 var base_path = 'cloudsql.googleapis.com/database/postgresql/',
-                    obj = {};
+                	obj = {};
                 
                 function checkParams(params) {
-                    ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
-                    if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                        throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                    }
-                    return params;
+                	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+                		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                			throw 'Required param is not set: ' + field + '.';
+                		}
+                	});
+                	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+                		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+                	}
+                	return params;
                 }
                 
                 function getField(data, path) {
-                    var steps = path.split('.');
+                	var steps = path.split('.');
                 
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
+                	for (var i = 0; i < steps.length; i++) {
+                		var step = steps[i];
                 
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field "' + path + '" is not present in data received.';
-                        }
-                        data = data[step];
-                    }
-                    return data;
+                		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                			throw 'Required field "' + path + '" is not present in data received.';
+                		}
+                		data = data[step];
+                	}
+                	return data;
                 }
                 
                 function getHttpData(url, token, body) {
-                    var request = new HttpRequest();
-                    if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                        request.setProxy(params.proxy);
-                    };
-                    request.addHeader('Authorization: Bearer ' + token);
-                    request.addHeader('Content-Type: application/json');
+                	var request = new HttpRequest();
+                	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+                		request.setProxy(params.proxy);
+                	};
+                	request.addHeader('Authorization: Bearer ' + token);
+                	request.addHeader('Content-Type: application/json');
                 
-                    var response = request.post(url, JSON.stringify(body));
+                	var response = request.post(url, JSON.stringify(body));
                 
-                    Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                        }
-                    }
+                	if (response !== null) {
+                		try {
+                			response = JSON.parse(response);
+                		}
+                		catch (error) {
+                			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+                		}
+                	}
                 
-                    if (typeof response !== 'object' || response === null) {
-                        throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                    }
+                	if (typeof response !== 'object' || response === null) {
+                		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+                	}
                 
-                    if (request.getStatus() !== 200) {
-                        if (typeof (response.error && response.error.message) !== 'undefined') {
-                            throw response.error.message;
-                        }
-                        else {
-                            throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                        }
-                    }
-                    return response;
+                	if (request.getStatus() !== 200) {
+                		if (typeof (response.error && response.error.message) !== 'undefined') {
+                			throw response.error.message;
+                		}
+                		else {
+                			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+                		}
+                	}
+                	return response;
                 };
                 
                 function singleMetrics(tsd) {
-                    var result = {};
+                	var result = {};
                 
-                    for (i in tsd) {
-                        result[getField(tsd[i], 'labelValues.4.stringValue')] = getField(tsd[i], 'pointData.0.values.0.int64Value');
-                    }
-                    return result;
+                	for (i in tsd) {
+                		result[getField(tsd[i], 'labelValues.4.stringValue')] = getField(tsd[i], 'pointData.0.values.0.int64Value');
+                	}
+                	return result;
                 }
                 
                 var params = checkParams(JSON.parse(value)),
-                    filter = ' | within ' + params.time_window + " | filter database_id ='" + params.database_id + "'" + " | filter database ='" + params.database_name + "'",
-                    j_filter = filter + ' | join',
-                    url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                    common_paths = ['deadlock_count', 'tuples_returned_count', 'tuples_fetched_count'],
-                    common_raw = getHttpData(url, params.token, { query: '{' + common_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                    keys = getField(common_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                    values = getField(common_raw, 'timeSeriesData.0.pointData.0.values'),
-                    re = /(^t_\d+\.value\.)/g;
+                	filter = ' | within ' + params.time_window + " | filter database_id ='" + params.database_id + "'" + " | filter database ='" + params.database_name + "'",
+                	j_filter = filter + ' | join',
+                	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+                	common_paths = ['deadlock_count', 'tuples_returned_count', 'tuples_fetched_count'],
+                	common_raw = getHttpData(url, params.token, { query: '{' + common_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+                	keys = getField(common_raw, 'timeSeriesDescriptor.pointDescriptors'),
+                	values = getField(common_raw, 'timeSeriesData.0.pointData.0.values'),
+                	re = /(^t_\d+\.value\.)/g;
                 
                 for (i in keys) {
-                    var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+                	var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
                 
-                    for (v in value_types) {
-                        if (typeof values[i][value_types[v]] !== 'undefined') {
-                            obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
-                        }
-                    }
+                	for (v in value_types) {
+                		if (typeof values[i][value_types[v]] !== 'undefined') {
+                			obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
+                		}
+                	}
                 }
                 
                 var single_paths = ['transaction_count', 'blocks_read_count', 'tuples_processed_count', 'tuple_size'],
-                    single_queries = single_paths.map(function (path) { return { query: base_path + path + filter }; });
+                	single_queries = single_paths.map(function (path) { return { query: base_path + path + filter }; });
                 
                 for (q in single_queries) {
-                    raw = getHttpData(url, params.token, single_queries[q]);
-                    obj = Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
+                	raw = getHttpData(url, params.token, single_queries[q]);
+                	obj = Object.assign(obj, singleMetrics(getField(raw, 'timeSeriesData')));
                 }
                 
                 return JSON.stringify(obj);
@@ -7301,110 +7301,110 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'cloudsql.googleapis.com/database/replication/',
-                pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
-                obj = {},
-                base_paths = ['network_lag', 'replica_lag', 'log_archive_failure_count', 'log_archive_success_count'];
+            	pgsql_path = 'cloudsql.googleapis.com/database/postgresql/replication/',
+            	obj = {},
+            	base_paths = ['network_lag', 'replica_lag', 'log_archive_failure_count', 'log_archive_success_count'];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'database_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                metric_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
-                re = /(^t_\d+\.value\.)/g;
+            	filter = ' | within ' + params.time_window + " | filter database_id = '" + params.database_id + "'",
+            	j_filter = filter + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	metric_raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+            	metric_keys = getField(metric_raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	metric_values = getField(metric_raw, 'timeSeriesData.0.pointData.0.values'),
+            	re = /(^t_\d+\.value\.)/g;
             
             for (i in metric_keys) {
-                var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
+            	var value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'];
             
-                for (v in value_types) {
-                    if (typeof metric_values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(metric_keys[i], 'key').replace(re, '')] = metric_values[i][value_types[v]];
-                    }
-                }
+            	for (v in value_types) {
+            		if (typeof metric_values[i][value_types[v]] !== 'undefined') {
+            			obj[getField(metric_keys[i], 'key').replace(re, '')] = metric_values[i][value_types[v]];
+            		}
+            	}
             }
             
             var state_raw = getHttpData(url, params.token, { query: base_path + 'state' + filter }),
-                state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
-                state_tsd = getField(state_raw, 'timeSeriesData');
+            	state_keys = getField(state_raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	state_tsd = getField(state_raw, 'timeSeriesData');
             
             for (i in state_keys) {
-                var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
+            	var state_key = getField(state_keys[i], 'key').replace(/value\./g, '');
             
-                obj[state_key] = 'undefined';
-                for (t in state_tsd) {
-                    if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
-                        obj[state_key] = getField(state_tsd[t], 'labelValues.3.stringValue');
-                        break;
-                    }
-                }
+            	obj[state_key] = 'undefined';
+            	for (t in state_tsd) {
+            		if (getField(state_tsd[t], 'pointData.0.values.' + i + '.boolValue') == true) {
+            			obj[state_key] = getField(state_tsd[t], 'labelValues.3.stringValue');
+            			break;
+            		}
+            	}
             }
             
             var lag_raw = getHttpData(url, params.token, { query: pgsql_path + 'replica_byte_lag' + '| within ' + params.time_window + " | filter replica_name = '" + params.database_id + "'" }),
-                lag_tsd = getField(lag_raw, 'timeSeriesData');
+            	lag_tsd = getField(lag_raw, 'timeSeriesData');
             
             for (t in lag_tsd) {
-                obj[getField(lag_tsd[t], 'labelValues.3.stringValue')] = getField(lag_tsd[t], 'pointData.0.values.0.int64Value');
+            	obj[getField(lag_tsd[t], 'labelValues.3.stringValue')] = getField(lag_tsd[t], 'pointData.0.values.0.int64Value');
             }
             
             return JSON.stringify(obj);
@@ -7521,11 +7521,11 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'Running',
-                      'Syncing',
-                      'Unsynced',
-                      'Stopped',
-                      'Error',
+                  	'Running',
+                  	'Syncing',
+                  	'Unsynced',
+                  	'Stopped',
+                  	'Error',
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -7780,91 +7780,91 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'compute.googleapis.com/instance/disk/',
-                base_paths = ['read_ops_count', 'read_bytes_count', 'write_bytes_count', 'write_ops_count'];
+            	base_paths = ['read_ops_count', 'read_bytes_count', 'write_bytes_count', 'write_ops_count'];
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'instance_id', 'token'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                return params;
+            	['project_id', 'time_window', 'instance_id', 'token'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	return params;
             }
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             var params = checkParams(JSON.parse(value)),
-                j_filter = ' | within ' + params.time_window + " | filter instance_id = '" + params.instance_id + "'" + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
-                metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                time_series = getField(raw, 'timeSeriesData'),
-                arr = [];
+            	j_filter = ' | within ' + params.time_window + " | filter instance_id = '" + params.instance_id + "'" + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	raw = getHttpData(url, params.token, { query: '{' + base_paths.map(function (path) { return base_path + path; }).join(';') + '}' + j_filter }),
+            	metrics = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	time_series = getField(raw, 'timeSeriesData'),
+            	arr = [];
             
             for (t in time_series) {
-                data = {
-                    disk_name: getField(time_series[t], 'labelValues.3.stringValue'),
-                    device_type: getField(time_series[t], 'labelValues.4.stringValue'),
-                    storage_type: getField(time_series[t], 'labelValues.6.stringValue'),
-                    metrics: {}
-                };
+            	data = {
+            		disk_name: getField(time_series[t], 'labelValues.3.stringValue'),
+            		device_type: getField(time_series[t], 'labelValues.4.stringValue'),
+            		storage_type: getField(time_series[t], 'labelValues.6.stringValue'),
+            		metrics: {}
+            	};
             
-                for (i in metrics) {
-                    re = /(^t_\d+\.value(_|\.))/g;
-                    data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
-                }
-                arr.push(data);
+            	for (i in metrics) {
+            		re = /(^t_\d+\.value(_|\.))/g;
+            		data['metrics'][getField(metrics[i], 'key').replace(re, '')] = getField(time_series[t], 'pointData.0.values.' + i + '.int64Value');
+            	}
+            	arr.push(data);
             }
             return JSON.stringify(arr);
           description: 'Disk entities and metrics related to a particular instance.'
@@ -7944,14 +7944,14 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'RUNNING',
-                      'PROVISIONING',
-                      'STAGING',
-                      'STOPPING',
-                      'REPAIRING',
-                      'TERMINATED',
-                      'SUSPENDING',
-                      'SUSPENDED'
+                  	'RUNNING',
+                  	'PROVISIONING',
+                  	'STAGING',
+                  	'STOPPING',
+                  	'REPAIRING',
+                  	'TERMINATED',
+                  	'SUSPENDING',
+                  	'SUSPENDED'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -8055,9 +8055,9 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'passed',
-                      'failed',
-                      'unknown',
+                  	'passed',
+                  	'failed',
+                  	'unknown',
                   ].indexOf(value);
                   return idx !== -1 ? idx : "";
           master_item:
@@ -8087,9 +8087,9 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'passed',
-                      'failed',
-                      'unknown',
+                  	'passed',
+                  	'failed',
+                  	'unknown',
                   ].indexOf(value);
                   return idx !== -1 ? idx : "";
           master_item:
@@ -8228,180 +8228,180 @@ zabbix_export:
           value_type: TEXT
           params: |
             var base_path = 'compute.googleapis.com/',
-                value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'],
-                re = /(^t_\d+\.value\.)/g,
-                obj = {},
-                base_paths = [
-                    'instance/uptime_total',
-                    'firewall/dropped_packets_count',
-                    'firewall/dropped_bytes_count',
-                    'instance/cpu/guest_visible_vcpus',
-                    'instance/cpu/reserved_cores',
-                    'instance/cpu/usage_time',
-                    'instance/cpu/utilization',
-                    'mirroring/mirrored_bytes_count',
-                    'mirroring/mirrored_packets_count'
-                ],
-                e2_paths = [
-                    'instance/cpu/scheduler_wait_time',
-                    'instance/memory/balloon/ram_size',
-                    'instance/memory/balloon/ram_used',
-                    'instance/memory/balloon/swap_in_bytes_count',
-                    'instance/memory/balloon/swap_out_bytes_count',
-                ],
-                net_paths = [
-                    'instance/network/received_packets_count',
-                    'instance/network/received_bytes_count',
-                    'instance/network/sent_bytes_count',
-                    'instance/network/sent_packets_count'
-                ],
-                integrity_paths = [
-                    'instance/integrity/late_boot_validation_status',
-                    'instance/integrity/early_boot_validation_status'
-                ];
+            	value_types = ['int64Value', 'doubleValue', 'stringValue', 'boolValue'],
+            	re = /(^t_\d+\.value\.)/g,
+            	obj = {},
+            	base_paths = [
+            		'instance/uptime_total',
+            		'firewall/dropped_packets_count',
+            		'firewall/dropped_bytes_count',
+            		'instance/cpu/guest_visible_vcpus',
+            		'instance/cpu/reserved_cores',
+            		'instance/cpu/usage_time',
+            		'instance/cpu/utilization',
+            		'mirroring/mirrored_bytes_count',
+            		'mirroring/mirrored_packets_count'
+            	],
+            	e2_paths = [
+            		'instance/cpu/scheduler_wait_time',
+            		'instance/memory/balloon/ram_size',
+            		'instance/memory/balloon/ram_used',
+            		'instance/memory/balloon/swap_in_bytes_count',
+            		'instance/memory/balloon/swap_out_bytes_count',
+            	],
+            	net_paths = [
+            		'instance/network/received_packets_count',
+            		'instance/network/received_bytes_count',
+            		'instance/network/sent_bytes_count',
+            		'instance/network/sent_packets_count'
+            	],
+            	integrity_paths = [
+            		'instance/integrity/late_boot_validation_status',
+            		'instance/integrity/early_boot_validation_status'
+            	];
             
             function getField(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        throw 'Required field "' + path + '" is not present in data received.';
-                    }
-                    data = data[step];
-                }
-                return data;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			throw 'Required field "' + path + '" is not present in data received.';
+            		}
+            		data = data[step];
+            	}
+            	return data;
             }
             
             function getFieldBool(data, path) {
-                var steps = path.split('.');
+            	var steps = path.split('.');
             
-                for (var i = 0; i < steps.length; i++) {
-                    var step = steps[i];
+            	for (var i = 0; i < steps.length; i++) {
+            		var step = steps[i];
             
-                    if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                        return false;
-                    }
-                    data = data[step];
-                }
-                return true;
+            		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            			return false;
+            		}
+            		data = data[step];
+            	}
+            	return true;
             }
             
             function queryMap(array, path, filter) {
-                var query_params = '{' + array.map(function (element) { return path + element; }).join(';') + '}';
-                return { query: query_params + filter }
+            	var query_params = '{' + array.map(function (element) { return path + element; }).join(';') + '}';
+            	return { query: query_params + filter }
             }
             
             function checkParams(params) {
-                ['project_id', 'time_window', 'instance_id', 'token', 'machine_type', 'integrity'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' || params[field].match(/^\{\$.*\}$/)) {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
-                    throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
-                }
-                if (params.integrity !== 'true' && params.integrity !== 'false') {
-                    throw 'Incorrect integrity state definition type. Valid definitions: true/false';
-                }
-                return params;
+            	['project_id', 'time_window', 'instance_id', 'token', 'machine_type', 'integrity'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' || params[field].match(/^\{\$.*\}$/)) {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	if (!params.time_window.match(/^[0-9]+(m|h)$/)) {
+            		throw 'Incorrect update interval for parameter  time_window. Valid ranges 1m-23h.';
+            	}
+            	if (params.integrity !== 'true' && params.integrity !== 'false') {
+            		throw 'Incorrect integrity state definition type. Valid definitions: true/false';
+            	}
+            	return params;
             }
             
             function getHttpData(url, token, body) {
-                var request = new HttpRequest();
-                if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
-                    request.setProxy(params.proxy);
-                };
-                request.addHeader('Authorization: Bearer ' + token);
-                request.addHeader('Content-Type: application/json');
+            	var request = new HttpRequest();
+            	if (typeof params.proxy !== 'undefined' && params.proxy !== '') {
+            		request.setProxy(params.proxy);
+            	};
+            	request.addHeader('Authorization: Bearer ' + token);
+            	request.addHeader('Content-Type: application/json');
             
-                var response = request.post(url, JSON.stringify(body));
+            	var response = request.post(url, JSON.stringify(body));
             
-                Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	Zabbix.log(4, '[ GCP API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from GCP API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from GCP API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof response !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	if (typeof response !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    }
-                    else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
-                return response;
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
+            	return response;
             };
             
             function nestedMap(raw) {
-                var ids = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                    ltsd = getField(raw, 'timeSeriesData'),
-                    result = {};
+            	var ids = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            		ltsd = getField(raw, 'timeSeriesData'),
+            		result = {};
             
-                for (i in ids) {
-                    var id = getField(ids[i], 'key').replace(re, '');
-                    result[id] = {};
-                    for (t in ltsd) {
-                        for (v in value_types) {
-                            if (getFieldBool(ltsd[t], 'pointData.0.values.' + [i] + '.' + [value_types[v]])) {
-                                ['stringValue', 'boolValue'].forEach(function (type) {
-                                    if (getFieldBool(ltsd[t], 'labelValues.4.' + [type])) {
-                                        result[id][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
-                                    }
-                                });
+            	for (i in ids) {
+            		var id = getField(ids[i], 'key').replace(re, '');
+            		result[id] = {};
+            		for (t in ltsd) {
+            			for (v in value_types) {
+            				if (getFieldBool(ltsd[t], 'pointData.0.values.' + [i] + '.' + [value_types[v]])) {
+            					['stringValue', 'boolValue'].forEach(function (type) {
+            						if (getFieldBool(ltsd[t], 'labelValues.4.' + [type])) {
+            							result[id][ltsd[t].labelValues[4][type]] = ltsd[t].pointData[0].values[i][value_types[v]];
+            						}
+            					});
             
-                            }
-                        }
-                    }
-                }
-                return result;
+            				}
+            			}
+            		}
+            	}
+            	return result;
             }
             
             var params = checkParams(JSON.parse(value));
             
             if (params.machine_type.match(/e2.*/)) {
-                base_paths = base_paths.concat(e2_paths);
+            	base_paths = base_paths.concat(e2_paths);
             }
             
             var filter = ' | within ' + params.time_window + " | filter instance_id = '" + params.instance_id + "'",
-                j_filter = filter + ' | join',
-                url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
-                raw = getHttpData(url, params.token, queryMap(base_paths, base_path, j_filter)),
-                keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
-                values = getField(raw, 'timeSeriesData.0.pointData.0.values');
+            	j_filter = filter + ' | join',
+            	url = 'https://monitoring.googleapis.com/v3/projects/' + params.project_id + '/timeSeries:query',
+            	raw = getHttpData(url, params.token, queryMap(base_paths, base_path, j_filter)),
+            	keys = getField(raw, 'timeSeriesDescriptor.pointDescriptors'),
+            	values = getField(raw, 'timeSeriesData.0.pointData.0.values');
             
             for (i in keys) {
-                for (v in value_types) {
-                    if (typeof values[i][value_types[v]] !== 'undefined') {
-                        obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
-                    }
-                }
+            	for (v in value_types) {
+            		if (typeof values[i][value_types[v]] !== 'undefined') {
+            			obj[getField(keys[i], 'key').replace(re, '')] = values[i][value_types[v]];
+            		}
+            	}
             }
             
             if (params.machine_type.match(/e2.*/)) {
-                obj.ram_pused = Math.floor((getField(obj, 'ram_used') / getField(obj, 'ram_size')) * 100);
+            	obj.ram_pused = Math.floor((getField(obj, 'ram_used') / getField(obj, 'ram_size')) * 100);
             }
             
             var mirr_raw = getHttpData(url, params.token, { query: base_path + 'mirroring/dropped_packets_count' + filter }),
-                tsd = getField(mirr_raw, 'timeSeriesData');
+            	tsd = getField(mirr_raw, 'timeSeriesData');
             
             for (t in tsd) {
-                for (v in value_types) {
-                    if (getFieldBool(tsd[t], 'pointData.0.values.0.' + [value_types[v]])) {
-                        obj[getField(tsd[t], 'labelValues.3.stringValue')] = getField(tsd[t], 'pointData.0.values.0.' + [value_types[v]]);
-                    }
-                }
+            	for (v in value_types) {
+            		if (getFieldBool(tsd[t], 'pointData.0.values.0.' + [value_types[v]])) {
+            			obj[getField(tsd[t], 'labelValues.3.stringValue')] = getField(tsd[t], 'pointData.0.values.0.' + [value_types[v]]);
+            		}
+            	}
             }
             
             var net_metrics = getHttpData(url, params.token, queryMap(net_paths, base_path, j_filter));
@@ -8409,22 +8409,22 @@ zabbix_export:
             Object.assign(obj, nestedMap(net_metrics));
             
             if (params.integrity === 'true') {
-                integrity_metrics = getHttpData(url, params.token, queryMap(integrity_paths, base_path, j_filter));
+            	integrity_metrics = getHttpData(url, params.token, queryMap(integrity_paths, base_path, j_filter));
             
-                var keys = getField(integrity_metrics, 'timeSeriesDescriptor.pointDescriptors'),
-                    tsd = getField(integrity_metrics, 'timeSeriesData');
+            	var keys = getField(integrity_metrics, 'timeSeriesDescriptor.pointDescriptors'),
+            		tsd = getField(integrity_metrics, 'timeSeriesData');
             
-                for (i in keys) {
-                    var key = getField(keys[i], 'key').replace(re, '');
+            	for (i in keys) {
+            		var key = getField(keys[i], 'key').replace(re, '');
             
-                    obj[key] = 'undefined';
-                    for (t in tsd) {
-                        if (getField(tsd[t], 'pointData.0.values.' + i + '.int64Value') == 1) {
-                            obj[key] = getField(tsd[t], 'labelValues.4.stringValue');
-                            break;
-                        }
-                    }
-                }
+            		obj[key] = 'undefined';
+            		for (t in tsd) {
+            			if (getField(tsd[t], 'pointData.0.values.' + i + '.int64Value') == 1) {
+            				obj[key] = getField(tsd[t], 'labelValues.4.stringValue');
+            				break;
+            			}
+            		}
+            	}
             }
             
             return JSON.stringify(obj);

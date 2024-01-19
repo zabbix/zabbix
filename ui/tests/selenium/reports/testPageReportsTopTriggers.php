@@ -437,7 +437,7 @@ class testPageReportsTopTriggers extends CWebTest {
 			$this->assertTrue($this->query($selector)->one()->isEnabled($enabled));
 		}
 
-		foreach (['id:from' => 16, 'id:to' => 16] as $input => $value) {
+		foreach (['id:from' => 255, 'id:to' => 255] as $input => $value) {
 			$this->assertEquals($value, $this->query($input)->one()->getAttribute('maxlength'));
 		}
 
@@ -1094,8 +1094,8 @@ class testPageReportsTopTriggers extends CWebTest {
 			[
 				[
 					'date' => [
-						'from' => 'now-1y/y',
-						'to' => 'now-1y/y'
+						'from' => 'now-10y/y',
+						'to' => 'now-10y/y'
 					],
 					'expected' => []
 				]

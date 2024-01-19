@@ -175,9 +175,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -203,9 +203,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -231,9 +231,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -333,9 +333,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -363,9 +363,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -403,9 +403,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -798,11 +798,10 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates total reads
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -903,9 +902,7 @@ zabbix_export:
                 - ''
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //use boottime to calculate uptime
-                  return (Math.floor(Date.now()/1000)-Number(value));
+                - 'return (Math.floor(Date.now() / 1000) - Number(value));'
           master_item:
             key: etcd.get_metrics
           tags:
@@ -959,9 +956,9 @@ zabbix_export:
               parameters:
                 - |
                   var valueArr = JSON.parse(value);
-                  return valueArr.reduce(function(acc,obj){
-                     return acc + parseFloat(obj['value'])
-                  },0);
+                  return valueArr.reduce(function (acc, obj) {
+                  	return acc + parseFloat(obj['value']);
+                  }, 0);
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
@@ -1029,9 +1026,9 @@ zabbix_export:
                   parameters:
                     - |
                       var valueArr = JSON.parse(value);
-                      return valueArr.reduce(function(acc,obj){
-                         return acc + parseFloat(obj['value'])
-                      },0);
+                      return valueArr.reduce(function (acc, obj) {
+                      	return acc + parseFloat(obj['value']);
+                      }, 0);
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
@@ -1061,14 +1058,14 @@ zabbix_export:
               parameters:
                 - |
                   var data = JSON.parse(value),
-                      lookup = {},
-                      result = [];
+                  	lookup = {},
+                  	result = [];
                   for (var item, i = 0; item = data[i++];) {
-                    var code = item.labels.grpc_code;
-                    if (!(code in lookup)) {
-                      lookup[code] = 1;
-                      result.push({ "{#GRPC.CODE}": code });
-                    }
+                  	var code = item.labels.grpc_code;
+                  	if (!(code in lookup)) {
+                  		lookup[code] = 1;
+                  		result.push({ "{#GRPC.CODE}": code });
+                  	}
                   }
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
