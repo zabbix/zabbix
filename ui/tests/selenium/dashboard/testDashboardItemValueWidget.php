@@ -3539,7 +3539,6 @@ class testDashboardItemValueWidget extends testWidgets {
 				]
 			],
 			// Non numeric (Text) item with aggregation function 'last' and Custom time period.
-
 			[
 				[
 					'fields' => [
@@ -3568,12 +3567,301 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected_value' => 'text 2',
 					'arrow' => 'up-down'
 				]
+			],
+			// Numeric (unsigned) item with aggregation function 'avg', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h',
+						'id:time_period_to' => 'now',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '3',
+									'avg' => '4',
+									'min' => '2',
+									'max' => '7'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '5',
+									'avg' => '5',
+									'min' => '1',
+									'max' => '8'
+								]
+							],
+							'time' => '-1 hour'
+						]
+					],
+					'expected_value' => '4.00',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (float) item with aggregation function 'min', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2h',
+						'id:time_period_to' => 'now-1h',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '10',
+									'avg' => '3.33',
+									'min' => '1.11',
+									'max' => '5.55'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '11',
+									'avg' => '2.22',
+									'min' => '1.51',
+									'max' => '3.33'
+								]
+							],
+							'time' => '-1 hour'
+						],
+						[
+							'value' => [
+								[
+									'num' => '51',
+									'avg' => '5.55',
+									'min' => '1.09',
+									'max' => '8.88'
+								]
+							],
+							'time' => '-2 hours'
+						]
+					],
+					'expected_value' => '1.51',
+					'arrow' => 'up'
+				]
+			],
+			// Numeric (float) item with aggregation function 'max', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-3h',
+						'id:time_period_to' => 'now-2h',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '101',
+									'avg' => '5.89',
+									'min' => '1.77',
+									'max' => '11.10'
+								]
+							],
+							'time' => '-2 hours'
+						],
+						[
+							'value' => [
+								[
+									'num' => '101',
+									'avg' => '5.87',
+									'min' => '1.05',
+									'max' => '11.11'
+								]
+							],
+							'time' => '-3 hours'
+						]
+					],
+					'expected_value' => '11.10',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'count', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h',
+						'id:time_period_to' => 'now',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '7',
+									'avg' => '5',
+									'min' => '1',
+									'max' => '8'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '9',
+									'avg' => '3',
+									'min' => '2',
+									'max' => '7'
+								]
+							],
+							'time' => '-1 hour'
+						]
+					],
+					'expected_value' => '7.00', // num result.
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (float) item with aggregation function 'sum', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2d',
+						'id:time_period_to' => 'now-1d',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '5',
+									'avg' => '3.33',
+									'min' => '1.11',
+									'max' => '55.55'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '7',
+									'avg' => '7.77',
+									'min' => '3.33',
+									'max' => '11.11'
+								]
+							],
+							'time' => '-1 day'
+						]
+					],
+					'expected_value' => '54.39' // num * avg result.
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'first', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2w',
+						'id:time_period_to' => 'now-1w',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '168',
+									'avg' => '8',
+									'min' => '2',
+									'max' => '14'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '336',
+									'avg' => '6',
+									'min' => '4',
+									'max' => '8'
+								]
+							],
+							'time' => '-1 week'
+						]
+					],
+					'expected_value' => '6.00' // avg result.
+				]
+			],
+			// Numeric (float) item with aggregation function 'last', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1w',
+						'id:time_period_to' => 'now',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '168',
+									'avg' => '8.11',
+									'min' => '2.58',
+									'max' => '17.89'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '336',
+									'avg' => '6.78',
+									'min' => '4.13',
+									'max' => '8.09'
+								]
+							],
+							'time' => '-1 week'
+						]
+					],
+					'expected_value' => '8.11', // avg result.
+					'arrow' => 'up'
+				]
 			]
 		];
 	}
 
 	/**
-	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
+	 * @backup !history, !history_log, !history_str, !history_text, !history_uint, !trends_uint, !trends
 	 *
 	 * @dataProvider getAggregationFunctionData
 	 */
