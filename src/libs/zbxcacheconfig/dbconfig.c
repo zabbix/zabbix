@@ -51,6 +51,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxkvs.h"
+#include "zbxcachevalue.h"
 
 int	sync_in_progress = 0;
 
@@ -2835,7 +2836,7 @@ do													\
 while(0)
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids)
+		zbx_vector_uint64_t *deleted_itemids, zbx_vector_uint64_t *new_itemids)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2975,6 +2976,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			item->preproc_item = NULL;
 			item->master_item = NULL;
+
+			if (NULL != new_itemids)
+				zbx_vector_uint64_append(new_itemids, itemid);
 		}
 		else
 		{
@@ -7349,12 +7353,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_uint64_t	update_flags = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
-	zbx_hashset_t		trend_queue;
-	zbx_vector_uint64_t	active_avail_diff;
-	zbx_hashset_t		activated_hosts;
-	zbx_uint64_t		new_revision = config->revision.config + 1;
-	int			connectors_num = 0;
-	zbx_hashset_t		psk_owners;
+	zbx_hashset_t			trend_queue;
+	zbx_vector_uint64_t		active_avail_diff;
+	zbx_hashset_t			activated_hosts;
+	zbx_uint64_t			new_revision = config->revision.config + 1;
+	int				connectors_num = 0;
+	zbx_hashset_t			psk_owners;
+	zbx_vector_dc_item_ptr_t	new_items, *pnew_items = NULL;
+	zbx_vector_uint64_pair_t	vc_items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -7370,7 +7376,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		dc_load_trigger_queue(&trend_queue);
 	}
 	else if (ZBX_DBSYNC_STATUS_INITIALIZED != sync_status)
+	{
 		changelog_sync_mode = ZBX_DBSYNC_INIT;
+	}
+	else
+	{
+		zbx_vector_dc_item_ptr_create(&new_items);
+		pnew_items = &new_items;
+	}
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
@@ -7675,7 +7688,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids);
+	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -8217,7 +8230,36 @@ out:
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
+	if (ZBX_DBSYNC_INIT != mode && 0 != new_items.values_num)
+	{
+		zbx_vector_uint64_pair_create(&vc_items);
+		zbx_vector_uint64_pair_reserve(&vc_items, new_items.values_num);
+
+		for (i = 0; i < new_items.values_num; i++)
+		{
+			if (NULL != new_items.values[i]->triggers)
+			{
+				zbx_uint64_pair_t	pair = {
+						.first = new_items.values[i]->itemid,
+						.second = (zbx_uint64_t)new_items.values[i]->value_type
+				};
+
+				zbx_vector_uint64_append_ptr(&vc_items, &pair);
+			}
+		}
+	}
+
 	FINISH_SYNC;
+
+	if (NULL != pnew_items)
+	{
+		if (0 != new_items.values_num)
+		{
+			zbx_vc_add_new_items(&vc_items);
+			zbx_vector_uint64_pair_destroy(&vc_items);
+		}
+		zbx_vector_dc_item_ptr_destroy(&new_items);
+	}
 
 #ifdef HAVE_ORACLE
 	if (ZBX_DB_OK == dberr)
