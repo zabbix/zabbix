@@ -1435,34 +1435,32 @@ int	vmware_pnic_compare(const void *v1, const void *v2)
 	return strcmp(nic1->name, nic2->name);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieves a list of vmware service clusters and resource pools    *
- *                                                                            *
- * Parameters: service       - [IN] the vmware service                        *
- *             easyhandle    - [IN] the CURL handle                           *
- *             cluster_data  - [OUT] a pointer to the output variable         *
- *             clusters      - [OUT] a pointer to the resulting clusters      *
- *                              vector                                        *
- *             rp_chunks     - [OUT] a pointer to the resulting resource pool *
- *                              vector                                        *
- *             alarms_data   - [OUT] the vector with all alarms               *
- *             error         - [OUT] the error message in the case of failure *
- *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
- *                                                                            *
- ******************************************************************************/
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: retrieves list of vmware service clusters and resource pools       *
+ *                                                                             *
+ * Parameters: service       - [IN] vmware service                             *
+ *             easyhandle    - [IN] CURL handle                                *
+ *             cluster_data  - [OUT] pointer to output variable                *
+ *             clusters      - [OUT] pointer to resulting clusters vector      *
+ *             rp_chunks     - [OUT] pointer to resulting resource pool vector *
+ *             alarms_data   - [OUT] vector with all alarms                    *
+ *             error         - [OUT] error message in case of failure          *
+ *                                                                             *
+ * Return value: SUCCEED - operation has completed successfully                *
+ *               FAIL    - operation has failed                                *
+ *                                                                             *
+ *******************************************************************************/
 static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CURL *easyhandle,
-		xmlDoc *cluster_data, zbx_vector_ptr_t *clusters, zbx_vector_vmware_rpool_chunk_t *rp_chunks,
-		zbx_vmware_alarms_data_t *alarms_data, char **error)
+		xmlDoc *cluster_data, zbx_vector_vmware_cluster_ptr_t *clusters,
+		zbx_vector_vmware_rpool_chunk_t *rp_chunks, zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
 #define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
 #define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
 
-	int			ret, i;
+	int			ret;
 	char			*id_esc, tmp[MAX_STRING_LEN * 2];
 	zbx_vmware_cluster_t	*cluster;
 	zbx_vector_str_t	rp_ids, ids;
@@ -1473,9 +1471,9 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 	zbx_vector_str_create(&ids);
 
 	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_CLUSTER), &ids);
-	zbx_vector_ptr_reserve(clusters, (size_t)(clusters->values_alloc + ids.values_num));
+	zbx_vector_vmware_cluster_ptr_reserve(clusters, (size_t)(clusters->values_alloc + ids.values_num));
 
-	for (i = 0; i < ids.values_num; i++)
+	for (int i = 0; i < ids.values_num; i++)
 	{
 		char	*name;
 
@@ -1507,14 +1505,14 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 			goto out;
 		}
 
-		zbx_vector_ptr_append(clusters, cluster);
+		zbx_vector_vmware_cluster_ptr_append(clusters, cluster);
 	}
 
 	zbx_vector_str_create(&rp_ids);
 	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_RESOURCEPOOL), &rp_ids);
 	zbx_vector_vmware_rpool_chunk_reserve(rp_chunks, (size_t)(rp_chunks->values_num + rp_ids.values_num));
 
-	for (i = 0; i < rp_ids.values_num; i++)
+	for (int i = 0; i < rp_ids.values_num; i++)
 	{
 		zbx_vmware_rpool_chunk_t	*rp_chunk;
 
@@ -1827,11 +1825,11 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int				i, ret = FAIL;
+	int				ret = FAIL;
 	xmlDoc				*cluster_data = NULL;
 	zbx_property_collection_iter	*iter = NULL;
 	zbx_vector_vmware_rpool_chunk_t	rp_chunks;
-	zbx_vector_ptr_t		cl_chunks;
+	zbx_vector_vmware_cluster_ptr_t	cl_chunks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1842,7 +1840,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	}
 
 	zbx_vector_vmware_rpool_chunk_create(&rp_chunks);
-	zbx_vector_ptr_create(&cl_chunks);
+	zbx_vector_vmware_cluster_ptr_create(&cl_chunks);
 
 	if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, &cl_chunks, &rp_chunks,
 			alarms_data, error))
@@ -1867,7 +1865,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 	zbx_vector_vmware_rpool_chunk_sort(&rp_chunks, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
-	for (i = 0; i < rp_chunks.values_num; i++)
+	for (int i = 0; i < rp_chunks.values_num; i++)
 	{
 		int				k;
 		zbx_vmware_resourcepool_t	*rpool;
@@ -1913,7 +1911,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	zbx_vector_vmware_resourcepool_sort(resourcepools, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 	zbx_vector_vmware_cluster_ptr_reserve(clusters, (size_t)(clusters->values_alloc + cl_chunks.values_num));
 
-	for (i = cl_chunks.values_num - 1; i >= 0 ; i--)
+	for (int i = cl_chunks.values_num - 1; i >= 0 ; i--)
 	{
 		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t*)(cl_chunks.values[i]);
 
@@ -1921,7 +1919,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 			goto clean;
 
 		zbx_vector_vmware_cluster_ptr_append(clusters, cluster);
-		zbx_vector_ptr_remove_noorder(&cl_chunks, i);
+		zbx_vector_vmware_cluster_ptr_remove_noorder(&cl_chunks, i);
 	}
 
 	ret = SUCCEED;
@@ -1929,8 +1927,8 @@ clean:
 	zbx_xml_free_doc(cluster_data);
 	zbx_vector_vmware_rpool_chunk_clear_ext(&rp_chunks, vmware_rp_chunk_free);
 	zbx_vector_vmware_rpool_chunk_destroy(&rp_chunks);
-	zbx_vector_ptr_clear_ext(&cl_chunks, (zbx_clean_func_t)vmware_cluster_free);
-	zbx_vector_ptr_destroy(&cl_chunks);
+	zbx_vector_vmware_cluster_ptr_clear_ext(&cl_chunks, vmware_cluster_free);
+	zbx_vector_vmware_cluster_ptr_destroy(&cl_chunks);
 out:
 	zbx_property_collection_free(iter);
 
