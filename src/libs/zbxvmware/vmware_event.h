@@ -25,8 +25,6 @@
 
 #include "zbxvmware.h"
 
-#include "zbxalgo.h"
-
 void	vmware_event_free(zbx_vmware_event_t *event);
 int	vmware_service_get_evt_severity(zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vector_vmware_key_value_t *evt_severities, char **error);

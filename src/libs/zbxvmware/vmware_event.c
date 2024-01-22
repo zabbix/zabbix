@@ -25,6 +25,7 @@
 #include "zbxshmem.h"
 #include "zbxnix.h"
 #include "zbxxml.h"
+#include "zbxalgo.h"
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
