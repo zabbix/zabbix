@@ -1959,11 +1959,11 @@ out:
 static int	vmware_service_initialize(zbx_vmware_service_t *service, CURL *easyhandle, char **error)
 {
 	char				*version_without_major, *version_update, *version = NULL, *fullname = NULL;
-	zbx_vector_ptr_t		counters;
+	zbx_vector_vmware_counter_ptr_t	counters;
 	zbx_vector_vmware_key_value_t	evt_severities;
 	int				ret = FAIL;
 
-	zbx_vector_ptr_create(&counters);
+	zbx_vector_vmware_counter_ptr_create(&counters);
 	zbx_vector_vmware_key_value_create(&evt_severities);
 
 	if (SUCCEED != vmware_service_get_contents(easyhandle, &version, &fullname, error))
@@ -2053,8 +2053,8 @@ out:
 	zbx_free(version);
 	zbx_free(fullname);
 
-	zbx_vector_ptr_clear_ext(&counters, (zbx_mem_free_func_t)vmware_counter_free);
-	zbx_vector_ptr_destroy(&counters);
+	zbx_vector_vmware_counter_ptr_clear_ext(&counters, vmware_counter_free);
+	zbx_vector_vmware_counter_ptr_destroy(&counters);
 	zbx_vector_vmware_key_value_clear_ext(&evt_severities, zbx_vmware_key_value_free);
 	zbx_vector_vmware_key_value_destroy(&evt_severities);
 

@@ -79,16 +79,19 @@ typedef struct
 }
 zbx_vmware_counter_t;
 
+ZBX_PTR_VECTOR_DECL(vmware_counter_ptr, zbx_vmware_counter_t *)
+
 zbx_hash_t	vmware_counter_hash_func(const void *data);
 int	vmware_counter_compare_func(const void *d1, const void *d2);
 zbx_hash_t	vmware_perf_entity_hash_func(const void *data);
 int	vmware_perf_entity_compare_func(const void *d1, const void *d2);
-void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr_t *src);
+void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_vmware_counter_ptr_t *src);
 void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pairs);
 void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity);
 void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter);
 void	vmware_counter_free(zbx_vmware_counter_t *counter);
-int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle, zbx_vector_ptr_t *counters, char **error);
+int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vector_vmware_counter_ptr_t *counters, char **error);
 void	vmware_service_update_perf_entities(zbx_vmware_service_t *service);
 
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,

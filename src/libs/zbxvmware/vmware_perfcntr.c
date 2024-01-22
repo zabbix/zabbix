@@ -40,6 +40,7 @@
 ZBX_VECTOR_IMPL(uint16, uint16_t)
 ZBX_PTR_VECTOR_IMPL(perf_available, zbx_vmware_perf_available_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_perf_value_ptr, zbx_vmware_perf_value_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_counter_ptr, zbx_vmware_counter_t *)
 
 #define ZBX_XPATH_REFRESHRATE()						\
 	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
@@ -168,13 +169,12 @@ static void	vmware_free_perfdata(zbx_vmware_perf_data_t *data)
  *                                                                            *
  * Purpose: copies performance counter vector into shared memory hashset      *
  *                                                                            *
- * Parameters: dst - [IN] the destination hashset                             *
- *             src - [IN] the source vector                                   *
+ * Parameters: dst - [IN] destination hashset                                 *
+ *             src - [IN] source vector                                       *
  *                                                                            *
  ******************************************************************************/
-void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr_t *src)
+void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_vmware_counter_ptr_t *src)
 {
-	int			i;
 	zbx_vmware_counter_t	*csrc, *cdst;
 
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
@@ -183,9 +183,9 @@ void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_ptr_t *src
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < src->values_num; i++)
+	for (int i = 0; i < src->values_num; i++)
 	{
-		csrc = (zbx_vmware_counter_t *)src->values[i];
+		csrc = src->values[i];
 
 		cdst = (zbx_vmware_counter_t *)zbx_hashset_insert(dst, csrc, sizeof(zbx_vmware_counter_t));
 
@@ -366,19 +366,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the performance counter ids                                   *
+ * Purpose: gets performance counter ids                                      *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             counters     - [IN/OUT] the vector the created performance     *
- *                                     counter object should be added to      *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             counters     - [IN/OUT] vector, created performance counter    *
+ *                                     object should be added to              *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
-int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle, zbx_vector_ptr_t *counters, char **error)
+int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle,
+		zbx_vector_vmware_counter_ptr_t *counters, char **error)
 {
 #	define ZBX_POST_VMWARE_GET_PERFCOUNTER							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -437,7 +438,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
-	int		i, ret = FAIL;
+	int		ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -463,9 +464,9 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 	}
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_ptr_reserve(counters, (size_t)(2 * nodeset->nodeNr + counters->values_alloc));
+	zbx_vector_vmware_counter_ptr_reserve(counters, (size_t)(2 * nodeset->nodeNr + counters->values_alloc));
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		zbx_vmware_counter_t	*counter;
 
@@ -494,7 +495,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 						" type of unitInfo:%s", counter->id, unit);
 			}
 
-			zbx_vector_ptr_append(counters, counter);
+			zbx_vector_vmware_counter_ptr_append(counters, counter);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "adding performance counter %s:" ZBX_FS_UI64, counter->path,
 					counter->id);
@@ -514,7 +515,7 @@ int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyha
 						" type of unitInfo:%s", counter->id, unit);
 			}
 
-			zbx_vector_ptr_append(counters, counter);
+			zbx_vector_vmware_counter_ptr_append(counters, counter);
 
 			zabbix_log(LOG_LEVEL_DEBUG, "adding performance counter %s:" ZBX_FS_UI64, counter->path,
 					counter->id);
