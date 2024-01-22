@@ -67,7 +67,7 @@ class CWebUser {
 				throw new Exception();
 			}
 
-			if (self::$data['mfaid'] == null && isset(self::$data['attempt_failed']) && self::$data['attempt_failed']) {
+			if (self::$data['mfaid'] == 0 && isset(self::$data['attempt_failed']) && self::$data['attempt_failed']) {
 				CProfile::init();
 				CProfile::update('web.login.attempt.failed', self::$data['attempt_failed'], PROFILE_TYPE_INT);
 				CProfile::update('web.login.attempt.ip', self::$data['attempt_ip'], PROFILE_TYPE_STR);

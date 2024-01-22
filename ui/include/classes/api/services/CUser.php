@@ -1659,11 +1659,11 @@ class CUser extends CApiService {
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
 
-		if ($db_user['attempt_failed'] != 0 && $db_user['mfaid'] === null) {
+		if ($db_user['attempt_failed'] != 0 && $db_user['mfaid'] == 0) {
 			self::resetFailedLoginAttempts($db_user);
 		}
 
-		if ($db_user['mfaid'] == null) {
+		if ($db_user['mfaid'] == 0) {
 			self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 		}
 
@@ -1863,7 +1863,7 @@ class CUser extends CApiService {
 		$db_user['debug_mode'] = GROUP_DEBUG_MODE_DISABLED;
 		$db_user['deprovisioned'] = false;
 		$db_user['gui_access'] = GROUP_GUI_ACCESS_SYSTEM;
-		$db_user['mfaid'] = null;
+		$db_user['mfaid'] = 0;
 
 		$group_auth_type = self::getAuthTypeByGuiAccess($db_user['gui_access']);
 		$group_status = GROUP_STATUS_ENABLED;
@@ -1940,7 +1940,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		if ($mfa_status == MFA_ENABLED && $db_user['mfaid'] === null && $mfaids) {
+		if ($mfa_status == MFA_ENABLED && $db_user['mfaid'] === 0 && $mfaids) {
 			$db_mfas = DB::select('mfa', [
 				'output' => ['mfaid', 'name'],
 				'mfaids' => array_keys($mfaids),
@@ -2115,7 +2115,7 @@ class CUser extends CApiService {
 		$db_user['secret'] = CEncryptHelper::generateKey();
 		$session_status = ZBX_SESSION_ACTIVE;
 
-		if (array_key_exists('mfaid', $db_user) && $db_user['mfaid'] !== null) {
+		if (array_key_exists('mfaid', $db_user) && $db_user['mfaid'] != 0) {
 			$session_status = ZBX_SESSION_VERIFICATION_REQUIRED;
 		}
 
