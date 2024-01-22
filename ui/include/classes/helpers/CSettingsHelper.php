@@ -154,7 +154,7 @@ class CSettingsHelper {
 			self::$params_private = CSettings::getPrivate();
 		}
 
-		$supported_params = array_diff_key(self::$params_private, array_flip([self::SESSION_KEY]));
+		$supported_params = array_intersect_key(self::$params_private, array_flip([self::SESSION_KEY]));
 
 		return array_key_exists($field, $supported_params) ? $supported_params[$field] : null;
 	}
