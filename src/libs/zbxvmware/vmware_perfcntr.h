@@ -27,6 +27,17 @@
 
 #include "zbxalgo.h"
 
+/* performance counter value for a specific instance */
+typedef struct
+{
+	zbx_uint64_t	counterid;
+	char		*instance;
+	zbx_uint64_t	value;
+}
+zbx_vmware_perf_value_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_perf_value_ptr, zbx_vmware_perf_value_t *)
+
 /* performance data for a performance collector entity */
 typedef struct
 {
@@ -36,13 +47,15 @@ typedef struct
 	/* entity id */
 	char			*id;
 
-	/* the performance counter values (see zbx_vmware_perfvalue_t) */
-	zbx_vector_ptr_t	values;
+	/* the performance counter values */
+	zbx_vector_vmware_perf_value_ptr_t	values;
 
 	/* error information */
 	char			*error;
 }
 zbx_vmware_perf_data_t;
+
+ZBX_PTR_VECTOR_DECL(vmware_perf_data_ptr, zbx_vmware_perf_data_t *)
 
 /* VMware performance counters available per object (information cache) */
 ZBX_VECTOR_DECL(uint16, uint16_t)
@@ -65,15 +78,6 @@ typedef struct
 	int		unit;
 }
 zbx_vmware_counter_t;
-
-/* performance counter value for a specific instance */
-typedef struct
-{
-	zbx_uint64_t	counterid;
-	char		*instance;
-	zbx_uint64_t	value;
-}
-zbx_vmware_perf_value_t;
 
 zbx_hash_t	vmware_counter_hash_func(const void *data);
 int	vmware_counter_compare_func(const void *d1, const void *d2);
