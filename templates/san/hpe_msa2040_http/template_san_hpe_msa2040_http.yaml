@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:59:47Z'
+  date: '2024-01-22T16:05:45Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -90,36 +90,36 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                fields = ['username', 'password', 'base_url'],
-                methods = [
-                    'system',
-                    'controllers',
-                    'controller-statistics',
-                    'frus',
-                    'disk-groups',
-                    'disk-group-statistics',
-                    'disks',
-                    'enclosures',
-                    'fans',
-                    'pools',
-                    'ports',
-                    'power-supplies',
-                    'volumes',
-                    'volume-statistics'
-                ],
-                data_tmp = {},
-                result_tmp = {},
-                session_key,
-                data = {};
+            	fields = ['username', 'password', 'base_url'],
+            	methods = [
+            		'system',
+            		'controllers',
+            		'controller-statistics',
+            		'frus',
+            		'disk-groups',
+            		'disk-group-statistics',
+            		'disks',
+            		'enclosures',
+            		'fans',
+            		'pools',
+            		'ports',
+            		'power-supplies',
+            		'volumes',
+            		'volume-statistics'
+            	],
+            	data_tmp = {},
+            	result_tmp = {},
+            	session_key,
+            	data = {};
             
             fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
+            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            		throw 'Required param is not set: "' + field + '".';
+            	}
             });
             
             if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
+            	params.base_url += '/';
             }
             
             var response, request = new HttpRequest();
@@ -129,24 +129,24 @@ zabbix_export:
             response = request.get(params.base_url + 'api/login/' + auth_string);
             
             if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Authentication request has failed with status code ' + request.getStatus() + ': ' + response;
+            	throw 'Authentication request has failed with status code ' + request.getStatus() + ': ' + response;
             }
             
             if (response !== null) {
-                try {
-                    session_key = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="response"]/text()');
-                    return_code = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="return-code"]/text()');
-                }
-                catch (error) {
-                    throw 'Failed to parse authentication response received from device API.';
-                }
+            	try {
+            		session_key = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="response"]/text()');
+            		return_code = XML.query(response, '/RESPONSE/OBJECT/PROPERTY[@name="return-code"]/text()');
+            	}
+            	catch (error) {
+            		throw 'Failed to parse authentication response received from device API.';
+            	}
             }
             
             if (return_code != '1') {
-                throw 'Authentication failed.'
+            	throw 'Authentication failed.';
             }
             else if (session_key === '') {
-                throw 'Failed to retrieve session key from authentication response.';
+            	throw 'Failed to retrieve session key from authentication response.';
             }
             
             request.clearHeader();
@@ -156,59 +156,59 @@ zabbix_export:
             data.errors = [];
             
             methods.forEach(function (method) {
-                response = request.get(params.base_url + 'api/show/' + method);
-                method_error = '';
+            	response = request.get(params.base_url + 'api/show/' + method);
+            	method_error = '';
             
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
-                    data.errors.push(method_error);
-                    return;
-                }
+            	if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            		method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
+            		data.errors.push(method_error);
+            		return;
+            	}
             
-                if (response !== null) {
-                    try {
-                        result_tmp = JSON.parse(XML.toJson(response));
-                        data[method] = [];
+            	if (response !== null) {
+            		try {
+            			result_tmp = JSON.parse(XML.toJson(response));
+            			data[method] = [];
             
-                        result_tmp.RESPONSE.OBJECT.forEach(function (object) {
-                            var data_tmp = {};
+            			result_tmp.RESPONSE.OBJECT.forEach(function (object) {
+            				var data_tmp = {};
             
-                            if (object['@basetype'] !== 'status' && object['@basetype'] !== 'enclosure-sku') {
-                                object.PROPERTY.forEach(function (property) {
-                                    name = property['@name'];
-                                    value = property['#text'] || '';
-                                    data_tmp[name] = value;
-                                });
-                
-                                if (method == 'controller-statistics') {
-                                    data_tmp['durable-id'] = data_tmp['durable-id'].toLowerCase();
-                                }
+            				if (object['@basetype'] !== 'status' && object['@basetype'] !== 'enclosure-sku') {
+            					object.PROPERTY.forEach(function (property) {
+            						name = property['@name'];
+            						value = property['#text'] || '';
+            						data_tmp[name] = value;
+            					});
             
-                                data[method].push(data_tmp);
-                            }
-                        });
-                    }
-                    catch (error) {
-                        method_error = 'Method: ' + method + '. Failed to parse response received from device API.';
-                    }
-                }
-                else {
-                    method_error = 'Method: ' + method + '. No data received by request.';
-                }
+            					if (method == 'controller-statistics') {
+            						data_tmp['durable-id'] = data_tmp['durable-id'].toLowerCase();
+            					}
             
-                if (method_error.length > 0) {
-                    data.errors.push(method_error);
-                }
+            					data[method].push(data_tmp);
+            				}
+            			});
+            		}
+            		catch (error) {
+            			method_error = 'Method: ' + method + '. Failed to parse response received from device API.';
+            		}
+            	}
+            	else {
+            		method_error = 'Method: ' + method + '. No data received by request.';
+            	}
+            
+            	if (method_error.length > 0) {
+            		data.errors.push(method_error);
+            	}
             });
             
             if (data.errors.length == 0) {
-                data.errors = '';
+            	data.errors = '';
             }
             
             response = request.get(params.base_url + 'api/exit');
             
             if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
+            	throw 'Logout request failed with status code ' + request.getStatus() + ': ' + response;
             }
             
             return JSON.stringify(data);
@@ -2854,19 +2854,19 @@ zabbix_export:
                   parameters:
                     - |
                       if (value == 'Absent') {
-                          return 2;
+                      	return 2;
                       }
                       else if (value == 'Fault') {
-                          return 1;
+                      	return 1;
                       }
                       else if (value == 'Invalid Data') {
-                          return 0;
+                      	return 0;
                       }
                       else if (value == 'OK') {
-                          return 4;
+                      	return 4;
                       }
                       else if (value == 'Not Available') {
-                          return 5;
+                      	return 5;
                       }
                       return 6;
               master_item:
