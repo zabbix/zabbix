@@ -5550,7 +5550,7 @@ static zbx_uint64_t	permission_hgset_add(const char *hash_str, zbx_vector_uint64
 
 		permission_last = &permissions.values[permissions.values_num - 1];
 
-		if (0 != permission_last->permission && permission_last->permission < permission.permission)
+		if (PERM_DENY != permission_last->permission && permission_last->permission < permission.permission)
 			permission_last->permission = permission.permission;
 	}
 	zbx_db_free_result(result);
@@ -5562,7 +5562,7 @@ static zbx_uint64_t	permission_hgset_add(const char *hash_str, zbx_vector_uint64
 	{
 		zbx_hgset_permission_t	*permission = &permissions.values[i];
 
-		if (0 != permission->permission)
+		if (PERM_DENY != permission->permission)
 			zbx_db_insert_add_values(&db_insert, permission->ugsetid, hgsetid, permission->permission);
 	}
 
@@ -6585,7 +6585,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 				{
 					int	*permission_old = &permissions.values[j].permission;
 
-					if (0 != *permission_old && (0 == prm.permission ||
+					if (PERM_DENY != *permission_old && (PERM_DENY == prm.permission ||
 							*permission_old < prm.permission))
 					{
 						*permission_old = prm.permission;
@@ -6603,7 +6603,7 @@ void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids)
 		{
 			zbx_host_permission_t	*permission = &permissions.values[i];
 
-			if (0 < permission->permission)
+			if (PERM_DENY < permission->permission)
 			{
 				zbx_db_insert_add_values(&db_insert, permission->ugsetid, permission->hgsetid,
 						permission->permission);

@@ -1543,8 +1543,11 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 			{
 				int	*permission_old = &permissions->values[j].permission;
 
-				if (0 != *permission_old && (0 == prm.permission || *permission_old < prm.permission))
+				if (PERM_DENY != *permission_old && (PERM_DENY == prm.permission ||
+						*permission_old < prm.permission))
+				{
 					*permission_old = prm.permission;
+				}
 			}
 			else
 				zbx_vector_lld_permission_append(permissions, prm);
@@ -1554,7 +1557,7 @@ static void	lld_permissions_make(zbx_vector_lld_permission_t *permissions, zbx_v
 
 	for (i = 0; i < permissions->values_num; i++)
 	{
-		if (0 == permissions->values[i].permission)
+		if (PERM_DENY == permissions->values[i].permission)
 			zbx_vector_lld_permission_remove_noorder(permissions, i--);
 	}
 
