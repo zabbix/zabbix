@@ -447,7 +447,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: read event data by id from XML and put to array of events         *
+ * Purpose: reads event data by id from XML and put to array of events        *
  *                                                                            *
  * Parameters: events         - [IN/OUT] array of parsed events               *
  *             xml_event      - [IN] XML node and id of parsed event          *
@@ -457,9 +457,10 @@ out:
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
+ *                                                                            *
  ******************************************************************************/
-static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnode_t xml_event, xmlDoc *xdoc,
-		const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz)
+static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_id_xmlnode_t xml_event,
+		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz)
 {
 #	define	ZBX_XPATH_EVT_INFO(param)									\
 		"*[local-name()='" param "']/*[local-name()='name']"
@@ -589,7 +590,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 	event->timestamp = timestamp;
 	event->message = evt_msg_strpool_strdup(message, &sz);
 	zbx_free(message);
-	zbx_vector_ptr_append(events, event);
+	zbx_vector_vmware_event_ptr_append(events, event);
 
 	if (0 < sz)
 		*alloc_sz += zbx_shmem_required_chunk_size(sz);
@@ -602,7 +603,7 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse multiple events data                                        *
+ * Purpose: parses multiple events data                                       *
  *                                                                            *
  * Parameters: events         - [IN/OUT] array of parsed events               *
  *             last_key       - [IN] key of last parsed event                 *
@@ -612,16 +613,17 @@ static int	vmware_service_put_event_data(zbx_vector_ptr_t *events, zbx_id_xmlnod
  *             alloc_sz       - [OUT] allocated memory size for events        *
  *             node_count     - [OUT] count of XML event nodes                *
  *                                                                            *
- * Return value: Count of events successfully parsed                          *
+ * Return value: count of events successfully parsed                          *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_t last_key, const int is_prop,
-		xmlDoc *xdoc, const zbx_vmware_eventlog_state_t *eventlog, zbx_uint64_t *alloc_sz, int *node_count)
+static int	vmware_service_parse_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t last_key,
+		const int is_prop, xmlDoc *xdoc, const zbx_vmware_eventlog_state_t *eventlog, zbx_uint64_t *alloc_sz,
+		int *node_count)
 {
 #	define LAST_KEY(evs)	(((const zbx_vmware_event_t *)evs->values[evs->values_num - 1])->key)
 
 	zbx_vector_id_xmlnode_t	ids;
-	int			i, parsed_num = 0;
+	int			parsed_num = 0;
 	char			*value;
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
@@ -656,7 +658,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	if (NULL != node_count)
 		*node_count = nodeset->nodeNr;
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		zbx_id_xmlnode_t	xml_event;
 		zbx_uint64_t		key;
@@ -692,7 +694,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 	if (0 != ids.values_num)
 	{
 		zbx_vector_id_xmlnode_sort(&ids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_ptr_reserve(events, (size_t)(ids.values_num + events->values_alloc));
+		zbx_vector_vmware_event_ptr_reserve(events, (size_t)(ids.values_num + events->values_alloc));
 
 		/* validate that last event from "latestPage" is connected with first event from ReadPreviousEvents */
 		if (0 != events->values_num && LAST_KEY(events) != ids.values[ids.values_num -1].id + 1)
@@ -705,12 +707,12 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 			/* if sequence of events is not continuous, ignore events from "latestPage" property */
 			/* except when events are filtered by severity */
 			if (0 != is_clear && 0 == eventlog->severity)
-				zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
+				zbx_vector_vmware_event_ptr_clear_ext(events, vmware_event_free);
 		}
 
 		/* we are reading "scrollable views" in reverse chronological order, */
 		/* so inside a "scrollable view" latest events should come first too */
-		for (i = ids.values_num - 1; i >= 0; i--)
+		for (int i = ids.values_num - 1; i >= 0; i--)
 		{
 			if (SUCCEED == vmware_service_put_event_data(events, ids.values[i], xdoc,
 					&eventlog->evt_severities, alloc_sz))
@@ -728,7 +730,7 @@ static int	vmware_service_parse_event_data(zbx_vector_ptr_t *events, zbx_uint64_
 		/* if sequence of events is not continuous, ignore events from "latestPage" property */
 		/* except when events are filtered by severity */
 		if (0 != is_clear && 0 == eventlog->severity)
-			zbx_vector_ptr_clear_ext(events, (zbx_clean_func_t)vmware_event_free);
+			zbx_vector_vmware_event_ptr_clear_ext(events, vmware_event_free);
 	}
 
 	zbx_vector_id_xmlnode_destroy(&ids);
@@ -748,19 +750,19 @@ clean:
  *                                                                            *
  * Purpose: retrieves event data                                              *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             last_key     - [IN] the ID of last processed event             *
- *             events       - [OUT] a pointer to the output variable          *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             last_key     - [IN] ID of last processed event                 *
+ *             events       - [OUT] pointer to the output variable            *
  *             alloc_sz     - [OUT] allocated memory size for events          *
- *             error        - [OUT] the error message in the case of failure  *
+ *             error        - [OUT] error message in the case of failure      *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_get_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_uint64_t last_key, zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
+		zbx_uint64_t last_key, zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
 #	define ATTEMPTS_NUM	4
 #	define EVENT_TAG	1
@@ -863,20 +865,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves data only last event                                    *
+ * Purpose: retrieves only last event data                                    *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             events       - [OUT] a pointer to the output variable          *
- *             alloc_sz     - [OUT] allocated memory size for events          *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             events     - [OUT] pointer to output variable                  *
+ *             alloc_sz   - [OUT] allocated memory size for events            *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_get_last_event_data(const zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
+		zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t *alloc_sz, char **error)
 {
 #	define ZBX_POST_VMWARE_LASTEVENT 								\
 		ZBX_POST_VSPHERE_HEADER									\

@@ -1023,15 +1023,13 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key,
+static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t eventlog_last_key,
 		const zbx_dc_item_t *item, zbx_vector_ptr_t *add_results)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
 	/* events were retrieved in reverse chronological order */
-	for (i = events->values_num - 1; i >= 0; i--)
+	for (int i = events->values_num - 1; i >= 0; i--)
 	{
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;

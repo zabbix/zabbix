@@ -379,6 +379,8 @@ typedef struct
 }
 zbx_vmware_event_t;
 
+ZBX_PTR_VECTOR_DECL(vmware_event_ptr, zbx_vmware_event_t *)
+
 /* the vmware service data object */
 typedef struct
 {
@@ -387,7 +389,7 @@ typedef struct
 	zbx_hashset_t				hvs;
 	zbx_hashset_t				vms_index;
 	zbx_vector_vmware_cluster_ptr_t		clusters;
-	zbx_vector_ptr_t			events;			/* vector of pointers to zbx_vmware_event_t structures */
+	zbx_vector_vmware_event_ptr_t		events;
 	int					max_query_metrics;	/* max count of Datastore perfCounters in one request */
 	zbx_vector_vmware_datastore_ptr_t	datastores;
 	zbx_vector_vmware_datacenter_ptr_t	datacenters;
@@ -542,13 +544,15 @@ typedef struct
 }
 zbx_vmware_service_t;
 
+ZBX_PTR_VECTOR_DECL(vmware_service_ptr, zbx_vmware_service_t *)
+
 /* the vmware collector data */
 typedef struct
 {
-	zbx_vector_ptr_t	services;
-	zbx_hashset_t		strpool;
-	zbx_uint64_t		strpool_sz;
-	zbx_binary_heap_t	jobs_queue;
+	zbx_vector_vmware_service_ptr_t	services;
+	zbx_hashset_t			strpool;
+	zbx_uint64_t			strpool_sz;
+	zbx_binary_heap_t		jobs_queue;
 }
 zbx_vmware_t;
 

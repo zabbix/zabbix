@@ -935,7 +935,6 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 {
 	zbx_vmware_data_t	*data;
-	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_hv_t		*hv, hv_local;
 
@@ -944,7 +943,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
 
 	VMWARE_VECTOR_CREATE(&data->clusters, vmware_cluster_ptr);
-	VMWARE_VECTOR_CREATE(&data->events, ptr);
+	VMWARE_VECTOR_CREATE(&data->events, vmware_event_ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore_ptr);
 	VMWARE_VECTOR_CREATE(&data->datacenters, vmware_datacenter_ptr);
 	VMWARE_VECTOR_CREATE(&data->resourcepools, vmware_resourcepool);
@@ -952,7 +951,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->alarms, vmware_alarm_ptr);
 	VMWARE_VECTOR_CREATE(&data->alarm_ids, str);
 	zbx_vector_vmware_cluster_ptr_reserve(&data->clusters, (size_t)src->clusters.values_num);
-	zbx_vector_ptr_reserve(&data->events, (size_t)src->events.values_alloc);
+	zbx_vector_vmware_event_ptr_reserve(&data->events, (size_t)src->events.values_alloc);
 	zbx_vector_vmware_datastore_ptr_reserve(&data->datastores, (size_t)src->datastores.values_num);
 	zbx_vector_vmware_datacenter_ptr_reserve(&data->datacenters, (size_t)src->datacenters.values_num);
 	zbx_vector_vmware_resourcepool_reserve(&data->resourcepools, (size_t)src->resourcepools.values_num);
@@ -965,52 +964,51 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 
 	data->error = vmware_shared_strdup(src->error);
 
-	for (i = 0; i < src->clusters.values_num; i++)
+	for (int i = 0; i < src->clusters.values_num; i++)
 	{
 		zbx_vector_vmware_cluster_ptr_append(&data->clusters,
 				vmware_cluster_shared_dup((zbx_vmware_cluster_t *)src->clusters.values[i]));
 	}
 
-	for (i = 0; i < src->events.values_num; i++)
-		zbx_vector_ptr_append(&data->events, vmware_shmem_event_dup((zbx_vmware_event_t *)src->events.values[i]));
+	for (int i = 0; i < src->events.values_num; i++)
+		zbx_vector_vmware_event_ptr_append(&data->events, vmware_shmem_event_dup(src->events.values[i]));
 
-	for (i = 0; i < src->datastores.values_num; i++)
+	for (int i = 0; i < src->datastores.values_num; i++)
 	{
 		zbx_vector_vmware_datastore_ptr_append(&data->datastores,
 				vmware_datastore_shared_dup(src->datastores.values[i]));
 	}
 
-	for (i = 0; i < src->datacenters.values_num; i++)
+	for (int i = 0; i < src->datacenters.values_num; i++)
 	{
 		zbx_vector_vmware_datacenter_ptr_append(&data->datacenters,
 				vmware_datacenter_shared_dup(src->datacenters.values[i]));
 	}
 
-	for (i = 0; i < src->resourcepools.values_num; i++)
+	for (int i = 0; i < src->resourcepools.values_num; i++)
 	{
 		zbx_vector_vmware_resourcepool_append(&data->resourcepools,
 				vmware_shmem_resourcepool_dup(src->resourcepools.values[i]));
 	}
 
-	for (i = 0; i < src->dvswitches.values_num; i++)
+	for (int i = 0; i < src->dvswitches.values_num; i++)
 	{
 		zbx_vector_vmware_dvswitch_ptr_append(&data->dvswitches,
 				vmware_shmem_dvswitch_dup(src->dvswitches.values[i]));
 	}
 
-	for (i = 0; i < src->alarms.values_num; i++)
+	for (int i = 0; i < src->alarms.values_num; i++)
 	{
 		zbx_vector_vmware_alarm_ptr_append(&data->alarms,
 				vmware_alarm_shared_dup(src->alarms.values[i]));
 	}
 
-	for (i = 0; i < src->alarm_ids.values_num; i++)
+	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&data->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
 	zbx_hashset_iter_reset(&src->hvs, &iter);
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
-
 		vmware_hv_shared_copy(&hv_local, hv);
 		hv = (zbx_vmware_hv_t *)zbx_hashset_insert(&data->hvs, &hv_local, sizeof(hv_local));
 
@@ -1020,9 +1018,9 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 			exit(EXIT_FAILURE);
 		}
 
-		for (i = 0; i < hv->vms.values_num; i++)
+		for (int i = 0; i < hv->vms.values_num; i++)
 		{
-			zbx_vmware_vm_index_t	vmi_local = {(zbx_vmware_vm_t *)hv->vms.values[i], hv};
+			zbx_vmware_vm_index_t	vmi_local = {hv->vms.values[i], hv};
 
 			zbx_hashset_insert(&data->vms_index, &vmi_local, sizeof(vmi_local));
 		}
@@ -1218,7 +1216,7 @@ int	vmware_shmem_init(zbx_uint64_t *config_vmware_cache_size, zbx_vmware_t **vmw
 
 	memset(*vmware, 0, sizeof(zbx_vmware_t));
 
-	VMWARE_VECTOR_CREATE(&(*vmware)->services, ptr);
+	VMWARE_VECTOR_CREATE(&(*vmware)->services, vmware_service_ptr);
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 	(*vmware)->strpool_sz = 0;
 
