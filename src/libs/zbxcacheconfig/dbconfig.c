@@ -7413,7 +7413,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	{
 		changelog_sync_mode = ZBX_DBSYNC_INIT;
 	}
-	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_vector_dc_item_ptr_create(&new_items);
 		pnew_items = &new_items;
@@ -7761,7 +7761,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	if (NULL != pnew_items)
 		dc_add_new_items_to_valuecache(pnew_items);
 
-	dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
+	zbx_dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 
 	/* sync rest of the data */
 	sec = zbx_time();
