@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-18T21:14:28Z'
+  date: '2024-01-22T12:11:30Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -13,11 +13,11 @@ zabbix_export:
         
         To set up the template:
         
-        1. Set you account ID as value of {$YUGABYTEDB.ACCOUNT.ID} macro. The account ID is the unique identifier for your customer account in YugabyteDB Managed. You can access the account ID from your profile in the YugabyteDB Managed user interface. To get your account ID, log in to YugabyteDB Managed and click the user profile icon. 
+        1. Set your account ID as value of {$YUGABYTEDB.ACCOUNT.ID} macro. The account ID is the unique identifier for your customer account in YugabyteDB Managed. You can access the account ID from your profile in the YugabyteDB Managed user interface. To get your account ID, log in to YugabyteDB Managed and click the user profile icon. 
         See YugabyteDB documentation for instructions:
         https://yugabyte.stoplight.io/docs/managed-apis/tvsjh28t5ivmw-getting-started#account-id
         
-        2. Set you project ID as value of {$YUGABYTEDB.PROJECT.ID} macro. The project ID is the unique identifier for a YugabyteDB Managed project. You can access the project ID from your profile in the YugabyteDB Managed user interface (along with the account ID). 
+        2. Set your project ID as value of {$YUGABYTEDB.PROJECT.ID} macro. The project ID is the unique identifier for a YugabyteDB Managed project. You can access the project ID from your profile in the YugabyteDB Managed user interface (along with the account ID). 
         See YugabyteDB documentation for instructions:
         https://yugabyte.stoplight.io/docs/managed-apis/tvsjh28t5ivmw-getting-started#project-id
         
@@ -25,7 +25,7 @@ zabbix_export:
         See YugabyteDB documentation for instructions:
         https://docs.yugabyte.com/preview/yugabyte-cloud/managed-automation/managed-apikeys/#create-an-api-key
         
-        NOTE: If needed, you can specify an HTTP proxy for the template to use by changing the value of {$YUGABYTEDB.PROXY} user macro.
+        NOTE: If needed, you can specify a HTTP proxy for the template to use by changing the value of {$YUGABYTEDB.PROXY} user macro.
         
         IMPORTANT! Value of {$YUGABYTEDB.ACCESS.TOKEN} macro is stored as plain (not secret) text by default.  
         
@@ -326,9 +326,9 @@ zabbix_export:
                 - tag: scope
                   value: performance
         - uuid: 8065a31bd61b494a9edf94692c4846ff
-          name: 'YugabyteDB Cluster: CPU usage'
+          name: 'YugabyteDB Cluster: CPU utilization'
           type: DEPENDENT
-          key: yugabytedb.cluster.cpu.usage
+          key: yugabytedb.cluster.cpu.utilization
           delay: '0'
           history: 7d
           value_type: FLOAT
@@ -347,7 +347,7 @@ zabbix_export:
               value: cpu
           triggers:
             - uuid: 22340ce9ea2e457fa4270498bfc53666
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.WARN}'
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.utilization,5m) > {$YUGABYTEDB.CPU.UTILIZATION.WARN}'
               name: 'YugabyteDB Cluster: CPU utilization is high'
               event_name: 'YugabyteDB Cluster: CPU utilization is high (over {$YUGABYTEDB.CPU.UTILIZATION.WARN}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -355,12 +355,12 @@ zabbix_export:
               description: 'YugabyteDB Cluster CPU utilization more than {$YUGABYTEDB.CPU.UTILIZATION.WARN}%. The system might be slow to respond.'
               dependencies:
                 - name: 'YugabyteDB Cluster: CPU utilization is too high'
-                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
+                  expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.utilization,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
               tags:
                 - tag: scope
                   value: performance
             - uuid: ed88478e0a784c8dbbe95c20b08c167e
-              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.usage,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
+              expression: 'min(/YugabyteDB Cluster by HTTP/yugabytedb.cluster.cpu.utilization,5m) > {$YUGABYTEDB.CPU.UTILIZATION.CRIT}'
               name: 'YugabyteDB Cluster: CPU utilization is too high'
               event_name: 'YugabyteDB Cluster: CPU utilization is too high (over {$YUGABYTEDB.CPU.UTILIZATION.CRIT}% for 5m)'
               opdata: 'Current utilization: {ITEM.LASTVALUE1}'
@@ -1539,14 +1539,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 31473b597b274acc894bde4415efc1df
-          name: 'YugabyteDB Cluster: YCQL DELETE, Operations/Sec'
+          name: 'YugabyteDB Cluster: YCQL DELETE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.delete.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of DELETE statements executed through the YCQL API. This does not include index writes.'
+          description: 'The count of DELETE statements executed through the YCQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1584,14 +1584,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: bc9776051ac5494da1450837ce2541f0
-          name: 'YugabyteDB Cluster: YCQL INSERT, Operations/Sec'
+          name: 'YugabyteDB Cluster: YCQL INSERT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.insert.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of INSERT statements executed through the YCQL API. This does not include index writes.'
+          description: 'The count of INSERT statements executed through the YCQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1629,14 +1629,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 8e6f1197d23e4398a40c08232ecbaf88
-          name: 'YugabyteDB Cluster: YCQL OTHER, Operations/Sec'
+          name: 'YugabyteDB Cluster: YCQL OTHER OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.other.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of OTHER statements executed through the YCQL API.'
+          description: 'The count of OTHER statements executed through the YCQL API per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1674,14 +1674,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: e663d79a6b404c9fb369c213f51a2f62
-          name: 'YugabyteDB Cluster: YCQL SELECT, Operations/Sec'
+          name: 'YugabyteDB Cluster: YCQL SELECT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.select.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of SELECT statements executed through the YCQL API. This does not include index writes.'
+          description: 'The count of SELECT statements executed through the YCQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1719,14 +1719,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 4b81ff96ce054cd480073217281eedf7
-          name: 'YugabyteDB Cluster: YCQL transaction, Operations/Sec'
+          name: 'YugabyteDB Cluster: YCQL transaction OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.transaction.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of transactions executed through the YCQL API.'
+          description: 'The count of transactions executed through the YCQL API per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1764,14 +1764,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 6120fea6606f4a98ac417559e80aad13
-          name: 'YugabyteDB Cluster: YCQL UPDATE, Operations/Sec'
+          name: 'YugabyteDB Cluster: YCQL UPDATE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ycql.update.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of UPDATE statements executed through the YCQL API.'
+          description: 'The count of UPDATE statements executed through the YCQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1809,14 +1809,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 3a6e9b4837c44babb020fe1e579db573
-          name: 'YugabyteDB Cluster: YSQL DELETE, Operations/Sec'
+          name: 'YugabyteDB Cluster: YSQL DELETE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.delete.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of DELETE statements executed through the YSQL API. This does not include index writes.'
+          description: 'The count of DELETE statements executed through the YSQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1854,14 +1854,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 8074080c8e7244eaaf4353a92a80a82a
-          name: 'YugabyteDB Cluster: YSQL INSERT, Operations/Sec'
+          name: 'YugabyteDB Cluster: YSQL INSERT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.insert.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of INSERT statements executed through the YSQL API. This does not include index writes.'
+          description: 'The count of INSERT statements executed through the YSQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1899,14 +1899,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 502162acb66941d19b567a5172a56600
-          name: 'YugabyteDB Cluster: YSQL OTHER, Operations/Sec'
+          name: 'YugabyteDB Cluster: YSQL OTHER OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.other.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of OTHER statements executed through the YSQL API.'
+          description: 'The count of OTHER statements executed through the YSQL API per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1944,14 +1944,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 03053740519b4756886897b45ed3f73c
-          name: 'YugabyteDB Cluster: YSQL SELECT, Operations/Sec'
+          name: 'YugabyteDB Cluster: YSQL SELECT OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.select.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of SELECT statements executed through the YSQL API. This does not include index writes.'
+          description: 'The count of SELECT statements executed through the YSQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1989,14 +1989,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: bd63dbe655734d66bbf9409500cc4a3f
-          name: 'YugabyteDB Cluster: YSQL transaction, Operations/Sec'
+          name: 'YugabyteDB Cluster: YSQL transaction OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.transaction.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of transactions executed through the YSQL API.'
+          description: 'The count of transactions executed through the YSQL API per second.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2034,14 +2034,14 @@ zabbix_export:
             - tag: component
               value: statistic
         - uuid: 2557d7cf5f0d429886999d6eba2d9182
-          name: 'YugabyteDB Cluster: YSQL UPDATE, Operations/Sec'
+          name: 'YugabyteDB Cluster: YSQL UPDATE OPS'
           type: DEPENDENT
           key: yugabytedb.cluster.ysql.update.ops
           delay: '0'
           history: 7d
           value_type: FLOAT
           units: '!OPS'
-          description: 'The count of UPDATE statements executed through the YSQL API. This does not include index writes.'
+          description: 'The count of UPDATE statements executed through the YSQL API per second. This does not include index writes.'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -2979,7 +2979,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'CPU usage'
+                      value: 'CPU utilization'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -2987,7 +2987,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'YugabyteDB Cluster by HTTP'
-                        key: yugabytedb.cluster.cpu.usage
+                        key: yugabytedb.cluster.cpu.utilization
                     - type: INTEGER
                       name: show
                       value: '1'
@@ -3022,7 +3022,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Memory usage'
+                      value: 'Memory utilization'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3054,7 +3054,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Disk space usage'
+                      value: 'Disk space utilization'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3115,7 +3115,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'YSQL average connection'
+                      value: 'YSQL connection average used'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3147,7 +3147,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'YSQL transaction, Operations/Sec'
+                      value: 'YSQL transaction OPS'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3288,7 +3288,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'YCQL transaction, Operations/Sec'
+                      value: 'YCQL transaction OPS'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3315,7 +3315,7 @@ zabbix_export:
             - name: 'YugabyteDB Cluster: Cluster'
               widgets:
                 - type: GRAPH_CLASSIC
-                  name: 'YugabyteDB Cluster: Memory usage'
+                  name: 'YugabyteDB Cluster: Memory utilization'
                   width: '12'
                   height: '6'
                   fields:
@@ -3338,7 +3338,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Total memory'
+                      value: 'Memory total'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3357,7 +3357,7 @@ zabbix_export:
                       name: units
                       value: B
                 - type: GRAPH_CLASSIC
-                  name: 'YugabyteDB Cluster: CPU usage'
+                  name: 'YugabyteDB Cluster: CPU utilization'
                   x: '12'
                   width: '12'
                   height: '6'
@@ -3382,7 +3382,7 @@ zabbix_export:
                       value: '45'
                     - type: STRING
                       name: description
-                      value: 'Usage memory'
+                      value: 'Memory usage'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3441,7 +3441,7 @@ zabbix_export:
                         host: 'YugabyteDB Cluster by HTTP'
                         name: 'YugabyteDB Cluster: Disk operations number'
                 - type: ITEM
-                  name: 'Disk size usage, percent'
+                  name: 'Disk space utilization'
                   x: '12'
                   'y': '5'
                   width: '4'
@@ -3456,7 +3456,7 @@ zabbix_export:
                       value: '40'
                     - type: STRING
                       name: description
-                      value: 'Disk size usage, percent'
+                      value: 'Disk space utilization'
                     - type: INTEGER
                       name: desc_size
                       value: '10'
@@ -3481,7 +3481,7 @@ zabbix_export:
                       name: value_size
                       value: '40'
                 - type: ITEM
-                  name: 'Disk size provisioned'
+                  name: 'Disk space provisioned'
                   x: '12'
                   'y': '8'
                   width: '4'
@@ -3496,7 +3496,7 @@ zabbix_export:
                       value: '40'
                     - type: STRING
                       name: description
-                      value: 'Disk size provisioned'
+                      value: 'Disk space provisioned'
                     - type: INTEGER
                       name: desc_size
                       value: '10'
@@ -3548,7 +3548,7 @@ zabbix_export:
                         host: 'YugabyteDB Cluster by HTTP'
                         name: 'YugabyteDB Cluster: Network rate'
                 - type: GRAPH_CLASSIC
-                  name: 'YugabyteDB Cluster: Connections used, percent'
+                  name: 'YugabyteDB Cluster: Connections utilization'
                   'y': '6'
                   width: '16'
                   height: '6'
@@ -3612,7 +3612,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: description
-                      value: 'YSQL maximum used connection'
+                      value: 'YSQL connection maximum used'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3644,7 +3644,7 @@ zabbix_export:
                       value: '0'
                     - type: STRING
                       name: description
-                      value: 'YSQL average connection'
+                      value: 'YSQL connection average used'
                     - type: INTEGER
                       name: desc_v_pos
                       value: '0'
@@ -3665,7 +3665,7 @@ zabbix_export:
             - name: 'YugabyteDB Cluster: Query statistic'
               widgets:
                 - type: GRAPH_CLASSIC
-                  name: 'YugabyteDB Cluster: YCQL, Operations/Sec'
+                  name: 'YugabyteDB Cluster: YCQL OPS'
                   width: '12'
                   height: '6'
                   fields:
@@ -3675,7 +3675,7 @@ zabbix_export:
                         host: 'YugabyteDB Cluster by HTTP'
                         name: 'YugabyteDB Cluster: YCQL operations'
                 - type: GRAPH_CLASSIC
-                  name: 'YugabyteDB Cluster: YSQL, Operations/Sec'
+                  name: 'YugabyteDB Cluster: YSQL OPS'
                   'y': '6'
                   width: '12'
                   height: '6'
@@ -3978,7 +3978,7 @@ zabbix_export:
           color: 199C0D
           item:
             host: 'YugabyteDB Cluster by HTTP'
-            key: yugabytedb.cluster.cpu.usage
+            key: yugabytedb.cluster.cpu.utilization
     - uuid: effb3cb75dc14d62b9a704c7358bd1f3
       name: 'YugabyteDB Cluster: Disc space usage'
       graph_items:
