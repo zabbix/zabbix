@@ -5997,7 +5997,7 @@ void	DCsync_configuration(unsigned char mode)
 		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		dc_load_trigger_queue(&trend_queue);
 	}
-	else
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		zbx_vector_dc_item_ptr_create(&new_items);
 		pnew_items = &new_items;
