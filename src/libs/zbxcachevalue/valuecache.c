@@ -2547,14 +2547,15 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 			zbx_vc_item_t	item_local = {
 					.itemid = h->itemid,
 					.value_type = h->value_type,
-					.status = ZBX_ITEM_STATUS_CACHED_ALL
+					.last_accessed = (int)time(NULL)
 
 			};
 
 			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
 		}
 
-		if (NULL != item)
+		/* cache new values only after the item history database status is known */
+		if (NULL != item && (ZBX_ITEM_STATUS_CACHED_ALL == item->status || 0 != item->db_cached_from))
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
 			zbx_vc_chunk_t		*head = item->head;
@@ -2913,7 +2914,8 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 			zbx_vc_item_t	item_local = {
 					.itemid = items->values[i].first,
 					.value_type = (unsigned char)items->values[i].second,
-					.status = ZBX_ITEM_STATUS_CACHED_ALL
+					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.last_accessed = (int)time(NULL)
 
 			};
 

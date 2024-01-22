@@ -92,7 +92,12 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 			dst_item->units = NULL;
 	}
 
-	dst_item->has_trigger = (NULL == src_item->triggers ? 0 : 1);
+	/* check also for update_triggers flag to avoid race condition when value is being added */
+	/* after item has been synced but before triggers are linked to it                       */
+	if (NULL != src_item->triggers || 0 != src_item->update_triggers)
+		dst_item->has_trigger = 1;
+	else
+		dst_item->has_trigger = 0;
 }
 
 /******************************************************************************
