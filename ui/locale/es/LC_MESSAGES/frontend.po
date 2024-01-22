@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-15 12:42+0000\n"
+"PO-Revision-Date: 2024-01-18 16:58+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1524,7 +1524,7 @@ msgstr "Tal cual"
 
 #: include/views/monitoring.history.php:97
 msgid "As plain text"
-msgstr "Como texto sencillo"
+msgstr "Como texto sin formato"
 
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
@@ -12657,7 +12657,7 @@ msgstr "Marcar como causa"
 
 #: include/views/monitoring.sysmap.edit.php:150
 msgid "Mark elements on trigger status change"
-msgstr "Marcar elementos en el cambio de estado del iniciador"
+msgstr "Marcar elementos al cambiar el estado del iniciador"
 
 #: include/views/monitoring.history.php:171
 msgid "Mark others"
@@ -13314,7 +13314,7 @@ msgstr "Silenciar"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
-msgstr "Mi"
+msgstr "Mio"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
@@ -15594,7 +15594,7 @@ msgstr "Algoritmo de colocación"
 #: app/views/mediatype.edit.php:274 include/classes/setup/CSetupWizard.php:559
 #: widgets/plaintext/Widget.php:29
 msgid "Plain text"
-msgstr "Texto plano"
+msgstr "Texto sin formato"
 
 #: app/views/administration.user.edit.php:761
 #: app/views/administration.user.edit.php:796
