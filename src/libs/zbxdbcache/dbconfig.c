@@ -5956,6 +5956,41 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add new items with triggers to value cache                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items)
+{
+	if (0 != items->values_num)
+	{
+		zbx_vector_uint64_pair_t	vc_items;
+		int				i;
+
+		zbx_vector_uint64_pair_create(&vc_items);
+		zbx_vector_uint64_pair_reserve(&vc_items, items->values_num);
+
+		for (i = 0; i < items->values_num; i++)
+		{
+			if (0 != items->values[i]->update_triggers)
+			{
+				zbx_uint64_pair_t	pair = {
+						.first = items->values[i]->itemid,
+						.second = (zbx_uint64_t)items->values[i]->value_type
+				};
+
+				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
+			}
+		}
+
+		if (0 != items->values_num)
+			zbx_vc_add_new_items(&vc_items);
+
+		zbx_vector_uint64_pair_destroy(&vc_items);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
