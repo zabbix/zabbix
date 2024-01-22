@@ -104,6 +104,8 @@ typedef struct
 }
 zbx_vmware_perf_entity_t;
 
+ZBX_PTR_VECTOR_DECL(vmware_perf_entity_ptr, zbx_vmware_perf_entity_t *)
+
 typedef struct
 {
 	char		*ssd;

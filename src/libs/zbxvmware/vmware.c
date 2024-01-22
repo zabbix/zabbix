@@ -96,6 +96,7 @@ ZBX_PTR_VECTOR_IMPL(vmware_fs_ptr, zbx_vmware_fs_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_vm_ptr, zbx_vmware_vm_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_event_ptr, zbx_vmware_event_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_perf_data_ptr, zbx_vmware_perf_data_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_perf_entity_ptr, zbx_vmware_perf_entity_t *)
 
 zbx_vmware_service_objects_t	*get_vmware_service_objects(void)
 {

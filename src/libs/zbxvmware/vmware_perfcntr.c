@@ -921,7 +921,8 @@ static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service,
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_ptr_t *entities, int counters_max, zbx_vector_vmware_perf_data_ptr_t *perfdata)
+		zbx_vector_vmware_perf_entity_ptr_t *entities, int counters_max,
+		zbx_vector_vmware_perf_data_ptr_t *perfdata)
 {
 	char				*tmp = NULL, *error = NULL;
 	size_t				tmp_alloc = 0, tmp_offset;
@@ -1038,7 +1039,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 		vmware_service_parse_perf_data(perfdata, doc);
 
 		while (entities->values_num > i + 1)
-			zbx_vector_ptr_remove_noorder(entities, entities->values_num - 1);
+			zbx_vector_vmware_perf_entity_ptr_remove_noorder(entities, entities->values_num - 1);
 	}
 
 	zbx_free(tmp);
@@ -1170,18 +1171,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: setting flag ZBX_VMWARE_COUNTER_ACCEPTABLE for new perf counters  *
+ * Purpose: sets flag ZBX_VMWARE_COUNTER_ACCEPTABLE for new perf counters     *
  *                                                                            *
- * Parameters: service        - [IN] the vmware service                       *
+ * Parameters: service        - [IN] vmware service                           *
  *             easyhandle     - [IN] prepared cURL connection handle          *
  *             perf_available - [IN/OUT] list of available counter per object *
- *             entities       - [IN/OUT] the list of perf entities            *
+ *             entities       - [IN/OUT] list of perf entities                *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_perf_available_t *perf_available, zbx_vector_ptr_t *entities)
+		zbx_vector_perf_available_t *perf_available, zbx_vector_vmware_perf_entity_ptr_t *entities)
 {
-	int	i;
 	char	begin_time[ZBX_XML_DATETIME];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() entities:%d perf_available:%d", __func__,
@@ -1189,7 +1189,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 
 	*begin_time = '\0';
 
-	for (i = 0; i < entities->values_num ; i++)
+	for (int i = 0; i < entities->values_num ; i++)
 	{
 		int				j;
 		zbx_vmware_perf_entity_t	*entity;
@@ -1274,7 +1274,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	struct curl_slist			*headers = NULL;
 	int					ret = FAIL;
 	char					*error = NULL;
-	zbx_vector_ptr_t			entities, hist_entities;
+	zbx_vector_vmware_perf_entity_ptr_t	entities, hist_entities;
 	zbx_vmware_perf_entity_t		*entity;
 
 	zbx_hashset_iter_t			iter;
@@ -1284,8 +1284,8 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
 
-	zbx_vector_ptr_create(&entities);
-	zbx_vector_ptr_create(&hist_entities);
+	zbx_vector_vmware_perf_entity_ptr_create(&entities);
+	zbx_vector_vmware_perf_entity_ptr_create(&hist_entities);
 	zbx_vector_vmware_perf_data_ptr_create(&perfdata);
 	zbx_vector_perf_available_create(&perf_available);
 	page.alloc = 0;
@@ -1336,7 +1336,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 		/* performance counter updates for one service can happen simultaneously. */
 		/* This means for refresh update we can safely use reference to entity    */
 		/* outside vmware lock.                                                   */
-		zbx_vector_ptr_append(&entities, entity);
+		zbx_vector_vmware_perf_entity_ptr_append(&entities, entity);
 	}
 
 	zbx_vmware_unlock();
@@ -1355,7 +1355,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 		}
 	}
 
-	zbx_vector_ptr_clear(&entities);
+	zbx_vector_vmware_perf_entity_ptr_clear(&entities);
 
 	zbx_vmware_lock();
 
@@ -1375,7 +1375,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 				continue;
 			}
 
-			zbx_vector_ptr_append(&entities, entity);
+			zbx_vector_vmware_perf_entity_ptr_append(&entities, entity);
 			break;
 		}
 	}
@@ -1383,7 +1383,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	zbx_vmware_unlock();
 
 	vmware_perf_counters_availability_check(service, easyhandle, &perf_available, &entities);
-	zbx_vector_ptr_clear(&entities);
+	zbx_vector_vmware_perf_entity_ptr_clear(&entities);
 
 	zbx_vmware_lock();
 
@@ -1424,9 +1424,9 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 
 
 		if (ZBX_VMWARE_PERF_INTERVAL_NONE == entity->refresh)
-			zbx_vector_ptr_append(&hist_entities, entity);
+			zbx_vector_vmware_perf_entity_ptr_append(&hist_entities, entity);
 		else
-			zbx_vector_ptr_append(&entities, entity);
+			zbx_vector_vmware_perf_entity_ptr_append(&entities, entity);
 	}
 
 	zbx_vmware_unlock();
@@ -1472,8 +1472,8 @@ out:
 	zbx_vector_vmware_perf_data_ptr_clear_ext(&perfdata, vmware_free_perfdata);
 	zbx_vector_vmware_perf_data_ptr_destroy(&perfdata);
 
-	zbx_vector_ptr_destroy(&hist_entities);
-	zbx_vector_ptr_destroy(&entities);
+	zbx_vector_vmware_perf_entity_ptr_destroy(&hist_entities);
+	zbx_vector_vmware_perf_entity_ptr_destroy(&entities);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed " ZBX_FS_SIZE_T " bytes of data", __func__,
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc);
