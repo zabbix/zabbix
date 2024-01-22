@@ -106,7 +106,6 @@ class CUser extends CApiService {
 			'selectMediatypes'			=> null,
 			'selectRole'				=> null,
 			'getAccess'					=> null,
-			'getTotpSecret'				=> null,
 			'countOutput'				=> false,
 			'preservekeys'				=> false,
 			'sortfield'					=> '',
@@ -238,21 +237,6 @@ class CUser extends CApiService {
 
 			while ($userAccess = DBfetch($access)) {
 				$result[$userAccess['userid']] = zbx_array_merge($result[$userAccess['userid']], $userAccess);
-			}
-		}
-
-		if ($options['getTotpSecret'] !== null) {
-			foreach ($result as $userid => $user) {
-				$result[$userid]['mfa_totp_secrets'] = [];
-			}
-
-			if (array_key_exists(self::$userData['userid'], $result)) {
-				$mfa_totp_secrets = DB::select('mfa_totp_secret', [
-					'output' => ['mfa_totp_secretid', 'mfaid', 'totp_secret'],
-					'filter' => ['userid' => self::$userData['userid']]
-				]);
-
-				$result[self::$userData['userid']]['mfa_totp_secrets'] = $mfa_totp_secrets;
 			}
 		}
 
