@@ -713,14 +713,6 @@ zbx_tag_t;
 /* time and memory size suffixes */
 zbx_uint64_t	suffix2factor(char c);
 
-#define ZBX_DC_FLAG_META	0x01	/* contains meta information (lastlogsize and mtime) */
-#define ZBX_DC_FLAG_NOVALUE	0x02	/* entry contains no value */
-#define ZBX_DC_FLAG_LLD		0x04	/* low-level discovery value */
-#define ZBX_DC_FLAG_UNDEF	0x08	/* unsupported or undefined (delta calculation failed) value */
-#define ZBX_DC_FLAG_NOHISTORY	0x10	/* values should not be kept in history */
-#define ZBX_DC_FLAG_NOTRENDS	0x20	/* values should not be kept in trends */
-#define ZBX_DC_FLAG_HASTRIGGER	0x40	/* value is used in trigger expression */
-
 /******************************************************************************
  *                                                                            *
  * CODE BELOW IS LIBC WRAPPERS WHICH COULD BE LATER MOVED TO SEPARATE LIBRARY *
