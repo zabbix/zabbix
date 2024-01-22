@@ -74,6 +74,8 @@ static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 static zbx_vmware_t	*vmware = NULL;
 static zbx_hashset_t	evt_msg_strpool;
 
+ZBX_PTR_VECTOR_IMPL(vmware_service_ptr, zbx_vmware_service_t *)
+
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
 ZBX_PTR_VECTOR_IMPL(str_uint64_pair, zbx_str_uint64_pair_t)
@@ -93,7 +95,6 @@ ZBX_PTR_VECTOR_IMPL(vmware_dev_ptr, zbx_vmware_dev_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_fs_ptr, zbx_vmware_fs_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_vm_ptr, zbx_vmware_vm_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_event_ptr, zbx_vmware_event_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_service_ptr, zbx_vmware_service_t *)
 
 zbx_vmware_service_objects_t	*get_vmware_service_objects(void)
 {
