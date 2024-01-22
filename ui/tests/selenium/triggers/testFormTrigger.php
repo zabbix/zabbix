@@ -91,58 +91,72 @@ class testFormTrigger extends CLegacyWebTest {
 	// Returns layout data
 	public static function layout() {
 		return [
+			// #0.
 			[
 				['constructor' => 'open', 'host' => self::HOST
 				]
 			],
+			// #1.
 			[
 				['constructor' => 'open_close', 'host' => self::HOST
 				]
 			],
+			// #2.
 			[
 				['constructor' => 'open', 'severity' => 'Warning', 'host' => self::HOST
 				]
 			],
+			// #3.
 			[
 				['constructor' => 'open_close', 'severity' => 'Disaster', 'host' => self::HOST
 				]
 			],
+			// #4.
 			[
 				['severity' => 'Not classified', 'host' => self::HOST
 				]
 			],
+			// #5.
 			[
 				['severity' => 'Information', 'host' => self::HOST
 				]
 			],
+			// #6.
 			[
 				['severity' => 'Warning', 'host' => self::HOST
 				]
 			],
+			// #7.
 			[
 				['severity' => 'Average', 'host' => self::HOST
 				]
 			],
+			// #8.
 			[
 				['severity' => 'High', 'host' => self::HOST
 				]
 			],
+			// #9.
 			[
 				['severity' => 'Disaster', 'host' => self::HOST
 				]
 			],
+			// #10.
 			[
 				['constructor' => 'open', 'template' => 'Inheritance test template'
 				]
 			],
+			// #11.
 			[
 				['constructor' => 'open_close', 'template' => 'Inheritance test template'
 				]
 			],
+			// #12.
 			[
 				['constructor' => 'open', 'severity' => 'Warning', 'template' => 'Inheritance test template'
 				]
 			],
+			// #13.
 			[
 				[
 					'constructor' => 'open_close',
@@ -150,40 +164,49 @@ class testFormTrigger extends CLegacyWebTest {
 					'template' => 'Inheritance test template'
 				]
 			],
+			// #14.
 			[
 				['severity' => 'Not classified', 'template' => 'Inheritance test template'
 				]
 			],
+			// #15.
 			[
 				['severity' => 'Information', 'template' => 'Inheritance test template'
 				]
 			],
+			// #16.
 			[
 				['severity' => 'Warning', 'template' => 'Inheritance test template'
 				]
 			],
+			// #17.
 			[
 				['severity' => 'Average', 'template' => 'Inheritance test template'
 				]
 			],
+			// #18.
 			[
 				['severity' => 'High', 'template' => 'Inheritance test template'
 				]
 			],
+			// #19.
 			[
 				['severity' => 'Disaster', 'template' => 'Inheritance test template'
 				]
 			],
+			// #20.
 			[
 				['host' => self::HOST, 'form' => 'testFormTrigger1'
 				]
 			],
+			// #21.
 			[
 				[
 					'template' => 'Inheritance test template',
 					'form' => 'testInheritanceTrigger1'
 				]
 			],
+			// #22.
 			[
 				[
 					'host' => 'Template inheritance test host',
@@ -192,6 +215,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'hostTemplate' => 'Inheritance test template'
 				]
 			],
+			// #23.
 			[
 				[
 					'host' => 'Template inheritance test host',
@@ -200,6 +224,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'hostTemplate' => 'Inheritance test template'
 				]
 			],
+			// #24.
 			[
 				[
 					'host' => self::HOST,
@@ -207,6 +232,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'constructor' => 'open'
 				]
 			],
+			// #25.
 			[
 				[
 					'template' => 'Inheritance test template',
@@ -214,6 +240,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'constructor' => 'open'
 				]
 			],
+			// #26.
 			[
 				[
 					'host' => 'Template inheritance test host',
@@ -482,6 +509,7 @@ class testFormTrigger extends CLegacyWebTest {
 	// Returns create data
 	public static function create() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -492,6 +520,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -502,6 +531,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #2.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -512,6 +542,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -523,6 +554,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -534,6 +566,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -542,6 +575,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -550,6 +584,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -558,6 +593,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -571,6 +607,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -579,6 +616,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -587,6 +625,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -595,6 +634,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -603,6 +643,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -611,6 +652,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -619,6 +661,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -627,6 +670,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #16.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -635,6 +679,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -643,6 +688,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -651,6 +697,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -664,6 +711,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'status' => false
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -673,6 +721,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'url' => 'triggers.php'
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -685,6 +734,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -696,6 +746,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -708,6 +759,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -719,6 +771,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -730,6 +783,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -741,6 +795,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #27.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -757,6 +812,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -773,6 +829,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #29.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -790,6 +847,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #30.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -804,6 +862,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #31.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -818,6 +877,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #32.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -832,6 +892,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #33.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -839,6 +900,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'rate(/'.self::HOST.'/Unsigned,2m:now-1h)>0.5'
 				]
 			],
+			// #34.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -851,6 +913,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #35.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -863,6 +926,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #36.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -875,6 +939,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #37.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -883,6 +948,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #38.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -890,6 +956,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'jsonpath(last(/'.self::HOST.'/Text),"$.last_name")<>"Test"'
 				]
 			],
+			// #39.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -901,6 +968,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #40.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -912,6 +980,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #41.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -923,6 +992,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #42.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -935,6 +1005,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #43.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -943,6 +1014,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'formCheck' => true
 				]
 			],
+			// #44.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -950,6 +1022,7 @@ class testFormTrigger extends CLegacyWebTest {
 					'expression' => 'xmlxpath(last(/'.self::HOST.'/Character),"/zabbix_export/version")=1'
 				]
 			],
+			// #45.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -961,6 +1034,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #46.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -972,6 +1046,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #47.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -983,6 +1058,7 @@ class testFormTrigger extends CLegacyWebTest {
 					]
 				]
 			],
+			// #48.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -991,6 +1067,7 @@ class testFormTrigger extends CLegacyWebTest {
 							'"$.[0].last_name")="Test" or xmlxpath(last(/'.self::HOST.'/Text),"/zabbix_export/version/text()")="test"'
 				]
 			],
+			// #49.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -999,6 +1076,7 @@ class testFormTrigger extends CLegacyWebTest {
 							'"$.[0].last_name")="Test" and jsonpath(last(/'.self::HOST.'/Text),"$.test.last")=4'
 				]
 			],
+			// #50.
 			[
 				[
 					'expected' => TEST_BAD,
