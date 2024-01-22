@@ -6280,6 +6280,9 @@ void	DCsync_configuration(unsigned char mode)
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
 
+	if (NULL != pnew_items)
+		dc_add_new_items_to_valuecache(pnew_items);
+
 	/* sync rest of the data */
 
 	sec = zbx_time();
@@ -6762,6 +6765,12 @@ out:
 	zbx_dbsync_clear(&hgroup_host_sync);
 
 	zbx_dbsync_free_env();
+
+	if (ZBX_DBSYNC_INIT == mode)
+		zbx_hashset_destroy(&trend_queue);
+
+	if (NULL != pnew_items)
+		zbx_vector_dc_item_ptr_destroy(pnew_items);
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
