@@ -32,7 +32,7 @@ void	vmware_shmem_set_vmware_mem_NULL(void);
 
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_str_t*, str)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_entity_tags_t*, vmware_entity_tags)
-VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_custquery_param_ptr_t*, custquery_param)
+VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_custquery_param_t*, custquery_param)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_ptr_t*, ptr)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_tag_t*, vmware_tag)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_perf_counter_ptr)
@@ -76,7 +76,7 @@ zbx_vmware_vm_t				*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src);
 zbx_vmware_data_t			*vmware_shmem_data_dup(zbx_vmware_data_t *src);
 zbx_vmware_service_t			*vmware_shmem_vmware_service_malloc(void);
 void					vmware_shmem_service_hashset_create(zbx_vmware_service_t *service);
-zbx_vector_custquery_param_ptr_t	*vmware_shmem_custquery_malloc(void);
+zbx_vector_custquery_param_t		*vmware_shmem_custquery_malloc(void);
 zbx_vmware_job_t			*vmware_shmem_vmware_job_malloc(void);
 void					vmware_shmem_vmware_job_free(zbx_vmware_job_t *job);
 zbx_vmware_entity_tags_t		*vmware_shmem_entity_tags_malloc(void);

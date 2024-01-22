@@ -447,16 +447,16 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves a list of vmware service datastore diskextents          *
+ * Purpose: retrieves list of vmware service datastore diskextents            *
  *                                                                            *
- * Parameters: doc        - [IN] XML document                                 *
+ * Parameters: doc          - [IN] XML document                               *
  *             diskextents  - [OUT] list of vmware diskextents                *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
-int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_t *diskextents)
+int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_ptr_t *diskextents)
 {
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
@@ -499,10 +499,10 @@ int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskexten
 		else
 			diskextent->partitionid = 0;
 
-		zbx_vector_vmware_diskextent_append(diskextents, diskextent);
+		zbx_vector_vmware_diskextent_ptr_append(diskextents, diskextent);
 	}
 
-	zbx_vector_vmware_diskextent_sort(diskextents, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_diskextent_ptr_sort(diskextents, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	ret = SUCCEED;
 out:

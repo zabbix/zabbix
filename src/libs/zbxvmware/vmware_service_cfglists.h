@@ -33,7 +33,7 @@ int	vmware_service_get_hv_ds_dc_dvs_list(const zbx_vmware_service_t *service, CU
 		zbx_vector_vmware_datacenter_ptr_t *datacenters, zbx_vector_vmware_dvswitch_ptr_t *dvswitches,
 		zbx_vector_str_t *vc_alarm_ids, char **error);
 
-int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_t *diskextents);
+int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_ptr_t *diskextents);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 

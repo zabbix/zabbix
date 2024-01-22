@@ -475,7 +475,7 @@ char	**xml_read_props(xmlDoc *xdoc, const zbx_vmware_propmap_t *propmap, int pro
  * Purpose: frees shared resources allocated to store custom query params     *
  *          data                                                              *
  *                                                                            *
- * Parameters: params - [IN] the custom query params data                     *
+ * Parameters: params - [IN] custom query params data                         *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_cq_param_shared_free(zbx_vmware_custquery_param_t cq_param)
@@ -514,8 +514,8 @@ static void	vmware_datastore_shared_free(zbx_vmware_datastore_t *datastore)
 	vmware_vector_str_uint64_pair_shared_clean(&datastore->hv_uuids_access);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
 
-	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_shmem_diskextent_free);
-	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
+	zbx_vector_vmware_diskextent_ptr_clear_ext(&datastore->diskextents, vmware_shmem_diskextent_free);
+	zbx_vector_vmware_diskextent_ptr_destroy(&datastore->diskextents);
 
 	zbx_vector_str_clear_ext(&datastore->alarm_ids, vmware_shared_strfree);
 	zbx_vector_str_destroy(&datastore->alarm_ids);
@@ -577,20 +577,20 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_shmem_event_free);
 		zbx_vector_ptr_destroy(&data->events);
 
-		zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_shared_free);
-		zbx_vector_vmware_datastore_destroy(&data->datastores);
+		zbx_vector_vmware_datastore_ptr_clear_ext(&data->datastores, vmware_datastore_shared_free);
+		zbx_vector_vmware_datastore_ptr_destroy(&data->datastores);
 
-		zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_shmem_datacenter_free);
-		zbx_vector_vmware_datacenter_destroy(&data->datacenters);
+		zbx_vector_vmware_datacenter_ptr_clear_ext(&data->datacenters, vmware_shmem_datacenter_free);
+		zbx_vector_vmware_datacenter_ptr_destroy(&data->datacenters);
 
 		zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_shmem_resourcepool_free);
 		zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
-		zbx_vector_vmware_dvswitch_clear_ext(&data->dvswitches, vmware_shmem_dvswitch_free);
-		zbx_vector_vmware_dvswitch_destroy(&data->dvswitches);
+		zbx_vector_vmware_dvswitch_ptr_clear_ext(&data->dvswitches, vmware_shmem_dvswitch_free);
+		zbx_vector_vmware_dvswitch_ptr_destroy(&data->dvswitches);
 
-		zbx_vector_vmware_alarm_clear_ext(&data->alarms, vmware_shmem_alarm_free);
-		zbx_vector_vmware_alarm_destroy(&data->alarms);
+		zbx_vector_vmware_alarm_ptr_clear_ext(&data->alarms, vmware_shmem_alarm_free);
+		zbx_vector_vmware_alarm_ptr_destroy(&data->alarms);
 
 		zbx_vector_str_clear_ext(&data->alarm_ids, vmware_shared_strfree);
 		zbx_vector_str_destroy(&data->alarm_ids);
@@ -606,12 +606,11 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
  *                                                                            *
  * Purpose: cleans resources allocated by vmware custom query in vmware       *
  *                                                                            *
- * Parameters: cust_query - [IN] the entity to free                           *
+ * Parameters: cust_query - [IN] entity to free                               *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_shared_cust_query_clean(zbx_vmware_cust_query_t *cust_query)
 {
-
 	if (NULL != cust_query->query_params)
 	{
 		zbx_vector_custquery_param_clear_ext(cust_query->query_params, vmware_cq_param_shared_free);
@@ -848,20 +847,20 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 	zbx_vector_ptr_clear_ext(&data->events, (zbx_clean_func_t)vmware_event_free);
 	zbx_vector_ptr_destroy(&data->events);
 
-	zbx_vector_vmware_datastore_clear_ext(&data->datastores, vmware_datastore_free);
-	zbx_vector_vmware_datastore_destroy(&data->datastores);
+	zbx_vector_vmware_datastore_ptr_clear_ext(&data->datastores, vmware_datastore_free);
+	zbx_vector_vmware_datastore_ptr_destroy(&data->datastores);
 
-	zbx_vector_vmware_datacenter_clear_ext(&data->datacenters, vmware_datacenter_free);
-	zbx_vector_vmware_datacenter_destroy(&data->datacenters);
+	zbx_vector_vmware_datacenter_ptr_clear_ext(&data->datacenters, vmware_datacenter_free);
+	zbx_vector_vmware_datacenter_ptr_destroy(&data->datacenters);
 
 	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
 	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
 
-	zbx_vector_vmware_dvswitch_clear_ext(&data->dvswitches, vmware_dvswitch_free);
-	zbx_vector_vmware_dvswitch_destroy(&data->dvswitches);
+	zbx_vector_vmware_dvswitch_ptr_clear_ext(&data->dvswitches, vmware_dvswitch_free);
+	zbx_vector_vmware_dvswitch_ptr_destroy(&data->dvswitches);
 
-	zbx_vector_vmware_alarm_clear_ext(&data->alarms, vmware_alarm_free);
-	zbx_vector_vmware_alarm_destroy(&data->alarms);
+	zbx_vector_vmware_alarm_ptr_clear_ext(&data->alarms, vmware_alarm_free);
+	zbx_vector_vmware_alarm_ptr_destroy(&data->alarms);
 
 	zbx_vector_str_clear_ext(&data->alarm_ids, zbx_str_free);
 	zbx_vector_str_destroy(&data->alarm_ids);
@@ -1243,26 +1242,26 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get open alarms and their details                                 *
+ * Purpose: gets open alarms and their details                                *
  *                                                                            *
- * Parameters: func_parent  - [IN] the parent function name                   *
- *             service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             xdoc         - [IN] the xml doc with info about alarms         *
- *             node         - [IN] the xml node with info about alarms        *
- *             ids          - [IN] the linked alarms ids                      *
- *             alarms_data  - [IN/OUT] the all alarms with cache              *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: func_parent  - [IN] parent function name                       *
+ *             service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             xdoc         - [IN] xml doc with info about alarms             *
+ *             node         - [IN] xml node with info about alarms            *
+ *             ids          - [IN] linked alarms ids                          *
+ *             alarms_data  - [IN/OUT] all alarms with cache                  *
+ *             error        - [OUT] error message in the case of failure      *
  *                                                                            *
- * Return value: SUCCEED   - the operation has completed successfully         *
- *               FAIL      - the operation has failed                         *
+ * Return value: SUCCEED   - operation has completed successfully             *
+ *               FAIL      - operation has failed                             *
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_service_t *service,
 		CURL *easyhandle, xmlDoc *xdoc, xmlNode *node, zbx_vector_str_t *ids,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
-	int 		i, ret = SUCCEED;
+	int 		ret = SUCCEED;
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj = NULL;
 	xmlNodeSetPtr	nodeset;
@@ -1283,10 +1282,10 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		goto clean;
 
 	nodeset = xpathObj->nodesetval;
-	zbx_vector_vmware_alarm_reserve(alarms_data->alarms,
+	zbx_vector_vmware_alarm_ptr_reserve(alarms_data->alarms,
 			(size_t)(alarms_data->alarms->values_num + nodeset->nodeNr));
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		char				*value;
 		int				j;
@@ -1341,7 +1340,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		alarm->acknowledged = (NULL != value && 0 == strcmp(value, "true") ? 1 : 0);
 		zbx_free(value);
 
-		zbx_vector_vmware_alarm_append(alarms_data->alarms, alarm);
+		zbx_vector_vmware_alarm_ptr_append(alarms_data->alarms, alarm);
 		zbx_vector_str_append(ids, zbx_strdup(NULL, alarm->key));
 	}
 clean:
@@ -1569,19 +1568,19 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieves status of the specified vmware cluster                  *
+ * Purpose: retrieves status of specified vmware cluster                      *
  *                                                                            *
- * Parameters: easyhandle   - [IN] the CURL handle                            *
+ * Parameters: easyhandle   - [IN] CURL handle                                *
  *             datastores   - [IN] all available Datastores                   *
- *             cluster      - [IN/OUT] the cluster                            *
- *             cq_values    - [IN/OUT] the vector with custom query entries   *
- *             error        - [OUT] the error message in the case of failure  *
+ *             cluster      - [IN/OUT]                                        *
+ *             cq_values    - [IN/OUT] vector with custom query entries       *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_vmware_datastore_t *datastores,
+static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_vmware_datastore_ptr_t *datastores,
 		zbx_vmware_cluster_t *cluster, zbx_vector_cq_value_t *cq_values, char **error)
 {
 #	define ZBX_POST_VMWARE_CLUSTER_STATUS 								\
@@ -1605,7 +1604,7 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_v
 		ZBX_POST_VSPHERE_FOOTER
 
 	char			*tmp, *clusterid_esc, *cq_prop;
-	int			i, ret;
+	int			ret;
 	xmlDoc			*doc = NULL;
 	zbx_vector_cq_value_t	cqvs;
 	zbx_vector_str_t	ids;
@@ -1634,14 +1633,14 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_v
 
 	zbx_xml_read_values(doc, ZBX_XPATH_PROP_NAME("datastore") "/*", &ids);
 
-	for (i = 0; i < ids.values_num; i++)
+	for (int i = 0; i < ids.values_num; i++)
 	{
 		int			j;
 		zbx_vmware_datastore_t	ds_cmp;
 
 		ds_cmp.id = ids.values[i];
 
-		if (FAIL == (j = zbx_vector_vmware_datastore_bsearch(datastores, &ds_cmp, vmware_ds_id_compare)))
+		if (FAIL == (j = zbx_vector_vmware_datastore_ptr_bsearch(datastores, &ds_cmp, vmware_ds_id_compare)))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Datastore \"%s\" not found on cluster \"%s\".", __func__,
 					ds_cmp.id, cluster->id);
@@ -1680,7 +1679,7 @@ out:
  *                                                                             *
  *******************************************************************************/
 static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *service, CURL *easyhandle,
-		const zbx_vector_vmware_datastore_t *datastores, zbx_vector_cq_value_t *cq_values,
+		const zbx_vector_vmware_datastore_ptr_t *datastores, zbx_vector_cq_value_t *cq_values,
 		zbx_vector_vmware_cluster_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
@@ -2458,7 +2457,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	zbx_vector_ptr_t	events;
 	zbx_vector_cq_value_t	dvs_query_values, prop_query_values, cust_query_values;
 	zbx_vmware_alarms_data_t	alarms_data;
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	ZBX_HTTPPAGE		page;	/* 347K/87K */
 	unsigned char		evt_pause = 0, evt_skip_old;
 	zbx_uint64_t		evt_last_key, events_sz = 0;
@@ -2473,14 +2472,14 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	zbx_hashset_create(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare);
 	zbx_vector_vmware_cluster_ptr_create(&data->clusters);
 	zbx_vector_ptr_create(&data->events);
-	zbx_vector_vmware_datastore_create(&data->datastores);
-	zbx_vector_vmware_datacenter_create(&data->datacenters);
+	zbx_vector_vmware_datastore_ptr_create(&data->datastores);
+	zbx_vector_vmware_datacenter_ptr_create(&data->datacenters);
 	zbx_vector_vmware_resourcepool_create(&data->resourcepools);
-	zbx_vector_vmware_dvswitch_create(&data->dvswitches);
+	zbx_vector_vmware_dvswitch_ptr_create(&data->dvswitches);
 	zbx_vector_cq_value_create(&dvs_query_values);
 	zbx_vector_cq_value_create(&prop_query_values);
 	zbx_vector_str_create(&data->alarm_ids);
-	zbx_vector_vmware_alarm_create(&data->alarms);
+	zbx_vector_vmware_alarm_ptr_create(&data->alarms);
 	alarms_data.alarms = &data->alarms;
 	zbx_vector_vmware_alarm_details_create(&alarms_data.details);
 	zbx_vector_cq_value_create(&cust_query_values);
@@ -2535,20 +2534,20 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 		goto clean;
 	}
 
-	zbx_vector_vmware_datastore_reserve(&data->datastores, (size_t)(dss.values_num + data->datastores.values_alloc));
+	zbx_vector_vmware_datastore_ptr_reserve(&data->datastores, (size_t)(dss.values_num + data->datastores.values_alloc));
 
-	for (i = 0; i < dss.values_num; i++)
+	for (int i = 0; i < dss.values_num; i++)
 	{
 		zbx_vmware_datastore_t	*datastore;
 
 		if (NULL != (datastore = vmware_service_create_datastore(service, easyhandle, dss.values[i],
 				&prop_query_values, &alarms_data)))
 		{
-			zbx_vector_vmware_datastore_append(&data->datastores, datastore);
+			zbx_vector_vmware_datastore_ptr_append(&data->datastores, datastore);
 		}
 	}
 
-	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_id_compare);
+	zbx_vector_vmware_datastore_ptr_sort(&data->datastores, vmware_ds_id_compare);
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type &&
 			SUCCEED != vmware_service_get_clusters_and_resourcepools(service, easyhandle, &data->datastores,
@@ -2563,7 +2562,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < hvs.values_num; i++)
+	for (int i = 0; i < hvs.values_num; i++)
 	{
 		zbx_vmware_hv_t	hv_local, *hv;
 
@@ -2589,18 +2588,18 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 		}
 	}
 
-	for (i = 0; i < data->datastores.values_num; i++)
+	for (int i = 0; i < data->datastores.values_num; i++)
 	{
 		zbx_vector_str_uint64_pair_sort(&data->datastores.values[i]->hv_uuids_access,
 				zbx_str_uint64_pair_name_compare);
 	}
 
-	zbx_vector_vmware_datastore_sort(&data->datastores, vmware_ds_uuid_compare);
+	zbx_vector_vmware_datastore_ptr_sort(&data->datastores, vmware_ds_uuid_compare);
 
 	vmware_service_dvswitch_load(easyhandle, &dvs_query_values);
 	vmware_service_props_load(easyhandle, get_vmware_service_objects()[service->type].property_collector,
 			&prop_query_values);
-	zbx_vector_vmware_alarm_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_alarm_ptr_sort(&data->alarms, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	if (0 == service->eventlog.req_sz && 0 == evt_pause)
 	{
@@ -2685,7 +2684,7 @@ out:
 		if (0 == service->eventlog.last_key || vmware_shmem_get_vmware_mem()->free_size < events_sz ||
 				SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		{
-			for (i = 0; i < data->events.values_num; i++)
+			for (int i = 0; i < data->events.values_num; i++)
 			{
 				zbx_vmware_event_t	*event = data->events.values[i];
 

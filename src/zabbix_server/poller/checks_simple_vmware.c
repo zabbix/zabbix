@@ -91,24 +91,24 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to Datastore data from vector with id              *
+ * Purpose: returns pointer to Datastore data from vector with id             *
  *                                                                            *
- * Parameters: dss     - [IN] the vector with all Datastores                  *
- *             ds_uuid - [IN] the id of Datastore                             *
+ * Parameters: dss     - [IN] vector with all Datastores                      *
+ *             ds_uuid - [IN] id of Datastore                                 *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_datastore_t* - the operation has completed successfully  *
- *        NULL                    - the operation has failed                  *
+ *        zbx_vmware_datastore_t* - operation has completed successfully      *
+ *        NULL                    - operation has failed                      *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, const char *ds_uuid)
+static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_ptr_t *dss, const char *ds_uuid)
 {
 	int			i;
 	zbx_vmware_datastore_t	ds_cmp;
 
 	ds_cmp.uuid = (char *)ds_uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, vmware_ds_uuid_compare)))
 		return NULL;
 
 	return dss->values[i];
@@ -116,24 +116,24 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to DVSwitch data from vector with uuid             *
+ * Purpose: returns pointer to DVSwitch data from vector with uuid            *
  *                                                                            *
- * Parameters: dvss - [IN] the vector with all DVSwitches                     *
- *             uuid - [IN] the id of dvswitch                                 *
+ * Parameters: dvss - [IN] vector with all DVSwitches                         *
+ *             uuid - [IN] id of dvswitch                                     *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_dvswitch_t* - the operation has completed successfully   *
- *        NULL                    - the operation has failed                  *
+ *        zbx_vmware_dvswitch_t* - operation has completed successfully       *
+ *        NULL                   - operation has failed                       *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, const char *uuid)
+static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_ptr_t *dvss, const char *uuid)
 {
 	zbx_vmware_dvswitch_t	dvs_cmp;
 	int			i;
 
 	dvs_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_dvswitch_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dvswitch_ptr_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
 		return NULL;
 
 	return dvss->values[i];
@@ -141,24 +141,24 @@ static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to Datacenter data from vector with id             *
+ * Purpose: returns pointer to Datacenter data from vector with id            *
  *                                                                            *
- * Parameters: dcs - [IN] the vector with all Datacenters                     *
- *             id  - [IN] the id of Datacenter                                *
+ * Parameters: dcs - [IN] vector with all Datacenters                         *
+ *             id  - [IN] id of Datacenter                                    *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_datacenter_t* - the operation has completed successfully *
- *        NULL                     - the operation has failed                 *
+ *        zbx_vmware_datacenter_t* - operation has completed successfully     *
+ *        NULL                     - operation has failed                     *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_t *dcs, const char *id)
+static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_ptr_t *dcs, const char *id)
 {
 	int			i;
 	zbx_vmware_datacenter_t	cmp;
 
 	cmp.id = (char *)id;
 
-	if (FAIL == (i = zbx_vector_vmware_datacenter_bsearch(dcs, &cmp, vmware_dc_id_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datacenter_ptr_bsearch(dcs, &cmp, vmware_dc_id_compare)))
 		return NULL;
 
 	return dcs->values[i];
@@ -279,6 +279,8 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __func__,
 			type, id, counterid, instance);
 
+	zbx_vmware_perf_counter_t	loc = {.counterid = counterid};
+
 	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
 		/* the requested counter has not been queried yet */
@@ -293,7 +295,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (FAIL == (i = zbx_vector_ptr_bsearch(&entity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
@@ -2353,7 +2355,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	nic_cmp.name = (char *)if_name;
 
-	if (FAIL == (i = zbx_vector_vmware_pnic_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
+	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
 		goto out;
@@ -2619,7 +2621,7 @@ static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char
 
 	dsname_cmp.name = (char *)ds_name;
 
-	if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", ds_name));
 		goto unlock;
@@ -2746,7 +2748,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 	{
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_name};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3001,7 +3003,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					name));
@@ -3018,7 +3020,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 	{
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)name};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3383,7 +3385,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 		dsname_cmp.name = (char *)ds_name;
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					ds_name));
@@ -3462,7 +3464,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	{
 		zbx_vmware_datastore_t	ds_cmp =  {.name = (char *)ds_name};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3605,7 +3607,7 @@ int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *usernam
 		int			i;
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)uuid};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -4071,7 +4073,7 @@ int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, con
 
 	custom_attr.name = (char *)attr_name;
 
-	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr,
+	if (FAIL == (index = zbx_vector_vmware_custom_attr_ptr_bsearch(&vm->custom_attrs, &custom_attr,
 			vmware_custom_attr_compare_name)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Custom attribute is not available."));
@@ -6051,20 +6053,20 @@ out:
 }
 
 
-static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids,
+static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_ptr_t *alarms, zbx_vector_str_t *ids,
 		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_OK;
+	int		ret = SYSINFO_RET_OK;
 	struct zbx_json	json_data;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < ids->values_num; i++)
+	for (int i = 0; i < ids->values_num; i++)
 	{
 		zbx_vmware_alarm_t	*alarm, cmp = {.key = ids->values[i]};
 		int			j;
 
-		if (FAIL == (j = zbx_vector_vmware_alarm_bsearch(alarms, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+		if (FAIL == (j = zbx_vector_vmware_alarm_ptr_bsearch(alarms, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Alarm not found:%s", cmp.key));
 			ret = SYSINFO_RET_FAIL;

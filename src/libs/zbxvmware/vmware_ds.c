@@ -88,8 +88,8 @@ void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)
 	zbx_vector_str_uint64_pair_clear_ext(&datastore->hv_uuids_access, zbx_str_uint64_pair_free);
 	zbx_vector_str_uint64_pair_destroy(&datastore->hv_uuids_access);
 
-	zbx_vector_vmware_diskextent_clear_ext(&datastore->diskextents, vmware_diskextent_free);
-	zbx_vector_vmware_diskextent_destroy(&datastore->diskextents);
+	zbx_vector_vmware_diskextent_ptr_clear_ext(&datastore->diskextents, vmware_diskextent_free);
+	zbx_vector_vmware_diskextent_ptr_destroy(&datastore->diskextents);
 
 	zbx_vector_str_clear_ext(&datastore->alarm_ids, zbx_str_free);
 	zbx_vector_str_destroy(&datastore->alarm_ids);
@@ -119,7 +119,7 @@ char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_ptr_t 
 	{
 		zbx_vmware_datastore_t	*ds = dss->values[i];
 
-		if (FAIL == zbx_vector_vmware_diskextent_bsearch(&ds->diskextents, &dx_cmp,
+		if (FAIL == zbx_vector_vmware_diskextent_ptr_bsearch(&ds->diskextents, &dx_cmp,
 				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC))
 		{
 			continue;
@@ -342,7 +342,7 @@ zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service
 	datastore->uncommitted = uncommitted;
 	zbx_vector_str_create(&datastore->alarm_ids);
 	zbx_vector_str_uint64_pair_create(&datastore->hv_uuids_access);
-	zbx_vector_vmware_diskextent_create(&datastore->diskextents);
+	zbx_vector_vmware_diskextent_ptr_create(&datastore->diskextents);
 	vmware_service_get_diskextents_list(doc, &datastore->diskextents);
 
 	if (0 != cqvs.values_num)

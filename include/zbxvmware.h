@@ -186,7 +186,7 @@ typedef struct
 zbx_vmware_dsname_t;
 
 int	vmware_dsname_compare(const void *d1, const void *d2);
-ZBX_PTR_VECTOR_DECL(vmware_dsname, zbx_vmware_dsname_t *)
+ZBX_PTR_VECTOR_DECL(vmware_dsname_ptr, zbx_vmware_dsname_t *)
 
 typedef struct
 {
@@ -310,7 +310,7 @@ typedef struct
 	char					*parent_type;
 	char					*ip;
 	char					**props;
-	zbx_vector_vmware_dsname_t		dsnames;
+	zbx_vector_vmware_dsname_ptr_t		dsnames;
 	zbx_vector_vmware_vm_ptr_t		vms;
 	zbx_vector_vmware_pnic_ptr_t		pnics;
 	zbx_vector_str_t			alarm_ids;
@@ -412,7 +412,7 @@ typedef struct
 	char	*value;
 }
 zbx_vmware_custquery_param_t;
-ZBX_PTR_VECTOR_DECL(custquery_param_ptr, zbx_vmware_custquery_param_t)
+ZBX_PTR_VECTOR_DECL(custquery_param, zbx_vmware_custquery_param_t)
 void	zbx_vmware_cq_param_free(zbx_vmware_custquery_param_t cq_param);
 
 /* the vmware custom request */
@@ -434,7 +434,7 @@ typedef struct
 	zbx_vmware_custom_query_type_t		query_type;
 
 	/* the fields name and values of query */
-	zbx_vector_custquery_param_ptr_t	*query_params;
+	zbx_vector_custquery_param_t		*query_params;
 
 	/* timestamp when the entity was pooled last time */
 	time_t					last_pooled;
@@ -599,7 +599,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 
 zbx_vmware_cust_query_t *zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *soap_type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
-		zbx_vector_custquery_param_ptr_t *query_params);
+		zbx_vector_custquery_param_t *query_params);
 zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode);
 

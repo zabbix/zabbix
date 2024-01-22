@@ -139,13 +139,13 @@ int	vmware_hv_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
- * Parameters: hv   - [IN] the vmware hypervisor                              *
+ * Parameters: hv   - [IN] vmware hypervisor                                  *
  *                                                                            *
  ******************************************************************************/
 void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_vmware_dsname_clear_ext(&hv->dsnames, vmware_shmem_dsname_free);
-	zbx_vector_vmware_dsname_destroy(&hv->dsnames);
+	zbx_vector_vmware_dsname_ptr_clear_ext(&hv->dsnames, vmware_shmem_dsname_free);
+	zbx_vector_vmware_dsname_ptr_destroy(&hv->dsnames);
 
 	zbx_vector_vmware_vm_ptr_clear_ext(&hv->vms, vmware_vm_shared_free);
 	zbx_vector_vmware_vm_ptr_destroy(&hv->vms);
@@ -230,13 +230,13 @@ static void	vmware_pnic_free(zbx_vmware_pnic_t *nic)
  *                                                                            *
  * Purpose: frees resources allocated to store vmware hypervisor              *
  *                                                                            *
- * Parameters: hv   - [IN] the vmware hypervisor                              *
+ * Parameters: hv   - [IN] vmware hypervisor                                  *
  *                                                                            *
  ******************************************************************************/
 void	vmware_hv_clean(zbx_vmware_hv_t *hv)
 {
-	zbx_vector_vmware_dsname_clear_ext(&hv->dsnames, vmware_dsname_free);
-	zbx_vector_vmware_dsname_destroy(&hv->dsnames);
+	zbx_vector_vmware_dsname_ptr_clear_ext(&hv->dsnames, vmware_dsname_free);
+	zbx_vector_vmware_dsname_ptr_destroy(&hv->dsnames);
 
 	zbx_vector_vmware_vm_ptr_clear_ext(&hv->vms, vmware_vm_free);
 	zbx_vector_vmware_vm_ptr_destroy(&hv->vms);
@@ -1236,7 +1236,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 
 	memset(hv, 0, sizeof(zbx_vmware_hv_t));
 
-	zbx_vector_vmware_dsname_create(&hv->dsnames);
+	zbx_vector_vmware_dsname_ptr_create(&hv->dsnames);
 	zbx_vector_vmware_diskinfo_ptr_create(&hv->diskinfo);
 	zbx_vector_vmware_vm_ptr_create(&hv->vms);
 
@@ -1288,7 +1288,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 
 	zbx_xml_read_values(details, ZBX_XPATH_HV_DATASTORES(), &datastores);
 	zbx_vector_str_sort(&datastores, ZBX_DEFAULT_STR_COMPARE_FUNC);
-	zbx_vector_vmware_dsname_reserve(&hv->dsnames, (size_t)datastores.values_num);
+	zbx_vector_vmware_dsname_ptr_reserve(&hv->dsnames, (size_t)datastores.values_num);
 	zabbix_log(LOG_LEVEL_DEBUG, "%s(): %d datastores are connected to hypervisor \"%s\"", __func__,
 			datastores.values_num, hv->id);
 
@@ -1370,10 +1370,10 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 		}
 
 		zbx_vector_vmware_hvdisk_sort(&dsname->hvdisks, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-		zbx_vector_vmware_dsname_append(&hv->dsnames, dsname);
+		zbx_vector_vmware_dsname_ptr_append(&hv->dsnames, dsname);
 	}
 
-	zbx_vector_vmware_dsname_sort(&hv->dsnames, vmware_dsname_compare);
+	zbx_vector_vmware_dsname_ptr_sort(&hv->dsnames, vmware_dsname_compare);
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
 	zbx_vector_vmware_vm_ptr_reserve(&hv->vms, (size_t)(vms.values_num + hv->vms.values_alloc));
 

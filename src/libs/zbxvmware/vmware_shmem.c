@@ -47,7 +47,7 @@ ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
 
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_str_t*, str)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_entity_tags_t*, vmware_entity_tags)
-VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_custquery_param_ptr_t*, custquery_param)
+VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_custquery_param_t*, custquery_param)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_ptr_t*, ptr)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_tag_t*, vmware_tag)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_perf_counter_ptr)
@@ -731,12 +731,12 @@ static zbx_vmware_diskinfo_t	*vmware_diskinfo_shared_dup(const zbx_vmware_diskin
  ******************************************************************************/
 static void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *src)
 {
-	VMWARE_VECTOR_CREATE(&dst->dsnames, vmware_dsname);
+	VMWARE_VECTOR_CREATE(&dst->dsnames, vmware_dsname_ptr);
 	VMWARE_VECTOR_CREATE(&dst->vms, vmware_vm_ptr);
 	VMWARE_VECTOR_CREATE(&dst->pnics, vmware_pnic_ptr);
 	VMWARE_VECTOR_CREATE(&dst->alarm_ids, str);
 	VMWARE_VECTOR_CREATE(&dst->diskinfo, vmware_diskinfo_ptr);
-	zbx_vector_vmware_dsname_reserve(&dst->dsnames, (size_t)src->dsnames.values_num);
+	zbx_vector_vmware_dsname_ptr_reserve(&dst->dsnames, (size_t)src->dsnames.values_num);
 	zbx_vector_vmware_vm_ptr_reserve(&dst->vms, (size_t)src->vms.values_num);
 	zbx_vector_vmware_pnic_ptr_reserve(&dst->pnics, (size_t)src->pnics.values_num);
 	zbx_vector_str_reserve(&dst->alarm_ids, (size_t)src->alarm_ids.values_num);
@@ -753,7 +753,7 @@ static void	vmware_hv_shared_copy(zbx_vmware_hv_t *dst, const zbx_vmware_hv_t *s
 	dst->ip = vmware_shared_strdup(src->ip);
 
 	for (int i = 0; i < src->dsnames.values_num; i++)
-		zbx_vector_vmware_dsname_append(&dst->dsnames, vmware_dsname_shared_dup(src->dsnames.values[i]));
+		zbx_vector_vmware_dsname_ptr_append(&dst->dsnames, vmware_dsname_shared_dup(src->dsnames.values[i]));
 
 	for (int i = 0; i < src->vms.values_num; i++)
 		zbx_vector_vmware_vm_ptr_append(&dst->vms, vmware_shmem_vm_dup((zbx_vmware_vm_t *)src->vms.values[i]));
@@ -875,14 +875,13 @@ static zbx_hash_t	vmware_vm_hash(const void *data)
  *                                                                            *
  * Purpose: copies vmware hypervisor datastore object into shared memory      *
  *                                                                            *
- * Parameters: src   - [IN] the vmware datastore object                       *
+ * Parameters: src   - [IN] vmware datastore object                           *
  *                                                                            *
- * Return value: a duplicated vmware datastore object                         *
+ * Return value: duplicated vmware datastore object                           *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_datastore_t *src)
 {
-	int			i;
 	zbx_vmware_datastore_t	*datastore;
 
 	datastore = (zbx_vmware_datastore_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datastore_t));
@@ -894,8 +893,8 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 
 	zbx_vector_str_uint64_pair_reserve(&datastore->hv_uuids_access, (size_t)src->hv_uuids_access.values_num);
 
-	VMWARE_VECTOR_CREATE(&datastore->diskextents, vmware_diskextent);
-	zbx_vector_vmware_diskextent_reserve(&datastore->diskextents, (size_t)src->diskextents.values_num);
+	VMWARE_VECTOR_CREATE(&datastore->diskextents, vmware_diskextent_ptr);
+	zbx_vector_vmware_diskextent_ptr_reserve(&datastore->diskextents, (size_t)src->diskextents.values_num);
 	VMWARE_VECTOR_CREATE(&datastore->alarm_ids, str);
 	zbx_vector_str_reserve(&datastore->alarm_ids, (size_t)src->alarm_ids.values_num);
 
@@ -903,7 +902,7 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 	datastore->free_space = src->free_space;
 	datastore->uncommitted = src->uncommitted;
 
-	for (i = 0; i < src->hv_uuids_access.values_num; i++)
+	for (int i = 0; i < src->hv_uuids_access.values_num; i++)
 	{
 		zbx_str_uint64_pair_t	val;
 
@@ -912,13 +911,13 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
 		zbx_vector_str_uint64_pair_append_ptr(&datastore->hv_uuids_access, &val);
 	}
 
-	for (i = 0; i < src->diskextents.values_num; i++)
+	for (int i = 0; i < src->diskextents.values_num; i++)
 	{
-		zbx_vector_vmware_diskextent_append(&datastore->diskextents,
+		zbx_vector_vmware_diskextent_ptr_append(&datastore->diskextents,
 				vmware_shmem_diskextent_dup(src->diskextents.values[i]));
 	}
 
-	for (i = 0; i < src->alarm_ids.values_num; i++)
+	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&datastore->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
 	return datastore;
@@ -928,9 +927,9 @@ static zbx_vmware_datastore_t	*vmware_datastore_shared_dup(const zbx_vmware_data
  *                                                                            *
  * Purpose: copies vmware data object into shared memory                      *
  *                                                                            *
- * Parameters: src   - [IN] the vmware data object                            *
+ * Parameters: src   - [IN] vmware data object                                *
  *                                                                            *
- * Return value: a duplicated vmware data object                              *
+ * Return value: duplicated vmware data object                                *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
@@ -944,7 +943,6 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	zbx_hashset_create_ext(&data->hvs, 1, vmware_hv_hash, vmware_hv_compare, NULL, __vm_shmem_malloc_func,
 			__vm_shmem_realloc_func, __vm_shmem_free_func);
 
-	//VMWARE_VECTOR_CREATE(&data->clusters, ptr);
 	VMWARE_VECTOR_CREATE(&data->clusters, vmware_cluster_ptr);
 	VMWARE_VECTOR_CREATE(&data->events, ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore_ptr);
@@ -1093,10 +1091,10 @@ void	vmware_shmem_service_hashset_create(zbx_vmware_service_t *service)
 #undef ZBX_VMWARE_COUNTERS_INIT_SIZE
 }
 
-zbx_vector_custquery_param_ptr_t *vmware_shmem_custquery_malloc(void)
+zbx_vector_custquery_param_t *vmware_shmem_custquery_malloc(void)
 {
-	return (zbx_vector_custquery_param_ptr_t *) __vm_shmem_malloc_func(NULL,
-				sizeof(zbx_vector_custquery_param_ptr_t));
+	return (zbx_vector_custquery_param_t *) __vm_shmem_malloc_func(NULL,
+				sizeof(zbx_vector_custquery_param_t));
 }
 
 /******************************************************************************
