@@ -2897,7 +2897,7 @@ void	zbx_vc_flush_stats(void)
  ******************************************************************************/
 void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 {
-	if (ZBX_VC_DISABLED == vc_state || 0 == items->values_num)
+	if (ZBX_VC_DISABLED == vc_state)
 		return;
 
 	WRLOCK_CACHE;
