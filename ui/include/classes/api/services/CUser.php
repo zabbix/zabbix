@@ -1198,7 +1198,7 @@ class CUser extends CApiService {
 
 			if ($user['role_type'] !== null && $user['role_type'] != USER_TYPE_SUPER_ADMIN) {
 				if ($db_users === null) {
-					if (array_key_exists('usrgrps', $user)) {
+					if (array_key_exists('usrgrps', $user) && $user['usrgrps']) {
 						$usrgrpids = array_column($user['usrgrps'], 'usrgrpid');
 					}
 				}
