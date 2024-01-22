@@ -588,7 +588,7 @@ zbx_vmware_dev_t	*vmware_shmem_dev_dup(const zbx_vmware_dev_t *src)
  *                                                                            *
  * Purpose: copies vmware virtual machine object into shared memory           *
  *                                                                            *
- * Parameters: src   - [IN] vmware virtual machine object                     *
+ * Parameters: src - [IN] vmware virtual machine object                       *
  *                                                                            *
  * Return value: duplicated vmware virtual machine object                     *
  *                                                                            *

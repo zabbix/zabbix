@@ -125,14 +125,14 @@ out:
  * Parameters: doc         - [IN] XML document                                *
  *             dvswitches  - [OUT] list of vmware DVSwitch                    *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswitch_ptr_t *dvswitches)
 {
 	char			*id, *name, *uuid;
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
@@ -158,7 +158,7 @@ static int	vmware_service_get_dvswitch_list(xmlDoc *doc, zbx_vector_vmware_dvswi
 	nodeset = xpathObj->nodesetval;
 	zbx_vector_vmware_dvswitch_ptr_reserve(dvswitches, (size_t)nodeset->nodeNr);
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		if (NULL == (id = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_NN("obj"))))
 		{
@@ -461,7 +461,7 @@ int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskexten
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 
 	if (NULL == doc)
 		return ret;
@@ -476,7 +476,7 @@ int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskexten
 
 	nodeset = xpathObj->nodesetval;
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		char			*value;
 		zbx_vmware_diskextent_t	*diskextent;

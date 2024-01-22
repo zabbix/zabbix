@@ -80,7 +80,7 @@ static void	zbx_str_uint64_pair_free(zbx_str_uint64_pair_t data)
  *                                                                            *
  * Purpose: frees resources allocated to store datastore data                 *
  *                                                                            *
- * Parameters: datastore   - [IN] the datastore                               *
+ * Parameters: datastore   - [IN]                                             *
  *                                                                            *
  ******************************************************************************/
 void	vmware_datastore_free(zbx_vmware_datastore_t *datastore)

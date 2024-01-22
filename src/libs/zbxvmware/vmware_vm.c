@@ -103,7 +103,7 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
  *                                                                            *
  * Purpose: frees shared resources allocated to store virtual machine         *
  *                                                                            *
- * Parameters: vm   - [IN] the virtual machine                                *
+ * Parameters: vm   - [IN]                                                    *
  *                                                                            *
  ******************************************************************************/
 void	vmware_vm_shared_free(zbx_vmware_vm_t *vm)

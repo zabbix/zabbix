@@ -596,15 +596,14 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: adds new or remove old entities (hypervisors, virtual machines)   *
+ * Purpose: adds new or removes old entities (hypervisors, virtual machines)  *
  *          from service performance entity list                              *
  *                                                                            *
- * Parameters: service - [IN] the vmware service                              *
+ * Parameters: service - [IN] vmware service                                  *
  *                                                                            *
  ******************************************************************************/
 void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 {
-	int			i;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_t		*vm;
 	zbx_hashset_iter_t	iter;
@@ -655,7 +654,7 @@ void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 		vmware_service_add_perf_entity(service, ZBX_VMWARE_SOAP_HV, hv->id, hv_perfcounters,
 				ZBX_VMWARE_PERF_QUERY_ALL, service->lastcheck);
 
-		for (i = 0; i < hv->vms.values_num; i++)
+		for (int i = 0; i < hv->vms.values_num; i++)
 		{
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
 			vmware_service_add_perf_entity(service, ZBX_VMWARE_SOAP_VM, vm->id, vm_perfcounters,
@@ -667,7 +666,7 @@ void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
 
 	if (ZBX_VMWARE_TYPE_VCENTER == service->type)
 	{
-		for (i = 0; i < service->data->datastores.values_num; i++)
+		for (int i = 0; i < service->data->datastores.values_num; i++)
 		{
 			zbx_vmware_datastore_t	*ds = service->data->datastores.values[i];
 			vmware_service_add_perf_entity(service, ZBX_VMWARE_SOAP_DS, ds->id, ds_perfcounters,

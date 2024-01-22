@@ -753,19 +753,19 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets the vmware hypervisor internal disks details info            *
+ * Purpose: gets vmware hypervisor internal disks details info                *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             hv_data      - [IN] the hv data with scsi topology info        *
- *             hvid         - [IN] the vmware hypervisor id                   *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             hv_data      - [IN] hv data with scsi topology info            *
+ *             hvid         - [IN] vmware hypervisor id                       *
  *             dss          - [IN] all known Datastores                       *
- *             vsan_uuid    - [IN] uuid of vsan Datastore                    *
- *             disks_info   - [OUT]
- *             error        - [OUT] the error message in the case of failure  *
+ *             vsan_uuid    - [IN] uuid of vsan Datastore                     *
+ *             disks_info   - [OUT]                                           *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service, CURL *easyhandle,
@@ -804,7 +804,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	xmlDoc				*doc = NULL, *doc_dinfo = NULL;
 	zbx_property_collection_iter	*iter = NULL;
 	char				*tmp = NULL, *hvid_esc, *scsi_req = NULL, *err = NULL;
-	int				i, total, updated = 0, updated_vsan = 0, ret = SUCCEED;
+	int				total, updated = 0, updated_vsan = 0, ret = SUCCEED;
 	const char			*pcollecter = get_vmware_service_objects()[service->type].property_collector;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, hvid);
@@ -817,7 +817,7 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 	if (0 == total)
 		goto out;
 
-	for (i = 0; i < scsi_luns.values_num; i++)
+	for (int i = 0; i < scsi_luns.values_num; i++)
 	{
 		scsi_req = zbx_strdcatf(scsi_req , ZBX_POST_SCSI_INFO, scsi_luns.values[i], scsi_luns.values[i],
 				scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i], scsi_luns.values[i],
@@ -1214,7 +1214,7 @@ static const char	*vmware_hv_vsan_uuid(zbx_vector_vmware_datastore_ptr_t *dss, z
  *             cq_values    - [IN/OUT] vector with custom query entries       *
  *             alarms_data  - [IN/OUT] vector with all alarms                 *
  *             hv           - [OUT] hypervisor object (must be allocated)     *
- *             error        - [OUT] error message in the case of failure      *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
  * Return value: SUCCEED - hypervisor object was initialized successfully     *
  *               FAIL    - otherwise                                          *
@@ -1226,7 +1226,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 		char **error)
 {
 	char				*value, *cq_prop;
-	int				i, j, ret;
+	int				j, ret;
 	xmlDoc				*details = NULL, *multipath_data = NULL;
 	zbx_vector_str_t		datastores, vms;
 	zbx_vector_cq_value_t		cqvs;
@@ -1307,7 +1307,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 	if (SUCCEED != vmware_hv_ds_access_update(service, easyhandle, hv->uuid, hv->id, &datastores, dss, error))
 		goto out;
 
-	for (i = 0; i < datastores.values_num; i++)
+	for (int i = 0; i < datastores.values_num; i++)
 	{
 		zbx_vmware_datastore_t	*ds, ds_cmp;
 		zbx_vmware_dsname_t	*dsname;
@@ -1377,7 +1377,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
 	zbx_vector_vmware_vm_ptr_reserve(&hv->vms, (size_t)(vms.values_num + hv->vms.values_alloc));
 
-	for (i = 0; i < vms.values_num; i++)
+	for (int i = 0; i < vms.values_num; i++)
 	{
 		zbx_vmware_vm_t	*vm;
 
@@ -1395,7 +1395,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 
 	zbx_vector_vmware_diskinfo_ptr_reserve(&hv->diskinfo, (size_t)disks_info.values_num);
 
-	for (i = 0; i < disks_info.values_num; i++)
+	for (int i = 0; i < disks_info.values_num; i++)
 	{
 		zbx_vector_vmware_diskinfo_ptr_append(&hv->diskinfo, disks_info.values[i].second);
 		disks_info.values[i].second = NULL;
@@ -1413,7 +1413,7 @@ out:
 	zbx_vector_str_destroy(&datastores);
 	zbx_vector_cq_value_destroy(&cqvs);
 
-	for (i = 0; i < disks_info.values_num; i++)
+	for (int i = 0; i < disks_info.values_num; i++)
 	{
 		zbx_str_free(disks_info.values[i].first);
 

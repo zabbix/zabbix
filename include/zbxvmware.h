@@ -74,7 +74,7 @@ zbx_vmware_perf_counter_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_perf_counter_ptr, zbx_vmware_perf_counter_t *)
 
-/* an entity monitored with performance counters*/
+/* an entity monitored with performance counters */
 typedef struct
 {
 	/* entity type: HostSystem or VirtualMachine */
@@ -378,7 +378,6 @@ typedef struct
 	int		timestamp;	/* event's time stamp */
 }
 zbx_vmware_event_t;
-
 
 /* the vmware service data object */
 typedef struct
