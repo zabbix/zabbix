@@ -111,8 +111,8 @@ class CUserMacro extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (($options['editable'] && !is_null($options['globalmacro'])) || self::$userData['ugsetid'] === null) {
-				return [];
+			if (($options['editable'] && !is_null($options['globalmacro'])) || self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
 			}
 			else {
 				$sqlParts['from'][] = 'host_hgset hh';

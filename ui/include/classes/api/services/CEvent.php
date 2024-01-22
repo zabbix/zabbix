@@ -224,7 +224,7 @@ class CEvent extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (self::$userData['ugsetid'] === null) {
+			if (self::$userData['ugsetid'] == 0) {
 				$sql_parts['where'][] = '1=0';
 			}
 			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {

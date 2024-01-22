@@ -2884,7 +2884,7 @@ class CUser extends CApiService {
 			}
 		}
 
-		return null;
+		return 0;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

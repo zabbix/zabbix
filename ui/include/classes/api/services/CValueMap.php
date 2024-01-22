@@ -74,8 +74,8 @@ class CValueMap extends CApiService {
 
 		// Permission check.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			if (self::$userData['ugsetid'] === null) {
-				return [];
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
 			}
 
 			$sql_parts['from'][] = 'host_hgset hh';

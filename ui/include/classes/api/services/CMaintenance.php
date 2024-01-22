@@ -98,8 +98,8 @@ class CMaintenance extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (self::$userData['ugsetid'] === null) {
-				return [];
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
 			}
 
 			$permission_condition = $options['editable']

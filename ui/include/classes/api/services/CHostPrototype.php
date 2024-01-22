@@ -161,7 +161,7 @@ class CHostPrototype extends CHostBase {
 		$sqlParts['where'][] = 'ph.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (self::$userData['ugsetid'] === null) {
+			if (self::$userData['ugsetid'] == 0) {
 				$sql_parts['where'][] = '1=0';
 			}
 			else {

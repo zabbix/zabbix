@@ -185,8 +185,8 @@ class CAlert extends CApiService {
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				if (self::$userData['ugsetid'] === null) {
-					return [];
+				if (self::$userData['ugsetid'] == 0) {
+					return $options['countOutput'] ? '0' : [];
 				}
 
 				$sql_parts['from']['e'] = 'events e';
@@ -217,8 +217,8 @@ class CAlert extends CApiService {
 				')';
 			}
 			elseif (in_array($options['eventobject'], [EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
-				if (self::$userData['ugsetid'] === null) {
-					return [];
+				if (self::$userData['ugsetid'] == 0) {
+					return $options['countOutput'] ? '0' : [];
 				}
 
 				$sql_parts['from']['e'] = 'events e';

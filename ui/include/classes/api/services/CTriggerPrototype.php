@@ -107,8 +107,8 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			if (self::$userData['ugsetid'] === null) {
-				return [];
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
 			}
 
 			$sqlParts['from']['functions'] = 'functions f';
