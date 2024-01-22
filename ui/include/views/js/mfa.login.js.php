@@ -24,7 +24,7 @@
  */
 ?>
 
-<script src="js/vendors/qrcode/qrcode.min.js"></script>
+<script src="js/vendors/qrcode/qrcode.js"></script>
 <script>
 	const view = {
 

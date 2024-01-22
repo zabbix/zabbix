@@ -71,6 +71,7 @@ $available_js = [
 	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
 	'd3.v7.min.js' => 'vendors/',
+	'qrcode.js' => 'vendors/qrcode',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
