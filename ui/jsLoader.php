@@ -68,9 +68,9 @@ $available_js = [
 	// vendors
 	'jquery.js' => 'vendors/',
 	'jquery-ui.js' => 'vendors/',
-	'leaflet.js' => 'vendors/Leaflet/Leaflet/',
+	'leaflet.v1.7.0.js' => 'vendors/Leaflet/Leaflet/',
 	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
-	'd3.v7.min.js' => 'vendors/',
+	'd3.v7.js' => 'vendors/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
