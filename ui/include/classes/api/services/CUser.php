@@ -2847,7 +2847,7 @@ class CUser extends CApiService {
 		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
 			$totp_generator = $this->createTotpGenerator($data);
 
-			if ($data['totp_secret'] == '') {
+			if (!array_key_exists('totp_secret', $data) || $data['totp_secret'] == '') {
 				$user_totp_secret = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
 					'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
@@ -2861,7 +2861,7 @@ class CUser extends CApiService {
 			$valid_code = $totp_generator->verifyKey($user_totp_secret, $data['verification_code']);
 
 			if ($valid_code) {
-				if ($data['totp_secret'] != '') {
+				if (array_key_exists('totp_secret', $data) && $data['totp_secret'] != '') {
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $data['mfa']['mfaid'],
 						'userid' =>$data['userid'],
