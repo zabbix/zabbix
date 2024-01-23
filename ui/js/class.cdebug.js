@@ -151,7 +151,7 @@ var jsDump;
 			arguments: array,
 			key: quote, // object calls it internally, the key part of an item in a map
 			functionCode: '[code]', // function calls it internally, it's the content of the function
-			attribute: quote, // onode calls it internally, it's a html attribute value
+			attribute: quote, // onode calls it internally, it's an HTML attribute value
 			string: quote,
 			date: quote,
 			regexp: literal, // regex
