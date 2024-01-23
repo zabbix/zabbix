@@ -993,7 +993,7 @@ static int	check_drule_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 
 	get_object_ids_discovery(esc_events, objectids);
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		size_t	sql_offset = 0;
 
@@ -1188,7 +1188,7 @@ static int	check_proxy_condition(const zbx_vector_db_event_t *esc_events, zbx_co
 
 	get_object_ids_discovery(esc_events, objectids);
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		size_t	sql_offset = 0;
 
@@ -1376,7 +1376,7 @@ static int	check_dhost_ip_condition(const zbx_vector_db_event_t *esc_events, zbx
 
 	get_object_ids_discovery(esc_events, objectids);
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		size_t	sql_offset = 0;
 
@@ -1581,7 +1581,7 @@ static int	check_duptime_condition(const zbx_vector_db_event_t *esc_events, zbx_
 
 	get_object_ids_discovery(esc_events, objectids);
 
-	for (int i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		size_t	sql_offset = 0;
 
@@ -2064,11 +2064,11 @@ static int	check_intern_event_type_condition(const zbx_vector_db_event_t *esc_ev
  *                                                                            *
  ******************************************************************************/
 static void	get_object_ids_internal(const zbx_vector_db_event_t *esc_events, zbx_vector_uint64_t *objectids,
-		const int *objects, const int objects_num)
+		const int *objects, const size_t objects_num)
 {
 	for (int i = 0; i < esc_events->values_num; i++)
 	{
-		int	j;
+		size_t	j;
 
 		const zbx_db_event	*event = esc_events->values[i];
 
@@ -2085,7 +2085,7 @@ static void	get_object_ids_internal(const zbx_vector_db_event_t *esc_events, zbx
 			zabbix_log(LOG_LEVEL_ERR, "unsupported event object [%d]", event->object);
 	}
 
-	for (int i = 0; i < objects_num; i++)
+	for (size_t i = 0; i < objects_num; i++)
 		zbx_vector_uint64_uniq(&objectids[i], ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 }
 
@@ -2116,16 +2116,16 @@ static int	check_intern_host_group_condition(const zbx_vector_db_event_t *esc_ev
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 		zbx_vector_uint64_create(&objectids[i]);
 
 	zbx_vector_uint64_create(&groupids);
 
-	get_object_ids_internal(esc_events, objectids, objects, (int)ARRSIZE(objects));
+	get_object_ids_internal(esc_events, objectids, objects, ARRSIZE(objects));
 
 	zbx_dc_get_nested_hostgroupids(&condition_value, 1, &groupids);
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		size_t	sql_offset = 0;
 
@@ -2185,7 +2185,7 @@ static int	check_intern_host_group_condition(const zbx_vector_db_event_t *esc_ev
 		zbx_db_free_result(result);
 	}
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		if (ZBX_CONDITION_OPERATOR_NOT_EQUAL == condition->op)
 		{
@@ -2255,17 +2255,17 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 	if (ZBX_CONDITION_OPERATOR_EQUAL != condition->op && ZBX_CONDITION_OPERATOR_NOT_EQUAL != condition->op)
 		return NOTSUPPORTED;
 
-	for (int i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		zbx_vector_uint64_create(&objectids[i]);
 		zbx_vector_uint64_pair_create(&objectids_pair[i]);
 	}
 
-	get_object_ids_internal(esc_events, objectids, objects, (int)ARRSIZE(objects));
+	get_object_ids_internal(esc_events, objectids, objects, ARRSIZE(objects));
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (int i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		zbx_vector_uint64_t		*objectids_ptr = &objectids[i];
 		zbx_vector_uint64_pair_t	*objectids_pair_ptr = &objectids_pair[i];
@@ -2311,7 +2311,7 @@ static int	check_intern_host_template_condition(const zbx_vector_db_event_t *esc
 				0 == i ? "t.triggerid" : "h.itemid");
 	}
 
-	for (int i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		zbx_vector_uint64_destroy(&objectids[i]);
 		zbx_vector_uint64_pair_destroy(&objectids_pair[i]);
@@ -2360,12 +2360,12 @@ static int	check_intern_host_condition(const zbx_vector_db_event_t *esc_events, 
 
 	ZBX_STR2UINT64(condition_value, condition->value);
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 		zbx_vector_uint64_create(&objectids[i]);
 
-	get_object_ids_internal(esc_events, objectids, objects, (int)ARRSIZE(objects));
+	get_object_ids_internal(esc_events, objectids, objects, ARRSIZE(objects));
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 	{
 		size_t	sql_offset = 0;
 
@@ -2412,7 +2412,7 @@ static int	check_intern_host_condition(const zbx_vector_db_event_t *esc_events, 
 		zbx_db_free_result(result);
 	}
 
-	for (size_t i = 0; i < (int)ARRSIZE(objects); i++)
+	for (size_t i = 0; i < ARRSIZE(objects); i++)
 		zbx_vector_uint64_destroy(&objectids[i]);
 
 	zbx_free(sql);
