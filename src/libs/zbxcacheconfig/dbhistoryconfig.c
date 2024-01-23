@@ -420,7 +420,7 @@ ZBX_PTR_VECTOR_IMPL(condition_ptr, zbx_condition_t *)
  * Purpose: creates action evaluation data from configuration cache action    *
  *                                                                            *
  * Parameters:                                                                *
- *             dc_action                        - [IN] source action          *
+ *             dc_action - [IN] source action                                 *
  *                                                                            *
  * Return value: action evaluation data                                       *
  *                                                                            *
