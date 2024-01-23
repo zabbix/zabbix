@@ -12,8 +12,9 @@ SUBDIRS = \
 	timer \
 	trapper \
 	escalator \
+	operations \
+	postinit \
 	proxypoller \
-	vmware \
 	taskmanager \
 	stats \
 	preproc \
@@ -34,10 +35,6 @@ libzbxserver_a_SOURCES = \
 	db_lengths.h \
 	actions.c \
 	actions.h \
-	operations.c \
-	operations.h \
-	postinit.c \
-	postinit.h \
 	zbxreport.h
 
 libzbxserver_a_CFLAGS = \
@@ -71,7 +68,7 @@ zabbix_server_LDADD = \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	vmware/libzbxvmware.a \
+	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
 	service/libservice.a \
@@ -84,6 +81,8 @@ zabbix_server_LDADD = \
 	poller/libzbxpoller_server.a \
 	lld/libzbxlld.a \
 	libzbxserver.a \
+	postinit/libzbxpostinit.a \
+	operations/libzbxoperations.a \
 	stats/libzbxserver_server.a \
 	ha/libzbxha.a \
 	$(top_builddir)/src/libs/zbxprometheus/libzbxprometheus.a \

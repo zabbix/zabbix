@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,7 @@
 
 use Widgets\Item\Widget;
 
-if ($data['error'] !== '') {
+if (array_key_exists('error', $data)) {
 	$body = (new CTableInfo())->setNoDataMessage($data['error']);
 }
 else {
@@ -81,17 +81,10 @@ else {
 					break;
 
 				case 'item_value':
-					$div->addClass('item-value');
-
-					if (array_key_exists('value_type', $cell_data)) {
-						$div->addClass(($cell_data['value_type'] == ITEM_VALUE_TYPE_FLOAT
-								|| $cell_data['value_type'] == ITEM_VALUE_TYPE_UINT64)
-							? 'type-number'
-							: 'type-text'
-						);
-					}
-
-					$div->addItem(drawValueCell($cell_data));
+					$div
+						->addClass('item-value')
+						->addClass($cell_data['is_numeric'] ? 'type-number' : 'type-text')
+						->addItem(drawValueCell($cell_data));
 					break;
 			}
 
@@ -112,6 +105,7 @@ else {
 
 (new CWidgetView($data))
 	->addItem($body)
+	->setVar('info', $data['info'])
 	->show();
 
 /**
@@ -141,17 +135,15 @@ function drawValueCell(array $cell_data): array {
 		$item_content_div->addItem($units_div);
 	}
 
-	if (array_key_exists('value', $cell_data['parts'])) {
-		$item_value_div = (new CDiv())->addClass('value');
+	$item_value_div = (new CDiv())->addClass('value');
 
-		if ($cell_data['parts']['value']['text'] === null) {
-			$cell_data['parts']['value']['text'] = _('No data');
-			$item_value_div->addClass('item-value-no-data');
-		}
-
-		$item_value_div = addTextFormatting($item_value_div, $cell_data['parts']['value']);
-		$item_content_div->addItem($item_value_div);
+	if ($cell_data['parts']['value']['text'] === null) {
+		$cell_data['parts']['value']['text'] = _('No data');
+		$item_value_div->addClass('item-value-no-data');
 	}
+
+	$item_value_div = addTextFormatting($item_value_div, $cell_data['parts']['value']);
+	$item_content_div->addItem($item_value_div);
 
 	if (array_key_exists('decimals', $cell_data['parts'])) {
 		$item_decimals_div = (new CDiv())->addClass('decimals');

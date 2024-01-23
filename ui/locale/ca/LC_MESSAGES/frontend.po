@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-16 13:08+0000\n"
+"PO-Revision-Date: 2024-01-06 12:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -3537,7 +3537,7 @@ msgstr "No es pot pas actualitzar massivament el nom d'equip visible."
 
 #: jsLoader.php:435
 msgid "Cannot open URL"
-msgstr ""
+msgstr "No es pot obrir la URL"
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -5000,7 +5000,7 @@ msgstr "Nom del context"
 
 #: app/views/script.userinput.edit.php:82
 msgid "Continue"
-msgstr ""
+msgstr "Continuar"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5910,7 +5910,7 @@ msgstr "Mode d'inventari d'equips predeterminat"
 
 #: app/views/administration.script.edit.php:358
 msgid "Default input string"
-msgstr ""
+msgstr "Cadena d'entrada per defecte"
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7136,11 +7136,11 @@ msgstr "Estil del dibuix"
 
 #: app/views/administration.script.edit.php:353
 msgid "Dropdown"
-msgstr ""
+msgstr "Menú desplegable"
 
 #: app/views/administration.script.edit.php:366
 msgid "Dropdown options"
-msgstr ""
+msgstr "Opcions desplegables"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7542,7 +7542,7 @@ msgstr "Activa les captures"
 
 #: app/views/administration.script.edit.php:333
 msgid "Enable user input"
-msgstr ""
+msgstr "Permetre l'entrada de l'usuari"
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -10859,15 +10859,15 @@ msgstr "La vista inicial s'ignora si s'estableix la vista predeterminada."
 
 #: app/views/administration.script.edit.php:339
 msgid "Input prompt"
-msgstr ""
+msgstr "Petició d'entrada"
 
 #: app/views/administration.script.edit.php:349
 msgid "Input type"
-msgstr ""
+msgstr "Tipus d'entrada"
 
 #: app/views/administration.script.edit.php:376
 msgid "Input validation rule"
-msgstr ""
+msgstr "Regla de validació d'entrada"
 
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
@@ -11044,7 +11044,7 @@ msgstr "La configuració de correspondència del grup d'usuaris d'aprovisionamen
 #: jsLoader.php:438
 #, c-format
 msgid "Invalid URL: %1$s"
-msgstr ""
+msgstr "URL no vàlida: %1$s"
 
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
@@ -11076,7 +11076,7 @@ msgstr "Adreça electrònica no vàlida per al tipus de suport amb l'identificad
 
 #: app/controllers/CControllerScriptUserInputCheck.php:43
 msgid "Invalid input"
-msgstr ""
+msgstr "Entrada incorrecta"
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -12515,7 +12515,7 @@ msgstr "Acció manual de l'equip"
 
 #: app/views/script.userinput.edit.php:100
 msgid "Manual input"
-msgstr ""
+msgstr "Entrada manual"
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -14785,7 +14785,7 @@ msgstr "Només es compten els triggers assignats als equips habilitats i en func
 
 #: jsLoader.php:439
 msgid "Open URL"
-msgstr ""
+msgstr "Obrir la URL"
 
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
@@ -15052,6 +15052,10 @@ msgstr "Anul·la el període d'historial d'elements"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Anul·la el període de tendència de l'element"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Anul·lar la tria de període de temps"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -19440,7 +19444,7 @@ msgstr "Test d'assumpte"
 
 #: app/views/administration.script.edit.php:345
 msgid "Test user input"
-msgstr ""
+msgstr "Provar l'entrada de l'usuari"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -20497,7 +20501,7 @@ msgstr "El nom de l'URL ha d'ésser únic per al mapa \"%1$s\"."
 
 #: jsLoader.php:441
 msgid "URL opening confirmation"
-msgstr ""
+msgstr "Confirmació d'obertura de la URL"
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -21303,7 +21307,7 @@ msgstr "Grups d'usuaris"
 
 #: app/controllers/CControllerScriptUserInputCheck.php:61
 msgid "User input has been successfully tested."
-msgstr ""
+msgstr "L'entrada de l'usuari s'ha provat correctament."
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22416,9 +22420,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "Amb problemes"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Amb aquesta configuració només veureu dades numèriques."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Amb aquesta configuració només es mostraran els elements numèrics en aquesta columna."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Amb aquesta configuració només veureu elements numèrics."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -23872,7 +23885,7 @@ msgstr "ús incorrecte de la funció \"%1$s\""
 #: include/classes/api/services/CScript.php:517
 #, c-format
 msgid "input does not match the provided pattern: %1$s"
-msgstr ""
+msgstr "l'entrada no coincideix amb el patró donat: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -24419,6 +24432,10 @@ msgstr "no a"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "no triat"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "no emprat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
@@ -25252,7 +25269,7 @@ msgstr "valor de l'etiqueta d'esdeveniment nova"
 
 #: include/classes/api/services/CScript.php:527
 msgid "values must be unique"
-msgstr ""
+msgstr "els valors han d'ésser únics"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"

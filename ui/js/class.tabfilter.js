@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -200,6 +200,10 @@ class CTabFilter extends CBaseComponent {
 		if (!this._timeselector) {
 			return;
 		}
+
+		this._target.querySelector('a.btn-time').textContent = item.hasCustomTime()
+			? item.getCustomTimeLabel()
+			: this._timeselector._data.label;
 
 		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
 			buttons = {

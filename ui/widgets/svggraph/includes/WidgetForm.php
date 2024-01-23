@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -356,7 +356,7 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
-				(new CWidgetFieldRangeControl('legend_lines', _('Max number of rows'),
+				(new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
 					SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
 				))
 					->setDefault(SVG_GRAPH_LEGEND_LINES_MIN)

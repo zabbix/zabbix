@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -783,7 +783,7 @@ class CHistFunctionParserTest extends TestCase {
 							]
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 15,
 							'match' => '',
 							'length' => 0
@@ -1053,19 +1053,19 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 15
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 100,
 							'match' => '',
 							'length' => 0
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 102,
 							'match' => '',
 							'length' => 0
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 103,
 							'match' => '',
 							'length' => 0
@@ -1271,7 +1271,7 @@ class CHistFunctionParserTest extends TestCase {
 							]
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 15,
 							'match' => '',
 							'length' => 0

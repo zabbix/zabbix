@@ -1,0 +1,1 @@
+A...I...S. [ZBXNEXT-5878,ZBXNEXT-8532] improved performance of permission checks for hosts, templates and API objects related to them; added strict validation for host group and template parameters of host API methods (asestakovs, vmaksimovs)

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -504,7 +504,11 @@ static int	zbx_execute_script_on_agent(const zbx_dc_host_t *host, const char *co
 	zbx_dc_interface_t	interface;
 
 	memset(&interface, 0, sizeof(interface));
-	zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT);
+	if (FAIL == zbx_dc_config_get_interface_by_type(&interface, host->hostid, INTERFACE_TYPE_AGENT))
+	{
+		zbx_strlcpy(error, "cannot find host AGENT interface", max_error_len);
+		return FAIL;
+	}
 
 	if (ZBX_INTERFACE_AVAILABLE_TRUE != interface.available &&
 			ZBX_INTERFACE_AVAILABLE_TRUE == zbx_get_active_agent_availability(host->hostid))
@@ -655,17 +659,14 @@ int	zbx_check_script_user_permissions(zbx_uint64_t userid, zbx_uint64_t hostid, 
 
 	result = zbx_db_select(
 		"select null"
-			" from hosts_groups hg,rights r,users_groups ug"
-		" where hg.groupid=r.id"
-			" and r.groupid=ug.usrgrpid"
-			" and hg.hostid=" ZBX_FS_UI64
-			" and ug.userid=" ZBX_FS_UI64
-		" group by hg.hostid"
-		" having min(r.permission)>%d"
-			" and max(r.permission)>=%d",
+			" from host_hgset h,permission p,user_ugset u"
+		" where u.ugsetid=p.ugsetid"
+			" and p.hgsetid=h.hgsetid"
+			" and h.hostid=" ZBX_FS_UI64
+			" and u.userid=" ZBX_FS_UI64
+			" and p.permission>=%d",
 		hostid,
 		userid,
-		PERM_DENY,
 		script->host_access);
 
 	if (NULL == zbx_db_fetch(result))

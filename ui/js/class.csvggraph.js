@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -269,6 +269,10 @@
 					to_offset: Math.ceil(to_offset)
 				})
 					.then((time_period) => {
+						if (time_period === null) {
+							return;
+						}
+
 						widget._startUpdating();
 						widget.feedback({time_period});
 						widget.broadcast({_timeperiod: time_period});
@@ -296,7 +300,7 @@
 				}
 
 				if ('has_fields_errors' in time_period) {
-					return;
+					throw new Error();
 				}
 
 				return time_period;
@@ -314,6 +318,8 @@
 				}
 
 				widget._updateMessages(messages, title);
+
+				return null;
 			})
 			.finally(() => {
 				widget._hidePreloader();
@@ -756,6 +762,10 @@
 							to: data.timePeriod.to,
 						})
 							.then((time_period) => {
+								if (time_period === null) {
+									return;
+								}
+
 								widget._startUpdating();
 								widget.feedback({time_period});
 								widget.broadcast({_timeperiod: time_period});
