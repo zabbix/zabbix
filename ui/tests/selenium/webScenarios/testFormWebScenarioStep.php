@@ -40,6 +40,13 @@ class testFormWebScenarioStep extends CWebTest {
 	const UPDATE_SCENARIO = 'Scenario for Clone';
 	const CREATE_SCENARIO = 'Scenario for Update';
 	const SQL = 'SELECT * FROM httpstep hs INNER JOIN httpstep_field hsf ON hsf.httpstepid = hs.httpstepid';
+	const MAPPING = [
+		null,
+		'Name' => ['selector' => 'xpath:.//input[@data-type="name"]'],
+		null,
+		'Value' => ['selector' => 'xpath:.//input[@data-type="value"]'],
+		null
+	];
 
 	/**
 	 * Attach MessageBehavior to the test.
@@ -310,10 +317,12 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing query field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'query fields' => [
+					'Query fields' => [
 						[
-							'name' => '',
-							'value' => 'query field value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '',
+							'Value' => 'query field value'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/query_fields/1/name": cannot be empty.'
@@ -328,10 +337,12 @@ class testFormWebScenarioStep extends CWebTest {
 						'Post type' => 'Form data',
 						'id:url' => 'http://zabbix.com'
 					],
-					'post fields' => [
+					'Post fields' => [
 						[
-							'name' => '',
-							'value' => 'post field value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '',
+							'Value' => 'post field value'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/posts/1/name": cannot be empty.'
@@ -345,10 +356,12 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing variable name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '',
-							'value' => 'variable field value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '',
+							'Value' => 'variable field value'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": cannot be empty.'
@@ -362,9 +375,11 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing variable nameopening bracket',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => 'name}'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => 'name}'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
@@ -378,9 +393,11 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Step with missing variable name closing bracket',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{name'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{name'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
@@ -394,9 +411,11 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Misplaced brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{na}me'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{na}me'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
@@ -410,9 +429,11 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Double brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{{name}}'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{{name}}'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
@@ -426,9 +447,11 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Only brackets in Variables field name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{}'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{}'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/1/name": is not enclosed in {} or is malformed.'
@@ -442,14 +465,18 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Duplicate Variable names',
 						'id:url' => 'http://zabbix.com'
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{name}',
-							'value' => 'AAA'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{name}',
+							'Value' => 'AAA'
 						],
 						[
-							'name' => '{name}',
-							'value' => 'BBB'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '{name}',
+							'Value' => 'BBB'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/variables/2": value (name)=({name}) already exists.'
@@ -463,10 +490,12 @@ class testFormWebScenarioStep extends CWebTest {
 						'Name' => 'Missing Headers name',
 						'id:url' => 'http://zabbix.com'
 					],
-					'headers' => [
+					'Headers' => [
 						[
-							'name' => '',
-							'value' => 'AAA'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '',
+							'Value' => 'AAA'
 						]
 					],
 					'scenario_error' => 'Invalid parameter "/1/steps/2/headers/1/name": cannot be empty.'
@@ -613,34 +642,45 @@ class testFormWebScenarioStep extends CWebTest {
 						'Required string' => '良い一日を',
 						'Required status codes' => '200,300,401'
 					],
-					'query fields' => [
+					'Query fields' => [
 						[
-							'name' => '1st query name- 良い一日を',
-							'value' => ''
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '1st query name- 良い一日を',
+							'Value' => ''
 						],
 						[
-							'name' => '2nd query name - 良い一日を',
-							'value' => '2nd query value - 良い一日を'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '2nd query name - 良い一日を',
+							'Value' => '2nd query value - 良い一日を'
 						]
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{1st variable name - 良い一日を}',
-							'value' => ''
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{1st variable name - 良い一日を}',
+							'Value' => ''
 						],
 						[
-							'name' => '{the 2nd variable name - 良い一日を}',
-							'value' => '2nd variable value - 良い一日を'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '{the 2nd variable name - 良い一日を}',
+							'Value' => '2nd variable value - 良い一日を'
 						]
 					],
-					'headers' => [
-						[
-							'name' => '1st header name - 良い一日を',
-							'value' => '1st header value - 良い一日を'
+					'Headers' => [
+						['action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '1st header name - 良い一日を',
+							'Value' => '1st header value - 良い一日を'
 						],
 						[
-							'name' => '2nd header name - 良い一日を',
-							'value' => ''
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '2nd header name - 良い一日を',
+							'Value' => ''
 						]
 					]
 				]
@@ -656,44 +696,60 @@ class testFormWebScenarioStep extends CWebTest {
 						'Required string' => STRING_255,
 						'Required status codes' => '200'.str_repeat(',200', 63)
 					],
-					'query fields' => [
+					'Query fields' => [
 						[
-							'name' => STRING_255,
-							'value' => STRING_255
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_255,
+							'Value' => STRING_255
 						],
 						[
-							'name' => 'query_name',
-							'value' => 'query_value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'query_name',
+							'Value' => 'query_value'
 						]
 					],
-					'post fields' => [
+					'Post fields' => [
 						[
-							'name' => STRING_255,
-							'value' => STRING_6000
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_255,
+							'Value' => STRING_6000
 						],
 						[
-							'name' => 'post_field_name',
-							'value' => 'post_field_value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'post_field_name',
+							'Value' => 'post_field_value'
 						]
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '{'.substr(STRING_255, 0, 253).'}',
-							'value' => STRING_6000
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '{'.substr(STRING_255, 0, 253).'}',
+							'Value' => STRING_6000
 						],
 						[
-							'name' => '{variable_name}',
-							'value' => 'variable_value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '{variable_name}',
+							'Value' => 'variable_value'
 						]
 					],
-					'headers' => [
+					'Headers' => [
 						[
-							'name' => STRING_255,
-							'value' => STRING_6000
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_255,
+							'Value' => STRING_6000
 						],
 						[
-							'name' => 'header_name',
-							'value' => 'header_value'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'header_name',
+							'Value' => 'header_value'
 						]
 					]
 				]
@@ -708,44 +764,60 @@ class testFormWebScenarioStep extends CWebTest {
 						'Required string' => '   Zabbix   ',
 						'Required status codes' => '   404   '
 					],
-					'query fields' => [
+					'Query fields' => [
 						[
-							'name' => '   trim query   ',
-							'value' => '   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   trim query   ',
+							'Value' => '   '
 						],
 						[
-							'name' => '   2nd trim query name - 良い一日を   ',
-							'value' => '   2nd trim query value - 良い一日を   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '   2nd trim query name - 良い一日を   ',
+							'Value' => '   2nd trim query value - 良い一日を   '
 						]
 					],
-					'post fields' => [
+					'Post fields' => [
 						[
-							'name' => '   trim post field name   ',
-							'value' => '   trim post field value   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   trim post field name   ',
+							'Value' => '   trim post field value   '
 						],
 						[
-							'name' => '   2nd trim post field name   ',
-							'value' => '   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '   2nd trim post field name   ',
+							'Value' => '   '
 						]
 					],
-					'variables' => [
+					'Variables' => [
 						[
-							'name' => '   {1st trim variable name - 良い一日を}   ',
-							'value' => '   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   {1st trim variable name - 良い一日を}   ',
+							'Value' => '   '
 						],
 						[
-							'name' => '   {2nd trim variable name - 良い一日を}   ',
-							'value' => '   2nd trim variable value - 良い一日を   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '   {2nd trim variable name - 良い一日を}   ',
+							'Value' => '   2nd trim variable value - 良い一日を   '
 						]
 					],
-					'headers' => [
+					'Headers' => [
 						[
-							'name' => '   1st trim header name - 良い一日を   ',
-							'value' => '   1st trim header value - 良い一日を   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => '   1st trim header name - 良い一日を   ',
+							'Value' => '   1st trim header value - 良い一日を   '
 						],
 						[
-							'name' => '   2nd trim header name - 良い一日を   ',
-							'value' => '   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '   2nd trim header name - 良い一日を   ',
+							'Value' => '   '
 						]
 					],
 					'trim' => true
@@ -795,10 +867,15 @@ class testFormWebScenarioStep extends CWebTest {
 
 		$step_form->fill($data['fields']);
 
-		foreach (['variables', 'query fields', 'post fields', 'headers'] as $field_name) {
+		foreach (['Variables', 'Query fields', 'Post fields', 'Headers'] as $field_name) {
 			if (array_key_exists($field_name, $data)) {
-				$field = $step_form->getField(ucfirst($field_name));
-				$this->fillTableField($data[$field_name], $field);
+				$pair_field = $step_form->getField($field_name)->asMultifieldTable()->setFieldMapping(self::MAPPING);
+
+				if ($pair_field->query('class:form_row')->all()->count() !== count($data[$field_name])) {
+					$pair_field->query('button:Add')->one()->click();
+				}
+
+				$pair_field->fill($data[$field_name]);
 			}
 		}
 
@@ -823,7 +900,7 @@ class testFormWebScenarioStep extends CWebTest {
 			if (array_key_exists('trim', $data)) {
 				$data['fields'] = array_map('trim', $data['fields']);
 
-				foreach (['query fields', 'post fields', 'variables', 'headers'] as $pair_field_type) {
+				foreach (['Query fields', 'Post fields', 'Variables', 'Headers'] as $pair_field_type) {
 					foreach ($data[$pair_field_type] as &$pair_field) {
 						$pair_field = array_map('trim', $pair_field);
 					}
@@ -864,10 +941,14 @@ class testFormWebScenarioStep extends CWebTest {
 
 			$step_form->checkValue($data['fields']);
 
-			foreach (['variables', 'query fields', 'post fields', 'headers'] as $field_name) {
+			foreach (['Variables', 'Query fields', 'Post fields', 'Headers'] as $field_name) {
 				if (array_key_exists($field_name, $data)) {
-					$field = $step_form->getField(ucfirst($field_name));
-					$this->checkTableField($field, $data[$field_name]);
+					foreach ($data[$field_name] as &$field_array) {
+						unset($field_array['action'], $field_array['index']);
+					}
+
+					$step_form->getField($field_name)->asMultifieldTable()->setFieldMapping(self::MAPPING)
+							->checkValue($data[$field_name]);
 				}
 			}
 		}
@@ -954,8 +1035,8 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?login=admin&password=s00p3r%24ecr3%26',
 					'parsed_query' => [
-						['name' => 'login', 'value' => 'admin'],
-						['name' => 'password', 'value' => 's00p3r$ecr3&']
+						['Name' => 'login', 'Value' => 'admin'],
+						['Name' => 'password', 'Value' => 's00p3r$ecr3&']
 					],
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -965,11 +1046,11 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?password=s00p3r%24ecr3%26',
 					'existing_query' => [
-						['name' => 'login', 'value' => 'admin']
+						['Name' => 'login', 'Value' => 'admin']
 					],
 					'parsed_query' => [
-						['name' => 'login', 'value' => 'admin'],
-						['name' => 'password', 'value' => 's00p3r$ecr3&']
+						['Name' => 'login', 'Value' => 'admin'],
+						['Name' => 'password', 'Value' => 's00p3r$ecr3&']
 					],
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -979,16 +1060,16 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?login=user&password=a123%24bcd4%26',
 					'existing_query' => [
-						['name' => 'login', 'value' => 'admin'],
-						['name' => 'login', 'value' => 'user'],
-						['name' => 'password', 'value' => 'password']
+						['Name' => 'login', 'Value' => 'admin'],
+						['Name' => 'login', 'Value' => 'user'],
+						['Name' => 'password', 'Value' => 'password']
 					],
 					'parsed_query' => [
-						['name' => 'login', 'value' => 'admin'],
-						['name' => 'login', 'value' => 'user'],
-						['name' => 'password', 'value' => 'password'],
-						['name' => 'login', 'value' => 'user'],
-						['name' => 'password', 'value' => 'a123$bcd4&']
+						['Name' => 'login', 'Value' => 'admin'],
+						['Name' => 'login', 'Value' => 'user'],
+						['Name' => 'password', 'Value' => 'password'],
+						['Name' => 'login', 'Value' => 'user'],
+						['Name' => 'password', 'Value' => 'a123$bcd4&']
 					],
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -998,7 +1079,7 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'url' => 'http://www.zabbix.com/enterprise_ready#test',
 					'parsed_query' => [
-						['name' => '', 'value' => '']
+						['Name' => '', 'Value' => '']
 					],
 					'resulting_url' => 'http://www.zabbix.com/enterprise_ready'
 				]
@@ -1008,8 +1089,8 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'url' => 'https://intranet.zabbix.com/secure/admin.jspa?=admin&password=',
 					'parsed_query' => [
-						['name' => '', 'value' => 'admin'],
-						['name' => 'password', 'value' => '']
+						['Name' => '', 'Value' => 'admin'],
+						['Name' => 'password', 'Value' => '']
 					],
 					'resulting_url' => 'https://intranet.zabbix.com/secure/admin.jspa'
 				]
@@ -1032,18 +1113,18 @@ class testFormWebScenarioStep extends CWebTest {
 		$step_form = $this->getStepForm(self::UPDATE_SCENARIO);
 		$url_field = $step_form->getField('id:url');
 		$url_field->fill($data['url']);
-		$query_table = $step_form->getField('Query fields');
+		$query_table = $step_form->getField('Query fields')->asMultifieldTable()->setFieldMapping(self::MAPPING);;
 
 		// Fill in existing query fields if such are present in the data provider.
 		if (array_key_exists('existing_query', $data)) {
-			$this->fillTableField($data['existing_query'], $query_table);
+			$query_table->fill($data['existing_query']);
 		}
 
 		$step_form->query('button:Parse')->one()->click();
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			$query_table->invalidate();
-			$this->checkTableField($query_table, $data['parsed_query']);
+			$query_table->checkValue($data['parsed_query']);
 			$this->assertEquals($data['resulting_url'], $url_field->getValue());
 		}
 		else {
@@ -1057,7 +1138,7 @@ class testFormWebScenarioStep extends CWebTest {
 			[
 				[
 					'post' => [
-						['name' => 'zab bix', 'value' => 'tes&t']
+						['Name' => 'zab bix', 'Value' => 'tes&t']
 					],
 					'result_raw' => 'zab%20bix=tes%26t'
 				]
@@ -1066,7 +1147,7 @@ class testFormWebScenarioStep extends CWebTest {
 			[
 				[
 					'post' => [
-						['name' => 'тест', 'value' => '自分との戦い いつも負ける']
+						['Name' => 'тест', 'Value' => '自分との戦い いつも負ける']
 					],
 					'result_raw' => '%D1%82%D0%B5%D1%81%D1%82=%E8%87%AA%E5%88%86%E3%81%A8%E3%81%AE%E6%88%A6%E3%81%84%20'.
 							'%E3%81%84%E3%81%A4%E3%82%82%E8%B2%A0%E3%81%91%E3%82%8B'
@@ -1076,7 +1157,7 @@ class testFormWebScenarioStep extends CWebTest {
 			[
 				[
 					'post' => [
-						['name' => '!@#$%^&*()', 'value' => '!@#$%^&*()']
+						['Name' => '!@#$%^&*()', 'Value' => '!@#$%^&*()']
 					],
 					'result_raw' => '!%40%23%24%25%5E%26*()=!%40%23%24%25%5E%26*()'
 				]
@@ -1085,8 +1166,8 @@ class testFormWebScenarioStep extends CWebTest {
 			[
 				[
 					'post' => [
-						['name' => 'zabbix', 'value' => 'test'],
-						['name' => '&Günter', 'value' => '']
+						['Name' => 'zabbix', 'Value' => 'test'],
+						['Name' => '&Günter', 'Value' => '']
 					],
 					'result_raw' => 'zabbix=test&%26G%C3%BCnter'
 				]
@@ -1096,8 +1177,8 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'raw_data' => 'login=Admin&password={{password}.urlencode()}',
 					'result_post' => [
-						['name' => 'login', 'value' => 'Admin'],
-						['name' => 'password', 'value' => '{{password}.urlencode()}']
+						['Name' => 'login', 'Value' => 'Admin'],
+						['Name' => 'password', 'Value' => '{{password}.urlencode()}']
 					]
 				]
 			],
@@ -1106,8 +1187,8 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'raw_data' => 'log+me+in%24&enter=Sign+in%26',
 					'result_post' => [
-						['name' => 'log me in$', 'value' => ''],
-						['name' => 'enter', 'value' => 'Sign in&']
+						['Name' => 'log me in$', 'Value' => ''],
+						['Name' => 'enter', 'Value' => 'Sign in&']
 					]
 				]
 			],
@@ -1116,7 +1197,7 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'raw_data' => '%E0%A4%B9%E0%A4%B0%E0%A4%B5%E0%A4%B2%E0%A5%87=tap%C4%B1ld%C4%B1',
 					'result_post' => [
-						['name' => 'हरवले', 'value' => 'tapıldı']
+						['Name' => 'हरवले', 'Value' => 'tapıldı']
 					]
 				]
 			],
@@ -1173,7 +1254,7 @@ class testFormWebScenarioStep extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'post' => [
-						['name' => '', 'value' => '!@#$%^&*()']
+						['Name' => '', 'Value' => '!@#$%^&*()']
 					],
 					'error' => "Cannot convert POST data:\n\nValues without names are not allowed in form fields."
 				]
@@ -1195,8 +1276,8 @@ class testFormWebScenarioStep extends CWebTest {
 			$post_type->fill('Form data');
 		}
 		else {
-			$post_table = $step_form->getField('Post fields');
-			$this->fillTableField($data['post'], $post_table);
+			$post_table = $step_form->getField('Post fields')->asMultifieldTable()->setFieldMapping(self::MAPPING);
+			$post_table->fill($data['post']);
 			$post_type->fill('Raw data');
 		}
 
@@ -1205,8 +1286,8 @@ class testFormWebScenarioStep extends CWebTest {
 				$this->assertEquals($data['result_raw'], $step_form->getField('Raw post')->getValue());
 			}
 			else {
-				$post_fields = $step_form->getField('Post fields');
-				$this->checkTableField($post_fields, $data['result_post']);
+				$post_fields = $step_form->getField('Post fields')->asMultifieldTable()->setFieldMapping(self::MAPPING);
+				$post_fields->checkValue($data['result_post']);
 			}
 		}
 		else {
@@ -1259,55 +1340,5 @@ class testFormWebScenarioStep extends CWebTest {
 		$this->assertEquals($error, $error_dialog->getContent()->getText());
 		$error_dialog->getFooter()->query('button:Ok')->one()->click();
 		$error_dialog->waitUntilNotPresent();
-	}
-
-	/**
-	 * Compare values from corresponding value pair table with expected data.
-	 *
-	 * @param	CElement	$table_field	value pair field object
-	 * @param	array		$expected		array with reference values
-	 */
-	protected function checkTableField($table_field, $expected) {
-		$obtained_fields = [];
-		$i = 0;
-
-		foreach ($table_field->query('xpath:(.//tr[@class])')->all() as $table_row) {
-			$obtained_fields[$i]['name'] = $table_row->query('xpath:(.//input)[1]')->one()->getValue();
-
-			if (array_key_exists('value', $expected[$i])) {
-				$obtained_fields[$i]['value'] = $table_row->query('xpath:(.//input)[2]')->one()->getValue();
-			}
-
-			$i++;
-		}
-
-		$this->assertEquals($expected, $obtained_fields);
-	}
-
-	/**
-	 * Fill the corresponding value pair table.
-	 *
-	 * @param	array	$input_data		values to be filled in
-	 * @param	string	$table_field	name of the value pair field
-	 */
-	protected function fillTableField($input_data, $table_field) {
-		$count = count($input_data);
-		$add_button = $table_field->query('button:Add')->one();
-
-		$i = 1;
-		foreach ($input_data as $row) {
-			// Add row in table if required.
-			if ($table_field->query('xpath:.//tr[@class="sortable"]')->all()->count() !== $count) {
-				$add_button->click();
-			}
-
-			$table_field->query('xpath:(.//tr['.$i.']//input)[1]')->one()->fill($row['name']);
-
-			if (array_key_exists('value', $row)) {
-				$table_field->query('xpath:(.//tr['.$i.']//input)[2]')->one()->fill($row['value']);
-			}
-
-			$i++;
-		}
 	}
 }

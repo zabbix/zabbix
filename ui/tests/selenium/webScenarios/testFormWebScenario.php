@@ -42,6 +42,13 @@ class testFormWebScenario extends CWebTest {
 	const DELETE_SCENARIO = 'Scenario for Delete';
 	const SQL = 'SELECT * FROM httptest h LEFT JOIN httptest_field hf ON hf.httptestid = h.httptestid ORDER BY h.httptestid, hf.httptest_fieldid';
 	const CLONE_SCENARIO = 'Scenario for Clone';
+	const MAPPING = [
+		null,
+		'Name' => ['selector' => 'xpath:.//input[@data-type="name"]'],
+		null,
+		'Value' => ['selector' => 'xpath:.//input[@data-type="value"]'],
+		null
+	];
 
 	protected static $all_fields = [
 		'scenario_fields' => [
@@ -63,28 +70,28 @@ class testFormWebScenario extends CWebTest {
 			'SSL key file' => '!@#$%^&*()_+=-良い一日を',
 			'SSL key password' => '!@#$%^&*()_+=-良い一日を'
 		],
-		'variables' => [
+		'Variables' => [
 			[
 				'action' => USER_ACTION_UPDATE,
 				'index' => 0,
-				'name' => '{!@#$%^&*()_+=-良い一日を}',
-				'value' => '!@#$%^&*()_+=-良い一日を'
+				'Name' => '{!@#$%^&*()_+=-良い一日を}',
+				'Value' => '!@#$%^&*()_+=-良い一日を'
 			],
 			[
-				'name' => '{xyz}',
-				'value' => ''
+				'Name' => '{xyz}',
+				'Value' => ''
 			]
 		],
-		'headers' => [
+		'Headers' => [
 			[
 				'action' => USER_ACTION_UPDATE,
 				'index' => 0,
-				'name' => 'OneTwoThree',
-				'value' => ''
+				'Name' => 'OneTwoThree',
+				'Value' => ''
 			],
 			[
-				'name' => '!@#$%^&*()_+=-良い一日を',
-				'value' => '!@#$%^&*()_+=-良い一日を'
+				'Name' => '!@#$%^&*()_+=-良い一日を',
+				'Value' => '!@#$%^&*()_+=-良い一日を'
 			]
 		],
 		'tags' => [
@@ -490,12 +497,12 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable name without brackets'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => 'abc',
-							'value' => ''
+							'Name' => 'abc',
+							'Value' => ''
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
@@ -508,12 +515,12 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable name without opening bracket'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => 'abc}',
-							'value' => 'abc'
+							'Name' => 'abc}',
+							'Value' => 'abc'
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
@@ -526,12 +533,12 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable name without closing bracket'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '{abc',
-							'value' => ''
+							'Name' => '{abc',
+							'Value' => ''
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
@@ -544,12 +551,12 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable with misplaced brackets'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '{}abc',
-							'value' => '!@#$%^&*()_+=-良い一日を'
+							'Name' => '{}abc',
+							'Value' => '!@#$%^&*()_+=-良い一日を'
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/variables/1/name": is not enclosed in {} or is malformed.'
@@ -562,16 +569,18 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Duplicate variable names'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '{abc}',
-							'value' => '123'
+							'Name' => '{abc}',
+							'Value' => '123'
 						],
 						[
-							'name' => '{abc}',
-							'value' => '987'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '{abc}',
+							'Value' => '987'
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/variables/2": value (name)=({abc}) already exists.'
@@ -584,16 +593,18 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Missing variable name'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => ' ',
-							'value' => '123'
+							'Name' => ' ',
+							'Value' => '123'
 						],
 						[
-							'name' => '{abc}',
-							'value' => '987'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '{abc}',
+							'Value' => '987'
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/variables/1/name": cannot be empty.'
@@ -606,16 +617,18 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Missing header name'
 					],
-					'headers' => [
+					'Headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '',
-							'value' => '123'
+							'Name' => '',
+							'Value' => '123'
 						],
 						[
-							'name' => 'abc',
-							'value' => '987'
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'abc',
+							'Value' => '987'
 						]
 					],
 					'error_details' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
@@ -692,8 +705,8 @@ class testFormWebScenario extends CWebTest {
 					'expected' => TEST_GOOD,
 					'scenario_fields' => self::$all_fields['scenario_fields'],
 					'auth_fields' => self::$all_fields['auth_fields'],
-					'variables' => self::$all_fields['variables'],
-					'headers' => self::$all_fields['headers'],
+					'Variables' => self::$all_fields['Variables'],
+					'Headers' => self::$all_fields['Headers'],
 					'tags' => self::$all_fields['tags']
 				]
 			],
@@ -717,26 +730,32 @@ class testFormWebScenario extends CWebTest {
 						'SSL key file' => STRING_255,
 						'SSL key password' => STRING_64
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '{'.substr(STRING_255, 0, 253).'}',
-							'value' => STRING_6000
-						]
-					],
-					'headers' => [
-						[
-							'action' => USER_ACTION_UPDATE,
-							'index' => 0,
-							'name' => STRING_255,
-							'value' => STRING_6000
+							'Name' => '{'.substr(STRING_255, 0, 253).'}',
+							'Value' => STRING_6000
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 1,
-							'name' => 'the 2nd header',
-							'value' => 'the value of the 2nd header'
+							'Name' => '{the 2nd variable}',
+							'Value' => '2nd variable value'
+						]
+					],
+					'Headers' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'Name' => STRING_255,
+							'Value' => STRING_6000
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => 'the 2nd header',
+							'Value' => 'the value of the 2nd header'
 						]
 					],
 					'tags' => [
@@ -778,28 +797,32 @@ class testFormWebScenario extends CWebTest {
 						]
 					],
 					'trim' => true,
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '   {!@#$%^&*()_+=-良い一日を}   ',
-							'value' => '   !@#$%^&*()_+=-良い一日を   '
+							'Name' => '   {!@#$%^&*()_+=-良い一日を}   ',
+							'Value' => '   !@#$%^&*()_+=-良い一日を   '
 						],
 						[
-							'name' => '  {abc}  ',
-							'value' => '   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '  {abc}  ',
+							'Value' => '   '
 						]
 					],
-					'headers' => [
+					'Headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
-							'name' => '   OneTwoThree   ',
-							'value' => '   FourFiveSix   '
+							'Name' => '   OneTwoThree   ',
+							'Value' => '   FourFiveSix   '
 						],
 						[
-							'name' => '   !@#$%^&*()_+=-良い一日を   ',
-							'value' => '   !@#$%^&*()_+=-良い一日を   '
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'Name' => '   !@#$%^&*()_+=-良い一日を   ',
+							'Value' => '   !@#$%^&*()_+=-良い一日を   '
 						]
 					]
 				]
@@ -873,12 +896,9 @@ class testFormWebScenario extends CWebTest {
 		$tags = $fields[''];
 		unset($fields['']);
 
-		foreach (['variables', 'headers'] as $field_name) {
-			$field = $form->getField(ucfirst($field_name));
-			$table_fields[$field_name]['name'] = $field->query('xpath:(//table[@data-type='.
-					CXPathHelper::escapeQuotes($field_name).']//input)[1]')->one()->getValue();
-			$table_fields[$field_name]['value'] = $field->query('xpath:(//table[@data-type='.
-					CXPathHelper::escapeQuotes($field_name).']//input)[2]')->one()->getValue();
+		foreach (['Variables', 'Headers'] as $field_name) {
+			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->setFieldMapping(self::MAPPING)
+					->getValue();
 		}
 
 		$form->query('button:Clone')->one()->click();
@@ -897,13 +917,9 @@ class testFormWebScenario extends CWebTest {
 
 		$form->checkValue($fields);
 
-		foreach (['variables', 'headers'] as $field_name) {
-			$field = $form->getField(ucfirst($field_name));
-			$this->assertEquals($table_fields[$field_name]['name'], $field->query('xpath:(//table[@data-type='.
-					CXPathHelper::escapeQuotes($field_name).']//input)[1]')->one()->getValue()
-			);
-			$this->assertEquals($table_fields[$field_name]['value'], $field->query('xpath:(//table[@data-type='.
-					CXPathHelper::escapeQuotes($field_name).']//input)[2]')->one()->getValue()
+		foreach (['Variables', 'Headers'] as $field_name) {
+			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()
+					->setFieldMapping(self::MAPPING)->getValue()
 			);
 		}
 
@@ -1017,7 +1033,7 @@ class testFormWebScenario extends CWebTest {
 			if (array_key_exists('trim', $data)) {
 				$skip_fields = ['Password', 'SSL key password'];
 
-				foreach (['scenario_fields', 'variables', 'headers', 'auth_fields', 'tags'] as $tab_fields) {
+				foreach (['scenario_fields', 'Variables', 'Headers', 'auth_fields', 'tags'] as $tab_fields) {
 					$original_fields = $data[$tab_fields];
 
 					if ($tab_fields === 'tags') {
@@ -1025,7 +1041,7 @@ class testFormWebScenario extends CWebTest {
 							$tag = array_map('trim', $tag);
 						}
 					}
-					elseif (in_array($tab_fields, ['variables', 'headers'])) {
+					elseif (in_array($tab_fields, ['Variables', 'Headers'])) {
 						foreach ($data[$tab_fields] as &$pair_field) {
 							$pair_field = array_map('trim', $pair_field);
 						}
@@ -1054,20 +1070,13 @@ class testFormWebScenario extends CWebTest {
 			$form->invalidate();
 			$form->checkValue($data['scenario_fields']);
 
-			foreach (['variables', 'headers'] as $field_name) {
+			foreach (['Variables', 'Headers'] as $field_name) {
 				if (array_key_exists($field_name, $data)) {
-					$field = $form->getField(ucfirst($field_name));
-
-					$i = 1;
-					foreach ($data[$field_name] as $field_pair) {
-						$this->assertEquals($field_pair['name'], $field->query('xpath:(//table[@data-type='.
-								CXPathHelper::escapeQuotes($field_name).']//tr['.$i.']//input)[1]')->one()->getValue()
-						);
-						$this->assertEquals($field_pair['value'], $field->query('xpath:(//table[@data-type='.
-								CXPathHelper::escapeQuotes($field_name).']//tr['.$i.']//input)[2]')->one()->getValue()
-						);
-						$i++;
+					foreach ($data[$field_name] as &$field_array) {
+						unset($field_array['action'], $field_array['index']);
 					}
+
+					$form->getField($field_name)->asMultifieldTable()->setFieldMapping(self::MAPPING)->checkValue($data[$field_name]);
 				}
 			}
 
@@ -1095,22 +1104,15 @@ class testFormWebScenario extends CWebTest {
 	protected function fillScenarioForm($data, $form, $action = 'update') {
 		$form->fill($data['scenario_fields']);
 
-		foreach (['variables', 'headers'] as $field_name) {
+		foreach (['Variables', 'Headers'] as $field_name) {
 			if (array_key_exists($field_name, $data)) {
-				$field = $form->getField(ucfirst($field_name));
+				$pair_field = $form->getField($field_name)->asMultifieldTable()->setFieldMapping(self::MAPPING);
 
-				if (count($data[$field_name]) > 1) {
-					$field->query('button:Add')->one()->click();
+				if ($pair_field->query('class:form_row')->all()->count() !== count($data[$field_name])) {
+					$pair_field->query('button:Add')->one()->click();
 				}
 
-				$i = 1;
-				foreach ($data[$field_name] as $field_pair) {
-					$field->query('xpath:(//table[@data-type='.CXPathHelper::escapeQuotes($field_name).']//tr['.
-							$i.']//input)[1]')->one()->fill($field_pair['name']);
-					$field->query('xpath:(//table[@data-type='.CXPathHelper::escapeQuotes($field_name).']//tr['.
-							$i.']//input)[2]')->one()->fill($field_pair['value']);
-					$i++;
-				}
+				$pair_field->fill($data[$field_name]);
 			}
 		}
 
