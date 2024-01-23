@@ -278,7 +278,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addItem([
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Draw')),
+							new CLabel(_('Draw'), $field_name.'['.$row_num.'][type]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
 									->addClass('js-type')
@@ -345,7 +345,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Missing data')),
+							new CLabel(_('Missing data'), $field_name.'['.$row_num.'][missingdatafunc]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][missingdatafunc]',
 									(int) $value['missingdatafunc'])
@@ -366,7 +366,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 						]),
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Y-axis')),
+							new CLabel(_('Y-axis'), $field_name.'['.$row_num.'][axisy]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
 									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
