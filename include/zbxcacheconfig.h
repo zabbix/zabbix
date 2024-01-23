@@ -948,30 +948,6 @@ int	zbx_dc_set_interfaces_availability(zbx_vector_availability_ptr_t *availabili
 
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 
-typedef struct
-{
-	zbx_uint64_t	conditionid;
-	zbx_uint64_t	actionid;
-	unsigned char	conditiontype;
-	unsigned char	op;
-	const char	*value;
-	const char	*value2;
-}
-zbx_dc_action_condition_t;
-
-ZBX_PTR_VECTOR_DECL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
-
-typedef struct
-{
-	zbx_uint64_t				actionid;
-	const char				*formula;
-	unsigned char				eventsource;
-	unsigned char				evaltype;
-	unsigned char				opflags;
-	zbx_vector_dc_action_condition_ptr_t	conditions;
-}
-zbx_dc_action_t;
-
 void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags);
 
 int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
