@@ -1018,22 +1018,22 @@ out:
  *             rpools       - [IN/OUT] vector with all Resource Pools         *
  *             cq_values    - [IN/OUT] vector with custom query entries       *
  *             alarms_data  - [IN/OUT] all alarms with cache                  *
- *             error        - [OUT] error message in the case of failure      *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
  * Return value: The created virtual machine object or NULL if an error was   *
  *               detected.                                                    *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *easyhandle,
-		const char *id, zbx_vector_vmware_resourcepool_t *rpools, zbx_vector_cq_value_t *cq_values,
+		const char *id, zbx_vector_vmware_resourcepool_ptr_t *rpools, zbx_vector_cq_value_ptr_t *cq_values,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
-	zbx_vmware_vm_t		*vm;
-	char			*value, *cq_prop;
-	xmlDoc			*details = NULL;
-	zbx_vector_cq_value_t	cqvs;
-	const char		*uuid_xpath[3] = {NULL, ZBX_XPATH_VM_UUID(), ZBX_XPATH_VM_INSTANCE_UUID()};
-	int			ret;
+	zbx_vmware_vm_t			*vm;
+	char				*value, *cq_prop;
+	xmlDoc				*details = NULL;
+	zbx_vector_cq_value_ptr_t	cqvs;
+	const char			*uuid_xpath[3] = {NULL, ZBX_XPATH_VM_UUID(), ZBX_XPATH_VM_INSTANCE_UUID()};
+	int				ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __func__, id);
 
@@ -1043,7 +1043,7 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 	zbx_vector_vmware_dev_ptr_create(&vm->devs);
 	zbx_vector_vmware_fs_ptr_create(&vm->file_systems);
 	zbx_vector_vmware_custom_attr_ptr_create(&vm->custom_attrs);
-	zbx_vector_cq_value_create(&cqvs);
+	zbx_vector_cq_value_ptr_create(&cqvs);
 	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_VM, id, &cqvs);
 	ret = vmware_service_get_vm_data(service, easyhandle, id, vm_propmap, ZBX_VMWARE_VMPROPS_NUM, cq_prop,
 			&details, error);
@@ -1095,7 +1095,7 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 
 		rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
-		if (FAIL != (i = zbx_vector_vmware_resourcepool_bsearch(rpools, &rpool_cmp,
+		if (FAIL != (i = zbx_vector_vmware_resourcepool_ptr_bsearch(rpools, &rpool_cmp,
 				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 		{
 			rpools->values[i]->vm_num += 1;
@@ -1114,7 +1114,7 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 	ret = vmware_service_get_alarms_data(__func__, service, easyhandle, details, NULL, &vm->alarm_ids, alarms_data,
 			error);
 out:
-	zbx_vector_cq_value_destroy(&cqvs);
+	zbx_vector_cq_value_ptr_destroy(&cqvs);
 	zbx_xml_free_doc(details);
 
 	if (SUCCEED != ret)

@@ -350,7 +350,7 @@ typedef struct
 }
 zbx_vmware_resourcepool_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
+ZBX_PTR_VECTOR_DECL(vmware_resourcepool_ptr, zbx_vmware_resourcepool_t *)
 
 /* the vmware eventlog state */
 typedef struct
@@ -395,7 +395,7 @@ typedef struct
 	int					max_query_metrics;	/* max count of Datastore perfCounters in one request */
 	zbx_vector_vmware_datastore_ptr_t	datastores;
 	zbx_vector_vmware_datacenter_ptr_t	datacenters;
-	zbx_vector_vmware_resourcepool_t	resourcepools;
+	zbx_vector_vmware_resourcepool_ptr_t	resourcepools;
 	zbx_vector_vmware_dvswitch_ptr_t	dvswitches;
 	zbx_vector_vmware_alarm_ptr_t		alarms;
 	zbx_vector_str_t			alarm_ids;

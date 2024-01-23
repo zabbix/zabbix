@@ -1221,15 +1221,15 @@ static const char	*vmware_hv_vsan_uuid(zbx_vector_vmware_datastore_ptr_t *dss, z
  *                                                                            *
  ******************************************************************************/
 int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
-		zbx_vector_vmware_datastore_ptr_t *dss, zbx_vector_vmware_resourcepool_t *rpools,
-		zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
+		zbx_vector_vmware_datastore_ptr_t *dss, zbx_vector_vmware_resourcepool_ptr_t *rpools,
+		zbx_vector_cq_value_ptr_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
 		char **error)
 {
 	char				*value, *cq_prop;
 	int				j, ret;
 	xmlDoc				*details = NULL, *multipath_data = NULL;
 	zbx_vector_str_t		datastores, vms;
-	zbx_vector_cq_value_t		cqvs;
+	zbx_vector_cq_value_ptr_t	cqvs;
 	zbx_vector_ptr_pair_t		disks_info;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() hvid:'%s'", __func__, id);
@@ -1243,7 +1243,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 	zbx_vector_str_create(&datastores);
 	zbx_vector_str_create(&vms);
 	zbx_vector_ptr_pair_create(&disks_info);
-	zbx_vector_cq_value_create(&cqvs);
+	zbx_vector_cq_value_ptr_create(&cqvs);
 
 	zbx_vector_vmware_pnic_ptr_create(&hv->pnics);
 	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_HV, id, &cqvs);
@@ -1411,7 +1411,7 @@ out:
 
 	zbx_vector_str_clear_ext(&datastores, zbx_str_free);
 	zbx_vector_str_destroy(&datastores);
-	zbx_vector_cq_value_destroy(&cqvs);
+	zbx_vector_cq_value_ptr_destroy(&cqvs);
 
 	for (int i = 0; i < disks_info.values_num; i++)
 	{

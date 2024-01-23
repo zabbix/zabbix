@@ -109,11 +109,9 @@ zbx_vmware_service_objects_t	*get_vmware_service_objects(void)
 	return vmware_service_objects;
 }
 
-ZBX_PTR_VECTOR_IMPL(cq_value, zbx_vmware_cq_value_t *)
-
-ZBX_PTR_VECTOR_IMPL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
-
-ZBX_PTR_VECTOR_IMPL(vmware_resourcepool, zbx_vmware_resourcepool_t *)
+ZBX_PTR_VECTOR_IMPL(cq_value_ptr, zbx_vmware_cq_value_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_alarm_details_ptr, zbx_vmware_alarm_details_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_resourcepool_ptr, zbx_vmware_resourcepool_t *)
 
 static zbx_uint64_t	evt_req_chunk_size;
 
@@ -588,8 +586,8 @@ static void	vmware_data_shared_free(zbx_vmware_data_t *data)
 		zbx_vector_vmware_datacenter_ptr_clear_ext(&data->datacenters, vmware_shmem_datacenter_free);
 		zbx_vector_vmware_datacenter_ptr_destroy(&data->datacenters);
 
-		zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_shmem_resourcepool_free);
-		zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
+		zbx_vector_vmware_resourcepool_ptr_clear_ext(&data->resourcepools, vmware_shmem_resourcepool_free);
+		zbx_vector_vmware_resourcepool_ptr_destroy(&data->resourcepools);
 
 		zbx_vector_vmware_dvswitch_ptr_clear_ext(&data->dvswitches, vmware_shmem_dvswitch_free);
 		zbx_vector_vmware_dvswitch_ptr_destroy(&data->dvswitches);
@@ -858,8 +856,8 @@ static void	vmware_data_free(zbx_vmware_data_t *data)
 	zbx_vector_vmware_datacenter_ptr_clear_ext(&data->datacenters, vmware_datacenter_free);
 	zbx_vector_vmware_datacenter_ptr_destroy(&data->datacenters);
 
-	zbx_vector_vmware_resourcepool_clear_ext(&data->resourcepools, vmware_resourcepool_free);
-	zbx_vector_vmware_resourcepool_destroy(&data->resourcepools);
+	zbx_vector_vmware_resourcepool_ptr_clear_ext(&data->resourcepools, vmware_resourcepool_free);
+	zbx_vector_vmware_resourcepool_ptr_destroy(&data->resourcepools);
 
 	zbx_vector_vmware_dvswitch_ptr_clear_ext(&data->dvswitches, vmware_dvswitch_free);
 	zbx_vector_vmware_dvswitch_ptr_destroy(&data->dvswitches);
@@ -1148,20 +1146,20 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get alarm details                                                 *
+ * Purpose: gets alarm details                                                *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             alarm_id     - [IN] the alarm details                          *
- *             details      - [IN/OUT] the Alarms cache data                  *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             alarm_id     - [IN] alarm details                              *
+ *             details      - [IN/OUT] alarms cache data                      *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: index - the element id in the vector                         *
- *               FAIL  - the operation has failed                             *
+ * Return value: index - element id in the vector                             *
+ *               FAIL  - operation has failed                                 *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *service, CURL *easyhandle,
-		const char * alarm_id, zbx_vector_vmware_alarm_details_t *details, char **error)
+		const char * alarm_id, zbx_vector_vmware_alarm_details_ptr_t *details, char **error)
 {
 #	define ZBX_POST_VMWARE_GET_ALARMS						\
 		ZBX_POST_VSPHERE_HEADER							\
@@ -1230,11 +1228,14 @@ static int	vmware_service_alarm_details_update(const zbx_vmware_service_t *servi
 		zbx_free(value);
 	}
 
-	zbx_vector_vmware_alarm_details_append(details, detail);
-	zbx_vector_vmware_alarm_details_sort(details, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_alarm_details_ptr_append(details, detail);
+	zbx_vector_vmware_alarm_details_ptr_sort(details, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
-	if (FAIL == (ret = zbx_vector_vmware_alarm_details_bsearch(details, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+	if (FAIL == (ret = zbx_vector_vmware_alarm_details_ptr_bsearch(details, &cmp,
+			ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+	{
 		*error = zbx_dsprintf(*error, "Cannot update alarm details:%s", alarm_id);
+	}
 out:
 	zbx_xml_free_doc(doc_details);
 
@@ -1306,7 +1307,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 
 		detail_cmp.alarm = value;
 
-		if (FAIL == (j = zbx_vector_vmware_alarm_details_bsearch(&alarms_data->details, &detail_cmp,
+		if (FAIL == (j = zbx_vector_vmware_alarm_details_ptr_bsearch(&alarms_data->details, &detail_cmp,
 				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)) &&
 				FAIL == (j = vmware_service_alarm_details_update(service, easyhandle, value,
 				&alarms_data->details, error)))
@@ -1584,7 +1585,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_vmware_datastore_ptr_t *datastores,
-		zbx_vmware_cluster_t *cluster, zbx_vector_cq_value_t *cq_values, char **error)
+		zbx_vmware_cluster_t *cluster, zbx_vector_cq_value_ptr_t *cq_values, char **error)
 {
 #	define ZBX_POST_VMWARE_CLUSTER_STATUS 								\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -1606,16 +1607,16 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_v
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	char			*tmp, *clusterid_esc, *cq_prop;
-	int			ret;
-	xmlDoc			*doc = NULL;
-	zbx_vector_cq_value_t	cqvs;
-	zbx_vector_str_t	ids;
+	char				*tmp, *clusterid_esc, *cq_prop;
+	int				ret;
+	xmlDoc				*doc = NULL;
+	zbx_vector_cq_value_ptr_t	cqvs;
+	zbx_vector_str_t		ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() clusterid:'%s'", __func__, cluster->id);
 
 	zbx_vector_str_create(&ids);
-	zbx_vector_cq_value_create(&cqvs);
+	zbx_vector_cq_value_ptr_create(&cqvs);
 	clusterid_esc = zbx_xml_escape_dyn(cluster->id);
 	cq_prop = vmware_cq_prop_soap_request(cq_values, ZBX_VMWARE_SOAP_CLUSTER, cluster->id, &cqvs);
 
@@ -1653,7 +1654,7 @@ static int	vmware_service_get_cluster_state(CURL *easyhandle, const zbx_vector_v
 		zbx_vector_str_append(&cluster->dss_uuid, zbx_strdup(NULL, datastores->values[j]->uuid));
 	}
 out:
-	zbx_vector_cq_value_destroy(&cqvs);
+	zbx_vector_cq_value_ptr_destroy(&cqvs);
 	zbx_vector_str_clear_ext(&ids, zbx_str_free);
 	zbx_vector_str_destroy(&ids);
 	zbx_xml_free_doc(doc);
@@ -1682,8 +1683,8 @@ out:
  *                                                                             *
  *******************************************************************************/
 static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *service, CURL *easyhandle,
-		const zbx_vector_vmware_datastore_ptr_t *datastores, zbx_vector_cq_value_t *cq_values,
-		zbx_vector_vmware_cluster_ptr_t *clusters, zbx_vector_vmware_resourcepool_t *resourcepools,
+		const zbx_vector_vmware_datastore_ptr_t *datastores, zbx_vector_cq_value_ptr_t *cq_values,
+		zbx_vector_vmware_cluster_ptr_t *clusters, zbx_vector_vmware_resourcepool_ptr_t *resourcepools,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
 #	define ZBX_POST_VCENTER_CLUSTER								\
@@ -1893,7 +1894,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 			{
 				rpool->parentid = zbx_strdup(NULL, 0 == rp_next->parent_is_rp ?
 						rp_next->first_parentid : rp_next->parentid);
-				zbx_vector_vmware_resourcepool_append(resourcepools, rpool);
+				zbx_vector_vmware_resourcepool_ptr_append(resourcepools, rpool);
 				rp_chunk->path = rpool->path;
 				rp_chunk->parentid = rpool->parentid;
 				break;
@@ -1908,7 +1909,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 			vmware_resourcepool_free(rpool);
 	}
 
-	zbx_vector_vmware_resourcepool_sort(resourcepools, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_resourcepool_ptr_sort(resourcepools, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 	zbx_vector_vmware_cluster_ptr_reserve(clusters, (size_t)(clusters->values_alloc + cl_chunks.values_num));
 
 	for (int i = cl_chunks.values_num - 1; i >= 0 ; i--)
@@ -2061,19 +2062,16 @@ out:
 }
 
 
-/******************************************************************************
- *                                                                            *
- * Purpose: move custom query response to shared memory                       *
- *                                                                            *
- * Parameters: cq_values - [IN] the vector with custom query entries and      *
- *                              responses                                     *
- *                                                                            *
- ******************************************************************************/
-static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_values)
+/*******************************************************************************
+ *                                                                             *
+ * Purpose: moves custom query response to shared memory                       *
+ *                                                                             *
+ * Parameters: cq_values - [IN] vector with custom query entries and responses *
+ *                                                                             *
+ *******************************************************************************/
+static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_ptr_t *cq_values)
 {
-	int	i;
-
-	for (i = 0; i < cq_values->values_num; i++)
+	for (int i = 0; i < cq_values->values_num; i++)
 	{
 		if (ZBX_VMWARE_CQV_ERROR == cq_values->values[i]->status)
 		{
@@ -2093,18 +2091,18 @@ static void	vmware_service_copy_cust_query_response(zbx_vector_cq_value_t *cq_va
 
 /******************************************************************************
  *                                                                            *
- * Purpose: collect custom requests of the selected type                      *
+ * Purpose: collects custom requests of the selected type                     *
  *                                                                            *
  * Parameters: cust_queries        - [IN] hashset with all type custom        *
  *                                        queries                             *
  *             type                - [IN] type of custom query                *
- *             cq_values           - [OUT] the vector with custom query       *
- *                                         entries and responses              *
+ *             cq_values           - [OUT] vector with custom query entries   *
+ *                                         and responses                      *
  *             cache_update_period - [IN]                                     *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zbx_vmware_custom_query_type_t type,
-		zbx_vector_cq_value_t *cq_values, int cache_update_period)
+		zbx_vector_cq_value_ptr_t *cq_values, int cache_update_period)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_cust_query_t	*instance;
@@ -2142,7 +2140,7 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 		cqv->status = ZBX_VMWARE_CQV_EMPTY;
 		cqv->instance = instance;
 		cqv->response = NULL;
-		zbx_vector_cq_value_append(cq_values, cqv);
+		zbx_vector_cq_value_ptr_append(cq_values, cqv);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() cq_values:%d", __func__, cq_values->values_num);
@@ -2150,14 +2148,14 @@ static void	vmware_service_cust_query_prep(zbx_hashset_t *cust_queries, const zb
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load DVSwitch info from VC                                        *
+ * Purpose: loads DVSwitch info from VC                                       *
  *                                                                            *
- * Parameters: easyhandle - [IN] the CURL handle                              *
- *             cq_values  - [IN/OUT] the vector with custom query entries     *
- *                                     and responses                          *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             cq_values  - [IN/OUT] vector with custom query entries and     *
+ *                                   responses                                *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t *cq_values)
+static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_ptr_t *cq_values)
 {
 #	define ZBX_POST_FETCH_DV_PORTS										\
 		ZBX_POST_VSPHERE_HEADER										\
@@ -2169,12 +2167,12 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 
 	size_t	offset;
 	char	*error, tmp[MAX_STRING_LEN], criteria[MAX_STRING_LEN];
-	int	i, j, count = 0;
+	int	count = 0;
 	xmlDoc	*doc = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() dvs count:%d", __func__, cq_values->values_num);
 
-	for (i = 0; i < cq_values->values_num; i++)
+	for (int i = 0; i < cq_values->values_num; i++)
 	{
 		zbx_vmware_cq_value_t	*cqv = cq_values->values[i];
 		xmlNode			*node;
@@ -2183,7 +2181,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 		offset = 0;
 		zbx_xml_free_doc(doc);
 
-		for (j = 0; j < cqv->instance->query_params->values_num; j++)
+		for (int j = 0; j < cqv->instance->query_params->values_num; j++)
 		{
 			char		*name_esc, *value_esc;
 			const char	*host_type;
@@ -2238,18 +2236,16 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_t
 
 /******************************************************************************
  *                                                                            *
- * Purpose: read from xml document property value                             *
+ * Purpose: reads from xml document property value                            *
  *                                                                            *
  * Parameters: fn_parent - [IN] parent function name                          *
- *             xdoc      - [IN] the xml document                              *
- *             cqvs      - [IN/OUT] the custom query entries                  *
+ *             xdoc      - [IN] xml document                                  *
+ *             cqvs      - [IN/OUT] custom query entries                      *
  *                                                                            *
  ******************************************************************************/
-void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_t *cqvs)
+void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_ptr_t *cqvs)
 {
-	int	i;
-
-	for (i = 0; i < cqvs->values_num; i++)
+	for (int i = 0; i < cqvs->values_num; i++)
 	{
 		char			xpath[MAX_STRING_LEN];
 		xmlNode			*node;
@@ -2287,15 +2283,15 @@ void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vecto
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load vmware object property info from VC                          *
+ * Purpose: loads vmware object property info from VC                         *
  *                                                                            *
- * Parameters: easyhandle - [IN] the CURL handle                              *
- *             collector  - [IN] the name of vmware property collector        *
- *             cq_values  - [IN/OUT] the vector with custom query entries     *
- *                                     and responses                          *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             collector  - [IN] name of vmware property collector            *
+ *             cq_values  - [IN/OUT] vector with custom query entries and     *
+ *                                   responses                                *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_props_load(CURL *easyhandle, const char *collector, zbx_vector_cq_value_t *cq_values)
+static void	vmware_service_props_load(CURL *easyhandle, const char *collector, zbx_vector_cq_value_ptr_t *cq_values)
 {
 #	define ZBX_POST_OBJ_PROP									\
 		ZBX_POST_VSPHERE_HEADER									\
@@ -2315,16 +2311,16 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 		"</ns0:RetrievePropertiesEx>"								\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int			i, total = 0, count = 0;
-	xmlDoc			*doc = NULL;
-	zbx_vector_cq_value_t	cq_resp;
+	int				total = 0, count = 0;
+	xmlDoc				*doc = NULL;
+	zbx_vector_cq_value_ptr_t	cq_resp;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() props total:%d", __func__, cq_values->values_num);
 
-	zbx_vector_cq_value_create(&cq_resp);
-	zbx_vector_cq_value_append(&cq_resp, NULL);
+	zbx_vector_cq_value_ptr_create(&cq_resp);
+	zbx_vector_cq_value_ptr_append(&cq_resp, NULL);
 
-	for (i = 0; i < cq_values->values_num; i++)
+	for (int i = 0; i < cq_values->values_num; i++)
 	{
 		char			*error = NULL, tmp[MAX_STRING_LEN];
 		zbx_vmware_cq_value_t	*cqv = cq_values->values[i];
@@ -2352,7 +2348,7 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 
 	zbx_xml_free_doc(doc);
 
-	zbx_vector_cq_value_destroy(&cq_resp);
+	zbx_vector_cq_value_ptr_destroy(&cq_resp);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() count: %d / %d", __func__, count, total);
 
 #	undef ZBX_POST_OBJ_PROP
@@ -2360,23 +2356,22 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create part of xml query for soap request                         *
+ * Purpose: creates part of xml query for soap request                        *
  *                                                                            *
- * Parameters: cq_values - [IN] the vector with custom query entries          *
+ * Parameters: cq_values - [IN] vector with custom query entries              *
  *             soap_type - [IN] soap type of hv, vm etc                       *
  *             obj_id    - [IN] vmware instance id (hv, vm etc)               *
- *             cqvs      - [OUT] - custom query entry                         *
+ *             cqvs      - [OUT] custom query entry                           *
  *                                                                            *
  * Return value: pointer to string with soap sub query                        *
  *                                                                            *
  ******************************************************************************/
-char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const char *soap_type,
-		const char *obj_id, zbx_vector_cq_value_t *cqvs)
+char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_ptr_t *cq_values, const char *soap_type,
+		const char *obj_id, zbx_vector_cq_value_ptr_t *cqvs)
 {
-	int	i;
 	char	*buff = zbx_strdup(NULL, "");
 
-	for (i = 0; i < cq_values->values_num; i++)
+	for (int i = 0; i < cq_values->values_num; i++)
 	{
 		zbx_vmware_cq_value_t	*cq = cq_values->values[i];
 		char			tmp[MAX_STRING_LEN / 4];
@@ -2392,7 +2387,7 @@ char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const 
 
 		zbx_snprintf(tmp, sizeof(tmp), "<ns0:pathSet>%s</ns0:pathSet>", cq->instance->key);
 		buff = zbx_strdcat(buff, tmp);
-		zbx_vector_cq_value_append(cqvs, cq);
+		zbx_vector_cq_value_ptr_append(cqvs, cq);
 	}
 
 	return buff;
@@ -2442,7 +2437,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: updates object with a new data from vmware service                *
+ * Purpose: updates object with new data from vmware service                  *
  *                                                                            *
  * Parameters: service               - [IN] vmware service                    *
  *             config_source_ip      - [IN]                                   *
@@ -2458,7 +2453,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	zbx_vmware_data_t		*data;
 	zbx_vector_str_t		hvs, dss;
 	zbx_vector_vmware_event_ptr_t	events;
-	zbx_vector_cq_value_t		dvs_query_values, prop_query_values, cust_query_values;
+	zbx_vector_cq_value_ptr_t	dvs_query_values, prop_query_values, cust_query_values;
 	zbx_vmware_alarms_data_t	alarms_data;
 	int				ret = FAIL;
 	ZBX_HTTPPAGE			page;	/* 347K/87K */
@@ -2477,15 +2472,15 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 	zbx_vector_vmware_event_ptr_create(&data->events);
 	zbx_vector_vmware_datastore_ptr_create(&data->datastores);
 	zbx_vector_vmware_datacenter_ptr_create(&data->datacenters);
-	zbx_vector_vmware_resourcepool_create(&data->resourcepools);
+	zbx_vector_vmware_resourcepool_ptr_create(&data->resourcepools);
 	zbx_vector_vmware_dvswitch_ptr_create(&data->dvswitches);
-	zbx_vector_cq_value_create(&dvs_query_values);
-	zbx_vector_cq_value_create(&prop_query_values);
+	zbx_vector_cq_value_ptr_create(&dvs_query_values);
+	zbx_vector_cq_value_ptr_create(&prop_query_values);
 	zbx_vector_str_create(&data->alarm_ids);
 	zbx_vector_vmware_alarm_ptr_create(&data->alarms);
 	alarms_data.alarms = &data->alarms;
-	zbx_vector_vmware_alarm_details_create(&alarms_data.details);
-	zbx_vector_cq_value_create(&cust_query_values);
+	zbx_vector_vmware_alarm_details_ptr_create(&alarms_data.details);
+	zbx_vector_cq_value_ptr_create(&cust_query_values);
 	zbx_vector_str_create(&hvs);
 	zbx_vector_str_create(&dss);
 
@@ -2498,7 +2493,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 			cache_update_period);
 	zbx_vmware_unlock();
 
-	zbx_vector_cq_value_sort(&prop_query_values, vmware_cq_instance_id_compare);
+	zbx_vector_cq_value_ptr_sort(&prop_query_values, vmware_cq_instance_id_compare);
 
 	if (NULL == (easyhandle = curl_easy_init()))
 	{
@@ -2660,8 +2655,8 @@ clean:
 	curl_easy_cleanup(easyhandle);
 	zbx_free(page.data);
 
-	zbx_vector_vmware_alarm_details_clear_ext(&alarms_data.details, vmware_alarm_details_free);
-	zbx_vector_vmware_alarm_details_destroy(&alarms_data.details);
+	zbx_vector_vmware_alarm_details_ptr_clear_ext(&alarms_data.details, vmware_alarm_details_free);
+	zbx_vector_vmware_alarm_details_ptr_destroy(&alarms_data.details);
 	zbx_vector_str_clear_ext(&hvs, zbx_str_free);
 	zbx_vector_str_destroy(&hvs);
 	zbx_vector_str_clear_ext(&dss, zbx_str_free);
@@ -2772,10 +2767,10 @@ out:
 
 	vmware_data_free(data);
 	zbx_vector_vmware_event_ptr_destroy(&events);
-	zbx_vector_cq_value_clear_ext(&dvs_query_values, zbx_vmware_cq_value_free);
-	zbx_vector_cq_value_destroy(&dvs_query_values);
-	zbx_vector_cq_value_clear_ext(&prop_query_values, zbx_vmware_cq_value_free);
-	zbx_vector_cq_value_destroy(&prop_query_values);
+	zbx_vector_cq_value_ptr_clear_ext(&dvs_query_values, zbx_vmware_cq_value_free);
+	zbx_vector_cq_value_ptr_destroy(&dvs_query_values);
+	zbx_vector_cq_value_ptr_clear_ext(&prop_query_values, zbx_vmware_cq_value_free);
+	zbx_vector_cq_value_ptr_destroy(&prop_query_values);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s \tprocessed:" ZBX_FS_SIZE_T " bytes of data. %s", __func__,
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, msg);

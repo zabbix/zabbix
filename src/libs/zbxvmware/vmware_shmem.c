@@ -945,7 +945,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	VMWARE_VECTOR_CREATE(&data->events, vmware_event_ptr);
 	VMWARE_VECTOR_CREATE(&data->datastores, vmware_datastore_ptr);
 	VMWARE_VECTOR_CREATE(&data->datacenters, vmware_datacenter_ptr);
-	VMWARE_VECTOR_CREATE(&data->resourcepools, vmware_resourcepool);
+	VMWARE_VECTOR_CREATE(&data->resourcepools, vmware_resourcepool_ptr);
 	VMWARE_VECTOR_CREATE(&data->dvswitches, vmware_dvswitch_ptr);
 	VMWARE_VECTOR_CREATE(&data->alarms, vmware_alarm_ptr);
 	VMWARE_VECTOR_CREATE(&data->alarm_ids, str);
@@ -953,7 +953,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 	zbx_vector_vmware_event_ptr_reserve(&data->events, (size_t)src->events.values_alloc);
 	zbx_vector_vmware_datastore_ptr_reserve(&data->datastores, (size_t)src->datastores.values_num);
 	zbx_vector_vmware_datacenter_ptr_reserve(&data->datacenters, (size_t)src->datacenters.values_num);
-	zbx_vector_vmware_resourcepool_reserve(&data->resourcepools, (size_t)src->resourcepools.values_num);
+	zbx_vector_vmware_resourcepool_ptr_reserve(&data->resourcepools, (size_t)src->resourcepools.values_num);
 	zbx_vector_vmware_dvswitch_ptr_reserve(&data->dvswitches, (size_t)src->dvswitches.values_num);
 	zbx_vector_vmware_alarm_ptr_reserve(&data->alarms, (size_t)src->alarms.values_num);
 	zbx_vector_str_reserve(&data->alarm_ids, (size_t)src->alarm_ids.values_num);
@@ -986,7 +986,7 @@ zbx_vmware_data_t	*vmware_shmem_data_dup(zbx_vmware_data_t *src)
 
 	for (int i = 0; i < src->resourcepools.values_num; i++)
 	{
-		zbx_vector_vmware_resourcepool_append(&data->resourcepools,
+		zbx_vector_vmware_resourcepool_ptr_append(&data->resourcepools,
 				vmware_shmem_resourcepool_dup(src->resourcepools.values[i]));
 	}
 
