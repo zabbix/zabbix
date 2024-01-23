@@ -21,8 +21,7 @@ libzbxvmware_a_SOURCES = \
 	vmware_rest.c \
 	vmware_manager.c \
 	vmware_internal.h \
-	vmware.c \
-	vmware.h
+	vmware.c
 
 libzbxvmware_a_CFLAGS = \
 	$(LIBXML2_CFLAGS) \

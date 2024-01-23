@@ -29,6 +29,11 @@ FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|readonly	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|name
 
+TABLE|ugset|ugsetid|ZBX_DATA
+FIELD		|ugsetid	|t_id		|	|NOT NULL	|0
+FIELD		|hash		|t_varchar(64)	|''	|NOT NULL	|0
+INDEX		|1		|hash
+
 TABLE|users|userid|ZBX_DATA
 FIELD		|userid		|t_id		|	|NOT NULL	|0
 FIELD		|username	|t_varchar(100)	|''	|NOT NULL	|0
@@ -63,6 +68,11 @@ FIELD		|active_till	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|tags_evaltype	|t_integer	|'0'	|NOT NULL	|0
 INDEX		|1		|active_since,active_till
 UNIQUE		|2		|name
+
+TABLE|hgset|hgsetid|ZBX_TEMPLATE
+FIELD		|hgsetid	|t_id		|	|NOT NULL	|0
+FIELD		|hash		|t_varchar(64)	|''	|NOT NULL	|0
+INDEX		|1		|hash
 
 TABLE|hosts|hostid|ZBX_TEMPLATE
 FIELD		|hostid		|t_id		|	|NOT NULL	|0
@@ -110,6 +120,16 @@ FIELD		|flags		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|uuid		|t_varchar(32)	|''	|NOT NULL	|0
 FIELD		|type		|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|type,name
+
+TABLE|hgset_group|hgsetid,groupid|ZBX_TEMPLATE
+FIELD		|hgsetid	|t_id		|	|NOT NULL	|0			|1|hgset
+FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|hstgrp	|		|RESTRICT
+INDEX		|1		|groupid
+
+TABLE|host_hgset|hostid|ZBX_TEMPLATE
+FIELD		|hostid		|t_id		|	|NOT NULL	|0			|1|hosts
+FIELD		|hgsetid	|t_id		|	|NOT NULL	|0			|2|hgset	|		|RESTRICT
+INDEX		|1		|hgsetid
 
 TABLE|group_prototype|group_prototypeid|ZBX_TEMPLATE
 FIELD		|group_prototypeid|t_id		|	|NOT NULL	|0
@@ -362,7 +382,7 @@ FIELD		|name		|t_varchar(64)	|''	|NOT NULL	|0
 FIELD		|gui_access	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|users_status	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|debug_mode	|t_integer	|'0'	|NOT NULL	|0
-FIELD		|userdirectoryid	|t_id	|NULL	|NULL	|0 |2|userdirectory	|	|RESTRICT
+FIELD		|userdirectoryid|t_id		|NULL	|NULL		|0			|2|userdirectory	|	|RESTRICT
 FIELD		|mfaid		|t_id	|NULL	|NULL	|0 |3|mfa	|	|RESTRICT
 FIELD		|mfa_status	|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|name
@@ -375,6 +395,16 @@ FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|1|usrgrp
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
 UNIQUE		|1		|usrgrpid,userid
 INDEX		|2		|userid
+
+TABLE|ugset_group|ugsetid,usrgrpid|ZBX_DATA
+FIELD		|ugsetid	|t_id		|	|NOT NULL	|0			|1|ugset
+FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp	|		|RESTRICT
+INDEX		|1		|usrgrpid
+
+TABLE|user_ugset|userid|ZBX_DATA
+FIELD		|userid		|t_id		|	|NOT NULL	|0			|1|users
+FIELD		|ugsetid	|t_id		|	|NOT NULL	|0			|2|ugset	|		|RESTRICT
+INDEX		|1		|ugsetid
 
 TABLE|scripts|scriptid|ZBX_DATA
 FIELD		|scriptid			|t_id		|	|NOT NULL	|0
@@ -802,6 +832,12 @@ FIELD		|permission	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|id		|t_id		|	|NOT NULL	|0			|2|hstgrp	|groupid
 INDEX		|1		|groupid
 INDEX		|2		|id
+
+TABLE|permission|ugsetid,hgsetid|ZBX_DATA
+FIELD		|ugsetid	|t_id		|	|NOT NULL	|0			|1|ugset
+FIELD		|hgsetid	|t_id		|	|NOT NULL	|0			|2|hgset
+FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
+INDEX		|1		|hgsetid
 
 TABLE|services|serviceid|ZBX_DATA
 FIELD		|serviceid	|t_id		|	|NOT NULL	|0
@@ -2224,4 +2260,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6050191	|6050191
+ROW		|1		|6050218	|6050218

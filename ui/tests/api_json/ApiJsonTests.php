@@ -80,6 +80,7 @@ require_once dirname(__FILE__).'/testUserMacro.php';
 require_once dirname(__FILE__).'/testUsers.php';
 require_once dirname(__FILE__).'/testValuemap.php';
 require_once dirname(__FILE__).'/testWebScenario.php';
+require_once dirname(__FILE__).'/testWebScenarioPermissions.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -148,6 +149,7 @@ class ApiJsonTests {
 		$suite->addTestSuite('testUsers');
 		$suite->addTestSuite('testValuemap');
 		$suite->addTestSuite('testWebScenario');
+		$suite->addTestSuite('testWebScenarioPermissions');
 
 		return $suite;
 	}

@@ -675,7 +675,7 @@ class testFormTabIndicators extends CWebTest {
 	public function testFormTabIndicators_CheckGeneralForms($data) {
 		$this->page->login()->open($data['url'])->waitUntilReady();
 
-		// Open widget configuration form if indicator check is performed on dachboard.
+		// Open widget configuration form if indicator check is performed on dashboard.
 		if ($data['url'] === 'zabbix.php?action=dashboard.view') {
 			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();

@@ -430,18 +430,18 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      var container_labels = item.labels.container + item.labels.namespace + item.labels.pod;
-                      if (item.labels.container !== '' && !lookup[container_labels]) {
-                          lookup[container_labels] = 1;
-                          result.push({
-                              '{#CONTAINER}': item.labels.container,
-                              '{#NAMESPACE}': item.labels.namespace,
-                              '{#POD}': item.labels.pod
-                          });
-                      }
+                  	var container_labels = item.labels.container + item.labels.namespace + item.labels.pod;
+                  	if (item.labels.container !== '' && !lookup[container_labels]) {
+                  		lookup[container_labels] = 1;
+                  		result.push({
+                  			'{#CONTAINER}': item.labels.container,
+                  			'{#NAMESPACE}': item.labels.namespace,
+                  			'{#POD}': item.labels.pod
+                  		});
+                  	}
                   })
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -610,18 +610,18 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      var request_labels = item.labels.code + item.labels.host + item.labels.method;
-                      if (!(lookup[request_labels])) {
-                          lookup[request_labels] = 1;
-                          result.push({
-                              '{#CODE}': item.labels.code,
-                              '{#HOST}': item.labels.host,
-                              '{#METHOD}': item.labels.method
-                          });
-                      }
+                  	var request_labels = item.labels.code + item.labels.host + item.labels.method;
+                  	if (!(lookup[request_labels])) {
+                  		lookup[request_labels] = 1;
+                  		result.push({
+                  			'{#CODE}': item.labels.code,
+                  			'{#HOST}': item.labels.host,
+                  			'{#METHOD}': item.labels.method
+                  		});
+                  	}
                   })
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -763,36 +763,36 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      lookup_histogram = {},
-                      result = [];
+                  	lookup_histogram = {},
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      if (item.name === 'kubelet_runtime_operations_total'){
-                          var op_type = item.labels.operation_type;
+                  	if (item.name === 'kubelet_runtime_operations_total'){
+                  		var op_type = item.labels.operation_type;
                   
-                          if (lookup[op_type]) {
-                              return;
-                          }
-                          lookup[op_type] = 1;
-                          result.push({
-                              '{#TYPE}': 'totals',
-                              '{#OP_TYPE}': op_type
-                          });
-                      }
+                  		if (lookup[op_type]) {
+                  			return;
+                  		}
+                  		lookup[op_type] = 1;
+                  		result.push({
+                  			'{#TYPE}': 'totals',
+                  			'{#OP_TYPE}': op_type
+                  		});
+                  	}
                   
-                      else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
-                          var labels = item.labels.operation_type + item.labels.le;
+                  	else if (item.name === 'kubelet_runtime_operations_duration_seconds_bucket'){
+                  		var labels = item.labels.operation_type + item.labels.le;
                   
-                          if (lookup_histogram[labels]) {
-                              return;
-                          }
-                          lookup_histogram[labels] = 1;
-                          result.push({
-                              '{#TYPE}': 'buckets',
-                              '{#OP_TYPE}': item.labels.operation_type,
-                              '{#LE}': item.labels.le
-                          });
-                      }
+                  		if (lookup_histogram[labels]) {
+                  			return;
+                  		}
+                  		lookup_histogram[labels] = 1;
+                  		result.push({
+                  			'{#TYPE}': 'buckets',
+                  			'{#OP_TYPE}': item.labels.operation_type,
+                  			'{#LE}': item.labels.le
+                  		});
+                  	}
                   });
                   
                   return JSON.stringify(result);

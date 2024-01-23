@@ -608,7 +608,7 @@ class testPageServicesServices extends CWebTest {
 		// Fill filter form with data.
 		$filter_form->fill(CTestArrayHelper::get($data, 'filter'));
 
-		// If data contains Tags fill them separataly, because tags form is more complicated.
+		// If data contains Tags fill them separately, because tags form is more complicated.
 		if (CTestArrayHelper::get($data, 'Tags')) {
 			if (CTestArrayHelper::get($data['Tags'], 'Source')) {
 				$filter_form->getField('id:filter_tag_source')->asSegmentedRadio()->fill($data['Tags']['Source']);

@@ -209,7 +209,7 @@ class testDashboardGaugeWidget extends testWidgets {
 			'id:scale_size' => ['value' => 15, 'maxlength' => 3, 'enabled' => true, 'visible' => false],
 			'id:scale_decimal_places' => ['value' => 0, 'maxlength' => 2, 'enabled' => true, 'visible' => false],
 
-			// Tresholds.
+			// Thresholds.
 			'id:th_show_labels' => ['value' => false, 'enabled' => false, 'visible' => false],
 			'id:th_show_arc' => ['value' => false, 'enabled' => false, 'visible' => false],
 			'id:th_arc_size' => ['value' => 5, 'maxlength' => 3, 'enabled' => false, 'visible' => false],
@@ -1203,7 +1203,7 @@ class testDashboardGaugeWidget extends testWidgets {
 				[
 					'screenshot_id' => 'Gauge with two thresholds',
 					'fields' => [
-						'Name' => 'All settings + treshholds',
+						'Name' => 'All settings + thresholds',
 						'Item' => self::GAUGE_ITEM,
 						'Min' => 1,
 						'Max' => 300,

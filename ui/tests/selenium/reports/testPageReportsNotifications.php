@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @dataSource LoginUsers, Actions
+ * @dataSource LoginUsers, Actions, UserPermissions
  */
 class testPageReportsNotifications extends CLegacyWebTest {
 
@@ -41,7 +41,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['All'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => array_reverse(range(date("Y"), date("Y",strtotime("-11 year"))))
+			'year' => array_reverse(range(date("Y"), 2012))
 		];
 		$default_selected = [
 			'media_type' => 'All',

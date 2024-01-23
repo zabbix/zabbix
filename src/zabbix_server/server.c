@@ -37,6 +37,7 @@
 #include "zbxnix.h"
 #include "zbxcomms.h"
 
+#include "zbxvmware.h"
 #include "zbxalerter.h"
 #include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
@@ -49,7 +50,6 @@
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "vmware/vmware.h"
 #include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"

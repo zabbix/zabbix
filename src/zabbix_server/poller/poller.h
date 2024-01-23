@@ -45,9 +45,6 @@ ZBX_THREAD_ENTRY(async_poller_thread, args);
 zbx_get_program_type_f  poller_get_program_type(void);
 zbx_get_progname_f	poller_get_progname(void);
 
-void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
-		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error);
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros);
 void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,

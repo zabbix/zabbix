@@ -28,6 +28,9 @@
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
 #endif
+#include "zbxalgo.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

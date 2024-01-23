@@ -32,6 +32,8 @@ window.check_popup = new class {
 		this.form = this.overlay.$dialogue.$body[0].querySelector('form');
 
 		this._loadViews();
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	_loadViews() {

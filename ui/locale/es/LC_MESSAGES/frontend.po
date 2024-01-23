@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-19 14:58+0000\n"
+"PO-Revision-Date: 2024-01-18 16:58+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -1524,7 +1524,7 @@ msgstr "Tal cual"
 
 #: include/views/monitoring.history.php:97
 msgid "As plain text"
-msgstr "Como texto sencillo"
+msgstr "Como texto sin formato"
 
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
@@ -11537,7 +11537,7 @@ msgstr[1] "Métricas activadas"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
-msgstr "Métrica en estado \"no soportado\""
+msgstr "Métrica en estado \"no soportada\""
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -12129,7 +12129,7 @@ msgstr "Plantilla de enlace"
 #: app/views/popup.lldoperation.php:236 app/views/popup.massupdate.host.php:71
 #: app/views/template.massupdate.php:76 include/actions.inc.php:706
 msgid "Link templates"
-msgstr "Plantillas de enlaces"
+msgstr "Vincular plantillas"
 
 #: widgets/navtree/views/navtreeitem.edit.php:65
 msgid "Linked map"
@@ -12657,7 +12657,7 @@ msgstr "Marcar como causa"
 
 #: include/views/monitoring.sysmap.edit.php:150
 msgid "Mark elements on trigger status change"
-msgstr "Marcar elementos en el cambio de estado del iniciador"
+msgstr "Marcar elementos al cambiar el estado del iniciador"
 
 #: include/views/monitoring.history.php:171
 msgid "Mark others"
@@ -13314,7 +13314,7 @@ msgstr "Silenciar"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
-msgstr "Mi"
+msgstr "Mio"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
@@ -14406,7 +14406,7 @@ msgstr "No hay métricas heredadas"
 #: include/items.inc.php:185
 #: include/views/configuration.host.discovery.list.php:165
 msgid "Not supported"
-msgstr "No soportado"
+msgstr "No soportada"
 
 #: app/views/administration.miscconfig.edit.php:138
 #, c-format
@@ -14474,7 +14474,7 @@ msgstr "Número de equipos (habilitados/deshabilitados)"
 
 #: app/partials/administration.system.info.php:65
 msgid "Number of items (enabled/disabled/not supported)"
-msgstr "Número de monitores (habilitados/deshabilitados/no soportados)"
+msgstr "Número de métricas (habilitadas/deshabilitadas/no soportadas)"
 
 #: include/classes/data/CItemData.php:2694
 msgid "Number of items in Zabbix database."
@@ -15056,7 +15056,7 @@ msgstr "Anular periodo de tendencias de elementos"
 
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
-msgstr ""
+msgstr "Anular selector de período de tiempo"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -15594,7 +15594,7 @@ msgstr "Algoritmo de colocación"
 #: app/views/mediatype.edit.php:274 include/classes/setup/CSetupWizard.php:559
 #: widgets/plaintext/Widget.php:29
 msgid "Plain text"
-msgstr "Texto plano"
+msgstr "Texto sin formato"
 
 #: app/views/administration.user.edit.php:761
 #: app/views/administration.user.edit.php:796
@@ -22423,7 +22423,7 @@ msgstr "Con problemas"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
-msgstr ""
+msgstr "Con esta configuración solo se mostrarán datos numéricos."
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
@@ -22432,7 +22432,7 @@ msgstr "Con esta configuración solo se mostrarán métricas numéricas en esta 
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
 msgid "With this setting only numeric items will be displayed."
-msgstr ""
+msgstr "Con esta configuración solo se mostrarán métricas numéricas."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22835,7 +22835,7 @@ msgstr "Versión del servidor Zabbix"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
-msgstr "Trapper ZABBIX"
+msgstr "Captura ZABBIX"
 
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"
@@ -24436,7 +24436,7 @@ msgstr "no seleccionada"
 
 #: include/classes/helpers/CItemHelper.php:261
 msgid "not used"
-msgstr ""
+msgstr "no utilizado"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"

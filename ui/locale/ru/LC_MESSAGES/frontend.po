@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-11-03 14:01+0000\n"
+"PO-Revision-Date: 2024-01-16 08:05+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -2044,7 +2044,7 @@ msgstr "По нижнему краю"
 
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
-msgstr "По нижнему краю"
+msgstr "Последние N"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -2386,7 +2386,7 @@ msgstr "Не удалось изменить тип пользователя с�
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Не удалось очистить историю и тренды"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2636,7 +2636,7 @@ msgstr[2] "Не удалось удалить графики"
 #: graphs.php:273 graphs.php:317
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
-msgstr[0] ""
+msgstr[0] "Не удалось удалить прототип графика"
 msgstr[1] "Не удалось удалить прототипы графиков"
 msgstr[2] "Не удалось удалить прототипы графиков"
 
@@ -20091,7 +20091,7 @@ msgstr "Топ 100 триггеров"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
-msgstr "Топ N"
+msgstr "Первые N"
 
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"

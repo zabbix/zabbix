@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-02 13:42+0000\n"
+"PO-Revision-Date: 2024-01-16 00:52+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -2937,7 +2937,7 @@ msgstr "找不到仪表板“%2$s”中使用的 SLA“%1$s”。"
 #: include/classes/import/importers/CTemplateDashboardImporter.php:241
 #, c-format
 msgid "Cannot find action \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "找不到仪表板“%2$s”中使用的动作“%1$s”。"
 
 #: include/classes/import/importers/CMapImporter.php:270
 #, c-format
@@ -3047,7 +3047,7 @@ msgstr "在仪表盘 \"%2$s\" 中，无法找到使用的监控项 \"%1$s\"。"
 #: include/classes/import/importers/CTemplateDashboardImporter.php:193
 #, c-format
 msgid "Cannot find map \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "找不到仪表板“%2$s”中使用的拓扑图“%1$s”。"
 
 #: include/classes/import/importers/CMapImporter.php:140
 #, c-format
@@ -3057,12 +3057,12 @@ msgstr "无法找到地图 \"%1$s\" 用于地图 \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:253
 #, c-format
 msgid "Cannot find media type \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "找不到仪表板“%2$s”中使用的媒介类型“%1$s”。"
 
 #: include/classes/import/importers/CTemplateDashboardImporter.php:205
 #, c-format
 msgid "Cannot find service \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "找不到仪表板“%2$s”中使用的服务“%1$s”。"
 
 #: include/classes/import/CConfigurationImport.php:1458
 #, c-format
@@ -3083,7 +3083,7 @@ msgstr "无法找到触发器 \"%1$s\" 用于地图 \"%2$s\"."
 #: include/classes/import/importers/CTemplateDashboardImporter.php:229
 #, c-format
 msgid "Cannot find user \"%1$s\" used in dashboard \"%2$s\"."
-msgstr ""
+msgstr "找不到仪表板“%2$s”中使用的用户“%1$s”。"
 
 #: include/classes/api/services/CUser.php:1543
 msgid "Cannot find user directory for LDAP."
@@ -3143,7 +3143,7 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到主�
 #: include/classes/api/services/CItemGeneral.php:874
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的 LLD 规则继承到托管“%3$s”，因为已从模板“%4$s”继承了具有相同键的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:813
 #, c-format
@@ -3163,7 +3163,7 @@ msgstr "无法将模板“%2$s”的密钥“%1$s”的 LLD 规则继承到模�
 #: include/classes/api/services/CItemGeneral.php:875
 #, c-format
 msgid "Cannot inherit LLD rule with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an LLD rule with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的 LLD 规则继承到模板“%3$s”，因为已从模板“%4$s”继承了具有相同键的 LLD 规则。"
 
 #: include/classes/api/services/CItemGeneral.php:814
 #, c-format
@@ -3203,7 +3203,7 @@ msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到�
 #: include/classes/api/services/CItemGeneral.php:880
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to host \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法继承模板“%2$s”的键为“%1$s”的项目原型来承载“%3$s”，因为具有相同键的项目原型已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:829
 #, c-format
@@ -3223,7 +3223,7 @@ msgstr "无法将模板“%2$s”的键为“%1$s”的监控项原型继承到�
 #: include/classes/api/services/CItemGeneral.php:881
 #, c-format
 msgid "Cannot inherit item prototype with key \"%1$s\" of template \"%2$s\" to template \"%3$s\", because an item prototype with the same key is already inherited from template \"%4$s\"."
-msgstr ""
+msgstr "无法将模板“%2$s”的键为“%1$s”的项目原型继承到模板“%3$s”，因为具有相同键的项目原型已从模板“%4$s”继承。"
 
 #: include/classes/api/services/CItemGeneral.php:830
 #, c-format
@@ -3327,7 +3327,7 @@ msgstr "无法链接模板"
 #: include/classes/api/services/CHostBase.php:806
 #, c-format
 msgid "Cannot link template \"%1$s\" to host \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到主机“%2$s”，因为它将通过模板“%3$s”链接两次。"
 
 #: include/classes/api/services/CHostBase.php:872
 #, c-format
@@ -3337,7 +3337,7 @@ msgstr "无法将模板“%1$s”链接到主机“%2$s”，因为其父模板�
 #: include/classes/api/services/CHostBase.php:803
 #, c-format
 msgid "Cannot link template \"%1$s\" to host prototype \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到宿主原型“%2$s”，因为它将通过模板“%3$s”链接两次。"
 
 #: include/classes/api/services/CHostBase.php:869
 #, c-format
@@ -3363,37 +3363,37 @@ msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为会发生循�
 #: include/classes/api/services/CHostBase.php:976
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host \"%3$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为它将链接到主机“%3$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:973
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to host prototype \"%3$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为它将链接到主机原型“%3$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:970
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked to template \"%3$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为它将链接到模板“%3$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:800
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because it would be linked twice through template \"%3$s\"."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为它将通过模板“%3$s”链接两次。"
 
 #: include/classes/api/services/CHostBase.php:1003
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host \"%4$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为其父模板“%3$s”将链接到主机“%4$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:1000
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to host prototype \"%4$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为其父模板“%3$s”将链接到主机原型“%4$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:997
 #, c-format
 msgid "Cannot link template \"%1$s\" to template \"%2$s\", because its parent template \"%3$s\" would be linked to template \"%4$s\" twice."
-msgstr ""
+msgstr "无法将模板“%1$s”链接到模板“%2$s”，因为其父模板“%3$s”将链接到模板“%4$s”两次。"
 
 #: include/classes/api/services/CHostBase.php:866
 #, c-format
@@ -3553,7 +3553,7 @@ msgstr "在模板 \"%2$s\" 中无法设置 \"%1$s\""
 
 #: widgets/piechart/includes/CWidgetFieldDataSet.php:175
 msgid "Cannot set \"Data set aggregation\" when item with type \"Total\" is added to the chart."
-msgstr ""
+msgstr "当类型为“总计”的监控项添加到图表时，无法设置“数据集聚合”。"
 
 #: include/classes/api/services/CItemGeneral.php:2478
 #, c-format
@@ -5116,7 +5116,7 @@ msgstr "从所选原型中禁用并创建主机？"
 
 #: include/views/configuration.host.prototype.list.php:195
 msgid "Create hosts from selected prototype as enabled?"
-msgstr ""
+msgstr "从启用的选定原型创建主机？"
 
 #: include/views/configuration.host.prototype.list.php:202
 msgid "Create hosts from selected prototypes as disabled?"
@@ -5152,11 +5152,11 @@ msgstr "创建监控项原型"
 
 #: include/views/configuration.item.prototype.list.php:212
 msgid "Create items from selected prototype as disabled?"
-msgstr ""
+msgstr "从所选原型中禁用并创建主机？"
 
 #: include/views/configuration.item.prototype.list.php:206
 msgid "Create items from selected prototype as enabled?"
-msgstr ""
+msgstr "从所选原型中启用并创建监控项？"
 
 #: include/views/configuration.item.prototype.list.php:213
 msgid "Create items from selected prototypes as disabled?"
@@ -5225,11 +5225,11 @@ msgstr "创建触发器原型"
 
 #: app/views/js/trigger.prototype.list.js.php:127
 msgid "Create triggers from selected prototype as disabled?"
-msgstr ""
+msgstr "从禁用的选定原型创建触发器？"
 
 #: app/views/js/trigger.prototype.list.js.php:110
 msgid "Create triggers from selected prototype as enabled?"
-msgstr ""
+msgstr "从启用的选定原型创建触发器？"
 
 #: app/views/js/trigger.prototype.list.js.php:126
 msgid "Create triggers from selected prototypes as disabled?"
@@ -5915,7 +5915,7 @@ msgstr "删除并清除"
 
 #: app/views/js/template.list.js.php:130
 msgid "Delete and clear selected template? (Warning: all linked hosts will be cleared!)"
-msgstr ""
+msgstr "删除并清除所选的模板? (警告: 所有链接的主机将被清除!)"
 
 #: app/views/js/template.list.js.php:127
 msgid "Delete and clear selected templates? (Warning: all linked hosts will be cleared!)"
@@ -6752,39 +6752,39 @@ msgstr "自动发现对象"
 
 #: include/classes/data/CItemData.php:1764
 msgid "Discovery of VMware clusters, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 集群，\"url\" - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1799
 msgid "Discovery of VMware datastores, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware 数据存储，\"url\" - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1953
 msgid "Discovery of VMware hypervisor datastores, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现 VMware hypervisor数据存储，“url” - VMware 服务 URL，”uuid“ - VMware hypervisor全局唯一标识。返回 JSON"
 
 #: include/classes/data/CItemData.php:2107
 msgid "Discovery of VMware hypervisor network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现VMware hypervisor网络接口，“url”- VMware 服务 URL，“uuid”- VMware hypervisor全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:1995
 msgid "Discovery of VMware hypervisors, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "发现 VMware hypervisor, \"url\" - VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:2541
 msgid "Discovery of VMware virtual machine disk devices, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现的VMware虚拟机磁盘设备，\"url\" - VMware服务URL，\"uuid\" - VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2562
 msgid "Discovery of VMware virtual machine file systems, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "发现 VMware虚拟机文件系统，\"url\" - VMware服务URL，\"uuid\" - VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2408
 msgid "Discovery of VMware virtual machine network interfaces, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware发现的虚拟机网络接口，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2310
 msgid "Discovery of VMware virtual machines, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 发现的虚拟机，“url” - VMware 服务 URL。返回 JSON"
 
 #: app/controllers/CControllerAuditLogList.php:228
 #: app/views/configuration.discovery.edit.php:285
@@ -9466,7 +9466,7 @@ msgstr "管家"
 #: include/views/configuration.item.edit.php:1084
 #: include/views/configuration.item.prototype.edit.php:952
 msgid "However, if \"Check for not supported value\" steps are configured, they are always placed and executed first (with \"any error\" being the last of them)."
-msgstr ""
+msgstr "如果配置了“检查不支持的值”步骤，则它们始终首先放置并执行（“任何错误”将显示最后一个）。"
 
 #: include/locales.inc.php:47
 msgid "Hungarian (hu_HU)"
@@ -14906,7 +14906,7 @@ msgstr "覆盖监控项趋势期间"
 
 #: app/views/popup.tabfilter.edit.php:40
 msgid "Override time period selector"
-msgstr ""
+msgstr "覆盖时间段选择器"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -21358,19 +21358,19 @@ msgstr "VMware数据中心报警数据，返回JSON，“url”-VMware服务URL�
 
 #: include/classes/data/CItemData.php:1869
 msgid "VMware datacenter tags array, \"url\" - VMware service URL, \"id\" - VMware datacenter id. Returns JSON"
-msgstr ""
+msgstr "VMware 数据中心标签数组，“url”- VMware 服务 URL，“id”- VMware 数据中心 ID。返回 JSON"
 
 #: include/classes/data/CItemData.php:1862
 msgid "VMware datacenters and their IDs, \"url\" - VMware service URL. Returns JSON"
-msgstr ""
+msgstr "VMware 数据中心及其 ID，“url”- VMware 服务 URL。返回 JSON"
 
 #: include/classes/data/CItemData.php:1792
 msgid "VMware datastore alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier"
-msgstr ""
+msgstr "VMware数据存储报警数据，返回JSON，“url”-VMware服务URL，“uuid”-VMware数据存储全局唯一标识符"
 
 #: include/classes/data/CItemData.php:1981
 msgid "VMware datastore capacity statistics in bytes or in percentage from total, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\" - total(default)/free/pfree/uncommitted. Returns integer for bytes; float for percentage"
-msgstr ""
+msgstr "VMware 数据存储容量统计信息（以字节为单位或占总数的百分比），“url”- VMware 服务 URL，“uuid”- VMware 管理程序全局唯一标识符，“数据存储”- 数据存储名称，“模式”- 总计（默认）/free/pfree/未承诺。返回字节的整数；浮动百分比"
 
 #: include/classes/data/CItemData.php:1834
 msgid "VMware datastore capacity statistics in bytes or in percentage from total. Returns integer for bytes; float for percentage"
@@ -21378,299 +21378,299 @@ msgstr "VMware数据存储容量统计信息，以字节为单位，以百分比
 
 #: include/classes/data/CItemData.php:1806
 msgid "VMware datastore hypervisors list, \"url\" - VMware service URL, \"datastore\" - datastore name"
-msgstr ""
+msgstr "VMware 数据存储管理程序列表，“url”- VMware 服务 URL，“数据存储”- 数据存储名称"
 
 #: include/classes/data/CItemData.php:1813
 msgid "VMware datastore performance counter, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"path\" - performance counter path, \"instance\" - datastore perfcounter instance from vmware.hv.diskinfo.get"
-msgstr ""
+msgstr "VMware 数据存储性能计数器，“url”- VMware 服务 URL，“uuid”- VMware 数据存储全局唯一标识符，“路径”- 性能计数器路径，“实例”- 来自 vmware.hv.diskinfo.get 的数据存储性能计数器实例"
 
 #: include/classes/data/CItemData.php:1820
 msgid "VMware datastore property, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier, \"prop\" - property path"
-msgstr ""
+msgstr "VMware 数据存储属性，“url”- VMware 服务 URL，“uuid”- VMware 数据存储全局唯一标识符，“prop”- 属性路径"
 
 #: include/classes/data/CItemData.php:1827
 msgid "VMware datastore read statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMware 数据存储读取统计信息，“url”- VMware 服务 URL，“数据存储”- 数据存储名称，“模式”- 延迟/最大延迟 - 平均或最大值"
 
 #: include/classes/data/CItemData.php:1841
 msgid "VMware datastore tags array, \"url\" - VMware service URL, \"uuid\" - VMware datastore global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 数据存储标记数组，“url”- VMware 服务 URL，“uuid”- VMware 数据存储全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:1848
 msgid "VMware datastore write statistics, \"url\" - VMware service URL, \"datastore\" - datastore name, \"mode\"- latency/maxlatency - average or maximum"
-msgstr ""
+msgstr "VMware 数据存储写入统计信息，“url”- VMware 服务 URL，“数据存储”- 数据存储名称，“模式”- 延迟/最大延迟 - 平均或最大值"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
-msgstr ""
+msgstr "VMware 事件日志，“url”- VMware 服务 URL，“ mode”- 全部（默认）或跳过 - 跳过旧数据的处理，“severity”- 默认情况下禁用过滤或“错误、警告、信息、用户”组合"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
-msgstr ""
+msgstr "VMware 事件日志，“url”- VMware 服务 URL，“mode”- 全部（默认），skip - 跳过旧数据的处理"
 
 #: include/classes/data/CItemData.php:2072
 msgid "VMware hypervisor BIOS UUID, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序 BIOS UUID，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2163
 msgid "VMware hypervisor HW vendor state sensors, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 虚拟机管理程序硬件供应商状态传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:1904
 msgid "VMware hypervisor alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware hypervisor报警数据，返回JSON，“url”-VMware服务URL，“uuid”-VMware hypervisor全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2093
 msgid "VMware hypervisor ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序增加了内存大小，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:1911
 msgid "VMware hypervisor cluster name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序集群名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:1918
 msgid "VMware hypervisor connection state, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序连接状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:1946
 msgid "VMware hypervisor datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns string"
-msgstr ""
+msgstr "VMware 虚拟机管理程序数据中心名称、“url”- VMware 服务 URL、“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回字符串"
 
 #: include/classes/data/CItemData.php:1974
 msgid "VMware hypervisor datastore read statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr ""
+msgstr "VMware 虚拟机管理程序数据存储读取统计信息，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符，“数据存储”- 数据存储名称，“模式”- 延迟"
 
 #: include/classes/data/CItemData.php:1988
 msgid "VMware hypervisor datastore write statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"datastore\" - datastore name, \"mode\"- latency"
-msgstr ""
+msgstr "VMware 虚拟机管理程序数据存储写入统计信息，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符，“数据存储”- 数据存储名称，“模式”- 延迟"
 
 #: include/classes/data/CItemData.php:1960
 msgid "VMware hypervisor datastores list, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序数据存储列表，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2156
 msgid "VMware hypervisor health state rollup sensor, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - gray; 1 - green; 2 - yellow; 3 - red"
-msgstr ""
+msgstr "VMware 虚拟机管理程序健康状态汇总传感器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 0 - 灰色； 1 - 绿色； 2-黄色； 3 - 红色"
 
 #: include/classes/data/CItemData.php:2051
 msgid "VMware hypervisor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序模型，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2009
 msgid "VMware hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2114
 msgid "VMware hypervisor network input statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr ""
+msgstr "VMware hypervisor 网络输入统计信息，“url”- VMware 服务 URL，“uuid”- VMware hypervisor 全局唯一标识符，“mode”- bps"
 
 #: include/classes/data/CItemData.php:2121
 msgid "VMware hypervisor network interface speed, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, <ifname> - interface name"
-msgstr ""
+msgstr "VMware 虚拟机管理程序网络接口速度，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符，<ifname> - 接口名称"
 
 #: include/classes/data/CItemData.php:2128
 msgid "VMware hypervisor network output statistics, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"mode\"- bps"
-msgstr ""
+msgstr "VMware hypervisor 网络输出统计信息，“url”- VMware 服务 URL，“uuid”- VMware hypervisor 全局唯一标识符，“mode”- bps"
 
 #: include/classes/data/CItemData.php:2135
 msgid "VMware hypervisor performance counter, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMware 虚拟机管理程序性能计数器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符，“path”- 性能计数器路径，“instance”- 性能计数器实例"
 
 #: include/classes/data/CItemData.php:2016
 msgid "VMware hypervisor processor frequency, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序处理器频率，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2023
 msgid "VMware hypervisor processor model, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序处理器型号，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:1932
 msgid "VMware hypervisor processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序处理器使用情况（以 Hz 为单位），“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2149
 msgid "VMware hypervisor property , \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier, \"prop\" - property path"
-msgstr ""
+msgstr "VMware 虚拟机管理程序属性，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符，“prop”- 属性路径"
 
 #: include/classes/data/CItemData.php:2058
 msgid "VMware hypervisor sensors value, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 虚拟机管理程序传感器值，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2065
 msgid "VMware hypervisor serialnumber, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序序列号，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2170
 msgid "VMware hypervisor status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2177
 msgid "VMware hypervisor tags array, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 虚拟机管理程序标签数组，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2044
 msgid "VMware hypervisor total memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序总内存大小，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2184
 msgid "VMware hypervisor uptime, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序正常运行时间，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2100
 msgid "VMware hypervisor used memory size, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序使用的内存大小，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2079
 msgid "VMware hypervisor vendor name, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序供应商名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2191
 msgid "VMware hypervisor version, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序版本，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符"
 
 #: include/classes/data/CItemData.php:1897
 msgid "VMware service full name, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware 服务全名，“url”-VMware 服务 URL"
 
 #: include/classes/data/CItemData.php:2219
 msgid "VMware service version, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware 服务版本，\"url\"-VMware 服务 URL"
 
 #: include/classes/data/CItemData.php:1743
 msgid "VMware virtual center alarms data, returns JSON, \"url\" - VMware service URL"
-msgstr ""
+msgstr "VMware虚拟中心报警数据，返回JSON，“url”-VMware服务URL"
 
 #: include/classes/data/CItemData.php:2226
 msgid "VMware virtual machine alarms data, returns JSON, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机报警数据，返回JSON，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2338
 msgid "VMware virtual machine ballooned memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机内存大小膨胀，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2471
 msgid "VMware virtual machine committed storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机承诺的存储空间，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2345
 msgid "VMware virtual machine compressed memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机压缩内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2233
 msgid "VMware virtual machine custom attribute value, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"name\" - custom attribute name"
-msgstr ""
+msgstr "VMware虚拟机自定义属性值，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符，“name”-自定义属性名称"
 
 #: include/classes/data/CItemData.php:2303
 msgid "VMware virtual machine datacenter name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns string"
-msgstr ""
+msgstr "VMware 虚拟机数据中心名称，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符。返回字符串"
 
 #: include/classes/data/CItemData.php:2548
 msgid "VMware virtual machine disk device read statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware 虚拟机磁盘设备读取统计信息，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- 磁盘设备实例，“mode”- bps/ops - 每秒字节数/操作数"
 
 #: include/classes/data/CItemData.php:2555
 msgid "VMware virtual machine disk device write statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - disk device instance, \"mode\"- bps/ops - bytes/operations per second"
-msgstr ""
+msgstr "VMware 虚拟机磁盘设备写入统计信息，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- 磁盘设备实例，“mode”- bps/ops - 每秒字节数/操作数"
 
 #: include/classes/data/CItemData.php:2247
 msgid "VMware virtual machine disk requires consolidation, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机磁盘需要整合，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2569
 msgid "VMware virtual machine file system statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"fsname\" - file system name, \"mode\"- total/free/used/pfree/pused"
-msgstr ""
+msgstr "VMware虚拟机文件系统统计信息，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符，“fsname”-文件系统名称，“mode”-total/free/used/pfree/pused"
 
 #: include/classes/data/CItemData.php:2380
 msgid "VMware virtual machine guest memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机访客内存使用情况，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2387
 msgid "VMware virtual machine host memory usage, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机主机内存使用情况，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2331
 msgid "VMware virtual machine hypervisor name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机管理程序名称，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2240
 msgid "VMware virtual machine name, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机名称，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2415
 msgid "VMware virtual machine network interface input statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware 虚拟机网络接口输入统计信息，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- 网络接口实例，“mode”- bps/pps - 每秒字节数/数据包数"
 
 #: include/classes/data/CItemData.php:2422
 msgid "VMware virtual machine network interface output statistics, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"instance\" - network interface instance, \"mode\"- bps/pps - bytes/packets per second"
-msgstr ""
+msgstr "VMware 虚拟机网络接口输出统计信息，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“instance”- 网络接口实例，“mode”- bps/pps - 每秒字节数/数据包数"
 
 #: include/classes/data/CItemData.php:2436
 msgid "VMware virtual machine performance counter, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"path\" - performance counter path, \"instance\" - performance counter instance"
-msgstr ""
+msgstr "VMware 虚拟机性能计数器，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“path”- 性能计数器路径，“instance”- 性能计数器实例"
 
 #: include/classes/data/CItemData.php:2443
 msgid "VMware virtual machine power state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机电源状态，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2359
 msgid "VMware virtual machine private memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifierr"
-msgstr ""
+msgstr "VMware 虚拟机私有内存大小，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2275
 msgid "VMware virtual machine processor ready time ms, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机处理器就绪时间 ms，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2296
 msgid "VMware virtual machine processor usage in Hz, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机处理器使用情况（以 Hz 为单位），“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2450
 msgid "VMware virtual machine property, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"prop\" - property path"
-msgstr ""
+msgstr "VMware 虚拟机属性，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“prop”- 属性路径"
 
 #: include/classes/data/CItemData.php:2366
 msgid "VMware virtual machine shared memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机共享内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2457
 msgid "VMware virtual machine snapshot state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware 虚拟机快照状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2464
 msgid "VMware virtual machine state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机状态，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2373
 msgid "VMware virtual machine swapped memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机交换内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2520
 msgid "VMware virtual machine tags array, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier. Returns JSON"
-msgstr ""
+msgstr "VMware虚拟机标签数组，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符。返回 JSON"
 
 #: include/classes/data/CItemData.php:2527
 msgid "VMware virtual machine tools state, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier, \"mode\"- version or status"
-msgstr ""
+msgstr "VMware 虚拟机工具状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机全局唯一标识符，“mode”- 版本或状态"
 
 #: include/classes/data/CItemData.php:2394
 msgid "VMware virtual machine total memory size, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机总内存大小，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2499
 msgid "VMware virtual machine uncommitted storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机未提交存储空间，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2506
 msgid "VMware virtual machine unshared storage space, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware虚拟机非共享存储空间，“url”-VMware服务URL，“uuid”-VMware虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2534
 msgid "VMware virtual machine uptime, \"url\" - VMware service URL, \"uuid\" - VMware virtual machine global unique identifier"
-msgstr ""
+msgstr "VMware 虚拟机正常运行时间，“url”-VMware 服务 URL，“uuid”-VMware 虚拟机全局唯一标识符"
 
 #: include/classes/data/CItemData.php:2086
 msgid "VVMware hypervisor maintenance status, \"url\" - VMware service URL, \"uuid\" - VMware hypervisor global unique identifier. Returns 0 - not in maintenance; 1 - in maintenance"
-msgstr ""
+msgstr "VVMware 虚拟机管理程序维护状态，“url”- VMware 服务 URL，“uuid”- VMware 虚拟机管理程序全局唯一标识符。返回0——不在维护中； 1 - 维护中"
 
 #: app/views/administration.miscconfig.edit.php:112
 msgid "Valid URI schemes"
@@ -22242,7 +22242,7 @@ msgstr "异常"
 
 #: widgets/tophosts/views/column.edit.php:130
 msgid "With this setting only numeric data will be displayed."
-msgstr ""
+msgstr "通过此设置，将仅显示数值类型数据。"
 
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
@@ -22251,7 +22251,7 @@ msgstr "使用此设置，此列中将仅显示数字项目。"
 #: widgets/item/views/widget.edit.php:70
 #: widgets/tophosts/views/column.edit.php:225
 msgid "With this setting only numeric items will be displayed."
-msgstr ""
+msgstr "通过此设置，将仅显示数值监控项数据。"
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22771,7 +22771,7 @@ msgstr "一个特殊的字符"
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "一串以空格分隔的主机名；将 %1$s 添加到列表中允许页面显示在与页面本身同源的框架中"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -24255,7 +24255,7 @@ msgstr "非所选的"
 
 #: include/classes/helpers/CItemHelper.php:261
 msgid "not used"
-msgstr ""
+msgstr "不曾使用"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
