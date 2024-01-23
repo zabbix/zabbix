@@ -220,8 +220,8 @@ foreach ($data['users'] as $user) {
 		$checkbox->setAttribute('data-actions', 'ldap');
 	}
 
-	if ($data['mfa_totp_enabled']) {
-		$checkbox->setAttribute('data-actions', 'mfa_totp_enabled');
+	if ($user['totp_enabled']) {
+		$checkbox->setAttribute('data-actions', 'totp');
 	}
 
 	if ($user['userdirectoryid']) {
@@ -311,7 +311,7 @@ $form->addItem([
 		],
 		'user.reset.totp' => [
 			'name' => _('Reset TOTP secret'),
-			'attributes' => ['data-required' => 'mfa_totp_enabled'],
+			'attributes' => ['data-required' => 'totp'],
 			'confirm_singular' => _('Multi-factor TOTP secret will be deleted.'),
 			'confirm_plural' => _('Multi-factor TOTP secrets will be deleted.'),
 			'csrf_token' => $csrf_token

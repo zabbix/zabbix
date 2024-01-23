@@ -143,8 +143,16 @@ class CControllerUserList extends CController {
 			]);
 		}
 
+		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
+			$userids_with_totp = DB::select('mfa_totp_secret', [
+				'output' => ['userid'],
+			]);
+			$userids_with_totp = array_column($userids_with_totp, 'userid');
+		}
+
 		foreach ($data['users'] as &$user) {
 			$user['role_name'] = $user['role'] ? $user['role']['name'] : '';
+			$user['totp_enabled'] = in_array($user['userid'], $userids_with_totp);
 		}
 		unset($user);
 
@@ -178,16 +186,6 @@ class CControllerUserList extends CController {
 			'login_attempts' => CSettingsHelper::get(CSettingsHelper::LOGIN_ATTEMPTS),
 			'max_in_table' => CSettingsHelper::get(CSettingsHelper::MAX_IN_TABLE)
 		];
-
-		$data['mfa_totp_enabled'] = false;
-		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
-			$mfas = API::Mfa()->get([
-				'filter' => ['type' => MFA_TYPE_TOTP],
-				'countOutput' => true
-			]);
-
-			$data['mfa_totp_enabled'] = $mfas > 0;
-		}
 
 		$response = new CControllerResponseData($data);
 		$response->setTitle(_('Configuration of users'));
