@@ -22,7 +22,6 @@ package dir
 import (
 	"fmt"
 	"io/fs"
-	"os"
 	"syscall"
 
 	"zabbix.com/pkg/win32"
@@ -85,24 +84,54 @@ func (sp *sizeParams) getClusterSize(path string) (uint64, error) {
 	return uint64(clusters.LpSectorsPerCluster) * uint64(clusters.LpBytesPerSector), nil
 }
 
+func hashFromFileInfo(i *syscall.ByHandleFileInformation) uint64 {
+	return uint64(i.FileIndexHigh)<<32 | uint64(i.FileIndexLow)
+}
+
+func getInodeData(path string) (inodeData, error) {
+	uPath, err := syscall.UTF16PtrFromString(path)
+	if err != nil {
+		return inodeData{}, err
+	}
+
+	attributes := uint32(syscall.FILE_FLAG_BACKUP_SEMANTICS | syscall.FILE_FLAG_OPEN_REPARSE_POINT)
+	h, err := syscall.CreateFile(uPath, 0, 0, nil, syscall.OPEN_EXISTING, attributes, 0)
+	if err != nil {
+		return inodeData{}, err
+	}
+
+	defer syscall.CloseHandle(h)
+
+	var i syscall.ByHandleFileInformation
+	err = syscall.GetFileInformationByHandle(h, &i)
+	if err != nil {
+		return inodeData{}, err
+	}
+
+	dev := uint64(i.VolumeSerialNumber)
+	ino := hashFromFileInfo(&i)
+
+	return inodeData{dev, ino}, nil
+}
+
 func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	if d.Type() == fs.ModeSymlink {
 		return true
 	}
 
-	i, err := d.Info()
+	iData, err := getInodeData(path)
 	if err != nil {
 		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+
 		return true
 	}
 
-	for _, f := range cp.files {
-		if os.SameFile(f, i) {
-			return true
-		}
+	_, ok := cp.files[iData]
+	if ok {
+		return true
 	}
 
-	cp.files = append(cp.files, i)
+	cp.files[iData] = struct{}{}
 
 	return false
 }

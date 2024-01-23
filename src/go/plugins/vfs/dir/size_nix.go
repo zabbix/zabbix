@@ -25,7 +25,6 @@ package dir
 import (
 	"fmt"
 	"io/fs"
-	"os"
 	"syscall"
 )
 
@@ -59,16 +58,27 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	i, err := d.Info()
 	if err != nil {
 		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
+
 		return true
 	}
 
-	for _, f := range cp.files {
-		if os.SameFile(f, i) {
-			return true
-		}
+	iStat, ok := i.Sys().(*syscall.Stat_t)
+	if !ok {
+		impl.Logger.Errf("failed to get file info for path %s", path)
+
+		return true
 	}
 
-	cp.files = append(cp.files, i)
+	iData := inodeData{
+		iStat.Dev, iStat.Ino,
+	}
+
+	_, ok = cp.files[iData]
+	if ok {
+		return true
+	}
+
+	cp.files[iData] = struct{}{}
 
 	return false
 }

@@ -32,6 +32,11 @@ import (
 
 var impl Plugin
 
+type inodeData struct {
+	Dev uint64
+	Ino uint64
+}
+
 type common struct {
 	path          string
 	maxDepth      int
@@ -39,7 +44,7 @@ type common struct {
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
-	files         []fs.FileInfo
+	files         map[inodeData]interface{}
 }
 
 func init() {
