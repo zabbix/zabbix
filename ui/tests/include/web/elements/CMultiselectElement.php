@@ -89,7 +89,7 @@ class CMultiselectElement extends CElement {
 		$query->waitUntilNotPresent();
 
 		// TODO: reload should be removed after fix DEV-1535
-		if ($elements->count() > 0 && $id === $this->getID()) {
+		if ($elements->count() > 0 && $id === $this->getID() && $this->parents('class:overlay-dialogue-controls')->exists()) {
 			$this->waitUntilReloaded();
 		}
 
