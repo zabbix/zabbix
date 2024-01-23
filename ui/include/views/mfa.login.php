@@ -37,12 +37,6 @@ if (array_key_exists('error', $data) && $data['error']) {
 
 global $ZBX_SERVER_NAME;
 
-if ($data['mfa']['type'] == MFA_TYPE_DUO) {
-	$form = (new CForm())
-		->addVar('request', '1')
-		->addItem([$error]);
-}
-
 if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
 	if (array_key_exists('qr_code_url', $data)) {
 		switch ($data['mfa']['hash_function']) {

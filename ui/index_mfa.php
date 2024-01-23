@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,7 +50,7 @@ if ($request != '') {
 $session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 
 // If MFA is not required - redirect to the main login page.
-if ($session_data['mfaid'] == '') {
+if (array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
 	redirect($redirect_to->toString());
 }
 
@@ -102,7 +102,7 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
 			redirect(reset($redirect));
 		}
 		elseif(hasRequest('qr_code_url')) {
-			// Show QR code and TOTP secret again, in initial setup verification code was incorrect.
+			// Show QR code and TOTP secret again, if initial setup verification code was incorrect.
 			$confirm_data['qr_code_url'] = getRequest('qr_code_url');
 			$confirm_data['totp_secret'] = getRequest('totp_secret');
 		}
