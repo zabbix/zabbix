@@ -23,8 +23,10 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware.h"
+#include "zbxvmware.h"
 #include "vmware_internal.h"
+
+#include "zbxalgo.h"
 
 void	vmware_dsname_free(zbx_vmware_dsname_t *dsname);
 char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_t *dss, char *diskname);

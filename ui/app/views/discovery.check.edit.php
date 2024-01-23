@@ -29,7 +29,7 @@ order_result($discovery_check_types);
 
 $inline_js = getPagePostJs().$this->readJsFile('discovery.check.edit.js.php');
 
-$form = new CForm();
+$form = (new CForm())->addStyle('display: none;');
 
 if (array_key_exists('dcheckid', $data['params']) && $data['params']['dcheckid']) {
 	$form->addVar('dcheckid', $data['params']['dcheckid']);

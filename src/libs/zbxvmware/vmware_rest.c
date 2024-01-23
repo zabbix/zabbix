@@ -17,7 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "vmware.h"
+#include "zbxvmware.h"
 #include "vmware_internal.h"
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)

@@ -47,7 +47,10 @@ jQuery(document).ready(function($) {
 		})
 		.trigger("change");
 
+	document.getElementById('media_form').style.display = '';
+
 	overlays_stack.end().centerDialog();
+	overlays_stack.end().recoverFocus();
 });
 
 /**

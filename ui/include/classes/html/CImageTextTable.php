@@ -32,7 +32,7 @@ class CImageTextTable {
 	public $y;
 
 	/**
-	 * Minimal row height. If the height of some row is bigger then given, the $rowheight will be set to this height.
+	 * Minimal row height. If the height of some row is bigger than given, the $rowheight will be set to this height.
 	 *
 	 * @var int
 	 */

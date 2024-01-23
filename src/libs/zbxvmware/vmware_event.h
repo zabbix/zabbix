@@ -23,8 +23,9 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include "vmware.h"
-#include "vmware_internal.h"
+#include "zbxvmware.h"
+
+#include "zbxalgo.h"
 
 void	vmware_event_free(zbx_vmware_event_t *event);
 int	vmware_service_get_evt_severity(zbx_vmware_service_t *service, CURL *easyhandle,

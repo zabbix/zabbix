@@ -402,7 +402,10 @@ function PopUp(action, parameters, {
 							const rect = label.getBoundingClientRect();
 
 							if (rect.width > 0) {
-								grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+								// Use of setTimeout() to prevent ResizeObserver observation error in Safari.
+								setTimeout(() => {
+									grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+								});
 								break;
 							}
 						}
