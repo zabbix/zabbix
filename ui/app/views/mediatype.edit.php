@@ -33,7 +33,8 @@ $form = (new CForm())
 	->setId('media-type-form')
 	->addVar('mediatypeid', $data['mediatypeid'])
 	->disablePasswordAutofill()
-	->addItem((new CInput('submit', null))->addStyle('display: none;'));
+	->addItem((new CInput('submit', null))->addStyle('display: none;'))
+	->addStyle('display: none;');
 
 // Create form grid.
 $mediatype_form_grid = (new CFormGrid())

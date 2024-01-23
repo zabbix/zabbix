@@ -84,55 +84,29 @@ class CTemplateDashboard extends CDashboardGeneral {
 		$options['groupCount'] = ($options['groupCount'] && $options['countOutput']);
 
 		// permissions
-		if (in_array(self::$userData['type'], [USER_TYPE_ZABBIX_USER, USER_TYPE_ZABBIX_ADMIN])) {
-			if ($options['editable']) {
-				if ($options['templateids'] !== null) {
-					$options['templateids'] = array_keys(API::Template()->get([
-						'output' => [],
-						'templateids' => $options['templateids'],
-						'editable' => true,
-						'preservekeys' => true
-					]));
-				}
-				else {
-					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-					$sql_parts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM hosts_groups hgg'.
-							' JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE d.templateid=hgg.hostid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.PERM_READ_WRITE.
-						')';
-				}
+			if ($options['editable']) {
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where'][] = 'd.templateid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+				$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
 			}
 			else {
-				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
-
-				// Select direct templates of all hosts accessible to the current user.
 				$db_host_templates = DBselect(
 					'SELECT DISTINCT ht.templateid'.
-					' FROM hosts_templates ht'.
-						' JOIN hosts h ON ht.hostid=h.hostid'.
-							' AND h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
-							' AND h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'.
-						' JOIN hosts_groups hg ON h.hostid=hg.hostid'.
-						' JOIN rights r ON hg.groupid=r.id'.
-							' AND '.dbConditionId('r.groupid', $user_groups).
-							' AND r.permission>='.PERM_READ.
-					' WHERE NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM hosts_groups hgg'.
-							' JOIN rights r2'.
-								' ON hgg.groupid=r2.id'.
-									' AND '.dbConditionId('r2.groupid', $user_groups).
-									' AND r2.permission='.PERM_DENY.
-						' WHERE h.hostid=hgg.hostid'.
-					')'
+					' FROM hosts h'.
+					' JOIN host_hgset hh ON h.hostid=hh.hostid'.
+					' JOIN permission p ON hh.hgsetid=p.hgsetid'.
+						' AND p.ugsetid='.self::$userData['ugsetid'].
+					' JOIN hosts_templates ht ON h.hostid=ht.hostid'.
+					' WHERE h.status IN ('.HOST_STATUS_MONITORED.','.HOST_STATUS_NOT_MONITORED.')'.
+						' AND h.flags IN ('.ZBX_FLAG_DISCOVERY_NORMAL.','.ZBX_FLAG_DISCOVERY_CREATED.')'
 				);
 
 				$templateids = [];

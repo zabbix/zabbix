@@ -193,6 +193,7 @@ static int	preproc_snmp_walk_to_json_params(const char *params,
 			parsed_param.field_name = zbx_strdup(NULL, field_name);
 			parsed_param.format_flag = format_flag;
 			parsed_param.oid_prefix = oid_prefix;
+			oid_prefix = NULL;
 
 			zbx_vector_snmp_walk_to_json_param_append(parsed_params, parsed_param);
 		}
@@ -215,13 +216,10 @@ static int	preproc_snmp_walk_to_json_params(const char *params,
 	}
 
 	zbx_free(params2);
+	zbx_free(oid_prefix);
 
 	if (0 != idx % 3)
-	{
-		zbx_free(oid_prefix);
-
 		return FAIL;
-	}
 
 	return SUCCEED;
 }
@@ -1063,7 +1061,11 @@ static void	zbx_init_snmp(void)
 	sigaddset(&mask, SIGQUIT);
 	zbx_sigmask(SIG_BLOCK, &mask, &orig_mask);
 
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_LOAD, 1);
+	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DISABLE_PERSISTENT_SAVE, 1);
+
 	init_snmp(preproc_get_progname_cb()());
+
 	netsnmp_init_mib();
 	zbx_snmp_init_done = 1;
 
@@ -1075,7 +1077,6 @@ void	preproc_init_snmp(void)
 	zbx_init_snmp();
 	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_PRINT_NUMERIC_OIDS, 1);
 	netsnmp_ds_set_int(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_OID_OUTPUT_FORMAT, NETSNMP_OID_OUTPUT_NUMERIC);
-	netsnmp_ds_set_boolean(NETSNMP_DS_LIBRARY_ID, NETSNMP_DS_LIB_DONT_PERSIST_STATE, 1);
 }
 
 void	preproc_shutdown_snmp(void)
