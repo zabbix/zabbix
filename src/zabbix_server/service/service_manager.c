@@ -38,16 +38,13 @@ ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_condition_ptr, zbx_service_action_condition_t *)
 ZBX_PTR_VECTOR_IMPL(service_rule_ptr, zbx_service_rule_t *)
 
-void	zbx_service_rule_free(zbx_service_rule_t *service_rule)
-{
-	zbx_free(service_rule);
-}
-
 ZBX_PTR_VECTOR_IMPL(service_tag_ptr, zbx_service_tag_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_ptr, zbx_service_action_t *)
+
+ZBX_PTR_VECTOR_DECL(status_update_ptr, zbx_status_update_t *)
 ZBX_PTR_VECTOR_IMPL(status_update_ptr, zbx_status_update_t *)
 
-void	zbx_status_update_free(zbx_status_update_t *status_update)
+static void	zbx_status_update_free(zbx_status_update_t *status_update)
 {
 	zbx_free(status_update);
 }
@@ -96,9 +93,9 @@ typedef struct
 	zbx_uint64_t				serviceid;
 	zbx_vector_service_problem_ptr_t	service_problems;
 	zbx_vector_service_problem_ptr_t	service_problems_recovered;
-#define ZBX_FLAG_SERVICE_UPDATE			__UINT64_C(0x00)
-#define ZBX_FLAG_SERVICE_RECALCULATE		__UINT64_C(0x01)
-#define ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS	__UINT64_C(0x04)
+#define ZBX_FLAG_SERVICE_UPDATE			0x00
+#define ZBX_FLAG_SERVICE_RECALCULATE		0x01
+#define ZBX_FLAG_SERVICE_RECALCULATE_SUPPRESS	0x04
 	int					flags;
 }
 zbx_services_diff_t;
@@ -141,8 +138,8 @@ static zbx_hash_t	default_uint64_ptr_hash_func(const void *d)
 	return ZBX_DEFAULT_UINT64_HASH_FUNC(*(const zbx_uint64_t * const *)d);
 }
 
-static void	match_event_to_service_problem_tags(zbx_event_t *event, zbx_hashset_t *service_problem_tags_index,
-		zbx_hashset_t *services_diffs, int flags)
+static void	match_event_to_service_problem_tags(const zbx_event_t *event,
+		const zbx_hashset_t *service_problem_tags_index, zbx_hashset_t *services_diffs, int flags)
 {
 	zbx_vector_service_ptr_t	candidates;
 
@@ -324,18 +321,20 @@ static void	add_service_problem(zbx_service_t *service, zbx_hashset_t *service_p
 static void	remove_service_problem(zbx_service_t *service, int index, zbx_hashset_t *service_problems_index)
 {
 	zbx_service_problem_index_t	*service_problem_index, service_problem_index_local;
-	int				i;
 	zbx_service_problem_t		*service_problem;
 
 	service_problem = service->service_problems.values[index];
 
 	service_problem_index_local.eventid = service_problem->eventid;
+
 	if (NULL == (service_problem_index = zbx_hashset_search(service_problems_index, &service_problem_index_local)))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 	}
 	else
 	{
+		int	i;
+
 		if (FAIL == (i = zbx_vector_service_ptr_search(&service_problem_index->services, service,
 				ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 		{
@@ -423,7 +422,6 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 {
 	zbx_tag_services_t	tag_services_local, *tag_services;
 	zbx_values_eq_t		value_eq_local, *value_eq;
-	int			i;
 
 	tag_services_local.tag = service_problem_tag->tag;
 
@@ -433,6 +431,8 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 	}
 	else
 	{
+		int	i;
+
 		if (ZBX_SERVICE_TAG_OPERATOR_LIKE == service_problem_tag->op)
 		{
 			i = zbx_vector_service_problem_tag_ptr_search(&tag_services->service_problem_tags_like,
@@ -670,9 +670,7 @@ static void	sync_services(zbx_service_manager_t *service_manager, int *updated, 
 
 		for (int i = 0; i < service->service_problem_tags.values_num; i++)
 		{
-			zbx_service_problem_tag_t	*service_problem_tag;
-
-			service_problem_tag = service->service_problem_tags.values[i];
+			zbx_service_problem_tag_t	*service_problem_tag = service->service_problem_tags.values[i];
 
 			remove_service_problem_tag_index(&service_manager->service_problem_tags_index,
 					service_problem_tag);
@@ -1310,9 +1308,7 @@ int	service_get_status(const zbx_service_t	*service, int *status)
 static zbx_status_update_t	*its_updates_append(zbx_vector_status_update_ptr_t *updates, zbx_uint64_t sourceid,
 		int status, int clock)
 {
-	zbx_status_update_t	*update;
-
-	update = (zbx_status_update_t *)zbx_malloc(NULL, sizeof(zbx_status_update_t));
+	zbx_status_update_t	*update = (zbx_status_update_t *)zbx_malloc(NULL, sizeof(zbx_status_update_t));
 
 	update->sourceid = sourceid;
 	update->status = status;
@@ -1367,8 +1363,9 @@ static int	its_updates_compare(const zbx_status_update_t **update1, const zbx_st
  *               FAIL    - otherwise                                          *
  *                                                                            *
  ******************************************************************************/
-static int	its_write_status_and_alarms(zbx_vector_status_update_ptr_t *alarms, zbx_hashset_t *service_updates,
-		zbx_vector_service_problem_ptr_t *service_problems_new, zbx_vector_uint64_t *service_problemids)
+static int	its_write_status_and_alarms(const zbx_vector_status_update_ptr_t *alarms,
+		zbx_hashset_t *service_updates, zbx_vector_service_problem_ptr_t *service_problems_new,
+		zbx_vector_uint64_t *service_problemids)
 {
 	int			ret = FAIL;
 	zbx_vector_status_update_ptr_t	updates;
@@ -1433,9 +1430,7 @@ static int	its_write_status_and_alarms(zbx_vector_status_update_ptr_t *alarms, z
 
 	for (int i = 0; i < service_problems_new->values_num; i++)
 	{
-		zbx_service_problem_t	*service_problem;
-
-		service_problem = service_problems_new->values[i];
+		zbx_service_problem_t	*service_problem = service_problems_new->values[i];
 		zbx_vector_uint64_append(&serviceids, service_problem->serviceid);
 	}
 
@@ -1757,12 +1752,10 @@ zbx_service_severity_t;
 ZBX_PTR_VECTOR_DECL(service_severity_ptr, zbx_service_severity_t *)
 ZBX_PTR_VECTOR_IMPL(service_severity_ptr, zbx_service_severity_t *)
 
-void	zbx_service_severity_free(zbx_service_severity_t *service_severity);
-
-void	zbx_service_severity_free(zbx_service_severity_t *service_severity)
-{
-	zbx_free(service_severity);
-}
+/* static void	zbx_service_severity_free(zbx_service_severity_t *service_severity) */
+/* { */
+/* 	zbx_free(service_severity); */
+/* } */
 
 static void	service_add_cause(zbx_vector_service_severity_ptr_t *causes, zbx_service_t *service, int severity)
 {
@@ -1947,7 +1940,6 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 		service_get_causes(cause->service, cause->severity, eventids);
 	}
 
-	zbx_vector_service_severity_ptr_clear_ext(&causes, zbx_service_severity_free);
 	zbx_vector_service_severity_ptr_destroy(&causes);
 }
 
@@ -2184,8 +2176,8 @@ static const zbx_service_update_t	*get_update_by_serviceid(const zbx_vector_serv
  *                                                                            *
  * Purpose: gets open problems for specified services                         *
  *                                                                            *
- * Parameters: manager         - [IN] service manager                         *
- *             problem_service - [IN] vector of eventid, serviceid pairs      *
+ * Parameters: serviceids      - [IN] service manager                         *
+ *             problem_service - [OUT] vector of eventid, serviceid pairs     *
  *                                                                            *
  ******************************************************************************/
 static void	db_get_service_problems(zbx_vector_uint64_t *serviceids, zbx_vector_uint64_pair_t *problem_service)
@@ -2234,9 +2226,7 @@ zbx_service_recovery_t;
 ZBX_PTR_VECTOR_DECL(service_recovery_ptr, zbx_service_recovery_t *)
 ZBX_PTR_VECTOR_IMPL(service_recovery_ptr, zbx_service_recovery_t *)
 
-void	zbx_service_recovery_free(zbx_service_recovery_t *service_recovery);
-
-void	zbx_service_recovery_free(zbx_service_recovery_t *service_recovery)
+static void	zbx_service_recovery_free(zbx_service_recovery_t *service_recovery)
 {
 	zbx_free(service_recovery);
 }
@@ -3004,7 +2994,7 @@ static void	get_parent_serviceids(zbx_service_t *service, zbx_vector_uint64_t *p
 {
 	for (int i = 0; i < service->parents.values_num; i++)
 	{
-		zbx_service_t	*parent = (service->parents.values[i]);
+		zbx_service_t	*parent = service->parents.values[i];
 
 		zbx_vector_uint64_append(parentids, parent->serviceid);
 
@@ -3412,7 +3402,7 @@ ZBX_THREAD_ENTRY(service_manager_thread, args)
 	zbx_ipc_client_t		*client;
 	zbx_ipc_message_t		*message;
 	int				ret, events_num = 0, tags_update_num = 0, problems_delete_num = 0,
-					service_update_num = 0,service_cache_reload_requested = 0,
+					service_update_num = 0, service_cache_reload_requested = 0,
 					server_num = ((zbx_thread_args_t *)args)->info.server_num,
 					process_num = ((zbx_thread_args_t *)args)->info.process_num;
 	double				time_stat, time_idle = 0, time_now, time_flush = 0, time_cleanup = 0, sec;

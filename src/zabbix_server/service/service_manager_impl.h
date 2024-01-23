@@ -79,8 +79,6 @@ zbx_service_rule_t;
 
 ZBX_PTR_VECTOR_DECL(service_rule_ptr, zbx_service_rule_t *)
 
-void	zbx_service_rule_free(zbx_service_rule_t *service_rule);
-
 typedef struct zbx_service_s zbx_service_t;
 
 typedef struct
@@ -131,10 +129,6 @@ typedef struct
 	int		clock;
 }
 zbx_status_update_t;
-
-ZBX_PTR_VECTOR_DECL(status_update_ptr, zbx_status_update_t *)
-
-void	zbx_status_update_free(zbx_status_update_t *status_update);
 
 /* service update queue items */
 typedef struct
