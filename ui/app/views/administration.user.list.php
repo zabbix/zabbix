@@ -220,7 +220,7 @@ foreach ($data['users'] as $user) {
 		$checkbox->setAttribute('data-actions', 'ldap');
 	}
 
-	if ($user['totp_enabled']) {
+	if (array_key_exists('totp_enabled', $user) && $user['totp_enabled']) {
 		$checkbox->setAttribute('data-actions', 'totp');
 	}
 
