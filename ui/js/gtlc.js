@@ -303,7 +303,9 @@ jQuery(function($) {
 		.on('mousedown', 'img', selectionHandlerDragStart)
 		.on('dblclick', 'img', function(event) {
 			if (typeof $(event.target).data('zbx_sbox') !== 'undefined') {
-				const obj = timeControl.objectList[event.target.id];
+				const obj = event.target.hasAttribute('id')
+					? timeControl.objectList[event.target.id]
+					: timeControl.objectList.charts_view;
 
 				if (obj.useCustomEvents !== 1) {
 					$.publish('timeselector.zoomout', {
@@ -456,7 +458,9 @@ jQuery(function($) {
 			return cancelEvent(event);
 		}
 
-		const obj = timeControl.objectList[event.data.target[0].id];
+		const obj = event.data.target[0].hasAttribute('id')
+			? timeControl.objectList[event.data.target[0].id]
+			: timeControl.objectList.charts_view;
 
 		if (obj.useCustomEvents !== 1) {
 			$.publish('timeselector.rangeoffset', {
