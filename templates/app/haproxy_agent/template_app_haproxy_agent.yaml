@@ -60,11 +60,11 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
-                      return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
+                  	var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
+                  	return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
                   }
                   catch (error) {
-                      throw "HAProxy uptime is not found : " + error;
+                  	throw "HAProxy uptime is not found : " + error;
                   }
           master_item:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
