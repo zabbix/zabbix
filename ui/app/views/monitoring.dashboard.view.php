@@ -30,11 +30,11 @@ if (array_key_exists('error', $data)) {
 	return;
 }
 
-$this->addJsFile('d3.v7.js');
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
-$this->addJsFile('leaflet.v1.7.0.js');
-$this->addJsFile('leaflet.markercluster.v1.1.0.js');
+$this->addJsFile('leaflet.js');
+$this->addJsFile('leaflet.markercluster.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');
@@ -67,7 +67,7 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
