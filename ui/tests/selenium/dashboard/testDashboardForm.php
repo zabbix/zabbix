@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore prepareDashboardData
  *
- * @dataSource LoginUsers
+ * @dataSource LoginUsers, UserPermissions
  */
 class testDashboardForm extends CWebTest {
 
