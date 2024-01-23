@@ -201,6 +201,16 @@ msgstr[0] "%1$s z %2$s prvku v problémovom stave"
 msgstr[1] "%1$s z %2$s prvkov v problémovom stave"
 msgstr[2] "%1$s z %2$s prvkov v problémovom stave "
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -3629,6 +3639,10 @@ msgstr "Nie je možné hromadne aktualizovať meno hosta."
 msgid "Cannot mass update visible host name."
 msgstr "Nie je možné hromadne aktualizovať zobrazované meno hosta."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -5106,6 +5120,10 @@ msgstr "Ponuka obsahu"
 msgid "Context name"
 msgstr "Meno kontextu"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr "Pokračovať v prepisoch"
@@ -6015,6 +6033,10 @@ msgstr "Predvolená autentifikácia"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "Predvolený mód inventára hosta"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7241,6 +7263,14 @@ msgstr "Vykresliť"
 msgid "Draw style"
 msgstr "Štýl vykreslenia"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7638,6 +7668,10 @@ msgstr "Povoliť označené scenáre?"
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
 msgstr "Povoliť zachytávanie"
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -9468,6 +9502,10 @@ msgstr "Prehľad hostovho inventára"
 msgid "Host label type"
 msgstr "Typ popisu hosta"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -10970,6 +11008,18 @@ msgstr "Počiatočný pohľad"
 msgid "Initial view is ignored if the default view is set."
 msgstr "Ak je nastavené predvolené zobrazenie, počiatočné zobrazenie sa ignoruje."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "Vložiť"
@@ -11142,6 +11192,11 @@ msgstr "Neplatná konfigurácia mapovania typov médií poskytovania SAML JIT."
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "Neplatná konfigurácia mapovania skupiny používateľov poskytovania SAML JIT."
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "Neplatný obsah súboru YAML"
@@ -11169,6 +11224,10 @@ msgstr "Neplatná e-mailová adresa „%1$s“."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Neplatná e-mailová adresa pre typ média s ID „%1$s“."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -12622,6 +12681,10 @@ msgstr "Manuálna akcia udalosti"
 msgid "Manual host action"
 msgstr "Manuálna akcia hosta"
 
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
 msgstr "Manuálne potlačenie problémov. Vstup dátumu a času akceptuje relatívny a absolútny formát času."
@@ -12843,6 +12906,11 @@ msgstr "Maximálna doba zobrazenia histórie"
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
 msgstr "Maximálny počet stĺpcov a riadkov v prehľadových tabuľkách"
+
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -14518,6 +14586,11 @@ msgstr "Nededené itemy"
 msgid "Not supported"
 msgstr "Nepodporované"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "Poznámky"
@@ -14890,6 +14963,10 @@ msgstr "Vlastníka reportu môžu nastaviť iba superadministrátori."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Len spúšťače priradené k monitorovaným hostom alebo závislé na monitorovaných položkách sú započítané"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "Otvoriť v novom okne"
@@ -15028,6 +15105,10 @@ msgstr "Alebo"
 msgid "Order"
 msgstr "Poradie"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "Stĺpec poradia"
@@ -15151,6 +15232,10 @@ msgstr "Prepísaná položka historickej periódy"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Prepísaná položka trendovej periódy"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -19552,6 +19637,10 @@ msgstr "Testovací reťazec"
 msgid "Test subject"
 msgstr "Testovaný subjekt"
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -20282,6 +20371,10 @@ msgstr "Spúšťač v šablóne \"%1$s\" má závislosť na spúšťači v šabl
 msgid "Trigger label type"
 msgstr "Typ popisku spúšťača"
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr "Prehľad spúšťačov"
@@ -20612,6 +20705,10 @@ msgstr "Adresa URL nie je správne zakódovaná."
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Meno URL musí byť jedinečné v mape \"%1$s\"."
+
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -21181,6 +21278,10 @@ msgstr "Doba dostupnosti/nedostupnosti"
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "Použite %{ref} v skupinovom filtri na referenčnú hodnotu tohto používateľského atribútu."
 
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
 msgstr "Použite kombinované žiadosti"
@@ -21414,6 +21515,10 @@ msgstr "Skupina používateľov s ID „%1$s“ nie je k dispozícii."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "Používateľské skupiny"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22532,9 +22637,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "S problémami"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Pri tomto nastavení sa v tomto stĺpci zobrazia iba číselné položky."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22596,6 +22710,10 @@ msgstr "Os X"
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
 msgstr "Hlavička HTTP X-Frame-Options"
+
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
@@ -23046,6 +23164,11 @@ msgstr "očakáva sa relatívny čas"
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
 msgstr "špeciálna postava"
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -23975,6 +24098,12 @@ msgstr "nesprávna syntax pri \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr "nesprávne použitie funkcie \"%1$s\""
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() – Vloží určené znaky alebo medzery do znakového reťazca, začínajúc na určenej pozícii v reťazci"
@@ -24520,6 +24649,10 @@ msgstr "mimo"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "nie je vybratý"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
@@ -25352,6 +25485,10 @@ msgstr "hodnota musí byť v rozsahu %1$s"
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
 msgstr "hodnotu nového event tagu"
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"

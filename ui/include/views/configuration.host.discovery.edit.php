@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -139,23 +139,24 @@ $parameters_table = (new CTable())
 	->setAttribute('style', 'width: 100%;');
 
 if ($parameters_data) {
-	foreach ($parameters_data as $parameter) {
-		$parameters_table->addRow([
-			(new CTextBox('parameters[name][]', $parameter['name'], $data['limited'],
-				DB::getFieldLength('item_parameter', 'name'))
-			)
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CTextBox('parameters[value][]', $parameter['value'], $data['limited'],
-				DB::getFieldLength('item_parameter', 'value'))
-			)
-				->setAttribute('style', 'width: 100%;')
-				->removeId(),
-			(new CButtonLink(_('Remove')))
-				->addClass('element-table-remove')
-				->setEnabled(!$data['limited'])
-				->onClick('jQuery(this).closest("tr").remove();')
-		]);
+	foreach ($parameters_data as $num => $parameter) {
+		$parameters_table->addItem(
+			(new CRow([
+				(new CTextBox('parameters['.$num.'][name]', $parameter['name'], $data['limited'],
+					DB::getFieldLength('item_parameter', 'name'))
+				)
+					->setAttribute('style', 'width: 100%;')
+					->removeId(),
+				(new CTextBox('parameters['.$num.'][value]', $parameter['value'], $data['limited'],
+					DB::getFieldLength('item_parameter', 'value'))
+				)
+					->setAttribute('style', 'width: 100%;')
+					->removeId(),
+				(new CButtonLink(_('Remove')))
+					->addClass('element-table-remove')
+					->setEnabled(!$data['limited'])
+			]))->addClass('form_row')
+		);
 	}
 }
 
@@ -209,30 +210,30 @@ $item_tab
 		))->setId('js-item-query-fields-field')
 	])
 	// Append ITEM_TYPE_SCRIPT parameters to form list.
-	->addItem(
-		(new CTag('script', true))
-			->setId('parameters_table_row')
-			->setAttribute('type', 'text/x-jquery-tmpl')
-			->addItem(
-				(new CRow([
-					(new CTextBox('parameters[name][]', '', false, DB::getFieldLength('item_parameter', 'name')))
-						->setAttribute('style', 'width: 100%;')
-						->removeId(),
-					(new CTextBox('parameters[value][]', '', false, DB::getFieldLength('item_parameter', 'value')))
-						->setAttribute('style', 'width: 100%;')
-						->removeId(),
-					(new CButtonLink(_('Remove')))
-						->addClass('element-table-remove')
-						->onClick('jQuery(this).closest("tr").remove();')
-				]))
-			)
-	)
 	->addItem([
 		(new CLabel(_('Parameters'), $parameters_table->getId()))->setId('js-item-parameters-label'),
-		(new CFormField((new CDiv($parameters_table))
-			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
-			->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
-		))->setId('js-item-parameters-field')
+		(new CFormField([
+			(new CDiv([
+				$parameters_table,
+				(new CTemplateTag('parameters_table_row'))->addItem(
+					(new CRow([
+						(new CTextBox('parameters[#{rowNum}][name]', '', false,
+							DB::getFieldLength('item_parameter', 'name')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CTextBox('parameters[#{rowNum}][value]', '', false,
+							DB::getFieldLength('item_parameter', 'value')
+						))
+							->setAttribute('style', 'width: 100%;')
+							->removeId(),
+						(new CButtonLink(_('Remove')))->addClass('element-table-remove')
+					]))->addClass('form_row')
+				)
+			]))
+				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
+				->setAttribute('style', 'min-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
+		]))->setId('js-item-parameters-field')
 	])
 	->addItem([
 		(new CLabel(_('Script'), 'script'))
@@ -695,10 +696,10 @@ $item_tab->addItem([
 $edit_source_timeouts_link = null;
 
 if ($data['can_edit_source_timeouts']
-		&& (($data['limited'] && $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED) || !$data['limited'])) {
-	$edit_source_timeouts_link = $data['inherited_timeouts']['source'] === 'proxy'
+		&& (!$data['limited'] || $data['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_DISABLED)) {
+	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
-			->setAttribute('data-proxyid', $data['inherited_timeouts']['proxyid'])
+			->setAttribute('data-proxyid', $data['host']['proxyid'])
 			->onClick('view.editProxy(event, this.dataset.proxyid);')
 		: (new CLink(_('Timeouts'),
 			(new CUrl('zabbix.php'))->setArgument('action', 'timeouts.edit')

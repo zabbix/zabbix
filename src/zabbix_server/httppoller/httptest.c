@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -835,6 +835,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		/* try to retrieve page several times depending on number of retries */
 		do
 		{
+			memset(&header, 0, sizeof(header));
+			memset(&body, 0, sizeof(body));
 			errbuf[0] = '\0';
 
 			if (CURLE_OK == (err = curl_easy_perform(easyhandle)))
@@ -845,12 +847,9 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		}
 		while (0 < --httptest->httptest.retries);
 
-		curl_slist_free_all(headers_slist);	/* must be called after curl_easy_perform() */
-
 		if (CURLE_OK == err)
 		{
-			char	*var_err_str = NULL;
-			char	*data;
+			char	*var_err_str = NULL, *data = NULL;
 
 			if (NULL != body.data)
 			{
@@ -869,7 +868,7 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 				data = header.data;
 			}
 
-			if (data == NULL)
+			if (NULL == data)
 				data = "";
 
 			zabbix_log(LOG_LEVEL_TRACE, "%s() page.data from %s:'%s'", __func__, httpstep.url, data);
@@ -952,8 +951,8 @@ static void	process_httptest(zbx_dc_host_t *host, zbx_httptest_t *httptest, int 
 		}
 		else
 			err_str = zbx_dsprintf(err_str, "%s", 0 < strlen(errbuf) ? errbuf : curl_easy_strerror(err));
-
 httpstep_error:
+		curl_slist_free_all(headers_slist);
 		zbx_free(db_httpstep.status_codes);
 		zbx_free(db_httpstep.required);
 		zbx_free(db_httpstep.posts);

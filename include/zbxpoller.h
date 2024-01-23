@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,16 +24,14 @@
 #include "module.h"
 
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset);
+		char *host, int version, unsigned char **data, size_t *data_alloc, size_t *data_offset);
 void	zbx_deactivate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
 		char *host, char *key_orig, unsigned char **data, size_t *data_alloc, size_t *data_offset,
 		int unavailable_delay, int unreachable_period, int unreachable_delay, const char *error);
 
-void	zbx_agent_handle_response(zbx_socket_t *s, ssize_t received_len, int *ret, char *addr, AGENT_RESULT *result);
-
 int	zbx_telnet_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip, unsigned char program_type,
-		AGENT_RESULT *result);
+		AGENT_RESULT *result, int *version);
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 #endif

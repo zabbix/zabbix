@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
+#include "postinit/postinit.h"
+
 #include "zbxexport.h"
 #include "zbxself.h"
 
@@ -35,6 +37,7 @@
 #include "zbxnix.h"
 #include "zbxcomms.h"
 
+#include "zbxvmware.h"
 #include "zbxalerter.h"
 #include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
@@ -47,7 +50,6 @@
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "vmware/vmware.h"
 #include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
@@ -63,7 +65,6 @@
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
 #include "zbxhistory.h"
-#include "postinit.h"
 #include "zbxvault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
@@ -289,7 +290,7 @@ static char	*config_server		= NULL;		/* not used in zabbix_server, required for 
 
 static int	config_housekeeping_frequency	= 1;
 static int	config_max_housekeeper_delete	= 5000;		/* applies for every separate field value */
-int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
+static int	config_confsyncer_frequency	= 10;
 
 static int	config_problemhousekeeping_frequency = 60;
 
@@ -353,7 +354,7 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
-char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*zbx_config_webservice_url	= NULL;
@@ -712,7 +713,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
+	if (NULL != config_stats_allowed_ip && FAIL == zbx_validate_peer_list(config_stats_allowed_ip, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -861,7 +862,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&config_value_cache_size,		TYPE_UINT64,
 			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
+		{"CacheUpdateFrequency",	&config_confsyncer_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
@@ -1017,7 +1018,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],		TYPE_INT,
 			PARM_OPT,	1,			100},
-		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
+		{"StatsAllowedIP",		&config_stats_allowed_ip,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"StartHistoryPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTORYPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
@@ -1445,7 +1446,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_max_concurrent_checks_per_poller};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency, get_config_forks};
+							config_proxydata_frequency, get_config_forks,
+							config_stats_allowed_ip};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							get_config_forks};
@@ -1470,8 +1472,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
 							config_proxyconfig_frequency, config_proxydata_frequency,
-							zbx_config_source_ip, config_ssl_ca_location,
-							config_ssl_cert_location, config_ssl_key_location};
+							config_confsyncer_frequency, zbx_config_source_ip,
+							config_ssl_ca_location, config_ssl_cert_location,
+							config_ssl_key_location};
 	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
@@ -1486,7 +1489,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 									config_ssl_cert_location,
 									config_ssl_key_location};
 	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
-	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
+	zbx_thread_alert_syncer_args	alert_syncer_args = {config_confsyncer_frequency};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 								zbx_config_dbhigh, zbx_config_source_ip};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
@@ -1496,6 +1499,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
 	zbx_thread_snmptrapper_args	snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_service_manager_args	serviceman_args = {zbx_config_timeout};
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1604,6 +1608,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				thread_args.args = &serviceman_args;
 				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -1611,7 +1616,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				thread_args.args = &dbconfig_args;
 				zbx_thread_start(dbconfig_thread, &thread_args, &zbx_threads[i]);
 
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex_server)))
+				/* wait for service manager startup */
+				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc, rtc_process_request_ex_server)))
+					goto out;
+
+				/* wait for configuration sync */
+				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc, rtc_process_request_ex_server)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,

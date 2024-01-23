@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -301,22 +301,56 @@ void	pp_format_error(const zbx_variant_t *value, zbx_pp_result_t *results, int r
  *             step  - [IN] preprocessing operation that produced error       *
  *                                                                            *
  ******************************************************************************/
-int	pp_error_on_fail(zbx_variant_t *value, const zbx_pp_step_t *step)
+int	pp_error_on_fail(zbx_dc_um_shared_handle_t *um_handle, zbx_uint64_t hostid, zbx_variant_t *value,
+		const zbx_pp_step_t *step)
 {
+	char	*error_handler_params;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	switch (step->error_handler)
 	{
 		case ZBX_PREPROC_FAIL_DISCARD_VALUE:
 			zbx_variant_clear(value);
 			break;
 		case ZBX_PREPROC_FAIL_SET_VALUE:
-			zbx_variant_clear(value);
-			zbx_variant_set_str(value, zbx_strdup(NULL, step->error_handler_params));
-			break;
 		case ZBX_PREPROC_FAIL_SET_ERROR:
 			zbx_variant_clear(value);
-			zbx_variant_set_error(value, zbx_strdup(NULL, step->error_handler_params));
+
+			error_handler_params = zbx_strdup(NULL, step->error_handler_params);
+
+			if (NULL != um_handle)
+			{
+				char	*error = NULL;
+
+				if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache,
+						&error_handler_params, &hostid, 1, ZBX_MACRO_ENV_NONSECURE, &error))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "cannot resolve user macros: %s", error);
+					zbx_free(error);
+				}
+			}
+
+			if (ZBX_PREPROC_FAIL_SET_VALUE == step->error_handler)
+			{
+				zbx_variant_set_str(value, error_handler_params);
+			}
+			else if (ZBX_PREPROC_FAIL_SET_ERROR == step->error_handler)
+			{
+				zbx_variant_set_error(value, error_handler_params);
+			}
+			else
+			{
+				THIS_SHOULD_NEVER_HAPPEN;
+				zabbix_log(LOG_LEVEL_ERR, "unexpected \"custom on fail\" handler type %d",
+						step->error_handler);
+				zbx_free(error_handler_params);
+			}
+
 			break;
 	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() value:%s", __func__, zbx_variant_value_desc(value));
 
 	return step->error_handler;
 }

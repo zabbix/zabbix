@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -386,4 +386,23 @@ int	__wrap_zbx_interface_availability_is_set(const void *ia)
 	return FAIL;
 }
 
+void	__wrap_zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
+		void *rtc)
+{
+	ZBX_UNUSED(proc_type);
+	ZBX_UNUSED(proc_num);
+	ZBX_UNUSED(msgs);
+	ZBX_UNUSED(msgs_num);
+	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(rtc);
+}
+
+void	__wrap_zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, const char *process_name,
+		void *rtc)
+{
+	ZBX_UNUSED(config_timeout);
+	ZBX_UNUSED(code);
+	ZBX_UNUSED(process_name);
+	ZBX_UNUSED(rtc);
+}
 

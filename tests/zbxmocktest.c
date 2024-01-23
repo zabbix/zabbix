@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,8 +88,6 @@ void	set_config_forks(unsigned char process_type, int forks)
 {
 	CONFIG_FORKS[process_type] = forks;
 }
-
-int	CONFIG_CONFSYNCER_FREQUENCY	= 60;
 
 static zbx_uint64_t	zbx_config_value_cache_size	= 8 * 0;
 

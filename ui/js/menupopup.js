@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ function getMenuPopupHost(options, trigger_element) {
 	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
-			items: getMenuPopupURLData(options.urls, trigger_element)
+			items: getMenuPopupURLData(options.urls, trigger_element, options.hostid, null)
 		});
 	}
 
@@ -321,7 +321,8 @@ function getMenuPopupHost(options, trigger_element) {
 		sections.push({
 			label: t('Scripts'),
 			items: getMenuPopupScriptData(options.scripts, trigger_element, options.hostid, options.eventid,
-				options.csrf_token)
+				options.csrf_token
+			)
 		});
 	}
 
@@ -980,7 +981,7 @@ function getMenuPopupTrigger(options, trigger_element) {
 	if ('urls' in options) {
 		sections.push({
 			label: t('Links'),
-			items: getMenuPopupURLData(options.urls, trigger_element)
+			items: getMenuPopupURLData(options.urls, trigger_element, null, options.eventid)
 		});
 	}
 
@@ -1460,7 +1461,12 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_
 				scriptid: script.scriptid,
 				confirmation: script.confirmation,
 				hostid: hostid,
-				eventid: eventid
+				eventid: eventid,
+				manualinput: script.manualinput,
+				manualinput_prompt: script.manualinput_prompt,
+				manualinput_validator_type: script.manualinput_validator_type,
+				manualinput_validator: script.manualinput_validator,
+				manualinput_default_value: script.manualinput_default_value
 			});
 		}
 	}
@@ -1471,12 +1477,14 @@ function getMenuPopupScriptData(scripts, trigger_element, hostid, eventid, csrf_
 /**
  * Build URL menu tree.
  *
- * @param {array} urls             URL names and nenu paths.
- * @param {Node}  trigger_element  UI element which triggered opening of overlay dialogue.
+ * @param {array}        urls             URL names and menu paths.
+ * @param {Node}         trigger_element  UI element which triggered opening of overlay dialogue.
+ * @param {string|null}  hostid           ID of host which triggered opening of overlay dialogue.
+ * @param {string|null}  eventid          ID of event which triggered opening of overlay dialogue.
  *
  * @return {array}
  */
-function getMenuPopupURLData(urls, trigger_element) {
+function getMenuPopupURLData(urls, trigger_element, hostid, eventid) {
 	let tree = {};
 
 	// Parse URLs and create tree.
@@ -1490,7 +1498,14 @@ function getMenuPopupURLData(urls, trigger_element) {
 				url: url.url,
 				target: url.target,
 				confirmation: url.confirmation,
-				rel: url.rel,
+				manualinput: url.manualinput,
+				manualinput_prompt: url.manualinput_prompt,
+				manualinput_validator_type: url.manualinput_validator_type,
+				manualinput_validator: url.manualinput_validator,
+				manualinput_default_value: url.manualinput_default_value,
+				scriptid: url.scriptid,
+				hostid,
+				eventid
 			});
 		}
 	}
@@ -1548,15 +1563,17 @@ function getMenuPopupURLItems(tree, trigger_elm) {
 			}
 
 			if (typeof data.params !== 'undefined') {
-				item.url = data.params.url;
-				item.target = data.params.target;
-				item.rel = data.params.rel;
-
-				if (data.params.confirmation !== '') {
-					item.clickCallback = function(e) {
-						return confirm(data.params.confirmation);
-					}
-				}
+				item.clickCallback = function(e) {
+					jQuery(this)
+						.closest('.menu-popup-top')
+						.menuPopup('close', trigger_elm, false);
+					Script.openUrl(data.params.scriptid, data.params.confirmation, trigger_elm,
+						data.params.hostid, data.params.eventid, data.params.url, data.params.target,
+						data.params.manualinput, data.params.manualinput_prompt, data.params.manualinput_validator_type,
+						data.params.manualinput_validator, data.params.manualinput_default_value
+					);
+					cancelEvent(e);
+				};
 			}
 
 			items[items.length] = item;
@@ -1582,17 +1599,19 @@ function getMenuPopupScriptItems(tree, trigger_elm, csrf_token) {
 		Object.values(tree).map((data) => {
 			const item = {label: data.name};
 
-			if (typeof data.items !== 'undefined' && objectSize(data.items) > 0) {
+			if (data.items !== undefined && objectSize(data.items) > 0) {
 				item.items = getMenuPopupScriptItems(data.items, trigger_elm, csrf_token);
 			}
 
-			if (typeof data.params !== 'undefined' && typeof data.params.scriptid !== 'undefined') {
+			if (data.params !== undefined && data.params.scriptid !== undefined) {
 				item.clickCallback = function(e) {
 					jQuery(this)
 						.closest('.menu-popup-top')
 						.menuPopup('close', trigger_elm, false);
-					executeScript(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
-						data.params.eventid, csrf_token
+					Script.execute(data.params.scriptid, data.params.confirmation, trigger_elm, data.params.hostid,
+						data.params.eventid, csrf_token, data.params.manualinput, data.params.manualinput_prompt,
+						data.params.manualinput_validator_type, data.params.manualinput_validator,
+						data.params.manualinput_default_value
 					);
 					cancelEvent(e);
 				};

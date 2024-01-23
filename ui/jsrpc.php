@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -857,6 +857,52 @@ switch ($data['method']) {
 
 			if ($items) {
 				$result = $items[0]['value_type'];
+			}
+		}
+		break;
+
+	case 'get_scripts_by_hosts':
+		$result = [];
+
+		if (array_key_exists('hostid', $data) && is_scalar($data['hostid'])) {
+			$scripts = API::Script()->getScriptsByHosts([
+				'hostid' => $data['hostid'],
+				'scriptid' => $data['scriptid'],
+				'manualinput' => $data['manualinput']
+			]);
+
+			$errors = CMessageHelper::getMessages();
+
+			if ($errors) {
+				$result = [
+					'error' => array_values(array_column($errors, 'message'))
+				];
+			}
+			elseif ($scripts) {
+				$result = $scripts[$data['hostid']][0];
+			}
+		}
+		break;
+
+	case 'get_scripts_by_events':
+		$result = [];
+
+		if (array_key_exists('eventid', $data) && is_scalar($data['eventid'])) {
+			$scripts = API::Script()->getScriptsByEvents([
+				'eventid' => $data['eventid'],
+				'scriptid' => $data['scriptid'],
+				'manualinput' => $data['manualinput']
+			]);
+
+			$errors = CMessageHelper::getMessages();
+
+			if ($errors) {
+				$result = [
+					'error' => array_values(array_column($errors, 'message'))
+				];
+			}
+			elseif ($scripts) {
+				$result = $scripts[$data['eventid']][0];
 			}
 		}
 		break;

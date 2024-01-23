@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -92,6 +92,9 @@ static void	worker_process_request(zbx_ipc_socket_t *socket, const char *config_
 	{
 		long		response_code;
 		CURLcode	err;
+
+		if (!ZBX_IS_RUNNING())
+			attempt_interval_sec = 0;
 
 		err = zbx_http_request_sync_perform(context.easyhandle, &context, attempt_interval_sec,
 				ZBX_HTTP_CHECK_RESPONSE_CODE);

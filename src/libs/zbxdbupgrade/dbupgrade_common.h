@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,8 @@
 #define ZABBIX_DBUPGRADE_COMMON_H
 
 int	delete_problems_with_nonexistent_object(void);
+#ifndef HAVE_SQLITE3
 int	create_problem_3_index(void);
 int	drop_c_problem_2_index(void);
+#endif
 #endif

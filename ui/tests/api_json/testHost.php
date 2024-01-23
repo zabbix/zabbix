@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ require_once __DIR__.'/../include/CAPITest.php';
  * @onBefore prepareHostsData
  *
  * @onAfter clearData
+ *
+ * @backup hosts
  */
 class testHost extends CAPITest {
 
@@ -928,26 +930,26 @@ class testHost extends CAPITest {
 		return [
 			'Test host.create common error - empty request' => [
 				'request' => [],
-				'expected_error' => 'Empty input parameter.'
+				'expected_error' => 'Invalid parameter "/": cannot be empty.'
 			],
 			'Test host.create common error - wrong fields' => [
 				'request' => [
 					'groups' => []
 				],
-				'expected_error' => 'Wrong fields for host "".'
+				'expected_error' => 'Invalid parameter "/1/groups": cannot be empty.'
 			],
 			'Test host.create common error - missing "groups"' => [
 				'request' => [
 					'host' => 'API test hosts create fail'
 				],
-				'expected_error' => 'Host "API test hosts create fail" cannot be without host group.'
+				'expected_error' => 'Invalid parameter "/1": the parameter "groups" is missing.'
 			],
 			'Test host.create common error - empty group' => [
 				'request' => [
 					'host' => 'API test hosts create fail',
 					'groups' => []
 				],
-				'expected_error' => 'Host "API test hosts create fail" cannot be without host group.'
+				'expected_error' => 'Invalid parameter "/1/groups": cannot be empty.'
 			],
 			'Test host.create common error - empty host name' => [
 				'request' => [
@@ -978,7 +980,7 @@ class testHost extends CAPITest {
 						[]
 					]
 				],
-				'expected_error' => 'Incorrect value for field "groups": the parameter "groupid" is missing.'
+				'expected_error' => 'Invalid parameter "/1/groups/1": the parameter "groupid" is missing.'
 			],
 			'Test host.create common error - invalid group' => [
 				'request' => [
@@ -989,7 +991,7 @@ class testHost extends CAPITest {
 						]
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/1/groups/1": object does not exist, or you have no permissions to it.'
 			],
 			'Test host.create common error - host already exists' => [
 				'request' => [
@@ -1498,11 +1500,6 @@ class testHost extends CAPITest {
 					]
 				]
 			],
-
-			/*
-			 * Possibly incorrect behavior in API in case templates that are added are same as the ones that should be
-			 * cleared. Currently templates that are added take priority. They do not cancel each other out.
-			 */
 			'Test host.update with clear - host has no templates (same)' => [
 				'request' => [
 					'hostid' => 'discovered_no_templates',
@@ -1523,20 +1520,7 @@ class testHost extends CAPITest {
 						]
 					]
 				],
-				'expected_result' => [
-					'parentTemplates' => [
-						[
-							'templateid' => 'api_test_hosts_f_tpl',
-							'host' => 'api_test_hosts_f_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						],
-						[
-							'templateid' => 'api_test_hosts_c_tpl',
-							'host' => 'api_test_hosts_c_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						]
-					]
-				]
+				'expected_result' => 'Invalid parameter "/1/templates_clear/1/templateid": cannot be specified the value of parameter "/1/templates/1/templateid".'
 			],
 			'Test host.update with clear - host has no templates (different)' => [
 				'request' => [
@@ -1609,20 +1593,7 @@ class testHost extends CAPITest {
 						]
 					]
 				],
-				'expected_result' => [
-					'parentTemplates' => [
-						[
-							'templateid' => 'api_test_hosts_f_tpl',
-							'host' => 'api_test_hosts_f_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						],
-						[
-							'templateid' => 'api_test_hosts_c_tpl',
-							'host' => 'api_test_hosts_c_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						]
-					]
-				]
+				'expected_result' => 'Invalid parameter "/1/templates_clear/1/templateid": cannot be specified the value of parameter "/1/templates/1/templateid".'
 			],
 			'Test host.update with clear non-existing - host has manual templates' => [
 				'request' => [
@@ -1752,15 +1723,10 @@ class testHost extends CAPITest {
 							'templateid' => 'api_test_hosts_e_tpl'
 						],
 						[
-							'templateid' => 'api_test_hosts_f_tpl',
-							'host' => 'api_test_hosts_f_tpl',
-							'link_type' => (string) TEMPLATE_LINK_LLD
+							'templateid' => 'api_test_hosts_f_tpl'
 						]
 					],
 					'templates_clear' => [
-						[
-							'templateid' => 'api_test_hosts_a_tpl'
-						],
 						[
 							'templateid' => 'api_test_hosts_c_tpl'
 						]
@@ -1812,28 +1778,34 @@ class testHost extends CAPITest {
 			}
 		}
 
-		foreach ($expected_result['parentTemplates'] as &$template) {
-			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		if (is_array($expected_result)) {
+			foreach ($expected_result['parentTemplates'] as &$template) {
+				$template['templateid'] = self::$data['templateids'][$template['templateid']];
+			}
+			unset($template);
 		}
-		unset($template);
 
 		$hosts_old = $this->backupTemplates([$request['hostid']]);
 
 		// Update templates on hosts.
-		$hosts_upd = $this->call('host.update', $request);
-		$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+		$expected_error = is_string($expected_result) ? $expected_result : null;
+		$hosts_upd = $this->call('host.update', $request, $expected_error);
 
-		// Check data after update.
-		$hosts = $this->call('host.get', [
-			'output' => ['hostid', 'host'],
-			'selectParentTemplates' => ['templateid', 'host', 'link_type'],
-			'hostids' => $request['hostid']
-		]);
-		$host = reset($hosts['result']);
+		if (is_array($expected_result)) {
+			$this->assertArrayHasKey('hostids', $hosts_upd['result']);
 
-		$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
-			'host.update with templates failed for host "'.$host['host'].'".'
-		);
+			// Check data after update.
+			$hosts = $this->call('host.get', [
+				'output' => ['hostid', 'host'],
+				'selectParentTemplates' => ['templateid', 'host', 'link_type'],
+				'hostids' => $request['hostid']
+			]);
+			$host = reset($hosts['result']);
+
+			$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
+				'host.update with templates failed for host "'.$host['host'].'".'
+			);
+		}
 
 		$this->restoreTemplates($hosts_old);
 	}
@@ -2057,20 +2029,7 @@ class testHost extends CAPITest {
 						]
 					]
 				],
-				'expected_result' => [
-					'parentTemplates' => [
-						[
-							'templateid' => 'api_test_hosts_f_tpl',
-							'host' => 'api_test_hosts_f_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						],
-						[
-							'templateid' => 'api_test_hosts_c_tpl',
-							'host' => 'api_test_hosts_c_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						]
-					]
-				]
+				'expected_result' => 'Invalid parameter "/templates_clear/1/templateid": cannot be specified the value of parameter "/templates/1/templateid".'
 			],
 			'Test host.massupdate with clear - host has no templates (different)' => [
 				'request' => [
@@ -2155,20 +2114,7 @@ class testHost extends CAPITest {
 						]
 					]
 				],
-				'expected_result' => [
-					'parentTemplates' => [
-						[
-							'templateid' => 'api_test_hosts_f_tpl',
-							'host' => 'api_test_hosts_f_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						],
-						[
-							'templateid' => 'api_test_hosts_c_tpl',
-							'host' => 'api_test_hosts_c_tpl',
-							'link_type' => (string) TEMPLATE_LINK_MANUAL
-						]
-					]
-				]
+				'expected_result' => 'Invalid parameter "/templates_clear/1/templateid": cannot be specified the value of parameter "/templates/1/templateid".'
 			],
 			'Test host.massupdate with clear non-existing - host has manual templates' => [
 				'request' => [
@@ -2318,15 +2264,10 @@ class testHost extends CAPITest {
 							'templateid' => 'api_test_hosts_e_tpl'
 						],
 						[
-							'templateid' => 'api_test_hosts_f_tpl',
-							'host' => 'api_test_hosts_f_tpl',
-							'link_type' => (string) TEMPLATE_LINK_LLD
+							'templateid' => 'api_test_hosts_f_tpl'
 						]
 					],
 					'templates_clear' => [
-						[
-							'templateid' => 'api_test_hosts_a_tpl'
-						],
 						[
 							'templateid' => 'api_test_hosts_c_tpl'
 						]
@@ -2439,29 +2380,35 @@ class testHost extends CAPITest {
 			}
 		}
 
-		foreach ($expected_result['parentTemplates'] as &$template) {
-			$template['templateid'] = self::$data['templateids'][$template['templateid']];
+		if (is_array($expected_result)) {
+			foreach ($expected_result['parentTemplates'] as &$template) {
+				$template['templateid'] = self::$data['templateids'][$template['templateid']];
+			}
+			unset($template);
 		}
-		unset($template);
 
 		$hosts_old = $this->backupTemplates($hostids);
 
 		// Update templates on hosts.
-		$hosts_upd = $this->call('host.massupdate', $request);
-		$this->assertArrayHasKey('hostids', $hosts_upd['result']);
+		$expected_error = is_string($expected_result) ? $expected_result : null;
+		$hosts_upd = $this->call('host.massupdate', $request, $expected_error);
 
-		// Check data after update.
-		$hosts = $this->call('host.get', [
-			'output' => ['hostid', 'host'],
-			'selectParentTemplates' => ['templateid', 'host', 'link_type'],
-			'hostids' => $hostids
-		]);
-		$hosts = $hosts['result'];
+		if (is_array($expected_result)) {
+			$this->assertArrayHasKey('hostids', $hosts_upd['result']);
 
-		foreach ($hosts as $host) {
-			$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
-				'host.massupdate with templates failed for host "'.$host['host'].'".'
-			);
+			// Check data after update.
+			$hosts = $this->call('host.get', [
+				'output' => ['hostid', 'host'],
+				'selectParentTemplates' => ['templateid', 'host', 'link_type'],
+				'hostids' => $hostids
+			]);
+			$hosts = $hosts['result'];
+
+			foreach ($hosts as $host) {
+				$this->assertSame($expected_result['parentTemplates'], $host['parentTemplates'],
+					'host.massupdate with templates failed for host "'.$host['host'].'".'
+				);
+			}
 		}
 
 		$this->restoreTemplates($hosts_old);

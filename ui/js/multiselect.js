@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 		options = $.extend({objectOptions: {}}, options);
 
 		var curl = new Curl('jsrpc.php');
-		curl.setArgument('type', 11); // PAGE_TYPE_TEXT_RETURN_JSON
+		curl.setArgument('type', PAGE_TYPE_TEXT_RETURN_JSON);
 		curl.setArgument('method', 'multiselect.get');
 		curl.setArgument('object_name', options.object_name);
 

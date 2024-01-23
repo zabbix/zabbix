@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -224,14 +224,7 @@ class testFormHostFromStandalone extends testFormHost {
 
 		$form->submit();
 		$this->page->waitUntilReady();
-
-		// TODO: Update the message details after ZBX-21366 is merged.
-		$message_details = [
-			'Templates "Test of discovered host 2 template for clear" unlinked from hosts "Discovered host from prototype 1".',
-			'Templates "Test of discovered host 1 template for unlink" unlinked from hosts "Discovered host from prototype 1".'
-		];
-
-		$this->assertMessage(TEST_GOOD, 'Host updated', $message_details);
+		$this->assertMessage(TEST_GOOD, 'Host updated');
 
 		foreach ($filtered_results as $result) {
 			// Open hosts objects and check objects on Discovered host after unlinking some templates.

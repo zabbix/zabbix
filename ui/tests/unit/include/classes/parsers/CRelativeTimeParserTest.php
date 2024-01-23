@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -342,6 +342,24 @@ class CRelativeTimeParserTest extends TestCase {
 						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '300', 'suffix' => 's']
 					],
 					'match' => 'now-300'
+				]
+			],
+			[
+				'now-2147483647', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'tokens' => [
+						['type' => CRelativeTimeParser::ZBX_TOKEN_OFFSET, 'sign' => '-', 'value' => '2147483647', 'suffix' => 's']
+					],
+					'match' => 'now-2147483647'
+				]
+			],
+			[
+				'now-2147483648', 0, [],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'tokens' => [],
+					'match' => 'now'
 				]
 			],
 			[

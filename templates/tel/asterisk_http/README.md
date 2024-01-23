@@ -120,7 +120,7 @@ If there are errors, increase the logging to debug level and see the Zabbix serv
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IAX trunk "{#OBJECTNAME}": Get IAX trunk|<p>Raw data for a IAX trunk.</p>|Dependent item|asterisk.iax.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
+|IAX trunk "{#OBJECTNAME}": Get IAX trunk|<p>Raw data for an IAX trunk.</p>|Dependent item|asterisk.iax.trunk.get[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.iax.trunks[?(@.ObjectName=='{#OBJECTNAME}')].first()`</p></li></ul>|
 |IAX trunk "{#OBJECTNAME}": Status|<p>IAX trunk status. Here are the possible states that a device state may have:</p><p>Unmonitored</p><p>UNKNOWN</p><p>UNREACHABLE</p><p>OK</p>|Dependent item|asterisk.iax.trunk.status[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.Status`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 |IAX trunk "{#OBJECTNAME}": Active channels|<p>The total number of active IAX trunk channels.</p>|Dependent item|asterisk.iax.trunk.active_channels[{#OBJECTNAME}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.active_channels`</p></li></ul>|
 
