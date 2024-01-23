@@ -1,24 +1,35 @@
 Changes for 6.0.26rc1
 
 New features:
+.......PS. [ZBXNEXT-8891] updated max supported MySQL version to 8.2 (mprihodko)
+.........T [ZBXNEXT-8524] added support for HTTP proxy in GCP templates (egordymov)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
-.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
+.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to dependent items and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+........S. [ZBX-22371] fixed process tags option not adding tags for service events (vso)
+...G...... [ZBX-17208] fixed invalid command-line flag handling in Zabbix agent 2 (rzvejs)
+.........T [ZBX-23937] fixed JavaScript for AWS EC2 instances discovery (egordymov)
+..F....... [ZBX-22715] fixed map shape dimension changes on resizing in scaled browser mode (ddauksa)
+.......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
+.......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
+...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+.........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
 .........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
-.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+.........T [ZBX-22558] fixed trigger expression for retrieval of stub page in Nginx templates (drasikhov)
 .........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
-...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
+...G...... [ZBX-23540] added error checks for RegisterMetrics calls (rzvejs)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
-..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
+..F....... [ZBX-23466] fixed data aggregation errors in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
 .........T [ZBX-23835] updated Meraki templates (egordymov)
 .........T [ZBX-23723] fixed proxy params in JavaScript AWS templates (egordymov)
-..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
+..F....... [ZBX-23733] fixed error when downloading graph as .png image if item name contains multibyte characters (gcalenko)
 ..F....... [ZBX-22983] fixed ellipsed dropdown options in items mass update in preprocessing (ddauksa)
 ...G...... [ZBX-23715] fixed persistent directory path not following symlinks upon creation (kprutkovs)
 .........T [ZBX-23825] fixed query_fields values for Acronis and Nomand templates (abiba)
-..F....... [ZBX-22055] fixed map image of map widget not being updated on apply button press (agriscenko, apoga)
+..F....... [ZBX-22055] fixed map image of map widget not being updated when pressing Apply button (agriscenko, apoga)
 ..F....... [ZBX-23629] fixed interface icon cursor to pointer (apoga)
 A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
 .......PS. [ZBX-23145] disabled deprecated automatic reconnection in MySQL (mprihodko)
@@ -2880,10 +2891,9 @@ A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.crea
 --------------------------------------------------------------------------------
 Changes for 5.0.41rc1
 
-New features:
-
 Bug fixes:
-..F....... [ZBX-23733] fixed error downloading graph as .png image when item name contains multibyte characters (gcalenko)
+...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
+..F....... [ZBX-23733] fixed error when downloading graph as .png image if item name contains multibyte characters (gcalenko)
 
 --------------------------------------------------------------------------------
 Changes for 5.0.40

@@ -773,7 +773,6 @@ class CWidgetHelper {
 	public static function getDatePicker(CWidgetFieldDatePicker $field): CDateSelector {
 		return (new CDateSelector($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
-			->setMaxLength(DB::getFieldLength('widget_field', 'value_str'))
 			->setEnabled(($field->getFlags() & CWidgetField::FLAG_DISABLED) == 0);
 	}
 
