@@ -80,7 +80,7 @@ abstract class CValidator {
 	}
 
 	/**
-	 * Throws an exception when trying to set an unexisting validator option.
+	 * Throws an exception when trying to set a nonexistent validator option.
 	 *
 	 * @param $name
 	 * @param $value

@@ -1656,7 +1656,7 @@ ZABBIX.apps.map = (function($) {
 			},
 
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {object} data
 			 */
@@ -1781,7 +1781,7 @@ ZABBIX.apps.map = (function($) {
 
 		Shape.prototype = {
 			/**
-			 * Updades values in property data.
+			 * Updates values in property data.
 			 *
 			 * @param {object} data
 			 */
@@ -3662,7 +3662,7 @@ ZABBIX.apps.map = (function($) {
 		};
 
 		/**
-		 * Form for editin links.
+		 * Form for editing links.
 		 *
 		 * @param {object} formContainer jQuesry object
 		 * @param {object} sysmap
