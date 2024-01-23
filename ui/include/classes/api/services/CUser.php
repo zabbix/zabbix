@@ -2911,6 +2911,8 @@ class CUser extends CApiService {
 		CWebUser::checkAuthentication($data['sessionid']);
 		self::resetFailedLoginAttempts($failed_login_data);
 
+		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
+
 		return true;
 	}
 

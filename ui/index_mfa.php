@@ -50,7 +50,7 @@ if ($request != '') {
 $session_data = json_decode(base64_decode(CCookieHelper::get(ZBX_SESSION_NAME)), true);
 
 // If MFA is not required - redirect to the main login page.
-if (array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
+if (!array_key_exists('mfaid', $session_data) || $session_data['mfaid'] == 0) {
 	redirect($redirect_to->toString());
 }
 
