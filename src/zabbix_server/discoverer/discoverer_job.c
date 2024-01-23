@@ -38,15 +38,9 @@ zbx_hash_t	discoverer_task_hash(const void *data)
 	zbx_hash_t			hash;
 	dtask_hash_t			state;
 
-	state.key.port = task->port;
 	state.key.dcheck_type = task->dchecks.values[0]->type;
-	state.key.addr_type = task->addr_type;
 	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&state.buf);
-
-	if (DISCOVERY_ADDR_RANGE == task->addr_type)
-		hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&task->addr.range->id, sizeof(task->addr.range->id), hash);
-	else
-		hash = ZBX_DEFAULT_STRING_HASH_ALGO(task->addr.ip, strlen(task->addr.ip), hash);
+	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&task->range->id, sizeof(task->range->id), hash);
 
 	return hash;
 }
@@ -57,27 +51,17 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
 	dtask_hash_t			state1, state2;
 
-	state1.key.port = task1->port;
-	state2.key.port = task2->port;
 	state1.key.dcheck_type = task1->dchecks.values[0]->type;
 	state2.key.dcheck_type = task2->dchecks.values[0]->type;
-	state1.key.addr_type = task1->addr_type;
-	state2.key.addr_type = task2->addr_type;
 	ZBX_RETURN_IF_NOT_EQUAL(state1.buf, state2.buf);
 
-	if (DISCOVERY_ADDR_IP == task1->addr_type)
-		return strcmp(task1->addr.ip, task2->addr.ip);
-
-	ZBX_RETURN_IF_NOT_EQUAL(task1->addr.range->id, task2->addr.range->id);
+	ZBX_RETURN_IF_NOT_EQUAL(task1->range->id, task2->range->id);
 	return 0;
 }
 
 void	discoverer_task_clear(zbx_discoverer_task_t *task)
 {
-	if (DISCOVERY_ADDR_IP == task->addr_type)
-		zbx_free(task->addr.ip);
-	else
-		zbx_free(task->addr.range);	/* the range vector is stored on job level */
+	zbx_free(task->range);	/* the range vector is stored on job level */
 
 	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
@@ -96,8 +80,8 @@ zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 
 zbx_uint64_t	discoverer_task_ip_check_count_get(zbx_discoverer_task_t *task)
 {
-	if (DISCOVERY_ADDR_RANGE == task->addr_type && 0 != task->addr.range->state.checks_per_ip)
-		return (zbx_uint64_t)task->addr.range->state.checks_per_ip;	/* except ICMP */
+	if (0 != task->range->state.checks_per_ip)
+		return (zbx_uint64_t)task->range->state.checks_per_ip;	/* except ICMP */
 	else
 		return discoverer_task_check_count_get(task);
 }

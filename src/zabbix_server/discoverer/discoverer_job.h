@@ -65,19 +65,12 @@ zbx_task_range_t;
 typedef struct
 {
 	zbx_vector_dc_dcheck_ptr_t	dchecks;
-	union
-	{
-		char			*ip;
-		zbx_task_range_t	*range;
-	}
-	addr;
-	unsigned short			port;
+	zbx_task_range_t		*range;
 	zbx_uint64_t			unique_dcheckid;
-	unsigned char			resolve_dns;
 
-#define DISCOVERY_ADDR_IP		0
-#define DISCOVERY_ADDR_RANGE		1
-	unsigned char			addr_type;
+#define DISCOVERY_TASK_TYPE_SYNC	0
+#define DISCOVERY_TASK_TYPE_ASYNC	1
+	unsigned char			type;
 }
 zbx_discoverer_task_t;
 

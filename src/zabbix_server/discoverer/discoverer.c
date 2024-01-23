@@ -895,7 +895,7 @@ static void	discovery_icmp_result_proc(const zbx_uint64_t druleid, const int dch
 			h->dnsname = NULL;
 		}
 
-		service = result_dservice_create(task->port, dcheckid);
+		service = result_dservice_create(0, dcheckid);
 		service->status = DOBJECT_STATUS_UP;
 		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 	}
@@ -915,24 +915,22 @@ static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t
 	zbx_vector_fping_host_t		hosts;
 	const zbx_dc_dcheck_t		*dcheck = task->dchecks.values[dcheck_idx];
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d resolve_dns:%d dchecks:%d key[0]:%s", log_worker_id,
-			__func__, DISCOVERY_ADDR_RANGE == task->addr_type ? task->addr.range->ipranges->values_num : -1,
-			task->resolve_dns, task->dchecks.values_num, 0 != task->dchecks.values_num ?
-			task->dchecks.values[0]->key_ : "empty");
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ranges:%d resolve_dns:%d dchecks:%d", log_worker_id,
+			__func__, task->range->ipranges->values_num, task->dchecks.values_num);
 
 	zbx_vector_fping_host_create(&hosts);
 
 	if (0 == worker_max)
 		worker_max = DISCOVERER_JOB_TASKS_INPROGRESS_MAX;
 
-	for (i = 0; i < task->addr.range->ipranges->values_num; i++)
-		count += zbx_iprange_volume(&task->addr.range->ipranges->values[i]);
+	for (i = 0; i < task->range->ipranges->values_num; i++)
+		count += zbx_iprange_volume(&task->range->ipranges->values[i]);
 
 	zbx_vector_fping_host_reserve(&hosts, (size_t)hosts.values_num + (size_t)count);
 	*ip = '\0';
 
-	while (SUCCEED == zbx_iprange_uniq_next(task->addr.range->ipranges->values,
-			task->addr.range->ipranges->values_num, ip, sizeof(ip)))
+	while (SUCCEED == zbx_iprange_uniq_next(task->range->ipranges->values,
+			task->range->ipranges->values_num, ip, sizeof(ip)))
 	{
 		ZBX_FPING_HOST	host;
 
@@ -1053,7 +1051,7 @@ void	discover_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discover
 		zbx_discoverer_results_t	*src = vr_src->values[i];
 		zbx_uint64_t 			check_count_rest;
 
-		if (0 == force && src->processed_checks_per_ip != task->addr.range->state.checks_per_ip)
+		if (0 == force && src->processed_checks_per_ip != task->range->state.checks_per_ip)
 			continue;
 
 		if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
@@ -1081,8 +1079,8 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 
 	*ip = '\0';
 
-	while (SUCCEED == zbx_iprange_uniq_next(task->addr.range->ipranges->values,
-			task->addr.range->ipranges->values_num, ip, sizeof(ip)))
+	while (SUCCEED == zbx_iprange_uniq_next(task->range->ipranges->values,
+			task->range->ipranges->values_num, ip, sizeof(ip)))
 	{
 		zbx_discoverer_results_t	cmp;
 		int				i;
@@ -1120,12 +1118,6 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 	zbx_vector_discoverer_results_ptr_t	results;
 	int					i, ret = SUCCEED;
 
-	if (DISCOVERY_ADDR_RANGE != task->addr_type)
-	{
-		*error = zbx_strdup(*error, "icmp checks failed with error: address type is out of range");
-		return FAIL;
-	}
-
 	zbx_vector_discoverer_results_ptr_create(&results);
 
 	for (i = 0; i < task->dchecks.values_num && SUCCEED == ret; i++)
@@ -1143,53 +1135,54 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 
 static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task, char **error)
 {
-	int					i, ret = SUCCEED;
+	int					ret = SUCCEED;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
+	char					ip[ZBX_INTERFACE_IP_LEN_MAX];
+	zbx_dc_dcheck_t				*dcheck;
 	zbx_vector_discoverer_services_ptr_t	services;
 	zbx_discoverer_results_t		*result = NULL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() ip:%s resolve_dns:%d dchecks:%d key[0]:%s", log_worker_id, __func__,
-			DISCOVERY_ADDR_IP == task->addr_type ? task->addr.ip : "ipranges",
-			task->resolve_dns, task->dchecks.values_num, 0 != task->dchecks.values_num ?
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() dchecks:%d key[0]:%s", log_worker_id, __func__,
+			task->dchecks.values_num, 0 != task->dchecks.values_num ?
 			task->dchecks.values[0]->key_ : "empty");
 
-	if (DISCOVERY_ADDR_IP != task->addr_type)
+	if (0 == task->range->state.index_ip && 0 == task->range->state.index_port &&
+			0 == task->range->state.dcheck_index)
 	{
-		*error = zbx_strdup(*error, "simple check failed with error: address type is out of range");
-		return FAIL;
+		zbx_gethost_by_ip(ip, dns, sizeof(dns));
 	}
 
-	if (1 == task->resolve_dns)
-		zbx_gethost_by_ip(task->addr.ip, dns, sizeof(dns));
-
 	zbx_vector_discoverer_services_ptr_create(&services);
+	dcheck = task->dchecks.values[task->range->state.dcheck_index];
+	(void)zbx_iprange_ip2str(task->range->ipranges->values[task->range->state.index_ip].type,
+			task->range->state.ipaddress, ip, sizeof(ip));
 
-	for (i = 0; i < task->dchecks.values_num; i++)
+	if (SUCCEED == discover_service(dcheck, ip, (unsigned short)task->range->state.port))
 	{
-		zbx_dc_dcheck_t			*dcheck = (zbx_dc_dcheck_t*)task->dchecks.values[i];
 		zbx_discoverer_dservice_t	*service;
 
-		if (FAIL == discover_service(dcheck, task->addr.ip, task->port))
-			continue;
-
-		service = result_dservice_create(task->port, dcheck->dcheckid);
+		service = result_dservice_create((unsigned short)task->range->state.port, dcheck->dcheckid);
 		service->status = DOBJECT_STATUS_UP;
 		zbx_vector_discoverer_services_ptr_append(&services, service);
 	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
 
-	if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, task->addr.ip,
-			discoverer_task_check_count_get(task), NULL))
+	if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
 	{
 		zbx_vector_discoverer_services_ptr_clear_ext(&services, service_free);
+		*error = zbx_dsprintf(*error, "Cannot decrease incomplete checks count, IP: '%s'.", ip);
+		ret = FAIL;
 		goto out;
 	}
 
-	result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, task->addr.ip);
+	result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
 
-	if (1 == task->resolve_dns)
+	if (0 == task->range->state.index_ip && 0 == task->range->state.index_port &&
+			0 == task->range->state.dcheck_index)
+	{
 		result->dnsname = zbx_strdup(result->dnsname, dns);
+	}
 
 	zbx_vector_discoverer_services_ptr_append_array(&result->services, services.values, services.values_num);
 out:
@@ -1198,9 +1191,55 @@ out:
 	zbx_vector_discoverer_services_ptr_destroy(&services);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d", log_worker_id, __func__,
-			task->addr.ip, NULL != result ? result->services.values_num : -1);
+			ip, NULL != result ? result->services.values_num : -1);
 
 	return ret;
+}
+
+int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
+{
+	int			ret, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
+	zbx_vector_portrange_t	port_ranges;
+	zbx_dc_dcheck_t		*dcheck = task->dchecks.values[task->range->state.dcheck_index];
+
+	if (0 == task->range->state.count)
+		return FAIL;
+
+	if (0 == memcmp(task->range->state.ipaddress, z,
+			ZBX_IPRANGE_V4 == task->range->ipranges->values[task->range->state.index_ip].type ?
+			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
+	{
+		task->range->state.index_ip = 0;
+		zbx_iprange_first(task->range->ipranges->values, task->range->state.ipaddress);
+	}
+
+	zbx_vector_portrange_create(&port_ranges);
+	dcheck_port_ranges_get(dcheck->ports, &port_ranges);
+	ret = zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num, &task->range->state.index_port,
+			&task->range->state.port);
+	zbx_vector_portrange_destroy(&port_ranges);
+
+	if (SUCCEED == ret)
+	{
+		task->range->state.count--;
+		return SUCCEED;
+	}
+
+	task->range->state.port = ZBX_PORTRANGE_INIT_PORT;
+
+	if (++task->range->state.dcheck_index < task->dchecks.values_num)
+		return discoverer_net_check_iter(task);
+
+	task->range->state.dcheck_index = 0;
+
+	if (SUCCEED == zbx_iprange_uniq_iter(task->range->ipranges->values,
+			task->range->ipranges->values_num, &task->range->state.index_ip,
+			task->range->state.ipaddress))
+	{
+		return discoverer_net_check_iter(task);
+	}
+
+	return FAIL;
 }
 
 static void	*discoverer_worker_entry(void *net_check_worker)
@@ -1261,8 +1300,39 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				continue;
 			}
 
+			if (DISCOVERY_TASK_TYPE_SYNC == task->type)
+			{
+				if (SUCCEED != discoverer_net_check_iter(task))
+				{
+					discoverer_task_free(task);
+					discoverer_queue_push(queue, job);
+					continue;
+				}
+
+				if (0 < task->range->state.count)
+				{
+					zbx_discoverer_task_t	*task_copy;
+
+					task_copy = (zbx_discoverer_task_t*)zbx_malloc(NULL,
+							sizeof(zbx_discoverer_task_t));
+					zbx_vector_dc_dcheck_ptr_create(&task_copy->dchecks);
+					zbx_vector_dc_dcheck_ptr_append_array(&task_copy->dchecks,
+							task->dchecks.values, task->dchecks.values_num);
+					task_copy->unique_dcheckid = task->unique_dcheckid;
+					task_copy->type = task->type;
+					task_copy->range = (zbx_task_range_t*)zbx_malloc(NULL,
+							sizeof(zbx_task_range_t));
+					*task_copy->range = *task->range;
+
+					(void)zbx_list_append(&job->tasks, task_copy, NULL);
+				}
+
+				queue->pending_checks_count--;
+			}
+			else
+				queue->pending_checks_count -= discoverer_task_check_count_get(task);
+
 			job->workers_used++;
-			queue->pending_checks_count -= discoverer_task_check_count_get(task);
 
 			if (0 == job->workers_max || job->workers_used != job->workers_max)
 			{
@@ -1281,7 +1351,9 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
 
-			if (DISCOVERY_ADDR_IP == task->addr_type)
+			dcheck_type = task->dchecks.values[0]->type;
+
+			if (DISCOVERY_TASK_TYPE_SYNC == task->type)
 			{
 				ret = discoverer_net_check_common(druleid, task, &error);
 			}
@@ -1291,8 +1363,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 			else
 			{
-				ret = discoverer_net_check_range(druleid, task, worker_max, &worker->stop, &dmanager,
-						log_worker_id, &error);
+				ret = discoverer_net_check_range(druleid, task, worker_max, &worker->stop,
+						&dmanager, log_worker_id, &error);
 			}
 
 			if (FAIL == ret)
@@ -1301,7 +1373,6 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 						worker->worker_id, job->druleid, error);
 			}
 
-			dcheck_type = task->dchecks.values[0]->type;
 			discoverer_task_free(task);
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);
 
