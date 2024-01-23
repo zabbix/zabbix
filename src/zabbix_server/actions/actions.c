@@ -3080,39 +3080,6 @@ static void	prepare_actions_conditions_eval(zbx_vector_action_eval_ptr_t *action
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies configuration cache action conditions to specified vector  *
- *                                                                            *
- * Parameters: dc_action  - [IN] source action                                *
- *             conditions - [OUT]                                             *
- *                                                                            *
- ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions)
-{
-	zbx_condition_t			*condition;
-	zbx_dc_action_condition_t	*dc_condition;
-
-	zbx_vector_condition_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
-
-	for (int i = 0; i < dc_action->conditions.values_num; i++)
-	{
-		dc_condition = dc_action->conditions.values[i];
-
-		condition = (zbx_condition_t *)zbx_malloc(NULL, sizeof(zbx_condition_t));
-
-		condition->conditionid = dc_condition->conditionid;
-		condition->actionid = dc_action->actionid;
-		condition->conditiontype = dc_condition->conditiontype;
-		condition->op = dc_condition->op;
-		condition->value = zbx_strdup(NULL, dc_condition->value);
-		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
-		zbx_vector_uint64_create(&condition->eventids);
-
-		zbx_vector_condition_ptr_append(conditions, condition);
-	}
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: processes all actions of each event in list                       *
  *                                                                            *
  * Parameters: events        - [IN] events to apply actions for               *
@@ -3143,8 +3110,7 @@ void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair
 	}
 
 	zbx_vector_action_eval_ptr_create(&actions);
-	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY,
-			dc_action_copy_conditions);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_NORMAL | ZBX_ACTION_OPCLASS_RECOVERY);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 	get_escalation_events(events, esc_events);
 
@@ -3386,8 +3352,7 @@ int	process_actions_by_acknowledgments(const zbx_vector_ack_task_ptr_t *ack_task
 	}
 
 	zbx_vector_action_eval_ptr_create(&actions);
-	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE,
-			dc_action_copy_conditions);
+	zbx_dc_config_history_sync_get_actions_eval(&actions, ZBX_ACTION_OPCLASS_ACKNOWLEDGE);
 	prepare_actions_conditions_eval(&actions, uniq_conditions);
 
 	if (0 == actions.values_num)

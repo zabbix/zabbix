@@ -972,9 +972,9 @@ typedef struct
 }
 zbx_dc_action_t;
 
-typedef void (dc_action_copy_conditions_f)(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions);
-void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags,
-		dc_action_copy_conditions_f dc_action_copy_conditions_cb_arg);
+void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions);
+
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags);
 
 int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);
