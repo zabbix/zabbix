@@ -972,8 +972,6 @@ typedef struct
 }
 zbx_dc_action_t;
 
-void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions);
-
 void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags);
 
 int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);

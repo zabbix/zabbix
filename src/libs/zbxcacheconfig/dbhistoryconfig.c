@@ -380,6 +380,39 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 	UNLOCK_CACHE_CONFIG_HISTORY;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: copies configuration cache action conditions to specified vector  *
+ *                                                                            *
+ * Parameters: dc_action  - [IN] source action                                *
+ *             conditions - [OUT]                                             *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions)
+{
+	zbx_condition_t			*condition;
+	zbx_dc_action_condition_t	*dc_condition;
+
+	zbx_vector_condition_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
+
+	for (int i = 0; i < dc_action->conditions.values_num; i++)
+	{
+		dc_condition = dc_action->conditions.values[i];
+
+		condition = (zbx_condition_t *)zbx_malloc(NULL, sizeof(zbx_condition_t));
+
+		condition->conditionid = dc_condition->conditionid;
+		condition->actionid = dc_action->actionid;
+		condition->conditiontype = dc_condition->conditiontype;
+		condition->op = dc_condition->op;
+		condition->value = zbx_strdup(NULL, dc_condition->value);
+		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
+		zbx_vector_uint64_create(&condition->eventids);
+
+		zbx_vector_condition_ptr_append(conditions, condition);
+	}
+}
+
 ZBX_PTR_VECTOR_IMPL(condition_ptr, zbx_condition_t *)
 
 /******************************************************************************
@@ -414,39 +447,6 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 }
 
 ZBX_PTR_VECTOR_IMPL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
-
-/******************************************************************************
- *                                                                            *
- * Purpose: copies configuration cache action conditions to specified vector  *
- *                                                                            *
- * Parameters: dc_action  - [IN] source action                                *
- *             conditions - [OUT]                                             *
- *                                                                            *
- ******************************************************************************/
-void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions)
-{
-	zbx_condition_t			*condition;
-	zbx_dc_action_condition_t	*dc_condition;
-
-	zbx_vector_condition_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
-
-	for (int i = 0; i < dc_action->conditions.values_num; i++)
-	{
-		dc_condition = dc_action->conditions.values[i];
-
-		condition = (zbx_condition_t *)zbx_malloc(NULL, sizeof(zbx_condition_t));
-
-		condition->conditionid = dc_condition->conditionid;
-		condition->actionid = dc_action->actionid;
-		condition->conditiontype = dc_condition->conditiontype;
-		condition->op = dc_condition->op;
-		condition->value = zbx_strdup(NULL, dc_condition->value);
-		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
-		zbx_vector_uint64_create(&condition->eventids);
-
-		zbx_vector_condition_ptr_append(conditions, condition);
-	}
-}
 
 /*************************************************************************************
  *                                                                                   *
