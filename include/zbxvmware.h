@@ -467,7 +467,7 @@ typedef struct
 	char	*id;
 }
 zbx_vmware_tag_t;
-ZBX_PTR_VECTOR_DECL(vmware_tag, zbx_vmware_tag_t *)
+ZBX_PTR_VECTOR_DECL(vmware_tag_ptr, zbx_vmware_tag_t *)
 
 /* the vmware tags data for entity (hv, vm etc) */
 typedef struct
@@ -479,18 +479,18 @@ zbx_vmware_obj_id_t;
 
 typedef struct
 {
-	char			*uuid;
-	zbx_vmware_obj_id_t	*obj_id;
-	char			*error;
-	zbx_vector_vmware_tag_t	tags;
+	char				*uuid;
+	zbx_vmware_obj_id_t		*obj_id;
+	char				*error;
+	zbx_vector_vmware_tag_ptr_t	tags;
 }
 zbx_vmware_entity_tags_t;
-ZBX_PTR_VECTOR_DECL(vmware_entity_tags, zbx_vmware_entity_tags_t *)
+ZBX_PTR_VECTOR_DECL(vmware_entity_tags_ptr, zbx_vmware_entity_tags_t *)
 
 typedef struct
 {
-	char				*error;
-	zbx_vector_vmware_entity_tags_t	entity_tags;
+	char					*error;
+	zbx_vector_vmware_entity_tags_ptr_t	entity_tags;
 }
 zbx_vmware_data_tags_t;
 

@@ -68,7 +68,7 @@ typedef struct
 }
 zbx_vmware_perf_available_t;
 
-ZBX_PTR_VECTOR_DECL(perf_available, zbx_vmware_perf_available_t *)
+ZBX_PTR_VECTOR_DECL(perf_available_ptr, zbx_vmware_perf_available_t *)
 
 /* mapping of performance counter group/key[rollup type] to its id (net/transmitted[average] -> <id>) */
 typedef struct

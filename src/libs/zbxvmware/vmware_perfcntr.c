@@ -38,7 +38,7 @@
 #define ZBX_XML_DATETIME		26
 
 ZBX_VECTOR_IMPL(uint16, uint16_t)
-ZBX_PTR_VECTOR_IMPL(perf_available, zbx_vmware_perf_available_t *)
+ZBX_PTR_VECTOR_IMPL(perf_available_ptr, zbx_vmware_perf_available_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_perf_value_ptr, zbx_vmware_perf_value_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_counter_ptr, zbx_vmware_counter_t *)
 
@@ -1087,24 +1087,24 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_vmware_perf_counter_pt
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update cache with lists of available perf counter for entity      *
+ * Purpose: updates cache with lists of available perf counter for entity     *
  *                                                                            *
- * Parameters: service        - [IN] the vmware service                       *
+ * Parameters: service        - [IN] vmware service                           *
  *             easyhandle     - [IN] prepared cURL connection handle          *
  *             type           - [IN] vmware object type (vm, hv etc)          *
  *             id             - [IN] vmware object id (vm, hv etc)            *
  *             refresh        - [IN] vmware refresh interval for perf counter *
  *             begin_time     - [IN] vmware begin time for perf counters list *
  *             perf_available - [IN/OUT] list of available counter per object *
- *             perf           - [IN/OUT] the list of perf entities            *
- *             error          - [OUT] the error message in the case of failure*
+ *             perf           - [IN/OUT] list of perf entities                *
+ *             error          - [OUT] error message in the case of failure    *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  ******************************************************************************/
 static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *easyhandle, const char *type,
-		const char *id, const int refresh, const char *begin_time, zbx_vector_perf_available_t *perf_available,
-		zbx_vmware_perf_available_t **perf, char **error)
+		const char *id, const int refresh, const char *begin_time,
+		zbx_vector_perf_available_ptr_t *perf_available, zbx_vmware_perf_available_t **perf, char **error)
 {
 #	define ZBX_POST_VMWARE_GET_AVAIL_PERF							\
 		ZBX_POST_VSPHERE_HEADER								\
@@ -1116,7 +1116,7 @@ static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *eas
 		"</ns0:QueryAvailablePerfMetric>"						\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int			i, ret;
+	int			ret;
 	char			tmp[MAX_STRING_LEN], interval[MAX_STRING_LEN / 32];
 	xmlDoc			*doc = NULL;
 	zbx_vector_str_t	counters;
@@ -1149,15 +1149,13 @@ static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *eas
 	(*perf)->id = zbx_strdup(NULL, id);
 	zbx_vector_uint16_create(&(*perf)->list);
 
-	for (i = 0; i < counters.values_num; i++)
-	{
+	for (int i = 0; i < counters.values_num; i++)
 		zbx_vector_uint16_append(&(*perf)->list, (uint16_t)atoi(counters.values[i]));
-	}
 
 	zbx_vector_uint16_sort(&(*perf)->list, vmware_uint16_compare);
 	zbx_vector_uint16_uniq(&(*perf)->list, vmware_uint16_compare);
-	zbx_vector_perf_available_append(perf_available, *perf);
-	zbx_vector_perf_available_sort(perf_available, vmware_perf_available_compare);
+	zbx_vector_perf_available_ptr_append(perf_available, *perf);
+	zbx_vector_perf_available_ptr_sort(perf_available, vmware_perf_available_compare);
 out:
 	zbx_vector_str_clear_ext(&counters, zbx_str_free);
 	zbx_vector_str_destroy(&counters);
@@ -1180,7 +1178,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *service, CURL *easyhandle,
-		zbx_vector_perf_available_t *perf_available, zbx_vector_vmware_perf_entity_ptr_t *entities)
+		zbx_vector_perf_available_ptr_t *perf_available, zbx_vector_vmware_perf_entity_ptr_t *entities)
 {
 	char	begin_time[ZBX_XML_DATETIME];
 
@@ -1191,12 +1189,11 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 
 	for (int i = 0; i < entities->values_num ; i++)
 	{
-		int				j;
 		zbx_vmware_perf_entity_t	*entity;
 
 		entity = (zbx_vmware_perf_entity_t *)entities->values[i];
 
-		for (j = 0; j < entity->counters.values_num; j++)
+		for (int j = 0; j < entity->counters.values_num; j++)
 		{
 			int				k;
 			char				*err = NULL;
@@ -1221,7 +1218,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 				strftime(begin_time, sizeof(begin_time), "%Y-%m-%dT%TZ", &st);
 			}
 
-			if (FAIL != (k = zbx_vector_perf_available_bsearch(
+			if (FAIL != (k = zbx_vector_perf_available_ptr_bsearch(
 					perf_available, &perf_cmp, vmware_perf_available_compare)))
 			{
 				perf = perf_available->values[k];
@@ -1279,7 +1276,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 
 	zbx_hashset_iter_t			iter;
 	zbx_vector_vmware_perf_data_ptr_t	perfdata;
-	zbx_vector_perf_available_t		perf_available;
+	zbx_vector_perf_available_ptr_t		perf_available;
 	static ZBX_HTTPPAGE			page;	/* 173K */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, service->username, service->url);
@@ -1287,7 +1284,7 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 	zbx_vector_vmware_perf_entity_ptr_create(&entities);
 	zbx_vector_vmware_perf_entity_ptr_create(&hist_entities);
 	zbx_vector_vmware_perf_data_ptr_create(&perfdata);
-	zbx_vector_perf_available_create(&perf_available);
+	zbx_vector_perf_available_ptr_create(&perf_available);
 	page.alloc = 0;
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -1466,8 +1463,8 @@ out:
 
 	zbx_vmware_unlock();
 
-	zbx_vector_perf_available_clear_ext(&perf_available, vmware_perf_available_free);
-	zbx_vector_perf_available_destroy(&perf_available);
+	zbx_vector_perf_available_ptr_clear_ext(&perf_available, vmware_perf_available_free);
+	zbx_vector_perf_available_ptr_destroy(&perf_available);
 
 	zbx_vector_vmware_perf_data_ptr_clear_ext(&perfdata, vmware_free_perfdata);
 	zbx_vector_vmware_perf_data_ptr_destroy(&perfdata);

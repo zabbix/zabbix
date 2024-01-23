@@ -46,9 +46,9 @@ ZBX_SHMEM_FUNC_IMPL(__vm, vmware_mem)
 }
 
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_str_t*, str)
-VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_entity_tags_t*, vmware_entity_tags)
+VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_entity_tags_ptr_t*, vmware_entity_tags_ptr)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_custquery_param_t*, custquery_param)
-VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_tag_t*, vmware_tag)
+VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_tag_ptr_t*, vmware_tag_ptr)
 VMWARE_SHMEM_VECTOR_CREATE_IMPL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_perf_counter_ptr)
 
 /******************************************************************************
@@ -389,8 +389,8 @@ void	vmware_shared_tag_free(zbx_vmware_tag_t *value)
 
 void	vmware_shared_entity_tags_free(zbx_vmware_entity_tags_t *value)
 {
-	zbx_vector_vmware_tag_clear_ext(&value->tags, vmware_shared_tag_free);
-	zbx_vector_vmware_tag_destroy(&value->tags);
+	zbx_vector_vmware_tag_ptr_clear_ext(&value->tags, vmware_shared_tag_free);
+	zbx_vector_vmware_tag_ptr_destroy(&value->tags);
 	vmware_shared_strfree(value->uuid);
 	vmware_shared_strfree(value->error);
 	__vm_shmem_free_func(value);

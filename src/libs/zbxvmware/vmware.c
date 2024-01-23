@@ -127,8 +127,8 @@ typedef struct
 }
 zbx_vmware_rpool_chunk_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk, zbx_vmware_rpool_chunk_t *)
+ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 
 #define ZBX_XPATH_FAULTSTRING(sz)									\
 	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
@@ -682,8 +682,8 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
 
 	zbx_hashset_destroy(&service->eventlog.evt_severities);
 
-	zbx_vector_vmware_entity_tags_clear_ext(&service->data_tags.entity_tags, vmware_shared_entity_tags_free);
-	zbx_vector_vmware_entity_tags_destroy(&service->data_tags.entity_tags);
+	zbx_vector_vmware_entity_tags_ptr_clear_ext(&service->data_tags.entity_tags, vmware_shared_entity_tags_free);
+	zbx_vector_vmware_entity_tags_ptr_destroy(&service->data_tags.entity_tags);
 	vmware_shared_strfree(service->data_tags.error);
 
 	vmware_shmem_service_free(service);
@@ -710,7 +710,7 @@ static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
  *                                                                            *
  * Purpose: frees resources allocated to store rp_chunk data                  *
  *                                                                            *
- * Parameters: rp_chunk - [IN] the resourcepool chunk                         *
+ * Parameters: rp_chunk - [IN] resourcepool chunk                             *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_rp_chunk_free(zbx_vmware_rpool_chunk_t *rp_chunk)
@@ -1454,7 +1454,7 @@ int	vmware_pnic_compare(const void *v1, const void *v2)
  *******************************************************************************/
 static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CURL *easyhandle,
 		xmlDoc *cluster_data, zbx_vector_vmware_cluster_ptr_t *clusters,
-		zbx_vector_vmware_rpool_chunk_t *rp_chunks, zbx_vmware_alarms_data_t *alarms_data, char **error)
+		zbx_vector_vmware_rpool_chunk_ptr_t *rp_chunks, zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
 #define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
@@ -1511,7 +1511,7 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 
 	zbx_vector_str_create(&rp_ids);
 	zbx_xml_read_values(cluster_data, ZBX_XPATH_OBJS_BY_TYPE(ZBX_VMWARE_SOAP_RESOURCEPOOL), &rp_ids);
-	zbx_vector_vmware_rpool_chunk_reserve(rp_chunks, (size_t)(rp_chunks->values_num + rp_ids.values_num));
+	zbx_vector_vmware_rpool_chunk_ptr_reserve(rp_chunks, (size_t)(rp_chunks->values_num + rp_ids.values_num));
 
 	for (int i = 0; i < rp_ids.values_num; i++)
 	{
@@ -1550,7 +1550,7 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 
 		rp_chunk->id = zbx_strdup(NULL, rp_ids.values[i]);
 		rp_chunk->path = rp_chunk->parentid = NULL;
-		zbx_vector_vmware_rpool_chunk_append(rp_chunks, rp_chunk);
+		zbx_vector_vmware_rpool_chunk_ptr_append(rp_chunks, rp_chunk);
 	}
 
 	zbx_vector_str_clear_ext(&rp_ids, zbx_str_free);
@@ -1826,11 +1826,11 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		"</ns0:RetrievePropertiesEx>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-	int				ret = FAIL;
-	xmlDoc				*cluster_data = NULL;
-	zbx_property_collection_iter	*iter = NULL;
-	zbx_vector_vmware_rpool_chunk_t	rp_chunks;
-	zbx_vector_vmware_cluster_ptr_t	cl_chunks;
+	int					ret = FAIL;
+	xmlDoc					*cluster_data = NULL;
+	zbx_property_collection_iter		*iter = NULL;
+	zbx_vector_vmware_rpool_chunk_ptr_t	rp_chunks;
+	zbx_vector_vmware_cluster_ptr_t		cl_chunks;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1840,7 +1840,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		goto out;
 	}
 
-	zbx_vector_vmware_rpool_chunk_create(&rp_chunks);
+	zbx_vector_vmware_rpool_chunk_ptr_create(&rp_chunks);
 	zbx_vector_vmware_cluster_ptr_create(&cl_chunks);
 
 	if (SUCCEED != vmware_service_process_cluster_data(service, easyhandle, cluster_data, &cl_chunks, &rp_chunks,
@@ -1864,7 +1864,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 		}
 	}
 
-	zbx_vector_vmware_rpool_chunk_sort(&rp_chunks, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_rpool_chunk_ptr_sort(&rp_chunks, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	for (int i = 0; i < rp_chunks.values_num; i++)
 	{
@@ -1882,7 +1882,7 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 
 		rp_parent.id = rp_chunk->first_parentid;
 
-		while (FAIL != (k = zbx_vector_vmware_rpool_chunk_bsearch(&rp_chunks, &rp_parent,
+		while (FAIL != (k = zbx_vector_vmware_rpool_chunk_ptr_bsearch(&rp_chunks, &rp_parent,
 				ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 		{
 			zbx_vmware_rpool_chunk_t	*rp_next = rp_chunks.values[k];
@@ -1926,8 +1926,8 @@ static int	vmware_service_get_clusters_and_resourcepools(zbx_vmware_service_t *s
 	ret = SUCCEED;
 clean:
 	zbx_xml_free_doc(cluster_data);
-	zbx_vector_vmware_rpool_chunk_clear_ext(&rp_chunks, vmware_rp_chunk_free);
-	zbx_vector_vmware_rpool_chunk_destroy(&rp_chunks);
+	zbx_vector_vmware_rpool_chunk_ptr_clear_ext(&rp_chunks, vmware_rp_chunk_free);
+	zbx_vector_vmware_rpool_chunk_ptr_destroy(&rp_chunks);
 	zbx_vector_vmware_cluster_ptr_clear_ext(&cl_chunks, vmware_cluster_free);
 	zbx_vector_vmware_cluster_ptr_destroy(&cl_chunks);
 out:
@@ -2873,7 +2873,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 	service->eventlog.req_sz = 0;
 	service->eventlog.oom = 0;
 	service->jobs_num = 0;
-	vmware_shmem_vector_vmware_entity_tags_create_ext(&service->data_tags.entity_tags);
+	vmware_shmem_vector_vmware_entity_tags_ptr_create_ext(&service->data_tags.entity_tags);
 	service->data_tags.error = NULL;
 
 	vmware_shmem_service_hashset_create(service);
@@ -3130,23 +3130,21 @@ void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: replace shared tags info                                          *
+ * Purpose: replaces shared tags info                                         *
  *                                                                            *
- * Parameters: src - [IN] the collected tags info                             *
- *             dst - [OUT] the shared tags container                          *
+ * Parameters: src - [IN] collected tags info                                 *
+ *             dst - [OUT] shared tags container                              *
  *                                                                            *
  ******************************************************************************/
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst)
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *src, zbx_vmware_data_tags_t *dst)
 {
-	int	i, j;
-
 	zbx_vmware_lock();
 
-	zbx_vector_vmware_entity_tags_clear_ext(&dst->entity_tags, vmware_shared_entity_tags_free);
+	zbx_vector_vmware_entity_tags_ptr_clear_ext(&dst->entity_tags, vmware_shared_entity_tags_free);
 	vmware_shared_strfree(dst->error);
 	dst->error = NULL;
 
-	for (i = 0; i < src->values_num; i++)
+	for (int i = 0; i < src->values_num; i++)
 	{
 		zbx_vmware_entity_tags_t	*to_entity, *from_entity = src->values[i];
 
@@ -3154,7 +3152,7 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 			continue;
 
 		to_entity = vmware_shmem_entity_tags_malloc();
-		vmware_shmem_vector_vmware_tag_create_ext(&to_entity->tags);
+		vmware_shmem_vector_vmware_tag_ptr_create_ext(&to_entity->tags);
 		to_entity->uuid = vmware_shared_strdup(from_entity->uuid);
 		to_entity->obj_id = NULL;
 
@@ -3166,7 +3164,7 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 		else
 			to_entity->error = NULL;
 
-		for (j = 0; j < from_entity->tags.values_num; j++)
+		for (int j = 0; j < from_entity->tags.values_num; j++)
 		{
 			zbx_vmware_tag_t	*to_tag, *from_tag = from_entity->tags.values[j];
 
@@ -3175,10 +3173,10 @@ void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, 
 			to_tag->description = vmware_shared_strdup(from_tag->description);
 			to_tag->category = vmware_shared_strdup(from_tag->category);
 			to_tag->id = NULL;
-			zbx_vector_vmware_tag_append(&to_entity->tags, to_tag);
+			zbx_vector_vmware_tag_ptr_append(&to_entity->tags, to_tag);
 		}
 
-		zbx_vector_vmware_entity_tags_append(&dst->entity_tags, to_entity);
+		zbx_vector_vmware_entity_tags_ptr_append(&dst->entity_tags, to_entity);
 	}
 
 	zbx_vmware_unlock();

@@ -679,13 +679,13 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update json document with tags info                               *
+ * Purpose: updates json document with tags info                              *
  *                                                                            *
- * Parameters: entity_tags - [IN] the all tags and linked objects             *
- *             uuid        - [IN] the vmware object uuid                      *
- *             tag_name    - [IN] the name of tags array                      *
- *             json_data   - [OUT] the json document                          *
- *             error       - [OUT] the error of tags receiving (optional)     *
+ * Parameters: data_tags   - [IN] all tags and linked objects                 *
+ *             uuid        - [IN] vmware object uuid                          *
+ *             tag_name    - [IN] name of tags array                          *
+ *             json_data   - [OUT] json document                              *
+ *             error       - [OUT] error of tags receiving (optional)         *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const char *uuid, const char *tag_name,
@@ -693,7 +693,7 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 {
 	int				i;
 	zbx_vmware_entity_tags_t	entity_cmp;
-	zbx_vector_vmware_tag_t		*tags;
+	zbx_vector_vmware_tag_ptr_t	*tags;
 
 	if (NULL != data_tags->error)
 	{
@@ -705,7 +705,7 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 
 	entity_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_entity_tags_bsearch(&data_tags->entity_tags, &entity_cmp,
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_ptr_bsearch(&data_tags->entity_tags, &entity_cmp,
 			ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 	{
 		return;

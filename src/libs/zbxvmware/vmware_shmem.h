@@ -31,9 +31,9 @@ void	vmware_shmem_set_vmware_mem_NULL(void);
 #define VMWARE_SHMEM_VECTOR_CREATE_DECL(ref,type) void	vmware_shmem_vector_##type##_create_ext(ref);
 
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_str_t*, str)
-VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_entity_tags_t*, vmware_entity_tags)
+VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_entity_tags_ptr_t*, vmware_entity_tags_ptr)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_custquery_param_t*, custquery_param)
-VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_tag_t*, vmware_tag)
+VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_tag_ptr_t*, vmware_tag_ptr)
 VMWARE_SHMEM_VECTOR_CREATE_DECL(zbx_vector_vmware_perf_counter_ptr_t*, vmware_perf_counter_ptr)
 
 void	vmware_shmem_perf_counter_free(zbx_vmware_perf_counter_t *counter);

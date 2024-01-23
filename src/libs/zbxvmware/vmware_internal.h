@@ -63,7 +63,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 		int config_vmware_timeout);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst);
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *src, zbx_vmware_data_tags_t *dst);
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
