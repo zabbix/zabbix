@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2725,11 +2725,31 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 				break;
 			case ZBX_OPERATION_TYPE_GROUP_ADD:
 				if (0 != groupid)
+				{
+					int	i;
+
+					if (FAIL != (i = zbx_vector_uint64_search(&del_groupids, groupid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						zbx_vector_uint64_remove_noorder(&del_groupids, i);
+					}
+
 					zbx_vector_uint64_append(&new_groupids, groupid);
+				}
 				break;
 			case ZBX_OPERATION_TYPE_GROUP_REMOVE:
 				if (0 != groupid)
+				{
+					int	i;
+
+					if (FAIL != (i = zbx_vector_uint64_search(&new_groupids, groupid,
+							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+					{
+						zbx_vector_uint64_remove_noorder(&new_groupids, i);
+					}
+
 					zbx_vector_uint64_append(&del_groupids, groupid);
+				}
 				break;
 			case ZBX_OPERATION_TYPE_TEMPLATE_ADD:
 				if (0 != templateid)
@@ -2739,7 +2759,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 					if (FAIL != (i = zbx_vector_uint64_search(&del_templateids, templateid,
 							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 					{
-						zbx_vector_uint64_remove(&del_templateids, i);
+						zbx_vector_uint64_remove_noorder(&del_templateids, i);
 					}
 
 					zbx_vector_uint64_append(&lnk_templateids, templateid);
@@ -2753,7 +2773,7 @@ static void	execute_operations(const zbx_db_event *event, zbx_uint64_t actionid)
 					if (FAIL != (i = zbx_vector_uint64_search(&lnk_templateids, templateid,
 							ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 					{
-						zbx_vector_uint64_remove(&lnk_templateids, i);
+						zbx_vector_uint64_remove_noorder(&lnk_templateids, i);
 					}
 
 					zbx_vector_uint64_append(&del_templateids, templateid);

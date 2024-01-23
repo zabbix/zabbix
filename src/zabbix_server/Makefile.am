@@ -16,7 +16,6 @@ SUBDIRS = \
 	operations \
 	postinit \
 	proxypoller \
-	vmware \
 	taskmanager \
 	stats \
 	preproc \
@@ -69,7 +68,7 @@ zabbix_server_LDADD = \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	vmware/libzbxvmware.a \
+	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
 	service/libservice.a \

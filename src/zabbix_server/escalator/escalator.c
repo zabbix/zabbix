@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,34 +218,66 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns user permissions for access to trigger                    *
+ * Purpose: checks user permissions for access to trigger                     *
  *                                                                            *
- * Return value: PERM_DENY - if host or user not found,                       *
- *               permission otherwise                                         *
+ * Return value: SUCCEED - user has access                                    *
+ *               FAIL    - user does not have access                          *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char **user_timezone)
+static int	check_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char **user_timezone)
 {
-	int			perm = PERM_DENY;
+	int			ret = FAIL;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		roleid;
+	zbx_vector_uint64_t	hostgroupids, hgsetids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		roleid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_uint64_create(&hgsetids);
+
 	if (USER_TYPE_SUPER_ADMIN == zbx_get_user_info(userid, &roleid, user_timezone))
 	{
-		perm = PERM_READ_WRITE;
+		ret = SUCCEED;
 		goto out;
 	}
 
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct hh.hgsetid from host_hgset hh"
+			" join items i on hh.hostid=i.hostid"
+			" join functions f on i.itemid=f.itemid"
+			" where f.triggerid=" ZBX_FS_UI64,
+			event->objectid);
+	zbx_db_select_uint64(sql, &hgsetids);
+
+	if (0 == hgsetids.values_num)
+		goto out;
+
+	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select count(*) from permission p"
+			" join user_ugset u on p.ugsetid=u.ugsetid"
+			" where u.userid=" ZBX_FS_UI64 " and", userid);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "p.hgsetid", hgsetids.values, hgsetids.values_num);
+	result = zbx_db_select("%s", sql);
+
+	if (NULL == (row = zbx_db_fetch(result)) || atoi(row[0]) != hgsetids.values_num)
+	{
+		zbx_db_free_result(result);
+		goto out;
+	}
+
+	zbx_db_free_result(result);
 	zbx_vector_uint64_create(&hostgroupids);
 
 	result = zbx_db_select(
 			"select distinct hg.groupid from items i"
 			" join functions f on i.itemid=f.itemid"
-			" join hosts_groups hg on hg.hostid = i.hostid"
+			" join hosts_groups hg on hg.hostid=i.hostid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			event->objectid);
 
@@ -260,17 +292,16 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char
 
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (PERM_DENY < (perm = zbx_get_hostgroups_permission(userid, &hostgroupids)) &&
-			FAIL == check_tag_based_permission(userid, &hostgroupids, event))
-	{
-		perm = PERM_DENY;
-	}
+	ret = check_tag_based_permission(userid, &hostgroupids, event);
 
 	zbx_vector_uint64_destroy(&hostgroupids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zbx_vector_uint64_destroy(&hgsetids);
+	zbx_free(sql);
 
-	return perm;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *role_ids)
@@ -742,7 +773,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+				if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -845,7 +876,7 @@ static void	add_sentusers_msg(zbx_user_msg_t **user_msg, zbx_uint64_t actionid, 
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+				if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -941,7 +972,7 @@ static void	add_sentusers_msg_esc_cancel(zbx_user_msg_t **user_msg, zbx_uint64_t
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+				if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -1020,7 +1051,7 @@ static void	add_sentusers_ack_msg(zbx_user_msg_t **user_msg, zbx_uint64_t action
 		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
-		if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+		if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 			goto clean;
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, NULL, NULL,

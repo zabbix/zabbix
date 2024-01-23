@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,6 +42,26 @@ use CWidgetsData;
  */
 class WidgetForm extends CWidgetForm {
 
+	public function validate(bool $strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+				&& !$this->getFieldValue('itemid')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
+		}
+
+		if ($this->getFieldValue('source_type') == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
+				&& !$this->getFieldValue('graphid')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Graph'), _('cannot be empty'));
+		}
+
+		return $errors;
+	}
+
 	public function addFields(): self {
 		return $this
 			->addField(
@@ -50,15 +70,15 @@ class WidgetForm extends CWidgetForm {
 					ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph')
 				]))
 					->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
-					->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			)
-			->addField(array_key_exists('source_type', $this->values)
-					&& $this->values['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
-				? (new CWidgetFieldMultiSelectItem('itemid', _('Item')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			->addField(
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
-				: (new CWidgetFieldMultiSelectGraph('graphid', _('Graph')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			)
+			->addField(
+				(new CWidgetFieldMultiSelectGraph('graphid', _('Graph')))
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
 			)
 			->addField(

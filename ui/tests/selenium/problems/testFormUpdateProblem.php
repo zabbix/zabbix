@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -206,7 +206,7 @@ class testFormUpdateProblem extends CWebTest {
 			[
 				[
 					'problems' => ['Trigger for unsigned'],
-					// If problem is Aknowledged - label is changed to Unacknowledge.
+					// If problem is Acknowledged - label is changed to Unacknowledge.
 					'labels' => ['Problem', 'Message', 'History', 'Scope', 'Change severity', 'Suppress',
 						'Unsuppress', 'Unacknowledge', 'Convert to cause', 'Close problem', ''
 					],
@@ -345,7 +345,7 @@ class testFormUpdateProblem extends CWebTest {
 			'id:severity' => ['value' => 'Not classified', 'enabled' => false],
 			'id:suppress_problem' => ['value' => false, 'enabled' => true],
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
-			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
+			'id:suppress_until_problem' => ['maxlength' => 255, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
