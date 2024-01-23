@@ -42,7 +42,7 @@ $this->addJsFile('d3.v7.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.v1.7.0.js');
-$this->addJsFile('leaflet.markercluster.js');
+$this->addJsFile('leaflet.markercluster.v1.1.0.js');
 $this->addJsFile('class.dashboard.js');
 $this->addJsFile('class.dashboard.page.js');
 $this->addJsFile('class.dashboard.widget.placeholder.js');

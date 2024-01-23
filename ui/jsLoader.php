@@ -66,11 +66,11 @@ $available_js = [
 	'inputsecret.js' => '',
 	'macrovalue.js' => '',
 	// vendors
-	'jquery.js' => 'vendors/',
-	'jquery-ui.js' => 'vendors/',
+	'jquery.v3.6.0.js' => 'vendors/JQuery/',
+	'jquery-ui.v1.13.2.js' => 'vendors/JQueryUI/',
 	'leaflet.v1.7.0.js' => 'vendors/Leaflet/Leaflet/',
-	'leaflet.markercluster.js' => 'vendors/Leaflet/Leaflet.markercluster/',
-	'd3.v7.js' => 'vendors/',
+	'leaflet.markercluster.v1.1.0.js' => 'vendors/Leaflet/Leaflet.markercluster/',
+	'd3.v7.js' => 'vendors/D3/',
 	// classes
 	'component.z-bar-gauge.js' => '',
 	'component.z-select.js' => '',
@@ -446,8 +446,8 @@ $js = '';
 if (empty($_GET['files'])) {
 	$files = [
 		'defines.js',
-		'jquery.js',
-		'jquery-ui.js',
+		'jquery.v3.6.0.js',
+		'jquery-ui.v1.13.2.js',
 		'main.js',
 		'common.js',
 		'component.z-bar-gauge.js',
