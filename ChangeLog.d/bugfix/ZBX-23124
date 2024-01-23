@@ -1,0 +1,1 @@
+.......P.. [ZBX-23124] fixed item state/error persistence on proxy, reducing chances for item without history to be stuck in non-supported state on server while working on proxy (wiper)
