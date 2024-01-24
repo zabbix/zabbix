@@ -137,7 +137,7 @@
 				graph.data('widget')._resumeUpdating();
 
 				data.isTriggerHintBoxFrozen = false;
-				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
+				data.isHintBoxFrozen = false; // Unfreeze because only unfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
 				destroyHintbox(graph);
 			});
@@ -155,8 +155,8 @@
 	}
 
 	/**
-	 * Silent mode means that hintbox is waiting for click to be repositionated. Once user clicks on graph, existing
-	 * hintbox will be repositionated with a new values in the place where user clicked on.
+	 * Silent mode means that hintbox is waiting for click to be repositioned. Once user clicks on graph, existing
+	 * hintbox will be repositioned with a new values in the place where user clicked on.
 	 */
 	function hintboxSilentMode(e) {
 		var graph = e.data.graph,

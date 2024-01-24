@@ -61,7 +61,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Configuration provider, return valid configuration for each comonent.
+	 * Configuration provider, return valid configuration for each component.
 	 *
 	 * @return array
 	 */
@@ -74,7 +74,7 @@ class testConfigTestOption extends CIntegrationTest {
 	}
 
 	/**
-	 * Configuration provider, return invalid configuration for each comonent.
+	 * Configuration provider, return invalid configuration for each component.
 	 *
 	 * @return array
 	 */
@@ -125,4 +125,3 @@ class testConfigTestOption extends CIntegrationTest {
 		}
 	}
 }
-
