@@ -55,10 +55,6 @@ typedef struct
 		int		dcheck_index;
 		zbx_uint64_t	count;		/* total count of checks in range */
 		unsigned int	checks_per_ip;	/* count of checks per ip */
-
-#define DISCOVERER_RANGE_READY		0
-#define DISCOVERER_RANGE_PROCESSING	1
-		unsigned char	processing;
 	}
 	state;
 	zbx_vector_iprange_t	*ipranges;

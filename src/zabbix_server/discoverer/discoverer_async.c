@@ -462,9 +462,10 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
+	zbx_vector_portrange_t			port_ranges;
 	discovery_poller_config_t		poller_config;
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX], first_ip[ZBX_INTERFACE_IP_LEN_MAX];
-	int					ret = SUCCEED;
+	int					ret = FAIL, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 
 	if (0 == log_worker_id)
 		log_worker_id = worker_id;
@@ -480,12 +481,20 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 
 	discovery_async_poller_init(dmanager, &poller_config);
 	zbx_vector_discoverer_results_ptr_create(&results);
+	zbx_vector_portrange_create(&port_ranges);
 	*first_ip = '\0';
 
-	while (0 == *stop && SUCCEED == discoverer_net_check_iter(task))
+	if (0 == memcmp(task->range->state.ipaddress, z,
+			ZBX_IPRANGE_V4 == task->range->ipranges->values[task->range->state.index_ip].type ?
+			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
+	{
+		task->range->state.index_ip = 0;
+		zbx_iprange_first(task->range->ipranges->values, task->range->state.ipaddress);
+	}
+
+	do
 	{
 		zbx_discoverer_results_t	*result;
-		zbx_dc_dcheck_t			*dcheck = task->dchecks.values[task->range->state.dcheck_index];
 
 		(void)zbx_iprange_ip2str(task->range->ipranges->values[task->range->state.index_ip].type,
 				task->range->state.ipaddress, ip, sizeof(ip));
@@ -497,51 +506,82 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 
-		switch (dcheck->type)
+		for (; task->range->state.dcheck_index < task->dchecks.values_num && 0 == *stop &&
+				0 != task->range->state.count; task->range->state.dcheck_index++)
 		{
-		case SVC_SNMPv1:
-		case SVC_SNMPv2c:
-		case SVC_SNMPv3:
+			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range->state.dcheck_index];
+
+			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
+
+			if (ZBX_PORTRANGE_INIT_PORT == task->range->state.port)
+			{
+				task->range->state.index_port = 0;
+				task->range->state.port = port_ranges.values->from;
+			}
+
+			do
+			{
+				switch (dcheck->type)
+				{
+				case SVC_SNMPv1:
+				case SVC_SNMPv2c:
+				case SVC_SNMPv3:
 #ifdef HAVE_NETSNMP
-			ret = discovery_snmp(&poller_config, dcheck, ip, (unsigned short)task->range->state.port,
-					result, error);
+					ret = discovery_snmp(&poller_config, dcheck, ip,
+							(unsigned short)task->range->state.port, result, error);
 #else
-			ret = FAIL;
-			*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
+					ret = FAIL;
+					*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
 #endif
-			break;
-		case SVC_AGENT:
-			ret = discovery_agent(&poller_config, dcheck, ip, (unsigned short)task->range->state.port,
-					result, error);
-			break;
-		case SVC_HTTP:
-		case SVC_HTTPS:
-		case SVC_SSH:
-		case SVC_LDAP:
-		case SVC_SMTP:
-		case SVC_FTP:
-		case SVC_POP:
-		case SVC_NNTP:
-		case SVC_IMAP:
-		case SVC_TCP:
-		case SVC_TELNET:
-			ret = discovery_tcpsvc(&poller_config, dcheck, ip, (unsigned short)task->range->state.port,
-					result, error);
-			break;
-		default:
-			ret = FAIL;
-			*error = zbx_dsprintf(*error, "Support check type %u was not compiled in.",
-					dcheck->type);
+					break;
+				case SVC_AGENT:
+					ret = discovery_agent(&poller_config, dcheck, ip,
+							(unsigned short)task->range->state.port, result, error);
+					break;
+				case SVC_SSH:
+				case SVC_LDAP:
+				case SVC_SMTP:
+				case SVC_FTP:
+				case SVC_HTTP:
+				case SVC_POP:
+				case SVC_NNTP:
+				case SVC_IMAP:
+				case SVC_TCP:
+				case SVC_HTTPS:
+				case SVC_TELNET:
+					ret = discovery_tcpsvc(&poller_config, dcheck, ip,
+							(unsigned short)task->range->state.port, result, error);
+					break;
+				default:
+					ret = FAIL;
+					*error = zbx_dsprintf(*error, "Support check type %u was not compiled in.",
+							dcheck->type);
+				}
+
+				if (FAIL == ret)
+					goto out;
+
+				while (worker_max == poller_config.processing)
+					event_base_loop(poller_config.base, EVLOOP_ONCE);
+
+				task->range->state.count--;
+			}
+			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
+					&task->range->state.index_port, &task->range->state.port) &&
+					0 != task->range->state.count && 0 == *stop);
+
+			task->range->state.port = ZBX_PORTRANGE_INIT_PORT;
+			zbx_vector_portrange_clear(&port_ranges);
+
 		}
 
-		if (FAIL == ret)
-			goto out;
-
-		while (worker_max == poller_config.processing)
-			event_base_loop(poller_config.base, EVLOOP_ONCE);
-
+		task->range->state.dcheck_index = 0;
 		discoverer_net_check_result_flush(dmanager, task, &results, 0);
 	}
+	while (SUCCEED == zbx_iprange_uniq_iter(task->range->ipranges->values,
+			task->range->ipranges->values_num, &task->range->state.index_ip,
+			task->range->state.ipaddress) && 0 != task->range->state.count && 0 == *stop);
+
 out:	/* try to close all handles if they are exhausted */
 	while (0 != poller_config.processing)
 	{
@@ -552,12 +592,14 @@ out:	/* try to close all handles if they are exhausted */
 	discoverer_net_check_result_flush(dmanager, task, &results, 1);
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);	/* Incomplete results*/
 	zbx_vector_discoverer_results_ptr_destroy(&results);
+	zbx_vector_portrange_destroy(&port_ranges);
+
 	discovery_async_poller_destroy(&poller_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
 			" last ip:%s", log_worker_id, __func__, druleid,
-			task->dchecks.values[task->range->state.dcheck_index]->type, task->range->state.count,
-			first_ip, ip);
+			task->dchecks.values[task->range->state.dcheck_index]->type,
+			task->range->state.count, first_ip, ip);
 
 	return ret;
 }

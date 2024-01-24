@@ -1196,7 +1196,7 @@ out:
 	return ret;
 }
 
-int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
+static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 {
 	int			ret, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 	zbx_vector_portrange_t	port_ranges;
@@ -1204,13 +1204,6 @@ int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 
 	if (0 == task->range->state.count)
 		return FAIL;
-
-	if (0 != task->range->id && DISCOVERER_RANGE_READY == task->range->state.processing)
-	{
-		task->range->state.count--;
-		task->range->state.processing = DISCOVERER_RANGE_PROCESSING;
-		return SUCCEED;
-	}
 
 	if (0 == memcmp(task->range->state.ipaddress, z,
 			ZBX_IPRANGE_V4 == task->range->ipranges->values[task->range->state.index_ip].type ?
@@ -1249,7 +1242,7 @@ int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 	return FAIL;
 }
 
-static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
+int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 {
 	switch(dcheck->type)
 	{

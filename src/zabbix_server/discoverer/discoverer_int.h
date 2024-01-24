@@ -97,6 +97,6 @@ void				discover_results_partrange_merge(zbx_hashset_t *hr_dst,
 void				results_free(zbx_discoverer_results_t *result);
 zbx_discoverer_dservice_t	*result_dservice_create(const unsigned short port, const zbx_uint64_t dcheckid);
 void				dcheck_port_ranges_get(const char *ports, zbx_vector_portrange_t *ranges);
-int				discoverer_net_check_iter(zbx_discoverer_task_t *task);
+int				dcheck_is_async(zbx_dc_dcheck_t *dcheck);
 
 #endif /* ZABBIX_DISCOVERER_INT_H_ */
