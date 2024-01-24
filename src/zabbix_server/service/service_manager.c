@@ -1752,10 +1752,10 @@ zbx_service_severity_t;
 ZBX_PTR_VECTOR_DECL(service_severity_ptr, zbx_service_severity_t *)
 ZBX_PTR_VECTOR_IMPL(service_severity_ptr, zbx_service_severity_t *)
 
-/* static void	zbx_service_severity_free(zbx_service_severity_t *service_severity) */
-/* { */
-/* 	zbx_free(service_severity); */
-/* } */
+static void	zbx_service_severity_free(zbx_service_severity_t *service_severity)
+{
+	zbx_free(service_severity);
+}
 
 static void	service_add_cause(zbx_vector_service_severity_ptr_t *causes, zbx_service_t *service, int severity)
 {
@@ -1940,6 +1940,7 @@ static void	service_get_causes(const zbx_service_t *service, int severity, zbx_v
 		service_get_causes(cause->service, cause->severity, eventids);
 	}
 
+	zbx_vector_service_severity_ptr_clear_ext(&causes, zbx_service_severity_free);
 	zbx_vector_service_severity_ptr_destroy(&causes);
 }
 
