@@ -33,7 +33,6 @@ class CWidgetFormGraph extends CWidgetForm {
 			ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH => _('Simple graph')
 		]))
 			->setDefault(ZBX_WIDGET_FIELD_RESOURCE_GRAPH)
-			->setAction('ZABBIX.Dashboard.reloadWidgetProperties()')
 			->setModern(true);
 
 		if (array_key_exists('source_type', $this->data)) {
@@ -42,37 +41,34 @@ class CWidgetFormGraph extends CWidgetForm {
 
 		$this->fields[$field_source->getName()] = $field_source;
 
-		if (array_key_exists('source_type', $this->data)
+		// Select simple graph field.
+		$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setMultiple(false)
+			->setFilterParameter('numeric', true);
+
+		if ($templateid === null) {
+			// For groups and hosts selection.
+			$field_item->setFilterParameter('with_simple_graph_items', true);
+		}
+
+		if (array_key_exists('itemid', $this->data)
 				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
-			// Select simple graph field.
-			$field_item = (new CWidgetFieldMsItem('itemid', _('Item'), $templateid))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false)
-				->setFilterParameter('numeric', true);
-
-			if ($templateid === null) {
-				// For groups and hosts selection.
-				$field_item->setFilterParameter('with_simple_graph_items', true);
-			}
-
-			if (array_key_exists('itemid', $this->data)) {
-				$field_item->setValue($this->data['itemid']);
-			}
-
-			$this->fields[$field_item->getName()] = $field_item;
+			$field_item->setValue($this->data['itemid']);
 		}
-		else {
-			// Select graph field.
-			$field_graph = (new CWidgetFieldMsGraph('graphid', _('Graph'), $templateid))
-				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setMultiple(false);
 
-			if (array_key_exists('graphid', $this->data)) {
-				$field_graph->setValue($this->data['graphid']);
-			}
+		$this->fields[$field_item->getName()] = $field_item;
 
-			$this->fields[$field_graph->getName()] = $field_graph;
+		$field_graph = (new CWidgetFieldMsGraph('graphid', _('Graph'), $templateid))
+			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
+			->setMultiple(false);
+
+		if (array_key_exists('graphid', $this->data)
+				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+			$field_graph->setValue($this->data['graphid']);
 		}
+
+		$this->fields[$field_graph->getName()] = $field_graph;
 
 		// Show legend checkbox.
 		$field_legend = (new CWidgetFieldCheckBox('show_legend', _('Show legend')))->setDefault(1);
@@ -91,5 +87,25 @@ class CWidgetFormGraph extends CWidgetForm {
 
 			$this->fields[$field_dynamic->getName()] = $field_dynamic;
 		}
+	}
+
+	public function validate($strict = false): array {
+		$errors = parent::validate($strict);
+
+		if ($errors) {
+			return $errors;
+		}
+
+		if ($this->fields['source_type']->getValue() == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH
+				&& !$this->fields['itemid']->getValue()) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
+		}
+
+		if ($this->fields['source_type']->getValue() == ZBX_WIDGET_FIELD_RESOURCE_GRAPH
+				&& !$this->fields['graphid']->getValue()) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Graph'), _('cannot be empty'));
+		}
+
+		return $errors;
 	}
 }
