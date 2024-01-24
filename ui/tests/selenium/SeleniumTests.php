@@ -137,6 +137,8 @@ require_once dirname(__FILE__).'/items/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
 require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
 require_once dirname(__FILE__).'/items/testPageItems.php';
+require_once dirname(__FILE__).'/items/testPageMassUpdateItemPrototypes.php';
+require_once dirname(__FILE__).'/items/testPageMassUpdateItems.php';
 
 // LLD.
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
@@ -277,8 +279,6 @@ require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
-require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
-require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -447,6 +447,8 @@ class SeleniumTests {
 		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testPageItemPrototypes');
 		$suite->addTestSuite('testPageItems');
+		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
+		$suite->addTestSuite('testPageMassUpdateItems');
 
 		// LLD.
 		$suite->addTestSuite('testFormLowLevelDiscovery');
@@ -579,8 +581,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
-		$suite->addTestSuite('testPageMassUpdateItems');
-		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
