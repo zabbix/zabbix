@@ -76,7 +76,7 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
  *               NULL             - operation has failed                      *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
+static zbx_vmware_hv_t	*hv_get(const zbx_hashset_t *hvs, const char *uuid)
 {
 	zbx_vmware_hv_t	*hv, hv_local = {.uuid = (char *)uuid};
 
@@ -268,8 +268,9 @@ out:
  *           ignored by server rather than generating error.                  *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid, const char *instance, unsigned int coeff, int unit, AGENT_RESULT *result)
+static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *service, const char *type,
+		const char *id, zbx_uint64_t counterid, const char *instance, unsigned int coeff, int unit,
+		AGENT_RESULT *result)
 {
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
@@ -422,7 +423,7 @@ out:
  *           ignored by server rather than generating error.                  *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *service, const char *type,
+static int	vmware_service_get_counter_value_by_path(const zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *path, const char *instance, unsigned int coeff, AGENT_RESULT *result)
 {
 	zbx_uint64_t	counterid;
@@ -530,7 +531,7 @@ out:
  *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_vcenter_vmprop(AGENT_REQUEST *request, const char *username, const char *password,
+static int	get_vcenter_vmprop(const AGENT_REQUEST *request, const char *username, const char *password,
 		int propid, AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
@@ -596,7 +597,7 @@ out:
  *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_vcenter_hvprop(AGENT_REQUEST *request, const char *username, const char *password, int propid,
+static int	get_vcenter_hvprop(const AGENT_REQUEST *request, const char *username, const char *password, int propid,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
