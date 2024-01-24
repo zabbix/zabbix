@@ -650,6 +650,7 @@ void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results)
  *             config_unreachable_period  - [IN]                                   *
  *             config_unreachable_delay   - [IN]                                   *
  *             program_type               - [IN]                                   *
+ *             progname                   - [IN]                                   *
  *             get_config_forks           - [IN]                                   *
  *             config_java_gateway        - [IN]                                   *
  *             config_java_gateway_port   - [IN]                                   *

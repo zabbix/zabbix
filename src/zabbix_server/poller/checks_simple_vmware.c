@@ -680,7 +680,8 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
  *                                                                            *
  * Purpose: updates json document with tags info                              *
  *                                                                            *
- * Parameters: entity_tags - [IN] all tags and linked objects                 *
+ * Parameters:                                                                *
+ *             data_tags   - [IN] all tags and linked objects                 *
  *             uuid        - [IN] vmware object uuid                          *
  *             tag_name    - [IN] name of tags array                          *
  *             json_data   - [OUT] json document                              *
@@ -741,7 +742,8 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
  *                                                                            *
  * Purpose: updates json document with tags info by object id                 *
  *                                                                            *
- * Parameters: entity_tags - [IN] all tags and linked objects                 *
+ * Parameters:                                                                *
+ *             data_tags   - [IN]                                             *
  *             type        - [IN] HostSystem, VirtualMachine etc              *
  *             id          - [IN] id of hv, vm etc                            *
  *             tag_name    - [IN] name of tags array                          *
@@ -4314,7 +4316,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 				continue;
 
 			for (int j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
-				j < service->data->datastores.values_num; j++)
+					j < service->data->datastores.values_num; j++)
 			{
 				if (0 != strcmp(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID],
 						service->data->datastores.values[j]->id))

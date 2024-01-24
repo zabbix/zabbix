@@ -1448,13 +1448,11 @@ static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 		unsigned char *query_and_ignore_type, int num, int level, char *error, size_t max_error_len,
 		int *max_succeed, int *min_fail, unsigned char poller_type)
 {
-	int			j, status, ret = SUCCEED, mapping_num = 0;
+	int			status, ret = SUCCEED, mapping_num = 0;
 	int			mapping[ZBX_MAX_SNMP_ITEMS];
 	oid			parsed_oids[ZBX_MAX_SNMP_ITEMS][MAX_OID_LEN];
 	size_t			parsed_oid_lens[ZBX_MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
-	struct variable_list	*var;
-	unsigned char		val_type;
 	struct snmp_session	*ss;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __func__, num, level);
@@ -1494,8 +1492,6 @@ static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 		mapping[mapping_num++] = i;
 	}
 
-	int	i;
-
 	if (0 == mapping_num)
 	{
 		snmp_free_pdu(pdu);
@@ -1513,6 +1509,9 @@ retry:
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
+		struct variable_list	*var;
+		int			i;
+
 		for (i = 0, var = response->variables;; i++, var = var->next_variable)
 		{
 			/* check that response variable binding matches the request variable binding */
@@ -1550,7 +1549,7 @@ retry:
 				break;
 			}
 
-			j = mapping[i];
+			int	j = mapping[i];
 
 			if (parsed_oid_lens[j] != var->name_length ||
 					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
@@ -1579,6 +1578,7 @@ retry:
 			}
 
 			/* process received data */
+			unsigned char	val_type;
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
 				(void)zbx_snmp_set_result(var, &results[j], &val_type);
@@ -1605,7 +1605,7 @@ retry:
 		/* SNMPv2 allows SNMPv1 behavior, too. So regardless of the SNMP version used, if we get this error, */
 		/* then we fix the PDU by removing the bad variable and retry the request. */
 
-		i = response->errindex - 1;
+		int	i = response->errindex - 1;
 
 		if (0 > i || i >= mapping_num)
 		{
@@ -1618,7 +1618,7 @@ retry:
 			goto exit;
 		}
 
-		j = mapping[i];
+		int	j = mapping[i];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_sess_synch_response() errindex:%ld OID:'%s'", __func__,
 				response->errindex, oids[j]);
@@ -1674,15 +1674,13 @@ halve:
 		{
 			/* halve the number of items */
 
-			int	base;
-
 			ret = zbx_snmp_get_values(ssp, items, oids, results, errcodes, query_and_ignore_type, num / 2,
 					level + 1, error, max_error_len, max_succeed, min_fail, poller_type);
 
 			if (SUCCEED != ret)
 				goto exit;
 
-			base = num / 2;
+			int	base = num / 2;
 
 			ret = zbx_snmp_get_values(ssp, items + base, oids + base, results + base, errcodes + base,
 					NULL == query_and_ignore_type ? NULL : query_and_ignore_type + base, num - base,
@@ -1692,7 +1690,7 @@ halve:
 		{
 			/* resort to querying items one by one */
 
-			for (i = 0; i < num; i++)
+			for (int i = 0; i < num; i++)
 			{
 				if (SUCCEED != errcodes[i])
 					continue;
@@ -2818,7 +2816,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
 		unsigned char poller_type)
 {
-	int		j, k, ret, to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0, to_verify[ZBX_MAX_SNMP_ITEMS],
+	int		ret, to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0, to_verify[ZBX_MAX_SNMP_ITEMS],
 			to_verify_num = 0;
 	unsigned char	query_and_ignore_type[ZBX_MAX_SNMP_ITEMS];
 	char		to_verify_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX],
@@ -2889,7 +2887,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 
 		for (int i = 0; i < to_verify_num; i++)
 		{
-			j = to_verify[i];
+			int	j = to_verify[i];
 
 			if (SUCCEED != errcodes[j])
 				continue;
@@ -2902,9 +2900,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 			{
 				/* ready to construct the final OID with index */
 
-				size_t	len;
-
-				len = strlen(oids_translated[j]);
+				size_t	len = strlen(oids_translated[j]);
 
 				pl = strchr(items[j].snmp_oid, '[');
 
@@ -2925,9 +2921,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 	{
 		for (int i = 0; i < to_walk_num; i++)
 		{
-			int	errcode;
-
-			j = to_walk[i];
+			int	k, j = to_walk[i];
 
 			/* see whether this OID tree was already walked for another item */
 
@@ -2944,8 +2938,8 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 
 			cache_del_snmp_index_subtree(&items[j], oids_translated[j]);
 
-			errcode = zbx_snmp_walk(ssp, &items[j], oids_translated[j], error, max_error_len, max_succeed,
-					min_fail, num, bulk, zbx_snmp_walk_cache_cb, (void *)&items[j]);
+			int	errcode = zbx_snmp_walk(ssp, &items[j], oids_translated[j], error, max_error_len,
+					max_succeed, min_fail, num, bulk, zbx_snmp_walk_cache_cb, (void *)&items[j]);
 
 			if (NETWORK_ERROR == errcode)
 			{
@@ -2974,7 +2968,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 
 		for (int i = 0; i < to_walk_num; i++)
 		{
-			j = to_walk[i];
+			int	j = to_walk[i];
 
 			if (SUCCEED != errcodes[j])
 				continue;
