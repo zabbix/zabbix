@@ -3264,7 +3264,7 @@ static int	DBpatch_6050217(void)
 
 static int	DBpatch_6050218(void)
 {
-	const zbx_db_field_t	field = {"local_port", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"local_port", "10051", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("proxy", &field);
 }
