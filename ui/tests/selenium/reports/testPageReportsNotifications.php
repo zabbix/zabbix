@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 use Facebook\WebDriver\WebDriverBy;
 
 /**
- * @dataSource LoginUsers
+ * @dataSource LoginUsers, Actions, UserPermissions
  */
 class testPageReportsNotifications extends CLegacyWebTest {
 
@@ -41,7 +41,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['All'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => array_reverse(range(date("Y"), date("Y",strtotime("-11 year"))))
+			'year' => array_reverse(range(date("Y"), 2012))
 		];
 		$default_selected = [
 			'media_type' => 'All',

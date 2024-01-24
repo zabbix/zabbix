@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,6 +29,7 @@ typedef struct
 {
 	zbx_config_tls_t		*zbx_config_tls;
 	zbx_get_program_type_f		zbx_get_program_type_cb_arg;
+	zbx_get_progname_f		zbx_get_progname_cb_arg;
 	int				config_timeout;
 	int				workers_num;
 	const char			*config_source_ip;

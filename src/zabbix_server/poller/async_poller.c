@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 
 	/* don't try activating interface if there were no errors detected */
 	if (SUCCEED != item->ret || ZBX_INTERFACE_AVAILABLE_TRUE != item->interface.available ||
-			0 != item->interface.errors_from)
+			0 != item->interface.errors_from || item->version != item->interface.version)
 	{
 		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
 				&item->interface.interfaceid)))
@@ -77,6 +77,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		zbx_free(interface_status->key_orig);
 		interface_status->key_orig = item->key_orig;
 		item->key_orig = NULL;
+		interface_status->version = item->version;
 	}
 
 	if (SUCCEED == item->ret)
@@ -213,7 +214,7 @@ static void	async_wake(evutil_socket_t fd, short events, void *arg)
 	ZBX_UNUSED(arg);
 }
 
-static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
+static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, const char *zbx_progname)
 {
 	zbx_dc_item_t			*items = NULL;
 	AGENT_RESULT			*results;
@@ -233,11 +234,13 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 		else
 		{
 			zbx_unset_snmp_bulkwalk_options();
-			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num);
-			zbx_set_snmp_bulkwalk_options();
+			zbx_clear_cache_snmp(ZBX_PROCESS_TYPE_SNMP_POLLER, poller_config->process_num, zbx_progname);
+			zbx_set_snmp_bulkwalk_options(zbx_progname);
 			poller_config->clear_cache = 0;
 		}
 	}
+#else
+	ZBX_UNUSED(zbx_progname);
 #endif
 
 	zbx_async_manager_queue_get(poller_config->manager, &poller_items);
@@ -265,7 +268,9 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 			{
 	#ifdef HAVE_LIBCURL
 				errcodes[i] = zbx_async_check_httpagent(&items[i], &results[i],
-						poller_config->config_source_ip, poller_config->curl_handle);
+						poller_config->config_source_ip, poller_config->config_ssl_ca_location,
+						poller_config->config_ssl_cert_location,
+						poller_config->config_ssl_key_location, poller_config->curl_handle);
 	#else
 				errcodes[i] = NOTSUPPORTED;
 				SET_MSG_RESULT(&results[i], zbx_strdup(NULL, "Support for HTTP agent was not compiled in:"
@@ -281,7 +286,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config)
 			else
 			{
 	#ifdef HAVE_NETSNMP
-				zbx_set_snmp_bulkwalk_options();
+				zbx_set_snmp_bulkwalk_options(zbx_progname);
 
 				errcodes[i] = zbx_async_check_snmp(&items[i], &results[i], process_snmp_result,
 						poller_config, poller_config, poller_config->base, poller_config->dnsbase,
@@ -471,6 +476,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
 	time_t				last_stat_time;
+#ifdef HAVE_NETSNMP
+	time_t				last_snmp_engineid_hk_time = 0;
+#endif
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
 	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
@@ -523,7 +531,17 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 #endif
 	}
 	else
+	{
 		async_poller_dns_init(&poller_config, poller_args_in);
+
+#ifdef HAVE_NETSNMP
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
+		{
+			zbx_init_snmp_engineid_cache();
+			last_snmp_engineid_hk_time = time(NULL);
+		}
+#endif
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -540,7 +558,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 
 		if (ZBX_IS_RUNNING())
 		{
-			async_initiate_queued_checks(&poller_config);
+			if (FAIL == zbx_vps_monitor_capped())
+				async_initiate_queued_checks(&poller_config, poller_args_in->zbx_get_progname_cb_arg());
+
 			zbx_async_manager_requeue_flush(poller_config.manager);
 			zbx_async_manager_interfaces_flush(poller_config.manager, &poller_config.interfaces);
 		}
@@ -552,9 +572,9 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		{
 			zbx_update_env(get_process_type_string(process_type), zbx_time());
 
-			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec]",
+			zbx_setproctitle("%s #%d [got %d values, queued %d in 5 sec%s]",
 				get_process_type_string(process_type), process_num, poller_config.processed,
-				poller_config.queued);
+				poller_config.queued, zbx_vps_monitor_status());
 
 			poller_config.processed = 0;
 			poller_config.queued = 0;
@@ -576,10 +596,28 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 			}
 #endif
 		}
+
+#ifdef HAVE_NETSNMP
+#define	SNMP_ENGINEID_HK_INTERVAL	86400
+		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
+				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+		{
+			last_snmp_engineid_hk_time = time(NULL);
+			zbx_housekeep_snmp_engineid_cache();
+		}
+#undef SNMP_ENGINEID_HK_INTERVAL
+#endif
 	}
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+	{
+#ifdef HAVE_NETSNMP
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
+			zbx_destroy_snmp_engineid_cache();
+#endif
+
 		async_poller_dns_destroy(&poller_config);
+	}
 
 	event_del(rtc_event);
 	async_poller_stop(&poller_config);

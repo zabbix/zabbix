@@ -28,6 +28,22 @@ return [
 			]
 		]
 	],
+	'ugset' => [
+		'key' => 'ugsetid',
+		'fields' => [
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'hash' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
+			]
+		]
+	],
 	'users' => [
 		'key' => 'userid',
 		'fields' => [
@@ -190,6 +206,22 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'hgset' => [
+		'key' => 'hgsetid',
+		'fields' => [
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20
+			],
+			'hash' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
 			]
 		]
 	],
@@ -398,6 +430,44 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			]
+		]
+	],
+	'hgset_group' => [
+		'key' => 'hgsetid,groupid',
+		'fields' => [
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hgset',
+				'ref_field' => 'hgsetid'
+			],
+			'groupid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hstgrp',
+				'ref_field' => 'groupid'
+			]
+		]
+	],
+	'host_hgset' => [
+		'key' => 'hostid',
+		'fields' => [
+			'hostid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hosts',
+				'ref_field' => 'hostid'
+			],
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hgset',
+				'ref_field' => 'hgsetid'
 			]
 		]
 	],
@@ -1141,8 +1211,7 @@ return [
 			],
 			'query_fields' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 2048,
+				'type' => DB::FIELD_TYPE_NCLOB,
 				'default' => ''
 			],
 			'posts' => [
@@ -1243,12 +1312,6 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => ''
-			],
-			'name_upper' => [
-				'null' => false,
-				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 255,
 				'default' => ''
 			]
 		]
@@ -1622,6 +1685,44 @@ return [
 			]
 		]
 	],
+	'ugset_group' => [
+		'key' => 'ugsetid,usrgrpid',
+		'fields' => [
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'ugset',
+				'ref_field' => 'ugsetid'
+			],
+			'usrgrpid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'usrgrp',
+				'ref_field' => 'usrgrpid'
+			]
+		]
+	],
+	'user_ugset' => [
+		'key' => 'userid',
+		'fields' => [
+			'userid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'users',
+				'ref_field' => 'userid'
+			],
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'ugset',
+				'ref_field' => 'ugsetid'
+			]
+		]
+	],
 	'scripts' => [
 		'key' => 'scriptid',
 		'fields' => [
@@ -1749,6 +1850,36 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '1'
+			],
+			'manualinput' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'manualinput_prompt' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
+			],
+			'manualinput_validator' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'manualinput_validator_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
+			],
+			'manualinput_default_value' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
+				'default' => ''
 			]
 		]
 	],
@@ -2450,7 +2581,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '365d'
+				'default' => '31d'
 			],
 			'hk_sessions_mode' => [
 				'null' => false,
@@ -2480,7 +2611,7 @@ return [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 32,
-				'default' => '90d'
+				'default' => '31d'
 			],
 			'hk_trends_mode' => [
 				'null' => false,
@@ -3610,6 +3741,31 @@ return [
 				'length' => 20,
 				'ref_table' => 'hstgrp',
 				'ref_field' => 'groupid'
+			]
+		]
+	],
+	'permission' => [
+		'key' => 'ugsetid,hgsetid',
+		'fields' => [
+			'ugsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'ugset',
+				'ref_field' => 'ugsetid'
+			],
+			'hgsetid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'hgset',
+				'ref_field' => 'hgsetid'
+			],
+			'permission' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '2'
 			]
 		]
 	],
@@ -6425,6 +6581,30 @@ return [
 				'default' => '0'
 			],
 			'error' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			]
+		]
+	],
+	'item_rtname' => [
+		'key' => 'itemid',
+		'fields' => [
+			'itemid' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_ID,
+				'length' => 20,
+				'ref_table' => 'items',
+				'ref_field' => 'itemid'
+			],
+			'name_resolved' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
+			],
+			'name_resolved_upper' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
 				'length' => 2048,
@@ -9665,6 +9845,18 @@ return [
 				'type' => DB::FIELD_TYPE_INT,
 				'length' => 10,
 				'default' => '0'
+			],
+			'item_value_type' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '31'
+			],
+			'attempt_interval' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 32,
+				'default' => '5s'
 			]
 		]
 	],

@@ -34,6 +34,7 @@ check_service_test_SOURCES = \
 	../../zbxmockdir.c
 
 parse_item_key_LDADD = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
@@ -48,7 +49,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
+	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -101,6 +102,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/libs/zbxnum/libzbxnum.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
+	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 if HAVE_IPMI
@@ -155,6 +157,7 @@ endif
 
 if AGENT
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \

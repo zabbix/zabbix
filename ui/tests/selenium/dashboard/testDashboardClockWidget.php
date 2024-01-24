@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,14 +23,17 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../common/testWidgets.php';
 
 /**
  * @backup widget, profiles
  *
+ * @dataSource AllItemValueTypes
+ *
  * @onBefore prepareClockWidgetData
  */
 
-class testDashboardClockWidget extends CWebTest {
+class testDashboardClockWidget extends testWidgets {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -232,7 +235,7 @@ class testDashboardClockWidget extends CWebTest {
 			/**
 			 * If the clock widgets type equals to "Host time", then additional field appears - 'Item',
 			 * which requires to select item of the "Host", in this case array_splice function allows us to put
-			 * this fields name into the array. Positive offset (4) starts from the beginning of the array,
+			 * this fields name into the array. Positive offset (5) starts from the beginning of the array,
 			 * while - (0) length parameter - specifies how many elements will be removed.
 			 */
 			if ($type === 'Host time') {
@@ -241,7 +244,7 @@ class testDashboardClockWidget extends CWebTest {
 				$form->isRequired('Item');
 			}
 
-			$this->assertEquals($fields, $form->getLabels(CElementFilter::VISIBLE)->asText());
+			$this->assertEquals($fields, array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
 		}
 
 		// Check if Apply and Cancel button are clickable and there are two of them.
@@ -250,7 +253,7 @@ class testDashboardClockWidget extends CWebTest {
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 
-		// Check fileds' visibility depending on Analog or Digital clock type.
+		// Check fields' visibility depending on Analog or Digital clock type.
 		foreach (['Analog' => false, 'Digital' => true] as $type => $status) {
 			$form->fill(['Clock type' => $type]);
 
@@ -291,7 +294,7 @@ class testDashboardClockWidget extends CWebTest {
 					// This is Time zone field found by xpath, because we have one more field with Time zone label.
 					'xpath:.//div[@class="fields-group fields-group-tzone"]' => ['id:tzone_size' => 20,
 							'id:tzone_bold' => false, 'id:tzone_color' => null,
-							'id:tzone_timezone' => 'Local default: (UTC+02:00) Europe/Riga',
+							'id:tzone_timezone' => 'Local default: '.CDateTimeHelper::getTimeZoneFormat('Europe/Riga'),
 							'id:tzone_format' => 'Short'
 					]
 				];
@@ -1209,5 +1212,13 @@ class testDashboardClockWidget extends CWebTest {
 			' ON w.widgetid=wf.widgetid'.
 			' WHERE w.name='.zbx_dbstr('DeleteClock')
 		));
+	}
+
+	/**
+	 * Check if binary items are not available for Clock widget.
+	 */
+	public function testDashboardClockWidget_CheckAvailableItems() {
+		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid['Dashboard for updating clock widgets'];
+		$this->checkAvailableItems($url, 'Clock');
 	}
 }

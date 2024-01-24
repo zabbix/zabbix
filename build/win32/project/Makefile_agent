@@ -80,6 +80,7 @@ OBJS = \
 	..\..\..\src\libs\zbxhttp\http.o \
 	..\..\..\src\libs\zbxhttp\punycode.o \
 	..\..\..\src\libs\zbxhttp\urlencode.o \
+	..\..\..\src\libs\zbxhttp\charset.o \
 	..\..\..\src\libs\zbxsysinfo\agent\agent.o \
 	..\..\..\src\libs\zbxsysinfo\agent\modbus.o \
 	..\..\..\src\libs\zbxsysinfo\common\zbxsysinfo_common.o \
@@ -90,6 +91,7 @@ OBJS = \
 	..\..\..\src\libs\zbxsysinfo\common\http.o \
 	..\..\..\src\libs\zbxsysinfo\common\http_metrics.o \
 	..\..\..\src\libs\zbxsysinfo\common\net.o \
+	..\..\..\src\libs\zbxsysinfo\common\ip_reverse.o \
 	..\..\..\src\libs\zbxsysinfo\common\dns.o \
 	..\..\..\src\libs\zbxsysinfo\common\system.o \
 	..\..\..\src\libs\zbxsysinfo\common\zabbix_stats.o \

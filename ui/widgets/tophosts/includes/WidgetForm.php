@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -141,22 +141,22 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
 			)
 			->addField(
-				(new CWidgetFieldRadioButtonList('order', _('Order'), [
-					Widget::ORDER_TOP_N => _('Top N'),
-					Widget::ORDER_BOTTOM_N => _('Bottom N')
-				]))->setDefault(Widget::ORDER_TOP_N)
-			)
-			->addField(
-				(new CWidgetFieldSelect('column', _('Order column'), $this->field_column_values))
+				(new CWidgetFieldSelect('column', _('Order by'), $this->field_column_values))
 					->setDefault($this->field_column_values
 						? self::DEFAULT_ORDER_COLUMN
 						: CWidgetFieldSelect::DEFAULT_VALUE
 					)
 					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('order', _('Order'), [
+					Widget::ORDER_TOP_N => _('Top N'),
+					Widget::ORDER_BOTTOM_N => _('Bottom N')
+				]))->setDefault(Widget::ORDER_TOP_N)
+			)
 			->addField($this->isTemplateDashboard()
 				? null
-				: (new CWidgetFieldIntegerBox('show_lines', _('Host count'), ZBX_MIN_WIDGET_LINES,
+				: (new CWidgetFieldIntegerBox('show_lines', _('Host limit'), ZBX_MIN_WIDGET_LINES,
 					ZBX_MAX_WIDGET_LINES
 				))
 					->setDefault(self::DEFAULT_HOSTS_COUNT)

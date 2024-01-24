@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -136,21 +136,22 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
  *                                                                              *
  * Purpose: activate item interface                                             *
  *                                                                              *
- * Parameters: ts         - [IN] the timestamp                                  *
- *             item       - [IN/OUT] the item                                   *
- *             data       - [IN/OUT] the serialized availability data           *
- *             data_alloc - [IN/OUT] the serialized availability data size      *
- *             data_alloc - [IN/OUT] the serialized availability data offset    *
- *             ts         - [IN] the timestamp                                  *
+ * Parameters: ts          - [IN] the timestamp                                 *
+ *             item        - [IN/OUT] the item                                  *
+*              version     - [IN/OUT] interface version                         *
+ *             data        - [IN/OUT] the serialized availability data          *
+ *             data_alloc  - [IN/OUT] the serialized availability data size     *
+ *             data_offset - [IN/OUT] the serialized availability data offset   *
+ *             ts          - [IN] the timestamp                                 *
  *                                                                              *
  *******************************************************************************/
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
-		char *host, unsigned char **data, size_t *data_alloc, size_t *data_offset)
+		char *host, int version, unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
 	zbx_interface_availability_t	in, out;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d",
-			__func__, interface->interfaceid, itemid, (int)type);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() interfaceid:" ZBX_FS_UI64 " itemid:" ZBX_FS_UI64 " type:%d version:%x",
+			__func__, interface->interfaceid, itemid, (int)type, version);
 
 	zbx_interface_availability_init(&in, interface->interfaceid);
 	zbx_interface_availability_init(&out, interface->interfaceid);
@@ -159,6 +160,9 @@ void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interfa
 		goto out;
 
 	interface_get_availability(interface, &in);
+
+	if (INTERFACE_TYPE_AGENT == interface->type && version != interface->version)
+		zbx_dc_set_interface_version(interface->interfaceid, version);
 
 	if (FAIL == zbx_dc_interface_activate(interface->interfaceid, ts, &in.agent, &out.agent))
 		goto out;

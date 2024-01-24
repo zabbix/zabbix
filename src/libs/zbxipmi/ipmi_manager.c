@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -641,7 +641,7 @@ static void	ipmi_manager_activate_interface(zbx_ipmi_manager_t *manager, zbx_uin
 
 	if (SUCCEED == errcode)
 	{
-		zbx_activate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, &data,
+		zbx_activate_item_interface(ts, &item.interface, item.itemid, item.type, item.host.host, 0, &data,
 				&data_alloc, &data_offset);
 		ipmi_manager_update_host(manager, &item.interface, item.host.hostid);
 	}
@@ -1015,16 +1015,21 @@ ZBX_THREAD_ENTRY(zbx_ipmi_manager_thread, args)
 		}
 
 		/* manager -> client */
-		scheduled_num += ipmi_manager_schedule_requests(&ipmi_manager, now,
-				ipmi_manager_args_in->config_timeout, &tmp);
-		time_t nextcheck = (time_t)tmp;
+		if (FAIL == zbx_vps_monitor_capped())
+		{
+			scheduled_num += ipmi_manager_schedule_requests(&ipmi_manager, now,
+					ipmi_manager_args_in->config_timeout, &tmp);
+			time_t nextcheck = (time_t)tmp;
 
-		if (FAIL != tmp)
-			timeout.sec = (nextcheck > now ? nextcheck - now : 0);
+			if (FAIL != tmp)
+				timeout.sec = (nextcheck > now ? nextcheck - now : 0);
+			else
+				timeout.sec = ZBX_IPMI_MANAGER_DELAY;
+
+			if (ZBX_IPMI_MANAGER_DELAY < timeout.sec)
+				timeout.sec = ZBX_IPMI_MANAGER_DELAY;
+		}
 		else
-			timeout.sec = ZBX_IPMI_MANAGER_DELAY;
-
-		if (ZBX_IPMI_MANAGER_DELAY < timeout.sec)
 			timeout.sec = ZBX_IPMI_MANAGER_DELAY;
 
 		zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_IDLE);

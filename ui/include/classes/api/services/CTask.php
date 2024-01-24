@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -514,13 +514,14 @@ class CTask extends CApiService {
 		$itemid_mapping = array_combine($itemids, $itemids);
 
 		// Check permissions.
-		$items = API::Item()->get([
-			'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
+		$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+			'output' => ['type', 'name_resolved', 'status', 'flags', 'master_itemid'],
 			'selectHosts' => ['name', 'status'],
 			'itemids' => $itemids,
+			'templated' => false,
 			'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 			'preservekeys' => true
-		]);
+		]), ['name_resolved' => 'name']);
 
 		$itemids_cnt = count($itemids);
 
@@ -529,6 +530,7 @@ class CTask extends CApiService {
 				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
+				'templated' => false,
 				'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 				'preservekeys' => true
 			]);
@@ -643,25 +645,25 @@ class CTask extends CApiService {
 
 		// If some items were not found in cache, select them from DB.
 		if ($itemids) {
-			$items_db = API::Item()->get([
-				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
+			$db_items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['type', 'name_resolved', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => !self::checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
-			if (!$items_db) {
+			if (!$db_items) {
 				self::exception(ZBX_API_ERROR_PERMISSIONS,
 					_('No permissions to referred object or it does not exist!')
 				);
 			}
 
 			// Add newly found items to cache.
-			$this->item_cache += $items_db;
+			$this->item_cache += $db_items;
 
 			// Append newly found items to items requested from cache.
-			$items += $items_db;
+			$items += $db_items;
 		}
 
 		// Return only requested items either from cache or DB.

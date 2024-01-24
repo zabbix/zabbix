@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,6 +96,8 @@ window.item_edit_form = new class {
 		this.updateFieldsVisibility();
 
 		this.initial_form_fields = this.#getFormFields(this.form);
+		this.form.style.display = '';
+		this.overlay.recoverFocus();
 	}
 
 	initForm(field_switches) {
@@ -416,19 +418,14 @@ window.item_edit_form = new class {
 
 				case 'query_fields':
 				case 'headers':
-					for (const [i, param] of Object.entries(fields[key])) {
-						fields[key][i] = {
-							name: param.name.trim(),
-							value: param.value.trim(),
-							sortorder: param.sortorder
-						}
-					}
-
-					break;
+					fields[key] = Object.values(fields[key]).sort(
+						(a, b) => parseFloat(a.sortorder) - parseFloat(b.sortorder)
+					);
+					// falls through
 
 				case 'parameters':
-					for (const [i, param] of Object.entries(fields.parameters)) {
-						fields.parameters[i] = {name: param.name.trim(), value: param.value.trim()}
+					for (const [i, param] of Object.entries(fields[key])) {
+						fields[key][i] = {name: param.name.trim(), value: param.value.trim()}
 					}
 
 					break;

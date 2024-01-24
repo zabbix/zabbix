@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -316,7 +316,6 @@ static void	parse_traps(int flag)
 			*pzaddr = '\0';
 
 			process_trap(addr, begin, end);
-			end = NULL;
 		}
 
 		/* parse the current trap */
@@ -618,13 +617,18 @@ ZBX_THREAD_ENTRY(zbx_snmptrapper_thread, args)
 
 		zbx_setproctitle("%s [processing data]", get_process_type_string(process_type));
 
-		while (ZBX_IS_RUNNING() && SUCCEED == get_latest_data(snmptrapper_args_in->config_snmptrap_file))
+		while (ZBX_IS_RUNNING() && FAIL == zbx_vps_monitor_capped())
+		{
+			if (SUCCEED != get_latest_data(snmptrapper_args_in->config_snmptrap_file))
+				break;
+
 			read_traps(snmptrapper_args_in->config_snmptrap_file);
+		}
 
 		sec = zbx_time() - sec;
 
-		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec]",
-				get_process_type_string(process_type), sec);
+		zbx_setproctitle("%s [processed data in " ZBX_FS_DBL " sec, idle 1 sec%s]",
+				get_process_type_string(process_type), sec, zbx_vps_monitor_status());
 
 		zbx_sleep_loop(info, 1);
 	}

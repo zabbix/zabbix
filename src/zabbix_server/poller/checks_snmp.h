@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,15 +35,15 @@
 
 typedef struct zbx_snmp_context	zbx_snmp_context_t;
 
-void	zbx_init_library_mt_snmp(void);
-void	zbx_shutdown_library_mt_snmp(void);
+void	zbx_init_library_mt_snmp(const char *progname);
+void	zbx_shutdown_library_mt_snmp(const char *progname);
 
 int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
-		const char *config_source_ip);
-void	get_values_snmp( zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		unsigned char poller_type, const char *config_source_ip);
+		const char *config_source_ip, const char *progname);
+void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
+		unsigned char poller_type, const char *config_source_ip, const char *progname);
 
-void	zbx_clear_cache_snmp(unsigned char process_type, int process_num);
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname);
 
 int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_task_clear_cb_t clear_cb,
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
@@ -52,8 +52,12 @@ zbx_dc_item_context_t	*zbx_async_check_snmp_get_item_context(zbx_snmp_context_t 
 void	*zbx_async_check_snmp_get_arg(zbx_snmp_context_t *snmp_context);
 void	zbx_async_check_snmp_clean(zbx_snmp_context_t *snmp_context);
 
-void	zbx_set_snmp_bulkwalk_options(void);
+void	zbx_set_snmp_bulkwalk_options(const char *progname);
 void	zbx_unset_snmp_bulkwalk_options(void);
+void	zbx_init_snmp_engineid_cache(void);
+void	zbx_clear_snmp_engineid_cache(void);
+void	zbx_destroy_snmp_engineid_cache(void);
+void	zbx_housekeep_snmp_engineid_cache(void);
 
 #endif
 

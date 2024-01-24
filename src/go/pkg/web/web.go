@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,15 @@ import (
 	"bytes"
 	"crypto/tls"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/log"
+	"golang.org/x/net/html/charset"
+	"golang.org/x/text/transform"
 	"zabbix.com/internal/agent"
 	"zabbix.com/pkg/version"
 )
@@ -37,7 +41,7 @@ import (
 func Get(url string, timeout time.Duration, dump bool) (string, error) {
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
-		return "", fmt.Errorf("Cannot create new request: %s", err)
+		return "", fmt.Errorf("Cannot create new request: %w", err)
 	}
 
 	req.Header = map[string][]string{
@@ -59,7 +63,7 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 
 	resp, err := client.Do(req)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %s", err)
+		return "", fmt.Errorf("Cannot get content of web page: %w", err)
 	}
 
 	defer resp.Body.Close()
@@ -68,12 +72,30 @@ func Get(url string, timeout time.Duration, dump bool) (string, error) {
 		return "", nil
 	}
 
-	b, err := httputil.DumpResponse(resp, true)
+	b, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return "", fmt.Errorf("Cannot get content of web page: %s", err)
+		return "", fmt.Errorf("Cannot get content of web page: %w", err)
 	}
 
-	return string(bytes.TrimRight(b, "\r\n")), nil
+	e, name, _ := charset.DetermineEncoding(b, resp.Header.Get("content-type"))
+	if err != nil {
+		return "", nil
+	}
+
+	log.Debugf("determined encoding '%s'", name)
+
+	r := transform.NewReader(bytes.NewReader(b), e.NewDecoder())
+
+	b, err = io.ReadAll(r)
+	if err != nil {
+		return "", fmt.Errorf("Cannot decode content of web page: %w", err)
+	}
+	h, err := httputil.DumpResponse(resp, false)
+	if err != nil {
+		return "", fmt.Errorf("Cannot get header of web page: %w", err)
+	}
+
+	return string(h) + string(b), nil
 }
 
 func disableRedirect(req *http.Request, via []*http.Request) error {

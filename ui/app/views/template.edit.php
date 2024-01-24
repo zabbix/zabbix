@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -326,7 +326,7 @@ else {
 }
 
 $tabs = (new CTabView(['id' => 'template-tabs']))
-	->addTab('template-tab', _('Templates'), $template_tab)
+	->addTab('template-tab', _('Template'), $template_tab)
 	->addTab('template-tags-tab', _('Tags'), $tags_tab, TAB_INDICATOR_TAGS)
 	->addTab('template-macro-tab', _('Macros'),$macros_tab, TAB_INDICATOR_TEMPLATE_MACROS)
 	->addTab('template-valuemap-tab', _('Value mapping'), $valuemap_tab, TAB_INDICATOR_TEMPLATE_VALUEMAPS)

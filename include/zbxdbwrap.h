@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,6 +91,11 @@ void	zbx_db_add_host_inventory(zbx_uint64_t hostid, int inventory_mode);
 
 void	zbx_db_delete_groups(zbx_vector_uint64_t *groupids);
 
+void	zbx_host_groups_add(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+void	zbx_host_groups_remove(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids);
+
+void	zbx_hgset_hash_calculate(zbx_vector_uint64_t *groupids, char *hash_str, size_t hash_len);
+
 zbx_uint64_t	zbx_db_add_interface(zbx_uint64_t hostid, unsigned char type, unsigned char useip,
 		const char *ip, const char *dns, unsigned short port, zbx_conn_flags_t flags);
 void	zbx_db_add_interface_snmp(const zbx_uint64_t interfaceid, const unsigned char version,
@@ -136,7 +141,6 @@ char	*zbx_db_get_user_timezone(zbx_uint64_t userid);
 
 const char	*zbx_permission_string(int perm);
 int	zbx_get_user_info(zbx_uint64_t userid, zbx_uint64_t *roleid, char **user_timezone);
-int	zbx_get_hostgroups_permission(zbx_uint64_t userid, zbx_vector_uint64_t *hostgroupids);
 int	zbx_get_item_permission(zbx_uint64_t userid, zbx_uint64_t itemid, char **user_timezone);
 int	zbx_get_host_permission(const zbx_user_t *user, zbx_uint64_t hostid);
 

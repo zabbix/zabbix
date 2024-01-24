@@ -176,7 +176,7 @@ out:
   par_l: 4
   par_r: 48
 ---
-test case: "function with LLD function"
+test case: "function with LLD function 1"
 in:
   param: '{{#VALUE}.regsub([0-9]+, \0)}+avg("Zabbix server:trap[\"{{#VALUE}.regsub([0-9]+, \0)}\"]",600) + {{#VALUE}.regsub([0-9], \0)}'
 out:
@@ -184,6 +184,33 @@ out:
   func_pos: 30
   par_l: 33
   par_r: 93
+---
+test case: "function with LLD function 2"
+in:
+  param: '{{#VALUE}.iregsub([0-9]+, \0)}+avg("Zabbix server:trap[\"{{#VALUE}.iregsub([0-9]+, \0)}\"]",600) + {{#VALUE}.iregsub([0-9], \0)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 31
+  par_l: 34
+  par_r: 95
+---
+test case: "function with LLD function 3"
+in:
+  param: '{{#VALUE}.fmttime(%B, -1M)}+avg("Zabbix server:trap[\"{{#VALUE}.fmttime(%B, -1M)}\"]",600) + {{#VALUE}.fmttime(%B, -1M)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 28
+  par_l: 31
+  par_r: 89
+---
+test case: "function with LLD function 4"
+in:
+  param: '{{#VALUE}.fmtnum(2)}+avg("Zabbix server:trap[\"{{#VALUE}.fmtnum(2)}\"]",600) + {{#VALUE}.fmtnum(2)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 21
+  par_l: 24
+  par_r: 75
 ---
 test case: "function with LLD function in macro context"
 in:
@@ -193,6 +220,15 @@ out:
   func_pos: 41
   par_l: 44
   par_r: 104
+---
+test case: "function with LLD function in macro context"
+in:
+  param: '{$MACRO:"{{#VALUE}.iregsub([0-9]+, \0)}"}+avg("Zabbix server:trap[\"{{#VALUE}.regsub([0-9]+, \0)}\"]",600) + {{#VALUE}.regsub([0-9], \0)}'
+out:
+  return: 'SUCCEED'
+  func_pos: 42
+  par_l: 45
+  par_r: 105
 ---
 test case: "function with LLD function double escaped"
 in:

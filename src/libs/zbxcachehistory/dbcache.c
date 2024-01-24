@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1263,6 +1263,14 @@ static void	DCexport_trends(const ZBX_DC_TREND *trends, int trends_num, zbx_hash
 	zbx_json_free(&json);
 }
 
+static int	match_item_value_type_by_mask(int mask, const zbx_history_sync_item_t *item)
+{
+	if (0 != (mask & (1 << item->value_type)))
+		return SUCCEED;
+
+	return FAIL;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: export history                                                    *
@@ -1321,7 +1329,8 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 			for (k = 0; k < connector_filters->values_num; k++)
 			{
-				if (SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
+				if (SUCCEED == match_item_value_type_by_mask(connector_filters->values[k].item_value_type,
+						item) && SUCCEED == zbx_match_tags(connector_filters->values[k].tags_evaltype,
 						&connector_filters->values[k].connector_tags, &item_info->item_tags))
 				{
 					zbx_vector_uint64_append(&connector_object.ids,
@@ -1335,7 +1344,7 @@ static void	DCexport_history(const zbx_dc_history_t *history, int history_num, z
 
 		zbx_json_clean(&json);
 
-		zbx_json_addobject(&json,ZBX_PROTO_TAG_HOST);
+		zbx_json_addobject(&json, ZBX_PROTO_TAG_HOST);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_HOST, item->host.host, ZBX_JSON_TYPE_STRING);
 		zbx_json_addstring(&json, ZBX_PROTO_TAG_NAME, item->host.name, ZBX_JSON_TYPE_STRING);
 		zbx_json_close(&json);
@@ -2571,6 +2580,8 @@ static int	DBmass_add_history(zbx_dc_history_t *history, int history_num)
 		if (SUCCEED == (ret = add_history(history, history_num, &history_values, &ret_flush)))
 			zabbix_log(LOG_LEVEL_WARNING, "skipped %d duplicates", num - history_values.values_num);
 	}
+
+	zbx_vps_monitor_add_written((zbx_uint64_t)history_values.values_num);
 
 	zbx_vector_ptr_destroy(&history_values);
 
@@ -3930,7 +3941,22 @@ void	zbx_dc_add_history_variant(zbx_uint64_t itemid, unsigned char value_type, u
 	{
 		zbx_log_t	log;
 
-		zbx_variant_convert(value, ZBX_VARIANT_STR);
+		if (FAIL == zbx_variant_convert(value, ZBX_VARIANT_STR))
+		{
+			char	*error;
+
+			zabbix_log(LOG_LEVEL_CRIT, "cannot convert value from %s to %s",
+					zbx_variant_type_desc(value), zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+			THIS_SHOULD_NEVER_HAPPEN;
+
+			error = zbx_dsprintf(NULL, "Cannot convert value from %s to %s.",
+					zbx_variant_type_desc(value), zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+			dc_local_add_history_notsupported(itemid, &ts, error, lastlogsize, mtime,
+					value_flags);
+			zbx_free(error);
+
+			return;
+		}
 
 		log.logeventid = value_opt->logeventid;
 		log.severity = value_opt->severity;
@@ -3986,6 +4012,8 @@ void	zbx_dc_flush_history(void)
 	cache->history_num += item_values_num;
 
 	UNLOCK_CACHE;
+
+	zbx_vps_monitor_add_collected((zbx_uint64_t)item_values_num);
 
 	item_values_num = 0;
 	string_values_offset = 0;

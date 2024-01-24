@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,6 +193,27 @@ class CIPParserTest extends TestCase {
 				]
 			],
 			[
+				'{{$M}.regsub("^([0-9]+)", \1)}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{{$M: "context"}.regsub("^([0-9]+)", \1)}', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{$M: "context"}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
+				'{{$M}.regsub("^([0-9]+)", \1)}TEXT', 0, ['v6' => true, 'usermacros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS_CONT,
+					'match' => '{{$M}.regsub("^([0-9]+)", \1)}'
+				]
+			],
+			[
 				'text{$MACRO}', 4, ['v6' => true, 'usermacros' => true],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -263,6 +284,13 @@ class CIPParserTest extends TestCase {
 				]
 			],
 			[
+				'{{HOST.HOST}.func()}', 0, ['v6' => true, 'usermacros' => true, 'lldmacros' => true, 'macros' => true],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{HOST.HOST}.func()}'
+				]
+			],
+			[
 				'{HOST.HOST}', 0, ['v6' => true, 'macros' => []],
 				[
 					'rc' => CParser::PARSE_FAIL,
@@ -281,6 +309,13 @@ class CIPParserTest extends TestCase {
 				[
 					'rc' => CParser::PARSE_SUCCESS,
 					'match' => '{HOST.HOST}'
+				]
+			],
+			[
+				'{{HOST.HOST}.func()}', 0, ['v6' => true, 'macros' => ['{HOST.NAME}', '{HOST.HOST}', '{HOST.DNS}']],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => '{{HOST.HOST}.func()}'
 				]
 			],
 			[

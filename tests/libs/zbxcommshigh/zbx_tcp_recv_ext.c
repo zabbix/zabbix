@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ void	zbx_mock_test_entry(void **state)
 	if (0 == received)
 		return;
 
-	buffer = zbx_yaml_assemble_binary_sequence("out.fragments", received);
+	buffer = zbx_yaml_assemble_binary_sequence("out.fragments", &received);
 
 	if (0 != (ZBX_TCP_LARGE & s.protocol))
 		offset += 8;

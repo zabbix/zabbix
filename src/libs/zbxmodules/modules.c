@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,7 +99,7 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 {
 	if (NULL != history_write_cbs.history_float_cb)
 	{
-		int	j = 0;
+		size_t	j = 0;
 
 		if (NULL == history_float_cbs)
 		{
@@ -120,7 +120,7 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 	if (NULL != history_write_cbs.history_integer_cb)
 	{
-		int	j = 0;
+		size_t	j = 0;
 
 		if (NULL == history_integer_cbs)
 		{
@@ -141,7 +141,7 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 	if (NULL != history_write_cbs.history_string_cb)
 	{
-		int	j = 0;
+		size_t	j = 0;
 
 		if (NULL == history_string_cbs)
 		{
@@ -162,7 +162,7 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 	if (NULL != history_write_cbs.history_text_cb)
 	{
-		int	j = 0;
+		size_t	j = 0;
 
 		if (NULL == history_text_cbs)
 		{
@@ -183,7 +183,7 @@ static void	zbx_register_history_write_cbs(zbx_module_t *module, ZBX_HISTORY_WRI
 
 	if (NULL != history_write_cbs.history_log_cb)
 	{
-		int	j = 0;
+		size_t	j = 0;
 
 		if (NULL == history_log_cbs)
 		{
@@ -252,7 +252,7 @@ static int	zbx_load_module(const char *path, char *name, int timeout)
 	module_tmp.lib = lib;
 	if (FAIL != zbx_vector_ptr_search(&modules, &module_tmp, zbx_module_compare_func))
 	{
-		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already beed loaded", name);
+		zabbix_log(LOG_LEVEL_DEBUG, "module \"%s\" has already been loaded", name);
 		return SUCCEED;
 	}
 

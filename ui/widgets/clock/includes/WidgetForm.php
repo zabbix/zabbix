@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,6 +59,10 @@ class WidgetForm extends CWidgetForm {
 			return $errors;
 		}
 
+		if ($this->getFieldValue('time_type') == TIME_TYPE_HOST && !$this->getFieldValue('itemid')) {
+			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Item'), _('cannot be empty'));
+		}
+
 		if ($this->getFieldValue('clock_type') == Widget::TYPE_DIGITAL && !$this->getFieldValue('show')) {
 			$errors[] = _s('Invalid parameter "%1$s": %2$s.', _('Show'), _('at least one option must be selected'));
 		}
@@ -77,11 +81,10 @@ class WidgetForm extends CWidgetForm {
 					TIME_TYPE_HOST => _('Host time')
 				]))->setDefault(TIME_TYPE_LOCAL)
 			)
-			->addField($time_type == TIME_TYPE_HOST
-				? (new CWidgetFieldMultiSelectItem('itemid', _('Item')))
-					->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
+			->addField(
+				(new CWidgetFieldMultiSelectItem('itemid', _('Item')))
+					->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 					->setMultiple(false)
-				: null
 			)
 			->addField(
 				(new CWidgetFieldRadioButtonList('clock_type', _('Clock type'), [

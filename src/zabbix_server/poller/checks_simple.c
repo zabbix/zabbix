@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -217,6 +217,7 @@ int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector
 	}
 
 	request.lastlogsize = item->lastlogsize;
+	request.timeout = item->timeout;
 
 	if (0 == strcmp(request.key, "net.tcp.service") || 0 == strcmp(request.key, "net.udp.service"))
 	{

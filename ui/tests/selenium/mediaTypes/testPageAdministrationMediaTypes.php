@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,8 +25,15 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup media_type
+ *
+ * @dataSource Actions
+ *
+ * @onBefore prepareActionData
  */
 class testPageAdministrationMediaTypes extends CWebTest {
+
+	const ZABBIX_ADMIN_GROUPID = 7;
+	const EMAIL_MEDIATYPEID = 1;
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -41,6 +48,26 @@ class testPageAdministrationMediaTypes extends CWebTest {
 	}
 
 	private static $media_name = 'Email';
+
+	public static function prepareActionData() {
+		CDataHelper::call('action.create', [
+			[
+				'name' => 'Action with email',
+				'eventsource' => EVENT_SOURCE_TRIGGERS,
+				'filter' => [
+					'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+					'conditions' => []
+				],
+				'operations' => [
+					[
+						'operationtype' => OPERATION_TYPE_MESSAGE,
+						'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+						'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+					]
+				]
+			]
+		]);
+	}
 
 	/**
 	 * Check basic elements on page.
@@ -150,7 +177,7 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					'filter' => [
 						'Name' => 'Jira '
 					],
-					'result' => ['Jira ServiceDesk', 'Jira with CustomFields']
+					'result' => ['Jira ServiceDesk']
 				]
 			],
 			[
@@ -163,9 +190,9 @@ class testPageAdministrationMediaTypes extends CWebTest {
 			[
 				[
 					'filter' => [
-						'Name' => 'a w'
+						'Name' => 'a S'
 					],
-					'result' => ['Jira with CustomFields']
+					'result' => ['Jira ServiceDesk']
 				]
 			],
 			// Filter by status.
@@ -280,14 +307,14 @@ class testPageAdministrationMediaTypes extends CWebTest {
 				[
 					'rows' => ['Email'],
 					'db_name' => 'Email',
-					'used_by_action' => 'Trigger action 3'
+					'used_by_action' => 'Service action'
 				]
 			],
 			// Select several.
 			[
 				[
-					'rows' => ['SMS', 'Discord'],
-					'db_name' => ['SMS', 'Discord']
+					'rows' => ['Discord', 'Email (HTML)'],
+					'db_name' => ['Discord', 'Email (HTML)']
 				]
 			],
 			// Select all.
@@ -627,5 +654,263 @@ class testPageAdministrationMediaTypes extends CWebTest {
 					CDBHelper::escape($data['db_name']).')')
 			);
 		}
+	}
+
+	/**
+	 * Function for getting the id of an Action and update it for changing all operations to one particular Media type,
+	 * in case if some action operations were set to -All- media types.
+	 */
+	protected function getIdAndUpdateAction() {
+		$update_info = [
+			[
+				'operationtype' => OPERATION_TYPE_MESSAGE,
+				'opmessage' => ['mediatypeid' => self::EMAIL_MEDIATYPEID],
+				'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+			]
+		];
+
+		foreach([EVENT_SOURCE_TRIGGERS, EVENT_SOURCE_DISCOVERY, EVENT_SOURCE_AUTOREGISTRATION, EVENT_SOURCE_INTERNAL,
+				EVENT_SOURCE_SERVICE] as $sourceid) {
+			$actionids = CDBHelper::getColumn('SELECT actionid FROM actions WHERE eventsource='.zbx_dbstr($sourceid), 'actionid');
+
+			foreach ($actionids as $actionid) {
+				switch ($sourceid) {
+					case EVENT_SOURCE_TRIGGERS:
+					case EVENT_SOURCE_SERVICE:
+						$update_data = [
+							'actionid' => $actionid,
+							'operations' => $update_info,
+							'recovery_operations' => $update_info,
+							'update_operations' => $update_info
+						];
+						break;
+
+					case EVENT_SOURCE_INTERNAL:
+						$update_data = [
+							'actionid' => $actionid,
+							'operations' => $update_info,
+							'recovery_operations' => $update_info
+						];
+						break;
+
+					case EVENT_SOURCE_DISCOVERY:
+					case EVENT_SOURCE_AUTOREGISTRATION:
+						$update_data = [
+							'actionid' => $actionid,
+							'operations' => $update_info
+						];
+				}
+
+				CDataHelper::call('action.update', $update_data);
+			}
+		}
+	}
+
+	public static function getActionsColumnData() {
+		return [
+			// #0 Used in no action.
+			[
+				[
+					'name' => 'Brevis.one',
+					'expected' => ''
+				]
+			],
+			// #1 Used in action operation directly.
+			[
+				[
+					'name' => 'Github',
+					'actions' => [
+						[
+							'name' => 'Github action operation',
+							'operation' => 'operations'
+						]
+					]
+				]
+			],
+			// #2 Used in action recovery operation directly.
+			[
+				[
+					'name' => 'iTop',
+					'actions' => [
+						[
+							'name' => 'iTop Action recovery operation',
+							'operation' => 'recovery_operations'
+						]
+					]
+				]
+			],
+			// #3 Used in action update operation directly.
+			[
+				[
+					'name' => 'Line',
+					'actions' => [
+						[
+							'name' => 'Line acton update operation',
+							'operation' => 'update_operations'
+						]
+					]
+				]
+			],
+			// #4 Used in two actions operation directly.
+			[
+				[
+					'name' => 'Slack',
+					'actions' => [
+						[
+							'name' => 'Slack acton update operation 1',
+							'operation' => 'operations'
+						],
+						[
+							'name' => 'Slack acton update operation 2',
+							'operation' => 'operations'
+						]
+					]
+				]
+			],
+			// #5 Used in two actions update operations directly.
+			[
+				[
+					'name' => 'OTRS',
+					'actions' => [
+						[
+							'name' => 'OTRS acton update operation 1',
+							'operation' => 'update_operations'
+						],
+						[
+							'name' => 'OTRS acton update operation 2',
+							'operation' => 'update_operations'
+						]
+					]
+				]
+			],
+			// #6 Used in two actions recovery directly.
+			[
+				[
+					'name' => 'Zendesk',
+					'actions' => [
+						[
+							'name' => 'Zendesk acton update operation 1',
+							'operation' => 'recovery_operations'
+						],
+						[
+							'name' => 'Zendesk acton update operation 2',
+							'operation' => 'recovery_operations'
+						]
+					]
+				]
+			],
+			// #7 Used in two actions operation, recovery and update directly.
+			[
+				[
+					'name' => 'PagerDuty',
+					'actions' => [
+						[
+							'name' => 'PagerDuty acton update operation 1',
+							'operation' => 'operations'
+						],
+						[
+							'name' => 'PagerDuty acton update operation 2',
+							'operation' => 'recovery_operations'
+						],
+						[
+							'name' => 'PagerDuty acton update operation 3',
+							'operation' => 'update_operations'
+						]
+					]
+				]
+			],
+			// #8 Used in action operation by -All-.
+			// !Important: last three cases should be run only in this order and always be placed in the end of data provider.
+			[
+				[
+					'name' => 'MantisBT',
+					'actions' => [
+						[
+							'name' => 'MantisBT action operation',
+							'operation' => 'operations',
+							'mediatypeid' => 0
+						]
+					]
+				]
+			],
+			// #9 Used in action recovery operation by -All-.
+			[
+				[
+					'name' => 'Express.ms',
+					'actions' => [
+						[
+							'name' => 'Express.ms recovery operation action',
+							'operation' => 'recovery_operations',
+							'mediatypeid' => 0
+						]
+					],
+					'expected' => 'Express.ms recovery operation action, MantisBT action operation'
+				]
+			],
+			// #10 Used in action update operation by -All-.
+			[
+				[
+					'name' => 'Opsgenie',
+					'actions' => [
+						[
+							'name' => 'Opsgenie update operation action',
+							'operation' => 'update_operations',
+							'mediatypeid' => 0
+						]
+					],
+					'expected' => 'Express.ms recovery operation action, MantisBT action operation, '.
+							'Opsgenie update operation action'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @onBeforeOnce getIdAndUpdateAction
+	 *
+	 * @dataProvider getActionsColumnData
+	 */
+	public function testPageAdministrationMediaTypes_ActionsColumn($data) {
+		// Create actions with Media types assigned to operations.
+		if (array_key_exists('actions', $data)) {
+			$column_actions = [];
+			foreach ($data['actions'] as $action) {
+				$mediatypeid = CTestArrayHelper::get($action,'mediatypeid',
+						CDBHelper::getValue('SELECT mediatypeid FROM media_type WHERE name='.zbx_dbstr($data['name']))
+				);
+
+				CDataHelper::call('action.create', [
+					[
+						'name' => $action['name'],
+						'eventsource' => EVENT_SOURCE_TRIGGERS,
+						'filter' => [
+							'evaltype' => CONDITION_EVAL_TYPE_AND_OR,
+							'conditions' => []
+						],
+						$action['operation'] => [
+							[
+								'operationtype' => OPERATION_TYPE_MESSAGE,
+								'opmessage' => ['mediatypeid' => $mediatypeid],
+								'opmessage_grp' => [['usrgrpid' => self::ZABBIX_ADMIN_GROUPID]]
+							]
+						]
+					]
+				]);
+
+				// Write actions to array for comparison.
+				$column_actions[] = $action['name'];
+			}
+
+			$expected = array_key_exists('expected', $data) ? $data['expected'] : implode(', ', $column_actions);
+		}
+		else {
+			$expected = $data['expected'];
+		}
+
+		$this->page->login()->open('zabbix.php?action=mediatype.list')->waitUntilReady();
+		$column_text = $this->query('class:list-table')->asTable()->waitUntilPresent()->one()
+				->findRow('Name', $data['name'])->getColumn('Used in actions')->getText();
+
+		$this->assertEquals($expected, $column_text);
 	}
 }

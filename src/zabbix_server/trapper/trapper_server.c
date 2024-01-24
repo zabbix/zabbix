@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,15 +30,14 @@
 #include "proxyconfigread/proxyconfig_read.h"
 #include "proxydata.h"
 
-extern int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
-
-static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout)
+static void	trapper_process_report_test(zbx_socket_t *sock, const struct zbx_json_parse *jp, int config_timeout,
+		zbx_get_config_forks_f get_config_forks)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
 	struct zbx_json		j;
 
-	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTMANAGER])
+	if (0 == get_config_forks(ZBX_PROCESS_TYPE_REPORTMANAGER))
 	{
 		zbx_send_response(sock, FAIL, "Report manager is disabled.", config_timeout);
 		return;
@@ -219,13 +218,14 @@ fail:
 int	trapper_process_request(const char *request, zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_timespec_t *ts, const zbx_config_comms_args_t *config_comms,
 		const zbx_config_vault_t *config_vault, int proxydata_frequency,
-		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs)
+		zbx_get_program_type_f get_program_type_cb, const zbx_events_funcs_t *events_cbs,
+		zbx_get_config_forks_f get_config_forks)
 {
 	ZBX_UNUSED(get_program_type_cb);
 
 	if (0 == strcmp(request, ZBX_PROTO_VALUE_REPORT_TEST))
 	{
-		trapper_process_report_test(sock, jp, config_comms->config_timeout);
+		trapper_process_report_test(sock, jp, config_comms->config_timeout, get_config_forks);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_ZABBIX_ALERT_SEND))
@@ -236,7 +236,9 @@ int	trapper_process_request(const char *request, zbx_socket_t *sock, const struc
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_CONFIG))
 	{
 		zbx_send_proxyconfig(sock, jp, config_vault, config_comms->config_timeout,
-				config_comms->config_trapper_timeout, config_comms->config_source_ip);
+				config_comms->config_trapper_timeout, config_comms->config_source_ip,
+				config_comms->config_ssl_ca_location, config_comms->config_ssl_cert_location,
+				config_comms->config_ssl_key_location);
 		return SUCCEED;
 	}
 	else if (0 == strcmp(request, ZBX_PROTO_VALUE_PROXY_DATA))

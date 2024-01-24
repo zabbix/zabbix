@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,6 +73,10 @@ int	DBrename_index(const char *table_name, const char *old_name, const char *new
 int	DBadd_foreign_key(const char *table_name, int id, const zbx_db_field_t *field);
 int	DBdrop_foreign_key(const char *table_name, int id);
 
+#if defined(HAVE_POSTGRESQL)
+int	DBcheck_field_type(const char *table_name, const zbx_db_field_t *field);
+#endif
+
 #	ifdef HAVE_ORACLE
 int	DBcreate_serial_sequence(const char *table_name);
 int	DBcreate_serial_trigger(const char *table_name, const char *field_name);
@@ -85,10 +89,17 @@ int	DBcreate_changelog_delete_trigger(const char *table_name, const char *field_
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
+int	zbx_dbupgrade_drop_trigger_on_insert(const char *table_name, const char *indexed_column_name);
+int	zbx_dbupgrade_drop_trigger_function_on_insert(const char *table_name, const char *indexed_column_name,
+		const char *function);
 
 int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname);
+int	zbx_dbupgrade_drop_trigger_on_update(const char *table_name, const char *indexed_column_name);
+int	zbx_dbupgrade_drop_trigger_function_on_update(const char *table_name, const char *indexed_column_name,
+		const char *function);
+
 #endif /* !HAVE_SQLITE3 */
 
 unsigned char	DBget_program_type(void);

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-09-27 10:32+0000\n"
+"PO-Revision-Date: 2024-01-06 12:07+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -189,6 +189,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s de %2$s element en estat problemàtic"
 msgstr[1] "%1$s de %2$s element en estat problemàtic"
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr "%1$s o %2$s - permet que la pàgina només es vegi dins un marc del mateix origen que la mateixa pàgina"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr "%1$s o %2$s - impedeix que la pàgina es vegi en un marc, independentment del lloc que ho provi"
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -317,11 +327,11 @@ msgstr "(creat per la descoberta d'equips)"
 #: include/views/configuration.item.edit.php:648
 #: include/views/configuration.item.prototype.edit.php:619
 msgid "(legacy) to retrieve a single value synchronously, optionally combined with other values"
-msgstr ""
+msgstr "(llegat) per recuperar un valor únic de forma sincrònica, opcionalment combinat amb altres valors"
 
 #: include/views/configuration.host.discovery.edit.php:553
 msgid "(legacy) to retrieve a subtree in JSON"
-msgstr ""
+msgstr "(llegat) per recuperar un subarbre en JSON"
 
 #: app/partials/configuration.host.edit.html.php:133
 msgid "(linked by host discovery)"
@@ -658,11 +668,10 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "La classe d'acció %1$s ha d'ampliar la classe %2$s."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "S'ha esborrat l'acció"
-msgstr[1] "S'ha esborrat l'acció"
+msgstr[1] "S'han esborrat les accions"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -1119,11 +1128,11 @@ msgstr "Agent"
 
 #: widgets/hostavail/views/widget.view.php:82
 msgid "Agent (active)"
-msgstr ""
+msgstr "Agent (actiu)"
 
 #: widgets/hostavail/views/widget.view.php:83
 msgid "Agent (passive)"
-msgstr ""
+msgstr "Agent (passiu)"
 
 #: include/classes/data/CItemData.php:911
 msgid "Agent availability check. Returns nothing - unavailable; 1 - available"
@@ -1529,15 +1538,15 @@ msgstr "Etiqueta d'actiu"
 #, c-format
 msgid "At %1$s %2$s of every %3$s week"
 msgid_plural "At %1$s %2$s of every %3$s weeks"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "%1$s %2$s de cada setmana %3$s"
+msgstr[1] "%1$s %2$s de cada %3$s setmanes"
 
 #: include/classes/helpers/CMaintenanceHelper.php:71
 #, c-format
 msgid "At %1$s every %2$s day"
 msgid_plural "At %1$s every %2$s days"
-msgstr[0] ""
-msgstr[1] ""
+msgstr[0] "A les %1$s cada dia %2$s"
+msgstr[1] "A les %1$s cada %2$s dies"
 
 #: include/classes/helpers/CMaintenanceHelper.php:114
 #, c-format
@@ -1607,7 +1616,7 @@ msgstr "Com a mínim un paràmetre \"%1$s\" o \"%2$s\" s'ha d'activar."
 
 #: widgets/gauge/views/widget.edit.php:50
 msgid "At least one parameter must be enabled."
-msgstr ""
+msgstr "Com a mínim s'ha d'habilitar un paràmetre."
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:283
 msgid "At least one update operation or message is mandatory"
@@ -2350,7 +2359,7 @@ msgstr "No es pot pas canviar el tipus d'usuari del propi rol."
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "No es poden pas netejar l'historial i tendències"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2539,11 +2548,10 @@ msgid "Cannot delete Zabbix internal user \"%1$s\", try disabling that user."
 msgstr "No es pot pas esborrar l'usuari intern de Zabbix \"%1$s\"; proveu a desactivar aquest usuari."
 
 #: app/controllers/CControllerActionDelete.php:87
-#, fuzzy
 msgid "Cannot delete action"
 msgid_plural "Cannot delete actions"
 msgstr[0] "No es pot pas esborrar l'acció"
-msgstr[1] "No es pot pas esborrar l'acció"
+msgstr[1] "No es poden pas esborrar les accions"
 
 #: include/classes/api/services/CRole.php:368
 #, c-format
@@ -2582,25 +2590,22 @@ msgstr[0] "No es pot pas esborrar la correlació de l'esdeveniment"
 msgstr[1] "No es poden pas esborrar les correlacions dels esdeveniments"
 
 #: graphs.php:281 graphs.php:338
-#, fuzzy
 msgid "Cannot delete graph"
 msgid_plural "Cannot delete graphs"
 msgstr[0] "No es pot pas esborrar el gràfic"
-msgstr[1] "No es pot pas esborrar el gràfic"
+msgstr[1] "No es poden pas esborrar gràfics"
 
 #: graphs.php:273 graphs.php:317
-#, fuzzy
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
 msgstr[0] "No es pot pas esborrar el prototip de gràfic"
-msgstr[1] "No es pot pas esborrar el prototip de gràfic"
+msgstr[1] "No es poden pas esborrar els prototips de gràfics"
 
 #: app/controllers/CControllerHostMassDelete.php:76
-#, fuzzy
 msgid "Cannot delete host"
 msgid_plural "Cannot delete hosts"
 msgstr[0] "No es pot esborrar l'equip"
-msgstr[1] "No es pot esborrar l'equip"
+msgstr[1] "No es poden pas esborrar els equips"
 
 #: include/classes/api/services/CHost.php:1461
 #, c-format
@@ -2655,18 +2660,16 @@ msgid "Cannot delete inventory."
 msgstr "No es pot pas esborrar l'inventari."
 
 #: items.php:524 items.php:736
-#, fuzzy
 msgid "Cannot delete item"
 msgid_plural "Cannot delete items"
 msgstr[0] "No es pot pas esborrar l'element"
-msgstr[1] "No es pot pas esborrar l'element"
+msgstr[1] "No es poden pas esborrar els elements"
 
 #: disc_prototypes.php:302 disc_prototypes.php:500
-#, fuzzy
 msgid "Cannot delete item prototype"
 msgid_plural "Cannot delete item prototypes"
 msgstr[0] "No es pot pas esborrar el prototip d'element"
-msgstr[1] "No es pot pas esborrar el prototip d'element"
+msgstr[1] "No es poden pas esborrar els prototips d'elements"
 
 #: app/controllers/CControllerMaintenanceDelete.php:71
 msgid "Cannot delete maintenance period"
@@ -2688,11 +2691,10 @@ msgstr[0] "No es pot pas esborrar el mòdul: %1$s."
 msgstr[1] "No es poden pas esborrar els mòduls: %1$s."
 
 #: sysmaps.php:266
-#, fuzzy
 msgid "Cannot delete network map"
 msgid_plural "Cannot delete network maps"
 msgstr[0] "No es pot pas esborrar el mapa de xarxa"
-msgstr[1] "No es pot pas esborrar el mapa de xarxa"
+msgstr[1] "No es poden pas esborrar els mapes de xarxa"
 
 #: app/controllers/CControllerProxyDelete.php:39
 msgid "Cannot delete proxies"
@@ -2745,11 +2747,10 @@ msgid "Cannot delete service \"%1$s\": %2$s."
 msgstr "No es pot pas esborrar el servei \"%1$s\": %2$s."
 
 #: app/controllers/CControllerTemplateDelete.php:143
-#, fuzzy
 msgid "Cannot delete template"
 msgid_plural "Cannot delete templates"
 msgstr[0] "No es pot pas esborrar la plantilla"
-msgstr[1] "No es pot pas esborrar la plantilla"
+msgstr[1] "No es poden pas esborrar les plantilles"
 
 #: app/controllers/CControllerTemplateGroupDelete.php:75
 msgid "Cannot delete template group"
@@ -2781,18 +2782,16 @@ msgid "Cannot delete templated web scenario \"%1$s\"."
 msgstr "No es pot pas esborrar l'escenari web amb plantilla \"%1$s\"."
 
 #: app/controllers/CControllerTriggerDelete.php:70
-#, fuzzy
 msgid "Cannot delete trigger"
 msgid_plural "Cannot delete triggers"
 msgstr[0] "No es pot pas esborrar el trigger"
-msgstr[1] "No es pot pas esborrar el trigger"
+msgstr[1] "No es poden pas esborrar els triggers"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:72
-#, fuzzy
 msgid "Cannot delete trigger prototype"
 msgid_plural "Cannot delete trigger prototypes"
 msgstr[0] "No es pot pas esborrar el prototip de trigger"
-msgstr[1] "No es pot pas esborrar el prototip de trigger"
+msgstr[1] "No es poden pas esborrar els prototips de triggers"
 
 #: app/controllers/CControllerUserDelete.php:59
 msgid "Cannot delete user"
@@ -2818,11 +2817,10 @@ msgstr[0] "No es pot pas esborrar el rol d'usuari"
 msgstr[1] "No es poden pas esborrar els rols d'usuaris"
 
 #: httpconf.php:178 httpconf.php:418
-#, fuzzy
 msgid "Cannot delete web scenario"
 msgid_plural "Cannot delete web scenarios"
 msgstr[0] "No es pot pas esborrar l'escenari web"
-msgstr[1] "No es pot pas esborrar l'escenari web"
+msgstr[1] "No es poden pas esborrar els escenaris web"
 
 #: app/controllers/CControllerTokenDisable.php:66
 msgid "Cannot disable API token"
@@ -3537,6 +3535,10 @@ msgstr "No es pot pas actualitzar massivament el nom d'equip."
 msgid "Cannot mass update visible host name."
 msgstr "No es pot pas actualitzar massivament el nom d'equip visible."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr "No es pot obrir la URL"
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -3884,11 +3886,10 @@ msgstr "No es poden pas actualitzar els grups de l'equip descobert \"%1$s\"."
 #: app/controllers/CControllerHostUpdate.php:36
 #: app/controllers/CControllerHostUpdate.php:160
 #: app/controllers/CControllerPopupMassupdateHost.php:521
-#, fuzzy
 msgid "Cannot update host"
 msgid_plural "Cannot update hosts"
 msgstr[0] "No es pot pas actualitzar l'equip"
-msgstr[1] "No es pot pas actualitzar l'equip"
+msgstr[1] "No es poden actualitzar els equips"
 
 #: include/classes/api/services/CHost.php:982
 msgid "Cannot update host encryption settings. Connection settings for both directions should be specified."
@@ -3921,11 +3922,10 @@ msgid "Cannot update interface for discovered host \"%1$s\"."
 msgstr "No es pot actualitzar la interfície de l'equip descobert \"%1$s\"."
 
 #: app/controllers/CControllerPopupMassupdateItem.php:279 items.php:670
-#, fuzzy
 msgid "Cannot update item"
 msgid_plural "Cannot update items"
 msgstr[0] "No es pot pas actualitzar l'element"
-msgstr[1] "No es pot pas actualitzar l'element"
+msgstr[1] "No es poden pas actualitzar els elements"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:278
 #: disc_prototypes.php:457 disc_prototypes.php:484 disc_prototypes.php:523
@@ -4018,11 +4018,10 @@ msgstr "No es pot pas actualitzar la passa cap a un escenari web amb plantilla \
 #: app/controllers/CControllerTemplateMassupdate.php:353
 #: app/controllers/CControllerTemplateUpdate.php:49
 #: app/controllers/CControllerTemplateUpdate.php:196
-#, fuzzy
 msgid "Cannot update template"
 msgid_plural "Cannot update templates"
 msgstr[0] "No es pot pas actualitzar la plantilla"
-msgstr[1] "No es pot pas actualitzar la plantilla"
+msgstr[1] "No es poden pas actualitzar les plantilles"
 
 #: app/controllers/CControllerTemplateGroupUpdate.php:41
 #: app/controllers/CControllerTemplateGroupUpdate.php:94
@@ -4032,11 +4031,10 @@ msgstr "No es pot pas actualitzar el grup de plantilles"
 #: app/controllers/CControllerTriggerMassupdate.php:212
 #: app/controllers/CControllerTriggerUpdate.php:58
 #: app/controllers/CControllerTriggerUpdate.php:155
-#, fuzzy
 msgid "Cannot update trigger"
 msgid_plural "Cannot update triggers"
 msgstr[0] "No es pot pas actualitzar el trigger"
-msgstr[1] "No es pot pas actualitzar el trigger"
+msgstr[1] "No es poden pas actualitzar els triggers"
 
 #: include/classes/api/services/CTriggerGeneral.php:2305
 #, c-format
@@ -4338,19 +4336,19 @@ msgstr "Netejar historial i tendències"
 
 #: include/views/configuration.item.list.php:315
 msgid "Clear history and trends of selected item?"
-msgstr ""
+msgstr "Netegem l'historial i tendències de l'element triat?"
 
 #: include/views/configuration.item.list.php:316
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "Netegem l'historial i tendències dels elements triats?"
 
 #: include/views/configuration.httpconf.list.php:238
 msgid "Clear history and trends of selected web scenario?"
-msgstr ""
+msgstr "Netegem l'historial i tendències de l'escenari web triat?"
 
 #: include/views/configuration.httpconf.list.php:239
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "Netegem l'historial i tendències dels escenaris web triats?"
 
 #: app/views/popup.massupdate.host.php:66 app/views/template.massupdate.php:70
 msgid "Clear when unlinking"
@@ -4999,6 +4997,10 @@ msgstr "Menú de contingut"
 #: app/views/popup.itemtestedit.view.php:167 include/items.inc.php:931
 msgid "Context name"
 msgstr "Nom del context"
+
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr "Continuar"
 
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
@@ -5905,6 +5907,10 @@ msgstr "Autenticació per defecte"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "Mode d'inventari d'equips predeterminat"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr "Cadena d'entrada per defecte"
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7027,7 +7033,7 @@ msgstr "Denominador de divisió"
 #: include/views/configuration.item.prototype.edit.php:839
 #: include/views/configuration.item.prototype.edit.php:854
 msgid "Do not store"
-msgstr ""
+msgstr "No emmagatzemar"
 
 #: jsLoader.php:213 jsLoader.php:358
 msgid "Do you wish to replace the conditional expression?"
@@ -7127,6 +7133,14 @@ msgstr "Dibuixar"
 #: include/views/configuration.graph.edit.php:388
 msgid "Draw style"
 msgstr "Estil del dibuix"
+
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr "Menú desplegable"
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr "Opcions desplegables"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7526,6 +7540,10 @@ msgstr "Vols activar els escenaris web triats?"
 msgid "Enable trapping"
 msgstr "Activa les captures"
 
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr "Permetre l'entrada de l'usuari"
+
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
 #: app/partials/configuration.host.edit.html.php:265
@@ -7758,7 +7776,7 @@ msgstr "Nom de l'esdeveniment"
 
 #: app/views/popup.condition.edit.php:672
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "El nom de l'esdeveniment coincideix amb el nom del trigger (amb macros ampliades) tret que s'especifiqui un nom d'esdeveniment personalitzat a la configuració del trigger."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -8177,7 +8195,7 @@ msgstr "Nom del camp"
 #: include/views/configuration.item.edit.php:633
 #: include/views/configuration.item.prototype.edit.php:604
 msgid "Field requirements:"
-msgstr ""
+msgstr "Requeriments del camp:"
 
 #: include/classes/data/CItemData.php:1607
 msgid "File checksum, calculated by the UNIX cksum algorithm. Returns integer for crc32 (default) and string for md5, sha256"
@@ -8637,11 +8655,10 @@ msgstr[0] "Gràfic copiat"
 msgstr[1] "Gràfics copiats"
 
 #: graphs.php:281 graphs.php:337
-#, fuzzy
 msgid "Graph deleted"
 msgid_plural "Graphs deleted"
 msgstr[0] "Gràfic esborrat"
-msgstr[1] "Gràfic esborrat"
+msgstr[1] "Gràfics esborrats"
 
 #: app/controllers/CControllerAuditLogList.php:230
 #: app/views/popup.lldoperation.php:51
@@ -8685,11 +8702,10 @@ msgid "Graph prototype added"
 msgstr "S'ha afegit un prototip de gràfic"
 
 #: graphs.php:273 graphs.php:316
-#, fuzzy
 msgid "Graph prototype deleted"
 msgid_plural "Graph prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip de gràfic"
-msgstr[1] "S'ha esborrat el prototip de gràfic"
+msgstr[1] "S'han esborrat els prototips de gràfics"
 
 #: graphs.php:222 graphs.php:294
 msgid "Graph prototype updated"
@@ -9032,7 +9048,7 @@ msgstr "Història"
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "History and trends cleared"
-msgstr ""
+msgstr "Històric i tendències netejats"
 
 #: app/views/administration.housekeeping.edit.php:221
 msgid "History and trends compression"
@@ -9183,11 +9199,10 @@ msgid "Host dashboards"
 msgstr "Taulers d'equip"
 
 #: app/controllers/CControllerHostMassDelete.php:66
-#, fuzzy
 msgid "Host deleted"
 msgid_plural "Hosts deleted"
 msgstr[0] "S'ha esborrat l'equip"
-msgstr[1] "S'ha esborrat l'equip"
+msgstr[1] "S'han esborrat els equips"
 
 #: app/controllers/CControllerHostGroupDisable.php:76
 #: app/controllers/CControllerPopupMassupdateHost.php:492
@@ -9343,6 +9358,10 @@ msgstr "Visió general de l'inventari d'equips"
 msgid "Host label type"
 msgstr "Tipus d'etiqueta d'equips"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr "Límit d'equip"
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -9387,11 +9406,10 @@ msgid "Host prototype added"
 msgstr "S'ha afegit un prototip d'equips"
 
 #: host_prototypes.php:139 host_prototypes.php:318
-#, fuzzy
 msgid "Host prototype deleted"
 msgid_plural "Host prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip d'equips"
-msgstr[1] "S'ha esborrat el prototip d'equips"
+msgstr[1] "S'han esborrat els prototips d'equips"
 
 #: include/views/configuration.host.prototype.edit.php:370
 msgid "Host prototype macros"
@@ -9464,11 +9482,10 @@ msgstr "L'actualització de l'equip ha fallat."
 
 #: app/controllers/CControllerHostUpdate.php:150
 #: app/controllers/CControllerPopupMassupdateHost.php:510
-#, fuzzy
 msgid "Host updated"
 msgid_plural "Hosts updated"
 msgstr[0] "Equip actualitzat"
-msgstr[1] "Equip actualitzat"
+msgstr[1] "Equips actualitzats"
 
 #: include/classes/api/services/CDashboardGeneral.php:583
 #, c-format
@@ -10057,7 +10074,7 @@ msgstr "Inclou l'entrada del menú d'esdeveniments"
 
 #: widgets/hostavail/includes/WidgetForm.php:62
 msgid "Include hosts in maintenance"
-msgstr ""
+msgstr "Posar els equips en manteniment"
 
 #: include/classes/data/CItemData.php:1117
 msgid "Incoming traffic statistics on network interface. Returns integer"
@@ -10840,6 +10857,18 @@ msgstr "Vista inicial"
 msgid "Initial view is ignored if the default view is set."
 msgstr "La vista inicial s'ignora si s'estableix la vista predeterminada."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr "Petició d'entrada"
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr "Tipus d'entrada"
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr "Regla de validació d'entrada"
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "Afegeix"
@@ -11012,6 +11041,11 @@ msgstr "La configuració de correspondència de tipus de suport d'aprovisionamen
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "La configuració de correspondència del grup d'usuaris d'aprovisionament SAML JIT no és pas vàlid."
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr "URL no vàlida: %1$s"
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "Contingut del fitxer YAML no vàlid"
@@ -11039,6 +11073,10 @@ msgstr "L'adreça electrònica \"%1$s\" no és vàlida."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Adreça electrònica no vàlida per al tipus de suport amb l'identificador \"%1$s\"."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr "Entrada incorrecta"
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11479,11 +11517,10 @@ msgid "Item count"
 msgstr "Recompte d'elements"
 
 #: items.php:524 items.php:735
-#, fuzzy
 msgid "Item deleted"
 msgid_plural "Items deleted"
 msgstr[0] "Element esborrat"
-msgstr[1] "Element esborrat"
+msgstr[1] "Elements esborrats"
 
 #: items.php:708
 msgid "Item disabled"
@@ -11530,11 +11567,10 @@ msgid "Item prototype added"
 msgstr "S'ha afegit un prototip d'element"
 
 #: disc_prototypes.php:302 disc_prototypes.php:499
-#, fuzzy
 msgid "Item prototype deleted"
 msgid_plural "Item prototypes deleted"
 msgstr[0] "S'ha esborrat el prototip d'element"
-msgstr[1] "S'ha esborrat el prototip d'element"
+msgstr[1] "S'han esborrat els prototips d'elements"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:286
 #: disc_prototypes.php:457 disc_prototypes.php:483 disc_prototypes.php:522
@@ -11573,11 +11609,10 @@ msgid "Item type does not use interface"
 msgstr "El tipus d'element no empra la interfície"
 
 #: app/controllers/CControllerPopupMassupdateItem.php:287 items.php:670
-#, fuzzy
 msgid "Item updated"
 msgid_plural "Items updated"
 msgstr[0] "Element actualitzat"
-msgstr[1] "Element actualitzat"
+msgstr[1] "Elements actualitzats"
 
 #: widgets/item/Widget.php:53 widgets/tophosts/views/column.edit.php:64
 msgid "Item value"
@@ -12478,6 +12513,10 @@ msgstr "Acció manual de l'esdeveniment"
 msgid "Manual host action"
 msgstr "Acció manual de l'equip"
 
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr "Entrada manual"
+
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
 msgstr "Esborrar els problemes manualment. L'hora d'entrada accepta el format d'hora relativa i absoluta."
@@ -12699,6 +12738,11 @@ msgstr "Període màxim de visualització de l'historial"
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
 msgstr "Nombre màxim de columnes i fileres a les taules generals"
+
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr "Nombre màxim de fileres"
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -13111,12 +13155,12 @@ msgstr "Manca la clau \"%1$s\" per a l'equip \"%2$s\"."
 
 #: widgets/hostavail/views/widget.view.php:38
 msgid "Mixed"
-msgstr ""
+msgstr "Mesclat"
 
 #: widgets/hostavail/views/widget.view.php:39
 msgctxt "compact table header"
 msgid "Mixed"
-msgstr ""
+msgstr "Mesclat"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:273
 #: app/views/administration.proxy.list.php:50
@@ -13530,11 +13574,10 @@ msgid "Network map added"
 msgstr "S'ha afegit el mapa de xarxa"
 
 #: sysmaps.php:265
-#, fuzzy
 msgid "Network map deleted"
 msgid_plural "Network maps deleted"
 msgstr[0] "S'ha esborrat el mapa de xarxa"
-msgstr[1] "S'ha esborrat el mapa de xarxa"
+msgstr[1] "S'han esborrat els mapes de xarxa"
 
 #: sysmaps.php:188
 msgid "Network map updated"
@@ -13643,11 +13686,11 @@ msgstr "Nou grup d'equips"
 
 #: app/views/item.edit.php:218
 msgid "New item"
-msgstr ""
+msgstr "Element nou"
 
 #: app/views/item.prototype.edit.php:191
 msgid "New item prototype"
-msgstr ""
+msgstr "Nou prototip d'element"
 
 #: app/controllers/CControllerMaintenanceTimePeriodEdit.php:142
 #: app/views/maintenance.edit.php:255 app/views/maintenance.edit.php:285
@@ -14364,6 +14407,11 @@ msgstr "Elements no heretats"
 msgid "Not supported"
 msgstr "No compatible"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr "Tingueu en compte que %1$s o %2$s es consideraran noms d'equips si s'empren sense cometes simples."
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "Notes"
@@ -14735,6 +14783,10 @@ msgstr "Només els superadministradors poden establir el propietari de l'informe
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Només es compten els triggers assignats als equips habilitats i en funció dels elements actius"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr "Obrir la URL"
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "Obrir a una nova finestra"
@@ -14873,6 +14925,10 @@ msgstr "O"
 msgid "Order"
 msgstr "Ordre"
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr "Ordenat per"
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr "Ordenar columna"
@@ -14996,6 +15052,10 @@ msgstr "Anul·la el període d'historial d'elements"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Anul·la el període de tendència de l'element"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Anul·lar la tria de període de temps"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -15461,6 +15521,10 @@ msgstr "Línia percentil (esquerra)"
 #: widgets/svggraph/includes/WidgetForm.php:264
 msgid "Percentile line (right)"
 msgstr "Línia percentil (dreta)"
+
+#: include/classes/data/CItemData.php:1214
+msgid "Performs a DNS query. Returns 0 if DNS is down, query time in seconds (with fractions) otherwise"
+msgstr "Fa una consulta DNS. Retorna 0 si el DNS és caigut; cas contrari, el temps de la consulta en segons (amb fraccions)"
 
 #: include/classes/data/CItemData.php:1085
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -16959,6 +17023,10 @@ msgstr "Retorna el nombre de canvis d'estat des del mode disc/memòria des de l'
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Retorna el percentatge de paquets de ping ICMP perduts."
 
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr "Retorna el nombre total de valors de l'historial escrits a la base de dades."
+
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
 msgid "Revert"
@@ -17221,7 +17289,7 @@ msgstr "Comunitat SNMP"
 
 #: include/items.inc.php:1570
 msgid "SNMP get value"
-msgstr ""
+msgstr "Valor SNMP get"
 
 #: include/views/inventory.host.view.php:65
 msgid "SNMP interfaces"
@@ -18174,7 +18242,7 @@ msgstr "Mostra el nombre de registres"
 
 #: widgets/hostavail/includes/WidgetForm.php:66
 msgid "Show only totals"
-msgstr ""
+msgstr "Mostra només els totals"
 
 #: app/partials/monitoring.problem.filter.php:281
 #: widgets/problemsbysv/includes/WidgetForm.php:98
@@ -18760,7 +18828,7 @@ msgstr "Emmagatzema les credencials a"
 #: include/views/configuration.item.prototype.edit.php:840
 #: include/views/configuration.item.prototype.edit.php:855
 msgid "Store up to"
-msgstr ""
+msgstr "Emmagatzemar fins a"
 
 #: include/classes/setup/CSetupWizard.php:755
 #: include/classes/setup/CSetupWizard.php:756
@@ -19168,11 +19236,10 @@ msgid "Template dashboards"
 msgstr "Taulers de plantilles"
 
 #: app/controllers/CControllerTemplateDelete.php:133
-#, fuzzy
 msgid "Template deleted"
 msgid_plural "Templates deleted"
 msgstr[0] "S'ha esborrat la plantilla"
-msgstr[1] "S'ha esborrat la plantilla"
+msgstr[1] "S'han esborrat les plantilles"
 
 #: app/controllers/CControllerAuditLogList.php:259
 #: app/partials/configuration.templategroup.edit.html.php:52
@@ -19243,11 +19310,10 @@ msgstr "Trigger de plantilla"
 
 #: app/controllers/CControllerTemplateMassupdate.php:361
 #: app/controllers/CControllerTemplateUpdate.php:188
-#, fuzzy
 msgid "Template updated"
 msgid_plural "Templates updated"
 msgstr[0] "Plantilla actualitzada"
-msgstr[1] "Plantilla actualitzada"
+msgstr[1] "Plantilles actualitzades"
 
 #: app/partials/hostmacros.inherited.list.html.php:55
 msgid "Template value"
@@ -19375,6 +19441,10 @@ msgstr "Cadena de prova"
 #: app/controllers/CControllerMediatypeTestEdit.php:85
 msgid "Test subject"
 msgstr "Test d'assumpte"
+
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr "Provar l'entrada de l'usuari"
 
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
@@ -19870,7 +19940,7 @@ msgstr "Temps total d'Elasticsearch: %1$s"
 
 #: widgets/hostavail/views/widget.view.php:81
 msgid "Total Hosts"
-msgstr ""
+msgstr "Total d'equips"
 
 #: include/classes/debug/CProfiler.php:149
 #, c-format
@@ -20054,11 +20124,10 @@ msgid "Trigger data storage period"
 msgstr "Període d'emmagatzematge de dades dels triggers"
 
 #: app/controllers/CControllerTriggerDelete.php:62
-#, fuzzy
 msgid "Trigger deleted"
 msgid_plural "Triggers deleted"
 msgstr[0] "S'ha esborrat el trigger"
-msgstr[1] "S'ha esborrat el trigger"
+msgstr[1] "S'han esborrat els triggers"
 
 #: tr_events.php:169
 msgid "Trigger details"
@@ -20099,6 +20168,10 @@ msgstr "El trigger de la plantilla \"%1$s\" té una dependència amb el trigger 
 #: include/views/monitoring.sysmap.edit.php:198
 msgid "Trigger label type"
 msgstr "Tipus d'etiqueta del trigger"
+
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr "Límit de trigger"
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
@@ -20202,11 +20275,10 @@ msgid "Trigger prototype added"
 msgstr "S'ha afegit un prototip de trigger"
 
 #: app/controllers/CControllerTriggerPrototypeDelete.php:62
-#, fuzzy
 msgid "Trigger prototype deleted"
 msgid_plural "Trigger prototypes deleted"
 msgstr[0] "Prototip de trigger esborrat"
-msgstr[1] "Prototip de trigger esborrat"
+msgstr[1] "S'han esborrat els prototips de triggers"
 
 #: app/controllers/CControllerTriggerMassupdate.php:219
 #: app/controllers/CControllerTriggerPrototypeDisable.php:76
@@ -20246,11 +20318,10 @@ msgstr "Etiquetes de triggers"
 
 #: app/controllers/CControllerTriggerMassupdate.php:220
 #: app/controllers/CControllerTriggerUpdate.php:147
-#, fuzzy
 msgid "Trigger updated"
 msgid_plural "Triggers updated"
 msgstr[0] "Trigger actualitzat"
-msgstr[1] "Trigger actualitzat"
+msgstr[1] "Triggers actualitzats"
 
 #: app/controllers/CControllerPopupGeneric.php:227
 #: app/controllers/CControllerPopupGeneric.php:241
@@ -20427,6 +20498,10 @@ msgstr "L'URL no és codificat correctament."
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "El nom de l'URL ha d'ésser únic per al mapa \"%1$s\"."
+
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr "Confirmació d'obertura de la URL"
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -20995,6 +21070,10 @@ msgstr "Temps d'activitat/temps d'inactivitat"
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr "Empreu %{ref} al filtre de grup per referenciar el valor de l'atribut de l'usuari."
 
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr "Emprar capçalera HTTP X-Frame-Options"
+
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
 msgstr "Emprar sol·licituds combinades"
@@ -21225,6 +21304,10 @@ msgstr "El grup d'usuaris amb l'identificador \"%1$s\" no és pas disponible."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "Grups d'usuaris"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr "L'entrada de l'usuari s'ha provat correctament."
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -21496,7 +21579,7 @@ msgstr "Estadístiques d'escriptura del magatzem de dades de VMware, \"url\" - U
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default) or skip - skip processing of older data, \"severity\" - filtering is disabled by default or \"error,warning,info,user\" in any combination"
-msgstr ""
+msgstr "Registre d'esdeveniments de VMware, \"url\" - URL del servei de VMware, \"mode\" - tot (per defecte) o ometre - ometre el processament de dades més antigues, \"gravetat\" - el filtrat és desactivat per defecte o \"error, avís, informació, usuari\" en qualsevol combinació"
 
 #: include/classes/data/CItemData.php:1890
 msgid "VMware event log, \"url\" - VMware service URL, \"mode\"- all (default), skip - skip processing of older data"
@@ -22188,11 +22271,10 @@ msgid "Web scenario added"
 msgstr "Escenari web afegit"
 
 #: httpconf.php:178 httpconf.php:417
-#, fuzzy
 msgid "Web scenario deleted"
 msgid_plural "Web scenarios deleted"
 msgstr[0] "S'ha esborrat l'escenari web"
-msgstr[1] "S'ha esborrat l'escenari web"
+msgstr[1] "S'han esborrat els escenaris web"
 
 #: httpconf.php:386
 msgid "Web scenario disabled"
@@ -22338,9 +22420,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "Amb problemes"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Amb aquesta configuració només veureu dades numèriques."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Amb aquesta configuració només es mostraran els elements numèrics en aquesta columna."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Amb aquesta configuració només veureu elements numèrics."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22402,6 +22493,10 @@ msgstr "Eix X"
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
 msgstr "Capçalera HTTP X-Frame-Options"
+
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr "Valors compatibles amb la capçalera HTTP d'X-Frame-Options:"
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
@@ -22671,7 +22766,7 @@ msgstr "Agent de Zabbix"
 
 #: widgets/hostavail/includes/WidgetForm.php:47
 msgid "Zabbix agent (active checks)"
-msgstr ""
+msgstr "Agent de Zabbix (validacions actives)"
 
 #: include/items.inc.php:87
 msgid "Zabbix agent (active)"
@@ -22679,7 +22774,7 @@ msgstr "Agent de Zabbix (actiu)"
 
 #: widgets/hostavail/includes/WidgetForm.php:48
 msgid "Zabbix agent (passive checks)"
-msgstr ""
+msgstr "Agent de Zabbix (validacions passives)"
 
 #: app/partials/administration.system.info.php:45
 msgid "Zabbix frontend version"
@@ -22852,6 +22947,11 @@ msgstr "s'espera un temps relatiu"
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
 msgstr "un caracter especial"
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr "una cadena de noms d'equips separats per espais; afegir %1$s a la llista permet que la pàgina es vegi en un marc del mateix origen que la mateixa pàgina"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -23057,6 +23157,13 @@ msgstr "asin() - L'arc sinus d'un valor com a angle, expressat en radians"
 #: app/controllers/CControllerScheduledReportUpdate.php:87
 msgid "at least one day of the week must be selected"
 msgstr "s'ha de triar com a mínim un dia de la setmana"
+
+#: tests/selenium/modules/clock32/includes/WidgetForm.php:63
+#: widgets/clock/includes/WidgetForm.php:63
+#: widgets/gauge/includes/WidgetForm.php:137
+#: widgets/item/includes/WidgetForm.php:90
+msgid "at least one option must be selected"
+msgstr "S'ha de triar com a mínim una opció."
 
 #: widgets/svggraph/includes/CWidgetFieldOverride.php:87
 msgid "at least one override option must be specified"
@@ -23727,6 +23834,11 @@ msgstr "in() - Comprova si un valor és igual a un dels valors llistats (1 - és
 msgid "including subgroups"
 msgstr "incloent subgrups"
 
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr "adreça incorrecta a partir de \"%1$s\""
+
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr "fórmula de l'article calculat incorrecta"
@@ -23768,6 +23880,12 @@ msgstr "sintaxi incorrecta al voltant de \"%1$s\""
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
 msgstr "ús incorrecte de la funció \"%1$s\""
+
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr "l'entrada no coincideix amb el patró donat: %1$s"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
@@ -24315,6 +24433,10 @@ msgstr "no a"
 msgid "not selected"
 msgstr "no triat"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "no emprat"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Nombre de segons des de l'època"
@@ -24772,13 +24894,13 @@ msgstr "els temps d'espera són desactivats perquè les versions del proxy i del
 #: include/views/configuration.item.edit.php:643
 #: include/views/configuration.item.prototype.edit.php:614
 msgid "to retrieve a single value"
-msgstr ""
+msgstr "per recuperar un sol valor"
 
 #: include/views/configuration.host.discovery.edit.php:548
 #: include/views/configuration.item.edit.php:638
 #: include/views/configuration.item.prototype.edit.php:609
 msgid "to retrieve a subtree"
-msgstr ""
+msgstr "per recuperar un subarbre"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1075
 msgid "trendavg() - Average value of a period T with exact period shift"
@@ -25011,7 +25133,7 @@ msgstr "ja existeix el valor %1$s"
 #: include/classes/parsers/CEscapedStringParser.php:72
 #, c-format
 msgid "value contains unescaped character at position %1$d"
-msgstr ""
+msgstr "El valor conté un caràcter sense escapar a la posició %1$d"
 
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:101
 #: app/controllers/CControllerUsergroupTagFilterCheck.php:107
@@ -25144,6 +25266,10 @@ msgstr "el valor ha d'ésser dins de l'interval de %1$s"
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
 msgstr "valor de l'etiqueta d'esdeveniment nova"
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr "els valors han d'ésser únics"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"

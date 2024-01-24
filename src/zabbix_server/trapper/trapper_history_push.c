@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -681,6 +681,12 @@ static int	process_history_push(zbx_socket_t *sock, const struct zbx_json_parse 
 	time_t				now;
 	zbx_vector_hp_item_value_ptr_t	values;
 	double				time_start;
+
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		*error = zbx_strdup(NULL, "Data collection has been paused.");
+		return FAIL;
+	}
 
 	time_start = zbx_time();
 

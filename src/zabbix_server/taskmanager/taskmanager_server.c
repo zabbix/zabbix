@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 
 #include "taskmanager_server.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 #include "../events/events.h"
-#include "../actions.h"
+#include "../actions/actions.h"
 
 #include "zbxservice.h"
 #include "zbxnix.h"
@@ -1013,11 +1013,31 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 	zbx_audit_flush();
 }
 
-static void	tm_process_temp_suppression(const char *data)
-{
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
 #define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
+static void	tm_service_manager_send_suppression_action(zbx_uint64_t eventid, zbx_uint64_t action)
+{
+	unsigned char	*data = NULL;
+	size_t          data_alloc = 0, data_offset = 0;
+
+	zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventid);
+
+	if (NULL == data)
+		return;
+
+	if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS)
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, (zbx_uint32_t)data_offset);
+	else if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS)
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, (zbx_uint32_t)data_offset);
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	zbx_free(data);
+}
+
+static void	tm_process_temp_suppression(const char *data)
+{
 	struct zbx_json_parse	jp;
 	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[12];
 	zbx_uint64_t		eventid, userid, action;
@@ -1124,10 +1144,12 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
+
+	tm_service_manager_send_suppression_action(eventid, action);
+}
 #undef ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS
 #undef ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS
 #undef ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME
-}
 
 /******************************************************************************
  *                                                                            *

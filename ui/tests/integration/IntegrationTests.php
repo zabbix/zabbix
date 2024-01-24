@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,10 @@ require_once dirname(__FILE__).'/testDiscoveryRules.php';
 require_once dirname(__FILE__).'/testAutoregistration.php';
 require_once dirname(__FILE__).'/testHistoryPush.php';
 require_once dirname(__FILE__).'/testItemTimeouts.php';
+require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
+require_once dirname(__FILE__).'/testScriptManualInput.php';
+require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
+require_once dirname(__FILE__).'/testPermissions.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -87,6 +91,10 @@ class IntegrationTests {
 		$suite->addTestSuite('testEventsCauseAndSymptoms');
 		$suite->addTestSuite('testHistoryPush');
 		$suite->addTestSuite('testItemTimeouts');
+		$suite->addTestSuite('testUserMacrosInItemNames');
+		$suite->addTestSuite('testScriptManualInput');
+		$suite->addTestSuite('testAgentJsonProtocol');
+		$suite->addTestSuite('testPermissions');
 
 		return $suite;
 	}

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1638,6 +1638,12 @@ int	zbx_process_sender_history_data(zbx_socket_t *sock, struct zbx_json_parse *j
 	zbx_host_rights_t	rights = {0};
 	int			ret;
 	zbx_dc_um_handle_t	*um_handle;
+
+	if (SUCCEED == zbx_vps_monitor_capped())
+	{
+		*info = zbx_strdup(*info, "data collection has been paused");
+		return FAIL;
+	}
 
 	um_handle = zbx_dc_open_user_macros();
 

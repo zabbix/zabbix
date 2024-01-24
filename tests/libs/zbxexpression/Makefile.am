@@ -5,6 +5,7 @@ SERVER_tests = \
 	evaluate_percentage_deviations_in_remainder \
 	substitute_lld_macros \
 	macro_fmttime \
+	macro_functions \
 	valuemaps
 endif
 
@@ -15,6 +16,7 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 COMMON_LIB_FILES = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxalerter/libzbxalerter.a \
 	$(top_srcdir)/src/libs/zbxdbsyncer/libzbxdbsyncer.a \
 	$(top_srcdir)/src/zabbix_server/dbconfig/libzbxdbconfig.a \
@@ -27,7 +29,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
+	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/libs/zbxscripts/libzbxscripts.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
@@ -101,6 +103,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxlog/libzbxlog.a \
+	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS)
 
@@ -138,6 +141,31 @@ macro_fmttime_LDADD += @SERVER_LIBS@
 macro_fmttime_LDFLAGS = @SERVER_LDFLAGS@ $(VALUECACHE_WRAP_FUNCS) $(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
 
 macro_fmttime_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
+	-I@top_srcdir@/src/libs/zbxcacheconfig \
+	-I@top_srcdir@/src/libs/zbxcachehistory \
+	-I@top_srcdir@/src/libs/zbxcachevalue \
+	-I@top_srcdir@/src/libs/zbxexpression
+
+macro_functions_SOURCES = \
+	macro_functions.c \
+	$(COMMON_SRC_FILES)
+
+macro_functions_LDADD = \
+	$(top_srcdir)/tests/mocks/valuecache/libvaluecachemock.a
+
+macro_functions_LDADD += $(COMMON_LIB_FILES) $(TLS_LIBS)
+
+macro_functions_LDADD += @SERVER_LIBS@
+
+macro_functions_LDFLAGS = @SERVER_LDFLAGS@ \
+			-Wl,--wrap=expr_db_get_trigger_value \
+			-Wl,--wrap=zbx_dc_open_user_macros \
+			-Wl,--wrap=zbx_dc_close_user_macros \
+			-Wl,--wrap=zbx_db_trigger_get_all_hostids \
+			-Wl,--wrap=zbx_dc_get_user_macro \
+			$(CMOCKA_LDFLAGS) $(YAML_LDFLAGS) $(TLS_LDFLAGS)
+
+macro_functions_CFLAGS = $(COMMON_COMPILER_FLAGS) $(TLS_CFLAGS) \
 	-I@top_srcdir@/src/libs/zbxcacheconfig \
 	-I@top_srcdir@/src/libs/zbxcachehistory \
 	-I@top_srcdir@/src/libs/zbxcachevalue \

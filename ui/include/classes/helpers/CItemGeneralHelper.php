@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,26 +236,6 @@ class CItemGeneralHelper {
 			$item['authtype'] = DB::getDefault('items', 'authtype');
 			$item['username'] = '';
 			$item['password'] = '';
-			$query_fields = [];
-
-			foreach ($item['query_fields'] as $query_field) {
-				$query_fields[] = [
-					'name' => key($query_field),
-					'value' => reset($query_field)
-				];
-			}
-
-			$item['query_fields'] = $query_fields;
-			$headers = [];
-
-			foreach ($item['headers'] as $header => $value) {
-				$headers[] = [
-					'name' => $header,
-					'value' => $value
-				];
-			}
-
-			$item['headers'] = $headers;
 		}
 
 		if ($item['type'] != ITEM_TYPE_JMX) {
@@ -264,6 +244,11 @@ class CItemGeneralHelper {
 
 		if ($item['timeout'] !== DB::getDefault('items', 'timeout')) {
 			$item['custom_timeout'] = ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
+		}
+
+		if ($item['parameters']) {
+			CArrayHelper::sort($item['parameters'], ['name']);
+			$item['parameters'] = array_values($item['parameters']);
 		}
 
 		if ($item['tags']) {
@@ -340,14 +325,9 @@ class CItemGeneralHelper {
 			$field_map['http_authtype'] = 'authtype';
 			$field_map['http_username'] = 'username';
 			$field_map['http_password'] = 'password';
-			$query_fields = [];
 
-			foreach ($input['query_fields'] as $query_field) {
-				$query_fields[] = [$query_field['name'] => $query_field['value']];
-			}
-
-			$input['query_fields'] = $query_fields;
-			$input['headers'] = array_column($input['headers'], 'value', 'name');
+			$input['query_fields'] = prepareItemQueryFields($input['query_fields']);
+			$input['headers'] = prepareItemHeaders($input['headers']);
 		}
 		else {
 			$input['query_fields'] = [];

@@ -129,6 +129,9 @@ $(RESOURCE_RES): $(RESOURCE_RC) $(RESOURCE_H) $(DESC_H)
 {..\..\..\src\libs\zbxwinservice}.c{..\..\..\src\libs\zbxwinservice}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 
+{..\..\..\src\libs\zbxagentget}.c{..\..\..\src\libs\zbxagentget}.o:
+	$(CC) $? /Fo"$@" $(CFLAGS)
+
 {..\..\..\src\zabbix_agent\active_checks}.c{..\..\..\src\zabbix_agent\active_checks}.o:
 	$(CC) $? /Fo"$@" $(CFLAGS)
 

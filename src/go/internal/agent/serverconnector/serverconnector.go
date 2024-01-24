@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -81,11 +81,13 @@ type activeChecksResponse struct {
 	Data           []*scheduler.Request   `json:"data"`
 	Commands       []*agent.RemoteCommand `json:"commands"`
 	Expressions    []*glexpr.Expression   `json:"regexp"`
+	HistoryUpload  string                 `json:"upload"`
 }
 
 type agentDataResponse struct {
-	Response string `json:"response"`
-	Info     string `json:"info"`
+	Response      string `json:"response"`
+	Info          string `json:"info"`
+	HistoryUpload string `json:"upload"`
 }
 
 type heartbeatMessage struct {
@@ -238,6 +240,12 @@ func (c *Connector) refreshActiveChecks() {
 			[]*glexpr.Expression{}, []*scheduler.Request{}, now)
 		c.firstActiveChecksRefreshed = true
 		return
+	}
+
+	if response.HistoryUpload == "disabled" {
+		c.resultCache.EnableUpload(false)
+	} else {
+		c.resultCache.EnableUpload(true)
 	}
 
 	if response.Commands != nil {

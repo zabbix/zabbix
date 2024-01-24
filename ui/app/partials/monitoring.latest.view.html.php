@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -277,13 +277,27 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol([$item_name, $item_key]))
 				->addClass($state_css)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-			(new CCol($item_delay))->addClass($state_css),
-			(new CCol($item_history))->addClass($state_css),
-			(new CCol($item_trends))->addClass($state_css),
-			(new CCol(item_type2str($item['type'])))->addClass($state_css),
-			(new CCol($last_check))->addClass($state_css),
-			(new CCol($last_value))->addClass($state_css),
-			(new CCol($change))->addClass($state_css),
+			(new CCol($item_delay))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item_history))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($item_trends))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol(item_type2str($item['type'])))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_check))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_value))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($change))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)
@@ -296,9 +310,15 @@ foreach ($data['items'] as $itemid => $item) {
 			(new CCol($item_name))
 				->addClass($state_css)
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
-			(new CCol($last_check))->addClass($state_css),
-			(new CCol($last_value))->addClass($state_css),
-			(new CCol($change))->addClass($state_css),
+			(new CCol($last_check))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($last_value))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
+			(new CCol($change))
+				->addClass($state_css)
+				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS),
 			($data['filter']['show_tags'] != SHOW_TAGS_NONE) ? $data['tags'][$itemid] : null,
 			$actions,
 			makeInformationList($item_icons)

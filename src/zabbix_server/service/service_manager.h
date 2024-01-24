@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,12 @@
 #define ZABBIX_SERVICE_MANAGER_H
 
 #include "zbxthreads.h"
+
+typedef struct
+{
+	int	config_timeout;
+}
+zbx_thread_service_manager_args;
 
 ZBX_THREAD_ENTRY(service_manager_thread, args);
 

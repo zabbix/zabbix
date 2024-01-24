@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1019,19 +1019,20 @@ class CApiInputValidator {
 				$value = (float) $number_parser->getMatch();
 			}
 			else {
+				$macro_parsers = [];
 				if ($flags & API_ALLOW_USER_MACRO) {
-					$user_macro_parser = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroParser();
+					$macro_parsers[] = new CUserMacroFunctionParser();
 				}
-
 				if ($flags & API_ALLOW_LLD_MACRO) {
-					$lld_macro_parser = new CLLDMacroParser();
-					$lld_macro_function_parser = new CLLDMacroFunctionParser();
+					$macro_parsers[] = new CLLDMacroParser();
+					$macro_parsers[] = new CLLDMacroFunctionParser();
 				}
 
-				if (($flags & API_ALLOW_USER_MACRO && $user_macro_parser->parse($data) == CParser::PARSE_SUCCESS)
-						|| ($flags & API_ALLOW_LLD_MACRO && ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS
-							|| $lld_macro_function_parser->parse($data) == CParser::PARSE_SUCCESS))) {
-					return true;
+				foreach ($macro_parsers as $macro_parser) {
+					if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+						return true;
+					}
 				}
 
 				$value = NAN;
@@ -2335,9 +2336,18 @@ class CApiInputValidator {
 
 						$object_values[] = $object[$field_name];
 
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
+						switch ($rule['fields'][$field_name]['type']) {
+							case API_SCRIPT_MENU_PATH:
+								$object_value = trim(trimPath($object[$field_name]), '/');
+								break;
+
+							case API_USER_MACRO:
+								$object_value = self::trimMacro($object[$field_name]);
+								break;
+
+							default:
+								$object_value = $object[$field_name];
+						}
 
 						if ($level < count($field_names)) {
 							if (!array_key_exists($object_value, $_uniq)) {
@@ -2381,9 +2391,23 @@ class CApiInputValidator {
 
 						$object_values[] = $object[$field_name];
 
-						$object_value = ($rule['fields'][$field_name]['type'] == API_USER_MACRO)
-							? self::trimMacro($object[$field_name])
-							: $object[$field_name];
+						switch ($rule['fields'][$field_name]['type']) {
+							case API_SCRIPT_MENU_PATH:
+								$object_value = trim(trimPath($object[$field_name]), '/');
+
+								// First or only slash from beginning is trimmed.
+								if (isset($object_value[0]) && $object_value[0] === '/') {
+									$object_value = substr($object_value, 1);
+								}
+								break;
+
+							case API_USER_MACRO:
+								$object_value = self::trimMacro($object[$field_name]);
+								break;
+
+							default:
+								$object_value = $object[$field_name];
+						}
 
 						if (!in_array($object_value, $values)) {
 							$_uniqs = [&$uniq];
@@ -2595,6 +2619,7 @@ class CApiInputValidator {
 
 		$options = [
 			'allow_user_macro' => (bool) ($flags & API_ALLOW_USER_MACRO),
+			'allow_manualinput_macro' => (bool) ($flags & API_ALLOW_MANUALINPUT_MACRO),
 			'allow_event_tags_macro' => (bool) ($flags & API_ALLOW_EVENT_TAGS_MACRO)
 		];
 
@@ -2844,18 +2869,18 @@ class CApiInputValidator {
 			return false;
 		}
 
+		$macro_parsers = [];
 		if ($flags & API_ALLOW_USER_MACRO) {
-			$user_macro_parser = new CUserMacroParser();
-
-			if ($user_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
-				return true;
-			}
+			$macro_parsers[] = new CUserMacroParser();
+			$macro_parsers[] = new CUserMacroFunctionParser();
+		}
+		if ($flags & API_ALLOW_LLD_MACRO) {
+			$macro_parsers[] = new CLLDMacroParser();
+			$macro_parsers[] = new CLLDMacroFunctionParser();
 		}
 
-		if ($flags & API_ALLOW_LLD_MACRO) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if ($lld_macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
+		foreach ($macro_parsers as $macro_parser) {
+			if ($macro_parser->parse($data) == CParser::PARSE_SUCCESS) {
 				return true;
 			}
 		}

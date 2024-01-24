@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -269,39 +269,38 @@ abstract class CItemGeneral extends CApiService {
 			}
 
 			if (array_key_exists('query_fields', $item)) {
-				foreach ($item['query_fields'] as $query_field) {
-					if (count($query_field) != 1 || key($query_field) === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1).'/query_fields', _('nonempty key and value pair expected'))
-						);
-					}
-				}
-
-				$item['query_fields'] = $item['query_fields'] ? json_encode($item['query_fields']) : '';
-
-				if (strlen($item['query_fields']) > DB::getFieldLength('items', 'query_fields')) {
+				if (strlen(self::prepareQueryFieldsForDb($item['query_fields']))
+						> DB::getFieldLength('items', 'query_fields')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/query_fields', _('value is too long')
 					));
 				}
+
+				$sortorder = 0;
+				$fields = [];
+
+				foreach ($item['query_fields'] as $field) {
+					$fields[++$sortorder] = ['sortorder' => $sortorder] + $field;
+				}
+
+				$item['query_fields'] = $fields;
 			}
 
 			if (array_key_exists('headers', $item)) {
-				foreach ($item['headers'] as $name => $value) {
-					if (trim($name) === '' || !is_string($value) || $value === '') {
-						self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
-							'/'.($i + 1).'/headers', _('nonempty key and value pair expected')
-						));
-					}
-				}
-
-				$item['headers'] = self::headersArrayToString($item['headers']);
-
-				if (strlen($item['headers']) > DB::getFieldLength('items', 'headers')) {
+				if (strlen(self::prepareHeadersForDb($item['headers'])) > DB::getFieldLength('items', 'headers')) {
 					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.',
 						'/'.($i + 1).'/headers', _('value is too long')
 					));
 				}
+
+				$sortorder = 0;
+				$fields = [];
+
+				foreach ($item['headers'] as $field) {
+					$fields[++$sortorder] = ['sortorder' => $sortorder] + $field;
+				}
+
+				$item['headers'] = $fields;
 			}
 		}
 		unset($item);
@@ -1297,11 +1296,11 @@ abstract class CItemGeneral extends CApiService {
 
 			// HTTP Agent item type specific fields.
 			'url' => DB::getDefault('items', 'url'),
-			'query_fields' => DB::getDefault('items', 'query_fields'),
+			'query_fields' => [],
 			'request_method' => DB::getDefault('items', 'request_method'),
 			'post_type' => DB::getDefault('items', 'post_type'),
 			'posts' => DB::getDefault('items', 'posts'),
-			'headers' => DB::getDefault('items', 'headers'),
+			'headers' => [],
 			'status_codes' => DB::getDefault('items', 'status_codes'),
 			'follow_redirects' => DB::getDefault('items', 'follow_redirects'),
 			'retrieve_mode' => DB::getDefault('items', 'retrieve_mode'),
@@ -2480,44 +2479,6 @@ abstract class CItemGeneral extends CApiService {
 	}
 
 	/**
-	 * Converts headers field text to hash with header name as key.
-	 *
-	 * @param string $headers  Headers string, one header per line, line delimiter "\r\n".
-	 *
-	 * @return array
-	 */
-	protected static function headersStringToArray(string $headers): array {
-		$result = [];
-
-		foreach (explode("\r\n", $headers) as $header) {
-			$header = explode(': ', $header, 2);
-
-			if (count($header) == 2) {
-				$result[$header[0]] = $header[1];
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Converts headers fields hash to string.
-	 *
-	 * @param array $headers  Array of headers where key is header name.
-	 *
-	 * @return string
-	 */
-	protected static function headersArrayToString(array $headers): string {
-		$result = [];
-
-		foreach ($headers as $k => $v) {
-			$result[] = $k.': '.$v;
-		}
-
-		return implode("\r\n", $result);
-	}
-
-	/**
 	 * Remove NCLOB value type fields from resulting query SELECT part if DISTINCT will be used.
 	 *
 	 * @param string $table_name     Table name.
@@ -2528,64 +2489,9 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array    The resulting SQL parts array.
 	 */
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
-		if (!$options['countOutput'] && self::dbDistinct($sql_parts)) {
-			$schema = $this->getTableSchema();
-			$nclob_fields = [];
-
-			foreach ($schema['fields'] as $field_name => $field) {
-				if ($field['type'] == DB::FIELD_TYPE_NCLOB
-						&& $this->outputIsRequested($field_name, $options['output'])) {
-					$nclob_fields[] = $field_name;
-				}
-			}
-
-			if ($nclob_fields) {
-				$output = ($options['output'] === API_OUTPUT_EXTEND)
-					? array_keys($schema['fields'])
-					: $options['output'];
-
-				$options['output'] = array_diff($output, $nclob_fields);
-			}
-		}
+		$this->unsetNclobFieldsFromOutput($options, $sql_parts);
 
 		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
-	}
-
-	/**
-	 * Add NCLOB type fields if there was DISTINCT in query.
-	 *
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 *
-	 * @return array    The result array with added NCLOB fields.
-	 */
-	protected function addNclobFieldValues(array $options, array $result): array {
-		$schema = $this->getTableSchema();
-		$nclob_fields = [];
-
-		foreach ($schema['fields'] as $field_name => $field) {
-			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
-				$nclob_fields[] = $field_name;
-			}
-		}
-
-		if (!$nclob_fields) {
-			return $result;
-		}
-
-		$pk = $schema['key'];
-		$options = [
-			'output' => $nclob_fields,
-			'filter' => [$pk => array_keys($result)]
-		];
-
-		$db_items = DBselect(DB::makeSql($this->tableName, $options));
-
-		while ($db_item = DBfetch($db_items)) {
-			$result[$db_item[$pk]] += $db_item;
-		}
-
-		return $result;
 	}
 
 	/**
@@ -2869,5 +2775,95 @@ abstract class CItemGeneral extends CApiService {
 		}
 
 		return array_merge($ns_regex, $ns_any, $other);
+	}
+
+	protected static function prepareItemsForApi(array &$items, bool $sortorder = true): void {
+		foreach ($items as &$item) {
+			self::prepareItemForApi($item, $sortorder);
+		}
+		unset($item);
+	}
+
+	protected static function prepareItemForApi(array &$item, bool $sortorder = true): void {
+		if (array_key_exists('query_fields', $item)) {
+			$item['query_fields'] = self::prepareQueryFieldsForApi($item['query_fields'], $sortorder);
+		}
+
+		if (array_key_exists('headers', $item)) {
+			$item['headers'] = self::prepareHeadersForApi($item['headers'], $sortorder);
+		}
+	}
+
+	private static function prepareQueryFieldsForApi(string $query_fields, bool $sortorder): array {
+		if ($query_fields === '') {
+			return [];
+		}
+
+		$_query_fields = json_decode($query_fields, true);
+		$query_fields = [];
+
+		if (json_last_error() == JSON_ERROR_NONE) {
+			foreach ($_query_fields as $i => $field) {
+				$query_fields[] = $sortorder
+					? ['sortorder' => $i + 1, 'name' => (string) key($field), 'value' => reset($field)]
+					: ['name' => (string) key($field), 'value' => reset($field)];
+			}
+		}
+
+		return $query_fields;
+	}
+
+	private static function prepareHeadersForApi(string $headers, bool $sortorder): array {
+		if ($headers === '') {
+			return [];
+		}
+
+		$_headers = explode("\r\n", $headers);
+		$headers = [];
+
+		foreach ($_headers as $i => $header) {
+			[$name, $value] = explode(': ', $header, 2) + [1 => ''];
+
+			$headers[] = $sortorder
+				? ['sortorder' => $i + 1, 'name' => $name, 'value' => $value]
+				: ['name' => $name, 'value' => $value];
+		}
+
+		return $headers;
+	}
+
+	protected static function prepareItemsForDb(array &$items): void {
+		foreach ($items as &$item) {
+			self::prepareItemForDb($item);
+		}
+		unset($item);
+	}
+
+	private static function prepareItemForDb(array &$item): void {
+		if (array_key_exists('query_fields', $item)) {
+			$item['query_fields'] = self::prepareQueryFieldsForDb($item['query_fields']);
+		}
+
+		if (array_key_exists('headers', $item)) {
+			$item['headers'] = self::prepareHeadersForDb($item['headers']);
+		}
+	}
+
+	private static function prepareQueryFieldsForDb(array $query_fields): string {
+		foreach ($query_fields as &$query_field) {
+			$query_field = [$query_field['name'] => $query_field['value']];
+		}
+		unset($query_field);
+
+		return $query_fields ? json_encode(array_values($query_fields), JSON_UNESCAPED_UNICODE) : '';
+	}
+
+	private static function prepareHeadersForDb(array $headers): string {
+		foreach ($headers as &$header) {
+			$header = $header['name'].': '.$header['value'];
+		}
+		unset($header);
+
+		return $headers ? implode("\r\n", $headers) : '';
 	}
 }

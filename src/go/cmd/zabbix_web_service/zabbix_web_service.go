@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -40,6 +40,7 @@ import (
 const usageMessageFormat = //
 `Usage of Zabbix web service:
   %[1]s [-c config-file]
+  %[1]s [-c config-file] -T
   %[1]s -h
   %[1]s -V
 
@@ -58,9 +59,10 @@ type handler struct {
 
 func main() {
 	var (
-		confFlag    string
-		helpFlag    bool
-		versionFlag bool
+		confFlag       string
+		helpFlag       bool
+		testConfigFlag bool
+		versionFlag    bool
 	)
 
 	version.Init(applicationName)
@@ -76,6 +78,15 @@ func main() {
 			},
 			Default: confDefault,
 			Dest:    &confFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test-config",
+				Shorthand:   "T",
+				Description: "Validate configuration file and exit",
+			},
+			Default: false,
+			Dest:    &testConfigFlag,
 		},
 		&zbxflag.BoolFlag{
 			Flag: zbxflag.Flag{
@@ -119,8 +130,22 @@ func main() {
 		os.Exit(0)
 	}
 
+	if testConfigFlag {
+		if confFlag == "" {
+			fmt.Fprintf(os.Stderr, "cannot validate configuration file: %s\n", "it was not specified")
+			os.Exit(1)
+		}
+
+		fmt.Printf("Validating configuration file \"%s\"\n", confFlag)
+	}
+
 	if err := conf.Load(confFlag, &options); err != nil {
 		fatalExit("", err)
+	}
+
+	if testConfigFlag {
+		fmt.Println("Validation successful")
+		os.Exit(0)
 	}
 
 	var logType, logLevel int
