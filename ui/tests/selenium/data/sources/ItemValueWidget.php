@@ -37,7 +37,7 @@ class ItemValueWidget {
 					]
 				],
 				'groups' => [
-					'groupid' => '4'
+					'groupid' => '4' // 'Zabbix servers' group.
 				],
 				'items' => [
 					[
@@ -98,7 +98,7 @@ class ItemValueWidget {
 					]
 				],
 				'groups' => [
-					'groupid' => '4'
+					'groupid' => '4' // 'Zabbix servers' group.
 				],
 				'items' => [
 					[

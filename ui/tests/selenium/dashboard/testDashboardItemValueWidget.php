@@ -2085,12 +2085,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (log) item without data and with aggregation function min.
+			// Non-numeric (Log) item without data and with aggregation function min.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Log',
-						'Name' => 'Non numeric (log) item without data and with aggregation function min',
+						'Name' => 'Non-numeric (log) item without data and with aggregation function min',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'min'
 					],
@@ -2101,12 +2101,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Character) item without data and with aggregation function max.
+			// Non-numeric (Character) item without data and with aggregation function max.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Character',
-						'Name' => 'Non numeric (Character) item without data and with aggregation function max',
+						'Name' => 'Non-numeric (Character) item without data and with aggregation function max',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'max'
 					],
@@ -2117,12 +2117,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Text) item without data and with aggregation function avg.
+			// Non-numeric (Text) item without data and with aggregation function avg.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
-						'Name' => 'Non numeric (Text) item without data and with aggregation function avg',
+						'Name' => 'Non-numeric (Text) item without data and with aggregation function avg',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'avg'
 					],
@@ -2133,12 +2133,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (log) item without data and with aggregation function sum.
+			// Non-numeric (Log) item without data and with aggregation function sum.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Log',
-						'Name' => 'Non numeric (log) item without data and with aggregation function sum',
+						'Name' => 'Non-numeric (log) item without data and with aggregation function sum',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'sum'
 					],
@@ -2149,12 +2149,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Character) item without data and with aggregation function first.
+			// Non-numeric (Character) item without data and with aggregation function first.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Character',
-						'Name' => 'Non numeric (Character) item without data and with aggregation function first',
+						'Name' => 'Non-numeric (Character) item without data and with aggregation function first',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'first'
 					],
@@ -2165,12 +2165,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Text) item without data and with aggregation function last.
+			// Non-numeric (Text) item without data and with aggregation function last.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
-						'Name' => 'Non numeric (Text) item without data and with aggregation function last',
+						'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'last'
 					],
@@ -2181,12 +2181,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (log) item without data and with aggregation function not used.
+			// Non-numeric (Log) item without data and with aggregation function not used.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Log',
-						'Name' => 'Non numeric (log) item without data and with aggregation function not used',
+						'Name' => 'Non-numeric (log) item without data and with aggregation function not used',
 						'Advanced configuration' => true
 					],
 					'thresholds' => [
@@ -2196,12 +2196,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (log) item without data but with aggregation function count (return 0).
+			// Non-numeric (Log) item without data but with aggregation function count (return 0).
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Log',
-						'Name' => 'Non numeric (log) item without data but with aggregation function count',
+						'Name' => 'Non-numeric (log) item without data but with aggregation function count',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2212,12 +2212,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Character) item without data but with aggregation function count (return 0).
+			// Non-numeric (Character) item without data but with aggregation function count (return 0).
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Character',
-						'Name' => 'Non numeric (Character) item without data but with aggregation function count',
+						'Name' => 'Non-numeric (Character) item without data but with aggregation function count',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2228,12 +2228,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Text) item without data but with aggregation function count (return 0).
+			// Non-numeric (Text) item without data but with aggregation function count (return 0).
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
-						'Name' => 'Non numeric (Text) item without data but with aggregation function count',
+						'Name' => 'Non-numeric (Text) item without data but with aggregation function count',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2244,12 +2244,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (log) item without data but with aggregation function count (return 0) and threshold equals 0.
+			// Non-numeric (Log) item without data but with aggregation function count (return 0) and threshold equals 0.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Log',
-						'Name' => 'Non numeric (log) item without data but with aggregation function count and threshold that match 0',
+						'Name' => 'Non-numeric (log) item without data but with aggregation function count and threshold that match 0',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2258,12 +2258,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// Non numeric (Character) item without data but with aggregation function count (return 0) and threshold equals 0.
+			// Non-numeric (Character) item without data but with aggregation function count (return 0) and threshold equals 0.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Character',
-						'Name' => 'Non numeric (Character) item without data but with aggregation function count and threshold that match 0',
+						'Name' => 'Non-numeric (Character) item without data but with aggregation function count and threshold that match 0',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2272,12 +2272,12 @@ class testDashboardItemValueWidget extends testWidgets {
 					]
 				]
 			],
-			// Non numeric (Text) item without data but with aggregation function count (return 0) and threshold equals 0.
+			// Non-numeric (Text) item without data but with aggregation function count (return 0) and threshold equals 0.
 			[
 				[
 					'fields' => [
 						'Item' => 'Item with type of information - Text',
-						'Name' => 'Non numeric (Text) item without data but with aggregation function count and threshold that match 0',
+						'Name' => 'Non-numeric (Text) item without data but with aggregation function count and threshold that match 0',
 						'Advanced configuration' => true,
 						'Aggregation function' => 'count'
 					],
@@ -2352,7 +2352,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'value' => '1.02'
 				]
 			],
-			// Non numeric (Text) item with data and aggregation function count.
+			// Non-numeric (Text) item with data and aggregation function count.
 			[
 				[
 					'fields' => [
@@ -2368,7 +2368,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'value' => 'test'
 				]
 			],
-			// Non numeric (Log) item with data and aggregation function count.
+			// Non-numeric (Log) item with data and aggregation function count.
 			[
 				[
 					'fields' => [
@@ -2384,7 +2384,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'value' => 'test'
 				]
 			],
-			// Non numeric (Character) item with data and aggregation function count.
+			// Non-numeric (Character) item with data and aggregation function count.
 			[
 				[
 					'fields' => [
@@ -2508,7 +2508,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'value' => '0'
 				]
 			],
-			// Non numeric (Log) item with data and aggregation function min.
+			// Non-numeric (Log) item with data and aggregation function min.
 			[
 				[
 					'fields' => [
@@ -2525,7 +2525,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Character) item with data and aggregation function max.
+			// Non-numeric (Character) item with data and aggregation function max.
 			[
 				[
 					'fields' => [
@@ -2543,7 +2543,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Text) item with data and aggregation function avg.
+			// Non-numeric (Text) item with data and aggregation function avg.
 			[
 				[
 					'fields' => [
@@ -2561,7 +2561,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Log) item with data and aggregation function sum.
+			// Non-numeric (Log) item with data and aggregation function sum.
 			[
 				[
 					'fields' => [
@@ -2579,7 +2579,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Character) item with data and aggregation function first.
+			// Non-numeric (Character) item with data and aggregation function first.
 			[
 				[
 					'fields' => [
@@ -2596,7 +2596,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Text) item with data and aggregation function last.
+			// Non-numeric (Text) item with data and aggregation function last.
 			[
 				[
 					'fields' => [
@@ -2613,7 +2613,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'opacity' => 'transparent'
 				]
 			],
-			// Non numeric (Text) item with data and aggregation function not used.
+			// Non-numeric (Text) item with data and aggregation function not used.
 			[
 				[
 					'fields' => [
@@ -2677,7 +2677,7 @@ class testDashboardItemValueWidget extends testWidgets {
 			);
 		}
 
-		// Neccessary for test stability.
+		// Necessary for test stability.
 		$dashboard->edit()->deleteWidget($data['fields']['Name'])->save();
 	}
 
@@ -3383,7 +3383,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected_value' => '11.99'
 				]
 			],
-			// Non numeric (text) item with aggregation function 'count' and Custom time period with relative time.
+			// Non-numeric (Text) item with aggregation function 'count' and Custom time period with relative time.
 			[
 				[
 					'fields' => [
@@ -3416,7 +3416,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'arrow' => 'up'
 				]
 			],
-			// Non numeric (Log) item with aggregation function 'min' and Custom time period with relative time.
+			// Non-numeric (Log) item with aggregation function 'min' and Custom time period with relative time.
 			[
 				[
 					'fields' => [
@@ -3437,7 +3437,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected_value' => 'No data'
 				]
 			],
-			// Non numeric (Character) item with aggregation function 'max' and Custom time period with absolute time.
+			// Non-numeric (Character) item with aggregation function 'max' and Custom time period with absolute time.
 			[
 				[
 					'fields' => [
@@ -3458,7 +3458,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected_value' => 'No data'
 				]
 			],
-			// Non numeric (Text) item with aggregation function 'avg' and Custom time period with relative time.
+			// Non-numeric (Text) item with aggregation function 'avg' and Custom time period with relative time.
 			[
 				[
 					'fields' => [
@@ -3483,7 +3483,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected_value' => 'No data'
 				]
 			],
-			// Non numeric (Log) item with aggregation function 'sum' and Custom time period.
+			// Non-numeric (Log) item with aggregation function 'sum' and Custom time period.
 			[
 				[
 					'fields' => [
@@ -3508,7 +3508,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'expected_value' => 'No data'
 				]
 			],
-			// Non numeric (Character) item with aggregation function 'first' and Custom time period.
+			// Non-numeric (Character) item with aggregation function 'first' and Custom time period.
 			[
 				[
 					'fields' => [
@@ -3538,7 +3538,7 @@ class testDashboardItemValueWidget extends testWidgets {
 					'arrow' => 'up-down'
 				]
 			],
-			// Non numeric (Text) item with aggregation function 'last' and Custom time period.
+			// Non-numeric (Text) item with aggregation function 'last' and Custom time period.
 			[
 				[
 					'fields' => [
@@ -3884,7 +3884,8 @@ class testDashboardItemValueWidget extends testWidgets {
 		$item_value = $content->query('class:value')->one()->getText();
 
 		if (array_key_exists('units', $data)) {
-			$widget_value = $item_value.$content->query('class:decimals')->one()->getText().$content->query('class:units')->one()->getText();
+			$widget_value = $item_value.$content->query('class:decimals')->one()->getText()
+					.$content->query('class:units')->one()->getText();
 		}
 		else {
 			$widget_value = (array_key_exists('value_mapping', $data) || array_key_exists('non_numeric', $data))
