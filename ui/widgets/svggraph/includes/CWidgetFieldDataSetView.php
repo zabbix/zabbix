@@ -30,6 +30,7 @@ use CButton,
 	CDiv,
 	CFormField,
 	CFormGrid,
+	CItemHelper,
 	CLabel,
 	CLink,
 	CList,
@@ -391,14 +392,14 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 									->setFocusableElementId('label-'.$field_name.'_'.$row_num.'_aggregate_function')
 									->setValue((int) $value['aggregate_function'])
 									->addOptions(CSelect::createOptionsFromArray([
-										AGGREGATE_NONE => graph_item_aggr_fnc2str(AGGREGATE_NONE),
-										AGGREGATE_MIN => graph_item_aggr_fnc2str(AGGREGATE_MIN),
-										AGGREGATE_MAX => graph_item_aggr_fnc2str(AGGREGATE_MAX),
-										AGGREGATE_AVG => graph_item_aggr_fnc2str(AGGREGATE_AVG),
-										AGGREGATE_COUNT => graph_item_aggr_fnc2str(AGGREGATE_COUNT),
-										AGGREGATE_SUM => graph_item_aggr_fnc2str(AGGREGATE_SUM),
-										AGGREGATE_FIRST => graph_item_aggr_fnc2str(AGGREGATE_FIRST),
-										AGGREGATE_LAST => graph_item_aggr_fnc2str(AGGREGATE_LAST)
+										AGGREGATE_NONE => CItemHelper::getAggregateFunctionName(AGGREGATE_NONE),
+										AGGREGATE_MIN => CItemHelper::getAggregateFunctionName(AGGREGATE_MIN),
+										AGGREGATE_MAX => CItemHelper::getAggregateFunctionName(AGGREGATE_MAX),
+										AGGREGATE_AVG => CItemHelper::getAggregateFunctionName(AGGREGATE_AVG),
+										AGGREGATE_COUNT => CItemHelper::getAggregateFunctionName(AGGREGATE_COUNT),
+										AGGREGATE_SUM => CItemHelper::getAggregateFunctionName(AGGREGATE_SUM),
+										AGGREGATE_FIRST => CItemHelper::getAggregateFunctionName(AGGREGATE_FIRST),
+										AGGREGATE_LAST => CItemHelper::getAggregateFunctionName(AGGREGATE_LAST)
 									]))
 									->setWidth(ZBX_TEXTAREA_TINY_WIDTH)
 							)

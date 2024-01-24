@@ -75,7 +75,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 					'expected' => TEST_BAD,
 					'names' => [
 						'Service with multiple service tags',
-						'Service for duplitate check'
+						'Service for duplicate check'
 					],
 					'Tags' => [
 						'action' => 'Add',
@@ -326,7 +326,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 				[
 					'names' => [
 						'Service with problem tags',
-						'Service for duplitate check'
+						'Service for duplicate check'
 					],
 					'Tags' => [
 						'action' => 'Add',
@@ -365,7 +365,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 				[
 					'names' => [
 						'Service with problem tags',
-						'Service for duplitate check'
+						'Service for duplicate check'
 					],
 					'Tags' => [
 						'action' => 'Replace',
@@ -389,7 +389,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 				[
 					'names' => [
 						'Service with problem tags',
-						'Service for duplitate check'
+						'Service for duplicate check'
 					],
 					'Tags' => [
 						'action' => 'Replace',
@@ -413,7 +413,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 				[
 					'names' => [
 						'Service with problem tags',
-						'Service for duplitate check'
+						'Service for duplicate check'
 					],
 					'Tags' => [
 						'action' => 'Replace',
@@ -434,7 +434,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 				[
 					'names' => [
 						'Service with problem tags',
-						'Service for duplitate check'
+						'Service for duplicate check'
 					],
 					'Tags' => [
 						'action' => 'Replace',
@@ -538,7 +538,7 @@ class testPageServicesServicesMassUpdate extends CWebTest {
 			'Service with problem',
 			'Service with multiple service tags',
 			'Service with problem tags',
-			'Service for duplitate check'
+			'Service for duplicate check'
 		];
 
 		$new_tags = [

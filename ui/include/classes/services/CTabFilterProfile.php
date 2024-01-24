@@ -139,7 +139,10 @@ class CTabFilterProfile {
 			? $this->tabfilters[$index] + $this->filter_defaults
 			: $this->filter_defaults;
 
-		if (!$data['filter_custom_time']) {
+		if ($data['filter_custom_time']) {
+			$data['filter_custom_time_label'] = relativeDateToText($data['from'], $data['to']);
+		}
+		else {
 			$data['from'] = $this->from;
 			$data['to'] = $this->to;
 		}

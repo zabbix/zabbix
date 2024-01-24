@@ -201,6 +201,10 @@ class CTabFilter extends CBaseComponent {
 			return;
 		}
 
+		this._target.querySelector('a.btn-time').textContent = item.hasCustomTime()
+			? item.getCustomTimeLabel()
+			: this._timeselector._data.label;
+
 		let disabled = disable || (!this._options.support_custom_time || item.hasCustomTime()),
 			buttons = {
 				decrement_button: this._target.querySelector('button.js-btn-time-left'),

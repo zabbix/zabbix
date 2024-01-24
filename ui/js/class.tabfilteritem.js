@@ -303,6 +303,15 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
+	 * Get custom time label.
+	 *
+	 * @returns {string}
+	 */
+	getCustomTimeLabel() {
+		return this.hasCustomTime() ? this._data.filter_custom_time_label : '';
+	}
+
+	/**
 	 * Update tab filter configuration: name, show_counter, custom_time. Set browser URL according new values.
 	 *
 	 * @param {object} data  Updated tab properties object.
@@ -316,6 +325,7 @@ class CTabFilterItem extends CBaseComponent {
 			};
 
 		if (data.filter_custom_time) {
+			this._data.filter_custom_time_label = data.filter_custom_time_label;
 			this._data.from = data.from;
 			this._data.to = data.to;
 		}

@@ -26,7 +26,7 @@
 #include "zbxself.h"
 #include "zbxdiscovery.h"
 #include "zbxtrends.h"
-#include "../vmware/vmware.h"
+#include "zbxvmware.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"

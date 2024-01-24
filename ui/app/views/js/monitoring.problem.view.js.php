@@ -409,7 +409,7 @@
 					}
 				})
 				.catch(() => {
-					/**
+					/*
 					 * On error restart refresh timer.
 					 * If refresh interval is set to 0 (no refresh) schedule initialization request after 5 sec.
 					 */

@@ -123,7 +123,7 @@ class testFormTagsDiscoveredHost extends testFormTags {
 	public function testFormTagsDiscoveredHost_InheritedTagLayout() {
 		$hostid = CDBHelper::getValue('SELECT hostid FROM hosts WHERE host='.zbx_dbstr($this->clone_name).' AND flags=4');
 		$all_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE hostid='.$hostid.' ORDER BY tag, value');
-		$inerited_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE automatic=1 AND hostid='.
+		$inherited_tags = CDBHelper::getAll('SELECT tag, value FROM host_tag WHERE automatic=1 AND hostid='.
 				$hostid.' ORDER BY tag, value');
 		$this->page->login()->open($this->link);
 		$this->query('link', $this->clone_name)->waitUntilClickable()->one()->click();
@@ -132,7 +132,7 @@ class testFormTagsDiscoveredHost extends testFormTags {
 		$tags_table = $this->query('class:tags-table')->asMultifieldTable()->one();
 		$tags_table->checkValue($all_tags);
 
-		foreach ($inerited_tags as $tag) {
+		foreach ($inherited_tags as $tag) {
 			$row = $tags_table->findRow('Name', $tag['tag']);
 			// Inherited tags are disabled and don't contain a remove button.
 			$this->assertFalse($row->query('button:Remove')->one(false)->isValid());

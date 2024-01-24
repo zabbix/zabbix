@@ -684,7 +684,7 @@ class testHostPrototype extends CAPITest {
 							' FROM interface_snmp'.
 							' WHERE interfaceid='.zbx_dbstr($interface['interfaceid'])
 						),
-						'Incorrect number of SNMP defails in database.'
+						'Incorrect number of SNMP details in database.'
 					);
 				}
 			}
