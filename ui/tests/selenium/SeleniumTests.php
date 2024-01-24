@@ -120,6 +120,10 @@ require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/hosts/testPageHosts.php';
 require_once dirname(__FILE__).'/hosts/testPageMonitoringHosts.php';
 
+// Icon mapping.
+require_once dirname(__FILE__).'/iconMapping/testFormAdministrationGeneralIconMapping.php';
+require_once dirname(__FILE__).'/iconMapping/testPageAdministrationGeneralIconMapping.php';
+
 // Items.
 require_once dirname(__FILE__).'/items/testFormItem.php';
 require_once dirname(__FILE__).'/items/testFormItemHttpAgent.php';
@@ -264,7 +268,6 @@ require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
 
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
-require_once dirname(__FILE__).'/testPageAdministrationGeneralIconMapping.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
@@ -288,7 +291,6 @@ require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralIconMapping.php';
 //require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralRegexp.php';
@@ -428,6 +430,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageMonitoringHosts');
 
+		// Icon mapping.
+		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
+		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
+
 		// Items.
 		$suite->addTestSuite('testFormItem');
 		$suite->addTestSuite('testFormItemHttpAgent');
@@ -561,7 +567,6 @@ class SeleniumTests {
 
 		$suite->addTestSuite('testExecuteNow');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
-		$suite->addTestSuite('testPageAdministrationGeneralIconMapping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralModules');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
@@ -587,7 +592,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
-		$suite->addTestSuite('testFormAdministrationGeneralIconMapping');
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
