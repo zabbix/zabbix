@@ -9914,6 +9914,12 @@ return [
 				'length' => 255,
 				'default' => ''
 			],
+			'local_port' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => '10051'
+			],
 			'proxy_groupid' => [
 				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
@@ -9932,6 +9938,12 @@ return [
 				'length' => 20,
 				'ref_table' => 'proxy',
 				'ref_field' => 'proxyid'
+			],
+			'status' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '0'
 			],
 			'lastaccess' => [
 				'null' => false,
@@ -9975,13 +9987,13 @@ return [
 			'failover_delay' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_CHAR,
-				'length' => 32,
+				'length' => 255,
 				'default' => '1m'
 			],
 			'min_online' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_INT,
-				'length' => 10,
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 255,
 				'default' => '1'
 			],
 			'status' => [
@@ -10014,7 +10026,7 @@ return [
 				'default' => ''
 			],
 			'proxyid' => [
-				'null' => false,
+				'null' => true,
 				'type' => DB::FIELD_TYPE_ID,
 				'length' => 20,
 				'ref_table' => 'proxy',
