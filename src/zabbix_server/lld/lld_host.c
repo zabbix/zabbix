@@ -18,9 +18,10 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
+
+#include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_host.h"
@@ -28,6 +29,11 @@
 #include "zbxdbwrap.h"
 #include "zbx_host_constants.h"
 #include "zbxstr.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
 #include "zbxcrypto.h"
 #include "zbxhash.h"
 

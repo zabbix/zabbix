@@ -19,8 +19,8 @@
 
 #include "events.h"
 
-#include "../db_lengths.h"
-#include "../actions.h"
+#include "../db_lengths_constants.h"
+#include "../actions/actions.h"
 
 #include "zbxexpression.h"
 #include "zbxexport.h"
