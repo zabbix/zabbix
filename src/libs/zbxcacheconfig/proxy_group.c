@@ -453,7 +453,19 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 		}
 	}
 
-	zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
+	const char	*local_port = proxy->local_port;
+
+	if ('\0' != *local_port && '{' == *local_port)
+	{
+		um_cache_resolve_const(config->um_cache, NULL, 0, proxy->local_port, ZBX_MACRO_ENV_NONSECURE,
+				&local_port);
+	}
+
+	if ('\0' != *local_port)
+		zbx_snprintf(redirect->address, sizeof(redirect->address), "%s:%s", proxy->local_address, local_port);
+	else
+		zbx_strlcpy(redirect->address, proxy->local_address, sizeof(redirect->address));
+
 	redirect->revision = hpi->host_proxy->revision;
 	redirect->reset = 0;
 

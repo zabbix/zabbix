@@ -487,6 +487,7 @@ typedef struct
 	const char			*address;
 	const char			*port;
 	const char			*local_address;
+	const char			*local_port;
 
 	unsigned char			custom_timeouts;
 	zbx_config_item_type_timeouts_t	item_timeouts;

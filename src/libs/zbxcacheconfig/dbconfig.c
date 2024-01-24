@@ -1530,6 +1530,7 @@ static void	DCsync_proxy_remove(ZBX_DC_PROXY *proxy)
 	dc_strpool_release(proxy->address);
 	dc_strpool_release(proxy->port);
 	dc_strpool_release(proxy->local_address);
+	dc_strpool_release(proxy->local_port);
 	dc_strpool_release(proxy->version_str);
 	dc_strpool_release(proxy->item_timeouts.agent);
 	dc_strpool_release(proxy->item_timeouts.simple);
@@ -7298,7 +7299,8 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 
 		/* in the case of local address change for proxy in a proxy group */
 		/* force re-sync of proxy lists to group proxies                  */
-		if (0 != proxy_groupid && 0 != found && 0 != strcmp(proxy->local_address, row[24]))
+		if (0 != proxy_groupid && 0 != found && (0 != strcmp(proxy->local_address, row[24]) ||
+				0 != strcmp(proxy->local_port, row[25])))
 		{
 			zbx_pg_group_t	*pg;
 
@@ -7308,7 +7310,9 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 				config->revision.proxy_group = revision;
 			}
 		}
+
 		dc_strpool_replace(found, &proxy->local_address, row[24]);
+		dc_strpool_replace(found, &proxy->local_port, row[25]);
 
 		dc_strpool_replace(found, &proxy->item_timeouts.agent, row[13]);
 		dc_strpool_replace(found, &proxy->item_timeouts.simple, row[14]);
