@@ -13,7 +13,12 @@
 			"width": 4,
 			"height": 3
 		},
-		"js_class": "CWidgetItem"
+		"js_class": "CWidgetItem",
+		"in": {
+			"time_period": {
+				"type": "_timeperiod"
+			}
+		}
 	},
 	"actions": {
 		"widget.item.view": {

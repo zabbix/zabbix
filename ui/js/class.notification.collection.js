@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -261,7 +261,7 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 
 /**
  * Notification sequence is maintained in DOM, in server response notifications must be ordered.
- * Shows or hides list node, updates and appends notification nodes, then deligates to remove dangling nodes.
+ * Shows or hides list node, updates and appends notification nodes, then delegates to remove dangling nodes.
  *
  * @param {object} severity_styles
  * @param {ZBX_NotificationsAlarm} alarm_state

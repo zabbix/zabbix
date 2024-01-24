@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -460,7 +460,7 @@ function submitPopup(overlay) {
 			message_box.insertBefore(form);
 		}
 		else if (action === 'item.prototype.massupdate' || action === 'item.massupdate') {
-			// Item and item prototype lists javascript handles successfull update.
+			// Item and item prototype lists javascript handles successful update.
 			overlayDialogueDestroy(overlay.dialogueid);
 			overlay.$dialogue[0].dispatchEvent(new CustomEvent('dialogue.submit', {detail: response}));
 		}

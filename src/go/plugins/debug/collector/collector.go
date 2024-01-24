@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,11 @@ package empty
 
 import (
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
+
+var impl Plugin
 
 type Options struct {
 	plugin.SystemOptions `conf:"optional,name=System"`
@@ -36,7 +39,13 @@ type Plugin struct {
 	options Options
 }
 
-var impl Plugin
+func init() {
+	impl.options.Interval = 1
+	err := plugin.RegisterMetrics(&impl, "DebugCollector", "debug.collector", "Returns empty value.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	p.Debugf("export %s%v", key, params)
@@ -64,9 +73,4 @@ func (p *Plugin) Configure(global *plugin.GlobalOptions, private interface{}) {
 
 func (p *Plugin) Validate(private interface{}) (err error) {
 	return
-}
-
-func init() {
-	impl.options.Interval = 1
-	plugin.RegisterMetrics(&impl, "DebugCollector", "debug.collector", "Returns empty value.")
 }

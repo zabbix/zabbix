@@ -290,11 +290,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -557,11 +557,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -690,11 +690,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -803,11 +803,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -911,11 +911,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -1092,11 +1092,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -1203,11 +1203,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -1411,11 +1411,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -1528,11 +1528,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   
@@ -1782,11 +1782,11 @@ zabbix_export:
                 - |
                   var data = JSON.parse(value);
                   for (var item, i = 0; item = data.data[i++];) {
-                      if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
-                          Object.assign(item, {
-                              '{#JMXIGNITEINSTANCENAME}': 'null'
-                          });
-                      }
+                  	if (!('{#JMXIGNITEINSTANCENAME}' in item)) {
+                  		Object.assign(item, {
+                  			'{#JMXIGNITEINSTANCENAME}': 'null'
+                  		});
+                  	}
                   
                   }
                   

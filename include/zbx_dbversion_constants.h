@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,8 +30,8 @@
 #define ZBX_MYSQL_MIN_VERSION_STR				"5.07.28"
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION				80030
 #define ZBX_MYSQL_MIN_SUPPORTED_VERSION_STR			"8.00.30"
-#define ZBX_MYSQL_MAX_VERSION					80199
-#define ZBX_MYSQL_MAX_VERSION_STR				"8.01.x"
+#define ZBX_MYSQL_MAX_VERSION					80299
+#define ZBX_MYSQL_MAX_VERSION_STR				"8.02.x"
 
 #define ZBX_MARIADB_MIN_VERSION					100200
 #define ZBX_MARIADB_MIN_VERSION_STR				"10.02.00"
