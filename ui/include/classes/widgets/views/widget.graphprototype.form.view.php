@@ -58,9 +58,7 @@ $form_list->addRow(CWidgetHelper::getMultiselectLabel($fields['itemid']), $field
 $scripts[] = $field_itemid->getPostJS();
 
 // Show legend.
-$form_list->addRow(
-	CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelper::getCheckBox($fields['show_legend'])
-);
+$form_list->addRow(CWidgetHelper::getLabel($fields['show_legend']), CWidgetHelper::getCheckBox($fields['show_legend']));
 
 // Dynamic item.
 if ($data['templateid'] === null) {
@@ -69,12 +67,6 @@ if ($data['templateid'] === null) {
 
 // Columns and Rows.
 CWidgetHelper::addIteratorFields($form_list, $fields['columns'], $fields['rows']);
-
-$scripts = [
-	$field_graphid->getPostJS(),
-	$field_itemid->getPostJS(),
-	$this->readJsFile('../../../include/classes/widgets/views/js/widget.graphprototype.form.view.js.php')
-];
 
 $form
 	->addItem($form_list)
