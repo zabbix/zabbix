@@ -38,6 +38,11 @@ ZBX_PTR_VECTOR_IMPL(service_update_ptr, zbx_service_update_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_condition_ptr, zbx_service_action_condition_t *)
 ZBX_PTR_VECTOR_IMPL(service_rule_ptr, zbx_service_rule_t *)
 
+void    zbx_service_rule_free(zbx_service_rule_t *service_rule)
+{
+	zbx_free(service_rule);
+}
+
 ZBX_PTR_VECTOR_IMPL(service_tag_ptr, zbx_service_tag_t *)
 ZBX_PTR_VECTOR_IMPL(service_action_ptr, zbx_service_action_t *)
 

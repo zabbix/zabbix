@@ -78,6 +78,7 @@ typedef struct
 zbx_service_rule_t;
 
 ZBX_PTR_VECTOR_DECL(service_rule_ptr, zbx_service_rule_t *)
+void    zbx_service_rule_free(zbx_service_rule_t *service_rule);
 
 typedef struct zbx_service_s zbx_service_t;
 
