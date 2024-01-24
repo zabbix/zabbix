@@ -25,11 +25,11 @@ zabbix_export:
               var params = JSON.parse(value);
               var req = new HttpRequest();
               req.addHeader('Authorization: PVEAPIToken=' + params.token + '=' + params.secret);
-              req.get(encodeURI('https://' + params.url + ':' + params.port + '/api2/json/version'));  
+              req.get(encodeURI('https://' + params.url + ':' + params.port + '/api2/json/version'));
             } catch (error) {
-                Zabbix.log(3, "Proxmox API failed: " + params.url + " Error: " + error);
-                if (!Number.isInteger(error))
-                    return 520;
+            	Zabbix.log(3, "Proxmox API failed: " + params.url + " Error: " + error);
+            	if (!Number.isInteger(error))
+            		return 520;
             }
             return req.getStatus();
           description: 'Get API service status.'

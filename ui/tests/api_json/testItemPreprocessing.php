@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -571,7 +571,17 @@ class testItemPreprocessing extends CAPITest {
 	 * @dataProvider lldPreprocessingStepsDataProvider
 	 */
 	public function testItemPreprocessing_TypeNotSupported(string $method, array $params, ?string $error = null) {
-		CTestDataHelper::processReferences($method, $params);
+		if ($method === 'item.create') {
+			CTestDataHelper::convertItemReferences($params);
+		}
+
+		if ($method === 'itemprototype.create') {
+			CTestDataHelper::convertItemPrototypeReferences($params);
+		}
+
+		if ($method === 'discoveryrule.create') {
+			CTestDataHelper::convertLldRuleReferences($params);
+		}
 
 		return $this->call($method, $params, $error);
 	}

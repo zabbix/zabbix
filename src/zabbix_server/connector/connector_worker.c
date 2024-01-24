@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "connector_worker.h"
 
-#include "../db_lengths.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxlog.h"
@@ -30,6 +29,7 @@
 #include "zbxcacheconfig.h"
 #include "zbxjson.h"
 #include "zbxstr.h"
+#include "zbxnum.h"
 
 static int	connector_object_compare_func(const void *d1, const void *d2)
 {

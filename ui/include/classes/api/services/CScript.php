@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1110,7 +1110,7 @@ class CScript extends CApiService {
 
 		foreach ($events as &$event) {
 			if ($event['cause_eventid'] != 0) {
-				// There is not need to select already preselected events again.
+				// There is no need to select already preselected events again.
 				if (array_key_exists($event['cause_eventid'], $events)) {
 					$event['cause'] = [
 						'eventid' => $events[$event['cause_eventid']]['eventid'],

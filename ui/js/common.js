@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -402,7 +402,10 @@ function PopUp(action, parameters, {
 							const rect = label.getBoundingClientRect();
 
 							if (rect.width > 0) {
-								grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+								// Use of setTimeout() to prevent ResizeObserver observation error in Safari.
+								setTimeout(() => {
+									grid.style.setProperty('--label-width', Math.ceil(rect.width) + 'px');
+								});
 								break;
 							}
 						}

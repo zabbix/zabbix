@@ -6,3 +6,5 @@ libzbxdiag_server_a_SOURCES = \
 	diag_server.c \
 	diag_server.h
 
+libzbxdiag_server_a_CFLAGS = \
+	$(TLS_CFLAGS)
