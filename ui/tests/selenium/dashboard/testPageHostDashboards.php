@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,9 +247,9 @@ class testPageHostDashboards extends CWebTest {
 			],
 			[
 				[
-					'fields' => ['id:from' => CURRENT_YEAR.'-01', 'id:to' => CURRENT_YEAR.'-01'],
-					'expected_fields' => ['id:from' => CURRENT_YEAR.'-01-01 00:00:00', 'id:to' => CURRENT_YEAR.'-01-31 23:59:59'],
-					'expected_tab' => CURRENT_YEAR.'-01-01 00:00:00 – '.CURRENT_YEAR.'-01-31 23:59:59',
+					'fields' => ['id:from' => '2023-01', 'id:to' => '2023-01'],
+					'expected_fields' => ['id:from' => '2023-01-01 00:00:00', 'id:to' => '2023-01-31 23:59:59'],
+					'expected_tab' => '2023-01-01 00:00:00 – 2023-01-31 23:59:59',
 					'zoom_buttons' => [
 						'js-btn-time-left' => true,
 						'btn-time-zoomout' => true,

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,7 +207,7 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			// Parameter in CImportValidatorFactory is irrelavant here, since export does not validate data.
+			// Parameter in CImportValidatorFactory is irrelevant here, since export does not validate data.
 			$schema = (new CImportValidatorFactory(CExportWriterFactory::YAML))
 				->getObject(ZABBIX_EXPORT_VERSION)
 				->getSchema();

@@ -159,7 +159,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -191,7 +190,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -223,7 +221,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -255,7 +252,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -308,7 +304,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -394,7 +389,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -422,9 +416,7 @@ zabbix_export:
                 - '{__name__=~"^node_cpu(?:_seconds_total)?$",cpu=~".+",mode="idle"}'
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //count the number of cores
-                  return JSON.parse(value).length
+                - 'return JSON.parse(value).length'
           master_item:
             key: node_exporter.get
           tags:
@@ -446,7 +438,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -478,7 +469,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -531,7 +521,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -563,7 +552,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -591,9 +579,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //Calculate utilization
-                  return (100 - value)
+                - 'return (100 - value)'
           master_item:
             key: 'system.cpu.idle[node_exporter]'
           tags:
@@ -841,9 +827,7 @@ zabbix_export:
                 - ''
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //use boottime to calculate uptime
-                  return (Math.floor(Date.now()/1000)-Number(value));
+                - 'return (Math.floor(Date.now()/1000)-Number(value));'
           master_item:
             key: node_exporter.get
           tags:
@@ -1173,27 +1157,27 @@ zabbix_export:
                       var newvalue;
                       switch(value) {
                         case "unknown":
-                          newvalue = 0;
-                          break;
+                      	newvalue = 0;
+                      	break;
                         case "notpresent":
-                          newvalue = 1;
-                          break;
+                      	newvalue = 1;
+                      	break;
                         case "down":
-                          newvalue = 2;
-                          break;
+                      	newvalue = 2;
+                      	break;
                         case "lowerlayerdown":
-                          newvalue = 3;
-                          break;
+                      	newvalue = 3;
+                      	break;
                         case "testing":
-                          newvalue = 4;
-                          break;
+                      	newvalue = 4;
+                      	break;
                         case "dormant":
-                          newvalue = 5;
-                          break;
+                      	newvalue = 5;
+                      	break;
                         case "up":
-                          newvalue = 6;
-                          break;  default:
-                          newvalue = "Problem parsing interface operstate in JS";
+                      	newvalue = 6;
+                      	break;  default:
+                      	newvalue = "Problem parsing interface operstate in JS";
                       }
                       return newvalue;
               master_item:
@@ -1726,17 +1710,16 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      //count vfs.fs.inode.pfree
                       var inode_free;
                       var inode_total;
-                      JSON.parse(value).forEach(function(metric) {
-                        if (metric['name'] == 'node_filesystem_files'){
-                            inode_total = metric['value'];
-                        } else if (metric['name'] == 'node_filesystem_files_free'){
-                            inode_free = metric['value'];
-                        }
+                      JSON.parse(value).forEach(function (metric) {
+                      	if (metric['name'] == 'node_filesystem_files') {
+                      		inode_total = metric['value'];
+                      	} else if (metric['name'] == 'node_filesystem_files_free') {
+                      		inode_free = metric['value'];
+                      	}
                       });
-                      return (inode_free/inode_total)*100;
+                      return (inode_free / inode_total) * 100;
               master_item:
                 key: node_exporter.get
               tags:

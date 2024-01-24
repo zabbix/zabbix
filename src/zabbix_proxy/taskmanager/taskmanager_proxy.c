@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -238,7 +238,7 @@ static int	tm_process_check_now(zbx_vector_uint64_t *taskids)
  ******************************************************************************/
 static int	tm_execute_data_json(int type, const char *data, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		zbx_get_config_forks_f get_config_forks)
+		const char *progname, zbx_get_config_forks_f get_config_forks)
 {
 	struct zbx_json_parse	jp_data;
 
@@ -252,7 +252,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 	{
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 			return zbx_trapper_item_test_run(&jp_data, 0, info, config_comms,
-					config_startup_time, program_type, get_config_forks);
+					config_startup_time, program_type, progname, get_config_forks);
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
@@ -273,7 +273,7 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
  ******************************************************************************/
 static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int clock, int ttl, time_t now,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time,
-		unsigned char program_type, zbx_get_config_forks_f get_config_forks)
+		unsigned char program_type, const char *progname, zbx_get_config_forks_f get_config_forks)
 {
 	zbx_db_row_t		row;
 	zbx_tm_task_t		*task = NULL;
@@ -306,7 +306,7 @@ static int	tm_execute_data(zbx_ipc_async_socket_t *rtc, zbx_uint64_t taskid, int
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			ret = tm_execute_data_json(data_type, row[1], &info, config_comms, config_startup_time,
-					program_type, get_config_forks);
+					program_type, progname, get_config_forks);
 			break;
 		case ZBX_TM_DATA_TYPE_ACTIVE_PROXY_CONFIG_RELOAD:
 			if (0 != (program_type & ZBX_PROGRAM_TYPE_PROXY_ACTIVE))
@@ -347,7 +347,7 @@ finish:
  ******************************************************************************/
 static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, int config_enable_remote_commands, int config_log_remote_commands,
-		unsigned char program_type, zbx_get_config_forks_f get_config_forks)
+		unsigned char program_type, const char *progname, zbx_get_config_forks_f get_config_forks)
 {
 	zbx_db_row_t		row;
 	int			processed_num = 0, clock, ttl;
@@ -387,7 +387,7 @@ static int	tm_process_tasks(zbx_ipc_async_socket_t *rtc, time_t now, const zbx_c
 				break;
 			case ZBX_TM_TASK_DATA:
 				if (SUCCEED == tm_execute_data(rtc, taskid, clock, ttl, now, config_comms,
-						config_startup_time, program_type, get_config_forks))
+						config_startup_time, program_type, progname, get_config_forks))
 				{
 					processed_num++;
 				}
@@ -524,6 +524,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 				taskmanager_args_in->config_startup_time,
 				taskmanager_args_in->config_enable_remote_commands,
 				taskmanager_args_in->config_log_remote_commands, info->program_type,
+				taskmanager_args_in->progname,
 				taskmanager_args_in->get_process_forks_cb_arg);
 
 		if (ZBX_TM_CLEANUP_PERIOD <= sec1 - cleanup_time)

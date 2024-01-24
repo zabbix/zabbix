@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,8 @@ require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
  * @backup dashboard
  *
  * @onBefore prepareData
+ *
+ * @dataSource UserPermissions
  */
 class testDashboardTopTriggersWidget extends CWebTest {
 
@@ -943,6 +945,18 @@ class testDashboardTopTriggersWidget extends CWebTest {
 							'Host' => 'Host with top triggers trapper',
 							'Trigger' => 'Problem Disaster',
 							'Severity' => 'Disaster',
+							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host for tag permissions',
+							'Trigger' => 'Trigger for tag permissions MySQL',
+							'Severity' => 'Not classified',
+							'Number of problems' => '1'
+						],
+						[
+							'Host' => 'Host for tag permissions',
+							'Trigger' => 'Trigger for tag permissions Oracle',
+							'Severity' => 'Not classified',
 							'Number of problems' => '1'
 						]
 					],

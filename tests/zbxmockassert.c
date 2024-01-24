@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -230,4 +230,45 @@ void	__zbx_mock_assert_time_ne(const char *file, int line, const char *prefix_ms
 		_FAIL(file, line, NULL, "Cannot convert timestamp to string format: %s", zbx_mock_error_string(err));
 
 	_FAIL(file, line, prefix_msg, "Did not expect timestamp \"%s\"", returned_str);
+}
+
+void	__zbx_mock_assert_vector_uint64_eq(const char *file, int line, const char *prefix_msg,
+		zbx_vector_uint64_t *expected_value, zbx_vector_uint64_t *returned_value)
+{
+	if (expected_value->values_num == returned_value->values_num)
+	{
+		int	i;
+
+		for (i = 0; i < expected_value->values_num; i++)
+		{
+			if (expected_value->values[i] != returned_value->values[i])
+				break;
+		}
+
+		if (i == expected_value->values_num)
+			return;
+
+		_FAIL(file, line, prefix_msg, "Expected value \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"",
+				expected_value->values[i], returned_value->values[i]);
+	}
+
+	_FAIL(file, line, prefix_msg, "Expected values number \"" ZBX_FS_UI64 "\" while got \"" ZBX_FS_UI64 "\"",
+			expected_value->values_num, returned_value->values_num);
+}
+
+void	__zbx_mock_assert_vector_uint64_ne(const char *file, int line, const char *prefix_msg,
+		zbx_vector_uint64_t *expected_value, zbx_vector_uint64_t *returned_value)
+{
+	int	i;
+
+	if (expected_value->values_num != returned_value->values_num)
+		return;
+
+	for (i = 0; i < expected_value->values_num; i++)
+	{
+		if (expected_value->values[i] != returned_value->values[i])
+			return;
+	}
+
+	_FAIL(file, line, prefix_msg, "Did not expect value \"" ZBX_FS_UI64 "\"", returned_value->values[i]);
 }

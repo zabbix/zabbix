@@ -278,9 +278,9 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
-                      item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
-                      outArr.push(item)
+                  	item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                  	item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
         - uuid: 72237ffed25148bea512b9a977e0bbde
@@ -336,9 +336,9 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
-                      item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
-                      outArr.push(item)
+                  	item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                  	item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
         - uuid: 6b75915015194d40b043d69754b0e8e9
@@ -436,9 +436,9 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
-                      item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
-                      outArr.push(item)
+                  	item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                  	item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
         - uuid: f3cb59dc48924203bc34da090f084665
@@ -1025,9 +1025,9 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = Math.floor(item['{#SNMPINDEX}'] / 100);
-                      item['{#ZYXEL.PORTID}'] = item['{#SNMPINDEX}'] % 100;
-                      outArr.push(item)
+                  	item['{#ZYXEL.SLOT.ID}'] = Math.floor(item['{#SNMPINDEX}'] / 100);
+                  	item['{#ZYXEL.PORTID}'] = item['{#SNMPINDEX}'] % 100;
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
           overrides:
@@ -1578,28 +1578,28 @@ zabbix_export:
                   parameters:
                     - |
                       var valueArray = [
-                          'moduleNoDefect',
-                          'moduleOverHeat',
-                          'moduleFanRpmLow',
-                          'moduleVoltageLow',
-                          'moduleThermalSensorFailure',
-                          'modulePullOut',
-                          'powerDC48VAFailure',
-                          'powerDC48VBFailure',
-                          'extAlarmInputTrigger',
-                          'moduleDown',
-                          'mscSwitchOverOK',
-                          'networkTopologyChange',
-                          'macSpoof',
-                          'cpuHigh',
-                          'memoryUsageHigh',
-                          'packetBufferUsageHigh',
-                          'loopguardOccurence'
+                      	'moduleNoDefect',
+                      	'moduleOverHeat',
+                      	'moduleFanRpmLow',
+                      	'moduleVoltageLow',
+                      	'moduleThermalSensorFailure',
+                      	'modulePullOut',
+                      	'powerDC48VAFailure',
+                      	'powerDC48VBFailure',
+                      	'extAlarmInputTrigger',
+                      	'moduleDown',
+                      	'mscSwitchOverOK',
+                      	'networkTopologyChange',
+                      	'macSpoof',
+                      	'cpuHigh',
+                      	'memoryUsageHigh',
+                      	'packetBufferUsageHigh',
+                      	'loopguardOccurence'
                       ];
                       var base2 = parseInt(value).toString(2);
                       var outArray = [];
                       for (var i = 0; i < base2.length; ++i) {
-                          if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
+                      	if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
                       }
                       return outArray.join();
               tags:
@@ -1961,9 +1961,9 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = [];
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
-                      item['{#ZYXEL.TEMP.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
-                      outArr.push(item);
+                  	item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                  	item['{#ZYXEL.TEMP.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                  	outArr.push(item);
                   });
                   return JSON.stringify(outArr);
         - uuid: dbc4a230a0bd408b9847b1507c248062
@@ -2022,12 +2022,12 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
-                      item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
-                      item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
-                      item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
-                      item["{#ZYXEL.VOLT.THRESH.HIGH}"] /= 1000;
-                      outArr.push(item)
+                  	item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                  	item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                  	item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
+                  	item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
+                  	item["{#ZYXEL.VOLT.THRESH.HIGH}"] /= 1000;
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
       tags:
