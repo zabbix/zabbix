@@ -53,8 +53,12 @@ typedef struct
 		int		port;
 		int		index_port;
 		int		dcheck_index;
-		int		count;		/* total count of checks in range or -1 */
+		zbx_uint64_t	count;		/* total count of checks in range */
 		unsigned int	checks_per_ip;	/* count of checks per ip */
+
+#define DISCOVERER_RANGE_READY		0
+#define DISCOVERER_RANGE_PROCESSING	1
+		unsigned char	processing;
 	}
 	state;
 	zbx_vector_iprange_t	*ipranges;
@@ -67,10 +71,6 @@ typedef struct
 	zbx_vector_dc_dcheck_ptr_t	dchecks;
 	zbx_task_range_t		*range;
 	zbx_uint64_t			unique_dcheckid;
-
-#define DISCOVERY_TASK_TYPE_SYNC	0
-#define DISCOVERY_TASK_TYPE_ASYNC	1
-	unsigned char			type;
 }
 zbx_discoverer_task_t;
 

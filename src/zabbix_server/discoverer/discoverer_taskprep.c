@@ -100,29 +100,6 @@ static zbx_dc_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_dc_
 	return dcheck_ptr;
 }
 
-static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
-{
-	switch(dcheck->type)
-	{
-		case SVC_AGENT:
-		case SVC_ICMPPING:
-		case SVC_SNMPv1:
-		case SVC_SNMPv2c:
-		case SVC_SNMPv3:
-		case SVC_TCP:
-		case SVC_SMTP:
-		case SVC_FTP:
-		case SVC_POP:
-		case SVC_NNTP:
-		case SVC_IMAP:
-		case SVC_HTTP:
-		case SVC_SSH:
-			return SUCCEED;
-		default:
-			return FAIL;
-	}
-}
-
 static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck,
 		zbx_vector_iprange_t *ipranges, zbx_uint64_t *queue_capacity,
 		zbx_hashset_t *tasks)
@@ -154,8 +131,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	{
 		zbx_vector_dc_dcheck_ptr_destroy(&task_local.dchecks);
 
-		if (FAIL == zbx_vector_dc_dcheck_ptr_search(&task->dchecks, dcheck,
-				ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
+		if (FAIL == zbx_vector_dc_dcheck_ptr_search(&task->dchecks, dcheck, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 		{
 			zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
 			task->range->state.checks_per_ip += checks_count;
@@ -165,12 +141,10 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	{
 		task_local.range = (zbx_task_range_t *)zbx_malloc(NULL, sizeof(zbx_task_range_t));
 		memset(task_local.range, 0, sizeof(zbx_task_range_t));
-		task_local.type = SUCCEED == dcheck_is_async(dcheck) ?
-				DISCOVERY_TASK_TYPE_ASYNC : DISCOVERY_TASK_TYPE_SYNC;
 		task_local.range->ipranges = ipranges;
 		task_local.range->state.port = ZBX_PORTRANGE_INIT_PORT;
-		task_local.range->state.count = DISCOVERER_JOB_TASKS_SKIP_LIMIT;
-		task_local.range->state.checks_per_ip += checks_count;
+		task_local.range->state.checks_per_ip = checks_count;
+		task_local.range->state.processing = DISCOVERER_RANGE_READY;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
 		zbx_hashset_insert(tasks, &task_local, sizeof(zbx_discoverer_task_t));
 
@@ -291,6 +265,25 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 			tasks_dst->num_data, total);
 }
 
+static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
+{
+	zbx_discoverer_task_t	*task;
+	zbx_hashset_iter_t	iter;
+
+	if (0 == ips_num)
+		return;
+
+	zbx_hashset_iter_reset(tasks, &iter);
+
+	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
+	{
+		if (SVC_ICMPPING == task->dchecks.values[0]->type)
+			continue;
+
+		task->range->state.count = task->range->state.checks_per_ip * ips_num;
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: process single discovery rule                                     *
@@ -302,6 +295,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashs
 	zbx_hashset_t	tasks_local, *tasks_ptr;
 	zbx_uint64_t	checks_count = 0;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
+	unsigned int	uniq_ips = 0;
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
@@ -353,31 +347,20 @@ next:
 
 	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
 	tasks_ptr = 0 == drule->concurrency_max ? &tasks_local : tasks;
+
+	if (0 != drule->unique_dcheckid)
+		checks_count = process_checks(drule, 1, queue_capacity, tasks_ptr, dchecks_common, ipranges);
+
+	checks_count += process_checks(drule, 0, queue_capacity, tasks_ptr, dchecks_common, ipranges);
+
+	if (0 == *queue_capacity || 0 == checks_count)
+		goto out;
+
 	*ip = '\0';
-	i = 0;
 
 	while (SUCCEED == zbx_iprange_uniq_next(ipranges->values, ipranges->values_num, ip, sizeof(ip)))
 	{
 		zbx_discoverer_check_count_t	*check_count, cmp;
-
-		if (0 == i)
-		{
-			if (0 != drule->unique_dcheckid)
-			{
-				checks_count = process_checks(drule, 1, queue_capacity, tasks_ptr, dchecks_common,
-						ipranges);
-			}
-
-			checks_count += process_checks(drule, 0, queue_capacity, tasks_ptr, dchecks_common, ipranges);
-
-			if (0 == *queue_capacity)
-				goto out;
-
-			i = 1;
-		}
-
-		if (0 == checks_count)
-			break;
 
 		cmp.druleid = drule->druleid;
 		zbx_strlcpy(cmp.ip, ip, sizeof(cmp.ip));
@@ -385,10 +368,14 @@ next:
 
 		check_count = zbx_hashset_insert(check_counts, &cmp, sizeof(zbx_discoverer_check_count_t));
 		check_count->count += checks_count;
+
+		uniq_ips++;
 	}
 
 	if (0 == drule->concurrency_max)
 		process_task_range_split(&tasks_local, tasks);
+	else
+		process_task_range_count(tasks, uniq_ips);
 out:
 	if (0 != tasks_local.num_data)
 	{

@@ -1087,7 +1087,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 		zbx_uint64_t 			check_count_rest;
 
 		if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
-				ip, discoverer_task_ip_check_count_get(task), &check_count_rest))
+				ip, discoverer_task_check_count_get(task), &check_count_rest))
 		{
 			continue;	/* config revision id was changed */
 		}
@@ -1205,6 +1205,13 @@ int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 	if (0 == task->range->state.count)
 		return FAIL;
 
+	if (0 != task->range->id && DISCOVERER_RANGE_READY == task->range->state.processing)
+	{
+		task->range->state.count--;
+		task->range->state.processing = DISCOVERER_RANGE_PROCESSING;
+		return SUCCEED;
+	}
+
 	if (0 == memcmp(task->range->state.ipaddress, z,
 			ZBX_IPRANGE_V4 == task->range->ipranges->values[task->range->state.index_ip].type ?
 			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
@@ -1240,6 +1247,29 @@ int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 	}
 
 	return FAIL;
+}
+
+static int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
+{
+	switch(dcheck->type)
+	{
+		case SVC_AGENT:
+		case SVC_ICMPPING:
+		case SVC_SNMPv1:
+		case SVC_SNMPv2c:
+		case SVC_SNMPv3:
+		case SVC_TCP:
+		case SVC_SMTP:
+		case SVC_FTP:
+		case SVC_POP:
+		case SVC_NNTP:
+		case SVC_IMAP:
+		case SVC_HTTP:
+		case SVC_SSH:
+			return SUCCEED;
+		default:
+			return FAIL;
+	}
 }
 
 static void	*discoverer_worker_entry(void *net_check_worker)
@@ -1300,7 +1330,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				continue;
 			}
 
-			if (DISCOVERY_TASK_TYPE_SYNC == task->type)
+			if (FAIL == dcheck_is_async(task->dchecks.values[0]))
 			{
 				if (SUCCEED != discoverer_net_check_iter(task))
 				{
@@ -1319,7 +1349,6 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 					zbx_vector_dc_dcheck_ptr_append_array(&task_copy->dchecks,
 							task->dchecks.values, task->dchecks.values_num);
 					task_copy->unique_dcheckid = task->unique_dcheckid;
-					task_copy->type = task->type;
 					task_copy->range = (zbx_task_range_t*)zbx_malloc(NULL,
 							sizeof(zbx_task_range_t));
 					*task_copy->range = *task->range;
@@ -1351,9 +1380,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_BUSY);
 
-			dcheck_type = task->dchecks.values[0]->type;
-
-			if (DISCOVERY_TASK_TYPE_SYNC == task->type)
+			if (FAIL == dcheck_is_async(task->dchecks.values[0]))
 			{
 				ret = discoverer_net_check_common(druleid, task, &error);
 			}
@@ -1373,6 +1400,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 						worker->worker_id, job->druleid, error);
 			}
 
+			dcheck_type = task->dchecks.values[0]->type;
 			discoverer_task_free(task);
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);
 

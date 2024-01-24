@@ -22,25 +22,13 @@
 
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
-typedef union {
-	struct {
-		zbx_uint32_t	port;
-		uint16_t	dcheck_type;
-		uint16_t	addr_type;
-	}		key;
-	zbx_uint64_t	buf;
-}
-dtask_hash_t;
-
 zbx_hash_t	discoverer_task_hash(const void *data)
 {
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;
 	zbx_hash_t			hash;
-	dtask_hash_t			state;
 
-	state.key.dcheck_type = task->dchecks.values[0]->type;
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&state.buf);
-	hash = ZBX_DEFAULT_UINT64_HASH_ALGO(&task->range->id, sizeof(task->range->id), hash);
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&task->range->id);
+	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&task->dchecks.values[0]->type, sizeof(task->dchecks.values[0]->type), hash);
 
 	return hash;
 }
@@ -49,13 +37,10 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 {
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
-	dtask_hash_t			state1, state2;
-
-	state1.key.dcheck_type = task1->dchecks.values[0]->type;
-	state2.key.dcheck_type = task2->dchecks.values[0]->type;
-	ZBX_RETURN_IF_NOT_EQUAL(state1.buf, state2.buf);
 
 	ZBX_RETURN_IF_NOT_EQUAL(task1->range->id, task2->range->id);
+	ZBX_RETURN_IF_NOT_EQUAL(task1->dchecks.values[0]->type, task2->dchecks.values[0]->type);
+
 	return 0;
 }
 
@@ -76,14 +61,6 @@ void	discoverer_task_free(zbx_discoverer_task_t *task)
 zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 {
 	return (zbx_uint64_t)task->dchecks.values_num;
-}
-
-zbx_uint64_t	discoverer_task_ip_check_count_get(zbx_discoverer_task_t *task)
-{
-	if (0 != task->range->state.checks_per_ip)
-		return (zbx_uint64_t)task->range->state.checks_per_ip;	/* except ICMP */
-	else
-		return discoverer_task_check_count_get(task);
 }
 
 zbx_uint64_t	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
