@@ -24,6 +24,10 @@ ROW   |2     |Admin role      |2   |0       |
 ROW   |3     |Super admin role|3   |1       |
 ROW   |4     |Guest role      |1   |0       |
 
+TABLE |ugset
+FIELDS|ugsetid|hash                                                            |
+ROW   |1      |b21d61561974b06cbeb97a71ca880e92f0fc06d49ac3246280afb88dfa6050a6|
+
 TABLE |users
 FIELDS|userid|username|name  |surname      |passwd                                                      |url |autologin|autologout|refresh|rows_per_page|roleid|
 ROW   |1     |Admin   |Zabbix|Administrator|$2y$10$92nDno4n0Zm7Ej7Jfsz8WukBfgSS/U0QkIuu8WkJPihXBb2A1UrEK|    |1        |0         |30s    |50           |3     |
@@ -941,6 +945,16 @@ ROW   |3   |9       |2     |
 ROW   |4   |7       |1     |
 ROW   |5   |13      |1     |
 ROW   |6   |13      |2     |
+
+TABLE |ugset_group
+FIELDS|ugsetid|usrgrpid|
+ROW   |1      |13      |
+ROW   |1      |8       |
+ROW   |1      |9       |
+
+TABLE |user_ugset
+FIELDS|userid|ugsetid|
+ROW   |2     |1      |
 
 TABLE |scripts
 FIELDS|scriptid|name                   |command                                                       |host_access|usrgrpid|groupid|description|confirmation|type|execute_on|timeout|scope|port|authtype|username|password|publickey|privatekey|menu_path|url |new_window|manualinput|manualinput_prompt|manualinput_validator|manualinput_validator_type|manualinput_default_value|

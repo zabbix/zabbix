@@ -161,22 +161,20 @@ class CHostPrototype extends CHostBase {
 		$sqlParts['where'][] = 'ph.flags='.ZBX_FLAG_DISCOVERY_NORMAL;
 
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+			if (self::$userData['ugsetid'] == 0) {
+				$sql_parts['where'][] = '1=0';
+			}
+			else {
+				$sqlParts['from'][] = 'host_hgset hh';
+				$sqlParts['from'][] = 'permission p';
+				$sqlParts['where'][] = 'i.hostid=hh.hostid';
+				$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
 
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM '.
-					'host_discovery hd,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-						' AND '.dbConditionId('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
-				' WHERE h.hostid=hd.hostid'.
-					' AND hd.parent_itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
-				' AND MAX(r.permission)>='.zbx_dbstr($permission).
-				')';
+				if ($options['editable']) {
+					$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
+			}
 		}
 
 		// discoveryids
@@ -2543,7 +2541,6 @@ class CHostPrototype extends CHostBase {
 				' AND '.dbConditionId('hd.parent_hostid', $hostids)
 		), 'hostid');
 
-		CHost::validateDeleteForce($discovered_hosts);
 		CHost::deleteForce($discovered_hosts);
 
 		DB::delete('interface', ['hostid' => $hostids]);
@@ -2618,8 +2615,7 @@ class CHostPrototype extends CHostBase {
 		), 'groupid');
 
 		if ($db_groups) {
-			CHostGroup::validateDeleteForce($db_groups);
-			CHostGroup::deleteForce($db_groups);
+			API::HostGroup()->deleteForce($db_groups);
 		}
 
 		DB::delete('group_discovery', ['parent_group_prototypeid' => $group_prototypeids]);

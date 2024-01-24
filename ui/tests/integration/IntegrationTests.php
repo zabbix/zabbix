@@ -51,6 +51,7 @@ require_once dirname(__FILE__).'/testItemTimeouts.php';
 require_once dirname(__FILE__).'/testUserMacrosInItemNames.php';
 require_once dirname(__FILE__).'/testScriptManualInput.php';
 require_once dirname(__FILE__).'/testAgentJsonProtocol.php';
+require_once dirname(__FILE__).'/testPermissions.php';
 
 use PHPUnit\Framework\TestSuite;
 
@@ -93,6 +94,7 @@ class IntegrationTests {
 		$suite->addTestSuite('testUserMacrosInItemNames');
 		$suite->addTestSuite('testScriptManualInput');
 		$suite->addTestSuite('testAgentJsonProtocol');
+		$suite->addTestSuite('testPermissions');
 
 		return $suite;
 	}

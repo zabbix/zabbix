@@ -259,7 +259,7 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
 
 /**
  * Notification sequence is maintained in DOM, in server response notifications must be ordered.
- * Shows or hides list node, updates and appends notification nodes, then deligates to remove dangling nodes.
+ * Shows or hides list node, updates and appends notification nodes, then delegates to remove dangling nodes.
  * Updates button tooltip text based on actual data.
  *
  * @param {object}                  Severity_styles.

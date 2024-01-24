@@ -207,7 +207,7 @@ class CConfigurationExport {
 		try {
 			$this->gatherData();
 
-			// Parameter in CImportValidatorFactory is irrelavant here, since export does not validate data.
+			// Parameter in CImportValidatorFactory is irrelevant here, since export does not validate data.
 			$schema = (new CImportValidatorFactory(CExportWriterFactory::YAML))
 				->getObject(ZABBIX_EXPORT_VERSION)
 				->getSchema();
