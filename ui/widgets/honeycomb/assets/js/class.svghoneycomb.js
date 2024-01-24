@@ -654,7 +654,6 @@ class CSVGHoneycomb {
 	}
 
 	#getFillColor(d) {
-		// TODO AS: https://d3js.org/d3-scale/threshold
 		if (!d.is_numeric) {
 			// Do not apply thresholds to non-numeric items
 			return null;
