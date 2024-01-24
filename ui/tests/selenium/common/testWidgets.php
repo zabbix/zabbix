@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -39,7 +39,7 @@ class testWidgets extends CWebTest {
 		// Assign the dialog from where the last Select button will be clicked.
 		$select_dialog = $widget_dialog;
 
-		// Item types expected in items table. For the most cases theses are all items except of Binary and depenedent.
+		// Item types expected in items table. For the most cases theses are all items except of Binary and dependent.
 		$item_types = [
 			'Character item',
 			'Float item',
@@ -70,10 +70,10 @@ class testWidgets extends CWebTest {
 				break;
 
 			case 'Graph prototype':
-				$widget_dialog->fill(['Source' => CFormElement::RELOADABLE_FILL('Simple graph prototype')]);
+				$widget_dialog->fill(['Source' => 'Simple graph prototype']);
 				$this->assertTrue($widget_dialog->getField('Item prototype')->isVisible());
 
-				// For Graph prototoype only numeric item prototypes are available.
+				// For Graph prototype only numeric item prototypes are available.
 				$item_types = ['Float item prototype', 'Unsigned item prototype', 'Unsigned_dependent item prototype'];
 				break;
 		}

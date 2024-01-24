@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -657,14 +657,16 @@ typedef struct
 }
 zbx_dc_action_condition_t;
 
+ZBX_PTR_VECTOR_DECL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
+
 typedef struct
 {
-	zbx_uint64_t		actionid;
-	const char		*formula;
-	unsigned char		eventsource;
-	unsigned char		evaltype;
-	unsigned char		opflags;
-	zbx_vector_ptr_t	conditions;
+	zbx_uint64_t				actionid;
+	const char				*formula;
+	unsigned char				eventsource;
+	unsigned char				evaltype;
+	unsigned char				opflags;
+	zbx_vector_dc_action_condition_ptr_t	conditions;
 }
 zbx_dc_action_t;
 

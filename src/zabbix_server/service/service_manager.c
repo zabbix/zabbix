@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,17 +18,22 @@
 **/
 
 #include "service_manager.h"
-#include "../server.h"
+#include "../server_constants.h"
 
 #include "zbxlog.h"
+#include "zbxalgo.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxipcservice.h"
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxservice.h"
 #include "service_actions.h"
 #include "zbxserialize.h"
+#include "zbxstr.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
-#include "zbxexpr.h"
 #include "zbxcacheconfig.h"
 #include "zbx_trigger_constants.h"
 #include "zbxrtc.h"

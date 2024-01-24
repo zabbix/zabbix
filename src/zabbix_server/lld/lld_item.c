@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
-#include "../db_lengths.h"
+#include "lld_audit.h"
+
+#include "zbxexpression.h"
 #include "zbxregexp.h"
 #include "zbxprometheus.h"
 #include "zbxxml.h"
@@ -28,10 +29,17 @@
 #include "zbxdbwrap.h"
 #include "zbxhttp.h"
 #include "zbxvariant.h"
-
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
-#include "lld_audit.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 #define	ZBX_DEPENDENT_ITEM_MAX_COUNT	29999
 #define	ZBX_DEPENDENT_ITEM_MAX_LEVELS	3

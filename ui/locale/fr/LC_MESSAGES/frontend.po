@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-19 20:59+0000\n"
+"PO-Revision-Date: 2024-01-09 19:10+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -15054,6 +15054,10 @@ msgstr "Surcharger la période d'historique des éléments"
 msgid "Override item trend period"
 msgstr "Surcharger la période de tendances des éléments"
 
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Remplacer le sélecteur de période de temps"
+
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
@@ -22417,9 +22421,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "Avec problèmes"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Avec ce paramètre, seules les données numériques seront affichées."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Avec ce paramètre, seuls les éléments numériques seront affichés dans cette colonne."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Avec ce paramètre, seuls les éléments numériques seront affichés."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -24420,6 +24433,10 @@ msgstr "pas dans"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "non sélectionné"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "non utilisé"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"

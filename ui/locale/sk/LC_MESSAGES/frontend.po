@@ -15233,6 +15233,10 @@ msgstr "Prepísaná položka historickej periódy"
 msgid "Override item trend period"
 msgstr "Prepísaná položka trendovej periódy"
 
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
+
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
 msgid "Override with name \"%1$s\" already exists."
@@ -22633,9 +22637,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "S problémami"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Pri tomto nastavení sa v tomto stĺpci zobrazia iba číselné položky."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -24636,6 +24649,10 @@ msgstr "mimo"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "nie je vybratý"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"

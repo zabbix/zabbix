@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 
+#include "zbxvmware.h"
 #include "zbxdbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
@@ -46,7 +47,6 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
-#include "../zabbix_server/vmware/vmware.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
