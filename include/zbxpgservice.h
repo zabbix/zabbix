@@ -35,6 +35,9 @@
 #define ZBX_PROXY_SYNC_FULL	1
 #define ZBX_PROXY_SYNC_PARTIAL	2
 
+#define ZBX_PG_DEFAULT_FAILOVER_DELAY		SEC_PER_MIN
+#define ZBX_PG_DEFAULT_FAILOVER_DELAY_STR	"1m"
+
 typedef struct
 {
 	int			status;

@@ -63,14 +63,8 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		pg = (zbx_dc_proxy_group_t *)DCfind_id(&config->proxy_groups, proxy_groupid, sizeof(ZBX_DC_PROXY),
 				&found);
 
-		if (FAIL == zbx_is_time_suffix(row[1], &pg->failover_delay, ZBX_LENGTH_UNLIMITED))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "invalid proxy group '" ZBX_FS_UI64 "' failover delay '%s', "
-					"using 60 seconds default value", pg->proxy_groupid, row[1]);
-			pg->failover_delay = SEC_PER_MIN;
-		}
-
-		pg->min_online = atoi(row[2]);
+		dc_strpool_replace(found, &pg->failover_delay, row[1]);
+		dc_strpool_replace(found, &pg->min_online, row[2]);
 		dc_strpool_replace(found, &pg->name, row[3]);
 
 		pg->revision = revision;
@@ -81,7 +75,10 @@ void	dc_sync_proxy_group(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		if (NULL == (pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups, &rowid)))
 			continue;
 
+		dc_strpool_release(pg->failover_delay);
+		dc_strpool_release(pg->min_online);
 		dc_strpool_release(pg->name);
+
 		zbx_hashset_remove_direct(&config->proxy_groups, pg);
 	}
 
@@ -145,11 +142,18 @@ int	zbx_dc_fetch_proxy_groups(zbx_hashset_t *groups, zbx_uint64_t *revision)
 		if (dc_group->revision > group->revision)
 		{
 			group->revision = dc_group->revision;
-			group->failover_delay = dc_group->failover_delay;
-			group->min_online = dc_group->min_online;
 
 			if (NULL == group->name || 0 != strcmp(group->name, dc_group->name))
 				group->name = zbx_strdup(group->name, dc_group->name);
+
+			if (NULL == group->failover_delay ||
+					0 != strcmp(group->failover_delay, dc_group->failover_delay))
+			{
+				group->failover_delay = zbx_strdup(group->failover_delay, dc_group->failover_delay);
+			}
+
+			if (NULL == group->min_online || 0 != strcmp(group->min_online, dc_group->min_online))
+				group->min_online = zbx_strdup(group->min_online, dc_group->min_online);
 		}
 	}
 

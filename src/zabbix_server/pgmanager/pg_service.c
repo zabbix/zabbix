@@ -23,6 +23,7 @@
 #include "zbxnix.h"
 #include "zbxserialize.h"
 #include "zbxthreads.h"
+#include "zbxpgservice.h"
 
 /******************************************************************************
  *                                                                            *
@@ -81,9 +82,10 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 {
 	unsigned char	*ptr = message->data, *data, mode = ZBX_PROXY_SYNC_NONE;
 	zbx_uint64_t	proxyid, proxy_hostmap_revision, hostmap_revision = 0;
-	int		now, failover_delay = SEC_PER_MIN;
-	zbx_uint32_t	data_len;
+	int		now;
+	zbx_uint32_t	data_len, failover_delay_len;
 	zbx_pg_proxy_t	*proxy;
+	char		*failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY_STR;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -125,7 +127,9 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 		proxy->sync_time = now;
 	}
 
-	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + sizeof(int);
+	zbx_serialize_prepare_str(failover_delay_len, failover_delay);
+
+	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + failover_delay_len;
 
 	if (ZBX_PROXY_SYNC_PARTIAL == mode)
 	{
@@ -136,7 +140,7 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 	ptr = data = (unsigned char *)zbx_malloc(NULL, data_len);
 	ptr += zbx_serialize_value(ptr, mode);
 	ptr += zbx_serialize_value(ptr, hostmap_revision);
-	ptr += zbx_serialize_value(ptr, failover_delay);
+	ptr += zbx_serialize_str(ptr, failover_delay, failover_delay_len);
 
 	if (ZBX_PROXY_SYNC_PARTIAL == mode)
 	{

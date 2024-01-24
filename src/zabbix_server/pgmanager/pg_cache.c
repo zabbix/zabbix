@@ -62,6 +62,8 @@ void	pg_group_clear(zbx_pg_group_t *group)
 	zbx_vector_uint64_destroy(&group->new_hostids);
 
 	zbx_free(group->name);
+	zbx_free(group->failover_delay);
+	zbx_free(group->min_online);
 }
 
 void	pg_proxy_clear(zbx_pg_proxy_t *proxy)
@@ -613,7 +615,7 @@ void	pg_cache_update_hostmap_revision(zbx_pg_cache_t *cache, zbx_vector_uint64_t
 static void	pg_cache_dump_group(zbx_pg_group_t *group)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "proxy group:" ZBX_FS_UI64 " %s", group->proxy_groupid, group->name);
-	zabbix_log(LOG_LEVEL_TRACE, "    status:%d failover_delay:%d min_online:%d revision:" ZBX_FS_UI64
+	zabbix_log(LOG_LEVEL_TRACE, "    status:%d failover_delay:%s min_online:%s revision:" ZBX_FS_UI64
 			" hostmap_revision:" ZBX_FS_UI64,
 			group->status, group->failover_delay, group->min_online, group->revision,
 			group->hostmap_revision);

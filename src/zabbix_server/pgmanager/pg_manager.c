@@ -25,6 +25,7 @@
 #include "zbxself.h"
 #include "zbxnix.h"
 #include "zbxcacheconfig.h"
+#include "zbxpgservice.h"
 
 #define PGM_STATUS_CHECK_INTERVAL	5
 
@@ -162,48 +163,89 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 	zbx_hashset_iter_t	iter;
 	zbx_pg_proxy_t		*proxy;
-	int			now;
+	zbx_pg_group_t		*group;
+	int			now, failover_delay, min_online;
+	zbx_dc_um_handle_t	*um_handle;
+	char			*tmp;
+
+	um_handle = zbx_dc_open_user_macros();
 
 	pg_cache_lock(cache);
 
 	now = (int)time(NULL);
 
-	zbx_hashset_iter_reset(&cache->proxies, &iter);
-	while (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_iter_next(&iter)))
+	zbx_hashset_iter_reset(&cache->groups, &iter);
+	while (NULL != (group = (zbx_pg_group_t *)zbx_hashset_iter_next(&iter)))
 	{
-		int	status = ZBX_PG_PROXY_STATUS_UNKNOWN;
+		int	update_group = 0;
 
-		if (now - proxy->lastaccess >= proxy->group->failover_delay)
+		tmp = zbx_strdup(NULL, group->failover_delay);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
+
+		if (FAIL == zbx_is_time_suffix(tmp, &failover_delay, ZBX_LENGTH_UNLIMITED))
 		{
-			if (now - cache->startup_time >= proxy->group->failover_delay)
+			zabbix_log(LOG_LEVEL_DEBUG, "invalid proxy group '" ZBX_FS_UI64 "' failover delay '%s', "
+					"using %d seconds default value", group->proxy_groupid, tmp,
+					ZBX_PG_DEFAULT_FAILOVER_DELAY);
+
+			failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
+		}
+
+		zbx_free(tmp);
+
+		for (int i = 0; i < group->proxies.values_num; i++)
+		{
+			int	status = ZBX_PG_PROXY_STATUS_UNKNOWN;
+
+			proxy = group->proxies.values[i];
+
+			if (now - proxy->lastaccess >= failover_delay)
 			{
-				status = ZBX_PG_PROXY_STATUS_OFFLINE;
-				proxy->firstaccess = 0;
+				if (now - cache->startup_time >= failover_delay)
+				{
+					status = ZBX_PG_PROXY_STATUS_OFFLINE;
+					proxy->firstaccess = 0;
+				}
 			}
+			else
+			{
+				if (0 == proxy->firstaccess)
+					proxy->firstaccess = proxy->lastaccess;
+
+				if (now - proxy->firstaccess >= failover_delay)
+					status = ZBX_PG_PROXY_STATUS_ONLINE;
+			}
+
+			if (ZBX_PG_PROXY_STATUS_UNKNOWN == status || proxy->status == status)
+				continue;
+
+			zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" changed status from %s to %s",
+					proxy->name, proxy_status_str[proxy->status], proxy_status_str[status]);
+
+			proxy->status = status;
+			update_group = 1;
 		}
-		else
-		{
-			if (0 == proxy->firstaccess)
-				proxy->firstaccess = proxy->lastaccess;
 
-			if (now - proxy->firstaccess >= proxy->group->failover_delay)
-				status = ZBX_PG_PROXY_STATUS_ONLINE;
-		}
-
-		if (ZBX_PG_PROXY_STATUS_UNKNOWN == status || proxy->status == status)
-			continue;
-
-		zabbix_log(LOG_LEVEL_WARNING, "Proxy \"%s\" changed status from %s to %s",
-				proxy->name, proxy_status_str[proxy->status], proxy_status_str[status]);
-
-		proxy->status = status;
-		pg_cache_queue_group_update(cache, proxy->group);
+		if (0 != update_group)
+			pg_cache_queue_group_update(cache, proxy->group);
 	}
 
 	for (int i = 0; i < cache->group_updates.values_num; i++)
 	{
-		zbx_pg_group_t	*group = cache->group_updates.values[i];
 		int		online = 0, offline = 0, healthy = 0, total = group->proxies.values_num;
+
+		group = cache->group_updates.values[i];
+
+		tmp = zbx_strdup(NULL, group->failover_delay);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
+
+		if (FAIL == zbx_is_time_suffix(tmp, &failover_delay, ZBX_LENGTH_UNLIMITED))
+			failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
+
+		tmp = zbx_strdup(tmp, group->min_online);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
+		min_online = atoi(tmp);
+		zbx_free(tmp);
 
 		for (int j = 0; j < group->proxies.values_num; j++)
 		{
@@ -213,7 +255,7 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 					online++;
 
 					if (now - group->proxies.values[j]->lastaccess + PGM_STATUS_CHECK_INTERVAL <
-							group->failover_delay)
+							failover_delay)
 					{
 						healthy++;
 					}
@@ -232,7 +274,7 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 				status = ZBX_PG_GROUP_STATUS_RECOVERY;
 				ZBX_FALLTHROUGH;
 			case ZBX_PG_GROUP_STATUS_RECOVERY:
-				if (total - offline < group->min_online)
+				if (total - offline < min_online)
 				{
 					status = ZBX_PG_GROUP_STATUS_OFFLINE;
 				}
@@ -240,26 +282,26 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 				{
 					status = ZBX_PG_GROUP_STATUS_ONLINE;
 				}
-				else if (now - group->status_time > group->failover_delay)
+				else if (now - group->status_time > failover_delay)
 				{
-					if (online >= group->min_online)
+					if (online >= min_online)
 						status = ZBX_PG_GROUP_STATUS_ONLINE;
 					else
 						status = ZBX_PG_GROUP_STATUS_OFFLINE;
 				}
 				break;
 			case ZBX_PG_GROUP_STATUS_DECAY:
-				if (healthy >= group->min_online)
+				if (healthy >= min_online)
 					status = ZBX_PG_GROUP_STATUS_ONLINE;
-				else if (online < group->min_online)
+				else if (online < min_online)
 					status = ZBX_PG_GROUP_STATUS_OFFLINE;
 				break;
 			case ZBX_PG_GROUP_STATUS_OFFLINE:
-				if (online >= group->min_online)
+				if (online >= min_online)
 					status = ZBX_PG_GROUP_STATUS_RECOVERY;
 				break;
 			case ZBX_PG_GROUP_STATUS_ONLINE:
-				if (healthy < group->min_online)
+				if (healthy < min_online)
 					status = ZBX_PG_GROUP_STATUS_DECAY;
 				break;
 		}
@@ -276,6 +318,8 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 	}
 
 	pg_cache_unlock(cache);
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************

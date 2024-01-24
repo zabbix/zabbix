@@ -911,8 +911,8 @@ zbx_dc_connector_t;
 typedef struct
 {
 	zbx_uint64_t	proxy_groupid;
-	int		failover_delay;
-	int		min_online;
+	const char 	*failover_delay;
+	const char	*min_online;
 	const char	*name;
 
 	zbx_uint64_t	revision;

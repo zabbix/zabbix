@@ -1426,11 +1426,11 @@ struct zbx_pg_group
 {
 	zbx_uint64_t			proxy_groupid;
 	char				*name;
+	char				*failover_delay;
+	char				*min_online;
 	zbx_uint64_t			revision;
 	zbx_uint64_t			hostmap_revision;
 	zbx_uint64_t			sync_revision;
-	int				failover_delay;
-	int				min_online;
 	int				status;
 	int				status_time;
 	zbx_uint32_t			flags;

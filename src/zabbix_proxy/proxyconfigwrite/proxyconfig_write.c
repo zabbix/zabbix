@@ -24,6 +24,7 @@
 #include "zbxcommshigh.h"
 #include "zbxrtc.h"
 #include "zbx_host_constants.h"
+#include "zbxpgservice.h"
 
 /*
  * The configuration sync is split into 4 parts for each table:
@@ -2027,13 +2028,28 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FAILOVER_DELAY, tmp, sizeof(tmp), NULL))
+	int			failover_delay;
+	char			*buf = NULL;
+	size_t			buf_alloc = 0;
+
+	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_FAILOVER_DELAY, &buf, &buf_alloc, NULL))
 	{
 		*error = zbx_strdup(NULL, "no failover_delay tag in proxy group configuration");
 		return FAIL;
 	}
 
-	zbx_dc_set_proxy_failover_delay(atoi(tmp));
+	zbx_dc_um_handle_t	*um_handle;
+
+	um_handle = zbx_dc_open_user_macros();
+	(void)zbx_dc_expand_user_and_func_macros(um_handle, &buf, NULL, 0, NULL);
+	zbx_dc_close_user_macros(um_handle);
+
+	if (FAIL == zbx_is_time_suffix(buf, &failover_delay, ZBX_LENGTH_UNLIMITED))
+		failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
+
+	zbx_free(buf);
+
+	zbx_dc_set_proxy_failover_delay(failover_delay);
 
 	int	full_sync = 0;
 
