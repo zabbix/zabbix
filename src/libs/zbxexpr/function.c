@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -493,18 +493,34 @@ void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, s
 			ZBX_BACKSLASH_ESC_ON, param_pos, length, sep_pos);
 }
 
+int	zbx_function_param_parse_count(const char *expr)
+{
+	int		ret = 0;
+	size_t		param_pos, length, sep_pos, params_len = strlen(expr);
+	const char	*ptr;
+
+	for (ptr = expr; ptr < expr + params_len; ptr += sep_pos + 1, ret++)
+		zbx_function_param_parse_ext(ptr, 0, ZBX_BACKSLASH_ESC_ON, &param_pos, &length, &sep_pos);
+
+	return ret;
+}
+
 /******************************************************************************
  *                                                                            *
  * Parameters: param  - [IN] parameter to unquote                             *
  *             len    - [IN] parameter length                                 *
  *             quoted - [OUT] flag that specifies whether parameter was       *
  *                            quoted before extraction                        *
+ *             esc_bs - [IN] 1 - unescape backslashes, turning 2 subsequent   *
+ *                               backslashes into 1                           *
+ *                           0 - do not unescape backslashes, backslashes     *
+ *                               are only used to escape double quotes        *
  *                                                                            *
  * Return value: The unquoted parameter. This value must be freed by the      *
  *               caller.                                                      *
  *                                                                            *
  ******************************************************************************/
-char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
+static char	*function_param_unquote_dyn(const char *param, size_t len, int *quoted, int esc_bs)
 {
 	char	*out;
 
@@ -524,7 +540,7 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
 
 		for (pin = param + 1; (size_t)(pin - param) < len - 1; pin++)
 		{
-			if ('\\' == pin[0] && '"' == pin[1])
+			if ('\\' == pin[0] && ('"' == pin[1] || (ZBX_BACKSLASH_ESC_ON == esc_bs && '\\' == pin[1])))
 				pin++;
 
 			*pout++ = *pin;
@@ -538,11 +554,48 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
 
 /******************************************************************************
  *                                                                            *
- * Parameters: param   - [IN/OUT] function parameter                          *
- *             forced  - [IN] 1 - Enclose parameter in " even if it does not  *
- *                                contain any special characters.             *
- *                            0 - Do nothing if the parameter does not        *
- *                                contain any special characters.             *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
+ *                            quoted before extraction                        *
+ *                                                                            *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
+{
+	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_ON);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: unquote history function parameter for versions <= 6.4            *
+ *                                                                            *
+ * Parameters: param  - [IN] parameter to unquote                             *
+ *             len    - [IN] parameter length                                 *
+ *             quoted - [OUT] flag that specifies whether parameter was       *
+ *                            quoted before extraction                        *
+ *                                                                            *
+ * Return value: The unquoted parameter. This value must be freed by the      *
+ *               caller.                                                      *
+ *                                                                            *
+ ******************************************************************************/
+char	*zbx_function_param_unquote_dyn_compat(const char *param, size_t len, int *quoted)
+{
+	return function_param_unquote_dyn(param, len, quoted, ZBX_BACKSLASH_ESC_OFF);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Parameters: param  - [IN/OUT] function parameter                           *
+ *             forced - [IN] 1 - Enclose parameter in " even if it does not   *
+ *                               contain any special characters.              *
+ *                           0 - Do nothing if the parameter does not contain *
+ *                               any special characters.                      *
+ *             esc_bs - [IN] 1 - escape backslashes, turns 1 backslash into 2 *
+ *                           0 - do not escape backslashes, the number of     *
+ *                               them remains the same                        *
  *                                                                            *
  * Return value: SUCCEED - if parameter was successfully quoted or quoting    *
  *                         was not necessary                                  *
@@ -550,7 +603,7 @@ char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted)
  *                         backslash in end                                   *
  *                                                                            *
  ******************************************************************************/
-int	zbx_function_param_quote(char **param, int forced)
+int	zbx_function_param_quote(char **param, int forced, int esc_bs)
 {
 	size_t	sz_src, sz_dst;
 
@@ -560,10 +613,10 @@ int	zbx_function_param_quote(char **param, int forced)
 		return SUCCEED;
 	}
 
-	if (0 != (sz_src = strlen(*param)) && '\\' == (*param)[sz_src - 1])
+	if (0 != (sz_src = strlen(*param)) && 0 == esc_bs && '\\' == (*param)[sz_src - 1])
 		return FAIL;
 
-	sz_dst = zbx_get_escape_string_len(*param, "\"") + 3;
+	sz_dst = zbx_get_escape_string_len(*param, 0 == esc_bs ? "\"" : "\"\\") + 3;
 
 	*param = (char *)zbx_realloc(*param, sz_dst);
 
@@ -573,7 +626,7 @@ int	zbx_function_param_quote(char **param, int forced)
 	while (0 < sz_src)
 	{
 		(*param)[--sz_dst] = (*param)[--sz_src];
-		if ('"' == (*param)[sz_src])
+		if ('"' == (*param)[sz_src] || (1 == esc_bs &&'\\' == (*param)[sz_src]))
 			(*param)[--sz_dst] = '\\';
 	}
 	(*param)[--sz_dst] = '"';

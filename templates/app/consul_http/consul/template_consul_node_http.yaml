@@ -268,98 +268,98 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Consul = {
-                setParams: function (params) {
-                    ['api_endpoint', 'token'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_endpoint', 'token'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            		});
             
-                    Consul.params = params;
-                    if (typeof Consul.params.api_endpoint === 'string' && !Consul.params.api_endpoint.endsWith('/')) {
-                        Consul.params.api_endpoint += '/';
-                    }
-                },
+            		Consul.params = params;
+            		if (typeof Consul.params.api_endpoint === 'string' && !Consul.params.api_endpoint.endsWith('/')) {
+            			Consul.params.api_endpoint += '/';
+            		}
+            	},
             
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Consul.params.api_endpoint + query;
+            	request: function (query) {
+            		var response,
+            			request = new HttpRequest(),
+            			url = Consul.params.api_endpoint + query;
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('X-Consul-Token: ' + Consul.params.token);
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('X-Consul-Token: ' + Consul.params.token);
             
-                    Zabbix.log(4, '[ Consul ] Sending request: ' + url);
-                    response = request.get(url);
+            		Zabbix.log(4, '[ Consul ] Sending request: ' + url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ Consul ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Consul ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Consul Agent API.';
-                        }
-                    }
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Consul Agent API.';
+            			}
+            		}
             
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
-                },
+            		return {
+            			status: request.getStatus(),
+            			response: response
+            		};
+            	},
             
-                getServices: function () {
-                    var result = Consul.request('v1/agent/services'),
-                        services = [];
+            	getServices: function () {
+            		var result = Consul.request('v1/agent/services'),
+            			services = [];
             
-                    if (typeof result.response !== 'object' || result.status != 200) {
-                        throw 'Cannot get service list from Consul Agent API.';
-                    }
+            		if (typeof result.response !== 'object' || result.status != 200) {
+            			throw 'Cannot get service list from Consul Agent API.';
+            		}
             
-                    Object.keys(result.response).forEach(function (service) {
-                        services.push(result.response[service]['ID']);
-                    });
+            		Object.keys(result.response).forEach(function (service) {
+            			services.push(result.response[service]['ID']);
+            		});
             
-                    return services;
-                },
+            		return services;
+            	},
             
-                getServiceStats: function (service_id) {
-                    var result = Consul.request('v1/agent/health/service/id/' + service_id);
+            	getServiceStats: function (service_id) {
+            		var result = Consul.request('v1/agent/health/service/id/' + service_id);
             
-                    if (typeof result.response !== 'object' || [200, 429, 503].indexOf(result.status) === -1) {
-                        throw 'Cannot get service info from Consul Agent API.';
-                    }
+            		if (typeof result.response !== 'object' || [200, 429, 503].indexOf(result.status) === -1) {
+            			throw 'Cannot get service info from Consul Agent API.';
+            		}
             
-                    return result.response;
-                }
+            		return result.response;
+            	}
             }
             
             try {
-                Consul.setParams(JSON.parse(value));
+            	Consul.setParams(JSON.parse(value));
             
-                var services = Consul.getServices(),
-                    result = [];
+            	var services = Consul.getServices(),
+            		result = [];
             
-                services.forEach(function (service) {
-                    var service_stats = Consul.getServiceStats(service);
+            	services.forEach(function (service) {
+            		var service_stats = Consul.getServiceStats(service);
             
-                    result.push({
-                        'id': service,
-                        'name': service_stats['Service']['Service'],
-                        'status': service_stats['AggregatedStatus'],
-                        'checks': service_stats['Checks'],
-                        'namespace': typeof service_stats['Service']['Namespace'] === 'undefined' ? 'None' : service_stats['Service']['Namespace']
-                    });
-                });
+            		result.push({
+            			'id': service,
+            			'name': service_stats['Service']['Service'],
+            			'status': service_stats['AggregatedStatus'],
+            			'checks': service_stats['Checks'],
+            			'namespace': typeof service_stats['Service']['Namespace'] === 'undefined' ? 'None' : service_stats['Service']['Namespace']
+            		});
+            	});
             
-                return JSON.stringify(result);
+            	return JSON.stringify(result);
             }
             catch (error) {
-                error += ((String(error).endsWith('.')) ? '' : '.');
-                Zabbix.log(3, '[ Consul ] ERROR: ' + error);
+            	error += ((String(error).endsWith('.')) ? '' : '.');
+            	Zabbix.log(3, '[ Consul ] ERROR: ' + error);
             
-                return JSON.stringify({error: error + ' Check debug log for more information.'});
+            	return JSON.stringify({error: error + ' Check debug log for more information.'});
             }
           description: 'Get all the services that are registered with the local agent and their status.'
           timeout: 15s
@@ -1436,14 +1436,14 @@ zabbix_export:
               parameters:
                 - |
                   var lookup = {},
-                      result = [];
+                  	result = [];
                   
                   JSON.parse(value).forEach(function (item) {
-                      var http_method = item.labels.method;
-                      if (!(lookup[http_method])) {
-                          lookup[http_method] = 1;
-                          result.push({ "{#HTTP_METHOD}": http_method });
-                      }
+                  	var http_method = item.labels.method;
+                  	if (!(lookup[http_method])) {
+                  		lookup[http_method] = 1;
+                  		result.push({ "{#HTTP_METHOD}": http_method });
+                  	}
                   })
                   
                   return JSON.stringify(result);
@@ -1594,32 +1594,32 @@ zabbix_export:
               parameters:
                 - |
                   var data = JSON.parse(value),
-                      result = [];
+                  	result = [];
                   
                   if (data.length === 0) {
-                      return '[]'
+                  	return '[]'
                   };
                   data.forEach(function (service) {
                   
-                      result.push({
-                          '{#TYPE}': 'aggregated_status',
-                          '{#SERVICE_NAME}': service.name,
-                          '{#SERVICE_ID}': service.id,
-                          '{#SERVICE_NAMESPACE}': service.namespace
-                      });
+                  	result.push({
+                  		'{#TYPE}': 'aggregated_status',
+                  		'{#SERVICE_NAME}': service.name,
+                  		'{#SERVICE_ID}': service.id,
+                  		'{#SERVICE_NAMESPACE}': service.namespace
+                  	});
                   
-                      if (service['checks'] !== 0) {
-                          service['checks'].forEach(function (check) {
-                              result.push({
-                                  '{#TYPE}': 'service_check',
-                                  '{#SERVICE_NAME}': service.name,
-                                  '{#SERVICE_ID}': service.id,
-                                  '{#SERVICE_NAMESPACE}': service.namespace,
-                                  '{#SERVICE_CHECK_ID}': check["CheckID"],
-                                  '{#SERVICE_CHECK_NAME}': check["Name"]
-                              });
-                          });
-                      }
+                  	if (service['checks'] !== 0) {
+                  		service['checks'].forEach(function (check) {
+                  			result.push({
+                  				'{#TYPE}': 'service_check',
+                  				'{#SERVICE_NAME}': service.name,
+                  				'{#SERVICE_ID}': service.id,
+                  				'{#SERVICE_NAMESPACE}': service.namespace,
+                  				'{#SERVICE_CHECK_ID}': check["CheckID"],
+                  				'{#SERVICE_CHECK_NAME}': check["Name"]
+                  			});
+                  		});
+                  	}
                   
                   });
                   
@@ -1883,7 +1883,7 @@ zabbix_export:
               parameters:
                 - |
                   return JSON.stringify(JSON.parse(value)["Stats"]["leader"] === true
-                      ? [{'{#SINGLETON}': ''}] : []);
+                  	? [{'{#SINGLETON}': ''}] : []);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -1986,7 +1986,7 @@ zabbix_export:
               parameters:
                 - |
                   return JSON.stringify(JSON.parse(value)["Config"]["Server"] === true
-                      ? [{'{#SINGLETON}': ''}] : []);
+                  	? [{'{#SINGLETON}': ''}] : []);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h

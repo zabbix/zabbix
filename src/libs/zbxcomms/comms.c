@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -674,7 +674,7 @@ static int	zbx_socket_create(zbx_socket_t *s, int type, const char *source_ip, c
 	}
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (NULL != ip && SUCCEED != zbx_is_ip(ip))
+	if (SUCCEED != zbx_is_ip(ip))
 		server_name = ip;
 
 	if (ZBX_TCP_SEC_TLS_CERT == tls_connect || ZBX_TCP_SEC_TLS_PSK == tls_connect)
@@ -822,14 +822,14 @@ int	zbx_tcp_send_context_init(const char *data, size_t len, size_t reserved, uns
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < len)
 	{
 		zbx_set_socket_strerror("cannot send data: message size " ZBX_FS_UI64 " exceeds the maximum"
-				" size " ZBX_FS_UI64 " bytes.", len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
+				" size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)len, ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}
 
 	if (ZBX_MAX_RECV_LARGE_DATA_SIZE < reserved)
 	{
 		zbx_set_socket_strerror("cannot send data: uncompressed message size " ZBX_FS_UI64
-				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", reserved,
+				" exceeds the maximum size " ZBX_FS_UI64 " bytes.", (zbx_uint64_t)reserved,
 				ZBX_MAX_RECV_LARGE_DATA_SIZE);
 		return FAIL;
 	}

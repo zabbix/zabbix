@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1822,7 +1822,9 @@ class CExpressionParserTest extends TestCase {
 
 			['find(/host/key,,"like","\\")=0', null, CParser::PARSE_FAIL],
 			['find(/host/key,,"like","\\\\")=0', null, CParser::PARSE_SUCCESS],
+			['find(/host/key,,"like","\\\\")=0', null, CParser::PARSE_FAIL, ['escape_backslashes' => false]],
 			['find(/host/key,,"like","\\r")=0', null, CParser::PARSE_FAIL],
+			['find(/host/key,,"like","\\r")=0', null, CParser::PARSE_SUCCESS, ['escape_backslashes' => false]],
 			['find(/host/key,,"like","\\\\r")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\\\\\"")=0', null, CParser::PARSE_SUCCESS],

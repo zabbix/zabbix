@@ -324,28 +324,28 @@ zabbix_export:
               parameters:
                 - |
                   var valueArray = [
-                      'moduleNoDefect',
-                      'moduleOverHeat',
-                      'moduleFanRpmLow',
-                      'moduleVoltageLow',
-                      'moduleThermalSensorFailure',
-                      'modulePullOut',
-                      'powerDC48VAFailure',
-                      'powerDC48VBFailure',
-                      'extAlarmInputTrigger',
-                      'moduleDown',
-                      'mscSwitchOverOK',
-                      'networkTopologyChange',
-                      'macSpoof',
-                      'cpuHigh',
-                      'memoryUsageHigh',
-                      'packetBufferUsageHigh',
-                      'loopguardOccurence'
+                  	'moduleNoDefect',
+                  	'moduleOverHeat',
+                  	'moduleFanRpmLow',
+                  	'moduleVoltageLow',
+                  	'moduleThermalSensorFailure',
+                  	'modulePullOut',
+                  	'powerDC48VAFailure',
+                  	'powerDC48VBFailure',
+                  	'extAlarmInputTrigger',
+                  	'moduleDown',
+                  	'mscSwitchOverOK',
+                  	'networkTopologyChange',
+                  	'macSpoof',
+                  	'cpuHigh',
+                  	'memoryUsageHigh',
+                  	'packetBufferUsageHigh',
+                  	'loopguardOccurence'
                   ];
                   var base2 = parseInt(value).toString(2);
                   var outArray = [];
                   for (var i = 0; i < base2.length; ++i) {
-                      if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
+                  	if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
                   }
                   return outArray.join();
           tags:
@@ -1094,12 +1094,12 @@ zabbix_export:
                   var inArray = JSON.parse(value);
                   var outArr = []
                   inArray.forEach(function (item, i, arr) {
-                      item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
-                      item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
-                      item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
-                      item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
-                      item["{#ZYXEL.VOLT.THRESH.HIGH}"] /= 1000;
-                      outArr.push(item)
+                  	item['{#ZYXEL.SLOT.ID}'] = item['{#SNMPINDEX}'].split('.')[1];
+                  	item['{#ZYXEL.SENSOR.ID}'] = item['{#SNMPINDEX}'].split('.')[2];
+                  	item["{#ZYXEL.VOLT.NOMINAL}"] = "+" + item["{#ZYXEL.VOLT.NOMINAL}"] / 1000 + "V";
+                  	item["{#ZYXEL.VOLT.THRESH.LOW}"] /= 1000;
+                  	item["{#ZYXEL.VOLT.THRESH.HIGH}"] /= 1000;
+                  	outArr.push(item)
                   });
                   return JSON.stringify(outArr);
       tags:

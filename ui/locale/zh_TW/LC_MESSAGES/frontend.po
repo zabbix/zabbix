@@ -3464,6 +3464,10 @@ msgstr "不能大量更新主機名稱."
 msgid "Cannot mass update visible host name."
 msgstr "不能大量更新可見主機名稱"
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -4902,6 +4906,10 @@ msgstr ""
 msgid "Context name"
 msgstr ""
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr ""
@@ -5802,6 +5810,10 @@ msgstr "預設認證方式"
 
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
+msgstr ""
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:73
@@ -7024,6 +7036,14 @@ msgstr ""
 msgid "Draw style"
 msgstr "繪圖風格"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7420,6 +7440,10 @@ msgstr ""
 #: include/views/configuration.item.edit.php:982
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
+msgstr ""
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
 msgstr ""
 
 #: app/partials/administration.system.info.php:238
@@ -10722,6 +10746,18 @@ msgstr ""
 msgid "Initial view is ignored if the default view is set."
 msgstr ""
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "插入"
@@ -10894,6 +10930,11 @@ msgstr ""
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr ""
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr ""
@@ -10920,6 +10961,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:948
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
@@ -12343,6 +12388,10 @@ msgstr ""
 #: app/views/administration.script.list.php:68
 #: app/views/administration.script.list.php:159
 msgid "Manual host action"
+msgstr ""
+
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
 msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:84
@@ -14603,6 +14652,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "只計算指派給啟用的主機的和相依於啟用的項目的觸發器"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr ""
@@ -14867,6 +14920,10 @@ msgstr ""
 #: app/partials/administration.system.info.php:224
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
+msgstr ""
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
@@ -19244,6 +19301,10 @@ msgstr "測試字串"
 msgid "Test subject"
 msgstr ""
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -20290,6 +20351,10 @@ msgstr ""
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr ""
 
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
+
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
 msgstr ""
@@ -21087,6 +21152,10 @@ msgstr ""
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "用户群組"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22195,8 +22264,17 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr ""
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
 msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
@@ -23644,6 +23722,12 @@ msgstr "接近 \"%1$s\\ 處語法錯誤"
 msgid "incorrect usage of function \"%1$s\""
 msgstr ""
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr ""
@@ -24189,6 +24273,10 @@ msgstr "非在"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "非所選的"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
@@ -25016,6 +25104,10 @@ msgstr ""
 #: app/views/js/correlation.edit.js.php:235
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
+msgstr ""
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193

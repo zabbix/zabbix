@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -134,10 +134,15 @@ static char	*generate_data_source(const char *sql)
 			break;
 	}
 
-	if (ptr_ds == data_source)
-		zbx_free(data_source);	/* failed to generate data_source */
+	if (ptr_ds != data_source)
+	{
+		if (' ' == *(ptr_ds - 1))
+			ptr_ds--;
+
+		*ptr_ds = '\0';
+	}
 	else
-		*(ptr_ds - 1) = '\0';
+		zbx_free(data_source);	/* failed to generate data_source */
 
 	return data_source;
 }

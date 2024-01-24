@@ -42,7 +42,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/libs/zbxdiscovery/libzbxdiscovery_proxy.a \
 	$(top_builddir)/src/libs/zbxexport/libzbxexport.a \
 	taskmanager/libzbxtaskmanager_proxy.a \
-	$(top_builddir)/src/zabbix_server/vmware/libzbxvmware.a \
+	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxproxysysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \

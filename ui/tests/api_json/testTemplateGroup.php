@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -504,7 +504,7 @@ class testTemplateGroup extends CAPITest {
 						['templateid' => '10362']
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/groups/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'templategroup' => [
@@ -516,7 +516,7 @@ class testTemplateGroup extends CAPITest {
 						['templateid' => '1035888']
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/templates/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'templategroup' => [
@@ -607,7 +607,7 @@ class testTemplateGroup extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/groups/1": unexpected parameter "name".'
 			],
-			// Check missig parameters.
+			// Check missing parameters.
 			[
 				'templategroup' => [
 					'templates' => [
@@ -653,7 +653,7 @@ class testTemplateGroup extends CAPITest {
 						'templateid' => '50010'
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/groups/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'templategroup' => [
@@ -664,7 +664,7 @@ class testTemplateGroup extends CAPITest {
 						'templateid' => '12345'
 					]
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/templates/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'templategroup' => [
@@ -695,6 +695,28 @@ class testTemplateGroup extends CAPITest {
 						'groupid' => '50013'
 					],
 					'templates' => []
+				],
+				'expected_error' => null
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '50013'
+					],
+					'templates' => [
+						'templateid' => '50010'
+					]
+				],
+				'expected_error' => null
+			],
+			[
+				'templategroup' => [
+					'groups' => [
+						'groupid' => '52005'
+					],
+					'templates' => [
+						'templateid' => '50020'
+					]
 				],
 				'expected_error' => null
 			]
@@ -761,21 +783,21 @@ class testTemplateGroup extends CAPITest {
 					'groupids' => ['12345'],
 					'templateids' => ['50020']
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => null
 			],
 			[
 				'templategroup' => [
 					'groupids' => ['52006'],
 					'templateids' => ['12345']
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => 'Invalid parameter "/templateids/1": object does not exist, or you have no permissions to it.'
 			],
 			[
 				'templategroup' => [
 					'groupids' => ['52006', '12345'],
 					'templateids' => ['50020']
 				],
-				'expected_error' => 'No permissions to referred object or it does not exist!'
+				'expected_error' => null
 			],
 			[
 				'templategroup' => [
@@ -789,7 +811,7 @@ class testTemplateGroup extends CAPITest {
 					'groupids' => ['52005'],
 					'templateids' => ['50010']
 				],
-				'expected_error' => 'Template "API Template" cannot be without template group.'
+				'expected_error' => null
 			],
 			[
 				'templategroup' => [

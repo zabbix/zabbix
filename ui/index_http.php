@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,9 +58,8 @@ if ($http_user) {
 	}
 
 	try {
-		CWebUser::$data = API::getApiService('user')->loginByUsername($http_user,
-			(CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE),
-			CAuthenticationHelper::get(CAuthenticationHelper::AUTHENTICATION_TYPE)
+		CWebUser::$data = CUser::loginByUsername($http_user,
+			CAuthenticationHelper::get(CAuthenticationHelper::HTTP_CASE_SENSITIVE) == ZBX_AUTH_CASE_SENSITIVE
 		);
 
 		if (!empty(CWebUser::$data)) {
