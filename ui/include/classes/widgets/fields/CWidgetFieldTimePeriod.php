@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,8 +95,6 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			$absolute_time_parser = new CAbsoluteTimeParser();
 			$relative_time_parser = new CRelativeTimeParser();
 
-			$default_period = $this->getDefaultPeriod();
-
 			$field_labels = [
 				'from' => ($label !== '' ? $label.'/' : '').$this->getFromLabel(),
 				'to' => ($label !== '' ? $label.'/' : '').$this->getToLabel()
@@ -104,16 +102,14 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 
 			foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
 				if (!array_key_exists($field, $value)) {
-					if ($strict) {
+					if ($strict || array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)) {
 						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $this->name,
 							_s('the parameter "%1$s" is missing', $field)
 						);
 						continue;
 					}
 
-					$value[$field] = array_key_exists(self::FOREIGN_REFERENCE_KEY, $default)
-						? $default_period[$field]
-						: $default[$field];
+					$value[$field] = $default[$field];
 				}
 
 				$field_value = &$value[$field];
@@ -159,21 +155,17 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 					}
 				}
 
-				$errors[] = [
-					_s('Invalid parameter "%1$s": %2$s.', $field_labels[$field],
-						$this->is_date_only ? _('a date is expected') : _('a time is expected')
-					)
-				];
+				$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_labels[$field],
+					$this->is_date_only ? _('a date is expected') : _('a time is expected')
+				);
 			}
 
 			if (!$errors) {
 				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
 					if ($value[$field_ts] < 0 || $value[$field_ts] > ZBX_MAX_DATE) {
-						$errors[] = [
-							_s('Invalid parameter "%1$s": %2$s.', $field_labels[$field],
-								$this->is_date_only ? _('a date is expected') : _('a time is expected')
-							)
-						];
+						$errors[] = _s('Invalid parameter "%1$s": %2$s.', $field_labels[$field],
+							$this->is_date_only ? _('a date is expected') : _('a time is expected')
+						);
 					}
 				}
 			}
@@ -207,27 +199,9 @@ class CWidgetFieldTimePeriod extends CWidgetField {
 			}
 		}
 
-		if ($errors) {
-			$value = $default;
-
-			if (!array_key_exists(self::FOREIGN_REFERENCE_KEY, $value)) {
-				$range_time_parser = new CRangeTimeParser();
-
-				foreach (['from' => 'from_ts', 'to' => 'to_ts'] as $field => $field_ts) {
-					if ($value[$field] !== '') {
-						$range_time_parser->parse($value[$field]);
-						$value[$field_ts] = $range_time_parser
-							->getDateTime($field === 'from', $this->timezone)
-							->getTimestamp();
-					}
-					else {
-						$value[$field_ts] = 0;
-					}
-				}
-			}
+		if (!$errors) {
+			$this->setValue($value);
 		}
-
-		$this->setValue($value);
 
 		return $errors;
 	}

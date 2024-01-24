@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -439,7 +439,7 @@ class C52TriggerExpressionConverter extends CConverter {
 				return;
 			}
 
-			$param = CHistFunctionParser::quoteParam($param, false);
+			$param = CHistFunctionParser::quoteParam($param, true, ['escape_backslashes' => false]);
 		});
 
 		// Remove empty parameters from the end of the parameters array.

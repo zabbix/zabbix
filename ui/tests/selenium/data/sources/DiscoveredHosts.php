@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -343,9 +343,9 @@ class DiscoveredHosts {
 		CDataHelper::call('host.update', [
 			'hostid' => self::DISCOVERED_HOSTID,
 			'templates' => [
-				$templates['templateids']['Test of discovered host Template'],
-				$templates['templateids']['Test of discovered host 1 template for unlink'],
-				$templates['templateids']['Test of discovered host 2 template for clear']
+				['templateid' => $templates['templateids']['Test of discovered host Template']],
+				['templateid' => $templates['templateids']['Test of discovered host 1 template for unlink']],
+				['templateid' => $templates['templateids']['Test of discovered host 2 template for clear']]
 			]
 		]);
 

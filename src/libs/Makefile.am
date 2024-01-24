@@ -78,6 +78,7 @@ DIST_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxprof \
 	zbxxml
 
@@ -136,6 +137,7 @@ SERVER_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
 if HAVE_IPMI
 SERVER_SUBDIRS += zbxipmi
@@ -191,6 +193,7 @@ PROXY_SUBDIRS = \
 	zbxvariant \
 	zbxvault \
 	zbxversion \
+	zbxvmware \
 	zbxxml
 if HAVE_IPMI
 PROXY_SUBDIRS += zbxipmi
@@ -236,6 +239,7 @@ SUBDIRS = \
 	zbxtime \
 	zbxvariant \
 	zbxversion \
+	zbxvmware \
 	zbxxml \
 	zbxagentget \
 	$(PROXY_SUBDIRS) \

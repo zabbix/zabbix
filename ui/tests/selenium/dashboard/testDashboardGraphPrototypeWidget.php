@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -382,7 +382,8 @@ class testDashboardGraphPrototypeWidget extends testWidgets {
 		$type = array_key_exists('Item prototype', $data['fields']) ? 'Item prototype' : 'Graph prototype';
 
 		if (!array_key_exists('Graph prototype', $data['fields']) && !array_key_exists('Item prototype', $data['fields'])) {
-			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->asMultiselect()->one()->clear();
+			$form->query('xpath:.//div[@id="graphid" or @id="itemid"]')->all()->filter(CElementFilter::VISIBLE)
+					->asMultiselect()->clear();
 		}
 
 		$values = $form->getFields()->filter(CElementFilter::VISIBLE)->asValues();

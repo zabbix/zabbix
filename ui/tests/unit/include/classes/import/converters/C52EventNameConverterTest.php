@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,16 +53,16 @@ class C52EventNameConverterTest extends TestCase {
 			[
 				'String containing expression macro '.
 				'{{?100*'.
-					'{Zabbux Server:system.cpu.load.trendavg(1M,now/M)}'.
+					'{Zabbix Server:system.cpu.load.trendavg(1M,now/M)}'.
 					'/'.
-					'{Zabbux Server:system.cpu.load.trendavg(1M,now/M-1M)}'.
+					'{Zabbix Server:system.cpu.load.trendavg(1M,now/M-1M)}'.
 				'}.fmtnum(0)}'.
 				'%',
 
 				'String containing expression macro {{?100*'.
-					'trendavg(/Zabbux Server/system.cpu.load,1M:now/M)'.
+					'trendavg(/Zabbix Server/system.cpu.load,1M:now/M)'.
 					'/'.
-					'trendavg(/Zabbux Server/system.cpu.load,1M:now/M-1M)'.
+					'trendavg(/Zabbix Server/system.cpu.load,1M:now/M-1M)'.
 				'}.fmtnum(0)}%'
 			],
 			[

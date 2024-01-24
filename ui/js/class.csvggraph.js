@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -143,7 +143,7 @@
 				graph.data('widget')._resumeUpdating();
 
 				data.isTriggerHintBoxFrozen = false;
-				data.isHintBoxFrozen = false; // Unfreeze because only onfrozen hintboxes can be removed.
+				data.isHintBoxFrozen = false; // Unfreeze because only unfrozen hintboxes can be removed.
 				graph.off('mouseup', hintboxSilentMode);
 				destroyHintbox(graph);
 			});
@@ -161,8 +161,8 @@
 	}
 
 	/**
-	 * Silent mode means that hintbox is waiting for click to be repositionated. Once user clicks on graph, existing
-	 * hintbox will be repositionated with a new values in the place where user clicked on.
+	 * Silent mode means that hintbox is waiting for click to be repositioned. Once user clicks on graph, existing
+	 * hintbox will be repositioned with a new values in the place where user clicked on.
 	 */
 	function hintboxSilentMode(e) {
 		var graph = e.data.graph,
@@ -275,6 +275,10 @@
 					to_offset: Math.ceil(to_offset)
 				})
 					.then((time_period) => {
+						if (time_period === null) {
+							return;
+						}
+
 						widget._startUpdating();
 						widget.feedback({time_period});
 						widget.broadcast({_timeperiod: time_period});
@@ -302,7 +306,7 @@
 				}
 
 				if ('has_fields_errors' in time_period) {
-					return;
+					throw new Error();
 				}
 
 				return time_period;
@@ -320,6 +324,8 @@
 				}
 
 				widget._updateMessages(messages, title);
+
+				return null;
 			})
 			.finally(() => {
 				widget._hidePreloader();
@@ -762,6 +768,10 @@
 							to: data.timePeriod.to,
 						})
 							.then((time_period) => {
+								if (time_period === null) {
+									return;
+								}
+
 								widget._startUpdating();
 								widget.feedback({time_period});
 								widget.broadcast({_timeperiod: time_period});

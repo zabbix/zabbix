@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1504,7 +1504,7 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:righty_units' => 'Static'
 					],
 					'Legend' => [
-						'Max number of rows' => '5',
+						'Number of rows' => '5',
 						'Display min/max/avg' => true
 					],
 					'Problems' => [
@@ -1797,7 +1797,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Legend' => [
 						'Show legend' => true,
-						'Max number of rows' => '5',
+						'Number of rows' => '5',
 						'Display min/max/avg' => true
 					],
 					'Problems' => [
@@ -2152,7 +2152,7 @@ class testDashboardGraphWidget extends testWidgets {
 					],
 					'Data set' => [
 						'host' => 'Zabbix*, new widget',
-						'item' => 'Agetn*, new widget'
+						'item' => 'Agent*, new widget'
 					]
 				]
 			],
@@ -2334,11 +2334,11 @@ class testDashboardGraphWidget extends testWidgets {
 	}
 
 	/*
-	 * Test enable/disable "Max number of rows" field by check/uncheck "Show legend".
+	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
 	 */
 	public function testDashboardGraphWidget_LegendFieldValidation() {
 		$this->page->login()->open(self::DASHBOARD_URL);
-		$fields = ['Max number of rows', 'Display min/max/avg', 'Number of columns'];
+		$fields = ['Number of rows', 'Display min/max/avg', 'Number of columns'];
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
 		$this->assertEnabledFields($fields);
@@ -2352,7 +2352,7 @@ class testDashboardGraphWidget extends testWidgets {
 		}
 
 		$field_attributes = [
-			'Max number of rows' => [
+			'Number of rows' => [
 				'min' => 1,
 				'max' => 10
 			],
@@ -2380,11 +2380,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => 1
 					],
 					'expected' => [
-						'Max number of rows' => 1,
+						'Number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Max number of rows' => 0,
+						'Number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2396,11 +2396,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => 4
 					],
 					'expected' => [
-						'Max number of rows' => 10,
+						'Number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Max number of rows' => 100,
+						'Number of rows' => 100,
 						'Number of columns' => 100
 					]
 				]
@@ -2412,11 +2412,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => 0
 					],
 					'expected' => [
-						'Max number of rows' => 1,
+						'Number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Max number of rows' => 0,
+						'Number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2428,11 +2428,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => 5
 					],
 					'expected' => [
-						'Max number of rows' => 10,
+						'Number of rows' => 10,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Max number of rows' => 100,
+						'Number of rows' => 100,
 						'Number of columns' => 100
 					]
 				]
@@ -2444,11 +2444,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => -1
 					],
 					'expected' => [
-						'Max number of rows' => 1,
+						'Number of rows' => 1,
 						'Number of columns' => 1
 					],
 					'range_percentage' => [
-						'Max number of rows' => 0,
+						'Number of rows' => 0,
 						'Number of columns' => 0
 					]
 				]
@@ -2460,11 +2460,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => 'a'
 					],
 					'expected' => [
-						'Max number of rows' => 1,
+						'Number of rows' => 1,
 						'Number of columns' => 4
 					],
 					'range_percentage' => [
-						'Max number of rows' => 0,
+						'Number of rows' => 0,
 						'Number of columns' => 100
 					]
 				]
@@ -2476,11 +2476,11 @@ class testDashboardGraphWidget extends testWidgets {
 						'id:legend_columns' => 3
 					],
 					'expected' => [
-						'Max number of rows' => 6,
+						'Number of rows' => 6,
 						'Number of columns' => 3
 					],
 					'range_percentage' => [
-						'Max number of rows' => 55.5556,
+						'Number of rows' => 55.5556,
 						'Number of columns' => 66.6667
 					]
 				]

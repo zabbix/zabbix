@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -420,7 +420,9 @@ class C64ImportConverter extends CConverter {
 		}
 
 		foreach (array_reverse($convert_parameters) as $parameter) {
-			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'], false);
+			$parameter['match'] = CHistFunctionParser::unquoteParam($parameter['match'],
+				['unescape_backslashes' => false]
+			);
 			$parameter['match'] = CHistFunctionParser::quoteParam($parameter['match']);
 
 			$expression = substr_replace($expression, $parameter['match'], $parameter['pos'], $parameter['length']);
