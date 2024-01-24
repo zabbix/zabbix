@@ -85,6 +85,7 @@ int	zbx_uint64match_condition(zbx_uint64_t value, zbx_uint64_t pattern, unsigned
 #define ZBX_TOKEN_REFERENCE		0x00040
 #define ZBX_TOKEN_LLD_FUNC_MACRO	0x00080
 #define ZBX_TOKEN_EXPRESSION_MACRO	0x00100
+#define ZBX_TOKEN_USER_FUNC_MACRO	0x00200
 
 /* additional token flags */
 #define ZBX_TOKEN_JSON		0x0010000
