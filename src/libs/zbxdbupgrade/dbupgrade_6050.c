@@ -2998,7 +2998,7 @@ static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_na
 		zbx_vector_uint64_clear(&groupids);
 	}
 
-	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_destroy(&groupids);
 
 	return ret;
 }
