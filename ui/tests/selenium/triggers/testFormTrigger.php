@@ -704,7 +704,9 @@ class testFormTrigger extends CLegacyWebTest {
 					'description' => 'MyTrigger_generalCheck',
 					'expression' => 'last(/'.self::HOST.'/Float,#1)<5',
 					'type' => true,
-					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process.',
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new'.
+							' value, if this value is part of this expression. If time based functions are used in the'.
+							' expression, it is recalculated every 30 seconds by a zabbix timer process.',
 					'url_name' => 'Trigger context menu name for trigger URL.',
 					'url' => 'https://www.zabbix.com',
 					'severity' => 'High',

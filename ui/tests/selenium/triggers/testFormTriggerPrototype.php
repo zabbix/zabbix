@@ -460,7 +460,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 
 	// Returns update data
 	public static function update() {
-		return CDBHelper::getDataProvider("select * from triggers t left join functions f on f.triggerid=t.triggerid where f.itemid='23804' and t.description LIKE 'testFormTriggerPrototype%'");
+		return CDBHelper::getDataProvider('SELECT * FROM triggers t LEFT JOIN functions f ON f.triggerid=t.triggerid'.
+				' WHERE f.itemid=\'23804\' AND t.description LIKE \'testFormTriggerPrototype%\''
+		);
 	}
 
 	/**
@@ -623,7 +625,9 @@ class testFormTriggerPrototype extends CLegacyWebTest {
 					'description' => 'MyTrigger_generalCheck',
 					'expression' => 'last(/Simple form test host/item-prototype-reuse[{#KEY}],#1)<5',
 					'type' => true,
-					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new value, if this value is part of this expression. If time based functions are used in the expression, it is recalculated every 30 seconds by a zabbix timer process. ',
+					'comments' => 'Trigger status (expression) is recalculated every time Zabbix server receives new'.
+							' value, if this value is part of this expression. If time based functions are used in the'.
+							' expression, it is recalculated every 30 seconds by a zabbix timer process. ',
 					'url_name' => 'Trigger context menu name for trigger URL.',
 					'url' => 'https://www.zabbix.com',
 					'severity' => 'High',
