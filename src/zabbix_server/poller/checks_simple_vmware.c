@@ -467,6 +467,7 @@ out:
  * Parameters: url       - [IN] vmware service URL                            *
  *             username  - [IN] vmware service username                       *
  *             password  - [IN] vmware service password                       *
+ *             result    - [IN]                                               *
  *             ret       - [OUT] operation result code                        *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
@@ -527,6 +528,7 @@ out:
  *                              is virtual machine uuid.                      *
  *             username  - [IN] vmware service user name                      *
  *             password  - [IN] vmware service password                       *
+ *             propid    - [IN]                                               *
  *             xpath     - [IN] xpath describing data to retrieve             *
  *             result    - [OUT] request result                               *
  *                                                                            *

@@ -91,7 +91,9 @@ static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *r
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_FAILED))
 		{
 			if (SUCCEED == zbx_json_value_by_name(&jp, ZBX_PROTO_TAG_ERROR, error, max_error_len, NULL))
+			{
 				ret = NETWORK_ERROR;
+			}
 			else
 			{
 				zbx_strlcpy(error, "Cannot get error message describing reasons for failure",
