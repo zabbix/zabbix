@@ -170,7 +170,7 @@ class CWidget extends CWidgetBase {
 	 * The method is called once, immediately after the promiseUpdate is resolved.
 	 * Custom implementation must also resolve the promise provided by the default implementation.
 	 *
-	 * @returns {Promise<void>}
+	 * @returns {Promise<any>}
 	 */
 	promiseReady() {
 		return new Promise(resolve => {
