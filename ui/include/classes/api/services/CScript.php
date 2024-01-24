@@ -1110,7 +1110,7 @@ class CScript extends CApiService {
 
 		foreach ($events as &$event) {
 			if ($event['cause_eventid'] != 0) {
-				// There is not need to select already preselected events again.
+				// There is no need to select already preselected events again.
 				if (array_key_exists($event['cause_eventid'], $events)) {
 					$event['cause'] = [
 						'eventid' => $events[$event['cause_eventid']]['eventid'],

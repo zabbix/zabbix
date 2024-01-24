@@ -107,22 +107,33 @@ class CTriggerPrototype extends CTriggerGeneral {
 
 		// editable + permission check
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
+
+			$sqlParts['from']['functions'] = 'functions f';
+			$sqlParts['from']['items'] = 'items i';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where']['ft'] = 'f.triggerid=t.triggerid';
+			$sqlParts['where']['fi'] = 'f.itemid=i.itemid';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 
 			$sqlParts['where'][] = 'NOT EXISTS ('.
 				'SELECT NULL'.
-				' FROM functions f,items i,hosts_groups hgg'.
-					' LEFT JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE t.triggerid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND i.hostid=hgg.hostid'.
-				' GROUP BY i.hostid'.
-				' HAVING MAX(permission)<'.zbx_dbstr($permission).
-					' OR MIN(permission) IS NULL'.
-					' OR MIN(permission)='.PERM_DENY.
+				' FROM functions f1'.
+				' JOIN items i1 ON f1.itemid=i1.itemid'.
+				' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+				' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
+					' AND p1.ugsetid=p.ugsetid'.
+				' WHERE t.triggerid=f1.triggerid'.
+					' AND p1.permission IS NULL'.
 			')';
 		}
 
