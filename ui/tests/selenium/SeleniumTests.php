@@ -231,6 +231,11 @@ require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
 
+// Sysmaps.
+require_once dirname(__FILE__).'/sysmaps/testFormMap.php';
+require_once dirname(__FILE__).'/sysmaps/testFormSysmap.php';
+require_once dirname(__FILE__).'/sysmaps/testPageMaps.php';
+
 // Tags.
 require_once dirname(__FILE__).'/tags/testFormTagsConnectors.php';
 require_once dirname(__FILE__).'/tags/testFormTagsHost.php';
@@ -281,7 +286,6 @@ require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageTriggers.php';
 require_once dirname(__FILE__).'/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
-require_once dirname(__FILE__).'/testPageMaps.php';
 /*
 require_once dirname(__FILE__).'/testPageQueueDetails.php';
 require_once dirname(__FILE__).'/testPageQueueOverview.php';
@@ -304,9 +308,7 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
-require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
-require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testFormTrigger.php';
 require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
@@ -533,6 +535,11 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageServicesSla');
 		$suite->addTestSuite('testPageServicesSlaReport');
 
+		// Sysmaps.
+		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormSysmap');
+		$suite->addTestSuite('testPageMaps');
+
 		// Tags.
 		$suite->addTestSuite('testFormTagsConnectors');
 		$suite->addTestSuite('testFormTagsHost');
@@ -585,7 +592,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageTriggerUrl');
 		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageMaintenance');
-		$suite->addTestSuite('testPageMaps');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -608,9 +614,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormMaintenance');
-		$suite->addTestSuite('testFormMap');
 		$suite->addTestSuite('testFormSetup');
-		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
