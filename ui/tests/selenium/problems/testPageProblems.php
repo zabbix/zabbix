@@ -1341,6 +1341,9 @@ class testPageProblems extends CWebTest {
 					'fields' => [
 						'Show' => 'History'
 					],
+					'time_selector' => [
+						'link' => 'Last 1 day'
+					],
 					'result' => [
 						['Problem' => 'Trigger for Age problem'],
 						['Problem' => 'Trigger for tag permissions Oracle'],
