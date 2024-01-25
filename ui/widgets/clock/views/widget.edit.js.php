@@ -42,10 +42,7 @@ window.widget_clock_form = new class {
 			});
 		}
 
-		this._time_type.addEventListener('change', () => {
-			ZABBIX.Dashboard.reloadWidgetProperties();
-			this.updateForm();
-		});
+		this._time_type.addEventListener('change', () => this.updateForm());
 
 		for (const checkbox of this._clock_type.querySelectorAll('input')) {
 			checkbox.addEventListener('change', () => this.updateForm());
@@ -59,6 +56,12 @@ window.widget_clock_form = new class {
 	}
 
 	updateForm() {
+		document.querySelectorAll('.js-row-itemid').forEach(element => {
+			element.style.display = this._time_type.value == <?= TIME_TYPE_HOST ?> ? '' : 'none'
+		});
+
+		$('#itemid').multiSelect(this._time_type.value != <?= TIME_TYPE_HOST ?> ? 'disable' : 'enable');
+
 		const is_digital = this._clock_type.querySelector('input:checked').value == <?= Widget::TYPE_DIGITAL ?>;
 
 		for (const element of this._form.querySelectorAll('.js-row-show')) {

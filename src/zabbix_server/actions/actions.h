@@ -21,6 +21,8 @@
 #define ZABBIX_ACTIONS_H
 
 #include "zbxdbhigh.h"
+#include "zbxcacheconfig.h"
+#include "zbxalgo.h"
 
 #define ZBX_ACTION_RECOVERY_NONE	0
 #define ZBX_ACTION_RECOVERY_OPERATIONS	1
@@ -35,32 +37,10 @@ typedef struct
 }
 zbx_ack_task_t;
 
-void	zbx_ack_task_free(zbx_ack_task_t *ack_task);
 ZBX_PTR_VECTOR_DECL(ack_task_ptr, zbx_ack_task_t *)
-
-typedef struct
-{
-	zbx_uint64_t	taskid;
-	zbx_uint64_t	actionid;
-	zbx_uint64_t	eventid;
-	zbx_uint64_t	triggerid;
-	zbx_uint64_t	acknowledgeid;
-}
-zbx_ack_escalation_t;
-
-typedef struct
-{
-	zbx_uint64_t			conditionid;
-	zbx_uint64_t			actionid;
-	char				*value;
-	char				*value2;
-	unsigned char			conditiontype;
-	unsigned char			op;
-	zbx_vector_uint64_t		eventids;
-}
-zbx_condition_t;
-
 ZBX_PTR_VECTOR_DECL(db_action_ptr, zbx_db_action*)
+
+void	zbx_ack_task_free(zbx_ack_task_t *ack_task);
 
 int	check_action_condition(zbx_db_event *event, zbx_condition_t *condition);
 void	process_actions(zbx_vector_db_event_t *events, const zbx_vector_uint64_pair_t *closed_events);
