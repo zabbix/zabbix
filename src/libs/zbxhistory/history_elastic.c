@@ -39,7 +39,6 @@ const char	*value_type_str[] = {"dbl", "str", "log", "uint", "text"};
 
 extern char	*CONFIG_HISTORY_STORAGE_URL;
 extern int	CONFIG_HISTORY_STORAGE_PIPELINES;
-//extern int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS;
 
 static zbx_uint32_t	ZBX_ELASTIC_SVERSION = ZBX_DBVERSION_UNDEFINED;
 
@@ -1212,10 +1211,11 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 	return FAIL;
 }
 
-void	zbx_elastic_version_extract(struct zbx_json *json, int *result)
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions)
 {
 	ZBX_UNUSED(json);
 	ZBX_UNUSED(result);
+	ZBX_UNUSED(config_allow_unsupported_db_versions);
 }
 
 zbx_uint32_t	zbx_elastic_version_get(void)
