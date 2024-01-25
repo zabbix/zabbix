@@ -18,6 +18,7 @@
 **/
 
 #include "report_protocol.h"
+#include "report.h"
 
 #include "zbxalerter.h"
 
