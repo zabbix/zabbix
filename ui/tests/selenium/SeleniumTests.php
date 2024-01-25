@@ -252,6 +252,7 @@ require_once dirname(__FILE__).'/tags/testFormTagsWeb.php';
 // Templates.
 require_once dirname(__FILE__).'/templates/testFormTemplate.php';
 require_once dirname(__FILE__).'/templates/testPageTemplates.php';
+require_once dirname(__FILE__).'/templates/testTemplateInheritance.php';
 
 // Timeouts.
 require_once dirname(__FILE__) . '/timeouts/testTimeoutsHosts.php';
@@ -269,6 +270,7 @@ require_once dirname(__FILE__).'/triggers/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggers.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerUrl.php';
+require_once dirname(__FILE__).'/triggers/testTriggerExpressions.php';
 
 // Users.
 require_once dirname(__FILE__).'/users/testFormUser.php';
@@ -276,6 +278,10 @@ require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
+
+// Value mapping.
+require_once dirname(__FILE__).'/valueMapping/testFormValueMappingsHost.php';
+require_once dirname(__FILE__).'/valueMapping/testFormValueMappingsTemplate.php';
 
 // Web scenarios.
 require_once dirname(__FILE__).'/webScenarios/testFormWebScenario.php';
@@ -314,16 +320,12 @@ require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
-require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
-require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
 require_once dirname(__FILE__).'/testInheritanceTrigger.php';
 require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
-require_once dirname(__FILE__).'/testTemplateInheritance.php';
 require_once dirname(__FILE__).'/testTimezone.php';
-require_once dirname(__FILE__).'/testTriggerExpressions.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
@@ -558,6 +560,7 @@ class SeleniumTests {
 		// Templates.
 		$suite->addTestSuite('testFormTemplate');
 		$suite->addTestSuite('testPageTemplates');
+		$suite->addTestSuite('testTemplateInheritance');
 
 		// Timeouts.
 		$suite->addTestSuite('testTimeoutsHosts');
@@ -575,6 +578,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageTriggers');
 		$suite->addTestSuite('testPageTriggerUrl');
+		$suite->addTestSuite('testTriggerExpressions');
 
 		// Users.
 		$suite->addTestSuite('testFormUser');
@@ -582,6 +586,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
 		$suite->addTestSuite('testPageUsers');
+
+		// Value mapping.
+		$suite->addTestSuite('testFormValueMappingsHost');
+		$suite->addTestSuite('testFormValueMappingsTemplate');
 
 		// Web scenarios.
 		$suite->addTestSuite('testFormWebScenario');
@@ -622,16 +630,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormTabIndicators');
-		$suite->addTestSuite('testFormValueMappingsHost');
-		$suite->addTestSuite('testFormValueMappingsTemplate');
 		$suite->addTestSuite('testPageBrowserWarning');
 		$suite->addTestSuite('testInheritanceTrigger');
 		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
-		$suite->addTestSuite('testTemplateInheritance');
 		$suite->addTestSuite('testTimezone');
-		$suite->addTestSuite('testTriggerExpressions');
 		$suite->addTestSuite('testSidebarMenu');
 		$suite->addTestSuite('testUrlParameters');
 		$suite->addTestSuite('testZBX6648');
