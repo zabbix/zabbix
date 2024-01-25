@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
-require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
@@ -507,7 +508,7 @@ class testPageTriggers extends CLegacyWebTest {
 			[
 				[
 					'filter_options' => [
-						'Inherited' =>'No'
+						'Inherited' => 'No'
 					],
 					'result' => [
 						['text' => 'Dependent trigger ONE', 'selector' => 'xpath:./a[@class="js-trigger-edit wordwrap"]'],
@@ -614,13 +615,13 @@ class testPageTriggers extends CLegacyWebTest {
 				[
 					'filter_options' => [
 						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
-						'Name' =>'Inheritance trigger',
+						'Name' => 'Inheritance trigger',
 						'Severity' => 'Not classified',
-						'State' =>'Unknown',
-						'Value' =>'Problem',
-						'Inherited' =>'Yes',
-						'Discovered' =>'No',
-						'With dependencies' =>'Yes'
+						'State' => 'Unknown',
+						'Value' => 'Problem',
+						'Inherited' => 'Yes',
+						'Discovered' => 'No',
+						'With dependencies' => 'Yes'
 					],
 					'tag_options' => [
 						'type' => 'Or',
