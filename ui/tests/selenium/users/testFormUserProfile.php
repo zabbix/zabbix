@@ -456,7 +456,7 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_GOOD,
 				'timeout' => '1d',
 				'suppressed' => false
-			]],
+			]]
 			// TODO: uncomment after ZBX-23993 is fixed.
 //			[[
 //				'expected' => TEST_GOOD
