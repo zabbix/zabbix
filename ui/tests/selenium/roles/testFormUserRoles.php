@@ -1452,7 +1452,7 @@ class testFormUserRoles extends CWebTest {
 			$multiselect->edit();
 			$dialog->invalidate();
 
-			// Filter out all unwanted services befoce checking table content.
+			// Filter out all unwanted services before checking table content.
 			$dialog->query('name:filter_name')->one()->fill('Service for delete');
 			$dialog->query('button:Filter')->one()->click();
 			$dialog->waitUntilReady();

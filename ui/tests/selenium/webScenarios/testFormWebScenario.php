@@ -223,7 +223,7 @@ class testFormWebScenario extends CWebTest {
 			'headers' => ['', 'Name', '', 'Value', '']
 		];
 
-		foreach (['Variables' => false, 'Headers' => true] as $table_name => $row_dragable) {
+		foreach (['Variables' => false, 'Headers' => true] as $table_name => $row_draggable) {
 			$table = $form->getField($table_name)->asTable();
 			$row = $table->getRow(0);
 			$this->assertSame($table_layout['headers'], $table->getHeadersText());
@@ -235,7 +235,7 @@ class testFormWebScenario extends CWebTest {
 			$this->assertFalse($remove_button->isClickable());
 
 			// Check the presence of the draggable icon.
-			if ($row_dragable) {
+			if ($row_draggable) {
 				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
 				$this->assertFalse($drag_icon->isEnabled());
 			}
@@ -248,7 +248,7 @@ class testFormWebScenario extends CWebTest {
 			$this->assertTrue($remove_button->isClickable());
 
 			// Check that draggable icon becomes enabled when a new row is added.
-			if ($row_dragable) {
+			if ($row_draggable) {
 				$this->assertFalse($drag_icon->isEnabled());
 				$add_button->click();
 				$this->assertTrue($drag_icon->isEnabled());
