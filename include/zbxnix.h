@@ -50,9 +50,6 @@ void	zbx_set_exiting_with_succeed(void);
 int	ZBX_IS_RUNNING(void);
 int	ZBX_EXIT_STATUS(void);
 
-/* callback function prototype for getting PID file path */
-//typedef const char*	(*zbx_get_pid_file_pathname_f)(void);
-
 int	zbx_daemon_start(int allow_root, const char *user, unsigned int flags,
 		//zbx_get_pid_file_pathname_f get_pid_file_cb,
 		zbx_get_config_str_f get_pid_file_cb,

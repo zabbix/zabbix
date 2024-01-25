@@ -1088,16 +1088,6 @@ static void	zbx_free_config(void)
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
 }
 
-/* /\****************************************************************************** */
-/*  *                                                                            * */
-/*  * Purpose: callback function for providing PID file path to libraries        * */
-/*  *                                                                            * */
-/*  ******************************************************************************\/ */
-/* static const char	*get_pid_file_path(void) */
-/* { */
-/* 	return CONFIG_PID_FILE; */
-/* } */
-
 static void	zbx_on_exit(int ret)
 {
 	char	*error = NULL;
