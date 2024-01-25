@@ -3336,7 +3336,7 @@ class CUser extends CApiService {
 				$duo_client->healthCheck();
 			}
 			catch (DuoException $e) {
-				throw new Exception('Verify the values in Duo Universal Prompt MFA method are correct. '.
+				throw new Exception('Verify the values in Duo Universal Prompt MFA method are correct.'.
 					$e->getMessage()
 				);
 			}
@@ -3373,13 +3373,16 @@ class CUser extends CApiService {
 				'clientid' =>			['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'clientid')],
 				'client_secret' =>		['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'client_secret')]
 			]],
-			'totp_secret' =>		['type' => API_STRING_UTF8],
-			'verification_code' =>	['type' => API_STRING_UTF8],
-			'state' =>				['type' => API_STRING_UTF8],
-			'username' =>			['type' => API_STRING_UTF8],
 			'redirect_uri' =>		['type' => API_STRING_UTF8],
-			'duo_code' =>			['type' => API_STRING_UTF8],
-			'duo_state' =>			['type' => API_STRING_UTF8]
+			'mfa_response_data' => ['type' => API_OBJECT, 'fields' => [
+				'totp_secret' =>		['type' => API_STRING_UTF8],
+				'verification_code' =>	['type' => API_STRING_UTF8],
+				'state' =>				['type' => API_STRING_UTF8],
+				'username' =>			['type' => API_STRING_UTF8],
+
+				'duo_code' =>			['type' => API_STRING_UTF8],
+				'duo_state' =>			['type' => API_STRING_UTF8]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
@@ -3391,11 +3394,12 @@ class CUser extends CApiService {
 			'userids' => $data['userid'],
 			'limit' => 1
 		]);
+		$mfa_response_data = $data['mfa_response_data'];
 
 		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
 			$totp_generator = $this->createTotpGenerator($data);
 
-			if (!array_key_exists('totp_secret', $data) || $data['totp_secret'] == '') {
+			if (!array_key_exists('totp_secret', $mfa_response_data) || $mfa_response_data['totp_secret'] == '') {
 				$user_totp_secret = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
 					'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
@@ -3403,17 +3407,17 @@ class CUser extends CApiService {
 				$user_totp_secret = $user_totp_secret[0]['totp_secret'];
 			}
 			else {
-				$user_totp_secret = $data['totp_secret'];
+				$user_totp_secret = $mfa_response_data['totp_secret'];
 			}
 
-			$valid_code = $totp_generator->verifyKey($user_totp_secret, $data['verification_code']);
+			$valid_code = $totp_generator->verifyKey($user_totp_secret, $mfa_response_data['verification_code']);
 
 			if ($valid_code) {
-				if (array_key_exists('totp_secret', $data) && $data['totp_secret'] != '') {
+				if (array_key_exists('totp_secret', $mfa_response_data) && $mfa_response_data['totp_secret'] != '') {
 					DB::insert('mfa_totp_secret', [[
 						'mfaid' => $data['mfa']['mfaid'],
 						'userid' =>$data['userid'],
-						'totp_secret' => $data['totp_secret']
+						'totp_secret' => $mfa_response_data['totp_secret']
 					]]);
 				}
 			}
@@ -3425,11 +3429,11 @@ class CUser extends CApiService {
 		}
 
 		if ($data['mfa']['type'] == MFA_TYPE_DUO) {
-			if (!array_key_exists('state', $data) || !array_key_exists('username', $data)) {
+			if (!array_key_exists('state', $mfa_response_data) || !array_key_exists('username', $mfa_response_data)) {
 				throw new Exception(_('No saved state please login again.'));
 			}
 
-			if ($data['duo_state'] != $data['state']) {
+			if ($mfa_response_data['duo_state'] != $mfa_response_data['state']) {
 				throw new Exception(_('Duo state does not match saved state.'));
 			}
 
@@ -3438,7 +3442,9 @@ class CUser extends CApiService {
 					$data['mfa']['api_hostname'], $data['redirect_uri']
 				);
 
-				$duo_client->exchangeAuthorizationCodeFor2FAResult($data['duo_code'], $data['username']);
+				$duo_client->exchangeAuthorizationCodeFor2FAResult($mfa_response_data['duo_code'],
+					$mfa_response_data['username']
+				);
 			} catch (DuoException $e) {
 				throw new Exception(_('Error decoding Duo result.'));
 			}

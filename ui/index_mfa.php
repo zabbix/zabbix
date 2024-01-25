@@ -78,13 +78,17 @@ if ($error) {
 if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
 	// Check of submitted verification code.
 	if (hasRequest('enter')) {
-		$data_to_check = array_merge($session_data_required, $confirm_data);
-		$data_to_check['verification_code'] = getRequest('verification_code', '');
-		unset($data_to_check['mfaid'], $data_to_check['qr_code_url']);
+		$mfa_response_data = [
+			'mfa_response_data' => [
+				'verification_code' => getRequest('verification_code', '')
+		]];
 
 		if (hasRequest('totp_secret')) {
-			$data_to_check['totp_secret'] = getRequest('totp_secret');
+			$mfa_response_data['mfa_response_data']['totp_secret'] = getRequest('totp_secret');
 		}
+
+		$data_to_check = array_merge($session_data_required, $confirm_data, $mfa_response_data);
+		unset($data_to_check['mfaid'], $data_to_check['qr_code_url'], $data_to_check['totp_secret']);
 
 		$confirm = API::User()->confirm($data_to_check);
 
@@ -130,15 +134,19 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_DUO) {
 			CMessageHelper::addError(_($error_msg));
 		}
 		else {
-			$input_data = [
-				'duo_code' => getRequest('duo_code'),
-				'duo_state' => getRequest('state')
+			$mfa_response_data = [
+				'mfa_response_data' => [
+					'duo_code' => getRequest('duo_code'),
+					'duo_state' => getRequest('state'),
+					'state' => $session_data['state'],
+					'username' => $session_data['username']
+				]
 			];
-			$session_data_required['state'] = $session_data['state'];
-			$session_data_required['username'] = $session_data['username'];
 
-			$data_to_check = array_merge($input_data, $confirm_data, $session_data_required);
-			unset($data_to_check['mfaid'], $data_to_check['prompt_uri']);
+			$data_to_check = array_merge($mfa_response_data, $confirm_data, $session_data_required);
+			unset($data_to_check['mfaid'], $data_to_check['prompt_uri'], $data_to_check['username'],
+				$data_to_check['state']
+			);
 
 			$confirm = API::User()->confirm($data_to_check);
 
