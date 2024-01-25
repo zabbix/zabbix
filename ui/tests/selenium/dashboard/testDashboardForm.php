@@ -27,7 +27,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore prepareDashboardData
  *
- * @dataSource LoginUsers
+ * @dataSource LoginUsers, UserPermissions
  */
 class testDashboardForm extends CWebTest {
 
@@ -856,7 +856,7 @@ class testDashboardForm extends CWebTest {
 
 				$db_names = CDBHelper::getAll($query);
 
-				// Database reult format is [['username' => 'Admin'], ['username' => 'Tag-user']]
+				// Database result format is [['username' => 'Admin'], ['username' => 'Tag-user']]
 				foreach ($db_names as $array) {
 					// Result format should be ['Admin', 'Tag-user'] to compare with table result in UI.
 					$result[] = $array[$key];

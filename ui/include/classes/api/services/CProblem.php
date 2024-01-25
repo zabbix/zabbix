@@ -133,79 +133,51 @@ class CProblem extends CApiService {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			// triggers
-			if ($options['object'] == EVENT_OBJECT_TRIGGER) {
-				$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				$sql_parts['where'][] = '1=0';
+			}
+			elseif ($options['object'] == EVENT_OBJECT_TRIGGER) {
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission pp';
+				$sql_parts['where']['p-f'] = 'p.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=pp.hgsetid';
+				$sql_parts['where'][] = 'pp.ugsetid='.self::$userData['ugsetid'];
 
-				// specific triggers
-				if ($options['objectids'] !== null) {
-					$options['objectids'] = array_keys(API::Trigger()->get([
-						'output' => [],
-						'triggerids' => $options['objectids'],
-						'editable' => $options['editable'],
-						'preservekeys' => true
-					]));
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'pp.permission='.PERM_READ_WRITE;
 				}
-				// all triggers
-				else {
-					$sql_parts['where'][] = 'NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM functions f,items i,hosts_groups hgg'.
-							' LEFT JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE p.objectid=f.triggerid'.
-							' AND f.itemid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY i.hostid'.
-						' HAVING MAX(permission)<'.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-							' OR MIN(permission) IS NULL'.
-							' OR MIN(permission)='.PERM_DENY.
-					')';
-				}
+
+				$sql_parts['where'][] = 'NOT EXISTS ('.
+					'SELECT NULL'.
+					' FROM functions f1'.
+					' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+					' LEFT JOIN permission pp1 ON hh1.hgsetid=pp1.hgsetid'.
+						' AND pp1.ugsetid=pp.ugsetid'.
+					' WHERE p.objectid=f1.triggerid'.
+						' AND pp1.permission IS NULL'.
+				')';
 
 				if ($options['source'] == EVENT_SOURCE_TRIGGERS) {
-					$sql_parts = self::addTagFilterSqlParts($user_groups, $sql_parts);
+					$sql_parts =
+						self::addTagFilterSqlParts(getUserGroupsByUserId(self::$userData['userid']), $sql_parts);
 				}
 			}
 			elseif ($options['object'] == EVENT_OBJECT_ITEM || $options['object'] == EVENT_OBJECT_LLDRULE) {
-				// specific items or lld rules
-				if ($options['objectids'] !== null) {
-					if ($options['object'] == EVENT_OBJECT_ITEM) {
-						$items = API::Item()->get([
-							'output' => [],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable'],
-							'preservekeys' => true
-						]);
-						$options['objectids'] = array_keys($items);
-					}
-					elseif ($options['object'] == EVENT_OBJECT_LLDRULE) {
-						$items = API::DiscoveryRule()->get([
-							'output' => [],
-							'itemids' => $options['objectids'],
-							'editable' => $options['editable'],
-							'preservekeys' => true
-						]);
-						$options['objectids'] = array_keys($items);
-					}
-				}
-				// all items or lld rules
-				else {
-					$user_groups = getUserGroupsByUserId(self::$userData['userid']);
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['p-i'] = 'p.objectid=i.itemid';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission pp';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=pp.hgsetid';
+				$sql_parts['where'][] = 'pp.ugsetid='.self::$userData['ugsetid'];
 
-					$sql_parts['where'][] = 'EXISTS ('.
-						'SELECT NULL'.
-						' FROM items i,hosts_groups hgg'.
-							' JOIN rights r'.
-								' ON r.id=hgg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $user_groups).
-						' WHERE p.objectid=i.itemid'.
-							' AND i.hostid=hgg.hostid'.
-						' GROUP BY hgg.hostid'.
-						' HAVING MIN(r.permission)>'.PERM_DENY.
-							' AND MAX(r.permission)>='.($options['editable'] ? PERM_READ_WRITE : PERM_READ).
-					')';
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'pp.permission='.PERM_READ_WRITE;
 				}
 			}
 		}

@@ -29,9 +29,9 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  *
  * @backup dashboard
  *
- * @onBefore prepareDashboardData
+ * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget
  *
- * @dataSource WebScenarios, AllItemValueTypes
+ * @onBefore prepareDashboardData
  */
 class testDashboardItemValueWidget extends testWidgets {
 
@@ -47,10 +47,14 @@ class testDashboardItemValueWidget extends testWidgets {
 		];
 	}
 
+	protected static $itemids;
 	protected static $dashboardid;
 	protected static $dashboard_zoom;
+	protected static $dashboard_threshold;
+	protected static $dashboard_aggregation;
 	protected static $old_name = 'New widget';
 	protected static $threshold_widget = 'Widget with thresholds';
+	const DATA_WIDET = 'Widget for aggregation function data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -87,140 +91,11 @@ class testDashboardItemValueWidget extends testWidgets {
 	}
 
 	public static function prepareDashboardData() {
-		$response = CDataHelper::call('dashboard.create', [
-			[
-				'name' => 'Dashboard for Single Item Widget test',
-				'private' => 0,
-				'pages' => [
-					[
-						'name' => 'Page with widgets',
-						'widgets' => [
-							[
-								'type' => 'item',
-								'name' => self::$old_name,
-								'x' => 0,
-								'y' => 0,
-								'width' => 12,
-								'height' => 4,
-								'fields' => [
-									[
-										'type' => 4,
-										'name' => 'itemid.0',
-										'value' => 42230
-									],
-									[
-										'type' => 1,
-										'name' => 'description',
-										'value' => 'Some description here. Описание.'
-									],
-									[
-										'type' => 0,
-										'name' => 'desc_h_pos',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'desc_v_pos',
-										'value' => 0
-									],
-									[
-										'type' => 0,
-										'name' => 'time_h_pos',
-										'value' => 2
-									],
-									[
-										'type' => 0,
-										'name' => 'time_v_pos',
-										'value' => 2
-									],
-									[
-										'type' => 0,
-										'name' => 'desc_size',
-										'value' => 17
-									],
-									[
-										'type' => 0,
-										'name' => 'decimal_size',
-										'value' => 41
-									],
-									[
-										'type' => 0,
-										'name' => 'value_size',
-										'value' => 56
-									],
-									[
-										'type' => 0,
-										'name' => 'time_size',
-										'value' => 14
-									]
-								]
-							],
-							[
-								'type' => 'item',
-								'name' => 'Widget with thresholds',
-								'x' => 0,
-								'y' => 6,
-								'width' => 10,
-								'height' => 3,
-								'fields' => [
-									[
-										'type' => 4,
-										'name' => 'itemid.0',
-										'value' => 42230
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.0.color',
-										'value' => 'BF00FF'
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.0.threshold',
-										'value' => '0'
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.1.color',
-										'value' => 'FF0080'
-									],
-									[
-										'type' => '1',
-										'name' => 'thresholds.1.threshold',
-										'value' => '0.01'
-									]
-								]
-							],
-							[
-								'type' => 'item',
-								'name' => 'Widget to delete',
-								'x' => 13,
-								'y' => 0,
-								'width' => 4,
-								'height' => 4,
-								'fields' => [
-									[
-										'type' => 4,
-										'name' => 'itemid.0',
-										'value' => 42230
-									]
-								]
-							]
-						]
-					]
-				]
-			],
-			[
-				'name' => 'Dashboard for zoom filter check',
-				'private' => 0,
-				'pages' => [
-					[
-						'name' => 'Page with widgets'
-					]
-				]
-			]
-		]);
-		self::$dashboardid = $response['dashboardids'][0];
-		self::$dashboard_zoom = $response['dashboardids'][1];
+		self::$dashboardid = CDataHelper::get('ItemValueWidget.dashboardid');
+		self::$dashboard_zoom = CDataHelper::get('ItemValueWidget.dashboard_zoom');
+		self::$dashboard_threshold = CDataHelper::get('ItemValueWidget.dashboard_threshold');
+		self::$dashboard_aggregation = CDataHelper::get('ItemValueWidget.dashboard_aggregation');
+		self::$itemids = CDataHelper::get('ItemValueWidget.itemids');
 	}
 
 	/**
@@ -567,7 +442,7 @@ class testDashboardItemValueWidget extends testWidgets {
 						'id:show_1' => false, // Description.
 						'id:show_2' => false, // Value.
 						'id:show_3' => false, // Time.
-						'id:show_4' => false  // Change indicator.
+						'id:show_4' => false // Change indicator.
 					],
 					'item' => [
 						'ЗАББИКС Сервер' => 'Linux: Available memory in %'
@@ -2177,20 +2052,594 @@ class testDashboardItemValueWidget extends testWidgets {
 		}
 	}
 
-	public function testDashboardItemValueWidget_ThresholdColor() {
-		$data = [
-			'fields' => [
-				'Item' => 'Available memory in %',
-				'Name' => 'Item Widget with threshold',
-				'Advanced configuration' => true
+	public static function getThresholdData() {
+		return [
+			// Numeric (unsigned) item without data.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Name' => 'Threshold and numeric item but without data',
+						'Advanced configuration' => true
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
 			],
-			'thresholds' => [
-				['color' => 'AABBCC', 'threshold' => '1'],
-				['color' => 'CCDDAA', 'threshold' => '2']
+			// Numeric (float) item without data.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Name' => 'Two thresholds and numeric item without data',
+						'Advanced configuration' => true
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '0'],
+						['color' => 'CCDDAA', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Log) item without data and with aggregation function min.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Non-numeric (log) item without data and with aggregation function min',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Character) item without data and with aggregation function max.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Non-numeric (Character) item without data and with aggregation function max',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Text) item without data and with aggregation function avg.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Non-numeric (Text) item without data and with aggregation function avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '-1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Log) item without data and with aggregation function sum.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Non-numeric (log) item without data and with aggregation function sum',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Character) item without data and with aggregation function first.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Non-numeric (Character) item without data and with aggregation function first',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '-1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Text) item without data and with aggregation function last.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Non-numeric (Text) item without data and with aggregation function last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0.00']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Log) item without data and with aggregation function not used.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Non-numeric (log) item without data and with aggregation function not used',
+						'Advanced configuration' => true
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Log) item without data but with aggregation function count (return 0).
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Non-numeric (log) item without data but with aggregation function count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Character) item without data but with aggregation function count (return 0).
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Non-numeric (Character) item without data but with aggregation function count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Text) item without data but with aggregation function count (return 0).
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Non-numeric (Text) item without data but with aggregation function count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '1']
+					],
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Log) item without data but with aggregation function count (return 0) and threshold equals 0.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Non-numeric (log) item without data but with aggregation function count and threshold that match 0',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					]
+				]
+			],
+			// Non-numeric (Character) item without data but with aggregation function count (return 0) and threshold equals 0.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Non-numeric (Character) item without data but with aggregation function count and threshold that match 0',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					]
+				]
+			],
+			// Non-numeric (Text) item without data but with aggregation function count (return 0) and threshold equals 0.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Non-numeric (Text) item without data but with aggregation function count and threshold that match 0',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => '7E57C2', 'threshold' => '0']
+					]
+				]
+			],
+			// Numeric (unsigned) item with data and aggregation function not used.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Name' => 'Thresholds and numeric (unsigned) item',
+						'Advanced configuration' => true
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '1'],
+						['color' => 'CCDDAA', 'threshold' => '2']
+					],
+					'value' => '1'
+				]
+			],
+			// Numeric (float) item with data and aggregation function not used.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Name' => 'Thresholds and numeric (float) item',
+						'Advanced configuration' => true
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '1.01'],
+						['color' => 'CCDDAA', 'threshold' => '2.01']
+					],
+					'value' => '1.02'
+				]
+			],
+			// Numeric (unsigned) item with data and aggregation function count.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Name' => 'Numeric (unsigned) item with thresholds and aggregation function count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '1'],
+						['color' => 'CCDDAA', 'threshold' => '2']
+					],
+					'value' => '1'
+				]
+			],
+			// Numeric (float) item with data and aggregation function count.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Name' => 'Numeric (float) item with thresholds and aggregation function count',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '0.99'],
+						['color' => 'CCDDAA', 'threshold' => '1.99']
+					],
+					'value' => '1.02'
+				]
+			],
+			// Non-numeric (Text) item with data and aggregation function count.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Thresholds and non-nmeric (Text) item',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => 'DDAAFF', 'threshold' => '1'],
+						['color' => 'FFDDAA', 'threshold' => '2']
+					],
+					'value' => 'test'
+				]
+			],
+			// Non-numeric (Log) item with data and aggregation function count.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Thresholds and non-nmeric (Log) item',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => 'DDAAFF', 'threshold' => '1'],
+						['color' => 'FFDDAA', 'threshold' => '2']
+					],
+					'value' => 'test'
+				]
+			],
+			// Non-numeric (Character) item with data and aggregation function count.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Thresholds and non-nmeric (Character) item',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count'
+					],
+					'thresholds' => [
+						['color' => 'DDAAFF', 'threshold' => '1'],
+						['color' => 'FFDDAA', 'threshold' => '2']
+					],
+					'value' => 'test'
+				]
+			],
+			// Numeric (unsigned) item with data and aggregation function min.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Name' => 'Numeric (unsigned) item with threshold and aggregation function min',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min'
+					],
+					'thresholds' => [
+						['color' => 'AABBCC', 'threshold' => '1'],
+						['color' => 'CCDDAA', 'threshold' => '2']
+					],
+					'expected_color' => 'AABBCC',
+					'value' => '1'
+				]
+			],
+			// Numeric (float) item with data and aggregation function max.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Name' => 'Numeric (float) item with threshold and aggregation function max',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max'
+					],
+					'thresholds' => [
+						['color' => '7CB342', 'threshold' => '0.00'],
+						['color' => 'FFF9C4', 'threshold' => '1.01']
+					],
+					'expected_color' => 'FFF9C4',
+					'value' => '1.01'
+				]
+			],
+			// Numeric (unsigned) item with data and aggregation function avg.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Name' => 'Numeric (unsigned) item with threshold and aggregation function avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'thresholds' => [
+						['color' => '7CB342', 'threshold' => '1'],
+						['color' => 'FFF9C4', 'threshold' => '2']
+					],
+					'expected_color' => '7CB342',
+					'value' => '1'
+				]
+			],
+			// Numeric (float) item with data and aggregation function sum.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Name' => 'Numeric (float) item with threshold and aggregation function sum',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum'
+					],
+					'thresholds' => [
+						['color' => 'D32F2F', 'threshold' => '1.11'],
+						['color' => '8BC34A', 'threshold' => '2.22']
+					],
+					'expected_color' => '8BC34A',
+					'value' => '2.22'
+				]
+			],
+			// Numeric (unsigned) item with data and aggregation function first.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Name' => 'Numeric (unsigned) item with threshold and aggregation function first',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first'
+					],
+					'thresholds' => [
+						['color' => 'D32F2F', 'threshold' => '0'],
+						['color' => '8BC34A', 'threshold' => '1']
+					],
+					'expected_color' => 'D32F2F',
+					'value' => '0'
+				]
+			],
+			// Numeric (float) item with data and aggregation function last.
+			[
+				[
+					'numeric' => true,
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Name' => 'Numeric (float) item with threshold and aggregation function last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'thresholds' => [
+						['color' => 'D32F2F', 'threshold' => '-1.00'],
+						['color' => '8BC34A', 'threshold' => '0.00']
+					],
+					'expected_color' => '8BC34A',
+					'value' => '0'
+				]
+			],
+			// Non-numeric (Log) item with data and aggregation function min.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function min',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min'
+					],
+					'thresholds' => [
+						['color' => 'DDAAFF', 'threshold' => '0']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Character) item with data and aggregation function max.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function max',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max'
+					],
+					'thresholds' => [
+						['color' => 'D32F2F', 'threshold' => '-1'],
+						['color' => '8BC34A', 'threshold' => '0']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Text) item with data and aggregation function avg.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function avg',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg'
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '1'],
+						['color' => '80CBC4', 'threshold' => '2']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Log) item with data and aggregation function sum.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Name' => 'Thresholds and non-nmeric (Log) item with aggregation function sum',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum'
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '1'],
+						['color' => '80CBC4', 'threshold' => '2']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Character) item with data and aggregation function first.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Name' => 'Thresholds and non-nmeric (Character) item with aggregation function first',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first'
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '0']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Text) item with data and aggregation function last.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function last',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last'
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '0']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
+			],
+			// Non-numeric (Text) item with data and aggregation function not used.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Name' => 'Thresholds and non-nmeric (Text) item with aggregation function not used',
+						'Advanced configuration' => true
+					],
+					'thresholds' => [
+						['color' => 'D1C4E9', 'threshold' => '0']
+					],
+					'value' => 'test',
+					'expected_color' => '000000',
+					'opacity' => 'transparent'
+				]
 			]
 		];
+	}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid);
+	/**
+	 * @backup !history, !history_log, !history_str, !history_text, !history_uint
+	 *
+	 * @dataProvider getThresholdData
+	 */
+	public function testDashboardItemValueWidget_ThresholdColor($data) {
+		$time = strtotime('now');
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_threshold);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Item value')]);
@@ -2204,18 +2653,32 @@ class testDashboardItemValueWidget extends testWidgets {
 		$this->assertMessage('Dashboard updated');
 
 		// Value for threshold trigger.
-		$index = 1;
 		foreach ($data['thresholds'] as $threshold) {
 			// Insert item data.
-			CDataHelper::addItemData(42244, $index, time() + $index);
-			$this->page->refresh()->waitUntilReady();
-			$rgb = implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
+			if (array_key_exists('value', $data)) {
+				CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $data['value'], $time);
 
-			$this->assertEquals('rgba('.$rgb.', 1)', $dashboard->getWidget($data['fields']['Name'])
+				if (array_key_exists('numeric', $data)) {
+					$data['value']++;
+				}
+
+				$time++;
+			}
+
+			$this->page->refresh()->waitUntilReady();
+
+			$rgb = (array_key_exists('expected_color', $data))
+				? implode(', ', sscanf($data['expected_color'], "%02x%02x%02x"))
+				: implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
+
+			$opacity = (array_key_exists('opacity', $data)) ? '0' : '1';
+			$this->assertEquals('rgba('.$rgb.', '.$opacity.')', $dashboard->getWidget($data['fields']['Name'])
 					->query('xpath:.//div[contains(@class, "dashboard-widget-item")]/div/div')->one()->getCSSValue('background-color')
 			);
-			$index++;
 		}
+
+		// Necessary for test stability.
+		$dashboard->edit()->deleteWidget($data['fields']['Name'])->save();
 	}
 
 	public static function getWidgetTimePeriodData() {
@@ -2364,7 +2827,7 @@ class testDashboardItemValueWidget extends testWidgets {
 				foreach (['id:from' => 'now-1h', 'id:to' => 'now'] as $selector => $value) {
 					$input = $this->query($selector)->one();
 					$this->assertEquals($value, $input->getValue());
-					$this->assertEquals(19, $input->getAttribute('maxlength'));
+					$this->assertEquals(255, $input->getAttribute('maxlength'));
 				}
 
 				$buttons = [
@@ -2436,6 +2899,1005 @@ class testDashboardItemValueWidget extends testWidgets {
 
 		// Necessary action for avoiding problems with next test.
 		$dashboard->save();
+	}
+
+	public static function getAggregationFunctionData() {
+		return [
+			// Item with value mapping, aggregation function 'min' and default Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom'
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'time' => 'now'
+						],
+						[
+							'value' => '1',
+							'time' => '-61 minute'
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Down (0)',
+					'arrow' => 'up-down' // Item value has changed comparing with previous hour.
+				]
+			],
+			// Item with value mapping and aggregation function 'max'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2h',
+						'id:time_period_to' => 'now-1h'
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'time' => '-1 minute'
+						],
+						[
+							'value' => '1',
+							'time' => '-62 minutes'
+						],
+						[
+							'value' => '0',
+							'time' => '-122 minutes'
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)',
+					'arrow' => 'up-down'
+				]
+			],
+			// Item with value mapping, aggregation function 'avg' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-7d',
+						'id:time_period_to' => 'now-5d'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => '-6 days'
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)'
+				]
+			],
+			// Item with value mapping, aggregation function 'avg' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-4d',
+						'id:time_period_to' => 'now-2d'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => '-3 days'
+						],
+						[
+							'value' => '0',
+							'time' => '-63 hours'
+						]
+					],
+					'expected_value' => '0.50' // Value mapping is ignored if value doesn't equals 0 or 1.
+				]
+			],
+			// Item with value mapping and aggregation function 'count'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-5h-30m',
+						'id:time_period_to' => 'now-14400' // -4 hours.
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => '-270 minutes'
+						],
+						[
+							'value' => '0',
+							'time' => '-275 minutes'
+						],
+						[
+							'value' => '1',
+							'time' => '-276 minutes'
+						]
+					],
+					'expected_value' => '3.00' // Mapping is not used if aggregation function is 'sum' or 'count'.
+				]
+			],
+			// Item with value mapping and aggregation function 'sum'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-360m',
+						'id:time_period_to' => 'now-240m' // - 4 hours.
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => '-270 minutes'
+						],
+						[
+							'value' => '0',
+							'time' => '-275 minutes'
+						],
+						[
+							'value' => '1',
+							'time' => '-280 minutes'
+						]
+					],
+					'expected_value' => '2.00' // Mapping is not used if aggregation function is 'sum' or 'count'.
+				]
+			],
+			// Item with value mapping and aggregation function 'first'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-30m',
+						'id:time_period_to' => 'now-30m'
+					],
+					'item_data' => [
+						[
+							'value' => '0',
+							'time' => '-45 minutes'
+						],
+						[
+							'value' => '1',
+							'time' => '-50 minutes'
+						],
+						[
+							'value' => '0',
+							'time' => '-2 hours'
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)',
+					'arrow' => 'up-down'
+				]
+			],
+			// Item with value mapping and aggregation function 'last'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-600s',
+						'id:time_period_to' => 'now-1800s'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => '-15 minutes'
+						],
+						[
+							'value' => '0',
+							'time' => '-45 minutes'
+						],
+						[
+							'value' => '1',
+							'time' => '-50 minutes'
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Down (0)'
+				]
+			],
+			// Item with value mapping and aggregation function 'not used'.
+			[
+				[
+					'fields' => [
+						'Item' => 'Value mapping',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'not used'
+					],
+					'item_data' => [
+						[
+							'value' => '1',
+							'time' => '-15 minutes'
+						],
+						[
+							'value' => '0',
+							'time' => '-45 minutes'
+						],
+						[
+							'value' => '1',
+							'time' => '-50 minutes'
+						]
+					],
+					'value_mapping' => true,
+					'expected_value' => 'Up (1)',
+					'arrow' => 'up-down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'min', decimal places and default Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Decimal places' => '9',
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom'
+					],
+					'item_data' => [
+						[
+							'value' => '5',
+							'time' => '-5 minutes'
+						],
+						[
+							'value' => '4',
+							'time' => '-30 minutes'
+						],
+						[
+							'value' => '10',
+							'time' => '-61 minute'
+						]
+					],
+					'expected_value' => '4.000000000',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (float) item with aggregation function 'max', decimal places and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Decimal places' => '3',
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-3h',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '7.76',
+							'time' => '-5 minutes'
+						],
+						[
+							'value' => '7.77',
+							'time' => '-90 minutes'
+						],
+						[
+							'value' => '7.78',
+							'time' => '-5 hours'
+						]
+					],
+					'expected_value' => '7.770',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'avg', default decimal places and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Decimal places' => '2',
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-30m',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => '-30 seconds'
+						],
+						[
+							'value' => '3',
+							'time' => '-45 seconds'
+						],
+						[
+							'value' => '10',
+							'time' => '-60 seconds'
+						],
+						[
+							'value' => '15',
+							'time' => '-90 seconds'
+						]
+					],
+					'expected_value' => '7.50'
+				]
+			],
+			// Item with units, aggregation function 'count' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with units',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-30s',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => '-10 minutes'
+						],
+						[
+							'value' => '95',
+							'time' => '-15 minutes'
+						]
+					],
+					// Item units are not shown if aggregation function is 'count' except when units are set in widget configuration.
+					'expected_value' => '2.00',
+					'arrow' => 'up'
+				]
+			],
+			// Item with units, aggregation function 'count', widget units override and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with units',
+						'Advanced configuration' => true,
+						'id:units' => '$',
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-30s',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => '-10 minutes'
+						],
+						[
+							'value' => '95',
+							'time' => '-15 minutes'
+						]
+					],
+					// Item units are not shown if aggregation function is 'count' except when units are set in widget configuration.
+					'units' => true,
+					'expected_value' => '2.00$',
+					'arrow' => 'up'
+				]
+			],
+			// Item with units, aggregation function 'sum' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with units',
+						'Advanced configuration' => true,
+						'id:units' => '',
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h-20m-30s',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => '2',
+							'time' => '-10 minutes'
+						],
+						[
+							'value' => '95',
+							'time' => '-15 minutes'
+						]
+					],
+					'units' => true,
+					'expected_value' => '97.00%'
+				]
+			],
+			// Numeric (float) item with aggregation function 'first' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2M',
+						'id:time_period_to' => 'now-1M'
+					],
+					'item_data' => [
+						[
+							'value' => '11.11',
+							'time' => '-10 days'
+						],
+						[
+							'value' => '12.55',
+							'time' => '-40 days'
+						],
+						[
+							'value' => '12.01',
+							'time' => '-45 days'
+						],
+						[
+							'value' => '12.99',
+							'time' => '-50 days'
+						],
+						[
+							'value' => '121.12',
+							'time' => '-70 days'
+						]
+					],
+					'expected_value' => '12.99'
+				]
+			],
+			// Numeric (float) item with aggregation function 'last' and Custom time period with absolute time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => '2024-01-17 00:00:00',
+						'id:time_period_to' => '2024-01-18 00:00:00'
+					],
+					'item_data' => [
+						[
+							'value' => '12.33',
+							'time' => '2024-01-17 04:00:00'
+						],
+						[
+							'value' => '12.55',
+							'time' => '2024-01-17 08:00:00'
+						],
+						[
+							'value' => '12.99',
+							'time' => '2024-01-17 11:00:00'
+						],
+						[
+							'value' => '11.99',
+							'time' => '2024-01-17 12:00:00'
+						]
+					],
+					'expected_value' => '11.99'
+				]
+			],
+			// Non-numeric (Text) item with aggregation function 'count' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2y-1M-2w-1d-10h-30m-20s',
+						'id:time_period_to' => 'now-1y-1M-2w-1d-10h-30m-20s'
+					],
+					'item_data' => [
+						[
+							'value' => 'text 1',
+							'time' => '-1 year -1 month -2 weeks -2 days -10 hours -30 minutes -20 seconds'
+						],
+						[
+							'value' => 'text 2',
+							'time' => '-1 year -1 month -2 weeks -1 day -20 hours -30 minutes -20 seconds'
+						],
+						[
+							'value' => 'text 3',
+							'time' => '-1 year -1 month -3 weeks -2 days -10 hours -30 minutes -20 seconds'
+						],
+						[
+							'value' => 'text 4',
+							'time' => '-1 year -2 month -2 weeks -2 days -10 hours -30 minutes -20 seconds'
+						]
+					],
+					'expected_value' => '4.00',
+					'arrow' => 'up'
+				]
+			],
+			// Non-numeric (Log) item with aggregation function 'min' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2y',
+						'id:time_period_to' => 'now-1y'
+					],
+					'item_data' => [
+						[
+							'value' => 'log 1',
+							'time' => '-15 month'
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non-numeric (Character) item with aggregation function 'max' and Custom time period with absolute time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => '2023-12-12 00:00:00',
+						'id:time_period_to' => '2023-12-12 10:00:00'
+					],
+					'item_data' => [
+						[
+							'value' => 'Character 1',
+							'time' => '2023-12-12 05:00:00'
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non-numeric (Text) item with aggregation function 'avg' and Custom time period with relative time.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1d',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'Text 1',
+							'time' => '-1 hour'
+						],
+						[
+							'value' => 'Text 2',
+							'time' => '-1 day -1 hour'
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non-numeric (Log) item with aggregation function 'sum' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Log',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum', // only numeric items will be displayed.
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1d',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'Log 1',
+							'time' => '-1 hour'
+						],
+						[
+							'value' => 'Log 2',
+							'time' => '-1 day -1 hour'
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'No data'
+				]
+			],
+			// Non-numeric (Character) item with aggregation function 'first' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Character',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1d',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'Character 1',
+							'time' => '-1 hour'
+						],
+						[
+							'value' => 'Character 2',
+							'time' => '-10 hours'
+						],
+						[
+							'value' => 'Character 3',
+							'time' => '-1 day -1 hour'
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'Character 2',
+					'arrow' => 'up-down'
+				]
+			],
+			// Non-numeric (Text) item with aggregation function 'last' and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - Text',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1w',
+						'id:time_period_to' => 'now'
+					],
+					'item_data' => [
+						[
+							'value' => 'text 2',
+							'time' => '-1 hour'
+						],
+						[
+							'value' => 'text 1',
+							'time' => '-1 hour -1 minute'
+						],
+						[
+							'value' => 'text 3',
+							'time' => '-8 days'
+						]
+					],
+					'non_numeric' => true,
+					'expected_value' => 'text 2',
+					'arrow' => 'up-down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'avg', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'avg',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h',
+						'id:time_period_to' => 'now',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '3',
+									'avg' => '4',
+									'min' => '2',
+									'max' => '7'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '5',
+									'avg' => '5',
+									'min' => '1',
+									'max' => '8'
+								]
+							],
+							'time' => '-1 hour'
+						]
+					],
+					'expected_value' => '4.00',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (float) item with aggregation function 'min', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'min',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2h',
+						'id:time_period_to' => 'now-1h',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '10',
+									'avg' => '3.33',
+									'min' => '1.11',
+									'max' => '5.55'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '11',
+									'avg' => '2.22',
+									'min' => '1.51',
+									'max' => '3.33'
+								]
+							],
+							'time' => '-1 hour'
+						],
+						[
+							'value' => [
+								[
+									'num' => '51',
+									'avg' => '5.55',
+									'min' => '1.09',
+									'max' => '8.88'
+								]
+							],
+							'time' => '-2 hours'
+						]
+					],
+					'expected_value' => '1.51',
+					'arrow' => 'up'
+				]
+			],
+			// Numeric (float) item with aggregation function 'max', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'max',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-3h',
+						'id:time_period_to' => 'now-2h',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '101',
+									'avg' => '5.89',
+									'min' => '1.77',
+									'max' => '11.10'
+								]
+							],
+							'time' => '-2 hours'
+						],
+						[
+							'value' => [
+								[
+									'num' => '101',
+									'avg' => '5.87',
+									'min' => '1.05',
+									'max' => '11.11'
+								]
+							],
+							'time' => '-3 hours'
+						]
+					],
+					'expected_value' => '11.10',
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'count', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'count',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1h',
+						'id:time_period_to' => 'now',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '7',
+									'avg' => '5',
+									'min' => '1',
+									'max' => '8'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '9',
+									'avg' => '3',
+									'min' => '2',
+									'max' => '7'
+								]
+							],
+							'time' => '-1 hour'
+						]
+					],
+					'expected_value' => '7.00', // num result.
+					'arrow' => 'down'
+				]
+			],
+			// Numeric (float) item with aggregation function 'sum', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'sum',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2d',
+						'id:time_period_to' => 'now-1d',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '5',
+									'avg' => '3.33',
+									'min' => '1.11',
+									'max' => '55.55'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '7',
+									'avg' => '7.77',
+									'min' => '3.33',
+									'max' => '11.11'
+								]
+							],
+							'time' => '-1 day'
+						]
+					],
+					'expected_value' => '54.39' // num * avg result.
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'first', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (unsigned)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'first',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-2w',
+						'id:time_period_to' => 'now-1w',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '168',
+									'avg' => '8',
+									'min' => '2',
+									'max' => '14'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '336',
+									'avg' => '6',
+									'min' => '4',
+									'max' => '8'
+								]
+							],
+							'time' => '-1 week'
+						]
+					],
+					'expected_value' => '6.00' // avg result.
+				]
+			],
+			// Numeric (float) item with aggregation function 'last', trends history data and Custom time period.
+			[
+				[
+					'fields' => [
+						'Item' => 'Item with type of information - numeric (float)',
+						'Advanced configuration' => true,
+						'Aggregation function' => 'last',
+						'Time period' => 'Custom',
+						'id:time_period_from' => 'now-1w',
+						'id:time_period_to' => 'now',
+						'History data' => 'Trends'
+					],
+					'item_data' => [
+						[
+							'value' => [
+								[
+									'num' => '168',
+									'avg' => '8.11',
+									'min' => '2.58',
+									'max' => '17.89'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'value' => [
+								[
+									'num' => '336',
+									'avg' => '6.78',
+									'min' => '4.13',
+									'max' => '8.09'
+								]
+							],
+							'time' => '-1 week'
+						]
+					],
+					'expected_value' => '8.11', // avg result.
+					'arrow' => 'up'
+				]
+			]
+		];
+	}
+
+	/**
+	 * @backup !history, !history_log, !history_str, !history_text, !history_uint, !trends_uint, !trends
+	 *
+	 * @dataProvider getAggregationFunctionData
+	 */
+	public function testDashboardItemValueWidget_AggregationFunctionData($data) {
+		foreach ($data['item_data'] as $params) {
+			$params['time'] = strtotime($params['time']);
+			CDataHelper::addItemData(self::$itemids[$data['fields']['Item']], $params['value'], $params['time']);
+		}
+
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_aggregation)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady();
+
+		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
+		$form->fill($data['fields']);
+		$form->submit();
+		$dashboard->save();
+		$dashboard->waitUntilReady();
+		$content = $dashboard->getWidget(self::DATA_WIDET)->getContent();
+		$item_value = $content->query('class:value')->one()->getText();
+
+		if (array_key_exists('units', $data)) {
+			$widget_value = $item_value.$content->query('class:decimals')->one()->getText()
+					.$content->query('class:units')->one()->getText();
+		}
+		else {
+			$widget_value = (array_key_exists('value_mapping', $data) || array_key_exists('non_numeric', $data))
+				? $item_value
+				: $item_value.$content->query('class:decimals')->one()->getText();
+		}
+
+		$this->assertEquals($data['expected_value'], $widget_value);
+
+		if (array_key_exists('arrow', $data)) {
+			$this->assertTrue($this->query('class:svg-arrow-'.$data['arrow'])->one()->isVisible());
+		}
 	}
 
 	/**

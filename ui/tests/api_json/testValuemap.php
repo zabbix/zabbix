@@ -662,7 +662,7 @@ class testValuemap extends CAPITest {
 			[
 				'valuemap' => [[
 					'valuemapid' => '0.0',
-					'name' => 'API valuemap udated'
+					'name' => 'API valuemap updated'
 				]],
 				'expected_error' => 'Invalid parameter "/1/valuemapid": a number is expected.'
 			],

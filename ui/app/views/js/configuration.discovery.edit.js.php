@@ -48,6 +48,7 @@ window.drule_edit_popup = new class {
 		this.#addRadioButtonValues(drule);
 		this.#initActionButtons();
 		this.#updateForm();
+		this.form.style.display = '';
 		this.overlay.recoverFocus();
 	}
 
@@ -333,6 +334,7 @@ window.drule_edit_popup = new class {
 		this.overlay.setProperties({title, buttons});
 		this.overlay.unsetLoading();
 		this.overlay.recoverFocus();
+		this.overlay.containFocus();
 	}
 
 	delete() {
