@@ -933,7 +933,7 @@ void	zbx_dc_get_hosts_by_functionids(const zbx_vector_uint64_t *functionids, zbx
 int	zbx_dc_get_proxy_nodata_win(zbx_uint64_t hostid, zbx_proxy_suppress_t *nodata_win, int *lastaccess);
 int	zbx_dc_get_proxy_delay_by_name(const char *name, int *delay, char **error);
 int	zbx_dc_get_proxy_lastaccess_by_name(const char *name, time_t *lastaccess, char **error);
-int	zbx_proxy_discovery_get(char **data, char **error);
+void	zbx_proxy_discovery_get(char **data);
 int	zbx_proxy_proxy_list_discovery_get(const zbx_vector_uint64_t *proxyids, char **data, char **error);
 
 unsigned int	zbx_dc_get_internal_action_count(void);
@@ -1396,6 +1396,10 @@ typedef struct zbx_pg_group zbx_pg_group_t;
 #define ZBX_PG_PROXY_SYNC_MODIFIED	0x0200
 
 /* proxy */
+
+#define ZBX_PG_PROXY_FLAGS_NONE		0x0000
+#define ZBX_PG_PROXY_UPDATE_STATUS	0x0001
+
 typedef struct
 {
 	zbx_uint64_t			proxyid;
@@ -1407,6 +1411,7 @@ typedef struct
 							/* host changes into deleted_group_hosts if the proxy was    */
 							/* offline for day+. In this case full proxy group data      */
 							/* resync will be forced                                     */
+	zbx_uint32_t			flags;
 	struct zbx_pg_group		*group;
 	zbx_vector_pg_host_ptr_t	hosts;
 	zbx_vector_pg_host_t		deleted_group_hosts;

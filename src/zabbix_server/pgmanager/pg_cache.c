@@ -398,7 +398,8 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
  *          database update                                                   *
  *                                                                            *
  * Parameters: cache          - [IN] proxy group cache                        *
- *             groups         - [IN] target groups                            *
+ *             groups         - [OUT] group database updates                  *
+ *             proxies        - [OUT] proxy database updates                  *
  *             hosts_new      - [OUT] new host-proxy links                    *
  *             hosts_mod      - [OUT] modified host-proxy links               *
  *             hosts_del      - [OUT] removed host-proxy links                *
@@ -406,8 +407,9 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
  *                                    mapping                                 *
  *                                                                            *
  ******************************************************************************/
-void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_host_t *hosts_new,
-		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del, zbx_vector_uint64_t *groupids)
+void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_update_t *proxies,
+		zbx_vector_pg_host_t *hosts_new, zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del,
+		zbx_vector_uint64_t *groupids)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() groups:%d", __func__, cache->group_updates.values_num);
 
@@ -420,14 +422,31 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 
 		if (ZBX_PG_GROUP_FLAGS_NONE != group->flags)
 		{
-			zbx_pg_update_t	update = {
-					.proxy_groupid = group->proxy_groupid,
+			zbx_pg_update_t	group_update = {
+					.objectid = group->proxy_groupid,
 					.status = group->status,
 					.flags = group->flags
 				};
 
-			zbx_vector_pg_update_append_ptr(groups, &update);
+			zbx_vector_pg_update_append_ptr(groups, &group_update);
 			group->flags = ZBX_PG_GROUP_FLAGS_NONE;
+
+			for (int j = 0; j < group->proxies.values_num; j++)
+			{
+				zbx_pg_proxy_t	*proxy = group->proxies.values[j];
+
+				if (ZBX_PG_PROXY_FLAGS_NONE != proxy->flags)
+				{
+					zbx_pg_update_t	proxy_update = {
+							.objectid = proxy->proxyid,
+							.status = proxy->status,
+							.flags = proxy->flags
+						};
+
+					zbx_vector_pg_update_append_ptr(proxies, &proxy_update);
+					proxy->flags = ZBX_PG_GROUP_FLAGS_NONE;
+				}
+			}
 		}
 	}
 

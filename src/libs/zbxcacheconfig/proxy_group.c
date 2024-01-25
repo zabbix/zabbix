@@ -459,7 +459,7 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
 
 	const char	*local_port = proxy->local_port;
 
-	if ('\0' != *local_port && '{' == *local_port)
+	if ('{' == *local_port)
 	{
 		um_cache_resolve_const(config->um_cache, NULL, 0, proxy->local_port, ZBX_MACRO_ENV_NONSECURE,
 				&local_port);

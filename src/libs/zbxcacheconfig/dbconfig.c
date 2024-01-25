@@ -15558,13 +15558,25 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 	{
 		zbx_dc_proxy_group_t	*pg;
 		char			*status;
+		int			failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 
 		pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
 				&dc_proxy->proxy_groupid);
 
 		zbx_json_addstring(json, "proxy_group", pg->name, ZBX_JSON_TYPE_STRING);
 
-		status = (now - dc_proxy->lastaccess >= pg->failover_delay ? "offline" : "online");
+		if ('{' == *pg->failover_delay)
+		{
+			const char	*value = NULL;
+
+			um_cache_resolve_const(config->um_cache, NULL, 0, pg->failover_delay, ZBX_MACRO_ENV_NONSECURE,
+					&value);
+
+			if (NULL != value)
+				(void)zbx_is_time_suffix(value, &failover_delay, ZBX_LENGTH_UNLIMITED);
+		}
+
+		status = (now - dc_proxy->lastaccess >= failover_delay ? "offline" : "online");
 
 		zbx_json_addstring(json, "status", status, ZBX_JSON_TYPE_STRING);
 	}
@@ -15578,66 +15590,37 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
  *          JSON for LLD                                                      *
  *                                                                            *
  * Parameter: data   - [OUT] JSON with proxy data                             *
- *            error  - [OUT] error message                                    *
- *                                                                            *
- * Return value: SUCCEED - interface data in JSON, 'data' is allocated        *
- *               FAIL    - proxy not found, 'error' message is allocated      *
  *                                                                            *
  * Comments: Allocates memory.                                                *
  *           If there are no proxies, an empty JSON {"data":[]} is returned.  *
  *                                                                            *
  ******************************************************************************/
-int	zbx_proxy_discovery_get(char **data, char **error)
+void	zbx_proxy_discovery_get(char **data)
 {
-	int				i, ret = FAIL, now;
-	zbx_vector_cached_proxy_ptr_t	proxies;
-	struct zbx_json			json;
+	int		now;
+	struct zbx_json	json;
 
 	WRLOCK_CACHE;
-
 	dc_status_update();
-
 	UNLOCK_CACHE;
-
-	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
-	zbx_vector_cached_proxy_ptr_create(&proxies);
-	zbx_dc_get_all_proxies(&proxies);
 
 	now = (int)time(NULL);
 
+	zbx_hashset_iter_t	iter;
+	ZBX_DC_PROXY		*dc_proxy;
+
 	RDLOCK_CACHE;
 
-	for (i = 0; i < proxies.values_num; i++)
-	{
-		zbx_cached_proxy_t	*proxy;
-		const ZBX_DC_PROXY	*dc_proxy;
-
-		proxy = proxies.values[i];
-
-		if (NULL == (dc_proxy = (const ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxy->proxyid)))
-		{
-			*error = zbx_dsprintf(*error, "Proxy \"%s\" not found in configuration cache.", proxy->name);
-			goto out;
-		}
-
+	zbx_hashset_iter_reset(&config->proxies, &iter);
+	while (NULL != (dc_proxy = (ZBX_DC_PROXY *)zbx_hashset_iter_next(&iter)))
 		dc_proxy_discovery_add_row(&json, dc_proxy, now);
-	}
 
-	ret = SUCCEED;
-out:
 	UNLOCK_CACHE;
 
-	if (SUCCEED == ret)
-	{
-		zbx_json_close(&json);
-		*data = zbx_strdup(NULL, json.buffer);
-	}
+	zbx_json_close(&json);
+	*data = zbx_strdup(NULL, json.buffer);
 
 	zbx_json_free(&json);
-	zbx_vector_cached_proxy_ptr_clear_ext(&proxies, zbx_cached_proxy_free);
-	zbx_vector_cached_proxy_ptr_destroy(&proxies);
-
-	return ret;
 }
 
 /******************************************************************************

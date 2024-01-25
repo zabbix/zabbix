@@ -131,13 +131,8 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 			{
 				char	*data;
 
-				if (SUCCEED == (res = zbx_proxy_discovery_get(&data, &error)))
-					SET_STR_RESULT(result, data);
-				else
-					SET_MSG_RESULT(result, error);
-
-				if (SUCCEED != res)
-					goto out;
+				zbx_proxy_discovery_get(&data);
+				SET_STR_RESULT(result, data);
 			}
 			else
 			{

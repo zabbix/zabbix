@@ -2028,9 +2028,9 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 		return FAIL;
 	}
 
-	int			failover_delay;
-	char			*buf = NULL;
-	size_t			buf_alloc = 0;
+	int	failover_delay;
+	char	*buf = NULL;
+	size_t	buf_alloc = 0;
 
 	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_FAILOVER_DELAY, &buf, &buf_alloc, NULL))
 	{

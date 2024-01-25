@@ -55,7 +55,7 @@ zbx_pg_cache_t;
 
 typedef struct
 {
-	zbx_uint64_t	proxy_groupid;
+	zbx_uint64_t	objectid;
 	int		status;
 	zbx_uint32_t	flags;
 }
@@ -70,8 +70,9 @@ void	pg_cache_init(zbx_pg_cache_t *cache, zbx_uint64_t map_revision);
 void	pg_cache_destroy(zbx_pg_cache_t *cache);
 
 void	pg_cache_queue_group_update(zbx_pg_cache_t *cache, zbx_pg_group_t *group);
-void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_host_t *hosts_new,
-		zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del, zbx_vector_uint64_t *groupids);
+void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups, zbx_vector_pg_update_t *proxies,
+		zbx_vector_pg_host_t *hosts_new, zbx_vector_pg_host_t *hosts_mod, zbx_vector_pg_host_t *hosts_del,
+		zbx_vector_uint64_t *groupids);
 void	pg_cache_group_remove_proxy(zbx_pg_cache_t *cache, zbx_pg_group_t *group, zbx_pg_proxy_t *proxy);
 void	pg_cache_proxy_free(zbx_pg_cache_t *cache, zbx_pg_proxy_t *proxy);
 

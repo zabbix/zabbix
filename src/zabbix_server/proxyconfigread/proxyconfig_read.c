@@ -1042,6 +1042,7 @@ out:
  *             sync_mode        - [OUT] sync mode, see ZBX_PG_PROXY_SYNC_     *
  *                                      defines                               *
  *             failover_delay   - [OUT] proxy group failover delay            *
+ *                                      (must be freed by caller)             *
  *             del_hostproxyids - [OUT] identifiers of deleted host_proxy     *
  *                                      records                               *
  *                                                                            *
@@ -1050,7 +1051,7 @@ out:
  *                                                                            *
  ******************************************************************************/
 static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx_uint64_t *proxy_hostmap_revision,
-		unsigned char *sync_mode, int *failover_delay, zbx_vector_uint64_t *del_hostproxyids)
+		unsigned char *sync_mode, char **failover_delay, zbx_vector_uint64_t *del_hostproxyids)
 {
 	static zbx_ipc_socket_t	pg_socket = {.fd = -1};
 
@@ -1079,6 +1080,7 @@ static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx
 	}
 
 	zbx_ipc_message_t	message;
+	zbx_uint32_t		failover_delay_len;
 
 	if (FAIL == zbx_ipc_socket_read(&pg_socket, &message))
 	{
@@ -1091,7 +1093,7 @@ static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx
 
 	ptr += zbx_deserialize_value(ptr, sync_mode);
 	ptr += zbx_deserialize_value(ptr, proxy_hostmap_revision);
-	ptr += zbx_deserialize_value(ptr, failover_delay);
+	ptr += zbx_deserialize_str(ptr, failover_delay, failover_delay_len);
 
 	if (ZBX_PROXY_SYNC_PARTIAL == *sync_mode)
 	{
@@ -1218,9 +1220,10 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 	zbx_vector_uint64_t		hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
 					macro_hostids, del_hostproxyids;
 	zbx_vector_keys_path_ptr_t	keys_paths;
-	int				global_macros = FAIL, ret = FAIL, failover_delay;
+	int				global_macros = FAIL, ret = FAIL;
 	zbx_uint64_t			flags = 0, hostmap_revision = proxy_hostmap_revision, proxy_group_revision;
 	unsigned char			hostmap_sync = ZBX_PROXY_SYNC_FULL;
+	char				*failover_delay = NULL;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&updated_hostids);
@@ -1439,6 +1442,8 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 out:
 	if (0 != flags)
 		zbx_db_commit();
+
+	zbx_free(failover_delay);
 
 	zbx_vector_uint64_destroy(&del_hostproxyids);
 	zbx_vector_keys_path_ptr_clear_ext(&keys_paths, key_path_free);
