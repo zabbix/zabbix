@@ -39,7 +39,7 @@ dnl *                     Checks for programs                       *
 dnl *                                                               *
 dnl *****************************************************************
 
-AC_PROG_CC([cc c99 gcc clang])
+AC_PROG_CC([clang gcc c99 cc])
 AM_PROG_CC_C_O
 
 dnl *****************************************************************
@@ -2104,6 +2104,8 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/actions/Makefile
+	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile
@@ -2118,7 +2120,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/operations/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile
 	src/zabbix_server/proxypoller/Makefile

@@ -19,15 +19,14 @@
 
 #include "escalator.h"
 
-#include "zbxexpression.h"
-#include "../server.h"
+#include "../server_constants.h"
+#include "../db_lengths_constants.h"
 
-#include "../db_lengths.h"
+#include "zbxexpression.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "../actions.h"
+#include "../actions/actions.h"
 #include "zbxscripts.h"
-#include "zbxcrypto.h"
 #include "zbxevent.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
