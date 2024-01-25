@@ -288,26 +288,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	win_start = last_ts_corr;
 	win_start.sec--;
 
-	/* dbg start */
-	int	dbg_old = 0, dbg_new = 0;
-
-	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
-			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
-	{
-		dbg_old = 1;
-	}
-
-	if (0 > timespec_cmp(&win_start, ts) && 0 <= timespec_cmp(&last_ts_corr, ts))
-	{
-		dbg_new = 1;
-	}
-
-	if (dbg_old != dbg_new)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "[ DBG ] %s():%d dbg_old = %d, dbg_new = %d, last_ts %d %d, ts = %d %d", __func__, __LINE__, dbg_old, dbg_new, last_ts.sec, last_ts.ns, ts->sec, ts->ns);
-	}
-	/* dbg end */
-
 	/* correction window is 1 sec before the corrected last _ftime clock reading */
 	if (0 > timespec_cmp(&win_start, ts) && 0 <= timespec_cmp(&last_ts_corr, ts))
 #else
@@ -316,9 +296,6 @@ void	zbx_timespec(zbx_timespec_t *ts)
 	{
 		ts->ns = last_ts.ns + (++corr);
 		timespec_normalize(ts);
-		/* dbg start */
-		zabbix_log(LOG_LEVEL_INFORMATION, "[ DBG ] %s():%d correction applied corr = %d; ts = %d %d, dbg_last_ts.sec = %d %d", __func__, __LINE__, corr, ts->sec, ts->ns, dbg_last_ts.sec, dbg_last_ts.ns);
-		/* dbg end */
 	}
 	else
 	{
