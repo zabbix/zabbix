@@ -678,14 +678,21 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (1 == process_num)
 		{
+			int	timer_expired;
+
+			if (sec - (double)maintenance_time >= ZBX_MAINTENANCE_TIMER_DELAY)
+				timer_expired = SUCCEED;
+			else
+				timer_expired = FAIL;
+
 			/* start update process only when all timers have finished their updates */
-			if (sec - (double)maintenance_time >= ZBX_MAINTENANCE_TIMER_DELAY &&
+			if ((SUCCEED == zbx_dc_maintenance_check_immediate_update() || SUCCEED == timer_expired) &&
 					FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
-				update = zbx_dc_update_maintenances();
+				update = zbx_dc_update_maintenances(timer_expired);
 
 				/* force maintenance updates at server startup */
 				if (0 == maintenance_time)
@@ -697,7 +704,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				else
 					hosts_num = 0;
 
-				db_remove_expired_event_suppress_data((time_t)sec);
+				if (SUCCEED == timer_expired)
+					db_remove_expired_event_suppress_data((time_t)sec);
 
 				if (SUCCEED == update)
 				{
@@ -714,7 +722,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						"updated %d hosts, suppressed %d events in " ZBX_FS_DBL " sec",
 						hosts_num, events_num, zbx_time() - sec);
 
-				update_time = (time_t)sec;
+				if (SUCCEED == timer_expired)
+					update_time = (time_t)sec;
 			}
 		}
 		else if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))

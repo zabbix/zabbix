@@ -1650,7 +1650,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				}
 
 				/* update maintenance states */
-				zbx_dc_update_maintenances();
+				zbx_dc_update_maintenances(SUCCEED);
 
 				zbx_db_close();
 				break;
