@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -397,7 +397,7 @@ final class CItemData {
 			'zabbix[proxy_buffer,buffer,<mode>]',
 			'zabbix[proxy_buffer,state,current]',
 			'zabbix[proxy_buffer,state,changes]',
-			'zabbix[vps,written]',
+			'zabbix[vps,written]'
 		],
 		ITEM_TYPE_DB_MONITOR => [
 			'db.odbc.discovery[<unique short description>,<dsn>,<connection string>]',

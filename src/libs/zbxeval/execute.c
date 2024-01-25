@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,6 @@
 
 #include "zbxeval.h"
 #include "eval.h"
-#include "count_pattern.h"
 
 #include "zbxalgo.h"
 #include "zbxvariant.h"
@@ -3195,6 +3194,7 @@ static void	eval_throw_exception(zbx_vector_var_t *output, char **error)
 	if (FAIL == zbx_variant_convert(arg, ZBX_VARIANT_STR))
 	{
 		*error = zbx_dsprintf(*error, "unknown exception of type '%s'", zbx_variant_type_desc(arg));
+
 		zabbix_log(LOG_LEVEL_CRIT, *error);
 		THIS_SHOULD_NEVER_HAPPEN;
 	}

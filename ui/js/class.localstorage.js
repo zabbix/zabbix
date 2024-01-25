@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -308,7 +308,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 	}
 
 	if (event.newValue === event.oldValue) {
-		// This is expensive, but internet expoler just dispatched storage change event at write.
+		// This is expensive, but Internet Explorer just dispatched storage change event at write.
 		return;
 	}
 
@@ -323,7 +323,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 	}
 
 	if (value.signature === ZBX_LocalStorage.signature) {
-		// Internet explorer just dispatched storage event onto current instance.
+		// Internet Explorer just dispatched storage event onto current instance.
 		return;
 	}
 
@@ -507,7 +507,7 @@ ZBX_LocalStorageKey.prototype.truncate = function() {
 };
 
 /**
- * Sunscribe a callback to key sync request.
+ * Subscribe a callback to key sync request.
  *
  * @param {callable} callback
  */

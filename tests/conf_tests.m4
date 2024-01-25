@@ -1,6 +1,6 @@
 #
 # Zabbix
-# Copyright (C) 2001-2023 Zabbix SIA
+# Copyright (C) 2001-2024 Zabbix SIA
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -71,15 +71,18 @@ AC_DEFUN([CONF_TESTS],
 			tests/libs/zbxprometheus/Makefile
 			tests/libs/zbxregexp/Makefile
 			tests/libs/zbxexpression/Makefile
+			tests/libs/zbxfile/Makefile
 			tests/libs/zbxsysinfo/Makefile
 			tests/libs/zbxsysinfo/common/Makefile
 			tests/libs/zbxtagfilter/Makefile
 			tests/libs/zbxtrends/Makefile
+			tests/libs/zbxhttp/Makefile
 			tests/libs/zbxtime/Makefile
 			tests/zabbix_server/Makefile
 			tests/zabbix_server/pinger/Makefile
 			tests/zabbix_server/service/Makefile
 			tests/zabbix_server/trapper/Makefile
+			tests/zabbix_server/lld/Makefile
 			tests/mocks/Makefile
 			tests/mocks/configcache/Makefile
 			tests/mocks/valuecache/Makefile

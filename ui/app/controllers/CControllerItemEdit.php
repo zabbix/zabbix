@@ -1,7 +1,7 @@
 <?php declare(strict_types=0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class CControllerItemEdit extends CControllerItem {
 			'clone' => 'in 1'
 		] + static::getValidationFields();
 
-		$ret = $this->validateInput($fields) && $this->validateRefferedObjects();
+		$ret = $this->validateInput($fields) && $this->validateReferredObjects();
 
 		if ($ret) {
 			if ($this->hasInput('clone') && !$this->hasInput('itemid')) {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,30 +42,35 @@ if (!defined('ZBX_PAGE_NO_THEME')) {
 switch ($page['type']) {
 	case PAGE_TYPE_IMAGE:
 		set_image_header();
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JS:
 		header('Content-Type: application/javascript; charset=UTF-8');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JSON:
 		header('Content-Type: application/json');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_JSON_RPC:
 		header('Content-Type: application/json-rpc');
+
 		if(!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
 		break;
 	case PAGE_TYPE_CSS:
 		header('Content-Type: text/css; charset=UTF-8');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
@@ -74,6 +79,7 @@ switch ($page['type']) {
 	case PAGE_TYPE_TEXT_RETURN_JSON:
 	case PAGE_TYPE_HTML_BLOCK:
 		header('Content-Type: text/plain; charset=UTF-8');
+
 		if (!defined('ZBX_PAGE_NO_MENU')) {
 			define('ZBX_PAGE_NO_MENU', true);
 		}
@@ -84,31 +90,19 @@ switch ($page['type']) {
 		header('X-Content-Type-Options: nosniff');
 		header('X-XSS-Protection: 1; mode=block');
 
-		if (CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS) !== '') {
-			if (strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'SAMEORIGIN') == 0
-					|| strcasecmp(CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS), 'DENY') == 0) {
-				$x_frame_options = CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS);
+		if (strcasecmp(CSettingsHelper::getGlobal(CSettingsHelper::X_FRAME_OPTIONS), 'null') != 0) {
+			$x_frame_options = CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS);
+
+			if (strcasecmp($x_frame_options, 'SAMEORIGIN') == 0) {
+				header('X-Frame-Options: SAMEORIGIN');
+			}
+			elseif (strcasecmp($x_frame_options, 'DENY') == 0) {
+				header('X-Frame-Options: DENY');
 			}
 			else {
-				$x_frame_options = 'SAMEORIGIN';
-				$allowed_urls = explode(',', CSettingsHelper::get(CSettingsHelper::X_FRAME_OPTIONS));
-				$url_to_check = array_key_exists('HTTP_REFERER', $_SERVER)
-					? parse_url($_SERVER['HTTP_REFERER'], PHP_URL_HOST)
-					: null;
-
-				if ($url_to_check) {
-					foreach ($allowed_urls as $allowed_url) {
-						if (strcasecmp(trim($allowed_url), $url_to_check) == 0) {
-							$x_frame_options = 'ALLOW-FROM '.$allowed_url;
-							break;
-						}
-					}
-				}
+				header('Content-Security-Policy: frame-ancestors '.$x_frame_options);
 			}
-
-			header('X-Frame-Options: '.$x_frame_options);
 		}
-		break;
 }
 
 if ($page['type'] == PAGE_TYPE_HTML) {

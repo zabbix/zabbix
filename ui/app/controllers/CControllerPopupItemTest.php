@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -860,12 +860,7 @@ abstract class CControllerPopupItemTest extends CController {
 
 				unset($data['interface']['type']);
 			}
-			elseif ($key === 'query_fields') {
-				if ($value === '[]') {
-					unset($data[$key]);
-				}
-			}
-			elseif ($key === 'parameters') {
+			elseif ($key === 'query_fields' || $key === 'headers' || $key === 'parameters') {
 				if (!$value) {
 					unset($data[$key]);
 				}
@@ -929,76 +924,6 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return $macros;
-	}
-
-	/**
-	 * Transform front-end familiar array of http query fields to the form server is capable to handle.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return string
-	 */
-	protected function transformQueryFields(array $data) {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result[] = [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return json_encode($result);
-	}
-
-	/**
-	 * Transform front-end familiar array of parameters fields to the form server is capable to handle. Server expects
-	 * one object where parameter names are keys and parameter values are values. Note that parameter names are unique.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return array
-	 */
-	protected function transformParametersFields(array $data): array {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result += [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
-	 * Transform front-end familiar array of http header fields to the form server is capable to handle.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return string
-	 */
-	protected function transformHeaderFields(array $data) {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result[] = $data['name'][$num].': '.$data['value'][$num];
-				}
-			}
-		}
-
-		return implode("\r\n", $result);
 	}
 
 	/**
@@ -1207,24 +1132,32 @@ abstract class CControllerPopupItemTest extends CController {
 					continue;
 				}
 
-				foreach (['name', 'value'] as $key) {
-					foreach (array_keys($inputs[$field][$key]) as $nr) {
-						$str = &$inputs[$field][$key][$nr];
-						if (strstr($str, '{') !== false) {
-							$matched_macros = CMacrosResolverGeneral::getMacroPositions($str, $types);
+				foreach ($inputs[$field] as &$entry) {
+					if (strpos($entry['name'], '{') !== false) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['name'], $types);
 
-							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-								$macro_value = array_key_exists($macro, $macros_posted)
-									? $macros_posted[$macro]
-									: '';
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
 
-								$str = substr_replace($str, $macro_value, $pos, strlen($macro));
-							}
+							$entry['name'] = substr_replace($entry['name'], $macro_value, $pos, strlen($macro));
 						}
+					}
 
-						unset($str);
+					if (strpos($entry['value'], '{') !== false) {
+						$matched_macros = CMacrosResolverGeneral::getMacroPositions($entry['value'], $types);
+
+						foreach (array_reverse($matched_macros, true) as $pos => $macro) {
+							$macro_value = array_key_exists($macro, $macros_posted)
+								? $macros_posted[$macro]
+								: '';
+
+							$entry['value'] = substr_replace($entry['value'], $macro_value, $pos, strlen($macro));
+						}
 					}
 				}
+				unset($entry);
 			}
 			elseif (strstr($inputs[$field], '{') !== false) {
 				if ($field === 'key') {
@@ -1361,5 +1294,38 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		return true;
+	}
+
+	/**
+	 * @param array $data
+	 */
+	protected static function transformFields(array &$data): void {
+		if (array_key_exists('query_fields', $data)) {
+			foreach ($data['query_fields'] as &$query_field) {
+				$query_field = [$query_field['name'] => $query_field['value']];
+			}
+			unset($query_field);
+
+			$data['query_fields'] = json_encode(array_values($data['query_fields']), JSON_UNESCAPED_UNICODE);
+		}
+
+		if (array_key_exists('headers', $data)) {
+			foreach ($data['headers'] as &$header) {
+				$header = $header['name'].': '.$header['value'];
+			}
+			unset($header);
+
+			$data['headers'] = implode("\r\n", $data['headers']);
+		}
+
+		if (array_key_exists('parameters', $data)) {
+			$parameters = [];
+
+			foreach ($data['parameters'] as $parameter) {
+				$parameters += [$parameter['name'] => $parameter['value']];
+			}
+
+			$data['parameters'] = $parameters;
+		}
 	}
 }

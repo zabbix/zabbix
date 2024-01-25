@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,10 +51,9 @@ foreach ($data['inputs'] as $name => $value) {
 		continue;
 	}
 	elseif ($name === 'query_fields' || $name === 'headers' || $name === 'parameters') {
-		foreach (['name', 'value'] as $key) {
-			if (array_key_exists($key, $value)) {
-				$form->addVar($name.'['.$key.']', $value[$key]);
-			}
+		foreach ($value as $num => $row) {
+			$form->addVar($name.'['.$num.'][name]', $row['name']);
+			$form->addVar($name.'['.$num.'][value]', $row['value']);
 		}
 		continue;
 	}
@@ -406,7 +405,7 @@ $form->addItem([
 		(new CDiv(
 			(new CSpan('#{result}'))
 				->addClass(ZBX_STYLE_LINK_ACTION)
-				->setHint('#{result}', 'hintbox-wrap')
+				->setHint('#{result_hint}', 'hintbox-wrap')
 		))
 			->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 			->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
@@ -417,8 +416,8 @@ $form->addItem([
 			(new CDiv(
 				(new CSpan('#{failed}'))
 					->addClass(ZBX_STYLE_LINK_ACTION)
-					->setHint('#{failed}', 'hintbox-wrap')
-			))
+					->setHint('#{failed_hint}', 'hintbox-wrap')
+				))
 				->addStyle('max-width: '.ZBX_TEXTAREA_STANDARD_WIDTH.'px;')
 				->addClass(ZBX_STYLE_OVERFLOW_ELLIPSIS)
 				->addClass(ZBX_STYLE_REL_CONTAINER)

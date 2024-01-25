@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
+/**
+ * @dataSource LoginUsers
+ */
 class testPageUsers extends CLegacyWebTest {
 	public $userAlias = 'Admin';
 	public $userName = 'Zabbix';
@@ -171,7 +175,8 @@ class testPageUsers extends CLegacyWebTest {
 
 			$this->zbxTestAcceptAlert();
 			$this->zbxTestCheckTitle('Configuration of users');
-			if (in_array($alias, ['guest', 'Admin', 'test-timezone', 'admin user for testFormScheduledReport', 'user-recipient of the report'])) {
+			if (in_array($alias, ['guest', 'Admin', 'test-timezone', 'admin user for testFormScheduledReport',
+					'user-recipient of the report', 'user-for-blocking'])) {
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad' ,'Cannot delete user');
 				$this->assertNotEquals(0, CDBHelper::getCount("select * from users where userid=$id"));
 				$this->assertNotEquals(0, CDBHelper::getCount("select * from users_groups where userid=$id"));

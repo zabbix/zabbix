@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,13 +18,15 @@
 **/
 
 #include "checks_internal.h"
-#include "zbxstats.h"
 
+#include "poller.h"
+
+#include "zbxstats.h"
 #include "checks_java.h"
 #include "zbxself.h"
 #include "zbxdiscovery.h"
 #include "zbxtrends.h"
-#include "../vmware/vmware.h"
+#include "zbxvmware.h"
 #include "../../libs/zbxsysinfo/common/zabbix_stats.h"
 #include "zbxavailability.h"
 #include "zbxnum.h"
@@ -32,7 +34,6 @@
 #include "zbx_host_constants.h"
 #include "zbxpreproc.h"
 
-extern unsigned char	program_type;
 extern int		CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT];
 
 static int	compare_interfaces(const void *p1, const void *p2)
@@ -526,11 +527,11 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 			case ZBX_PROCESS_TYPE_ESCALATOR:
 			case ZBX_PROCESS_TYPE_PROXYPOLLER:
 			case ZBX_PROCESS_TYPE_TIMER:
-				if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+				if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 			case ZBX_PROCESS_TYPE_DATASENDER:
-				if (0 == (program_type & ZBX_PROGRAM_TYPE_PROXY))
+				if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_PROXY))
 					process_type = ZBX_PROCESS_TYPE_UNKNOWN;
 				break;
 		}
@@ -675,7 +676,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		}
 		else if (0 == strcmp(tmp, "trend"))
 		{
-			if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+			if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid second parameter."));
 				goto out;
@@ -953,7 +954,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		char		*error = NULL;
 		zbx_tfc_stats_t	stats;
 
-		if (0 == (program_type & ZBX_PROGRAM_TYPE_SERVER))
+		if (0 == (poller_get_program_type()() & ZBX_PROGRAM_TYPE_SERVER))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid first parameter."));
 			goto out;

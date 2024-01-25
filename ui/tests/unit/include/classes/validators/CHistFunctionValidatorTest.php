@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,6 +50,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['avg(/host/key, {$PERIOD}:{$TIMESHIFT})', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key, {$PERIOD}:now-5h)', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key, {$PERIOD}:now/h-{$TIMESHIFT})', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['avg(/host/key, {{$PERIOD}.regsub("^([0-9]+)", \1)}:now/{{$OFFSET}.regsub("^([0-9]+)", \1)}-{{$TIMESHIFT}.regsub("^([0-9]+)", \1)})', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key, "{$PERIOD}")', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key, "{$PERIOD}d")', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['avg(/host/key, "{#PERIOD}")', ['usermacros' => true], ['rc' => false, 'error' => 'invalid second parameter in function "avg"']],
@@ -799,6 +800,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['last_foreach(/host/key, {$PERIOD}:{$TIMESHIFT})', ['usermacros' => true, 'calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$PERIOD}:now-1d)', ['usermacros' => true, 'calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$PERIOD}:now-{$TIMESHIFT})', ['usermacros' => true, 'calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
+			['last_foreach(/host/key, {{$PERIOD}.regsub("^([0-9]+)", \1)}:now-{{$TIMESHIFT}.regsub("^([0-9]+)", \1)})', ['usermacros' => true, 'calculated' => true], ['rc' => false, 'error' => 'invalid second parameter in function "last_foreach"']],
 			['last_foreach(/host/key, {$MACRO})', ['usermacros' => true, 'calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, {#LLDMACRO})', ['lldmacros' => true, 'calculated' => true], ['rc' => true, 'error' => null]],
 			['last_foreach(/host/key, 1d,)', ['calculated' => true], ['rc' => false, 'error' => 'invalid number of parameters in function "last_foreach"']],
@@ -913,6 +915,7 @@ class CHistFunctionValidatorTest extends TestCase {
 			['baselinewma(/host/key, 1M:now/y, "y", 1)', [], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {$PERIOD}:{$TIMESHIFT}, "y", 2)', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {$PERIOD}:now-{$TIMESHIFT}, "y", 2)', ['usermacros' => true], ['rc' => true, 'error' => null]],
+			['baselinewma(/host/key, {{$PERIOD}.func()}:now-{{$TIMESHIFT: context}.func()}, "y", 2)', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {$MACRO}, "y", 2)', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {$MACRO}, {$MACRO}, {$MACRO})', ['usermacros' => true], ['rc' => true, 'error' => null]],
 			['baselinewma(/host/key, {#LLDMACRO}, {#LLDMACRO}, {#LLDMACRO})', ['lldmacros' => true], ['rc' => true, 'error' => null]],

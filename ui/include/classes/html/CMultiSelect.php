@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -255,7 +255,7 @@ class CMultiSelect extends CTag {
 					'with_items', 'with_simple_graph_items', 'with_simple_graph_item_prototypes', 'with_triggers',
 					'value_types', 'excludeids', 'disableids', 'enrich_parent_groups', 'with_monitored_items',
 					'with_httptests', 'user_type', 'disable_selected', 'hostids', 'with_inherited', 'context',
-					'enabled_only', 'group_status', 'hide_host_filter'
+					'enabled_only', 'group_status', 'hide_host_filter', 'resolve_macros'
 				];
 
 				foreach ($parameters as $field => $value) {
@@ -423,6 +423,11 @@ class CMultiSelect extends CTag {
 				if (array_key_exists('group_status', $parameters)) {
 					$popup_parameters['group_status'] = $parameters['group_status'];
 					$autocomplete_parameters['group_status'] = $parameters['group_status'];
+				}
+
+				if (array_key_exists('resolve_macros', $parameters) && $parameters['resolve_macros']) {
+					$popup_parameters['resolve_macros'] = '1';
+					$autocomplete_parameters['resolve_macros'] = true;
 				}
 			}
 

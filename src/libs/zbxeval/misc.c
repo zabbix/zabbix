@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -242,13 +242,33 @@ void	zbx_eval_deserialize(zbx_eval_context_t *ctx, const char *expression, zbx_u
 	}
 }
 
-static int	compare_tokens_by_loc(const void *d1, const void *d2)
+int	zbx_eval_compare_tokens_by_loc(const void *d1, const void *d2)
 {
 	const zbx_eval_token_t	*t1 = *(const zbx_eval_token_t * const *)d1;
 	const zbx_eval_token_t	*t2 = *(const zbx_eval_token_t * const *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(t1->loc.l, t2->loc.l);
 	return 0;
+}
+
+static const zbx_eval_token_t	*eval_get_next_function_token(const zbx_eval_context_t *ctx, int token_index)
+{
+	if (0 != (ctx->stack.values[token_index].type & ZBX_EVAL_CLASS_FUNCTION))
+		return NULL;
+
+	for(int i = token_index + 1; i < ctx->stack.values_num; i++)
+	{
+		const zbx_eval_token_t	*token = &ctx->stack.values[i];
+		if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
+		{
+			if (token->opt < (zbx_uint32_t)(i - token_index))
+				return NULL;
+
+			return &ctx->stack.values[i];
+		}
+	}
+
+	return NULL;
 }
 
 /******************************************************************************
@@ -331,9 +351,20 @@ static void	eval_token_print_alloc(const zbx_eval_context_t *ctx, char **str, si
 	value_str = zbx_variant_value_desc(&token->value);
 
 	if (0 == quoted)
+	{
 		zbx_strcpy_alloc(str, str_alloc, str_offset, value_str);
+	}
 	else
-		zbx_strquote_alloc(str, str_alloc, str_offset, value_str);
+	{
+		const zbx_eval_token_t	*func_token = NULL;
+
+		if (0 != (ctx->rules & ZBX_EVAL_PARSE_STR_V64_COMPAT))
+			func_token = eval_get_next_function_token(ctx, (int)(token - ctx->stack.values));
+
+		zbx_strquote_alloc_opt(str, str_alloc, str_offset, value_str,
+				NULL != func_token && ZBX_EVAL_TOKEN_HIST_FUNCTION == func_token->type ?
+				ZBX_STRQUOTE_SKIP_BACKSLASH : ZBX_STRQUOTE_DEFAULT);
+	}
 }
 
 /******************************************************************************
@@ -370,7 +401,7 @@ void	zbx_eval_compose_expression(const zbx_eval_context_t *ctx, char **expressio
 			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
 	}
 
-	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
+	zbx_vector_ptr_sort(&tokens, zbx_eval_compare_tokens_by_loc);
 
 	for (i = 0; i < tokens.values_num; i++)
 	{
@@ -416,6 +447,11 @@ static int	eval_has_usermacro(const char *str, size_t len)
 		{
 			if ('$' == *ptr)
 				return SUCCEED;
+
+			if ('{' == *ptr++)
+				if ('$' == *ptr)
+					return SUCCEED;
+
 			ptr++;
 		}
 	}
@@ -568,10 +604,19 @@ int	zbx_eval_expand_user_macros(const zbx_eval_context_t *ctx, const zbx_uint64_
 				{
 					if (FAIL == zbx_variant_convert(&token->value, ZBX_VARIANT_STR))
 					{
-						*error = zbx_dsprintf(*error, "failed to convert token to string from %s",
-								zbx_variant_type_desc(&token->value));
-						zabbix_log(LOG_LEVEL_CRIT, *error);
+						zabbix_log(LOG_LEVEL_CRIT, "cannot convert value from %s to %s",
+								zbx_variant_type_desc(&token->value),
+								zbx_get_variant_type_desc(ZBX_VARIANT_STR));
 						THIS_SHOULD_NEVER_HAPPEN;
+
+						if (NULL != error)
+						{
+							*error = zbx_dsprintf(*error,
+									"cannot convert value from %s to %s",
+									zbx_variant_type_desc(&token->value),
+									zbx_get_variant_type_desc(ZBX_VARIANT_STR));
+						}
+
 						ret = FAIL;
 						break;
 					}
@@ -796,7 +841,7 @@ void	zbx_eval_get_functionids_ordered(zbx_eval_context_t *ctx, zbx_vector_uint64
 			zbx_vector_ptr_append(&tokens, &ctx->stack.values[i]);
 	}
 
-	zbx_vector_ptr_sort(&tokens, compare_tokens_by_loc);
+	zbx_vector_ptr_sort(&tokens, zbx_eval_compare_tokens_by_loc);
 
 	for (i = 0; i < tokens.values_num; i++)
 	{

@@ -190,6 +190,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s di %2$s elemento in problem state"
 msgstr[1] "%1$s di %2$s elementi in problem state"
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -3540,6 +3550,10 @@ msgstr "Impossibile aggiornare massivamente nome host."
 msgid "Cannot mass update visible host name."
 msgstr "Impossibile aggiornare massivamente nome visibile host."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -4992,6 +5006,10 @@ msgstr ""
 msgid "Context name"
 msgstr "Nome contesto"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr ""
@@ -5897,6 +5915,10 @@ msgstr "Autenticazione predefinita"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "Modalita' inventario host predefinito"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7121,6 +7143,14 @@ msgstr ""
 msgid "Draw style"
 msgstr "Stile disegno"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7517,6 +7547,10 @@ msgstr "Abilitare scenari web selezionati?"
 #: include/views/configuration.item.edit.php:982
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
+msgstr ""
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
 msgstr ""
 
 #: app/partials/administration.system.info.php:238
@@ -9337,6 +9371,10 @@ msgstr "Panoramica inventario host"
 msgid "Host label type"
 msgstr "Tipo etichetta host"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -10834,6 +10872,18 @@ msgstr ""
 msgid "Initial view is ignored if the default view is set."
 msgstr ""
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "Inserisci"
@@ -11006,6 +11056,11 @@ msgstr ""
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr ""
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr ""
@@ -11032,6 +11087,10 @@ msgstr ""
 #: include/classes/api/services/CUser.php:948
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
+msgstr ""
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
 msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
@@ -12472,6 +12531,10 @@ msgstr ""
 msgid "Manual host action"
 msgstr ""
 
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
 msgstr ""
@@ -12692,6 +12755,11 @@ msgstr ""
 
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
+msgstr ""
+
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
 msgstr ""
 
 #: app/views/administration.gui.edit.php:138
@@ -14358,6 +14426,11 @@ msgstr ""
 msgid "Not supported"
 msgstr "Non supportato"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "Note"
@@ -14730,6 +14803,10 @@ msgstr ""
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Solo i trigger assegnati agli host abilitati e dipendenti da item abilitati son conteggiatiSolo i trigger assegnati agli host abilitati e dipendenti da item abilitati son conteggiati"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr ""
@@ -14868,6 +14945,10 @@ msgstr "Or"
 msgid "Order"
 msgstr ""
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr ""
@@ -14991,6 +15072,10 @@ msgstr "Sovrascrivi periodo dello storico item"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Sovrascrivi periodo del trend item"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -16957,6 +17042,10 @@ msgstr ""
 #: include/classes/data/CItemData.php:976
 msgid "Returns percentage of lost ICMP ping packets."
 msgstr "Restituisce la percentuale di pacchetti ICMP ping persi."
+
+#: include/classes/data/CItemData.php:2999
+msgid "Returns total number of history values written to database."
+msgstr ""
 
 #: app/partials/hostmacros.inherited.list.html.php:119
 #: app/partials/hostmacros.list.html.php:95 jsLoader.php:317
@@ -19376,6 +19465,10 @@ msgstr "Stringa di test"
 msgid "Test subject"
 msgstr ""
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -20100,6 +20193,10 @@ msgstr "Il trigger nel template \"%1$s\" contiene dipendenze dal trigger nel tem
 msgid "Trigger label type"
 msgstr "Tipo etichetta trigger"
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr "Panoramica Trigger"
@@ -20427,6 +20524,10 @@ msgstr "URL non codificata correttamente."
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Nome URL deve essere unico per la mappa \"%1$s\"."
+
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -20995,6 +21096,10 @@ msgstr "Tempo di attività/inattività"
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
 msgstr ""
@@ -21225,6 +21330,10 @@ msgstr "Gruppo utenti con ID \"%1$s\" non è disponibile."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "Gruppi utenti"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22338,8 +22447,17 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr ""
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
 msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
@@ -22401,6 +22519,10 @@ msgstr ""
 
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:439
@@ -22848,6 +22970,11 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989
@@ -23731,6 +23858,11 @@ msgstr ""
 msgid "including subgroups"
 msgstr "inclusione sottogruppi"
 
+#: include/classes/parsers/CIPRangeParser.php:148
+#, c-format
+msgid "incorrect address starting from \"%1$s\""
+msgstr ""
+
 #: include/classes/parsers/C10TriggerExpression.php:525
 msgid "incorrect calculated item formula"
 msgstr ""
@@ -23771,6 +23903,12 @@ msgstr "Sintassi non corretta in \"%1$s\""
 #: include/classes/validators/CExpressionValidator.php:197
 #, c-format
 msgid "incorrect usage of function \"%1$s\""
+msgstr ""
+
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:665
@@ -24318,6 +24456,10 @@ msgstr "non in"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "non selezionato"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
@@ -25147,6 +25289,10 @@ msgstr ""
 #: app/views/js/correlation.edit.js.php:235
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
+msgstr ""
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193

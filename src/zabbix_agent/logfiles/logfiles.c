@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1955,81 +1955,6 @@ clean:
 	return	ret;
 }
 
-static char	*buf_find_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf,
-		size_t szbyte)
-{
-	if (1 == szbyte)	/* single-byte character set */
-	{
-		for (; p < p_end; p++)
-		{
-			/* detect NULL byte and replace it with '?' character */
-			if (0x0 == *p)
-			{
-				*p = '?';
-				continue;
-			}
-
-			if (0xd < *p || 0xa > *p)
-				continue;
-
-			if (0xa == *p)  /* LF (Unix) */
-			{
-				*p_next = p + 1;
-				return p;
-			}
-
-			if (0xd == *p)	/* CR (Mac) */
-			{
-				if (p < p_end - 1 && 0xa == *(p + 1))   /* CR+LF (Windows) */
-				{
-					*p_next = p + 2;
-					return p;
-				}
-
-				*p_next = p + 1;
-				return p;
-			}
-		}
-		return (char *)NULL;
-	}
-	else
-	{
-		while (p <= p_end - szbyte)
-		{
-			/* detect NULL byte in UTF-16 encoding and replace it with '?' character */
-			if (2 == szbyte && 0x0 == *p && 0x0 == *(p + 1))
-			{
-				if (0x0 == *cr)			/* Big-endian */
-					p[1] = '?';
-				else				/* Little-endian */
-					*p = '?';
-			}
-
-			if (0 == memcmp(p, lf, szbyte))		/* LF (Unix) */
-			{
-				*p_next = p + szbyte;
-				return p;
-			}
-
-			if (0 == memcmp(p, cr, szbyte))		/* CR (Mac) */
-			{
-				if (p <= p_end - szbyte - szbyte && 0 == memcmp(p + szbyte, lf, szbyte))
-				{
-					/* CR+LF (Windows) */
-					*p_next = p + szbyte + szbyte;
-					return p;
-				}
-
-				*p_next = p + szbyte;
-				return p;
-			}
-
-			p += szbyte;
-		}
-		return (char *)NULL;
-	}
-}
-
 static void	log_regexp_runtime_error(const char *key, const char *err_msg, zbx_uint64_t itemid,
 		int *runtime_error_logging_allowed)
 {
@@ -2124,7 +2049,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 		p = buf;			/* current byte */
 		p_end = buf + (size_t)nbytes;	/* no data from this position */
 
-		if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+		if (NULL == (p_nl = zbx_find_buf_newline(p, &p_next, p_end, cr, lf, szbyte)))
 		{
 			if (p_end > p)
 				logfile->incomplete = 1;
@@ -2410,7 +2335,7 @@ static int	zbx_read2(int fd, unsigned char flags, struct st_logfile *logfile, zb
 				p_start = p_next;
 				p = p_next;
 
-				if (NULL == (p_nl = buf_find_newline(p, &p_next, p_end, cr, lf, szbyte)))
+				if (NULL == (p_nl = zbx_find_buf_newline(p, &p_next, p_end, cr, lf, szbyte)))
 				{
 					/* There are no complete records in the buffer. */
 					/* Try to read more data from this position if available. */
@@ -2990,7 +2915,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 		p = buf;
 		p_end = buf + nbytes;	/* no data from this position */
 
-		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
+		if (NULL != zbx_find_buf_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
 			/* found the beginning of line */
 
@@ -3038,7 +2963,7 @@ static int	adjust_position_after_jump(struct st_logfile *logfile, zbx_uint64_t *
 		p = buf;
 		p_end = buf + nbytes;	/* no data from this position */
 
-		if (NULL != buf_find_newline(p, &p_next, p_end, cr, lf, szbyte))
+		if (NULL != zbx_find_buf_newline(p, &p_next, p_end, cr, lf, szbyte))
 		{
 			/* Found the beginning of line. It may not be the closest beginning of line to the place  */
 			/* we jumped to (it could be about sizeof(buf) bytes away) but it is ok for our purposes. */

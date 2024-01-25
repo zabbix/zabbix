@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -789,7 +789,8 @@ static void	update_template_lld_rule_formulas(zbx_vector_ptr_t *items, zbx_vecto
  *                                                                            *
  ******************************************************************************/
 static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_template_item_t *item,
-		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata, char **sql, size_t *sql_alloc,
+		zbx_db_insert_t *db_insert_items, zbx_db_insert_t *db_insert_irtdata,
+		zbx_db_insert_t *db_insert_irtname, char **sql, size_t *sql_alloc,
 		size_t *sql_offset)
 {
 	int			i;
@@ -915,6 +916,21 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 		ZBX_UNUSED(d);
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset, " where itemid=" ZBX_FS_UI64 ";\n", item->itemid);
+
+		if (0 != (item->upd_flags & ZBX_FLAG_TEMPLATE_ITEM_UPDATE_NAME))
+		{
+			if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			{
+				str_esc = zbx_db_dyn_escape_string(item->name);
+
+				zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "update item_rtname set"
+						" name_resolved='%s',name_resolved_upper=upper('%s')"
+						" where itemid=" ZBX_FS_UI64 ";\n",
+						str_esc, str_esc, item->itemid);
+				zbx_free(str_esc);
+				zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
+			}
+		}
 	}
 	else
 	{
@@ -933,6 +949,9 @@ static void	save_template_item(zbx_uint64_t hostid, zbx_uint64_t *itemid, zbx_te
 
 		zbx_db_insert_add_values(db_insert_irtdata, *itemid);
 
+		if (ZBX_FLAG_DISCOVERY_NORMAL == item->flags || ZBX_FLAG_DISCOVERY_CREATED == item->flags)
+			zbx_db_insert_add_values(db_insert_irtname, *itemid, item->name, item->name);
+
 		zbx_audit_item_create_entry(ZBX_AUDIT_ACTION_ADD, *itemid, item->name, item->flags);
 		zbx_audit_item_update_json_add_data(*itemid, item, hostid);
 
@@ -947,8 +966,8 @@ dependent:
 			dependent->upd_flags |= ZBX_FLAG_TEMPLATE_ITEM_UPDATE_MASTER_ITEMID;
 
 		dependent->master_itemid = item->itemid;
-		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, sql, sql_alloc,
-				sql_offset);
+		save_template_item(hostid, itemid, dependent, db_insert_items, db_insert_irtdata, db_insert_irtname,
+				sql, sql_alloc, sql_offset);
 	}
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -968,7 +987,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 	size_t			sql_alloc = 16 * ZBX_KIBIBYTE, sql_offset = 0;
 	int			new_items = 0, upd_items = 0, i;
 	zbx_uint64_t		itemid = 0;
-	zbx_db_insert_t		db_insert_items, db_insert_irtdata;
+	zbx_db_insert_t		db_insert_items, db_insert_irtdata, db_insert_irtname;
 	zbx_template_item_t	*item;
 
 	if (0 == items->values_num)
@@ -1000,6 +1019,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"verify_host", "allow_traps", "discover", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
+		zbx_db_insert_prepare(&db_insert_irtname, "item_rtname", "itemid", "name_resolved",
+				"name_resolved_upper", (char *)NULL);
 	}
 
 	if (0 != upd_items)
@@ -1016,7 +1037,7 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		if (0 == item->master_itemid)
 		{
 			save_template_item(hostid, &itemid, item, &db_insert_items, &db_insert_irtdata,
-					&sql, &sql_alloc, &sql_offset);
+					&db_insert_irtname, &sql, &sql_alloc, &sql_offset);
 		}
 	}
 
@@ -1025,6 +1046,8 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 		zbx_db_insert_execute(&db_insert_items);
 		zbx_db_insert_clean(&db_insert_items);
 
+		zbx_db_insert_execute(&db_insert_irtname);
+		zbx_db_insert_clean(&db_insert_irtname);
 		zbx_db_insert_execute(&db_insert_irtdata);
 		zbx_db_insert_clean(&db_insert_irtdata);
 	}

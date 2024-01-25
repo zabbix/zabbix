@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@ class AllItemValueTypes {
 	const HOST = 'Host for all item value types';
 
 	public static function load() {
-		CDataHelper::call('host.create', [
+		$hosts = CDataHelper::call('host.create', [
 			'host' => self::HOST,
 			'groups' => [['groupid' => 4]],
 			'inventory_mode' => 0,
@@ -32,10 +32,18 @@ class AllItemValueTypes {
 				'alias' => 'Item_Types_Alias'
 			]
 		]);
-		$hostids = CDataHelper::getIds('host');
+		$hostid = $hosts['hostids'][0];
 
-		// Create items.
-		$items_data = [];
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'LLD rule for item types',
+			'key_' => 'lld_rule',
+			'hostid' => $hostid,
+			'type' => ITEM_TYPE_TRAPPER
+		]);
+		$lldid = CDataHelper::getIds('name');
+
+		// Create item prototypes.
+		$item_prototype_data = [];
 		$value_types = [
 			'Float' => ITEM_VALUE_TYPE_FLOAT,
 			'Character' => ITEM_VALUE_TYPE_STR,
@@ -44,9 +52,46 @@ class AllItemValueTypes {
 			'Text' => ITEM_VALUE_TYPE_TEXT
 		];
 
+		$dependent_items = [
+			'Binary' => ITEM_VALUE_TYPE_BINARY,
+			'Unsigned_dependent' => ITEM_VALUE_TYPE_UINT64
+		];
+
+		foreach ($value_types as $name => $type) {
+			$item_prototype_data[] = [
+				'hostid' => $hostid,
+				'ruleid' => $lldid['LLD rule for item types'],
+				'name' => $name.' item prototype',
+				'key_' => $name.'_item_prototype_[{#KEY}]',
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => $type
+			];
+		}
+		CDataHelper::call('itemprototype.create', $item_prototype_data);
+		$simple_itemprototypeids = CDataHelper::getIds('name');
+
+		// Add dependent item prototype.
+		$dependent_item_prototype_data = [];
+
+		foreach ($dependent_items as $name => $type) {
+			$dependent_item_prototype_data[] = [
+				'hostid' => $hostid,
+				'ruleid' => $lldid['LLD rule for item types'],
+				'name' => $name.' item prototype',
+				'key_' => $name.'_item_prototype_[{#KEY}]',
+				'type' => ITEM_TYPE_DEPENDENT,
+				'value_type' => $type,
+				'master_itemid' => $simple_itemprototypeids['Float item prototype']
+			];
+		}
+		CDataHelper::call('itemprototype.create', $dependent_item_prototype_data);
+
+		// Create items.
+		$items_data = [];
+
 		foreach ($value_types as $name => $type) {
 			$items_data[] = [
-				'hostid' => $hostids[self::HOST],
+				'hostid' => $hostid,
 				'name' => $name.' item',
 				'key_' => $name,
 				'type' => ITEM_TYPE_TRAPPER,
@@ -54,7 +99,15 @@ class AllItemValueTypes {
 			];
 		}
 
-		CDataHelper::call('item.create', $items_data	);
+		$master_item_data[] = [
+			'hostid' => 90001, // Host for host prototype tests
+			'name' => 'Master Item for testItemTypeSelection',
+			'key_' => 'graph[1]',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_TEXT
+		];
+
+		CDataHelper::call('item.create', array_merge_recursive($items_data, $master_item_data));
 		$simple_itemids = CDataHelper::getIds('name');
 
 		// Add dependent item.
@@ -66,7 +119,7 @@ class AllItemValueTypes {
 
 		foreach ($dependent_items as $name => $type) {
 			$dependent_items_data[] = [
-				'hostid' => $hostids[self::HOST],
+				'hostid' => $hostid,
 				'name' => $name.' item',
 				'key_' => $name,
 				'type' => ITEM_TYPE_DEPENDENT,
@@ -76,8 +129,12 @@ class AllItemValueTypes {
 		}
 		CDataHelper::call('item.create', $dependent_items_data);
 		$dependent_itemids = CDataHelper::getIds('name');
+
 		$itemids = array_merge_recursive($simple_itemids, $dependent_itemids);
 
-		return $itemids;
+		return [
+			'hostid' => $hostid,
+			'itemids' => $itemids
+		];
 	}
 }

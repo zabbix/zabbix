@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -465,7 +465,7 @@ class testPageHostInterfaces extends CWebTest {
 			// Check interface color in availability column.
 			$this->assertEquals($data['interfaces'][$interface_name]['color'], $interface->getCSSValue('background-color'));
 			// Open interface popup.
-			$interface->click();
+			$interface->waitUntilClickable->click();
 			$overlay = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$interface_table = $overlay->query('xpath:.//table[@class="list-table"]')->asTable()->one();
 			// Check table headers in popup.
@@ -484,7 +484,6 @@ class testPageHostInterfaces extends CWebTest {
 			}
 
 			$overlay->close();
-			$overlay->waitUntilNotPresent();
 		}
 		// Assert interface names in Availability column.
 		$this->assertEquals(array_keys($data['interfaces']), $host_interfaces);

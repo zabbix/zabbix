@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,16 +19,18 @@
 **/
 
 
-require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
-use Facebook\WebDriver\WebDriverBy;
-
 /**
  * @backup profiles
+ *
+ * @onBefore prepareProblemsData
+ *
+ * @dataSource UserPermissions
  */
-class testPageProblems extends CLegacyWebTest {
+class testPageProblems extends CWebTest {
 
 	/**
 	 * Attach TagBehavior and TableBehavior to the test.
@@ -45,336 +47,1443 @@ class testPageProblems extends CLegacyWebTest {
 		];
 	}
 
-	public function testPageProblems_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckTitle('Problems');
-		$this->zbxTestCheckHeader('Problems');
+	public function prepareProblemsData() {
+		/**
+		 * Change refresh interval so Problems page doesn't refresh automatically,
+		 * and popup dialogs don't disappear.
+		 */
+		DBexecute('UPDATE users SET refresh=999 WHERE username='.zbx_dbstr('Admin'));
 
-		$this->assertTrue($this->zbxTestCheckboxSelected('show_10'));
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
-			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Age less than', 'Host inventory', 'Tags',
-			'Show suppressed problems', 'Acknowledgement status', 'Severity', 'Time', 'Recovery time', 'Status', 'Host',
-			'Problem', 'Duration', 'Ack', 'Actions', 'Tags']);
+		// Create host group for hosts with item and trigger.
+		$hostgroups = CDataHelper::call('hostgroup.create', [['name' => 'Group for Problems Page']]);
 
-		$this->zbxTestCheckNoRealHostnames();
+		// Create host.
+		$hosts = CDataHelper::call('host.create', [
+			'host' => 'Host for Problems Page',
+			'groups' => [['groupid' => $hostgroups['groupids'][0]]]
+		]);
+
+		// Create item on previously created host.
+		$items = CDataHelper::call('item.create',[
+			'hostid' => $hosts['hostids'][0],
+			'name' => 'Age problem item',
+			'key_' => 'trap',
+			'type' => ITEM_TYPE_TRAPPER,
+			'value_type' => ITEM_VALUE_TYPE_FLOAT
+		]);
+
+		// Create trigger based on item.
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Trigger for Age problem',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE
+			],
+			[
+				'description' => 'Trigger for Age problem 1 day',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Trigger for Age problem 1 month',
+				'expression' => 'last(/Host for Problems Page/trap)=0',
+				'priority' => TRIGGER_SEVERITY_AVERAGE,
+				'manual_close' => 1
+			],
+			[
+				'description' => 'Problem trap>10 [Symptom]',
+				'expression' => 'last(/Host for Problems Page/trap)>10',
+				'priority' => TRIGGER_SEVERITY_WARNING
+			],
+			[
+				'description' => 'Problem trap>100 [Cause]',
+				'expression' => 'last(/Host for Problems Page/trap)>150',
+				'priority' => TRIGGER_SEVERITY_DISASTER
+			]
+		]);
+
+		// Create event with recent age.
+		$time = time();
+		CDataHelper::addItemData($items['itemids'][0], [0, 20, 150]);
+		CDBHelper::setTriggerProblem('Trigger for Age problem', TRIGGER_VALUE_TRUE, ['clock' => $time]);
+		CDBHelper::setTriggerProblem('Trigger for Age problem 1 day', TRIGGER_VALUE_TRUE,
+				['clock' => $time - 86400]
+		);
+		CDBHelper::setTriggerProblem('Trigger for Age problem 1 month', TRIGGER_VALUE_TRUE,
+				['clock' => $time - 2.628e+6]
+		);
+
+		$dayid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 day'));
+		$monthid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Trigger for Age problem 1 month'));
+
+		// Close problems to check time selector filter tab.
+		foreach ([$dayid, $monthid] as $eventid) {
+			CDataHelper::call('event.acknowledge', [
+				'eventids' => $eventid,
+				'action' => 1,
+				'message' => 'Closed problem'
+			]);
+		}
 	}
 
-	public function testPageProblems_History_CheckLayout() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
+	public function prepareCauseAndSymptoms() {
+		// Create problems.
+		CDBHelper::setTriggerProblem('Problem trap>10 [Symptom]', TRIGGER_VALUE_TRUE);
+		CDBHelper::setTriggerProblem('Problem trap>100 [Cause]', TRIGGER_VALUE_TRUE);
 
-		$this->zbxTestClickXpathWait("//label[text()='History']");
-		$this->query('name:filter_apply')->one()->click();
-		$this->assertTrue($this->zbxTestCheckboxSelected('show_20'));
-		$this->zbxTestAssertNotVisibleId('age_state_0');
-		$this->zbxTestTextPresent(['Show', 'Host groups', 'Host', 'Triggers', 'Problem', 'Not classified',
-			'Information', 'Warning', 'Average', 'High', 'Disaster', 'Host inventory', 'Tags', 'Show suppressed problems',
-			'Acknowledgement status', 'Severity', 'Time', 'Recovery time','Status', 'Host', 'Problem', 'Duration',
-			'Ack', 'Actions', 'Tags']);
-
-		$this->zbxTestCheckNoRealHostnames();
+		// Set cause and symptoms.
+		$causeid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>100 [Cause]'));
+		$symptomid = CDBHelper::getValue('SELECT eventid FROM problem WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
+		DBexecute('UPDATE problem SET cause_eventid='.$causeid.' WHERE name='.zbx_dbstr('Problem trap>10 [Symptom]'));
+		DBexecute('INSERT INTO event_symptom (eventid, cause_eventid) VALUES ('.$symptomid.','.$causeid.')');
+		DBexecute('UPDATE event_symptom SET cause_eventid='.$causeid.' WHERE eventid='.$symptomid);
 	}
 
-	/**
-	 * Search problems by "AND" or "OR" tag options
-	 */
-	public function testPageProblems_FilterByTagsOptionAndOr() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
+	public function testPageProblems_Layout() {
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
+		$this->page->assertTitle('Problems');
+		$this->page->assertHeader('Problems');
 
-		// Check the default tag filter option AND and tag value option Contains
-		$result_form = $this->query('xpath://form[@name="problem"]')->one();
-		$this->zbxTestClickButtonText('Reset');
-		$result_form->waitUntilReloaded();
-		$this->assertTrue($this->zbxTestCheckboxSelected('evaltype_00'));
-		$form = $this->query('id:tabfilter_0')->asForm()->waitUntilPresent()->one();
-		$this->zbxTestDropdownAssertSelected('tags_00_operator', 'Contains');
+		$filter_tab = CFilterElement::find()->one()->setContext(CFilterElement::CONTEXT_LEFT);
+		$this->assertTrue($filter_tab->isExpanded());
 
-		// Select "AND" option and two tag names with partial "Contains" value match
-		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
-		$this->query('name:tags_add')->one()->click();
-		$form->query('name:tags[1][tag]')->one()->clear()->sendKeys('Database');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
-		$this->zbxTestTextNotPresent('Test trigger with tag');
+		// Check that filter is collapsing/expanding on click.
+		foreach ([false, true] as $status) {
+			$filter_tab->expand($status);
+			$this->assertTrue($filter_tab->isExpanded($status));
+		}
 
-		// Change tags select to "OR" option
-		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
-		$this->query('name:filter_apply')->one()->click();
-		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger with tag');
-		$this->zbxTestAssertElementText('//tbody/tr[4]/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 4 of 4 found');
+		$filter_form = $filter_tab->getForm();
+		$this->assertEquals(['Show', 'Host groups', 'Hosts', 'Triggers', 'Problem', 'Severity', 'Age less than',
+				'Show symptoms', 'Show suppressed problems', 'Acknowledgement status', 'Host inventory',
+				'Tags', 'Show tags', 'Tag display priority', 'Show operational data', 'Compact view',
+				'Show details'], $filter_form->getLabels()->asText()
+		);
+
+		// Check complicated labels.
+		foreach (['By me', 'Tag name', 'Show timeline', 'Highlight whole row'] as $label) {
+			$this->assertTrue($filter_form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')
+					->one()->isVisible()
+			);
+		}
+
+		$this->assertEquals([], $filter_form->getRequiredLabels());
+
+		$fields_values = [
+			'Show' => ['value' => 'Recent problems'],
+			'id:groupids_0_ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'id:hostids_0_ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'id:triggerids_0_ms' => ['value' => '', 'placeholder' => 'type here to search'],
+			'Problem' => ['value' => '', 'maxlength' => 255],
+			'Not classified' => ['value' => false],
+			'Information' => ['value' => false],
+			'Warning' => ['value' => false],
+			'Average' => ['value' => false],
+			'High' => ['value' => false],
+			'Disaster' => ['value' => false],
+			'name:age_state' => ['value' => false],
+			'name:age' => ['value' => 14, 'enabled' => false],
+			'Show symptoms' => ['value' => false],
+			'Show suppressed problems' => ['value' => false],
+			'Acknowledgement status' => ['value' => 'All'],
+			'id:acknowledged_by_me_0' => ['value' => false, 'enabled' => false],
+			'name:inventory[0][field]' => ['value' => 'Type'],
+			'name:inventory[0][value]' => ['value' => '', 'maxlength' => 255],
+			'id:evaltype_0' => ['value' => 'And/Or'],
+			'name:tags[0][tag]' => ['value' => '', 'placeholder' => 'tag', 'maxlength' => 255],
+			'id:tags_00_operator' => ['value' => 'Contains'],
+			'id:tags_00_value' => ['value' => '', 'placeholder' => 'value', 'maxlength' => 255],
+			'Show tags' => ['value' => 3],
+			'id:tag_name_format_0' => ['value' => 'Full'],
+			'Tag display priority' => ['value' => '', 'placeholder' => 'comma-separated list', 'maxlength' => 255],
+			'Show operational data' => ['value' => 'None'],
+			'Compact view' => ['value' => false],
+			'Show details' => ['value' => false],
+			'Show timeline' => ['value' => true],
+			'Highlight whole row' => ['value' => false, 'enabled' => false]
+		];
+
+		foreach ($fields_values as $label => $attributes) {
+			$field = $filter_form->getField($label);
+			$this->assertEquals($attributes['value'], $field->getValue());
+			$this->assertTrue($field->isVisible());
+			$this->assertTrue($field->isEnabled(CTestArrayHelper::get($attributes, 'enabled', true)));
+
+			foreach (['placeholder', 'maxlength'] as $attribute) {
+				if (array_key_exists($attribute, $attributes)) {
+					$this->assertEquals($attributes[$attribute], $field->getAttribute($attribute));
+				}
+			}
+		}
+
+		$segmented_radios = [
+			'Show' => ['Recent problems', 'Problems', 'History'],
+			'Acknowledgement status' => ['All', 'Unacknowledged', 'Acknowledged'],
+			'Tags' => ['And/Or', 'Or'],
+			'Show tags' => ['None', 1, 2, 3],
+			'id:tag_name_format_0' => ['Full', 'Shortened', 'None'],
+			'Show operational data' => ['None', 'Separately', 'With problem name']
+		];
+
+		foreach ($segmented_radios as $field => $labels) {
+			$this->assertEquals($labels, $filter_form->getField($field)->asSegmentedRadio()->getLabels()->asText());
+		}
+
+		$dropdowns = [
+			'name:inventory[0][field]' => ['Type', 'Type (Full details)', 'Name', 'Alias', 'OS', 'OS (Full details)',
+					'OS (Short)', 'Serial number A', 'Serial number B', 'Tag', 'Asset tag', 'MAC address A',
+					'MAC address B', 'Hardware', 'Hardware (Full details)', 'Software', 'Software (Full details)',
+					'Software application A', 'Software application B', 'Software application C', 'Software application D',
+					'Software application E', 'Contact', 'Location', 'Location latitude', 'Location longitude',
+					'Notes', 'Chassis', 'Model', 'HW architecture', 'Vendor', 'Contract number', 'Installer name',
+					'Deployment status', 'URL A', 'URL B', 'URL C', 'Host networks', 'Host subnet mask', 'Host router',
+					'OOB IP address', 'OOB subnet mask', 'OOB router', 'Date HW purchased', 'Date HW installed',
+					'Date HW maintenance expires', 'Date HW decommissioned', 'Site address A', 'Site address B',
+					'Site address C', 'Site city', 'Site state / province', 'Site country', 'Site ZIP / postal',
+					'Site rack location', 'Site notes', 'Primary POC name', 'Primary POC email', 'Primary POC phone A',
+					'Primary POC phone B', 'Primary POC cell', 'Primary POC screen name', 'Primary POC notes',
+					'Secondary POC name', 'Secondary POC email', 'Secondary POC phone A', 'Secondary POC phone B',
+					'Secondary POC cell', 'Secondary POC screen name', 'Secondary POC notes'
+			],
+			'id:tags_00_operator' => ['Exists', 'Equals', 'Contains', 'Does not exist', 'Does not equal', 'Does not contain']
+		];
+
+		foreach ($dropdowns as $field => $options) {
+			$this->assertEquals($options, $filter_form->getField($field)->asDropdown()->getOptions()->asText());
+		}
+
+		// Check how filter form changes depending on 'Show' field settings.
+		$age_field = $filter_form->getField('Age less than');
+
+		$dependant_fields = [
+			'History' => [
+				'xpath://button[@data-action="selectPrevTab"]' => true,
+				'xpath://button[@data-action="toggleTabsList"]' => true,
+				'xpath://button[@data-action="selectNextTab"]' => true,
+				'xpath://button[contains(@class, "js-btn-time-left")]' => true,
+				'button:Zoom out' => true,
+				'xpath://button[contains(@class, "js-btn-time-right")]' => false,
+				'xpath://a[text()="Last 1 hour"]' => true
+			],
+			'Problems' => [
+				'xpath://button[@data-action="selectPrevTab"]' => true,
+				'xpath://button[@data-action="toggleTabsList"]' => true,
+				'xpath://button[@data-action="selectNextTab"]' => true,
+				'xpath://button[contains(@class, "js-btn-time-left")]' => false,
+				'button:Zoom out' => false,
+				'xpath://button[contains(@class, "js-btn-time-right")]' => false,
+				'xpath://a[text()="Last 1 hour"]' => false
+			]
+		];
+
+		foreach ($dependant_fields as $show => $checked_elements) {
+			$filter_form->fill(['Show' => $show]);
+
+			if ($show === 'History') {
+				$age_field->waitUntilNotVisible();
+				$fields_values['Show']['value'] = 'History';
+				$attribute_status = false;
+			}
+			else {
+				$age_field->waitUntilVisible();
+				$fields_values['Show']['value'] = 'Problems';
+				$attribute_status = true;
+			}
+
+			$fields_values['name:age_state']['visible'] = $attribute_status;
+			$fields_values['name:age_state']['enabled'] = $attribute_status;
+			$fields_values['name:age']['visible'] = $attribute_status;
+
+			foreach ($checked_elements as $query => $state) {
+				$this->assertTrue($this->query($query)->one()->isEnabled($state));
+			}
+
+			foreach ($fields_values as $label => $attributes) {
+				$field = $filter_form->getField($label);
+				$this->assertTrue($field->isVisible(CTestArrayHelper::get($attributes, 'visible', true)));
+				$this->assertTrue($field->isEnabled(CTestArrayHelper::get($attributes, 'enabled', true)));
+			}
+		}
+
+		// Check Age field editability.
+		foreach ([false, true] as $state) {
+			$filter_form->fill(['id:age_state_0' => $state]);
+			$this->assertTrue($filter_form->getField('name:age')->isEnabled($state));
+		}
+
+		// Acknowledgement status field editability.
+		foreach (['All' => false, 'Unacknowledged' => false, 'Acknowledged' => true] as $label => $status) {
+			$filter_form->fill(['Acknowledgement status' => $label]);
+			$this->assertTrue($filter_form->getField('id:acknowledged_by_me_0')->isEnabled($status));
+		}
+
+		// Tags fields editability.
+		foreach (['None' => false, 1 => true, 2 => true, 3 => true] as $label => $status) {
+			$filter_form->fill(['Show tags' => $label]);
+
+			foreach (['id:tag_name_format_0', 'Tag display priority'] as $field) {
+				$this->assertTrue($filter_form->getField($field)->isEnabled($status));
+			}
+		}
+
+		// Show operational data and checkboxes dependency.
+		foreach ([true, false] as $state) {
+			$filter_form->fill(['Compact view' => $state]);
+
+			foreach (['Show operational data', 'Show details', 'Show timeline'] as $field) {
+				$this->assertTrue($filter_form->getField($field)->isEnabled(!$state));
+			}
+			$this->assertTrue($filter_form->getField('Highlight whole row')->isEnabled($state));
+		}
+
+		$this->assertEquals(3, $filter_tab->query('button', ['Save as', 'Apply', 'Reset'])
+				->all()->filter(CElementFilter::CLICKABLE)->count()
+		);
+
+		// Check Problems table layout.
+		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertEquals(['Time', 'Severity', 'Host', 'Problem'], $table->getSortableHeaders()->asText());
+
+		$this->query('button:Reset')->waitUntilClickable()->one()->click();
+		$table->waitUntilReloaded();
+
+		$dependant_headers = [
+			[
+				'label' => 'Show',
+				'value' => 'Recent problems',
+				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show',
+				'value' => 'History',
+				'headers' => ['Recovery time', 'Status', 'Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show',
+				'value' => 'Problems',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show tags',
+				'value' => 'None',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions']
+			],
+			[
+				'label' => 'Show tags',
+				'value' => 1,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show tags',
+				'value' => 2,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show tags',
+				'value' => 3,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show operational data',
+				'value' => 'None',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show operational data',
+				'value' => 'Separately',
+				'headers' => ['Info', 'Host', 'Problem', 'Operational data', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show operational data',
+				'value' => 'With problem name',
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show timeline',
+				'value' => false,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			],
+			[
+				'label' => 'Show timeline',
+				'value' => true,
+				'headers' => ['Info', 'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags']
+			]
+		];
+
+		foreach ($dependant_headers as $field) {
+			$filter_form->fill([$field['label'] => $field['value']]);
+			$filter_form->submit();
+			$table->waitUntilReloaded();
+			$start_headers = ($field['label'] === 'Show timeline' && !$field['value'])
+				? ['', 'Time', 'Severity']
+				: ['', 'Time', '', '', 'Severity'];
+			$this->assertEquals(array_merge($start_headers, $field['headers']), $table->getHeadersText());
+		}
+
+		// Check that some unfiltered data is displayed in the table.
+		$this->assertTableStats(CDBHelper::getCount(
+				'SELECT null FROM problem'.
+				' WHERE cause_eventid IS NULL'.
+				' AND eventid'.
+					' NOT IN (SELECT eventid FROM event_suppress)'
+		));
+
+		// Check Mass update button.
+		$mass_update_button = $this->query('button:Mass update')->one();
+		$this->assertFalse($mass_update_button->isClickable());
+		$table->getRow(0)->select();
+		$this->assertSelectedCount(1);
+		$mass_update_button->waitUntilClickable();
 	}
 
-	/**
-	 * Search problems by partial or exact tag value match
-	 */
-	public function testPageProblems_FilterByTagsOptionContainsEquals() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
-		$result_form = $this->query('xpath://form[@name="problem"]')->one();
-		$this->zbxTestClickButtonText('Reset');
-		$result_form->waitUntilReloaded();
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
-
-		// Search by partial "Contains" tag value match
-		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('service');
-		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
-		$this->zbxTestTextNotPresent('Test trigger with tag');
-
-		// Change tag value filter to "Equals"
-		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
-		$this->query('name:filter_apply')->one()->click();
-		$this->zbxTestAssertElementText('//tbody/tr[@class="nothing-to-show"]/td', 'No data found.');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
-	}
-
-	/**
-	 * Search problems by partial and exact tag value match and then remove one
-	 */
-	public function testPageProblems_FilterByTagsOptionContainsEqualsAndRemoveOne() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
-		$result_form = $this->query('xpath://form[@name="problem"]')->one();
-		$this->zbxTestClickButtonText('Reset');
-		$result_form->waitUntilReloaded();
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
-
-		// Select tag option "OR" and exact "Equals" tag value match
-		$this->zbxTestClickXpath('//label[@for="evaltype_20"]');
-		$this->zbxTestDropdownSelect('tags_00_operator', 'Equals');
-
-		// Filter by two tags
-		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
-		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
-		$this->query('name:tags_add')->one()->click();
-		$form->query('name:tags[1][tag]')->one()->clear()->sendKeys('service');
-		$form->query('name:tags[1][value]')->one()->clear()->sendKeys('abc');
-
-		// Search and check result
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		$this->zbxTestAssertElementText('//tbody/tr[1]/td[10]/a', 'Test trigger with tag');
-		$this->zbxTestAssertElementText('//tbody/tr[2]/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 2 of 2 found');
-
-		// Remove first tag option
-		$this->zbxTestClickXpath('//button[@name="tags[0][remove]"]');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
-	}
-
-	public static function getFilterByTagsExceptContainsEqualsData() {
+	public static function getFilterData() {
 		return [
-			// "And" and "And/Or" checks.
+			// #0 Host group filter - empty result.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Exists']
+					'fields' => [
+						'Host groups' => 'Empty group'
 					],
-					'expected_problems' => [
-						'Test trigger to check tag filter on problem page',
-						'Test trigger with tag',
-						'Trigger for tag permissions MySQL',
-						'Trigger for tag permissions Oracle'
+					'result' => []
+				]
+			],
+			// #1 Host group filter result.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Another group to check Overview'
+					],
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '4_Host_to_check_Monitoring_Overview',
+							'Problem' => '4_trigger_Average',
+							'Update' => 'Update',
+							'Tags' => ''
+						]
 					]
 				]
 			],
+			// #2 Host filter result with trigger description and action check.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Exists']
+					'fields' => [
+						'Hosts' => '3_Host_to_check_Monitoring_Overview'
 					],
-					'expected_problems' => [
-						'Test trigger to check tag filter on problem page',
-						'Test trigger with tag',
-						'Trigger for tag permissions MySQL',
-						'Trigger for tag permissions Oracle'
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '3_Host_to_check_Monitoring_Overview',
+							'Problem' => '3_trigger_Average',
+							'Update' => 'Update',
+							'Tags' => ''
+						]
+					],
+					'check_trigger_description' => [
+						'Macro - resolved, URL - clickable: 3_Host_to_check_Monitoring_Overview, https://zabbix.com'
+					],
+					'check_actions' => [
+						[
+							[
+								'Time' => '2018-08-07 11:05:35',
+								'User/Recipient' => 'Admin (Zabbix Administrator)',
+								'Action' => '',
+								'Message/Command' => '',
+								'Status' => '',
+								'Info' => ''
+							],
+							[
+								'Time' => '2018-08-06 14:42:06',
+								'User/Recipient' => '',
+								'Action' => '',
+								'Message/Command' => '',
+								'Status' => '',
+								'Info' => ''
+							]
+						]
 					]
 				]
 			],
+			// #3 Trigger filter.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Exists'],
-						['name' => 'Database', 'operator' => 'Exists']
+					'fields' => [
+						'Triggers' => ['Trigger_for_suppression', '2_trigger_Information'],
+						'Show suppressed problems' => true
 					],
-					'expected_problems' => [
-						'Test trigger to check tag filter on problem page'
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for suppression',
+							'Problem' => 'Trigger_for_suppression',
+							'Update' => 'Update',
+							'Tags' => 'SupTag: A'
+						],
+						[
+							'Severity' => 'Information',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => '1_Host_to_check_Monitoring_Overview',
+							'Problem' => '2_trigger_Information',
+							'Update' => 'Update',
+							'Tags' => ''
+						]
+					],
+					'check_trigger_description' => [
+						false,
+						'http://zabbix.com https://www.zabbix.com/career https://www.zabbix.com/contact'
+					],
+					'check_actions' => [
+						false,
+						[
+							[
+								'Time' => '2018-08-07 11:05:35',
+								'User/Recipient' => 'Admin (Zabbix Administrator)',
+								'Action' => '',
+								'Message/Command' => '',
+								'Status' => '',
+								'Info' => ''
+							],
+							[
+								'Time' => '2018-08-06 14:42:06',
+								'User/Recipient' => '',
+								'Action' => '',
+								'Message/Command' => '',
+								'Status' => '',
+								'Info' => ''
+							]
+						]
 					]
 				]
 			],
+			// #4 And/Or tag operator.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Exists'],
-						['name' => 'Database', 'operator' => 'Exists']
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Contains', 'value' => ''],
+							['name' => 'Database', 'operator' => 'Contains', 'value' => '']
+						]
 					],
-					'expected_problems' => [
-						'Test trigger to check tag filter on problem page',
-						'Test trigger with tag',
-						'Trigger for tag permissions MySQL',
-						'Trigger for tag permissions Oracle'
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'ЗАББИКС Сервер',
+							'Problem' => 'Test trigger to check tag filter on problem page',
+							'Update' => 'Update',
+							'Tags' => 'DatabaseService: abcservice: abcdef'
+						]
 					]
 				]
 			],
+			// #5 Or tag operator.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'Alpha', 'operator' => 'Does not exist']
+					'fields' => [
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Third test trigger with tag priority',
-						'First test trigger with tag priority'
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Contains', 'value' => ''],
+							['name' => 'Database', 'operator' => 'Contains', 'value' => '']
+						]
+					],
+					'result' => [
+						[
+							'Severity' => 'Not classified',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for tag permissions',
+							'Problem' => 'Trigger for tag permissions Oracle',
+							'Update' => 'Update',
+							'Tags' => 'Service: Oracle'
+						],
+						[
+							'Severity' => 'Not classified',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for tag permissions',
+							'Problem' => 'Trigger for tag permissions MySQL',
+							'Update' => 'Update',
+							'Tags' => 'Service: MySQL'
+						],
+						[
+							'Severity' => 'Warning',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'ЗАББИКС Сервер',
+							'Problem' => 'Test trigger with tag',
+							'Update' => 'Update',
+							'Tags' => 'Service: abc'
+						],
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'ЗАББИКС Сервер',
+							'Problem' => 'Test trigger to check tag filter on problem page',
+							'Update' => 'Update',
+							'Tags' => 'DatabaseService: abcservice: abcdef'
+						]
 					]
 				]
 			],
+			// #6 Tag operator Contains.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Alpha', 'operator' => 'Does not exist']
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'service', 'operator' => 'Contains', 'value' => 'abc']
+						]
 					],
-					'absent_problems' => [
-						'Third test trigger with tag priority',
-						'First test trigger with tag priority'
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'ЗАББИКС Сервер',
+							'Problem' => 'Test trigger to check tag filter on problem page',
+							'Update' => 'Update',
+							'Tags' => 'service: abcdefDatabaseService: abc'
+						]
 					]
 				]
 			],
+			// #7 Tag operator Equals.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Does not exist'],
-						['name' => 'Database', 'operator' => 'Does not exist']
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'service', 'operator' => 'Equals', 'value' => 'abc']
+						]
 					],
-					'absent_problems' => [
-						'Test trigger to check tag filter on problem page'
+					'result' => []
+				]
+			],
+			// #8 "And/Or" and operator Exists, one tag.
+			[
+				[
+					'fields' => [
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
 			],
+			// #9 "Or" and operator Exists, one tag.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Does not exist'],
-						['name' => 'Database', 'operator' => 'Does not exist']
+					'fields' => [
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Trigger for tag permissions Oracle',
-						'Test trigger with tag',
-						'Trigger for tag permissions MySQL',
-						'Test trigger to check tag filter on problem page'
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
 			],
+			// #10 "And/Or" and operator Exists, two tags.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Exists'],
+							['name' => 'Database', 'operator' => 'Exists']
+						]
 					],
-					'absent_problems' => [
-						'Inheritance trigger with tags'
+					'result' => [
+						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
 			],
+			// #11 "Or" and operator Exists, two tags.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
+					'fields' => [
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Inheritance trigger with tags'
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Exists'],
+							['name' => 'Database', 'operator' => 'Exists']
+						]
+					],
+					'result' => [
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page']
 					]
 				]
 			],
+			// #12 "And/Or" and operator Does not exist.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium'],
-						['name' => 'Beta', 'operator' => 'Does not equal', 'value' => 'b']
+					'fields' => [
+						'Host groups' => 'Zabbix servers',
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Inheritance trigger with tags',
-						'Second test trigger with tag priority',
-						'First test trigger with tag priority'
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Alpha', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority']
 					]
 				]
 			],
+			// #13 "Or" and operator Does not exist.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Service', 'operator' => 'Does not equal', 'value' => 'abc'],
-						['name' => 'Database', 'operator' => 'Does not equal']
+					'fields' => [
+						'Host groups' => 'Zabbix servers',
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Test trigger to check tag filter on problem page'
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Alpha', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority']
 					]
 				]
 			],
+			// #14 "And/Or" and operator Does not exist, two tags.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
+					'fields' => [
+						'Host groups' => ['Host group for tag permissions', 'Zabbix servers'],
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Third test trigger with tag priority',
-						'First test trigger with tag priority'
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Does not exist'],
+							['name' => 'Database', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority']
 					]
 				]
 			],
+			// #15 "Or" and operator Does not exist, two tags.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
+					'fields' => [
+						'Host groups' => ['Host group for tag permissions', 'Zabbix servers'],
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Third test trigger with tag priority',
-						'First test trigger with tag priority'
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Does not exist'],
+							['name' => 'Database', 'operator' => 'Does not exist']
+						]
+					],
+					'result' => [
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority']
 					]
 				]
 			],
+			// #16 "And/Or" and operator Does not equal.
 			[
 				[
-					'evaluation_type' => 'And/Or',
-					'tags' => [
-						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'],
-						['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
+					'fields' => [
+						'Show timeline' => false
 					],
-					'absent_problems' => [
-						'Third test trigger with tag priority',
-						'First test trigger with tag priority'
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium']
+						]
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month'],
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority'],
+						['Problem' => '4_trigger_Average'],
+						['Problem' => '3_trigger_Average'],
+						['Problem' => '2_trigger_Information'],
+						['Problem' => '1_trigger_Disaster'],
+						['Problem' => '1_trigger_High'],
+						['Problem' => '1_trigger_Average'],
+						['Problem' => '1_trigger_Warning'],
+						['Problem' => '1_trigger_Not_classified']
 					]
 				]
 			],
+			// #17 "And/Or" and operator Does not equal.
 			[
 				[
-					'evaluation_type' => 'Or',
-					'tags' => [
-						['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'],
-						['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
+					'fields' => [
+						'Host groups' => 'Host group for tag permissions'
 					],
-					'absent_problems' => [
-						'First test trigger with tag priority'
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Does not equal', 'value' => 'MySQL']
+						]
+					],
+					'result' => [
+						['Problem' => 'Trigger for tag permissions Oracle']
+					]
+				]
+			],
+			// #18 "And/Or" and operator Does not equal, two tags.
+			[
+				[
+					'fields' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'server', 'operator' => 'Does not equal', 'value' => 'selenium'],
+							['name' => 'Beta', 'operator' => 'Does not equal', 'value' => 'b']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority']
+					]
+				]
+			],
+			// #19 "Or" and operator Does not equal, two tags.
+			[
+				[
+					'fields' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Does not equal', 'value' => 'abc'],
+							['name' => 'Database', 'operator' => 'Does not equal']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Inheritance trigger with tags'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority']
+					],
+					'check_trigger_dependency' => [false, 'Trigger disabled with tags', false, false, false]
+				]
+			],
+			// #20 "And/Or" and operator Does not contain, one tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Inheritance trigger with tags'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority']
+
+					]
+				]
+			],
+			// #21 "Or" and operator Does not contain, one tag.
+			[
+				[
+					'fields' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Inheritance trigger with tags'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority']
+					]
+				]
+			],
+			// #22 "And/Or" and operator Does not contain, two tags.
+			[
+				[
+					'fields' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'] ,
+							['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Inheritance trigger with tags'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority']
+					]
+				]
+			],
+			// #23 "Or" and operator Does not contain, two tags.
+			[
+				[
+					'fields' => [
+						'Host groups' => ['Group to check triggers filtering', 'Zabbix servers'],
+						'Show timeline' => false
+					],
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Alpha', 'operator' => 'Does not contain', 'value' => 'a'] ,
+							['name' => 'Delta', 'operator' => 'Does not contain', 'value' => 'd']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page'],
+						['Problem' => 'Inheritance trigger with tags'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority']
+					]
+				]
+			],
+			// #24 Filter by all filter fields. Show tags = 3, Shortened.
+			[
+				[
+					'fields' => [
+						'Host groups' => 'Zabbix servers',
+						'Hosts' => 'ЗАББИКС Сервер',
+						'Triggers' => ['Test trigger to check tag filter on problem page', 'Test trigger with tag'],
+						'Problem' => 'Test trigger',
+						'High' => true,
+						'Average' => true,
+						'Show symptoms' => true,
+						'Acknowledgement status' => 'Unacknowledged',
+						'Host inventory' => [
+							'action' => USER_ACTION_UPDATE, 'index' => 0,
+							'field' => 'Location latitude', 'value' => '56.95387'
+						],
+						'Show tags' => 3,
+						'id:tag_name_format_0' => 'Shortened',
+						'Tag display priority' => 'Tag4',
+						'Show operational data' => 'Separately',
+						'Show details' => true
+					],
+					'Tags' => [
+						'Type' => 'And/Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Contains', 'value' => 'abc']
+						]
+					],
+					'result' => [
+						[
+							'' => '',
+							'Time' => '2020-10-23 15:33:48',
+							'' => '',
+							'' => '',
+							'Severity' => 'Average',
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'ЗАББИКС Сервер',
+							'Problem' => "Test trigger to check tag filter on problem page\navg(/Test host/proc.num,5m)>100",
+							'Operational data' => '*UNKNOWN*',
+							'Update' => 'Update',
+							'Actions' => '',
+							'Tags' => 'TagSer: abcDat'
+						]
+					],
+					'check_tags' => [
+						'Tag' => 'Tag4',
+						'Ser: abc' => 'Service: abc',
+						'Dat' => 'Database',
+						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+					]
+				]
+			],
+			// #25 Show tags = 2, Full.
+			[
+				[
+					'fields' => [
+						'Problem' => 'Test trigger',
+						'Average' => true,
+						'Show tags' => 2,
+						'id:tag_name_format_0' => 'Full'
+					],
+					'result' => [
+						[
+							'Problem' => 'Test trigger to check tag filter on problem page',
+							'Tags' => 'DatabaseService: abc'
+						]
+					],
+					'check_tags' => [
+						'Database' => 'Database',
+						'Service: abc' => 'Service: abc',
+						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+					]
+				]
+			],
+			// #26 Show tags = 1, None.
+			[
+				[
+					'fields' => [
+						'Problem' => 'Test trigger',
+						'Average' => true,
+						'Show tags' => 1,
+						'id:tag_name_format_0' => 'None'
+					],
+					'result' => [
+						[
+							'Problem' => 'Test trigger to check tag filter on problem page',
+							'Tags' => 'abc'
+						]
+					],
+					'check_tags' => [
+						'abc' => 'Service: abc',
+						'...' => 'DatabaseService: abcservice: abcdefTag4Tag5: 5'
+					]
+				]
+			],
+			// #27 Show tags = None. Tags column absence is being checked in _Layout.
+			[
+				[
+					'fields' => [
+						'Problem' => 'Test trigger',
+						'Average' => true,
+						'Show tags' => 'None'
+					],
+					'result' => [
+						[
+							'Problem' => 'Test trigger to check tag filter on problem page'
+						]
+					]
+				]
+			],
+			// #28 Tags priority check 1.
+			[
+				[
+					'fields' => [
+						'Problem' => 'test trigger with tag priority',
+						'Show tags' => 3,
+						'Tag display priority' => 'Kappa'
+					],
+					'result' => [
+						[
+							'Problem' => 'Fourth test trigger with tag priority',
+							'Tags' => 'Delta: tEta: eGamma: g'
+						],
+						[
+							'Problem' => 'Third test trigger with tag priority',
+							'Tags' => 'Kappa: kAlpha: aIota: i'
+						],
+						[
+							'Problem' => 'Second test trigger with tag priority',
+							'Tags' => 'Beta: bEpsilon: eEta: e'
+						],
+						[
+							'Problem' => 'First test trigger with tag priority',
+							'Tags' => 'Alpha: aBeta: bDelta: d'
+						]
+					]
+				]
+			],
+			// #29 Tags priority check 2.
+			[
+				[
+					'fields' => [
+						'Problem' => 'test trigger with tag priority',
+						'Show tags' => 3,
+						'Tag display priority' => 'Kappa, Beta'
+					],
+					'result' => [
+						[
+							'Problem' => 'Fourth test trigger with tag priority',
+							'Tags' => 'Delta: tEta: eGamma: g'
+						],
+						[
+							'Problem' => 'Third test trigger with tag priority',
+							'Tags' => 'Kappa: kAlpha: aIota: i'
+						],
+						[
+							'Problem' => 'Second test trigger with tag priority',
+							'Tags' => 'Beta: bEpsilon: eEta: e'
+						],
+						[
+							'Problem' => 'First test trigger with tag priority',
+							'Tags' => 'Beta: bAlpha: aDelta: d'
+						]
+					]
+				]
+			],
+			// #30 Tags priority check 3.
+			[
+				[
+					'fields' => [
+						'Problem' => 'test trigger with tag priority',
+						'Show tags' => 3,
+						'Tag display priority' => 'Gamma, Kappa, Beta'
+					],
+					'result' => [
+						[
+							'Problem' => 'Fourth test trigger with tag priority',
+							'Tags' => 'Gamma: gDelta: tEta: e'
+						],
+						[
+							'Problem' => 'Third test trigger with tag priority',
+							'Tags' => 'Kappa: kAlpha: aIota: i'
+						],
+						[
+							'Problem' => 'Second test trigger with tag priority',
+							'Tags' => 'Beta: bEpsilon: eEta: e'
+						],
+						[
+							'Problem' => 'First test trigger with tag priority',
+							'Tags' => 'Gamma: gBeta: bAlpha: a'
+						]
+					]
+				]
+			],
+			// #31 Test result with 2 tags, and then result after removing one tag.
+			[
+				[
+					'Tags' => [
+						'Type' => 'Or',
+						'tags' => [
+							['name' => 'Service', 'operator' => 'Equals', 'value' => 'abc'],
+							['name' => 'service', 'operator' => 'Contains', 'value' => 'abc']
+						]
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Test trigger to check tag filter on problem page']
+					],
+					'removed_tag_result' => [
+						['Problem' => 'Test trigger to check tag filter on problem page']
+					]
+				]
+			],
+			// #32 Suppressed problem not shown.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for suppression',
+						'Show suppressed problems' => false
+					],
+					'result' => []
+				]
+			],
+			// #33 Suppressed problem is shown.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'Host for suppression',
+						'Show suppressed problems' => true
+					],
+					'result' => [
+						[
+							'Severity' => 'Average',
+							'Recovery time' => '',
+							'Status' => 'PROBLEM',
+							'Info' => '',
+							'Host' => 'Host for suppression',
+							'Problem' => 'Trigger_for_suppression'
+						]
+					],
+					'check_suppressed' => "Suppressed till: 12:17\nMaintenance: Maintenance for suppression test"
+				]
+			],
+			// #34 Show timeline.
+			[
+				[
+					'fields' => [
+						'Hosts' => 'ЗАББИКС Сервер',
+						'Warning' => true
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['' => 'October'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority']
+					],
+					'table_timeline' => true
+				]
+			],
+			// #35 Age filter - 999.
+			[
+				[
+					'fields' => [
+						'id:age_state_0' => true,
+						'name:age' => 999,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
+					]
+				]
+			],
+			// #36 Age filter - 0.
+			[
+				[
+					'fields' => [
+						'id:age_state_0' => true,
+						'name:age' => 0
+					],
+					'result' => []
+				]
+			],
+			// #37 Age filter - 1.
+			[
+				[
+					'fields' => [
+						'id:age_state_0' => true,
+						'name:age' => 10,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => 'Trigger for Age problem 1 day']
+					]
+				]
+			],
+			// #38 History.
+			[
+				[
+					'fields' => [
+						'Show' => 'History'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL']
+					]
+				]
+			],
+			// #39 Problems.
+			[
+				[
+					'fields' => [
+						'Show' => 'Problems',
+						'Not classified' => true,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Trigger for tag permissions Oracle'],
+						['Problem' => 'Trigger for tag permissions MySQL'],
+						['Problem' => '1_trigger_Not_classified']
+					]
+				]
+			],
+			// #40 Unacknowledged.
+			[
+				[
+					'fields' => [
+						'Severity' => 'Warning',
+						'Acknowledgement status' => 'Unacknowledged',
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Test trigger with tag'],
+						['Problem' => 'Fourth test trigger with tag priority'],
+						['Problem' => 'Third test trigger with tag priority'],
+						['Problem' => 'Second test trigger with tag priority'],
+						['Problem' => 'First test trigger with tag priority'],
+						['Problem' => '1_trigger_Warning']
+					]
+				]
+			],
+			// #41 Acknowledged.
+			[
+				[
+					'fields' => [
+						'Acknowledgement status' => 'Acknowledged',
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => '4_trigger_Average'],
+						['Problem' => '3_trigger_Average'],
+						['Problem' => '2_trigger_Information']
+					]
+				]
+			],
+			// #42 Acknowledged by me.
+			[
+				[
+					'fields' => [
+						'Acknowledgement status' => 'Acknowledged',
+						'id:acknowledged_by_me_0' => true,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => '3_trigger_Average'],
+						['Problem' => '2_trigger_Information']
+					]
+				]
+			],
+			// #43 Compact view.
+			[
+				[
+					'fields' => [
+						'Problem' => '1_trigger_Disaster',
+						'Compact view' => true
+					],
+					'result' => [
+						['Problem' => '1_trigger_Disaster']
+					]
+				]
+			],
+			// #44 Highlight whole row.
+			[
+				[
+					'fields' => [
+						'Problem' => '1_trigger_Average',
+						'Compact view' => true,
+						'Highlight whole row' => true
+					],
+					'result' => [
+						['Problem' => '1_trigger_Average']
+					]
+				]
+			],
+			// #45 Time selector 1 day.
+			[
+				[
+					'fields' => [
+						'Show' => 'History',
+						'Hosts' => 'Host for Problems Page',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'id:from' => 'now-1d',
+						'id:to' => 'now'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem']
+					]
+				]
+			],
+			// #46 Time selector 2 weeks.
+			[
+				[
+					'fields' => [
+						'Show' => 'History',
+						'Hosts' => 'Host for Problems Page',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'id:from' => 'now-2w',
+						'id:to' => 'now'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day']
+					]
+				]
+			],
+			// #47 Time selector Last 1 year.
+			[
+				[
+					'fields' => [
+						'Show' => 'History',
+						'Hosts' => 'Host for Problems Page',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'link' => 'Last 1 year'
+					],
+					'result' => [
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
 				]
 			]
@@ -382,319 +1491,265 @@ class testPageProblems extends CLegacyWebTest {
 	}
 
 	/**
-	 * @dataProvider getFilterByTagsExceptContainsEqualsData
+	 * @dataProvider getFilterData
 	 */
-	public function testPageProblems_FilterByTagsExceptContainsEquals($data) {
-		$this->page->login()->open('zabbix.php?show_timeline=0&action=problem.view&sort=name&sortorder=ASC');
-		$form = $this->query('name:zbx_filter')->waitUntilPresent()->asForm()->one();
-		$form->fill(['id:evaltype_0' => $data['evaluation_type']]);
-		$this->setTags($data['tags']);
-		$table = $this->query('class:list-table')->waitUntilPresent()->asTable()->one();
-		$this->query('name:filter_apply')->one()->click();
-		$table->waitUntilReloaded();
+	public function testPageProblems_Filter($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 
-		// We remove from the result list templates that is not displayed there.
-		if (array_key_exists('absent_problems', $data)) {
-			$filtering = $this->getTableColumnData('Problem');
-			foreach ($data['absent_problems'] as $absence) {
-				if (($key = array_search($absence, $filtering))) {
-					unset($filtering[$key]);
-				}
+		if (array_key_exists('Tags', $data)) {
+			$form->fill(['id:evaltype_0' => $data['Tags']['Type']]);
+			$this->setTags($data['Tags']['tags']);
+		}
+
+		if (array_key_exists('fields', $data)) {
+			$form->fill($data['fields']);
+		}
+
+		$form->submit();
+
+		if (array_key_exists('time_selector', $data)) {
+			$this->query('xpath://a[contains(@class, "zi-clock")]')->waitUntilClickable()->one()->click();
+			$this->query('class:time-quick-range')->waitUntilVisible()->one();
+			$form = $this->query('class:filter-container')->asForm(['normalized' => true])->one();
+			$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+			if (CTestArrayHelper::get($data['time_selector'], 'link')) {
+				$form->query('link', $data['time_selector']['link'])->waitUntilClickable()->one()->click();
 			}
-			$filtering = array_values($filtering);
-			$this->assertTableDataColumn($filtering, 'Problem');
+			else {
+				$form->fill($data['time_selector']);
+			}
+
+			$this->query('button:Apply')->one()->click();
+		}
+
+		$table->waitUntilReloaded();
+		$this->assertTableData($data['result']);
+
+		// Check "Compact view" and "Highlight whole row" filter checkboxes.
+		$compact_selector = 'xpath://table[contains(@class, "compact-view")]';
+		$highlight_selector = 'xpath://tr[contains(@class, "-bg")]';
+		if (array_key_exists('fields', $data) && CTestArrayHelper::get($data['fields'], 'Compact view', false)) {
+			$this->assertTrue($this->query($compact_selector)->exists());
+
+			$this->assertEquals(CTestArrayHelper::get($data['fields'], 'Highlight whole row', false),
+					$this->query($highlight_selector)->exists()
+			);
 		}
 		else {
-			$this->assertTableDataColumn($data['expected_problems'], 'Problem');
+			foreach ([$compact_selector, $highlight_selector] as $selector) {
+				$this->assertFalse($this->query($selector)->exists());
+			}
 		}
 
-		// Reset filter due to not influence further tests.
-		$this->query('name:filter_reset')->one()->click();
+		// If Show timeline = true, it adds one more row to the result table.
+		$this->assertTableStats(CTestArrayHelper::get($data, 'table_timeline')
+			? count($data['result']) - 1
+			: count($data['result'])
+		);
+
+		$dialog_selector = 'xpath://div[@class="overlay-dialogue"]';
+		if (array_key_exists('check_trigger_description', $data)) {
+			foreach ($data['check_trigger_description'] as $i => $description) {
+				$cell = $table->getRow($i)->getColumn('Problem');
+
+				if (!$description) {
+					$this->assertFalse($cell->query('xpath:.//button[contains(@class, "zi-alert-with-content")]')->exists());
+				}
+				else {
+					$cell->query('tag:button')->waitUntilClickable()->one()->click();
+					$description_dialog = $this->query($dialog_selector)->waitUntilVisible()->one();
+					$this->assertEquals($description, $description_dialog->getText());
+					$description_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+					$description_dialog->waitUntilNotPresent();
+				}
+			}
+		}
+
+		if (array_key_exists('check_actions', $data)) {
+			foreach ($data['check_actions'] as $i => $action) {
+				$cell = $table->getRow($i)->getColumn('Actions');
+				$tick = $cell->query('xpath:.//span[@title="Acknowledged"]');
+
+				if (!$action) {
+					$this->assertFalse($tick->exists());
+				}
+				else {
+					$this->assertTrue($tick->exists());
+					$cell->query('tag:button')->waitUntilClickable()->one()->forceClick();
+					$action_dialog = $this->query($dialog_selector)->waitUntilVisible()->one();
+					$this->assertTableData($action, 'xpath://div[@class="overlay-dialogue"]//table');
+					$action_dialog->query('xpath:.//button[@title="Close"]')->waitUntilClickable()->one()->click();
+					$action_dialog->waitUntilNotPresent();
+				}
+			}
+		}
+
+		if (array_key_exists('check_trigger_dependency', $data)) {
+			foreach ($data['check_trigger_dependency'] as $i => $dependency) {
+				$arrow = $table->getRow($i)->getColumn('Problem')->query('tag:button');
+
+				if (!$dependency) {
+					$this->assertFalse($arrow->exists());
+				}
+				else {
+					$arrow->one()->click();
+					$dependency_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
+					$this->assertEquals("Depends on\n".$dependency, $dependency_dialog->getText());
+					$dependency_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
+					$dependency_dialog->waitUntilNotPresent();
+				}
+			}
+		}
+
+		if (array_key_exists('check_tags', $data)) {
+			foreach ($data['check_tags'] as $tag => $text) {
+				$selector = ($tag === '...')
+					? 'xpath:.//button[@class="btn-icon zi-more"]'
+					: 'xpath:.//span[text()='.CXPathHelper::escapeQuotes($tag).']';
+				$table->getRow(0)->getColumn('Tags')->query($selector)->one()->click();
+				$popup = $this->query($dialog_selector)->one()->waitUntilVisible();
+				$this->assertEquals($text, $popup->getText());
+				$popup->query('xpath:.//button[@title="Close"]')->one()->click();
+				$popup->waitUntilNotPresent();
+			}
+		}
+
+		if (array_key_exists('removed_tag_result', $data)) {
+			$form->query('name:tags[0][remove]')->one()->click();
+			$form->submit();
+			$table->waitUntilReloaded();
+			$this->assertTableData($data['removed_tag_result']);
+			$this->assertTableStats(count($data['removed_tag_result']));
+		}
+
+		if (array_key_exists('check_suppressed', $data)) {
+			$table->getRow(0)->getColumn('Info')->query('tag:button')->one()->click();
+			$suppressed_dialog = $this->query($dialog_selector)->one()->waitUntilVisible();
+			$this->assertEquals($data['check_suppressed'], $suppressed_dialog->getText());
+			$suppressed_dialog->query('xpath:.//button[@title="Close"]')->one()->click();
+			$suppressed_dialog->waitUntilNotPresent();
+		}
 	}
 
-	/**
-	 * Search by all options in filter
-	 */
-	public function testPageProblems_FilterByAllOptions() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
+	public function testPageProblems_ResetButton() {
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1');
+		$form = $this->query('name:zbx_filter')->asForm()->waitUntilVisible()->one();
+		$table = $this->query('class:list-table')->asTable()->one();
 
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
-		$form = $this->query('id:tabfilter_0')->asForm()->one();
-		$this->zbxTestClickButtonText('Reset');
-		$form->waitUntilReloaded();
-
-		// Select host group
-		$this->zbxTestClickButtonMultiselect('groupids_0');
-		$this->zbxTestLaunchOverlayDialog('Host groups');
-		$this->zbxTestCheckboxSelect('item_4');
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
-
-		// Select host
-		$this->zbxTestClickButtonMultiselect('hostids_0');
-		$this->zbxTestLaunchOverlayDialog('Hosts');
-		$this->zbxTestClickWait('spanid10084');
-
-		// Select trigger
-		$this->zbxTestClickButtonMultiselect('triggerids_0');
-		$this->zbxTestLaunchOverlayDialog('Triggers');
-		$this->zbxTestCheckboxSelect("item_'99250'");
-		$this->zbxTestCheckboxSelect("item_'99251'");
-		$this->zbxTestClickXpath('//div[@class="overlay-dialogue-footer"]//button[text()="Select"]');
-
-		// Type problem name
-		$this->zbxTestInputType('name_0', 'Test trigger');
-
-		// Select average, high and disaster severities
-		$this->query('name:zbx_filter')->asForm()->one()->getField('Severity')->fill(['Average', 'High', 'Disaster']);
-
-		// Add tag
-		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('Service');
-		$form->query('name:tags[0][value]')->one()->clear()->sendKeys('abc');
-		// Check Acknowledgement status.
-		$this->zbxTestCheckboxSelect('acknowledgement_status_1_0');
-		// Check Show details
-		$this->zbxTestCheckboxSelect('details_0');
-		// Apply filter and check result
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one();
-		$this->query('name:filter_apply')->one()->click();
+		// Check table contents before filtering. Set false "Show timeline" because it makes table complicated.
+		$form->fill(['Show timeline' => false]);
+		$form->submit();
 		$table->waitUntilReloaded();
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
-		$this->zbxTestClickButtonText('Reset');
+		$start_rows_count = $table->getRows()->count();
+		$this->assertTableStats($start_rows_count);
+		$start_contents = $this->getTableColumnData('Problem');
+
+		// Filter some problems.
+		$form->invalidate();
+		$form->fill(['Hosts' => '3_Host_to_check_Monitoring_Overview']);
+		$form->submit();
+		$table->waitUntilReloaded();
+
+		// Check that filtered count matches expected.
+		$this->assertEquals(1, $table->getRows()->count());
+		$this->assertTableStats(1);
+
+		// Checking that filtered Problem matches expected.
+		$this->assertTableDataColumn(['3_trigger_Average'], 'Problem');
+
+		// After pressing reset button, check that previous problems are displayed again.
+		$this->query('button:Reset')->one()->click();
+		$table->waitUntilReloaded();
+
+		$form->fill(['Show timeline' => false]);
+		$form->submit();
+		$table->waitUntilReloaded();
+
+		$reset_count = $table->getRows()->count();
+		$this->assertEquals($start_rows_count, $reset_count);
+		$this->assertTableStats($reset_count);
+		$this->assertEquals($start_contents, $this->getTableColumnData('Problem'));
 	}
 
-	public function testPageProblems_ShowTags() {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
-		$form = $this->query('id:tabfilter_0')->asForm()->one()->waitUntilVisible();
-		$result_form = $this->query('xpath://form[@name="problem"]')->one();
-		$this->zbxTestClickButtonText('Reset');
-		$result_form->waitUntilReloaded();
-
-		// Check Show tags NONE
-		$form->query('name:tags[0][tag]')->one()->clear()->sendKeys('service');
-		$this->zbxTestClickXpath('//label[@for="show_tags_00"]');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		// Check result
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Test trigger to check tag filter on problem page');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
-		$this->zbxTestAssertElementNotPresentXpath('//thead/tr/th[text()="Tags"]');
-
-		// Check Show tags 1
-		$this->zbxTestClickXpath('//label[@for="show_tags_10"]');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-
-		// Check Tags column in result
-		$this->zbxTestAssertVisibleXpath('//thead/tr/th[text()="Tags"]');
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
-		$this->zbxTestTextNotVisible('Database');
-		$this->zbxTestTextNotVisible('Service: abc');
-		$this->zbxTestTextNotVisible('Tag4');
-		$this->zbxTestTextNotVisible('Tag5: 5');
-
-		// Check Show tags 2
-		$this->zbxTestClickXpath('//label[@for="show_tags_20"]');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		// Check tags in result
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
-		$this->zbxTestTextNotVisible('Service: abc');
-		$this->zbxTestTextNotVisible('Tag4');
-		$this->zbxTestTextNotVisible('Tag5: 5');
-		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button['.CXPathHelper::fromClass('zi-more').']');
-
-		// Check Show tags 3
-		$this->zbxTestClickXpath('//label[@for="show_tags_30"]');
-		$this->query('name:filter_apply')->one()->click();
-		$result_form->waitUntilReloaded();
-		// Check tags in result
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'service: abcdef');
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[2]', 'Database');
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[3]', 'Service: abc');
-		$this->zbxTestTextNotVisible('Tag4');
-		$this->zbxTestTextNotVisible('Tag5: 5');
-		// Check Show More tags hint button
-		$this->zbxTestAssertVisibleXpath('//tr/td[14]/button['.CXPathHelper::fromClass('zi-more').']');
-	}
-
-	public function getTagPriorityData() {
+	public static function getCauseSymptomsData() {
 		return [
-			// Check tag priority.
+			// #0 Show symptoms false.
 			[
 				[
-					'tag_priority' => 'Kappa',
-					'show_tags' => '3',
-					'sorting' => [
-						'First test trigger with tag priority' => ['Alpha: a', 'Beta: b', 'Delta: d'],
-						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
-						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
-						'Fourth test trigger with tag priority' => ['Delta: t', 'Eta: e', 'Gamma: g']
+					'fields' => [
+						'Hosts' => 'Host for Problems Page',
+						'Show symptoms' => false,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Problem trap>100 [Cause]'],
+						['Problem' => 'Problem trap>10 [Symptom]'],
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
 				]
 			],
+			// #1 Show symptoms true.
 			[
 				[
-					'tag_priority' => 'Kappa, Beta',
-					'show_tags' => '3',
-					'sorting' => [
-						'First test trigger with tag priority' => ['Beta: b', 'Alpha: a', 'Delta: d'],
-						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
-						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
-						'Fourth test trigger with tag priority' => ['Delta: t', 'Eta: e', 'Gamma: g']
+					'fields' => [
+						'Hosts' => 'Host for Problems Page',
+						'Show symptoms' => true,
+						'Show timeline' => false
+					],
+					'result' => [
+						['Problem' => 'Problem trap>100 [Cause]'],
+						['Problem' => 'Problem trap>10 [Symptom]'],
+						['Problem' => 'Problem trap>10 [Symptom]'],
+						['Problem' => 'Trigger for Age problem'],
+						['Problem' => 'Trigger for Age problem 1 day'],
+						['Problem' => 'Trigger for Age problem 1 month']
 					]
-				]
-			],
-			[
-				[
-					'tag_priority' => 'Gamma, Kappa, Beta',
-					'show_tags' => '3',
-					'sorting' => [
-						'First test trigger with tag priority' => ['Gamma: g','Beta: b', 'Alpha: a'],
-						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e', 'Eta: e'],
-						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a', 'Iota: i'],
-						'Fourth test trigger with tag priority' => ['Gamma: g','Delta: t', 'Eta: e']
-					]
-				]
-			],
-			// Check tag name format.
-			[
-				[
-					'tag_priority' => 'Gamma, Kappa, Beta',
-					'show_tags' => '3',
-					'tag_name_format' => 'Shortened',
-					'sorting' => [
-						'First test trigger with tag priority' => ['Gam: g','Bet: b', 'Alp: a'],
-						'Second test trigger with tag priority' => ['Bet: b', 'Eps: e', 'Eta: e'],
-						'Third test trigger with tag priority' => ['Kap: k', 'Alp: a', 'Iot: i'],
-						'Fourth test trigger with tag priority' => ['Gam: g','Del: t', 'Eta: e']
-					]
-				]
-			],
-			[
-				[
-					'tag_priority' => 'Gamma, Kappa, Beta',
-					'show_tags' => '3',
-					'tag_name_format' => 'None',
-					'sorting' => [
-						'First test trigger with tag priority' => ['g','b', 'a'],
-						'Second test trigger with tag priority' => ['b', 'e', 'e'],
-						'Third test trigger with tag priority' => ['k', 'a', 'i'],
-						'Fourth test trigger with tag priority' => ['g','t', 'e']
-					]
-				]
-			],
-			// Check tags count.
-			[
-				[
-					'tag_priority' => 'Kappa',
-					'show_tags' => '2',
-					'sorting' => [
-						'First test trigger with tag priority' => ['Alpha: a', 'Beta: b'],
-						'Second test trigger with tag priority' => ['Beta: b', 'Epsilon: e'],
-						'Third test trigger with tag priority' => ['Kappa: k', 'Alpha: a'],
-						'Fourth test trigger with tag priority' => ['Delta: t', 'Eta: e']
-					]
-				]
-			],
-			[
-				[
-					'tag_priority' => 'Kappa',
-					'show_tags' => '1',
-					'sorting' => [
-						'First test trigger with tag priority' => ['Alpha: a'],
-						'Second test trigger with tag priority' => ['Beta: b'],
-						'Third test trigger with tag priority' => ['Kappa: k'],
-						'Fourth test trigger with tag priority' => ['Delta: t']
-					]
-				]
-			],
-			[
-				[
-					'show_tags' => '0'
 				]
 			]
 		];
 	}
 
 	/**
-	 * @dataProvider getTagPriorityData
+	 * @onBeforeOnce prepareCauseAndSymptoms
+	 *
+	 * @dataProvider getCauseSymptomsData
 	 */
-	public function testPageProblems_TagPriority($data) {
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$table = $this->query('xpath://form[@name="problem"]')->one();
-		$this->zbxTestClickButtonText('Reset');
+	public function testPageProblems_FilterCauseSymptoms($data) {
+		$this->page->login()->open('zabbix.php?action=problem.view&filter_reset=1&sort=clock&sortorder=ASC');
+		$form = CFilterElement::find()->one()->getForm();
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
+
+		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = true.
+		$this->assertEquals(['', '', '', 'Time', '', '', 'Severity', 'Recovery time', 'Status', 'Info',
+				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
+		);
+
+		$form->fill($data['fields']);
+		$form->submit();
 		$table->waitUntilReloaded();
-		$this->zbxTestInputType('name_0', 'trigger with tag priority');
+		$this->assertTableData($data['result']);
 
-		if (array_key_exists('show_tags', $data)) {
-			$this->zbxTestClickXpath('//label[@for="show_tags_'.$data['show_tags'].'0"]');
+		// Check headers when Cause and Symptoms problems present in table and 'Show timeline' = false.
+		$this->assertEquals(['', '', '', 'Time', 'Severity', 'Recovery time', 'Status', 'Info',
+				'Host', 'Problem', 'Duration', 'Update', 'Actions', 'Tags'], $table->getHeadersText()
+		);
+
+		$symptom_xpath = 'xpath:.//span[(@title="Symptom")]';
+
+		// For Cause problem arrow icon is not present at all.
+		$this->assertFalse($table->getRow(0)->query($symptom_xpath)->exists());
+
+		// For both cases Symptom arrow icon is not visible for the collapsed problem.
+		$this->assertFalse($table->getRow(1)->query($symptom_xpath)->one()->isVisible());
+
+		// When Symptom is present in the table it is marked with Symptom arrow icon.
+		if ($data['fields']['Show symptoms']) {
+			$this->assertTrue($table->getRow(2)->query($symptom_xpath)->one()->isVisible());
 		}
-
-		if (array_key_exists('tag_priority', $data)) {
-			$this->zbxTestInputType('tag_priority_0', $data['tag_priority']);
-		}
-
-		if (array_key_exists('tag_name_format', $data)) {
-			$this->zbxTestClickXpath('//ul[@id="tag_name_format_0"]//label[text()="'.$data['tag_name_format'].'"]');
-		}
-
-		$this->query('name:filter_apply')->one()->click();
-		$table->waitUntilReloaded();
-
-		// Check tag priority sorting.
-		if (array_key_exists('sorting', $data)) {
-			foreach ($data['sorting'] as $problem => $tags) {
-				$tags_priority = [];
-				$get_tags_rows = $this->webDriver->findElements(WebDriverBy::xpath('//a[text()="'.$problem.'"]/../../td/span[@class="tag"]'));
-				foreach ($get_tags_rows as $row) {
-					$tags_priority[] = $row->getText();
-				}
-				$this->assertEquals($tags, $tags_priority);
-			}
-		}
-
-		if ($data['show_tags'] === '0') {
-			$this->zbxTestAssertElementNotPresentXpath('//th[text()="Tags"]');
-			$this->zbxTestAssertElementPresentXpath('//input[@id="tag_priority_0"][@disabled]');
-			$this->zbxTestAssertElementPresentXpath('//input[contains(@id, "tag_name_format_")][@disabled]');
-		}
-	}
-
-	public function testPageProblems_SuppressedProblems() {
-		CMultiselectElement::setDefaultFillMode(CMultiselectElement::MODE_SELECT);
-
-		$this->zbxTestLogin('zabbix.php?action=problem.view');
-		$this->zbxTestCheckHeader('Problems');
-		$result_form = $this->query('xpath://form[@name="problem"]')->one();
-		$this->zbxTestClickButtonText('Reset');
-		$result_form->waitUntilReloaded();
-
-		$this->zbxTestClickButtonMultiselect('hostids_0');
-		$this->zbxTestLaunchOverlayDialog('Hosts');
-		COverlayDialogElement::find()->one()->waitUntilReady()->setDataContext('Host group for suppression');
-
-		$this->zbxTestClickLinkTextWait('Host for suppression');
-		COverlayDialogElement::ensureNotPresent();
-		$this->query('name:filter_apply')->one()->waitUntilClickable()->click();
-		$result_form->waitUntilReloaded();
-
-		$this->zbxTestTextNotPresent('Trigger_for_suppression');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 0 of 0 found');
-
-		$this->zbxTestCheckboxSelect('show_suppressed_0');
-		$this->query('name:filter_apply')->one()->click();
-
-		$this->zbxTestAssertElementText('//tbody/tr/td[10]/a', 'Trigger_for_suppression');
-		$this->zbxTestAssertElementText('//tbody/tr/td[14]/span[1]', 'SupTag: A');
-		$this->zbxTestAssertElementText('//div[@class="table-stats"]', 'Displaying 1 of 1 found');
-
-		// Click on suppression icon and check text in hintbox.
-		$this->zbxTestClickXpathWait('//tbody/tr/td[8]/div/button['.CXPathHelper::fromClass('zi-eye-off').']');
-		$this->zbxTestAssertElementText('//div[@data-hintboxid]', 'Suppressed till: 12:17 Maintenance: Maintenance for suppression test');
 	}
 }

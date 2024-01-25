@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -96,8 +96,7 @@ class CControllerDashboardUpdate extends CController {
 			$db_dashboards = API::Dashboard()->get([
 				'output' => ['dashboardid'],
 				'selectPages' => ['widgets'],
-				'dashboardids' => $this->getInput('dashboardid'),
-				'editable' => true
+				'dashboardids' => $this->getInput('dashboardid')
 			]);
 
 			if (!$db_dashboards) {

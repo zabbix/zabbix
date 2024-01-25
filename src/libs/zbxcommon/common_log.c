@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,15 +28,17 @@
 static int			log_level = LOG_LEVEL_WARNING;
 static ZBX_THREAD_LOCAL int	*plog_level = &log_level;
 static zbx_log_func_t		log_func_callback = NULL;
+static zbx_get_progname_f	get_progname_cb = NULL;
 
 #define LOG_COMPONENT_NAME_LEN	64
 static ZBX_THREAD_LOCAL int	log_level_change = LOG_LEVEL_UNCHANGED;
 static ZBX_THREAD_LOCAL char	log_component_name[LOG_COMPONENT_NAME_LEN + 1];
 #undef LOG_COMPONENT_NAME_LEN
 
-void	zbx_init_library_common(zbx_log_func_t log_func)
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname)
 {
 	log_func_callback = log_func;
+	get_progname_cb = get_progname;
 }
 
 void	zbx_log_handle(int level, const char *fmt, ...)
@@ -211,3 +213,24 @@ void	zbx_change_component_log_level(zbx_log_component_t *component, int directio
 	}
 }
 #endif
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: Print error text to the stderr                                    *
+ *                                                                            *
+ * Parameters: fmt - format of message                                        *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_error(const char *fmt, ...)
+{
+	va_list	args;
+
+	va_start(args, fmt);
+
+	fprintf(stderr, "%s [%li]: ", (NULL != get_progname_cb) ? get_progname_cb() : "", zbx_get_thread_id());
+	vfprintf(stderr, fmt, args);
+	fprintf(stderr, "\n");
+	fflush(stderr);
+
+	va_end(args);
+}

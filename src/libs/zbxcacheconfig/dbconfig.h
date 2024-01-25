@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -543,6 +543,7 @@ typedef struct
 	unsigned char	reset_availability;
 	/* item statistics per interface */
 	int		items_num;
+	int		version;
 }
 ZBX_DC_INTERFACE;
 
@@ -656,14 +657,16 @@ typedef struct
 }
 zbx_dc_action_condition_t;
 
+ZBX_PTR_VECTOR_DECL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
+
 typedef struct
 {
-	zbx_uint64_t		actionid;
-	const char		*formula;
-	unsigned char		eventsource;
-	unsigned char		evaltype;
-	unsigned char		opflags;
-	zbx_vector_ptr_t	conditions;
+	zbx_uint64_t				actionid;
+	const char				*formula;
+	unsigned char				eventsource;
+	unsigned char				evaltype;
+	unsigned char				opflags;
+	zbx_vector_dc_action_condition_ptr_t	conditions;
 }
 zbx_dc_action_t;
 
@@ -896,6 +899,8 @@ typedef struct
 	int				status;
 	int				tags_evaltype;
 	zbx_vector_dc_connector_tag_t	tags;
+	int				item_value_type;
+	const char			*attempt_interval;
 }
 zbx_dc_connector_t;
 
@@ -1062,10 +1067,10 @@ size_t	zbx_maintenance_update_flags_num(void);
 char	*dc_expand_user_macros_in_expression(const char *text, zbx_uint64_t *hostids, int hostids_num);
 char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t itemid);
 char	*dc_expand_user_macros_in_calcitem(const char *formula, zbx_uint64_t hostid);
+char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env);
 
-char	*dc_expand_user_macros(const char *text, const zbx_uint64_t *hostids, int hostids_num);
+void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *src_interface);
 
-void		DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *src_interface);
 ZBX_DC_HOST	*DCfind_host(const char *host);
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key);
 void		DCget_function(zbx_dc_function_t *dst_function, const ZBX_DC_FUNCTION *src_function);

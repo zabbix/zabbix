@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -552,6 +552,8 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 
 		if (0 != (token.type & flags))
 		{
+			char	*m_ptr;
+
 			switch (token.type)
 			{
 				case ZBX_TOKEN_LLD_MACRO:
@@ -565,12 +567,15 @@ int	zbx_substitute_lld_macros(char **data, const struct zbx_json_parse *jp_row,
 							max_error_len);
 					pos = token.loc.r;
 					break;
+				case ZBX_TOKEN_USER_FUNC_MACRO:
 				case ZBX_TOKEN_FUNC_MACRO:
-					if (NULL != func_macro_in_list(*data, &token.data.func_macro, NULL))
+					if (NULL != (m_ptr = func_get_macro_from_func(*data, &token.data.func_macro,
+							NULL)))
 					{
 						ret = substitute_func_macro(data, &token, jp_row, lld_macro_paths,
 								error, max_error_len);
 						pos = token.loc.r;
+						zbx_free(m_ptr);
 					}
 					break;
 				case ZBX_TOKEN_EXPRESSION_MACRO:
@@ -673,7 +678,7 @@ int	zbx_substitute_function_lld_param(const char *e, size_t len, unsigned char k
 		else
 			zbx_substitute_lld_macros(&param, jp_row, lld_macro_paths, ZBX_MACRO_ANY, NULL, 0);
 
-		if (SUCCEED != zbx_function_param_quote(&param, quoted))
+		if (SUCCEED != zbx_function_param_quote(&param, quoted, ZBX_BACKSLASH_ESC_ON))
 		{
 			zbx_snprintf(error, max_error_len, "Cannot quote parameter \"%s\"", param);
 			ret = FAIL;

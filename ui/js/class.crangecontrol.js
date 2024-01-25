@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -104,7 +104,17 @@ jQuery(function ($) {
 					.insertBefore($input);
 
 				$input
-					.change(function() {$range.val(this.value); updateHandler();})
+					.change(function() {
+						const value = Number(this.value);
+
+						if (Number.isInteger(value)) {
+							$range[0].value = value;
+							updateHandler();
+						}
+						else {
+							this.value = $range[0].value;
+						}
+					})
 					.appendTo($control);
 			});
 		},

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1589,6 +1589,35 @@ static int	dbsync_compare_interface(const ZBX_DC_INTERFACE *interface, const zbx
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: applies necessary preprocessing before row is compared/used       *
+ *                                                                            *
+ * Parameter: row - [IN] the row to preprocess                                *
+ *                                                                            *
+ * Return value: the preprocessed row                                         *
+ *                                                                            *
+ * Comments: The row preprocessing can be used to expand user macros in       *
+ *           some columns.                                                    *
+ *                                                                            *
+ ******************************************************************************/
+static char	**dbsync_interface_preproc_row(char **row)
+{
+	zbx_uint64_t	hostid;
+
+	/* get associated host identifier */
+	ZBX_STR2UINT64(hostid, row[1]);
+
+	/* expand user macros */
+	if (NULL != strstr(row[5], "{$"))
+		row[5] = dc_expand_user_and_func_macros_dyn(row[5], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+	if (NULL != strstr(row[6], "{$"))
+		row[6] = dc_expand_user_and_func_macros_dyn(row[6], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+
+	return row;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: compares interfaces table with cached configuration data          *
  *                                                                            *
  * Parameter: sync - [OUT] the changeset                                      *
@@ -1617,7 +1646,7 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 		return FAIL;
 	}
 
-	dbsync_prepare(sync, 23, NULL);
+	dbsync_prepare(sync, 23, dbsync_interface_preproc_row);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{
@@ -1631,17 +1660,20 @@ int	zbx_dbsync_compare_interfaces(zbx_dbsync_t *sync)
 	while (NULL != (dbrow = zbx_db_fetch(result)))
 	{
 		unsigned char	tag = ZBX_DBSYNC_ROW_NONE;
+		char		**row;
 
 		ZBX_STR2UINT64(rowid, dbrow[0]);
 		zbx_hashset_insert(&ids, &rowid, sizeof(rowid));
 
+		row = dbsync_preproc_row(sync, dbrow);
+
 		if (NULL == (interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&dbsync_env.cache->interfaces, &rowid)))
 			tag = ZBX_DBSYNC_ROW_ADD;
-		else if (FAIL == dbsync_compare_interface(interface, dbrow))
+		else if (FAIL == dbsync_compare_interface(interface, row))
 			tag = ZBX_DBSYNC_ROW_UPDATE;
 
 		if (ZBX_DBSYNC_ROW_NONE != tag)
-			dbsync_add_row(sync, rowid, tag, dbrow);
+			dbsync_add_row(sync, rowid, tag, row);
 	}
 
 	zbx_hashset_iter_reset(&dbsync_env.cache->interfaces, &iter);
@@ -4004,10 +4036,10 @@ int	zbx_dbsync_compare_connectors(zbx_dbsync_t *sync)
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "select connectorid,protocol,data_type,url,max_records,"
 			"max_senders,timeout,max_attempts,token,http_proxy,authtype,username,password,verify_peer,"
 			"verify_host,ssl_cert_file,ssl_key_file,ssl_key_password,status,"
-			"tags_evaltype"
+			"tags_evaltype,item_value_type,attempt_interval"
 		" from connector");
 
-	dbsync_prepare(sync, 20, NULL);
+	dbsync_prepare(sync, 22, NULL);
 
 	if (ZBX_DBSYNC_INIT == sync->mode)
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -63,7 +63,7 @@ typedef struct
 	int	log_file_size;
 } zbx_config_log_t;
 
-int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, char **error);
+int	zbx_open_log(const zbx_config_log_t *log_file_cfg, int level, const char *syslog_app_name, char **error);
 void	zbx_log_impl(int level, const char *fmt, va_list args);
 void	zbx_close_log(void);
 

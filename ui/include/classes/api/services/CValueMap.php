@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -74,20 +74,19 @@ class CValueMap extends CApiService {
 
 		// Permission check.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE vm.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.zbx_dbstr($permission).
-				')';
+			$sql_parts['from'][] = 'host_hgset hh';
+			$sql_parts['from'][] = 'permission p';
+			$sql_parts['where'][] = 'vm.hostid=hh.hostid';
+			$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// hostids

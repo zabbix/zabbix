@@ -1,7 +1,7 @@
 ﻿<?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,10 +88,10 @@ class CPeriodParserTest extends TestCase {
 				'sec_num' => '',
 				'time_shift' => ''
 			]],
-			['{$M}', 0, ['usermacros' => true], [
+			['{{$M}.regsub("([a-z]+)", \1)}', 0, ['usermacros' => true], [
 				'rc' => CParser::PARSE_SUCCESS,
-				'match' => '{$M}',
-				'sec_num' => '{$M}',
+				'match' => '{{$M}.regsub("([a-z]+)", \1)}',
+				'sec_num' => '{{$M}.regsub("([a-z]+)", \1)}',
 				'time_shift' => ''
 			]],
 			['{$M}:', 0, ['usermacros' => true], [
@@ -105,6 +105,12 @@ class CPeriodParserTest extends TestCase {
 				'match' => '{$M}:{$M: context}',
 				'sec_num' => '{$M}',
 				'time_shift' => '{$M: context}'
+			]],
+			['{{$M}.regsub("([a-z]+)", \1)}:{{$M: context}.regsub("([a-z]+)", \1)}', 0, ['usermacros' => true], [
+				'rc' => CParser::PARSE_SUCCESS,
+				'match' => '{{$M}.regsub("([a-z]+)", \1)}:{{$M: context}.regsub("([a-z]+)", \1)}',
+				'sec_num' => '{{$M}.regsub("([a-z]+)", \1)}',
+				'time_shift' => '{{$M: context}.regsub("([a-z]+)", \1)}'
 			]],
 			['{$M}:{#M}', 0, ['usermacros' => true], [
 				'rc' => CParser::PARSE_SUCCESS_CONT,

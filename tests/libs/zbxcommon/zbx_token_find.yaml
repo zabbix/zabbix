@@ -605,4 +605,28 @@ out:
   token_type: ZBX_TOKEN_EXPRESSION_MACRO
   expression: '{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{{?{?1 + 2'
   return: SUCCEED
+---
+test case: "successfully found function macros token in user macro"
+in:
+  expression: '{{$USERMACRO}.regsub("App([0-9]) ([a-z]+)","App\1")}'
+out:
+  return: SUCCEED
+  token_type: ZBX_TOKEN_USER_FUNC_MACRO
+  token_l: 0
+  token_r: 51
+  macro_l: 1
+  macro_r: 12
+  func_l: 14
+  func_r: 50
+  func_param_l: 20
+  func_param_r: 50
+---
+test case: 'Success: {?count(//trap[1],#5,"str\\arg", 0)}'
+in:
+  expression: '{?count(//trap[1],#5,"str\\arg", 0)}'
+out:
+  token: '{?count(//trap[1],#5,"str\\arg", 0)}'
+  token_type: ZBX_TOKEN_EXPRESSION_MACRO
+  expression: 'count(//trap[1],#5,"str\\arg", 0)'
+  return: SUCCEED
 ...

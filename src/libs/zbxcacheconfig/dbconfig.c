@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,11 +20,11 @@
 #include "dbconfig.h"
 
 #include "zbxtasks.h"
-#include "zbxexpression.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
 #include "cfg.h"
 #include "zbxcrypto.h"
+#include "zbxtypes.h"
 #include "zbxvault.h"
 #include "zbxdbhigh.h"
 #include "dbsync.h"
@@ -51,6 +51,8 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxkvs.h"
+#include "zbxcomms.h"
+#include "zbxdb.h"
 
 int	sync_in_progress = 0;
 
@@ -435,15 +437,15 @@ static int	DCget_disable_until(const ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *
 }
 /******************************************************************************
  *                                                                            *
- * Purpose: expand user macros in string returning new string with resolved   *
- *          macros                                                            *
+ * Purpose: expand user and function macros in string returning new string    *
+ *          with resolved macros                                              *
  *                                                                            *
  ******************************************************************************/
-static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env)
+char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *hostids, int hostids_num, int env)
 {
 	zbx_token_t	token;
 	int		pos = 0, last_pos = 0;
-	char		*str = NULL, *name = NULL, *context = NULL;
+	char		*str = NULL;
 	size_t		str_alloc = 0, str_offset = 0;
 
 	if ('\0' == *text)
@@ -452,12 +454,33 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		const char	*value = NULL;
+		char		*out = NULL;
 
-		if (ZBX_TOKEN_USER_MACRO != token.type)
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_USER_FUNC_MACRO != token.type)
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
-		um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, env, &value);
+
+		switch (token.type)
+		{
+			int		ret;
+
+			case ZBX_TOKEN_USER_FUNC_MACRO:
+				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l + 1,
+						env, &value);
+
+				if (NULL != value)
+					out = zbx_strdup(NULL, value);
+
+				ret = zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
+				ZBX_UNUSED(ret);
+				value = out;
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l, env,
+						&value);
+				break;
+		}
 
 		if (NULL != value)
 		{
@@ -469,11 +492,9 @@ static char	*dc_expand_user_macros_dyn(const char *text, const zbx_uint64_t *hos
 					token.loc.r - token.loc.l + 1);
 		}
 
-		zbx_free(name);
-		zbx_free(context);
-
 		pos = (int)token.loc.r;
 		last_pos = pos + 1;
+		zbx_free(out);
 	}
 
 	zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
@@ -498,7 +519,7 @@ int	DCitem_nextcheck_update(ZBX_DC_ITEM *item, const ZBX_DC_INTERFACE *interface
 
 	seed = get_item_nextcheck_seed(item->itemid, item->interfaceid, item->type, item->key);
 
-	delay_s = dc_expand_user_macros_dyn(item->delay, &item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+	delay_s = dc_expand_user_and_func_macros_dyn(item->delay, &item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 	ret = zbx_interval_preproc(delay_s, &simple_interval, &custom_intervals, error);
 	zbx_free(delay_s);
 
@@ -1922,7 +1943,8 @@ static void	DCsync_host_inventory(zbx_dbsync_t *sync, zbx_uint64_t revision)
 }
 
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location)
 {
 	zbx_dc_kvs_path_t	*dc_kvs_path;
 	zbx_dc_kv_t		*dc_kv;
@@ -1953,7 +1975,8 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 			}
 
 		}
-		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip, &error))
+		else if (FAIL == zbx_vault_kvs_get(dc_kvs_path->path, &kvs, config_vault, config_source_ip,
+				config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "cannot get secrets for path \"%s\": %s", dc_kvs_path->path,
 					error);
@@ -2024,45 +2047,118 @@ void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_
 
 /******************************************************************************
  *                                                                            *
- * Purpose: trying to resolve the macros in host interface                    *
+ * Purpose: expand host macros in string                                      *
+ *                                                                            *
+ * Return value: text with resolved macros or NULL if there were no macros    *
  *                                                                            *
  ******************************************************************************/
-static void	substitute_host_interface_macros(ZBX_DC_INTERFACE *interface)
+static char	*dc_expand_host_macros_dyn(const char *text, const ZBX_DC_HOST *dc_host)
 {
-	int		macros;
-	char		*addr;
-	zbx_dc_host_t	host;
+#define IF_MACRO_HOST		"{HOST."
+#define IF_MACRO_HOST_HOST	IF_MACRO_HOST "HOST}"
+#define IF_MACRO_HOST_NAME	IF_MACRO_HOST "NAME}"
+#define IF_MACRO_HOST_IP	IF_MACRO_HOST "IP}"
+#define IF_MACRO_HOST_DNS	IF_MACRO_HOST "DNS}"
+#define IF_MACRO_HOST_CONN	IF_MACRO_HOST "CONN}"
+/* deprecated macros */
+#define IF_MACRO_HOSTNAME	"{HOSTNAME}"
+#define IF_MACRO_IPADDRESS	"{IPADDRESS}"
 
-#define STR_CONTAINS_MACROS(str)	(NULL != strchr(str, '{'))
+#define IF_MACRO_HOST_HOST_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_HOST)
+#define IF_MACRO_HOST_NAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_NAME)
+#define IF_MACRO_HOST_IP_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_IP)
+#define IF_MACRO_HOST_DNS_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_DNS)
+#define IF_MACRO_HOST_CONN_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOST_CONN)
+#define IF_MACRO_HOSTNAME_LEN	ZBX_CONST_STRLEN(IF_MACRO_HOSTNAME)
+#define IF_MACRO_IPADDRESS_LEN	ZBX_CONST_STRLEN(IF_MACRO_IPADDRESS)
 
-	macros = STR_CONTAINS_MACROS(interface->ip) ? 0x01 : 0;
-	macros |= STR_CONTAINS_MACROS(interface->dns) ? 0x02 : 0;
+	zbx_token_t		token;
+	int			pos = 0, last_pos = 0;
+	char			*str = NULL;
+	size_t			str_alloc = 0, str_offset = 0;
+	zbx_dc_interface_t	interface;
 
-	if (0 != macros)
+	if ('\0' == *text)
+		return NULL;
+
+	for (; SUCCEED == zbx_token_find(text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
-		zbx_dc_get_host_by_hostid(&host, interface->hostid);
+		const char	*value = NULL;
 
-		if (0 != (macros & 0x01))
+		if (ZBX_TOKEN_MACRO != token.type)
+			continue;
+
+		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
+
+		if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_HOST, IF_MACRO_HOST_HOST_LEN) ||
+				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOSTNAME, IF_MACRO_HOSTNAME_LEN))
 		{
-			addr = zbx_strdup(NULL, interface->ip);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
-				dc_strpool_replace(1, &interface->ip, addr);
-			zbx_free(addr);
+			value = dc_host->host;
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_NAME, IF_MACRO_HOST_NAME_LEN))
+		{
+			value = dc_host->name;
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_IP, IF_MACRO_HOST_IP_LEN) ||
+				SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_IPADDRESS, IF_MACRO_IPADDRESS_LEN))
+		{
+			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+					INTERFACE_TYPE_AGENT))
+			{
+				value = interface.ip_orig;
+			}
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_DNS, IF_MACRO_HOST_DNS_LEN))
+		{
+			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+					INTERFACE_TYPE_AGENT))
+			{
+				value = interface.dns_orig;
+			}
+		}
+		else if (SUCCEED == zbx_strloc_cmp(text, &token.loc, IF_MACRO_HOST_CONN, IF_MACRO_HOST_CONN_LEN))
+		{
+			if (SUCCEED == zbx_dc_config_get_interface_by_type(&interface, dc_host->hostid,
+					INTERFACE_TYPE_AGENT))
+			{
+				value = interface.addr;
+			}
 		}
 
-		if (0 != (macros & 0x02))
+		if (NULL != value)
 		{
-			addr = zbx_strdup(NULL, interface->dns);
-			zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, &host, NULL, NULL, NULL, NULL, NULL,
-					NULL, &addr, ZBX_MACRO_TYPE_INTERFACE_ADDR, NULL, 0);
-			if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
-				dc_strpool_replace(1, &interface->dns, addr);
-			zbx_free(addr);
+			zbx_strcpy_alloc(&str, &str_alloc, &str_offset, value);
 		}
+		else
+		{
+			zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + token.loc.l,
+					token.loc.r - token.loc.l + 1);
+		}
+
+		pos = (int)token.loc.r;
+		last_pos = pos + 1;
 	}
-#undef STR_CONTAINS_MACROS
+
+	/* if no macros were found then str will be NULL, which should be returned */
+	if (NULL != str)
+		zbx_strcpy_alloc(&str, &str_alloc, &str_offset, text + last_pos);
+
+	return str;
+
+#undef IF_MACRO_HOSTNAME_LEN
+#undef IF_MACRO_HOST_CONN_LEN
+#undef IF_MACRO_HOST_DNS_LEN
+#undef IF_MACRO_HOST_IP_LEN
+#undef IF_MACRO_HOST_NAME_LEN
+#undef IF_MACRO_HOST_HOST_LEN
+#undef IF_MACRO_IPADDRESS
+#undef IF_MACRO_HOSTNAME
+#undef IF_MACRO_HOST_CONN
+#undef IF_MACRO_HOST_DNS
+#undef IF_MACRO_HOST_IP
+#undef IF_MACRO_HOST_NAME
+#undef IF_MACRO_HOST_HOST
+#undef IF_MACRO_HOST
 }
 
 /******************************************************************************
@@ -2104,47 +2200,85 @@ static void	dc_interface_snmpaddrs_remove(ZBX_DC_INTERFACE *interface)
 	}
 }
 
+static void	dc_interface_snmpaddrs_update(ZBX_DC_INTERFACE *interface)
+{
+	ZBX_DC_INTERFACE_ADDR	*ifaddr, ifaddr_local;
+
+	ifaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
+
+	if ('\0' != *ifaddr_local.addr)
+	{
+		if (NULL == (ifaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(&config->interface_snmpaddrs,
+				&ifaddr_local)))
+		{
+			dc_strpool_acquire(ifaddr_local.addr);
+
+			ifaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(
+					&config->interface_snmpaddrs, &ifaddr_local,
+					sizeof(ZBX_DC_INTERFACE_ADDR));
+			zbx_vector_uint64_create_ext(&ifaddr->interfaceids,
+					__config_shmem_malloc_func,
+					__config_shmem_realloc_func,
+					__config_shmem_free_func);
+		}
+
+		zbx_vector_uint64_append(&ifaddr->interfaceids, interface->interfaceid);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: setup SNMP attributes for interface with interfaceid index        *
  *                                                                            *
  * Parameters: interfaceid  - [IN]                                            *
  *             row          - [IN] the row data from DB                       *
- *             bulk_changed - [IN]                                            *
+ *             modified     - [OUT] 1 if SNMP data were modified, untouched   *
+ *                                  otherwise                                 *
  *                                                                            *
  ******************************************************************************/
-static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, const char **row,
-		unsigned char *bulk_changed)
+static ZBX_DC_SNMPINTERFACE	*dc_interface_snmp_set(zbx_uint64_t interfaceid, const char **row, int *modified)
 {
 	int			found;
 	ZBX_DC_SNMPINTERFACE	*snmp;
-	unsigned char		bulk;
+	unsigned char		bulk, version, securitylevel, authprotocol, privprotocol, max_repetitions;
 
 	snmp = (ZBX_DC_SNMPINTERFACE *)DCfind_id(&config->interfaces_snmp, interfaceid, sizeof(ZBX_DC_SNMPINTERFACE),
 			&found);
 
 	ZBX_STR2UCHAR(bulk, row[13]);
+	ZBX_STR2UCHAR(version, row[12]);
+	ZBX_STR2UCHAR(securitylevel, row[16]);
+	ZBX_STR2UCHAR(authprotocol, row[19]);
+	ZBX_STR2UCHAR(privprotocol, row[20]);
+	ZBX_STR2UCHAR(max_repetitions, row[22]);
 
-	if (0 == found)
-		*bulk_changed = 1;
-	else if (snmp->bulk != bulk)
-		*bulk_changed = 1;
-	else
-		*bulk_changed = 0;
+	if (0 != found)
+	{
+		if (snmp->bulk != bulk || version != snmp->version || securitylevel != snmp->securitylevel ||
+				authprotocol != snmp->authprotocol || privprotocol != snmp->privprotocol ||
+				max_repetitions != snmp->max_repetitions)
+		{
+			*modified = 1;
+		}
+	}
 
-	if (0 != *bulk_changed)
-		snmp->bulk = bulk;
+	snmp->bulk = bulk;
+	snmp->version = version;
+	snmp->securitylevel = securitylevel;
+	snmp->authprotocol = authprotocol;
+	snmp->privprotocol = privprotocol;
+	snmp->max_repetitions = max_repetitions;
 
-	ZBX_STR2UCHAR(snmp->version, row[12]);
-	dc_strpool_replace(found, &snmp->community, row[14]);
-	dc_strpool_replace(found, &snmp->securityname, row[15]);
-	ZBX_STR2UCHAR(snmp->securitylevel, row[16]);
-	dc_strpool_replace(found, &snmp->authpassphrase, row[17]);
-	dc_strpool_replace(found, &snmp->privpassphrase, row[18]);
-	ZBX_STR2UCHAR(snmp->authprotocol, row[19]);
-	ZBX_STR2UCHAR(snmp->privprotocol, row[20]);
-	dc_strpool_replace(found, &snmp->contextname, row[21]);
-	ZBX_STR2UCHAR(snmp->max_repetitions, row[22]);
+	if (SUCCEED == dc_strpool_replace(found, &snmp->community, row[14]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->securityname, row[15]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->authpassphrase, row[17]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->privpassphrase, row[18]))
+		*modified = 1;
+	if (SUCCEED == dc_strpool_replace(found, &snmp->contextname, row[21]))
+		*modified = 1;
 
 	return snmp;
 }
@@ -2174,6 +2308,60 @@ static void	dc_interface_snmp_remove(zbx_uint64_t interfaceid)
 	return;
 }
 
+typedef struct
+{
+	ZBX_DC_INTERFACE	*interface;
+	ZBX_DC_SNMPINTERFACE	*snmp;
+	ZBX_DC_HOST		*host;
+	char			*ip;
+	char			*dns;
+	int			modified;
+	int			found;
+}
+zbx_dc_if_update_t;
+
+ZBX_PTR_VECTOR_DECL(dc_if_update_ptr, zbx_dc_if_update_t *)
+ZBX_PTR_VECTOR_IMPL(dc_if_update_ptr, zbx_dc_if_update_t *)
+
+static void	dc_if_update_free(zbx_dc_if_update_t *update)
+{
+	zbx_free(update->ip);
+	zbx_free(update->dns);
+	zbx_free(update);
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: resolve host macros in host interface update                      *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_if_update_substitute_host_macros(zbx_dc_if_update_t *update, const ZBX_DC_HOST *host)
+{
+	char	*addr;
+
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->ip, host)))
+	{
+		if (SUCCEED == zbx_is_ip(addr))
+		{
+			zbx_free(update->ip);
+			update->ip = addr;
+		}
+		else
+			zbx_free(addr);
+	}
+
+	if (NULL != (addr = dc_expand_host_macros_dyn(update->dns, host)))
+	{
+		if (SUCCEED == zbx_is_ip(addr) || SUCCEED == zbx_validate_hostname(addr))
+		{
+			zbx_free(update->dns);
+			update->dns = addr;
+		}
+		else
+			zbx_free(addr);
+	}
+}
+
 static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 {
 	char			**row;
@@ -2182,21 +2370,22 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 	ZBX_DC_INTERFACE	*interface;
 	ZBX_DC_INTERFACE_HT	*interface_ht, interface_ht_local;
-	ZBX_DC_INTERFACE_ADDR	*interface_snmpaddr, interface_snmpaddr_local;
 	ZBX_DC_HOST		*host;
 
 	int			found, update_index, ret, i;
 	zbx_uint64_t		interfaceid, hostid;
 	unsigned char		type, main_, useip;
-	unsigned char		reset_snmp_stats;
-	zbx_vector_ptr_t	interfaces;
+
+	zbx_vector_dc_if_update_ptr_t	updates;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&interfaces);
+	zbx_vector_dc_if_update_ptr_create(&updates);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
+		zbx_dc_if_update_t	*update;
+
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
 			break;
@@ -2214,9 +2403,14 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		interface = (ZBX_DC_INTERFACE *)DCfind_id(&config->interfaces, interfaceid, sizeof(ZBX_DC_INTERFACE),
 				&found);
-		zbx_vector_ptr_append(&interfaces, interface);
 
-		/* remove old address->interfaceid index */
+		update = (zbx_dc_if_update_t *)zbx_malloc(NULL, sizeof(zbx_dc_if_update_t));
+		memset(update, 0, sizeof(zbx_dc_if_update_t));
+
+		update->interface = interface;
+		update->host = host;
+
+				/* remove old address->interfaceid index */
 		if (0 != found && INTERFACE_TYPE_SNMP == interface->type)
 			dc_interface_snmpaddrs_remove(interface);
 
@@ -2252,21 +2446,21 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 				else
 					update_index = 1;
 			}
+
+			update->modified = 1;
 		}
-
-		/* store new information in interface structure */
-
-		reset_snmp_stats = (0 == found || interface->hostid != hostid || interface->type != type ||
-				interface->useip != useip);
+		else if (interface->useip != useip)
+			update->modified = 1;
 
 		interface->hostid = hostid;
 		interface->type = type;
 		interface->main = main_;
 		interface->useip = useip;
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->ip, row[5]));
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->dns, row[6]));
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]));
-		reset_snmp_stats |= (SUCCEED == dc_strpool_replace(found, &interface->error, row[10]));
+
+		update->ip = zbx_strdup(NULL, row[5]);
+		update->dns = zbx_strdup(NULL, row[6]);
+		if (SUCCEED == dc_strpool_replace(found, &interface->port, row[7]))
+			update->modified = 1;
 
 		if (0 == found)
 		{
@@ -2276,6 +2470,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			interface->availability_ts = time(NULL);
 			interface->reset_availability = 0;
 			interface->items_num = 0;
+			dc_strpool_replace(found, &interface->error, row[10]);
+			interface->version = 0;
 		}
 
 		/* update interfaces_ht index using new data, if not done already */
@@ -2288,42 +2484,13 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			zbx_hashset_insert(&config->interfaces_ht, &interface_ht_local, sizeof(ZBX_DC_INTERFACE_HT));
 		}
 
-		/* update interface_snmpaddrs for SNMP traps or reset bulk request statistics */
-
+		/* update SNMP data  */
 		if (INTERFACE_TYPE_SNMP == interface->type)
 		{
-			ZBX_DC_SNMPINTERFACE	*snmp;
-			unsigned char		bulk_changed;
-
-			interface_snmpaddr_local.addr = (0 != interface->useip ? interface->ip : interface->dns);
-
-			if ('\0' != *interface_snmpaddr_local.addr)
-			{
-				if (NULL == (interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_search(
-						&config->interface_snmpaddrs, &interface_snmpaddr_local)))
-				{
-					dc_strpool_acquire(interface_snmpaddr_local.addr);
-					zbx_vector_uint64_create_ext(&(interface_snmpaddr_local.interfaceids),
-							__config_shmem_malloc_func,
-							__config_shmem_realloc_func,
-							__config_shmem_free_func);
-					interface_snmpaddr = (ZBX_DC_INTERFACE_ADDR *)zbx_hashset_insert(
-							&config->interface_snmpaddrs, &interface_snmpaddr_local,
-							sizeof(ZBX_DC_INTERFACE_ADDR));
-				}
-
-				zbx_vector_uint64_append(&interface_snmpaddr->interfaceids, interfaceid);
-			}
-
 			if (FAIL == zbx_db_is_null(row[12]))
 			{
-				snmp = dc_interface_snmp_set(interfaceid, (const char **)row, &bulk_changed);
-
-				if (1 == reset_snmp_stats || 0 != bulk_changed)
-				{
-					snmp->max_succeed = 0;
-					snmp->min_fail = ZBX_MAX_SNMP_ITEMS + 1;
-				}
+				update->snmp = dc_interface_snmp_set(interfaceid, (const char **)row,
+						&update->modified);
 			}
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
@@ -2333,7 +2500,17 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		/* because other interfaces might reference main interfaces ip and dns */
 		/* with {HOST.IP} and {HOST.DNS} macros                                */
 		if (1 == interface->main && INTERFACE_TYPE_AGENT == interface->type)
-			substitute_host_interface_macros(interface);
+		{
+			dc_if_update_substitute_host_macros(update, host);
+
+			if (SUCCEED == dc_strpool_replace(found, &interface->ip, update->ip))
+				update->modified = 1;
+
+			if (SUCCEED == dc_strpool_replace(found, &interface->dns, update->dns))
+				update->modified = 1;
+		}
+		update->found = found;
+		zbx_vector_dc_if_update_ptr_append(&updates, update);
 
 		if (0 == found)
 		{
@@ -2357,18 +2534,42 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			else
 				THIS_SHOULD_NEVER_HAPPEN;
 		}
-
-		dc_host_update_revision(host, revision);
 	}
 
-	/* resolve macros in other interfaces */
-
-	for (i = 0; i < interfaces.values_num; i++)
+	/* resolve macros in other interfaces and handle interface modify status */
+	for (i = 0; i < updates.values_num; i++)
 	{
-		interface = (ZBX_DC_INTERFACE *)interfaces.values[i];
+		zbx_dc_if_update_t	*update = updates.values[i];
 
-		if (1 != interface->main || INTERFACE_TYPE_AGENT != interface->type)
-			substitute_host_interface_macros(interface);
+		if (1 != update->interface->main || INTERFACE_TYPE_AGENT != update->interface->type)
+		{
+			dc_if_update_substitute_host_macros(update, update->host);
+
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->ip, update->ip))
+				update->modified = 1;
+
+			if (SUCCEED == dc_strpool_replace(update->found, &update->interface->dns, update->dns))
+				update->modified = 1;
+		}
+
+		if (0 != update->modified)
+		{
+			if (INTERFACE_TYPE_AGENT == interface->type &&
+					interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+			{
+				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+			}
+
+			dc_host_update_revision(update->host, revision);
+
+			if (NULL != update->snmp)
+			{
+				update->snmp->max_succeed = 0;
+				update->snmp->min_fail = ZBX_MAX_SNMP_ITEMS + 1;
+
+				dc_interface_snmpaddrs_update(update->interface);
+			}
+		}
 	}
 
 	/* remove deleted interfaces from buffer */
@@ -2422,7 +2623,8 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		zbx_hashset_remove_direct(&config->interfaces, interface);
 	}
 
-	zbx_vector_ptr_destroy(&interfaces);
+	zbx_vector_dc_if_update_ptr_clear_ext(&updates, dc_if_update_free);
+	zbx_vector_dc_if_update_ptr_destroy(&updates);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -2617,6 +2819,22 @@ char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type)
 
 	return tmt;
 }
+
+#define DUMP_HASHMAP(source_hashmap, hash_type, search_key)						\
+do													\
+{													\
+	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))						\
+	{												\
+		zbx_hashset_iter_t      iter;								\
+		hash_type		*next;								\
+		zbx_hashset_iter_reset(&source_hashmap, &iter);						\
+		THIS_SHOULD_NEVER_HAPPEN;								\
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot find id in map: " ZBX_FS_UI64, search_key);		\
+		while (NULL != (next = (hash_type *)zbx_hashset_iter_next(&iter)))			\
+			zabbix_log(LOG_LEVEL_DEBUG, "map key: " ZBX_FS_UI64, next->search_key);		\
+	}												\
+}													\
+while(0)
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids)
@@ -3278,42 +3496,57 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid);
+			if (NULL != (numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid)))
+			{
+				dc_strpool_release(numitem->units);
+				dc_strpool_release(numitem->trends_period);
 
-			dc_strpool_release(numitem->units);
-			dc_strpool_release(numitem->trends_period);
-
-			zbx_hashset_remove_direct(&config->numitems, numitem);
+				zbx_hashset_remove_direct(&config->numitems, numitem);
+			}
+			else
+				DUMP_HASHMAP(config->numitems, ZBX_DC_NUMITEM, itemid);
 		}
 
 		/* SNMP items */
 
 		if (ITEM_TYPE_SNMP == item->type)
 		{
-			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid);
-			dc_strpool_release(snmpitem->snmp_oid);
-			zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
+			if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
+			{
+				dc_strpool_release(snmpitem->snmp_oid);
+				zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
+			}
+			else
+				DUMP_HASHMAP(config->snmpitems, ZBX_DC_SNMPITEM, itemid);
 		}
 
 		/* IPMI items */
 
 		if (ITEM_TYPE_IPMI == item->type)
 		{
-			ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&config->ipmiitems, &itemid);
-			dc_strpool_release(ipmiitem->ipmi_sensor);
-			zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
+			if (NULL != (ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&config->ipmiitems, &itemid)))
+			{
+				dc_strpool_release(ipmiitem->ipmi_sensor);
+				zbx_hashset_remove_direct(&config->ipmiitems, ipmiitem);
+			}
+			else
+				DUMP_HASHMAP(config->ipmiitems, ZBX_DC_IPMIITEM, itemid);
 		}
 
 		/* trapper items */
 
-		if (ITEM_TYPE_TRAPPER == item->type &&
-				NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems, &itemid)))
+		if (ITEM_TYPE_TRAPPER == item->type)
 		{
-			dc_strpool_release(trapitem->trapper_hosts);
-			zbx_hashset_remove_direct(&config->trapitems, trapitem);
-		}
+			if (NULL != (trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&config->trapitems, &itemid)))
+			{
+				dc_strpool_release(trapitem->trapper_hosts);
+				zbx_hashset_remove_direct(&config->trapitems, trapitem);
+			}
+			else
+				DUMP_HASHMAP(config->trapitems, ZBX_DC_TRAPITEM, itemid);
+	}
 
-		/* dependent items */
+	/* dependent items */
 
 		if (NULL != (depitem = (ZBX_DC_DEPENDENTITEM *)zbx_hashset_search(&config->dependentitems, &itemid)))
 		{
@@ -3323,123 +3556,156 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 		/* log items */
 
-		if (ITEM_VALUE_TYPE_LOG == item->value_type &&
-				NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &itemid)))
+		if (ITEM_VALUE_TYPE_LOG == item->value_type)
 		{
-			dc_strpool_release(logitem->logtimefmt);
-			zbx_hashset_remove_direct(&config->logitems, logitem);
+			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &itemid)))
+			{
+				dc_strpool_release(logitem->logtimefmt);
+				zbx_hashset_remove_direct(&config->logitems, logitem);
+			}
+			else
+				DUMP_HASHMAP(config->logitems, ZBX_DC_LOGITEM, itemid);
 		}
 
 		/* db items */
 
-		if (ITEM_TYPE_DB_MONITOR == item->type &&
-				NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &itemid)))
+		if (ITEM_TYPE_DB_MONITOR == item->type)
 		{
-			dc_strpool_release(dbitem->params);
-			dc_strpool_release(dbitem->username);
-			dc_strpool_release(dbitem->password);
+			if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &itemid)))
+			{
+				dc_strpool_release(dbitem->params);
+				dc_strpool_release(dbitem->username);
+				dc_strpool_release(dbitem->password);
 
-			zbx_hashset_remove_direct(&config->dbitems, dbitem);
+				zbx_hashset_remove_direct(&config->dbitems, dbitem);
+			}
+			else
+				DUMP_HASHMAP(config->dbitems, ZBX_DC_DBITEM, itemid);
 		}
 
 		/* SSH items */
 
 		if (ITEM_TYPE_SSH == item->type)
 		{
-			sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &itemid);
+			if (NULL != (sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &itemid)))
+			{
+				dc_strpool_release(sshitem->username);
+				dc_strpool_release(sshitem->password);
+				dc_strpool_release(sshitem->publickey);
+				dc_strpool_release(sshitem->privatekey);
+				dc_strpool_release(sshitem->params);
 
-			dc_strpool_release(sshitem->username);
-			dc_strpool_release(sshitem->password);
-			dc_strpool_release(sshitem->publickey);
-			dc_strpool_release(sshitem->privatekey);
-			dc_strpool_release(sshitem->params);
-
-			zbx_hashset_remove_direct(&config->sshitems, sshitem);
+				zbx_hashset_remove_direct(&config->sshitems, sshitem);
+			}
+			else
+				DUMP_HASHMAP(config->sshitems, ZBX_DC_SSHITEM, itemid);
 		}
 
 		/* TELNET items */
 
 		if (ITEM_TYPE_TELNET == item->type)
 		{
-			telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &itemid);
+			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems,
+					&itemid)))
+			{
+				dc_strpool_release(telnetitem->username);
+				dc_strpool_release(telnetitem->password);
+				dc_strpool_release(telnetitem->params);
 
-			dc_strpool_release(telnetitem->username);
-			dc_strpool_release(telnetitem->password);
-			dc_strpool_release(telnetitem->params);
-
-			zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
+				zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
+			}
+			else
+				DUMP_HASHMAP(config->telnetitems, ZBX_DC_TELNETITEM, itemid);
 		}
 
 		/* simple items */
 
 		if (ITEM_TYPE_SIMPLE == item->type)
 		{
-			simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems, &itemid);
+			if (NULL != (simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems,
+					&itemid)))
+			{
+				dc_strpool_release(simpleitem->username);
+				dc_strpool_release(simpleitem->password);
 
-			dc_strpool_release(simpleitem->username);
-			dc_strpool_release(simpleitem->password);
-
-			zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
+				zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
+			}
+			else
+				DUMP_HASHMAP(config->simpleitems, ZBX_DC_SIMPLEITEM, itemid);
 		}
 
 		/* JMX items */
 
 		if (ITEM_TYPE_JMX == item->type)
 		{
-			jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &itemid);
+			if (NULL != (jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &itemid)))
+			{
+				dc_strpool_release(jmxitem->username);
+				dc_strpool_release(jmxitem->password);
+				dc_strpool_release(jmxitem->jmx_endpoint);
 
-			dc_strpool_release(jmxitem->username);
-			dc_strpool_release(jmxitem->password);
-			dc_strpool_release(jmxitem->jmx_endpoint);
-
-			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
+				zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
+			}
+			else
+				DUMP_HASHMAP(config->jmxitems, ZBX_DC_JMXITEM, itemid);
 		}
 
 		/* calculated items */
 
 		if (ITEM_TYPE_CALCULATED == item->type)
 		{
-			calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid);
-			dc_strpool_release(calcitem->params);
+			if (NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid)))
+			{
+				dc_strpool_release(calcitem->params);
 
-			if (NULL != calcitem->formula_bin)
-				__config_shmem_free_func((void *)calcitem->formula_bin);
+				if (NULL != calcitem->formula_bin)
+					__config_shmem_free_func((void *)calcitem->formula_bin);
 
-			zbx_hashset_remove_direct(&config->calcitems, calcitem);
+				zbx_hashset_remove_direct(&config->calcitems, calcitem);
+			}
+			else
+				DUMP_HASHMAP(config->calcitems, ZBX_DC_CALCITEM, itemid);
 		}
 
 		/* HTTP agent items */
 
 		if (ITEM_TYPE_HTTPAGENT == item->type)
 		{
-			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
+			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
+			{
+				dc_strpool_release(httpitem->url);
+				dc_strpool_release(httpitem->query_fields);
+				dc_strpool_release(httpitem->posts);
+				dc_strpool_release(httpitem->status_codes);
+				dc_strpool_release(httpitem->http_proxy);
+				dc_strpool_release(httpitem->headers);
+				dc_strpool_release(httpitem->ssl_cert_file);
+				dc_strpool_release(httpitem->ssl_key_file);
+				dc_strpool_release(httpitem->ssl_key_password);
+				dc_strpool_release(httpitem->username);
+				dc_strpool_release(httpitem->password);
+				dc_strpool_release(httpitem->trapper_hosts);
 
-			dc_strpool_release(httpitem->url);
-			dc_strpool_release(httpitem->query_fields);
-			dc_strpool_release(httpitem->posts);
-			dc_strpool_release(httpitem->status_codes);
-			dc_strpool_release(httpitem->http_proxy);
-			dc_strpool_release(httpitem->headers);
-			dc_strpool_release(httpitem->ssl_cert_file);
-			dc_strpool_release(httpitem->ssl_key_file);
-			dc_strpool_release(httpitem->ssl_key_password);
-			dc_strpool_release(httpitem->username);
-			dc_strpool_release(httpitem->password);
-			dc_strpool_release(httpitem->trapper_hosts);
-
-			zbx_hashset_remove_direct(&config->httpitems, httpitem);
+				zbx_hashset_remove_direct(&config->httpitems, httpitem);
+			}
+			else
+				DUMP_HASHMAP(config->httpitems, ZBX_DC_HTTPITEM, itemid);
 		}
 
 		/* Script items */
 
 		if (ITEM_TYPE_SCRIPT == item->type)
 		{
-			scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid);
+			if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems,
+					&itemid)))
+			{
+				dc_strpool_release(scriptitem->script);
 
-			dc_strpool_release(scriptitem->script);
-
-			zbx_vector_ptr_destroy(&scriptitem->params);
-			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
+				zbx_vector_ptr_destroy(&scriptitem->params);
+				zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
+			}
+			else
+				DUMP_HASHMAP(config->scriptitems, ZBX_DC_SCRIPTITEM, itemid);
 		}
 
 		/* items */
@@ -3452,6 +3718,20 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 			/* item keys should be unique for items within a host, otherwise items with  */
 			/* same key share index and removal of last added item already cleared index */
 			THIS_SHOULD_NEVER_HAPPEN;
+
+			if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
+			{
+				zbx_hashset_iter_t	iter;
+				ZBX_DC_ITEM_HK		*next;
+				zbx_hashset_iter_reset(&config->items_hk, &iter);
+				zabbix_log(LOG_LEVEL_DEBUG, "cannot find id in map, hostid: " ZBX_FS_UI64 ", key: %s",
+						item->hostid, item->key);
+				while (NULL != (next = (ZBX_DC_ITEM_HK *)zbx_hashset_iter_next(&iter)))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "map hostid: " ZBX_FS_UI64 ", key: %s",
+							next->hostid, next->key);
+				}
+			}
 		}
 		else if (item == item_hk->item_ptr)
 		{
@@ -3486,6 +3766,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
+#undef DUMP_HASHMAP
 
 static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 {
@@ -3873,13 +4154,13 @@ static int	dc_function_calculate_trends_nextcheck(const zbx_dc_um_handle_t *um_h
 
 	if (NULL != um_handle)
 	{
-		(void)zbx_dc_expand_user_macros(um_handle, &param, &timer->hostid, 1, NULL);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &param, &timer->hostid, 1, NULL);
 	}
 	else
 	{
 		char	*tmp;
 
-		tmp = dc_expand_user_macros_dyn(param, &timer->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		tmp = dc_expand_user_and_func_macros_dyn(param, &timer->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 		zbx_free(param);
 		param = tmp;
 	}
@@ -4444,10 +4725,10 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 			if (EVENT_SOURCE_AUTOREGISTRATION == action->eventsource)
 				config->auto_registration_actions++;
 
-			zbx_vector_ptr_create_ext(&action->conditions, __config_shmem_malloc_func,
+			zbx_vector_dc_action_condition_ptr_create_ext(&action->conditions, __config_shmem_malloc_func,
 					__config_shmem_realloc_func, __config_shmem_free_func);
 
-			zbx_vector_ptr_reserve(&action->conditions, 1);
+			zbx_vector_dc_action_condition_ptr_reserve(&action->conditions, 1);
 
 			action->opflags = ZBX_ACTION_OPCLASS_NONE;
 		}
@@ -4466,7 +4747,7 @@ static void	DCsync_actions(zbx_dbsync_t *sync)
 			config->auto_registration_actions--;
 
 		dc_strpool_release(action->formula);
-		zbx_vector_ptr_destroy(&action->conditions);
+		zbx_vector_dc_action_condition_ptr_destroy(&action->conditions);
 
 		zbx_hashset_remove_direct(&config->actions, action);
 	}
@@ -4525,13 +4806,16 @@ static int	dc_compare_action_conditions_by_type(const void *d1, const void *d2)
 	return 0;
 }
 
+ZBX_PTR_VECTOR_DECL(dc_action_ptr, zbx_dc_action_t *)
+ZBX_PTR_VECTOR_IMPL(dc_action_ptr, zbx_dc_action_t *)
+
 /******************************************************************************
  *                                                                            *
- * Purpose: Updates action conditions configuration cache                     *
+ * Purpose: updates action conditions configuration cache                     *
  *                                                                            *
- * Parameters: sync - [IN] the db synchronization data                        *
+ * Parameters: sync - [IN] db synchronization data                            *
  *                                                                            *
- * Comments: The result contains the following fields:                        *
+ * Comments: result contains the following fields:                            *
  *           0 - conditionid                                                  *
  *           1 - actionid                                                     *
  *           2 - conditiontype                                                *
@@ -4547,12 +4831,12 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 	zbx_uint64_t			actionid, conditionid;
 	zbx_dc_action_t			*action;
 	zbx_dc_action_condition_t	*condition;
-	int				found, i, index, ret;
-	zbx_vector_ptr_t		actions;
+	int				found, index, ret;
+	zbx_vector_dc_action_ptr_t	actions;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_ptr_create(&actions);
+	zbx_vector_dc_action_ptr_create(&actions);
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4579,11 +4863,11 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 		if (0 == found)
 		{
 			condition->actionid = actionid;
-			zbx_vector_ptr_append(&action->conditions, condition);
+			zbx_vector_dc_action_condition_ptr_append(&action->conditions, condition);
 		}
 
 		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
-			zbx_vector_ptr_append(&actions, action);
+			zbx_vector_dc_action_ptr_append(&actions, action);
 	}
 
 	/* remove deleted conditions */
@@ -4597,13 +4881,13 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 
 		if (NULL != (action = (zbx_dc_action_t *)zbx_hashset_search(&config->actions, &condition->actionid)))
 		{
-			if (FAIL != (index = zbx_vector_ptr_search(&action->conditions, condition,
+			if (FAIL != (index = zbx_vector_dc_action_condition_ptr_search(&action->conditions, condition,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
-				zbx_vector_ptr_remove_noorder(&action->conditions, index);
+				zbx_vector_dc_action_condition_ptr_remove_noorder(&action->conditions, index);
 
 				if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
-					zbx_vector_ptr_append(&actions, action);
+					zbx_vector_dc_action_ptr_append(&actions, action);
 			}
 		}
 
@@ -4615,18 +4899,21 @@ static void	DCsync_action_conditions(zbx_dbsync_t *sync)
 
 	/* sort conditions by type */
 
-	zbx_vector_ptr_sort(&actions, ZBX_DEFAULT_PTR_COMPARE_FUNC);
-	zbx_vector_ptr_uniq(&actions, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_dc_action_ptr_sort(&actions, ZBX_DEFAULT_PTR_COMPARE_FUNC);
+	zbx_vector_dc_action_ptr_uniq(&actions, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
-	for (i = 0; i < actions.values_num; i++)
+	for (int i = 0; i < actions.values_num; i++)
 	{
-		action = (zbx_dc_action_t *)actions.values[i];
+		action = actions.values[i];
 
 		if (ZBX_CONDITION_EVAL_TYPE_AND_OR == action->evaltype)
-			zbx_vector_ptr_sort(&action->conditions, dc_compare_action_conditions_by_type);
+		{
+			zbx_vector_dc_action_condition_ptr_sort(&action->conditions,
+					dc_compare_action_conditions_by_type);
+		}
 	}
 
-	zbx_vector_ptr_destroy(&actions);
+	zbx_vector_dc_action_ptr_destroy(&actions);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -5804,7 +6091,7 @@ static void	dc_sync_drules(zbx_dbsync_t *sync, zbx_uint64_t revision)
 
 		dc_strpool_replace(found, (const char **)&drule->delay_str, row[2]);
 
-		delay_str = dc_expand_user_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
+		delay_str = dc_expand_user_and_func_macros_dyn(row[2], NULL, 0, ZBX_MACRO_ENV_NONSECURE);
 		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 			delay = ZBX_DEFAULT_INTERVAL;
 		zbx_free(delay_str);
@@ -6095,7 +6382,7 @@ static void	dc_sync_httptests(zbx_dbsync_t *sync, zbx_uint64_t revision)
 			zbx_vector_dc_httptest_ptr_append(&host->httptests, httptest);
 		}
 
-		delay_str = dc_expand_user_macros_dyn(row[2], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		delay_str = dc_expand_user_and_func_macros_dyn(row[2], &hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
 			delay = ZBX_DEFAULT_INTERVAL;
 		zbx_free(delay_str);
@@ -6699,6 +6986,8 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_strpool_replace(found, &connector->ssl_key_password, row[17]);
 		ZBX_STR2UCHAR(connector->status, row[18]);
 		ZBX_STR2UCHAR(connector->tags_evaltype, row[19]);
+		connector->item_value_type = atoi(row[20]);
+		dc_strpool_replace(found, &connector->attempt_interval, row[21]);
 	}
 
 	/* remove deleted connectors */
@@ -6718,6 +7007,7 @@ static void	DCsync_connectors(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		dc_strpool_release(connector->ssl_cert_file);
 		dc_strpool_release(connector->ssl_key_file);
 		dc_strpool_release(connector->ssl_key_password);
+		dc_strpool_release(connector->attempt_interval);
 
 		zbx_hashset_remove_direct(&config->connectors, connector);
 	}
@@ -6997,12 +7287,47 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids)
+{
+	zbx_hashset_iter_t	iter;
+	const ZBX_DC_HOST	*dc_host;
+	zbx_uint64_t		global_revision = 0;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (SUCCEED == um_cache_get_host_revision(config->um_cache, 0, &global_revision) &&
+			global_revision >= new_revision)
+	{
+		zbx_vector_uint64_append(hostids, 0);
+	}
+
+	zbx_hashset_iter_reset(&config->hosts, &iter);
+	while (NULL != (dc_host = (const ZBX_DC_HOST *)zbx_hashset_iter_next(&iter)))
+	{
+		zbx_uint64_t	revision = 0;
+
+		if (dc_host->revision >= new_revision)
+		{
+			zbx_vector_uint64_append(hostids, dc_host->hostid);
+			continue;
+		}
+
+		if (SUCCEED == um_cache_get_host_revision(config->um_cache, dc_host->hostid, &revision) &&
+				revision >= new_revision)
+		{
+			zbx_vector_uint64_append(hostids, dc_host->hostid);
+		}
+	}
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault, int proxyconfig_frequency)
 {
 	static int	sync_status = ZBX_DBSYNC_STATUS_UNKNOWN;
@@ -8002,6 +8327,8 @@ clean:
 		DCdump_configuration();
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+
+	return new_revision;
 }
 
 /******************************************************************************
@@ -9026,6 +9353,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->disable_until = src_interface->disable_until;
 		dst_interface->errors_from = src_interface->errors_from;
 		zbx_strscpy(dst_interface->error, src_interface->error);
+		dst_interface->version = src_interface->version;
 	}
 	else
 	{
@@ -9040,6 +9368,7 @@ void	DCget_interface(zbx_dc_interface_t *dst_interface, const ZBX_DC_INTERFACE *
 		dst_interface->disable_until = 0;
 		dst_interface->errors_from = 0;
 		*dst_interface->error = '\0';
+		dst_interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
 	}
 
 	dst_interface->addr = (1 == dst_interface->useip ? dst_interface->ip_orig : dst_interface->dns_orig);
@@ -11633,6 +11962,18 @@ out:
 	return ret;
 }
 
+void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version)
+{
+	ZBX_DC_INTERFACE	*dc_interface;
+
+	WRLOCK_CACHE;
+
+	if (NULL != (dc_interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid)))
+		dc_interface->version = version;
+
+	UNLOCK_CACHE;
+}
+
 /***************************************************************************************
  *                                                                                     *
  * Purpose: attempt to set interface as unavailable based on agent availability        *
@@ -12313,8 +12654,8 @@ int	zbx_dc_get_item_queue(zbx_vector_ptr_t *queue, int from, int to)
 						data_expected_from = dc_host->data_expected_from;
 					}
 
-					delay_s = dc_expand_user_macros_dyn(dc_item->delay, &dc_item->hostid, 1,
-							ZBX_MACRO_ENV_NONSECURE);
+					delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay, &dc_item->hostid,
+							1, ZBX_MACRO_ENV_NONSECURE);
 					ret = zbx_interval_preproc(delay_s, &delay, NULL, NULL);
 					zbx_free(delay_s);
 
@@ -12416,8 +12757,8 @@ static void	get_host_statistics(ZBX_DC_HOST *dc_host, ZBX_DC_PROXY *dc_proxy, in
 						int	delay;
 						char	*delay_s;
 
-						delay_s = dc_expand_user_macros_dyn(dc_item->delay, &dc_item->hostid, 1,
-								ZBX_MACRO_ENV_NONSECURE);
+						delay_s = dc_expand_user_and_func_macros_dyn(dc_item->delay,
+								&dc_item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
 
 						if (SUCCEED == zbx_interval_preproc(delay_s, &delay, NULL, NULL) &&
 								0 != delay)
@@ -13181,16 +13522,21 @@ void	zbx_config_clean(zbx_config_t *cfg)
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces)
 {
 #define ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL	(10 * SEC_PER_MIN)
+#define ZBX_INTERFACE_VERSION_RESET_INTERVAL	(SEC_PER_HOUR)
 
 	ZBX_DC_HOST			*host;
 	ZBX_DC_INTERFACE		*interface;
 	zbx_hashset_iter_t		iter;
 	zbx_interface_availability_t	*ia = NULL;
 	int				now;
+	static int			last_version_reset;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
+
+	if (last_version_reset + ZBX_INTERFACE_VERSION_RESET_INTERVAL < now)
+		last_version_reset = now;
 
 	WRLOCK_CACHE;
 
@@ -13202,6 +13548,12 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &interface->hostid)))
 			continue;
+
+		if (last_version_reset == now)
+		{
+			if (interface->version < ZBX_COMPONENT_VERSION(7, 0, 0))
+				interface->version = ZBX_COMPONENT_VERSION(7, 0, 0);
+		}
 
 		/* On server skip hosts handled by proxies. They are handled directly */
 		/* when receiving hosts' availability data from proxies.              */
@@ -13256,6 +13608,7 @@ int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfac
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() interfaces:%d", __func__, interfaces->values_num);
 
 	return 0 == interfaces->values_num ? FAIL : SUCCEED;
+#undef ZBX_INTERFACE_VERSION_RESET_INTERVAL
 #undef ZBX_INTERFACE_MOVE_TOLERANCE_INTERVAL
 }
 
@@ -14921,7 +15274,7 @@ static void	proxy_discovery_add_item_type_timeout(const char *key, struct zbx_js
 	char	*expanded_value;
 	int	tm_seconds = 0;
 
-	expanded_value = dc_expand_user_macros_dyn(raw_timeout, &proxyid, 1, ZBX_MACRO_ENV_NONSECURE);
+	expanded_value = dc_expand_user_and_func_macros_dyn(raw_timeout, &proxyid, 1, ZBX_MACRO_ENV_NONSECURE);
 
 	if (SUCCEED == zbx_is_time_suffix(expanded_value, &tm_seconds, ZBX_LENGTH_UNLIMITED))
 	{
@@ -15118,9 +15471,9 @@ char	*zbx_dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t 
 		zbx_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
-		(void)zbx_dc_expand_user_macros(um_handle, &param, &hostid, 1, NULL);
+		(void)zbx_dc_expand_user_and_func_macros(um_handle, &param, &hostid, 1, NULL);
 
-		if (SUCCEED == zbx_function_param_quote(&param, quoted))
+		if (SUCCEED == zbx_function_param_quote(&param, quoted, 1))
 			zbx_strcpy_alloc(&buf, &buf_alloc, &buf_offset, param);
 		else
 			zbx_strncpy_alloc(&buf, &buf_alloc, &buf_offset, ptr + param_pos, param_len);
@@ -15305,7 +15658,7 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand user macros in the specified text value                    *
+ * Purpose: expand user and function  macros in the specified text value      *
  *                                                                            *
  * Parameters: um_handle   - [IN] the user macro cache handle                 *
  *             text        - [IN/OUT] the text value with macros to expand    *
@@ -15314,30 +15667,46 @@ void	zbx_dc_get_user_macro(const zbx_dc_um_handle_t *um_handle, const char *macr
  *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, char **error)
+int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, char **error)
 {
 	zbx_token_t	token;
 	int		pos = 0, ret = FAIL;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'", __func__, *text);
+	zabbix_log(LOG_LEVEL_TRACE, "In %s() '%s'", __func__, *text);
 
 	for (; SUCCEED == zbx_token_find(*text, pos, &token, ZBX_TOKEN_SEARCH_BASIC); pos++)
 	{
 		const char	*value = NULL;
+		char		*out = NULL;
 
-		if (ZBX_TOKEN_USER_MACRO != token.type)
-			continue;
+		switch(token.type)
+		{
+			case ZBX_TOKEN_USER_FUNC_MACRO:
+				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
+						token.loc.l + 1, um_handle->macro_env, &value);
 
-		um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text + token.loc.l,
-				um_handle->macro_env, &value);
+				if (NULL != value)
+					out = zbx_strdup(NULL, value);
+
+				ret = zbx_calculate_macro_function(*text + token.loc.l, &token.data.func_macro, &out);
+				value = out;
+				break;
+			case ZBX_TOKEN_USER_MACRO:
+				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
+						token.loc.l, um_handle->macro_env, &value);
+				break;
+			default:
+				continue;
+		}
 
 		if (NULL == value)
 		{
 			if (NULL != error)
 			{
 				*error = zbx_dsprintf(NULL, "unknown user macro \"%.*s\"",
-						(int)(token.loc.r - token.loc.l + 1), *text + token.loc.l);
+						(int)(token.loc.r - token.loc.l + 1), *text +
+						token.loc.l);
 				goto out;
 			}
 		}
@@ -15345,18 +15714,19 @@ int	zbx_dc_expand_user_macros(const zbx_dc_um_handle_t *um_handle, char **text, 
 			zbx_replace_string(text, token.loc.l, &token.loc.r, value);
 
 		pos = (int)token.loc.r;
+		zbx_free(out);
 	}
 
 	ret = SUCCEED;
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() '%s'", __func__, *text);
+	zabbix_log(LOG_LEVEL_TRACE, "End of %s() '%s'", __func__, *text);
 
 	return ret;
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: expand user macros in the specified text value                    *
+ * Purpose: expand user and func macros in the specified text value           *
  *                                                                            *
  * Parameters: um_cache    - [IN] the user macro cache                        *
  *             text        - [IN/OUT] the text value with macros to expand    *
@@ -15366,13 +15736,13 @@ out:
  *             error       - [OUT] the error message                          *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_expand_user_macros_from_cache(zbx_um_cache_t *um_cache, char **text, const zbx_uint64_t *hostids,
-		int hostids_num, unsigned char env, char **error)
+int	zbx_dc_expand_user_and_func_macros_from_cache(zbx_um_cache_t *um_cache, char **text,
+		const zbx_uint64_t *hostids, int hostids_num, unsigned char env, char **error)
 {
-	/* wrap the passed user macro cache into user macro handle structure */
+	/* wrap the passed user macro and func macro cache into user macro handle structure */
 	zbx_dc_um_handle_t	um_handle = {.cache = &um_cache, .macro_env = env, .prev = NULL};
 
-	return zbx_dc_expand_user_macros(&um_handle, text, hostids, hostids_num, error);
+	return zbx_dc_expand_user_and_func_macros(&um_handle, text, hostids, hostids_num, error);
 }
 
 typedef struct
@@ -15476,7 +15846,10 @@ static void	dc_get_items_to_reschedule(const zbx_hashset_t *activated_hosts, zbx
 			delay_ex = NULL;
 		}
 		else
-			delay_ex = dc_expand_user_macros_dyn(item->delay, &item->hostid, 1, ZBX_MACRO_ENV_NONSECURE);
+		{
+			delay_ex = dc_expand_user_and_func_macros_dyn(item->delay, &item->hostid, 1,
+					ZBX_MACRO_ENV_NONSECURE);
+		}
 
 		if (0 != zbx_strcmp_null(item->delay_ex, delay_ex))
 		{

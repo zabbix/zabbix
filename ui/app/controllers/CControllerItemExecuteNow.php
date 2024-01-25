@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,14 +84,14 @@ class CControllerItemExecuteNow extends CController {
 			]);
 		}
 		else {
-			$items = API::Item()->get([
-				'output' => ['type', 'name', 'status', 'flags', 'master_itemid'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['type', 'name_resolved', 'status', 'flags', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 		}
 
 		if ($items) {
@@ -278,14 +278,14 @@ class CControllerItemExecuteNow extends CController {
 
 		// If some items were not found in cache, select them from DB.
 		if ($itemids) {
-			$items = API::Item()->get([
-				'output' => ['type', 'name', 'status', 'master_itemid'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['type', 'name_resolved', 'status', 'master_itemid'],
 				'selectHosts' => ['name', 'status'],
 				'itemids' => $itemids,
 				'editable' => !$this->checkAccess(CRoleHelper::ACTIONS_INVOKE_EXECUTE_NOW),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			/*
 			 * Master item could be removed during the process, which means dependent item is also removed. If that is

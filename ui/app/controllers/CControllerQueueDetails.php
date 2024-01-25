@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,13 +56,13 @@ class CControllerQueueDetails extends CController {
 		}
 		else {
 			$queue_data = array_column($queue_data, null, 'itemid');
-			$items = API::Item()->get([
-				'output' => ['hostid', 'name'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['hostid', 'name_resolved'],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($queue_data),
 				'webitems' => true,
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 
 			if (count($queue_data) != count($items)) {
 				$items += API::DiscoveryRule()->get([

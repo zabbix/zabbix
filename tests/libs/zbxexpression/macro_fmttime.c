@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,6 +78,8 @@ void	zbx_mock_test_entry(void **state)
 	const char		*expected_value;
 	zbx_token_func_macro_t	token;
 	zbx_mock_handle_t	handle;
+	struct tm		ltm;
+	time_t			time_new;
 
 	ZBX_UNUSED(state);
 
@@ -97,6 +99,13 @@ void	zbx_mock_test_entry(void **state)
 			.func_param	= { func_param_pos, strlen(macro_expr) - 2 }
 		};
 
+#define FMTTIME_INPUT_SIZE	20
+	time_new = time(&time_new);
+	localtime_r(&time_new, &ltm);
+	returned_value = zbx_malloc(returned_value, FMTTIME_INPUT_SIZE);
+	zbx_snprintf(returned_value, FMTTIME_INPUT_SIZE, "%.4d-%.2d-%.2dT%.2d:%.2d:%.2d", ltm.tm_year + 1900,
+			ltm.tm_mon + 1, ltm.tm_mday, ltm.tm_hour, ltm.tm_min, ltm.tm_sec);
+
 	returned_ret = zbx_calculate_macro_function(macro_expr, &token, &returned_value);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 	zbx_mock_assert_result_eq("return value", expected_ret, returned_ret);
@@ -112,4 +121,5 @@ void	zbx_mock_test_entry(void **state)
 	}
 
 	zbx_free(returned_value);
+#undef FMTTIME_INPUT_SIZE
 }

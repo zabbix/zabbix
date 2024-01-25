@@ -14,6 +14,8 @@ libcommonsysinfo_a_SOURCES = \
 	cpu.h \
 	dir.c \
 	dir.h \
+	ip_reverse.c \
+	ip_reverse.h \
 	dns.c \
 	dns.h \
 	vfs_file.c \

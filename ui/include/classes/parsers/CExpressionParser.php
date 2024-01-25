@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ class CExpressionParser extends CParser {
 	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
 	 *   'host_macro_n' => false          Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
 	 *   'empty_host' => false            Allow empty hostname in the query string.
+	 *   'escape_backslashes' => true     Disable backslash escaping in history function parameters prior to v7.0.
 	 *
 	 * @var array
 	 */
@@ -66,7 +67,8 @@ class CExpressionParser extends CParser {
 		'calculated' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
-		'empty_host' => false
+		'empty_host' => false,
+		'escape_backslashes' => true
 	];
 
 	/**
@@ -530,10 +532,9 @@ class CExpressionParser extends CParser {
 	 *  - function like func(/host/item,<params>)
 	 *  - floating point number; can be with suffix [KMGTsmhdw]
 	 *  - string
-	 *  - macro like {TRIGGER.VALUE}
-	 *  - user macro like {$MACRO}
-	 *  - LLD macro like {#LLD}
-	 *  - LLD macro with function like {{#LLD}.func())}
+	 *  - macros like {TRIGGER.VALUE} and {{TRIGGER.VALUE}.func()}
+	 *  - user macros like {$MACRO} and {{$MACRO}.func()}
+	 *  - LLD macros like {#LLD} and {{#LLD}.func()}
 	 *
 	 * @param string  $source
 	 * @param int     $pos
@@ -549,17 +550,19 @@ class CExpressionParser extends CParser {
 		}
 
 		if (!$options['calculated']) {
-			$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
+			if (self::parseUsing(new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]), $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
+				return true;
+			}
 
-			if (self::parseUsing($macro_parser, $source, $pos, $tokens, CExpressionParserResult::TOKEN_TYPE_MACRO)) {
+			if (self::parseUsing(new CMacroFunctionParser(['macros' => ['{TRIGGER.VALUE}']]), $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_MACRO)) {
 				return true;
 			}
 		}
 
 		if ($options['collapsed_expression']) {
-			$functionid_parser = new CFunctionIdParser();
-
-			if (self::parseUsing($functionid_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CFunctionIdParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO)) {
 				return true;
 			}
@@ -573,25 +576,24 @@ class CExpressionParser extends CParser {
 		}
 
 		if ($options['usermacros']) {
-			$user_macro_parser = new CUserMacroParser();
+			if (self::parseUsing(new CUserMacroParser, $source, $pos, $tokens,
+					CExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
+				return true;
+			}
 
-			if (self::parseUsing($user_macro_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CUserMacroFunctionParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_USER_MACRO)) {
 				return true;
 			}
 		}
 
 		if ($options['lldmacros']) {
-			$lld_macro_parser = new CLLDMacroParser();
-
-			if (self::parseUsing($lld_macro_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CLLDMacroParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 				return true;
 			}
 
-			$lld_macro_function_parser = new CLLDMacroFunctionParser();
-
-			if (self::parseUsing($lld_macro_function_parser, $source, $pos, $tokens,
+			if (self::parseUsing(new CLLDMacroFunctionParser, $source, $pos, $tokens,
 					CExpressionParserResult::TOKEN_TYPE_LLD_MACRO)) {
 				return true;
 			}
@@ -617,7 +619,8 @@ class CExpressionParser extends CParser {
 			'calculated' => $options['calculated'],
 			'host_macro' => $options['host_macro'],
 			'host_macro_n' => $options['host_macro_n'],
-			'empty_host' => $options['empty_host']
+			'empty_host' => $options['empty_host'],
+			'escape_backslashes' => $options['escape_backslashes']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {
@@ -841,15 +844,13 @@ class CExpressionParser extends CParser {
 			}
 
 			if ($allow_macros) {
-				$user_macro_parser = new CUserMacroParser();
-				$macro_parser = new CMacroParser(['macros' => ['{TRIGGER.VALUE}']]);
-				$lld_macro_parser = new CLLDMacroParser();
-				$lld_macro_function_parser = new CLLDMacroFunctionParser;
-
-				if ($user_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-						|| $macro_parser->parse($value) == CParser::PARSE_SUCCESS
-						|| $lld_macro_parser->parse($value) == CParser::PARSE_SUCCESS
-						|| $lld_macro_function_parser->parse($value) == CParser::PARSE_SUCCESS) {
+				$parser_options = ['macros' => ['{TRIGGER.VALUE}']];
+				if ((new CMacroParser($parser_options))->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CMacroFunctionParser($parser_options))->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CUserMacroParser)->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CUserMacroFunctionParser)->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CLLDMacroParser)->parse($value) == CParser::PARSE_SUCCESS
+						|| (new CLLDMacroFunctionParser)->parse($value) == CParser::PARSE_SUCCESS) {
 					return $value;
 				}
 			}

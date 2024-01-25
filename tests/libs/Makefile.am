@@ -19,4 +19,6 @@ SUBDIRS = \
 	zbxtagfilter \
 	zbxtrends \
 	zbxtime \
-	zbxeval
+	zbxeval \
+	zbxfile \
+	zbxhttp

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2076,7 +2076,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful update of lld_macro_paths by replaceing them with exact values' => [
+			'Test successful update of lld_macro_paths by replacing them with exact values' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [
@@ -2724,44 +2724,66 @@ class testDiscoveryRule extends CAPITest {
 		if ($expected_error === null) {
 			$this->assertTrue($result['result']);
 
+			/*
+			 * NOTE: Metadata like lastlogsize, mtime should not be copied. Fields like hostid, itemid are unset, since
+			 * they will differ on target hosts.
+			 */
+
+			$lld_ruleids = [];
+
 			// Get all discovery rule fields.
 			$src_items = CDBHelper::getAll(
-				'SELECT i.type,i.snmp_oid,i.name,i.key_,i.delay,'.
-						'i.status,i.value_type,i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,'.
-						'i.params,i.ipmi_sensor,i.authtype,i.username,i.password,i.publickey,i.privatekey,'.
-						'i.flags,i.description,i.inventory_link,i.lifetime,i.jmx_endpoint,i.url,i.query_fields,i.timeout,'.
-						'i.posts,i.status_codes,i.follow_redirects,i.post_type,i.http_proxy,i.headers,i.retrieve_mode,'.
-						'i.request_method,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,i.verify_peer,'.
-						'i.verify_host,i.allow_traps'.
+				'SELECT i.itemid,i.type,i.snmp_oid,i.hostid,i.name,i.key_,i.delay,i.status,i.value_type,'.
+					'i.trapper_hosts,i.units,i.logtimefmt,i.valuemapid,i.params,i.ipmi_sensor,i.authtype,i.username,'.
+					'i.password,i.publickey,i.privatekey,i.flags,i.description,i.inventory_link,i.lifetime,'.
+					'i.jmx_endpoint,i.url,i.query_fields,i.timeout,i.posts,i.status_codes,i.follow_redirects,'.
+					'i.post_type,i.http_proxy,i.headers,i.retrieve_mode,i.request_method,i.ssl_cert_file,'.
+					'i.ssl_key_file,i.ssl_key_password,i.verify_peer,i.verify_host,i.allow_traps'.
 				' FROM items i'.
 				' WHERE '.dbConditionId('i.itemid', $params['discoveryids'])
 			);
-			$src_items = zbx_toHash($src_items, 'key_');
-			/*
-			 * NOTE: Metadata like lastlogsize, mtime should not be copied. Fields like hostid, interfaceid, itemid
-			 * are not selected, since they will be different.
-			 */
+			$src_items = array_column($src_items, null, 'itemid');
 
-			// Find same items on destination hosts.
-			foreach ($params['discoveryids'] as $itemid) {
-				$dst_items = CDBHelper::getAll(
-					'SELECT src.type,src.snmp_oid,src.name,src.key_,'.
-						'src.delay,src.status,src.value_type,src.trapper_hosts,src.units,'.
-						'src.logtimefmt,src.valuemapid,src.params,'.
-						'src.ipmi_sensor,src.authtype,src.username,src.password,src.publickey,src.privatekey,'.
-						'src.flags,src.description,src.inventory_link,src.lifetime,src.jmx_endpoint,'.
-						'src.url,src.query_fields,src.timeout,src.posts,src.status_codes,src.follow_redirects,'.
-						'src.post_type,src.http_proxy,src.headers,src.retrieve_mode,src.request_method,'.
-						'src.ssl_cert_file,src.ssl_key_file,src.ssl_key_password,src.verify_peer,src.verify_host,'.
-						'src.allow_traps'.
-					' FROM items src,items dest'.
-					' WHERE dest.itemid='.zbx_dbstr($itemid).
-						' AND src.key_=dest.key_'.
-						' AND '.dbConditionInt('src.hostid', $params['hostids'])
-				);
+			foreach ($src_items as $src_item) {
+				$lld_ruleids[$src_item['hostid']][$src_item['key_']] = $src_item['itemid'];
+			}
 
-				foreach ($dst_items as $dst_item) {
-					$this->assertSame($src_items[$dst_item['key_']], $dst_item);
+			$dest_items = CDBHelper::getAll(
+				'SELECT dest.itemid,dest.type,dest.snmp_oid,dest.hostid,dest.name,dest.key_,dest.delay,dest.status,'.
+					'dest.value_type,dest.trapper_hosts,dest.units,dest.logtimefmt,dest.valuemapid,dest.params,'.
+					'dest.ipmi_sensor,dest.authtype,dest.username,dest.password,dest.publickey,dest.privatekey,'.
+					'dest.flags,dest.description,dest.inventory_link,dest.lifetime,dest.jmx_endpoint,dest.url,'.
+					'dest.query_fields,dest.timeout,dest.posts,dest.status_codes,dest.follow_redirects,dest.post_type,'.
+					'dest.http_proxy,dest.headers,dest.retrieve_mode,dest.request_method,dest.ssl_cert_file,'.
+					'dest.ssl_key_file,dest.ssl_key_password,dest.verify_peer,dest.verify_host,dest.allow_traps'.
+				' FROM items dest,items src'.
+				' WHERE '.dbConditionId('src.itemid', $params['discoveryids']).
+					' AND dest.key_=src.key_'.
+					' AND '.dbConditionId('dest.hostid', $params['hostids'])
+			);
+			$dest_items = array_column($dest_items, null, 'itemid');
+
+			foreach ($dest_items as $dest_item) {
+				$lld_ruleids[$dest_item['hostid']][$dest_item['key_']] = $dest_item['itemid'];
+			}
+
+			foreach ($params['discoveryids'] as $src_itemid) {
+				$this->assertArrayHasKey($src_itemid, $src_items, 'Source LLD rule should be retrieved.');
+
+				$src_item = $src_items[$src_itemid];
+				unset($src_item['itemid'], $src_item['hostid']);
+
+				foreach ($params['hostids'] as $dest_hostid) {
+					$this->assertArrayHasKey($dest_hostid, $lld_ruleids, 'Destination host exists in LLD rule copies.');
+					$this->assertArrayHasKey($src_item['key_'], $lld_ruleids[$dest_hostid],
+						'Destination host has item with matching key.'
+					);
+
+					$dest_itemid = $lld_ruleids[$dest_hostid][$src_item['key_']];
+					$dest_item = $dest_items[$dest_itemid];
+					unset($dest_item['itemid'], $dest_item['hostid']);
+
+					$this->assertSame($src_item, $dest_item, 'LLD and copy on host should match.');
 				}
 			}
 		}

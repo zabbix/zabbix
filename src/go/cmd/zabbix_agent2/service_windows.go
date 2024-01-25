@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,20 +41,20 @@ import (
 const usageMessageExampleConfPath = `C:\zabbix\zabbix_agent2.conf`
 
 var (
-    serviceName = "Zabbix Agent 2"
+	serviceName = "Zabbix Agent 2"
 
-    svcInstallFlag       bool
-    svcUninstallFlag     bool
-    svcStartFlag         bool
-    svcStopFlag          bool
-    svcMultipleAgentFlag bool
+	svcInstallFlag       bool
+	svcUninstallFlag     bool
+	svcStartFlag         bool
+	svcStopFlag          bool
+	svcMultipleAgentFlag bool
 
-    winServiceRun bool
+	winServiceRun bool
 
-    eLog *eventlog.Log
+	eLog *eventlog.Log
 
-    winServiceWg sync.WaitGroup
-    fatalStopWg  sync.WaitGroup
+	winServiceWg sync.WaitGroup
+	fatalStopWg  sync.WaitGroup
 
 	fatalStopChan chan bool
 	startChan     chan bool
@@ -170,26 +170,45 @@ func eventLogErr(err error) error {
 	return nil
 }
 
+func validateMultipleAgentFlag() bool {
+	if svcMultipleAgentFlag && !(svcInstallFlag || svcUninstallFlag || svcStartFlag || svcStopFlag) && !winServiceRun {
+		return false
+	}
+
+	return true
+}
+
 func validateExclusiveFlags(args *Arguments) error {
 	var (
-		defaultFlagSet  = args.test != "" || args.print || args.verbose
-		serviceFlagsSet = []bool{svcInstallFlag, svcUninstallFlag, svcStartFlag, svcStopFlag}
-		count           int
+		exclusiveFlagsSet = []bool{
+			svcInstallFlag,
+			svcUninstallFlag,
+			svcStartFlag,
+			svcStopFlag,
+			args.print,
+			args.test != "",
+			args.runtimeCommand != "",
+			args.testConfig,
+		}
+		count int
 	)
 
-	for _, serserviceFlagSet := range serviceFlagsSet {
-		if serserviceFlagSet {
+	if args.verbose && !(args.test != "" || args.print) {
+		return errors.New("option -v, --verbose can only be specified with -t or -p")
+	}
+
+	for _, exclusiveFlagSet := range exclusiveFlagsSet {
+		if exclusiveFlagSet {
 			count++
 		}
-		if count >= 2 || (serserviceFlagSet && defaultFlagSet) {
-			return errors.New("mutually exclusive options used, use help '-help'('-h'), for additional information")
+		if count >= 2 { //nolint:gomnd
+			return errors.New("mutually exclusive options used, see -h, --help for more information")
 		}
 	}
 
-	if svcMultipleAgentFlag && count == 0 && !winServiceRun {
+	if !validateMultipleAgentFlag() {
 		return errors.New(
-			"multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information",
-		)
+			"option -m, --multiple-agents can only be used with one of the service options, see -h, --help for more information")
 	}
 
 	return nil

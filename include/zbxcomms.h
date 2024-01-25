@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -147,6 +147,9 @@ typedef struct
 	const int		config_timeout;
 	const int		config_trapper_timeout;
 	const char		*config_source_ip;
+	const char		*config_ssl_ca_location;
+	const char		*config_ssl_cert_location;
+	const char		*config_ssl_key_location;
 }
 zbx_config_comms_args_t;
 
@@ -204,7 +207,6 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
-	zbx_uint32_t			reserved_payload;
 }
 zbx_socket_t;
 
@@ -243,6 +245,7 @@ void	zbx_gethost_by_ip(const char *ip, char *host, size_t hostlen);
 void	zbx_getip_by_host(const char *host, char *ip, size_t iplen);
 int	zbx_inet_ntop(struct addrinfo *ai, char *ip, socklen_t len);
 #endif
+int	zbx_inet_pton(int af, const char *src, void *dst);
 
 int	zbx_tcp_connect(zbx_socket_t *s, const char *source_ip, const char *ip, unsigned short port, int timeout,
 		unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2);
@@ -286,7 +289,8 @@ void	zbx_tcp_close(zbx_socket_t *s);
 int	get_address_family(const char *addr, int *family, char *error, int max_error_len);
 #endif
 
-int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout);
+int	zbx_tcp_listen(zbx_socket_t *s, const char *listen_ip, unsigned short listen_port, int timeout,
+		int config_tcp_max_backlog_size);
 void	zbx_tcp_unlisten(zbx_socket_t *s);
 
 int	zbx_tcp_accept(zbx_socket_t *s, unsigned int tls_accept, int poll_timeout);

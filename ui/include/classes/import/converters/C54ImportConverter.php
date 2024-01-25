@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -129,6 +129,12 @@ class C54ImportConverter extends CConverter {
 	 */
 	private static function convertItems(array $items): array {
 		foreach ($items as &$item) {
+			$item += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
+
+			if ($item['type'] === CXmlConstantName::CALCULATED && array_key_exists('params', $item)) {
+				$item['params'] = self::convertCalcItemFormula($item['params']);
+			}
+
 			if (array_key_exists('preprocessing', $item)) {
 				$item['preprocessing'] = self::convertPreprocessingSteps($item['preprocessing']);
 			}
@@ -176,12 +182,91 @@ class C54ImportConverter extends CConverter {
 			}
 
 			if (array_key_exists('item_prototypes', $discovery_rule)) {
-				$discovery_rule['item_prototypes'] = self::convertItems($discovery_rule['item_prototypes']);
+				$discovery_rule['item_prototypes'] = self::convertItemPrototypes($discovery_rule['item_prototypes']);
 			}
 		}
 		unset($discovery_rule);
 
 		return $discovery_rules;
+	}
+
+	/**
+	 * @param array  $item_prototypes
+	 *
+	 * @return array
+	 */
+	private static function convertItemPrototypes(array $item_prototypes): array {
+		foreach ($item_prototypes as &$item_prototype) {
+			$item_prototype += ['type' => CXmlConstantName::ZABBIX_PASSIVE];
+
+			if ($item_prototype['type'] === CXmlConstantName::CALCULATED
+					&& array_key_exists('params', $item_prototype)) {
+				$item_prototype['params'] = self::convertCalcItemFormula($item_prototype['params'], true);
+			}
+
+			if (array_key_exists('preprocessing', $item_prototype)) {
+				$item_prototype['preprocessing'] = self::convertPreprocessingSteps($item_prototype['preprocessing']);
+			}
+		}
+		unset($item_prototype);
+
+		return $item_prototypes;
+	}
+
+	/**
+	 * Removes useless 2nd parameter from last_foreach() functions if it is 0.
+	 *
+	 * @param string $formula
+	 * @param bool   $prototype
+	 *
+	 * @return string
+	 */
+	private static function convertCalcItemFormula(string $formula, bool $prototype = false): string {
+		$expression_parser = new CExpressionParser([
+			'usermacros' => true,
+			'lldmacros' => $prototype,
+			'calculated' => true,
+			'host_macro' => true,
+			'empty_host' => true
+		]);
+
+		$simple_interval_parser = new CSimpleIntervalParser(['with_year' => true]);
+
+		if ($expression_parser->parse($formula) != CParser::PARSE_SUCCESS) {
+			return $formula;
+		}
+
+		$tokens = $expression_parser
+			->getResult()
+			->getTokensOfTypes([CExpressionParserResult::TOKEN_TYPE_HIST_FUNCTION]);
+
+		foreach (array_reverse($tokens) as $token) {
+			if ($token['data']['function'] !== 'last_foreach' || count($token['data']['parameters']) != 2) {
+				continue;
+			}
+
+			if ($token['data']['parameters'][1]['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
+				continue;
+			}
+
+			$sec_num = $token['data']['parameters'][1]['data']['sec_num'];
+
+			if ($simple_interval_parser->parse($sec_num) != CParser::PARSE_SUCCESS) {
+				continue;
+			}
+
+			if (timeUnitToSeconds($sec_num, true) == 0) {
+				$pos = $token['data']['parameters'][1]['pos'];
+				$length = $token['data']['parameters'][1]['length'];
+				for ($lpos = $pos; $formula[$lpos] !== ','; $lpos--)
+					;
+				$rpos = strpos($formula, ')', $pos + $length);
+
+				$formula = substr_replace($formula, '', $lpos, $rpos - $lpos);
+			}
+		}
+
+		return $formula;
 	}
 
 	/**

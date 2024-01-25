@@ -38,6 +38,10 @@
 			border-top-right-radius: 0;
 			border-bottom-right-radius: 0;
 		}
+
+		&[data-hintbox='1'] {
+			cursor: pointer;
+		}
 	}
 }
 

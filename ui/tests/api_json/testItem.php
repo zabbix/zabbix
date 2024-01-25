@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -251,6 +251,322 @@ class testItem extends CAPITest {
 								'password' => str_repeat('z', 255)
 							],
 							'expected_error' => null
+						],
+						'Accept query fields' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.query_fields',
+								'name' => 'httpagent.accept.query_fields',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'foo',
+										'value' => 'bar'
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Accept query fields repeated' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.query_fields.repeated',
+								'name' => 'httpagent.accept.query_fields.repeated',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'foo',
+										'value' => 'bar'
+									],
+									[
+										'name' => 'foo',
+										'value' => 'bar'
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Accept query fields empty value' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.query_fields.empty.value',
+								'name' => 'httpagent.accept.query_fields.empty.value',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'foo',
+										'value' => ''
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Reject query fields empty name' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.query_fields.empty.name',
+								'name' => 'httpagent.reject.query_fields.empty.name',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => '',
+										'value' => ''
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/query_fields/1/name": cannot be empty.'
+						],
+						'Reject query fields unexpected property' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.query_fields.unexpected',
+								'name' => 'httpagent.reject.query_fields.unexpected',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'foo',
+										'value' => 'bar',
+										'sortorder' => 5
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/query_fields/1": unexpected parameter "sortorder".'
+						],
+						'Reject old format query fields' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.query_fields.nonarray',
+								'name' => 'httpagent.accept.query_fields.nonarray',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => json_encode(['a' => 'b'])
+							],
+							'expected_error' => 'Invalid parameter "/1/query_fields": an array is expected.'
+						],
+						'Reject query fields without name' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.query_fields.no.name',
+								'name' => 'httpagent.reject.query_fields.no.name',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'value' => 'bar'
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/query_fields/1": the parameter "name" is missing.'
+						],
+						'Reject query fields without value' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.query_fields.no.value',
+								'name' => 'httpagent.reject.query_fields.no.value',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'foo'
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/query_fields/1": the parameter "value" is missing.'
+						],
+						'Accept max length for query fields' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.query_fields.long',
+								'name' => 'httpagent.accept.query_fields.long',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'a',
+										'value' => str_repeat('b', DB::getFieldLength('items', 'query_fields') - strlen('[{"a":""}]'))
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Reject too long query fields' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.query_fields.long',
+								'name' => 'httpagent.reject.query_fields.long',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'query_fields' => [
+									[
+										'name' => 'a',
+										'value' => str_repeat('b', DB::getFieldLength('items', 'query_fields') - strlen('[{"a":""}]') + 1)
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/query_fields": value is too long.'
+						],
+						'Accept headers' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.headers',
+								'name' => 'httpagent.accept.headers',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'name' => 'foo',
+										'value' => 'bar'
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Accept headers repeated' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.headers.repeated',
+								'name' => 'httpagent.accept.headers.repeated',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'name' => 'foo',
+										'value' => 'bar'
+									],
+									[
+										'name' => 'foo',
+										'value' => 'bar'
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Accept headers empty value' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.headers.empty.value',
+								'name' => 'httpagent.accept.headers.empty.value',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'name' => 'foo',
+										'value' => ''
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Reject headers empty name' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.headers.empty.name',
+								'name' => 'httpagent.reject.headers.empty.name',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'name' => '',
+										'value' => ''
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/headers/1/name": cannot be empty.'
+						],
+						'Reject headers unexpected property' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.headers.unexpected',
+								'name' => 'httpagent.reject.headers.unexpected',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'name' => 'foo',
+										'value' => 'bar',
+										'sortorder' => 5
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/headers/1": unexpected parameter "sortorder".'
+						],
+						'Reject old format headers' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.headers.nonarray',
+								'name' => 'httpagent.reject.headers.nonarray',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => implode("\r\n", ['foo: bar', 'bar: foo'])
+							],
+							'expected_error' => 'Invalid parameter "/1/headers": an array is expected.'
+						],
+						'Reject headers without name' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.headers.no.name',
+								'name' => 'httpagent.reject.headers.no.name',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'value' => 'bar'
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/headers/1": the parameter "name" is missing.'
+						],
+						'Reject headers without value' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.headers.no.value',
+								'name' => 'httpagent.reject.headers.no.value',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'name' => 'foo'
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/headers/1": the parameter "value" is missing.'
+						],
+						'Accept max length headers' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.accept.headers.long',
+								'name' => 'httpagent.accept.headers.long',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'value' => 'a',
+										'name' => str_repeat('b', DB::getFieldLength('items', 'headers') - strlen('a: '))
+									]
+								]
+							],
+							'expected_error' => null
+						],
+						'Reject too long headers' => [
+							'request_data' => $params + [
+								'hostid' => '50009',
+								'key_' => 'httpagent.reject.headers.long',
+								'name' => 'httpagent.reject.headers.long',
+								'type' => $type,
+								'value_type' => ITEM_VALUE_TYPE_TEXT,
+								'headers' => [
+									[
+										'value' => 'a',
+										'name' => str_repeat('b', DB::getFieldLength('items', 'headers') - strlen('a: ') + 1)
+									]
+								]
+							],
+							'expected_error' => 'Invalid parameter "/1/headers": value is too long.'
 						]
 					];
 					break;

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Ge_neral Public License as published by
@@ -21,6 +21,7 @@
 #define ZABBIX_MOCK_ASSERT_H
 
 #include "zbxtime.h"
+#include "zbxalgo.h"
 
 void	__zbx_mock_assert_str_eq(const char *file, int line, const char *prefix_msg, const char *expected_value,
 		const char *returned_value);
@@ -33,6 +34,12 @@ void	__zbx_mock_assert_uint64_eq(const char *file, int line, const char *prefix_
 
 void	__zbx_mock_assert_uint64_ne(const char *file, int line, const char *prefix_msg, zbx_uint64_t expected_value,
 		zbx_uint64_t returned_value);
+
+void	__zbx_mock_assert_vector_uint64_eq(const char *file, int line, const char *prefix_msg,
+		zbx_vector_uint64_t *expected_value, zbx_vector_uint64_t *returned_value);
+
+void	__zbx_mock_assert_vector_uint64_ne(const char *file, int line, const char *prefix_msg,
+		zbx_vector_uint64_t *expected_value, zbx_vector_uint64_t *returned_value);
 
 void	__zbx_mock_assert_int_eq(const char *file, int line, const char *prefix_msg, int expected_value,
 		int returned_value);
@@ -130,4 +137,9 @@ void	__zbx_mock_assert_time_ne(const char *file, int line, const char *prefix_ms
 #define zbx_mock_assert_time_ne(prefix_msg, expected_value, returned_value) \
 	__zbx_mock_assert_time_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 
+#define zbx_mock_assert_vector_uint64_eq(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_vector_uint64_eq(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
+
+#define zbx_mock_assert_vector_uint64_ne(prefix_msg, expected_value, returned_value) \
+	__zbx_mock_assert_vector_uint64_ne(__FILE__, __LINE__, prefix_msg, expected_value, returned_value)
 #endif

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 
 #ifdef HAVE_LIBXML2
 #	include <libxml/xpath.h>
+#	include <libxml/parser.h>
 #endif
 
 typedef struct _zbx_xml_node_t zbx_xml_node_t;
@@ -271,7 +272,7 @@ static int	query_xpath(zbx_variant_t *value, const char *params, int *is_empty, 
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
-	xmlErrorPtr	pErr;
+	const xmlError	*pErr;
 	xmlBufferPtr	xmlBufferLocal;
 
 	if (NULL == (doc = xmlReadMemory(value->data.str, strlen(value->data.str), "noname.xml", NULL, 0)))
@@ -672,7 +673,7 @@ static void	vector_to_json(zbx_vector_xml_node_ptr_t *nodes, struct zbx_json *js
  ******************************************************************************/
 int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **root_node, char **errmsg)
 {
-	xmlErrorPtr	pErr;
+	const xmlError	*pErr;
 
 	if (NULL == (*xml_doc = xmlReadMemory(data, strlen(data), "noname.xml", NULL, options)))
 	{
@@ -728,7 +729,7 @@ int	zbx_open_xml(char *data, int options, int maxerrlen, void **xml_doc, void **
  ******************************************************************************/
 int	zbx_check_xml_memory(char *mem, int maxerrlen, char **errmsg)
 {
-	xmlErrorPtr	pErr;
+	const xmlError	*pErr;
 
 	if (NULL == mem)
 	{
@@ -983,7 +984,7 @@ int	zbx_json_to_xml(char *json_data, char **xstr, char **errmsg)
 	int			size, ret = FAIL;
 	struct zbx_json_parse	jp;
 	xmlDoc			*doc = NULL;
-	xmlErrorPtr		pErr;
+	const xmlError		*pErr;
 	xmlChar			*xmem;
 
 	if (NULL == (doc = xmlNewDoc(BAD_CAST XML_DEFAULT_VERSION)))
@@ -1039,7 +1040,11 @@ zbx_libxml_error_t;
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error_xpath_check(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error_xpath_check(void *user_data, const xmlError *err)
+#endif
 {
 	zbx_libxml_error_t	*err_ctx;
 
@@ -1189,7 +1194,11 @@ out:
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error_try_read_value(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error_try_read_value(void *user_data, const xmlError *err)
+#endif
 {
 	ZBX_UNUSED(user_data);
 	ZBX_UNUSED(err);

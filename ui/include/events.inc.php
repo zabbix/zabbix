@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -252,7 +252,7 @@ function isEventUpdating(bool $in_closing, array $event): bool {
 /**
  * Calculate and return a rank change icon depending on current event rank change. If event is currently a cause event
  * and it is undergoing a rank change, return cause event icon. If event is currently a symptom event and it is
- * undergoing a rank change, return symptom event icon. Icon can be displayed regarless if current status is in closing.
+ * undergoing a rank change, return symptom event icon. Icon can be displayed regardless if current status is in closing.
  *
  * @param array  $event                              Event data.
  * @param array  $event['acknowledges']              List of event acknowledges.

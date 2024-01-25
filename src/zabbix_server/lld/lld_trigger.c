@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,15 +18,23 @@
 **/
 
 #include "lld.h"
-#include "zbxexpression.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
+
+#include "zbxexpression.h"
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_trigger.h"
 #include "zbxnum.h"
 #include "zbxdbwrap.h"
 #include "zbx_trigger_constants.h"
 #include "zbxvariant.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxeval.h"
+#include "zbxexpr.h"
+#include "zbxstr.h"
 
 typedef struct
 {

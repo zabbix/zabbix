@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,11 @@
  */
 class CSimpleIntervalParser extends CParser {
 
+	/**
+	 * @var array
+	 */
+	private $macro_parsers = [];
+
 	private $options = [
 		'usermacros' => false,
 		'lldmacros' => false,
@@ -31,30 +36,14 @@ class CSimpleIntervalParser extends CParser {
 		'with_year' => false
 	];
 
-	private $user_macro_parser;
-	private $lld_macro_parser;
-	private $lld_macro_function_parser;
-
 	public function __construct($options = []) {
-		if (array_key_exists('usermacros', $options)) {
-			$this->options['usermacros'] = $options['usermacros'];
-		}
-		if (array_key_exists('lldmacros', $options)) {
-			$this->options['lldmacros'] = $options['lldmacros'];
-		}
-		if (array_key_exists('negative', $options)) {
-			$this->options['negative'] = $options['negative'];
-		}
-		if (array_key_exists('with_year', $options)) {
-			$this->options['with_year'] = $options['with_year'];
-		}
+		$this->options = $options + $this->options;
 
 		if ($this->options['usermacros']) {
-			$this->user_macro_parser = new CUserMacroParser();
+			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['lldmacros']) {
-			$this->lld_macro_parser = new CLLDMacroParser();
-			$this->lld_macro_function_parser = new CLLDMacroFunctionParser();
+			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -80,17 +69,16 @@ class CSimpleIntervalParser extends CParser {
 		) {
 			$p += strlen($matches[0]);
 		}
-		elseif ($this->options['usermacros'] && $this->user_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->user_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros'] && $this->lld_macro_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_parser->getLength();
-		}
-		elseif ($this->options['lldmacros']
-				&& $this->lld_macro_function_parser->parse($source, $p) != self::PARSE_FAIL) {
-			$p += $this->lld_macro_function_parser->getLength();
-		}
 		else {
+			foreach ($this->macro_parsers as $macro_parser) {
+				if ($macro_parser->parse($source, $p) != self::PARSE_FAIL) {
+					$p += $macro_parser->getLength();
+					break;
+				}
+			}
+		}
+
+		if ($p == $pos) {
 			return self::PARSE_FAIL;
 		}
 

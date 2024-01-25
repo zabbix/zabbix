@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -243,6 +243,7 @@ static int	eval_parse_constant(zbx_eval_context_t *ctx, size_t pos, zbx_eval_tok
 					case ZBX_TOKEN_SIMPLE_MACRO:
 						type = ZBX_EVAL_TOKEN_VAR_MACRO;
 						break;
+					case ZBX_TOKEN_USER_FUNC_MACRO:
 					case ZBX_TOKEN_USER_MACRO:
 						type = ZBX_EVAL_TOKEN_VAR_USERMACRO;
 						break;
@@ -418,13 +419,17 @@ static int	eval_parse_string_token(zbx_eval_context_t *ctx, size_t pos, zbx_eval
 
 		if ('\\' == *ptr)
 		{
-			if ('"' != ptr[1] && '\\' != ptr[1] )
+			if (0 == (ZBX_EVAL_PARSE_STR_V64_COMPAT & ctx->rules) && '"' != ptr[1] && '\\' != ptr[1])
 			{
 				*error = zbx_dsprintf(*error, "invalid escape sequence in string starting with \"%s\"",
 						ptr);
 				return FAIL;
 			}
-			ptr++;
+
+			if (0 != (ZBX_EVAL_PARSE_STR_V64_COMPAT & ctx->rules) && '"' != ptr[1])
+				continue;
+			else
+				ptr++;
 		}
 	}
 
@@ -1026,7 +1031,7 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 {
 	if (0 != (token->type & ZBX_EVAL_CLASS_FUNCTION))
 	{
-		int	i, params = 0;
+		int			i, params = 0;
 
 		for (i = (int)token->opt; i < ctx->stack.values_num; i++)
 		{
@@ -1096,7 +1101,6 @@ static int	eval_append_operator(zbx_eval_context_t *ctx, zbx_eval_token_t *token
 	}
 
 	zbx_vector_eval_token_append_ptr(&ctx->stack, token);
-
 	return SUCCEED;
 }
 

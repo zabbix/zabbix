@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,11 +186,14 @@ void	zbx_locks_destroy(void)
 	for (i = 0; i < ZBX_RWLOCK_COUNT; i++)
 		(void)pthread_rwlock_destroy(&shared_lock->rwlocks[i]);
 
-	shmdt(shared_lock);
+	if (-1 == shmdt(shared_lock))
+		zabbix_log(LOG_LEVEL_TRACE, "cannot detach shared lock memory: %s", zbx_strerror(errno));
+
 	shared_lock = NULL;
 	shm_id = 0;
 #else
-	(void)semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0);
+	if (-1 == semctl(ZBX_SEM_LIST_ID, 0, IPC_RMID, 0))
+		zabbix_log(LOG_LEVEL_TRACE, "cannot remove semaphore set %d: %s", ZBX_SEM_LIST_ID, zbx_strerror(errno));
 #endif
 }
 

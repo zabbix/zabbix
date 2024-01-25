@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -234,10 +234,13 @@ out:
  *                                                                            *
  * Purpose: sends configuration data to proxy                                 *
  *                                                                            *
- * Parameters: proxy                  - [IN/OUT] proxy data                   *
- *             config_vault           - [IN]                                  *
- *             config_trapper_timeout - [IN]                                  *
- *             config_source_ip       - [IN]                                  *
+ * Parameters: proxy                    - [IN/OUT] proxy data                 *
+ *             config_vault             - [IN]                                *
+ *             config_trapper_timeout   - [IN]                                *
+ *             config_source_ip         - [IN]                                *
+ *             config_ssl_ca_location   - [IN]                                *
+ *             config_ssl_cert_location - [IN]                                *
+ *             config_ssl_key_location  - [IN]                                *
  *                                                                            *
  * Return value: SUCCEED - processed successfully                             *
  *               other code - an error occurred                               *
@@ -247,7 +250,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vault_t *config_vault,
-		int config_trapper_timeout, const char *config_source_ip)
+		int config_trapper_timeout, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location)
 {
 	char				*error = NULL, *buffer = NULL;
 	int				ret, flags = ZBX_TCP_PROTOCOL | ZBX_TCP_COMPRESS, loglevel;
@@ -284,7 +288,7 @@ static int	proxy_send_configuration(zbx_dc_proxy_t *proxy, const zbx_config_vaul
 	zbx_json_clean(&j);
 
 	if (SUCCEED != (ret = zbx_proxyconfig_get_data(proxy, &jp, &j, &status, config_vault, config_source_ip,
-			&error)))
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error)))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot collect configuration data for proxy \"%s\": %s",
 				proxy->name, error);
@@ -534,7 +538,8 @@ out:
  *                                                                            *
  ******************************************************************************/
 static int	process_proxy(const zbx_config_vault_t *config_vault, int config_timeout, int config_trapper_timeout,
-		const char *config_source_ip, const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency,
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, const zbx_events_funcs_t *events_cbs, int proxyconfig_frequency,
 		int proxydata_frequency)
 {
 	zbx_dc_proxy_t		proxy, proxy_old;
@@ -592,7 +597,8 @@ static int	process_proxy(const zbx_config_vault_t *config_vault, int config_time
 			if (proxy.proxy_config_nextcheck <= now && proxy.compatibility == ZBX_PROXY_VERSION_CURRENT)
 			{
 				if (SUCCEED != (ret = proxy_send_configuration(&proxy, config_vault,
-						config_trapper_timeout, config_source_ip)))
+						config_trapper_timeout, config_source_ip, config_ssl_ca_location,
+						config_ssl_cert_location, config_ssl_key_location)))
 				{
 					goto error;
 				}
@@ -705,6 +711,9 @@ ZBX_THREAD_ENTRY(proxypoller_thread, args)
 
 		processed += process_proxy(proxy_poller_args_in->config_vault, proxy_poller_args_in->config_timeout,
 				proxy_poller_args_in->config_trapper_timeout, proxy_poller_args_in->config_source_ip,
+				proxy_poller_args_in->config_ssl_ca_location,
+				proxy_poller_args_in->config_ssl_cert_location,
+				proxy_poller_args_in->config_ssl_key_location,
 				proxy_poller_args_in->events_cbs, proxy_poller_args_in->proxyconfig_frequency,
 				proxy_poller_args_in->proxydata_frequency);
 		total_sec += zbx_time() - sec;

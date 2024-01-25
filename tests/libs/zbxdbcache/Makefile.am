@@ -18,6 +18,7 @@ noinst_PROGRAMS = $(SERVER_tests)
 
 if SERVER
 VALUECACHE_LIBS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcomms/libzbxcomms.a \
 	$(top_srcdir)/src/libs/zbxcompress/libzbxcompress.a \
 	$(top_srcdir)/src/libs/zbxhash/libzbxhash.a \
@@ -48,6 +49,7 @@ VALUECACHE_LIBS = \
 	$(top_srcdir)/tests/libzbxmockdata.a
 
 CACHE_LIBS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \

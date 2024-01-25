@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -120,47 +120,16 @@ function getItemFormData(array $item = []) {
 			);
 	}
 
-	if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-		foreach (['query_fields', 'headers'] as $property) {
-			$values = [];
-
-			if (is_array($data[$property]) && array_key_exists('name', $data[$property])
-					&& array_key_exists('value', $data[$property])) {
-				foreach ($data[$property]['name'] as $index => $key) {
-					if (array_key_exists($index, $data[$property]['value'])) {
-						$sortorder = $data[$property]['sortorder'][$index];
-						$values[$sortorder] = [$key => $data[$property]['value'][$index]];
-					}
-				}
-			}
-			ksort($values);
-			$data[$property] = $values;
-		}
-
-		$data['parameters'] = [];
-	}
-	elseif ($data['type'] == ITEM_TYPE_SCRIPT) {
-		$values = [];
-
-		if (is_array($data['parameters']) && array_key_exists('name', $data['parameters'])
-				&& array_key_exists('value', $data['parameters'])) {
-			foreach ($data['parameters']['name'] as $index => $key) {
-				if (array_key_exists($index, $data['parameters']['value'])) {
-					$values[] = [
-						'name' => $key,
-						'value' => $data['parameters']['value'][$index]
-					];
-				}
-			}
-		}
-		$data['parameters'] = $values;
-
+	if ($data['type'] != ITEM_TYPE_HTTPAGENT) {
 		$data['headers'] = [];
 		$data['query_fields'] = [];
+	}
+
+	if ($data['type'] == ITEM_TYPE_SCRIPT) {
+		CArrayHelper::sort($data['parameters'], ['name']);
+		$data['parameters'] = array_values($data['parameters']);
 	}
 	else {
-		$data['headers'] = [];
-		$data['query_fields'] = [];
 		$data['parameters'] = [];
 	}
 
@@ -263,18 +232,9 @@ function getItemFormData(array $item = []) {
 		$data['http_username'] = $data['item']['username'];
 		$data['http_password'] = $data['item']['password'];
 
-		if ($data['type'] == ITEM_TYPE_HTTPAGENT) {
-			// Convert hash to array where every item is hash for single key value pair as it is used by view.
-			$headers = [];
-
-			foreach ($data['headers'] as $key => $value) {
-				$headers[] = [$key => $value];
-			}
-
-			$data['headers'] = $headers;
-		}
-		elseif ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
+		if ($data['type'] == ITEM_TYPE_SCRIPT && $data['parameters']) {
 			CArrayHelper::sort($data['parameters'], ['name']);
+			$data['parameters'] = array_values($data['parameters']);
 		}
 
 		$data['preprocessing'] = $data['item']['preprocessing'];

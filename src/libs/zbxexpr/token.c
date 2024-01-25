@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -452,7 +452,8 @@ static int	token_parse_function(const char *expression, const char *func,
  *             macro      - [IN] beginning of the token                       *
  *             func       - [IN] beginning of the macro function in token     *
  *             token      - [OUT]                                             *
- *             token_type - [IN] type flag ZBX_TOKEN_FUNC_MACRO or            *
+ *             token_type - [IN] type flag ZBX_TOKEN_FUNC_MACRO,              *
+ *                               ZBX_TOKEN_USER_FUNC_MACRO or                 *
  *                               ZBX_TOKEN_LLD_FUNC_MACRO                     *
  *                                                                            *
  * Return value: SUCCEED - function macro was parsed successfully             *
@@ -497,7 +498,8 @@ static int	token_parse_func_macro(const char *expression, const char *macro, con
 	token->loc.r = ptr - expression;
 
 	/* initialize token data */
-	data = ZBX_TOKEN_FUNC_MACRO == token_type ? &token->data.func_macro : &token->data.lld_func_macro;
+	data = (ZBX_TOKEN_FUNC_MACRO == token_type || ZBX_TOKEN_USER_FUNC_MACRO == token_type) ?
+			&token->data.func_macro : &token->data.lld_func_macro;
 	data->macro.l = offset + 1;
 	data->macro.r = func_loc.l - 2;
 
@@ -818,9 +820,10 @@ int	zbx_token_parse_lld_macro(const char *expression, const char *macro, zbx_tok
  *                         macro                                              *
  *                                                                            *
  * Comments: This function parses token with a macro inside it. There are     *
- *           three types of nested macros - low-level discovery function      *
- *           macros, function macros and a specific case of simple macros     *
- *           where {HOST.HOSTn} macro is used as host name.                   *
+ *           four types of nested macros - low-level discovery function       *
+ *           macros, built-in function macros, user macros  and a specific    *
+ *           case of simple macros where {HOST.HOSTn} macro is used as host   *
+ *           name.                                                            *
  *                                                                            *
  *           If the macro points at valid macro in the expression then        *
  *           the generic token fields are set and either the                  *
@@ -862,6 +865,15 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 
 		ptr = expression + expr_token.loc.r;
 	}
+	else if ('$' == macro[2])
+	{
+		zbx_token_t	expr_token;
+
+		if (SUCCEED != token_parse_user_macro(expression, macro + 1, &expr_token))
+			return FAIL;
+
+		ptr = expression + expr_token.loc.r;
+	}
 	else
 	{
 		zbx_strloc_t	loc;
@@ -882,11 +894,46 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 	/*               simple macros                        {{MACRO}:key.function()} */
 	if ('.' == ptr[1])
 	{
-		return token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
-				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
+		int	token_type = ZBX_TOKEN_FUNC_MACRO;
+
+		if ('#' == macro[2])
+			token_type = ZBX_TOKEN_LLD_FUNC_MACRO;
+		else if ('$' == macro[2])
+			token_type = ZBX_TOKEN_USER_FUNC_MACRO;
+
+		return token_parse_func_macro(expression, macro, ptr + 2, token, token_type);
 	}
 	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
 		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);
 
 	return FAIL;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: compares substring at the specified location with the specified   *
+ *          text                                                              *
+ *                                                                            *
+ * Parameters: src      - [IN] the source string                              *
+ *             loc      - [IN] the substring location                         *
+ *             text     - [IN] the text to compare with                       *
+ *             text_len - [IN] the text length                                *
+ *                                                                            *
+ * Return value: -1 - the substring is less than the specified text           *
+ *                0 - the substring is equal to the specified text            *
+ *                1 - the substring is greater than the specified text        *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_strloc_cmp(const char *src, const zbx_strloc_t *loc, const char *text, size_t text_len)
+{
+	size_t	src_len = loc->r - loc->l + 1;
+
+	if (src_len < text_len)
+		return -1;
+
+	if (src_len > text_len)
+		return 1;
+
+	return memcmp(src + loc->l, text, text_len);
+}
+

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,13 +59,6 @@ typedef zbx_vector_ptr_t * zbx_vector_ptr_lp_t;
 typedef zbx_vector_expression_t * zbx_vector_expression_lp_t;
 
 int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
-
-const char	*progname = NULL;
-const char	title_message[] = "agent";
-const char	syslog_app_name[] = "agent";
-const char	*usage_message[] = {};
-unsigned char	program_type	= 0x80;
-const char	*help_message[] = {};
 
 zbx_metric_t	parameters_agent[] = {NULL};
 zbx_metric_t	parameters_specific[] = {NULL};
