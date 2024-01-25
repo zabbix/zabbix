@@ -148,6 +148,29 @@ const char	*get_program_name(const char *path)
 	return filename;
 }
 
+static void	timespec_normalize(zbx_timespec_t *ts)
+{
+	while (ts->ns >= 1000000000)
+	{
+		ts->sec++;
+		ts->ns -= 1000000000;
+	}
+}
+
+static int	timespec_cmp(const zbx_timespec_t *ts1, const zbx_timespec_t *ts2)
+{
+	if (ts1->sec < ts2->sec)
+		return -1;
+	if (ts1->sec > ts2->sec)
+		return 1;
+	if (ts1->ns < ts2->ns)
+		return -1;
+	if (ts1->ns > ts2->ns)
+		return 1;
+
+	return 0;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: Gets the current time.                                            *
@@ -163,6 +186,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #if defined(_WINDOWS) || defined(__MINGW32__)
 	static ZBX_THREAD_LOCAL LARGE_INTEGER	tickPerSecond = {0};
 	struct _timeb				tb;
+	zbx_timespec_t				win_start, last_ts_corr;
 #else
 	struct timeval	tv;
 	int		rc = -1;
@@ -179,6 +203,18 @@ void	zbx_timespec(zbx_timespec_t *ts)
 
 	ts->sec = (int)tb.time;
 	ts->ns = tb.millitm * 1000000;
+
+	/* dbg start */
+	static ZBX_THREAD_LOCAL zbx_timespec_t	dbg_last_ts = {0, 0};
+
+	if (ts->sec < dbg_last_ts.sec ||
+			(ts->sec == dbg_last_ts.sec && ts->ns < dbg_last_ts.ns))
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "[ DBG ] %s():%d OS time shift back detected: ts = %d %d, dbg_last_ts = %d %d", __func__, __LINE__, ts->sec, ts->ns, dbg_last_ts.sec, dbg_last_ts.ns);
+	}
+
+	dbg_last_ts = *ts;
+	/* dbg end */
 
 	if (0 != tickPerSecond.QuadPart)
 	{
@@ -214,12 +250,7 @@ void	zbx_timespec(zbx_timespec_t *ts)
 					if (1000000 > ns)	/* value less than 1 millisecond */
 					{
 						ts->ns += ns;
-
-						while (ts->ns >= 1000000000)
-						{
-							ts->sec++;
-							ts->ns -= 1000000000;
-						}
+						timespec_normalize(ts);
 					}
 				}
 			}
@@ -250,19 +281,44 @@ void	zbx_timespec(zbx_timespec_t *ts)
 #endif	/* not _WINDOWS */
 
 #if defined(_WINDOWS) || defined(__MINGW32__)
+	last_ts_corr = last_ts;
+	last_ts_corr.ns += corr;
+	timespec_normalize(&last_ts_corr);
+
+	win_start = last_ts_corr;
+	win_start.sec--;
+
+	/* dbg start */
+	int	dbg_old = 0, dbg_new = 0;
+
 	if (last_ts.sec == ts->sec && (last_ts.ns == ts->ns ||
 			(last_ts.ns + corr >= ts->ns && 1000000 > (last_ts.ns + corr - ts->ns))))
+	{
+		dbg_old = 1;
+	}
+
+	if (0 > timespec_cmp(&win_start, ts) && 0 <= timespec_cmp(&last_ts_corr, ts))
+	{
+		dbg_new = 1;
+	}
+
+	if (dbg_old != dbg_new)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "[ DBG ] %s():%d dbg_old = %d, dbg_new = %d, last_ts %d %d, ts = %d %d", __func__, __LINE__, dbg_old, dbg_new, last_ts.sec, last_ts.ns, ts->sec, ts->ns);
+	}
+	/* dbg end */
+
+	/* correction window is 1 sec before the corrected last _ftime clock reading */
+	if (0 > timespec_cmp(&win_start, ts) && 0 <= timespec_cmp(&last_ts_corr, ts))
 #else
 	if (last_ts.ns == ts->ns && last_ts.sec == ts->sec)
 #endif
 	{
 		ts->ns = last_ts.ns + (++corr);
-
-		while (ts->ns >= 1000000000)
-		{
-			ts->sec++;
-			ts->ns -= 1000000000;
-		}
+		timespec_normalize(ts);
+		/* dbg start */
+		zabbix_log(LOG_LEVEL_INFORMATION, "[ DBG ] %s():%d correction applied corr = %d; ts = %d %d, dbg_last_ts.sec = %d %d", __func__, __LINE__, corr, ts->sec, ts->ns, dbg_last_ts.sec, dbg_last_ts.ns);
+		/* dbg end */
 	}
 	else
 	{
