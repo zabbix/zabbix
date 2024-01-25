@@ -500,11 +500,11 @@ class testDashboardGaugeWidget extends testWidgets {
 						['threshold' => '10']
 					],
 					'error' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -557,11 +557,11 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": cannot be empty.',
 						'Invalid parameter "Max": cannot be empty.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -590,11 +590,12 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
+						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -651,11 +652,11 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Thresholds/1/threshold": a number is expected.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
@@ -686,11 +687,11 @@ class testDashboardGaugeWidget extends testWidgets {
 					'error' => [
 						'Invalid parameter "Min": a number is expected.',
 						'Invalid parameter "Max": a number is expected.',
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]

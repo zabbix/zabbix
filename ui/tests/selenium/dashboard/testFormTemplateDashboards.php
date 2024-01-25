@@ -2819,11 +2819,11 @@ class testFormTemplateDashboards extends CWebTest {
 						]
 					],
 					'error_message' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -2855,11 +2855,11 @@ class testFormTemplateDashboards extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'error_message' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -2891,11 +2891,11 @@ class testFormTemplateDashboards extends CWebTest {
 						'Item' => self::TEMPLATE.': '.self::TEMPLATE_ITEM
 					],
 					'error_message' => [
-						'Invalid parameter "Description size": value must be one of 1-100.',
-						'Invalid parameter "Value size": value must be one of 1-100.',
-						'Invalid parameter "Arc size": value must be one of 1-100.',
-						'Invalid parameter "Units size": value must be one of 1-100.',
-						'Invalid parameter "Scale size": value must be one of 1-100.',
+						'Invalid parameter "Description: Size": value must be one of 1-100.',
+						'Invalid parameter "Value: Size": value must be one of 1-100.',
+						'Invalid parameter "Value arc: Size": value must be one of 1-100.',
+						'Invalid parameter "Units: Size": value must be one of 1-100.',
+						'Invalid parameter "Scale: Size": value must be one of 1-100.',
 						'Invalid parameter "Arc size": value must be one of 1-100.'
 					]
 				]
@@ -4377,9 +4377,10 @@ class testFormTemplateDashboards extends CWebTest {
 		}
 		else {
 			$all_types = ['Action log', 'Clock', 'Discovery status', 'Favorite graphs', 'Favorite maps', 'Gauge', 'Geomap',
-					'Graph', 'Graph (classic)', 'Graph prototype', 'Host availability', 'Item value', 'Map', 'Map navigation tree',
-					'Pie chart', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity', 'SLA report',
-					'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring', 'Data overview'
+					'Graph', 'Graph (classic)', 'Graph prototype', 'Honeycomb', 'Host availability', 'Item value', 'Map',
+					'Map navigation tree', 'Pie chart', 'Plain text', 'Problem hosts', 'Problems', 'Problems by severity',
+					'SLA report', 'System information', 'Top hosts', 'Top triggers', 'Trigger overview', 'URL', 'Web monitoring',
+					'Data overview'
 			];
 			$this->assertEquals($all_types, $form->getField('Type')->getOptions()->asText());
 		}
