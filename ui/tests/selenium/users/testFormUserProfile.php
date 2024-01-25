@@ -374,6 +374,9 @@ class testFormUserProfile extends CLegacyWebTest {
 	public static function messaging() {
 		return [
 			[[
+				'expected' => TEST_GOOD
+			]],
+			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
 				'timeout' => ' ',
@@ -453,9 +456,6 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_GOOD,
 				'timeout' => '1d',
 				'suppressed' => false
-			]],
-			[[
-				'expected' => TEST_GOOD
 			]]
 		];
 	}
