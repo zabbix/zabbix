@@ -48,5 +48,11 @@ window.widget_clock_form = new class {
 		});
 
 		$('#itemid').multiSelect(this.#time_type.value != <?= TIME_TYPE_HOST ?> ? 'disable' : 'enable');
+
+		const ms_itemid_input = this.#form.querySelector('[name="itemid"]');
+
+		if (ms_itemid_input !== null && this.#time_type.value != <?= TIME_TYPE_HOST ?>) {
+			ms_itemid_input.disabled = true;
+		}
 	}
 };

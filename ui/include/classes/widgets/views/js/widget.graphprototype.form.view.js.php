@@ -49,5 +49,16 @@ window.widget_graphprototype_form = new class {
 
 		$('#graphid').multiSelect(is_graph_prototype ? 'enable' : 'disable');
 		$('#itemid').multiSelect(is_graph_prototype ? 'disable' : 'enable');
+
+		const ms_itemid_input = this.#form.querySelector('[name="itemid"]');
+		const ms_graphid_input = this.#form.querySelector('[name="graphid"]');
+
+		if (ms_itemid_input !== null && is_graph_prototype) {
+			ms_itemid_input.disabled = true;
+		}
+
+		if (ms_graphid_input !== null && !is_graph_prototype) {
+			ms_graphid_input.disabled = true;
+		}
 	}
 };

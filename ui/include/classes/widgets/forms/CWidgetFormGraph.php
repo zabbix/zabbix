@@ -52,8 +52,7 @@ class CWidgetFormGraph extends CWidgetForm {
 			$field_item->setFilterParameter('with_simple_graph_items', true);
 		}
 
-		if (array_key_exists('itemid', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH) {
+		if (array_key_exists('itemid', $this->data)) {
 			$field_item->setValue($this->data['itemid']);
 		}
 
@@ -63,8 +62,7 @@ class CWidgetFormGraph extends CWidgetForm {
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setMultiple(false);
 
-		if (array_key_exists('graphid', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH) {
+		if (array_key_exists('graphid', $this->data)) {
 			$field_graph->setValue($this->data['graphid']);
 		}
 

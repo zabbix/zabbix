@@ -46,7 +46,7 @@ class CWidgetFormClock extends CWidgetForm {
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setMultiple(false);
 
-		if (array_key_exists('itemid', $this->data) && $this->data['time_type'] == TIME_TYPE_HOST) {
+		if (array_key_exists('itemid', $this->data)) {
 			$field_item->setValue($this->data['itemid']);
 		}
 

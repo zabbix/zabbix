@@ -51,8 +51,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 			$field_item_prototype->setFilterParameter('with_simple_graph_item_prototypes', true);
 		}
 
-		if (array_key_exists('itemid', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_SIMPLE_GRAPH_PROTOTYPE) {
+		if (array_key_exists('itemid', $this->data)) {
 			$field_item_prototype->setValue($this->data['itemid']);
 		}
 
@@ -63,8 +62,7 @@ class CWidgetFormGraphPrototype extends CWidgetForm {
 			->setFlags(CWidgetField::FLAG_LABEL_ASTERISK)
 			->setMultiple(false);
 
-		if (array_key_exists('graphid', $this->data)
-				&& $this->data['source_type'] == ZBX_WIDGET_FIELD_RESOURCE_GRAPH_PROTOTYPE) {
+		if (array_key_exists('graphid', $this->data)) {
 			$field_graph_prototype->setValue($this->data['graphid']);
 		}
 
