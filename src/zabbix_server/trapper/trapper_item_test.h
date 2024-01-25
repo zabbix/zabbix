@@ -30,4 +30,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks);
 
+int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
+		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, struct zbx_json *json,
+		char **error);
+
 #endif

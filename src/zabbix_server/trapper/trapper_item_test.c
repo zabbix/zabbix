@@ -31,6 +31,13 @@
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"
 
+#include "zbxpreproc.h"
+#include "zbxpreprocbase.h"
+#include "zbxdbhigh.h"
+#include "zbxtime.h"
+
+#define ZBX_STATE_NOT_SUPPORTED	1
+
 static void	dump_item(const zbx_dc_item_t *item)
 {
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
@@ -140,27 +147,420 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 		*num = atoi(zbx_db_get_field(table, fieldname)->default_value);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: parses preprocessing test request                                 *
+ *                                                                            *
+ * Parameters: jp_item      - [IN] item object of the request                 *
+ *             jp_options   - [IN] item object of the request                 *
+ *             jp_steps     - [IN] item object of the request                 *
+ *             value        - [IN] item value for preprocessing               *
+ *             value_size   - [IN] size of the item value for preprocessing   *
+ *             values       - [OUT] the values to test optional               *
+ *                                  (history + current)                       *
+ *             ts           - [OUT] value timestamps                          *
+ *             values_num   - [OUT] the number of values                      *
+ *             value_type   - [OUT] the value type                            *
+ *             steps        - [OUT] the preprocessing steps                   *
+ *             single       - [OUT] is preproc step single                    *
+ *             state        - [OUT] the item state                            *
+ *             bypass_first - [OUT] the flag to bypass first step             *
+ *             error        - [OUT] the error message                         *
+ *                                                                            *
+ * Return value: SUCCEED - the request was parsed successfully                *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
+		const struct zbx_json_parse *jp_options, const struct zbx_json_parse *jp_steps, char *value,
+		size_t value_size, char **values, zbx_timespec_t *ts, int *values_num, unsigned char *value_type,
+		zbx_vector_pp_step_ptr_t *steps, int *single, int *state, int *bypass_first, char **error)
+{
+	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
+	const char		*ptr;
+	int			ret = FAIL;
+	struct zbx_json_parse	jp_data, jp_history, jp_step;
+	size_t			size;
+	zbx_timespec_t		ts_now;
+
+	if (FAIL == zbx_json_value_by_name(jp_item, ZBX_PROTO_TAG_VALUE_TYPE, buffer, sizeof(buffer), NULL))
+	{
+		*error = zbx_strdup(NULL, "Missing value type field.");
+		goto out;
+	}
+
+	*value_type = (unsigned char)atoi(buffer);
+
+	if (FAIL == zbx_json_value_by_name(jp_options, ZBX_PROTO_TAG_SINGLE, buffer, sizeof(buffer), NULL))
+		*single = 0;
+	else
+		*single = (0 == strcmp(buffer, "true") ? 1 : 0);
+
+	*state = 0;
+
+	if (SUCCEED == zbx_json_value_by_name(jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
+		*state = atoi(buffer);
+
+	zbx_timespec(&ts_now);
+
+	if (SUCCEED == zbx_json_brackets_by_name(jp_options, ZBX_PROTO_TAG_HISTORY, &jp_history))
+	{
+		size = 0;
+
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_history, ZBX_PROTO_TAG_VALUE, values, &size, NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing history value field.");
+			goto out;
+		}
+
+		(*values_num)++;
+
+		if (FAIL == zbx_json_value_by_name(&jp_history, ZBX_PROTO_TAG_TIMESTAMP, buffer, sizeof(buffer), NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing history timestamp field.");
+			goto out;
+		}
+
+		if (0 != strncmp(buffer, "now", ZBX_CONST_STRLEN("now")))
+		{
+			*error = zbx_dsprintf(NULL, "invalid history value timestamp: %s", buffer);
+			goto out;
+		}
+
+		ts[0] = ts_now;
+		ptr = buffer + ZBX_CONST_STRLEN("now");
+
+		if ('\0' != *ptr)
+		{
+			int	delay;
+
+			if ('-' != *ptr || FAIL == zbx_is_time_suffix(ptr + 1, &delay, (int)strlen(ptr + 1)))
+			{
+				*error = zbx_dsprintf(NULL, "invalid history value timestamp: %s", buffer);
+				goto out;
+			}
+
+			ts[0].sec -= delay;
+		}
+	}
+
+	values[*values_num] = value;
+	size = value_size;
+
+	ts[(*values_num)++] = ts_now;
+	*bypass_first = 0;
+
+	for (ptr = NULL; NULL != (ptr = zbx_json_next(jp_steps, ptr));)
+	{
+		zbx_pp_step_t	*step;
+		int		step_type, error_handler;
+
+		if (FAIL == zbx_json_brackets_open(ptr, &jp_step))
+		{
+			*error = zbx_strdup(NULL, "Cannot parse preprocessing step.");
+			goto out;
+		}
+
+		if (FAIL == zbx_json_value_by_name(&jp_step, ZBX_PROTO_TAG_TYPE, buffer, sizeof(buffer), NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing preprocessing step type field.");
+			goto out;
+		}
+
+		step_type = atoi(buffer);
+
+		if (FAIL == zbx_json_value_by_name(&jp_step, ZBX_PROTO_TAG_ERROR_HANDLER, buffer, sizeof(buffer), NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing preprocessing step type error handler field.");
+			goto out;
+		}
+
+		error_handler = atoi(buffer);
+
+		size = 0;
+
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_step, ZBX_PROTO_TAG_PARAMS, &step_params, &size, NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing preprocessing step type params field.");
+			goto out;
+		}
+
+		size = 0;
+
+		if (FAIL == zbx_json_value_by_name_dyn(&jp_step, ZBX_PROTO_TAG_ERROR_HANDLER_PARAMS,
+				&error_handler_params, &size, NULL))
+		{
+			*error = zbx_strdup(NULL, "Missing preprocessing step type error handler params field.");
+			goto out;
+		}
+
+		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type || ZBX_STATE_NOT_SUPPORTED == *state)
+		{
+			step = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t));
+			step->type = step_type;
+			step->params = step_params;
+			step->error_handler = error_handler;
+			step->error_handler_params = error_handler_params;
+			zbx_vector_pp_step_ptr_append(steps, step);
+		}
+		else
+		{
+			zbx_free(step_params);
+			zbx_free(error_handler_params);
+			(*bypass_first)++;
+		}
+
+		step_params = NULL;
+		error_handler_params = NULL;
+	}
+
+	ret = SUCCEED;
+out:
+	if (FAIL == ret)
+	{
+		zbx_vector_pp_step_ptr_clear_ext(steps, zbx_pp_step_free);
+		zbx_free(values[0]);
+		zbx_free(values[1]);
+	}
+
+	zbx_free(step_params);
+	zbx_free(error_handler_params);
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: executes preprocessing test request                               *
+ *                                                                            *
+ * Parameters: jp_item    - [IN] item object of the request                   *
+ *             jp_options - [IN] item object of the request                   *
+ *             jp_steps   - [IN] item object of the request                   *
+ *             value      - [IN] item value for preprocessing                 *
+ *             value_size - [IN] size of the item value for preprocessing     *
+ *             json       - [OUT] the output json                             *
+ *             json       - [OUT] the output json                             *
+ *             error      - [OUT] the error message                           *
+ *                                                                            *
+ * Return value: SUCCEED - the request was executed successfully              *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ * Comments: This function will fail if the request format is not valid or    *
+ *           there was connection (to preprocessing manager) error.           *
+ *           Any errors in the preprocessing itself are reported in output    *
+ *           json and success is returned.                                    *
+ *                                                                            *
+ ******************************************************************************/
+int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
+		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, struct zbx_json *json,
+		char **error)
+{
+	char				*values[2] = {NULL, NULL}, *preproc_error = NULL;
+	int				i, single, state, bypass_first, ret = FAIL, values_num = 0, first_step_type;
+	unsigned char			value_type;
+	zbx_vector_pp_step_ptr_t	steps;
+	zbx_timespec_t			ts[2];
+	zbx_pp_result_t			*result;
+	zbx_vector_pp_result_ptr_t	results;
+	zbx_pp_history_t		history;
+	size_t				truncated;
+
+	zbx_vector_pp_step_ptr_create(&steps);
+	zbx_vector_pp_result_ptr_create(&results);
+	zbx_pp_history_init(&history);
+
+	if (FAIL == trapper_parse_preproc_test(jp_item, jp_options, jp_steps, value, value_size, values, ts,
+			&values_num, &value_type, &steps, &single, &state, &bypass_first, error))
+	{
+		goto out;
+	}
+
+	first_step_type = 0;
+	if (0 != steps.values_num)
+		first_step_type  = steps.values[0]->type;
+
+	if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != first_step_type && ZBX_STATE_NOT_SUPPORTED == state)
+	{
+		preproc_error = zbx_strdup(NULL, "This item is not supported. Please, add a preprocessing step"
+				" \"Check for not supported value\" to process it.");
+		zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
+		goto err;
+	}
+
+	for (i = 0; i < values_num; i++)
+	{
+		zbx_vector_pp_result_ptr_clear_ext(&results, zbx_pp_result_free);
+
+		if (0 == steps.values_num)
+		{
+			result = (zbx_pp_result_t *)zbx_malloc(NULL, sizeof(zbx_pp_result_t));
+
+			result->action = ZBX_PREPROC_FAIL_DEFAULT;
+			zbx_variant_set_str(&result->value, zbx_strdup(NULL, values[i]));
+			zbx_variant_set_none(&result->value_raw);
+			zbx_vector_pp_result_ptr_append(&results, result);
+		}
+		else if (FAIL == zbx_preprocessor_test(value_type, values[i], &ts[i], (unsigned char)state, &steps,
+				&results, &history, error))
+		{
+			goto out;
+		}
+
+		if (ZBX_VARIANT_ERR == results.values[results.values_num - 1]->value.type)
+		{
+			preproc_error = zbx_strdup(NULL, results.values[results.values_num - 1]->value.data.err);
+			break;
+		}
+
+		if (0 == single)
+		{
+			result = (zbx_pp_result_t *)results.values[results.values_num - 1];
+			if (ZBX_VARIANT_NONE != result->value.type && FAIL == zbx_variant_to_value_type(&result->value,
+					value_type, &preproc_error))
+			{
+				break;
+			}
+		}
+	}
+
+	if (i + 1 < values_num)
+		zbx_json_addstring(json, ZBX_PROTO_TAG_PREVIOUS, "true", ZBX_JSON_TYPE_INT);
+
+	zbx_json_addarray(json, ZBX_PROTO_TAG_STEPS);
+
+	for (i = 0; i < bypass_first; i++)
+	{
+		zbx_json_addobject(json, NULL);
+
+		truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1],
+			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+				truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+
+		zbx_json_close(json);
+	}
+
+	if (0 != steps.values_num)
+	{
+		for (i = 0; i < results.values_num; i++)
+		{
+			result = (zbx_pp_result_t *)results.values[i];
+
+			zbx_json_addobject(json, NULL);
+
+			if (ZBX_PREPROC_FAIL_DEFAULT != result->action)
+			{
+				zbx_json_addint64(json, ZBX_PROTO_TAG_ACTION, result->action);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value_raw.data.err,
+						ZBX_JSON_TYPE_STRING);
+
+				if (ZBX_PREPROC_FAIL_SET_ERROR == result->action)
+				{
+					zbx_json_addstring(json, ZBX_PROTO_TAG_FAILED, result->value.data.err,
+							ZBX_JSON_TYPE_STRING);
+				}
+			}
+
+			if (ZBX_VARIANT_ERR == result->value.type)
+			{
+				if (ZBX_PREPROC_FAIL_DEFAULT == result->action)
+				{
+					zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value.data.err,
+						ZBX_JSON_TYPE_STRING);
+				}
+			}
+			else if (ZBX_VARIANT_NONE != result->value.type)
+			{
+				truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
+						ZBX_JSON_TEST_DATA_MAX_SIZE);
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+						truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false",
+						ZBX_JSON_TYPE_TRUE);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+			}
+			else
+				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
+
+			zbx_json_close(json);
+		}
+	}
+err:
+	zbx_json_close(json);
+
+	if (NULL == preproc_error)
+	{
+		result = (zbx_pp_result_t *)results.values[results.values_num - 1];
+
+		if (ZBX_VARIANT_NONE != result->value.type)
+		{
+			truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+					zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
+					ZBX_JSON_TEST_DATA_MAX_SIZE);
+			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+					truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+		}
+		else
+			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
+	}
+	else
+		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, preproc_error, ZBX_JSON_TYPE_STRING);
+
+	ret = SUCCEED;
+out:
+	zbx_free(preproc_error);
+
+	for (i = 0; i < values_num; i++)
+		zbx_free(values[i]);
+
+	zbx_pp_history_clear(&history);
+
+	zbx_vector_pp_result_ptr_clear_ext(&results, zbx_pp_result_free);
+	zbx_vector_pp_result_ptr_destroy(&results);
+
+	zbx_vector_pp_step_ptr_clear_ext(&steps, zbx_pp_step_free);
+	zbx_vector_pp_step_ptr_destroy(&steps);
+
+	return ret;
+}
+
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks)
 {
-	char				tmp[MAX_STRING_LEN + 1], **pvalue;
+	char				tmp[MAX_STRING_LEN + 1], **pvalue, *value = NULL;
 	zbx_dc_item_t			item;
 	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
-	struct zbx_json_parse		jp_interface, jp_host, jp_details, jp_script_params;
+	struct zbx_json_parse		jp_item, jp_host, jp_options, jp_steps, jp_interface, jp_details,
+					jp_script_params;
 	AGENT_RESULT			result;
 	int				errcode, ret = FAIL;
+	size_t				value_size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	// item JSON object presence is checked in the calling function
+	zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item);
+
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_OPTIONS, &jp_options))
+		zbx_json_open("{}", &jp_options);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
+		jp_steps.end = jp_steps.start = NULL;
 
 	memset(&item, 0, sizeof(item));
 
 	if (NULL == table_items)
 		table_items = zbx_db_get_table("items");
 
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
-	item.key = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_KEY, table_items, "key_");
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_TYPE, table_items, "type", &item.type);
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_KEY, table_items, "key_", item.key_orig, sizeof(item.key_orig));
+	item.key = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_KEY, table_items, "key_");
 
 	if (0 != proxyid && FAIL == zbx_is_item_processed_by_server(item.type, item.key))
 	{
@@ -169,28 +569,28 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		goto out;
 	}
 
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_VALUE_TYPE, table_items, "value_type", &item.value_type);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_AUTHTYPE, table_items, "authtype", &item.authtype);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_FLAGS, table_items, "flags", &item.flags);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_FOLLOW_REDIRECTS, table_items, "follow_redirects",
 			&item.follow_redirects);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_POST_TYPE, table_items, "post_type", &item.post_type);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_RETRIEVE_MODE, table_items, "retrieve_mode", &item.retrieve_mode);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_REQUEST_METHOD, table_items, "request_method", &item.request_method);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_OUTPUT_FORMAT, table_items, "output_format", &item.output_format);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_PEER, table_items, "verify_peer", &item.verify_peer);
-	db_uchar_from_json(jp_data, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_POST_TYPE, table_items, "post_type", &item.post_type);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_RETRIEVE_MODE, table_items, "retrieve_mode", &item.retrieve_mode);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_REQUEST_METHOD, table_items, "request_method", &item.request_method);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_OUTPUT_FORMAT, table_items, "output_format", &item.output_format);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_VERIFY_PEER, table_items, "verify_peer", &item.verify_peer);
+	db_uchar_from_json(&jp_item, ZBX_PROTO_TAG_VERIFY_HOST, table_items, "verify_host", &item.verify_host);
 
-	db_string_from_json(jp_data, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
+	db_string_from_json(&jp_item, ZBX_PROTO_TAG_IPMI_SENSOR, table_items, "ipmi_sensor", item.ipmi_sensor,
 			sizeof(item.ipmi_sensor));
 
-	item.snmp_oid = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid");
-	item.params = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PARAMS, table_items, "params");
-	item.username = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_USERNAME, table_items, "username");
-	item.publickey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PUBLICKEY, table_items, "publickey");
-	item.privatekey = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey");
-	item.password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_PASSWORD, table_items, "password");
-	item.jmx_endpoint = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint");
+	item.snmp_oid = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SNMP_OID, table_items, "snmp_oid");
+	item.params = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PARAMS, table_items, "params");
+	item.username = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_USERNAME, table_items, "username");
+	item.publickey = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PUBLICKEY, table_items, "publickey");
+	item.privatekey = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PRIVATEKEY, table_items, "privatekey");
+	item.password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_PASSWORD, table_items, "password");
+	item.jmx_endpoint = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_JMX_ENDPOINT, table_items, "jmx_endpoint");
 
 	switch (item.type)
 	{
@@ -204,27 +604,28 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		case ITEM_TYPE_SNMP:
 		case ITEM_TYPE_SCRIPT:
 		case ITEM_TYPE_HTTPAGENT:
-			db_string_from_json(jp_data, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig, sizeof(item.timeout_orig));
+			db_string_from_json(&jp_item, ZBX_PROTO_TAG_TIMEOUT, table_items, "timeout", item.timeout_orig,
+					sizeof(item.timeout_orig));
 			break;
 	}
 
-	item.url = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_URL, table_items, "url");
-	item.query_fields = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields");
+	item.url = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_URL, table_items, "url");
+	item.query_fields = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_QUERY_FIELDS, table_items, "query_fields");
 
-	item.posts = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_POSTS, table_items, "posts");
+	item.posts = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_POSTS, table_items, "posts");
 
-	item.status_codes = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_STATUS_CODES, table_items, "status_codes");
-	item.http_proxy = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_PROXY, table_items, "http_proxy");
+	item.status_codes = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_STATUS_CODES, table_items, "status_codes");
+	item.http_proxy = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_HTTP_PROXY, table_items, "http_proxy");
 
-	item.headers = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
+	item.headers = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
 
-	item.ssl_cert_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items, "ssl_cert_file");
-	item.ssl_key_file = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
-	item.ssl_key_password = db_string_from_json_dyn(jp_data, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
+	item.ssl_cert_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items, "ssl_cert_file");
+	item.ssl_key_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
+	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
 
 	if (ITEM_TYPE_SCRIPT == item.type &&
-			SUCCEED == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
+			SUCCEED == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_PARAMETERS, &jp_script_params))
 	{
 		item.script_params = zbx_dsprintf(NULL, "%.*s",
 				(int)(jp_script_params.end - jp_script_params.start + 1), jp_script_params.start);
@@ -235,7 +636,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	if (NULL == table_interface)
 		table_interface = zbx_db_get_table("interface");
 
-	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
+	if (FAIL == zbx_json_brackets_by_name(&jp_host, ZBX_PROTO_TAG_INTERFACE, &jp_interface))
 		zbx_json_open("{}", &jp_interface);
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_interface, ZBX_PROTO_TAG_INTERFACE_ID, tmp, sizeof(tmp), NULL))
@@ -298,9 +699,6 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	if (NULL == table_hosts)
 		table_hosts = zbx_db_get_table("hosts");
-
-	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
-		zbx_json_open("{}", &jp_host);
 
 	db_string_from_json(&jp_host, ZBX_PROTO_TAG_HOST, table_hosts, "host", item.host.host, sizeof(item.host.host));
 
@@ -447,40 +845,52 @@ out:
 	return ret;
 }
 
-void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		zbx_get_config_forks_f get_config_forks)
+static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time, unsigned char program_type, zbx_get_config_forks_f get_config_forks,
+		struct zbx_json *json, char **error)
 {
 	zbx_user_t		user;
-	struct zbx_json_parse	jp_data;
-	struct zbx_json		json;
-	char			tmp[MAX_ID_LEN + 1];
+	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
+	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL;
 	zbx_uint64_t		proxyid;
-	int			ret;
-	char			*info;
-	size_t			truncated;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+	int			ret = FAIL;
+	size_t			truncated, value_size = 0;
 
 	zbx_user_init(&user);
 
 	if (FAIL == zbx_get_user_from_json(jp, &user, NULL) || USER_TYPE_ZABBIX_ADMIN > user.type)
 	{
-		zbx_send_response(sock, FAIL, "Permission denied.", config_comms->config_timeout);
+		*error = zbx_strdup(NULL, "Permission denied.");
 		goto out;
 	}
 
 	if (SUCCEED != zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
 	{
-		char	*error;
-
-		error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
-		zbx_send_response(sock, FAIL, error, config_comms->config_timeout);
-		zbx_free(error);
+		*error = zbx_dsprintf(NULL, "Cannot parse request tag: %s.", ZBX_PROTO_TAG_DATA);
 		goto out;
 	}
 
-	zbx_json_init(&json, 1024);
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+	{
+		*error = zbx_strdup(NULL, "Missing item field.");
+		goto out;
+	}
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_OPTIONS, &jp_options))
+		zbx_json_open("{}", &jp_options);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
+		jp_steps.end = jp_steps.start = NULL;
+
+	if (NULL != jp_steps.start && (FAIL != zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_RUNTIME_ERROR, &value,
+			&value_size, NULL) || FAIL != zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_VALUE, &value,
+			&value_size, NULL)))
+	{
+		goto preproc_test;
+	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
 		ZBX_STR2UINT64(proxyid, tmp);
@@ -490,21 +900,65 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			get_config_forks);
 
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
-	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-	truncated = zbx_json_addstring_limit(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
-			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_TRUNCATED,
-			truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json->buffer);
 
-	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout);
+preproc_test:
+	zbx_json_addstring(json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
+	zbx_json_addobject(json, ZBX_PROTO_TAG_DATA);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
+	if (NULL != info)
+	{
+		zbx_json_addobject(json, ZBX_PROTO_TAG_ITEM);
 
-	zbx_free(info);
-	zbx_json_free(&json);
+		truncated = zbx_json_addstring_limit(json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR,
+			info, ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
+		zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
+				truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
+		zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+
+		zbx_json_close(json);
+
+		value = zbx_strdup(NULL, info);
+		value_size = strlen(value);
+		ret = SUCCEED;
+	}
+
+	if (NULL == jp_steps.start)
+		goto out;
+
+	zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
+	ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, json, error);
+	zbx_json_close(json);
 out:
+	zbx_free(info);
 	zbx_user_free(&user);
+
+	return ret;
+}
+
+void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
+		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
+		zbx_get_config_forks_f get_config_forks)
+{
+	struct zbx_json	json;
+	int		ret;
+	char		*error = NULL;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	zbx_json_init(&json, 1024);
+
+	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, get_config_forks,
+			&json, &error)))
+	{
+		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout);
+	}
+	else
+	{
+		zbx_send_response(sock, ret, error, config_comms->config_timeout);
+		zbx_free(error);
+	}
+
+	zbx_json_free(&json);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }

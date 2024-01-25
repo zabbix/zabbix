@@ -29,7 +29,6 @@
 #include "zbxcommshigh.h"
 #include "../poller/checks_snmp.h"
 #include "trapper_auth.h"
-#include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
 #include "trapper_item_test.h"
 #include "trapper_request.h"
@@ -1183,11 +1182,6 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		{
 			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
 					config_stats_allowed_ip);
-		}
-		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
-		{
-			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
-				ret = zbx_trapper_preproc_test(sock, &jp, config_comms->config_timeout);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_EXPRESSIONS_EVALUATE))
 		{
