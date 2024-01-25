@@ -270,7 +270,7 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	1 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 };
 
-static int	get_CONFIG_FORKS(unsigned char process_type)
+static int	get_config_forks(unsigned char process_type)
 {
 	if (ZBX_PROCESS_TYPE_COUNT > process_type)
 		return CONFIG_FORKS[process_type];
@@ -1454,12 +1454,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							config_java_gateway_port};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency, get_CONFIG_FORKS,
+							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_externalscripts,
 							config_java_gateway, config_java_gateway_port};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
-							get_CONFIG_FORKS};
+							get_config_forks};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_zbx_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, config_ssl_ca_location,
@@ -1497,17 +1497,18 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_connector_worker_args	connector_worker_args = {zbx_config_source_ip, config_ssl_ca_location,
 									config_ssl_cert_location,
 									config_ssl_key_location};
-	zbx_thread_report_manager_args	report_manager_args = {get_CONFIG_FORKS};
+	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
 	zbx_thread_alert_syncer_args	alert_syncer_args = {config_confsyncer_frequency};
-	zbx_thread_alert_manager_args	alert_manager_args = {get_CONFIG_FORKS, get_zbx_config_alert_scripts_path,
+	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 								zbx_config_dbhigh, zbx_config_source_ip};
-	zbx_thread_lld_manager_args	lld_manager_args = {get_CONFIG_FORKS};
-	zbx_thread_connector_manager_args	connector_manager_args = {get_CONFIG_FORKS};
+	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
+	zbx_thread_connector_manager_args	connector_manager_args = {get_config_forks};
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
-	zbx_thread_timer_args		timer_args = {get_CONFIG_FORKS};
-	zbx_thread_snmptrapper_args	snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_timer_args		timer_args = {get_config_forks};
+	zbx_thread_snmptrapper_args	snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
+								.config_ha_node_name = CONFIG_HA_NODE_NAME};
 	zbx_thread_service_manager_args	serviceman_args = {zbx_config_timeout};
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
@@ -1518,7 +1519,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_CONFIG_FORKS, config_conf_cache_size,
+	if (SUCCEED != zbx_init_configuration_cache(get_zbx_program_type, get_config_forks, config_conf_cache_size,
 			&error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize configuration cache: %s", error);
@@ -1528,7 +1529,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 
 	zbx_vps_monitor_init(config_vps_limit, config_vps_overcommit_limit);
 
-	if (SUCCEED != zbx_init_selfmon_collector(get_CONFIG_FORKS, &error))
+	if (SUCCEED != zbx_init_selfmon_collector(get_config_forks, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize self-monitoring: %s", error);
 		zbx_free(error);
