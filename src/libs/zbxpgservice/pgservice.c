@@ -39,7 +39,8 @@ void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *u
 	{
 		char	*error = NULL;
 
-		if (FAIL == zbx_ipc_socket_open(&pgservice_sock, ZBX_IPC_SERVICE_PG_MANAGER, 0, &error))
+		if (FAIL == zbx_ipc_socket_open(&pgservice_sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to proxy group manager service: %s", error);
 			zbx_free(error);
@@ -78,7 +79,8 @@ void	zbx_pg_update_proxy_lastaccess(zbx_uint64_t proxyid, int lastaccess)
 	{
 		char	*error = NULL;
 
-		if (FAIL == zbx_ipc_socket_open(&pgservice_sock, ZBX_IPC_SERVICE_PG_MANAGER, 0, &error))
+		if (FAIL == zbx_ipc_socket_open(&pgservice_sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT,
+				&error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to proxy group manager service: %s", error);
 			zbx_free(error);
@@ -113,7 +115,7 @@ int	zbx_pg_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error
 
 	if (0 == pgservice_sock.fd)
 	{
-		if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, SEC_PER_MIN, error))
+		if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, error))
 			return FAIL;
 
 		psock = &sock;

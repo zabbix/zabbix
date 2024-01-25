@@ -318,7 +318,7 @@ int	pg_service_init(zbx_pg_service_t *pgs, zbx_pg_cache_t *cache, char **error)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (FAIL == zbx_ipc_service_start(&pgs->service, ZBX_IPC_SERVICE_PG_MANAGER, error))
+	if (FAIL == zbx_ipc_service_start(&pgs->service, ZBX_IPC_SERVICE_PGSERVICE, error))
 		goto out;
 
 	pthread_attr_t	attr;
@@ -350,7 +350,7 @@ void	pg_service_destroy(zbx_pg_service_t *pgs)
 	zbx_ipc_socket_t	sock;
 	char			*error = NULL;
 
-	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, 0, &error))
+	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, &error))
 	{
 		zabbix_log(LOG_LEVEL_ERR, "cannot connect to to proxy group manager service: %s", error);
 		zbx_free(error);

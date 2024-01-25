@@ -2251,7 +2251,7 @@ TABLE|host_proxy|hostproxyid|0
 FIELD		|hostproxyid	|t_id		|	|NOT NULL	|0
 FIELD		|hostid		|t_id		|	|NULL		|0|1|hosts	|	|RESTRICT
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_PROXY
-FIELD		|proxyid	|t_id		|	|NOT NULL	|ZBX_PROXY|2|proxy|	|RESTRICT
+FIELD		|proxyid	|t_id		|	|NULL		|ZBX_PROXY|2|proxy|	|RESTRICT
 FIELD		|revision	|t_bigint	|'0'	|NOT NULL	|ZBX_PROXY
 UNIQUE		|1		|hostid
 INDEX		|2		|proxyid

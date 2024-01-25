@@ -47,9 +47,6 @@ static void	pgm_init(zbx_pg_cache_t *cache)
 
 	zbx_db_free_result(result);
 
-	if (0 == map_revision)
-		map_revision++;
-
 	pg_cache_init(cache, map_revision);
 }
 
@@ -595,6 +592,7 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_pg_update_t	groups, proxies;
 	zbx_vector_pg_host_t	hosts_new, hosts_mod, hosts_del;
 	zbx_vector_uint64_t	groupids;
+	zbx_uint64_t		hostmap_revision;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -606,6 +604,7 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 	zbx_vector_uint64_create(&groupids);
 
 	pg_cache_lock(cache);
+	hostmap_revision = cache->hostmap_revision;
 	pg_cache_get_updates(cache, &groups, &proxies, &hosts_new, &hosts_mod, &hosts_del, &groupids);
 	pg_cache_unlock(cache);
 
@@ -636,7 +635,8 @@ static void	pgm_flush_updates(zbx_pg_cache_t *cache)
 
 			pgm_db_flush_host_proxy_inserts(&hosts_new);
 
-			pgm_db_flush_host_proxy_revision(cache->hostmap_revision);
+			if (hostmap_revision != cache->hostmap_revision)
+				pgm_db_flush_host_proxy_revision(cache->hostmap_revision);
 
 		}
 		while (ZBX_DB_DOWN == (ret = zbx_db_commit()));

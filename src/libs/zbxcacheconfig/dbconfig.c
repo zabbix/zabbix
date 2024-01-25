@@ -7457,7 +7457,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	else if (ZBX_DBSYNC_STATUS_INITIALIZED != sync_status)
 		changelog_sync_mode = ZBX_DBSYNC_INIT;
 
-	if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+	if (ZBX_DBSYNC_INIT != changelog_sync_mode && 0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 	{
 		/* track host - proxy group relocations only during incremental sync */
 		zbx_vector_objmove_create(&pg_host_reloc);
@@ -8444,10 +8444,10 @@ clean:
 
 	zbx_dbsync_env_clear();
 
-	if (ZBX_DBSYNC_INIT != changelog_sync_mode)
+	if (NULL != pg_host_reloc_ref)
 	{
-		zbx_pg_update_object_relocations(ZBX_IPC_PGM_HOST_PGROUP_UPDATE, &pg_host_reloc);
-		zbx_vector_objmove_destroy(&pg_host_reloc);
+		zbx_pg_update_object_relocations(ZBX_IPC_PGM_HOST_PGROUP_UPDATE, pg_host_reloc_ref);
+		zbx_vector_objmove_destroy(pg_host_reloc_ref);
 	}
 
 	zbx_hashset_destroy(&activated_hosts);

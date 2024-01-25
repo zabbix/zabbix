@@ -23,7 +23,9 @@
 #include "zbxipcservice.h"
 #include "zbxalgo.h"
 
-#define ZBX_IPC_SERVICE_PG_MANAGER		"pgmanager"
+#define ZBX_IPC_SERVICE_PGSERVICE	"pgservice"
+
+#define ZBX_PG_SERVICE_TIMEOUT		SEC_PER_MIN
 
 #define ZBX_IPC_PGM_HOST_PGROUP_UPDATE		1
 #define ZBX_IPC_PGM_GET_PROXY_SYNC_DATA		2

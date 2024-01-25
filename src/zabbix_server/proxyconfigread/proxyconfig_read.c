@@ -1059,7 +1059,7 @@ static void	proxyconfig_get_proxy_group_updates(const zbx_dc_proxy_t *proxy, zbx
 	{
 		char	*error = NULL;
 
-		if (FAIL == zbx_ipc_socket_open(&pg_socket, ZBX_IPC_SERVICE_PG_MANAGER, SEC_PER_MIN, &error))
+		if (FAIL == zbx_ipc_socket_open(&pg_socket, ZBX_IPC_SERVICE_PGSERVICE, ZBX_PG_SERVICE_TIMEOUT, &error))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "Cannot connect to proxy group manager service: %s", error);
 			*sync_mode = ZBX_PROXY_SYNC_FULL;

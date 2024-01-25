@@ -3201,7 +3201,7 @@ static int	DBpatch_6050208(void)
 				{"hostproxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
 				{"hostid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 				{"host", "", NULL, NULL, 128, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
-				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, ZBX_NOTNULL, 0},
+				{"proxyid", NULL, NULL, NULL, 0, ZBX_TYPE_ID, 0, 0},
 				{"revision", "0", NULL, NULL, 0, ZBX_TYPE_UINT, ZBX_NOTNULL, 0},
 				{0}
 			},
