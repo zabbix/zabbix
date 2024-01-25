@@ -2774,7 +2774,7 @@ int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const zbx_db_eve
 			zbx_free(replace_to);
 		}
 
-		if (ZBX_TOKEN_FUNC_MACRO == token.type)
+		if (ZBX_TOKEN_FUNC_MACRO == token.type || ZBX_TOKEN_USER_FUNC_MACRO == token.type)
 			zbx_free(m_ptr);
 
 		pos++;
