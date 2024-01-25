@@ -164,83 +164,59 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 	protected function doAction() {
 		global $ZBX_SERVER, $ZBX_SERVER_PORT;
 
-		// Get post data for particular item type.
-		$data = $this->getItemTestProperties($this->getInputAll(), true);
+		$this->prepareTestData($data);
 
-		// Apply effective macros values to properties.
-		$data = $this->resolveItemPropertyMacros($data);
-
-		if ($this->item_type != ITEM_TYPE_CALCULATED) {
-			unset($data['value_type']);
-		}
-		else {
-			$data['host']['hostid'] = $this->getInput('hostid');
-		}
-
-		// Rename fields according protocol.
-		$data = CArrayHelper::renameKeys($data, [
-			'params_ap' => 'params',
-			'params_es' => 'params',
-			'params_f' => 'params',
-			'script' => 'params',
-			'http_username' => 'username',
-			'http_password' => 'password',
-			'http_authtype' => 'authtype',
-			'item_type' => 'type'
-		]);
-
-		// Only non-empty fields need to be sent to server.
-		$data = $this->unsetEmptyValues($data);
-
-		self::transformHttpFields($data);
-
-		if (array_key_exists('parameters', $data)) {
-			$data['parameters'] = $this->transformParametersFields($data['parameters']);
-		}
-
-		/*
-		 * Server will turn off status code check if field value is empty. If field is not present, then server will
-		 * default to check if status code is 200.
-		 */
-		if ($this->item_type == ITEM_TYPE_HTTPAGENT && !array_key_exists('status_codes', $data)) {
-			$data['status_codes'] = '';
-		}
-
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+		$result = $server->testItem(self::adjustFieldTypes($data), CSessionHelper::getId());
 		$output = [
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
-		// Send test to be executed on Zabbix server.
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-		);
-		$result = $server->testItem($data, CSessionHelper::getId());
-
-		// Handle the response.
-		if ($result === false) {
-			error($server->getError());
-		}
-		elseif (is_array($result)) {
-			if (array_key_exists('result', $result)) {
-				$output['prev_value'] = $this->getInput('value', '');
-				$output['prev_time'] = $this->getPrevTime();
-				$output['value'] = $result['result'];
-
-				if (array_key_exists('truncated', $result) && $result['truncated']) {
-					$output['warning'] = _s('First %1$s of %2$s shown.',
-						convertUnits(['value' => strlen($output['value']), 'units' => 'B']),
-						convertUnits(['value' => $result['original_size'], 'units' => 'B'])
-					);
-				}
-
-				$output['eol'] = (strstr($result['result'], "\r\n") === false) ? ZBX_EOL_LF : ZBX_EOL_CRLF;
+		try {
+			if ($result === false) {
+				throw new ErrorException($server->getError(), 70);
 			}
 
-			if (array_key_exists('error', $result) && $result['error'] !== '') {
-				error($result['error']);
+			if (array_key_exists('error', $result)) {
+				throw new ErrorException($result['error'], 70);
+			}
+
+			if (!array_key_exists('item', $result)) {
+				throw new ErrorException('', 70);
+			}
+
+			if (array_key_exists('error', $result['item'])) {
+				throw new ErrorException($result['item']['error'], 70);
+			}
+
+			$result_item = $result['item'];
+
+			$output += [
+				'prev_value' => $this->getInput('value', ''),
+				'prev_time' => $this->getPrevTime(),
+				'eol' => $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF,
+				'value' => $result_item['result']
+			];
+
+			if (array_key_exists('truncated', $result_item) && $result_item['truncated']) {
+				$output['value_warning'] = _s('First %1$s of %2$s shown.',
+					convertUnits(['value' => strlen($result_item['result']), 'units' => 'B']),
+					convertUnits(['value' => $result_item['original_size'], 'units' => 'B'])
+				);
+			}
+		}
+		catch (ErrorException $exception) {
+			if ($exception->getCode() != 70) {
+				throw $exception;
+			}
+
+			if ($exception->getMessage() !== '') {
+				error($exception->getMessage());
 			}
 		}
 
