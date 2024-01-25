@@ -36,7 +36,9 @@ class testUsers extends CAPITest {
 			'user_with_disabled_usergroup' => null,
 			'user_for_token_tests' => null,
 			'user_with_valid_session' => null,
-			'user_for_extend_parameter_tests' => null
+			'user_for_extend_parameter_tests' => null,
+			'user_with_mfa_default' => null,
+			'user_with_mfa_duo' => null
 		],
 		'sessionids' => [
 			'not_authorized_session' => null,
@@ -290,6 +292,49 @@ class testUsers extends CAPITest {
 
 		self::$data['mfaids']['mfa_totp_1'] = $mfaids['mfaids'][0];
 		self::$data['mfaids']['mfa_duo_1'] = $mfaids['mfaids'][1];
+
+		$usergroupids_mfa = CDataHelper::call('usergroup.create', [
+			[
+				'name' => 'API test users MFA Default',
+				'mfaid' => 0,
+				'mfa_status' => GROUP_MFA_ENABLED
+			],
+			[
+				'name' => 'API test users MFA Duo',
+				'mfaid' => self::$data['mfaids']['mfa_duo_1'],
+				'mfa_status' => GROUP_MFA_ENABLED
+			]
+		]);
+
+		$usergroupids['mfa_default'] = $usergroupids_mfa['usrgrpids'][0];
+		$usergroupids['mfa_duo'] = $usergroupids_mfa['usrgrpids'][1];
+
+		CDataHelper::call('authentication.update', [
+			'mfa_status' => MFA_ENABLED,
+			'mfaid' => self::$data['mfaids']['mfa_totp_1']
+		]);
+
+		$userids_mfa = CDataHelper::call('user.create', [
+			[
+				'username' => 'User with mfa default',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['mfa_default']]
+				]
+			],
+			[
+				'username' => 'User with mfa duo',
+				'roleid' => $admin_roleid,
+				'passwd' => 'zabbix123456',
+				'usrgrps' => [
+					['usrgrpid' => $usergroupids['mfa_duo']]
+				]
+			]
+		]);
+
+		self::$data['userids']['user_with_mfa_default'] = $userids_mfa['userids'][0];
+		self::$data['userids']['user_with_mfa_duo'] = $userids_mfa['userids'][1];
 	}
 
 	public static function user_create() {
@@ -2332,6 +2377,21 @@ class testUsers extends CAPITest {
 					'password' => 'zabbix'
 				],
 				'expected_error' => 'No permissions for system access.'
+			],
+			// Check user with MFA cannot login to API
+			[
+				'login' => [
+					'username' => 'user_with_mfa_default',
+					'password' => 'zabbix123456'
+				],
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
+			],
+			[
+				'login' => [
+					'username' => 'user_with_mfa_duo',
+					'password' => 'zabbix123456'
+				],
+				'expected_error' => 'Incorrect user name or password or account is temporarily blocked.'
 			],
 			// Successfully login.
 			[
