@@ -983,7 +983,7 @@ class testUsers extends CAPITest {
 								'mfaid' => 'mfa_totp_1',
 								'totp_secret' => '123asdf123asdf13asdf123asdf123as'
 							]
-						],
+						]
 					]
 				],
 				'expected_error' => null

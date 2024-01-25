@@ -149,9 +149,7 @@ class CControllerUserList extends CController {
 		unset($user);
 
 		if (CAuthenticationHelper::get(CAuthenticationHelper::MFA_STATUS) == MFA_ENABLED) {
-			$userids_with_totp = DB::select('mfa_totp_secret', [
-				'output' => ['userid'],
-			]);
+			$userids_with_totp = DB::select('mfa_totp_secret', ['output' => ['userid']]);
 			$userids_with_totp = array_column($userids_with_totp, 'userid');
 
 			foreach ($data['users'] as &$user) {
