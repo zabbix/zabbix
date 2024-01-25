@@ -115,17 +115,19 @@ exit:
 }
 
 int	get_value_java(unsigned char request, const zbx_dc_item_t *item, AGENT_RESULT *result, int config_timeout,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_java_gateway, int config_java_gateway_port)
 {
 	int	errcode = SUCCEED;
 
-	get_values_java(request, item, result, &errcode, 1, config_timeout, config_source_ip);
+	get_values_java(request, item, result, &errcode, 1, config_timeout, config_source_ip, config_java_gateway,
+			config_java_gateway_port);
 
 	return errcode;
 }
 
-void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes, int num,
-		int config_timeout, const char *config_source_ip)
+void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
+		int num, int config_timeout, const char *config_source_ip, const char *config_java_gateway,
+		int config_java_gateway_port)
 {
 	zbx_socket_t	s;
 	struct zbx_json	json;
@@ -145,7 +147,7 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 
 	zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
 
-	if (NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY)
+	if (NULL == config_java_gateway || '\0' == *config_java_gateway)
 	{
 		err = GATEWAY_ERROR;
 		zbx_strscpy(error, "JavaGateway configuration parameter not set or empty");
@@ -203,7 +205,7 @@ void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RE
 	}
 	zbx_json_close(&json);
 
-	if (SUCCEED == (err = zbx_tcp_connect(&s, config_source_ip, CONFIG_JAVA_GATEWAY, CONFIG_JAVA_GATEWAY_PORT,
+	if (SUCCEED == (err = zbx_tcp_connect(&s, config_source_ip, config_java_gateway, config_java_gateway_port,
 			config_timeout, ZBX_TCP_SEC_UNENCRYPTED, NULL, NULL)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "JSON before sending [%s]", json.buffer);

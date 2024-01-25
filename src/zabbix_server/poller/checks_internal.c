@@ -237,22 +237,24 @@ out:
 	return ret;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: retrieve data from Zabbix server (internally supported items)     *
- *                                                                            *
- * Parameters: item                - [IN] item we are interested in           *
- *             result              - [OUT] value of the requested item        *
- *             config_comms        - [IN] Zabbix server/proxy configuration   *
- *                        for communication                                   *
- *             config_startup_time - [IN] program startup time                *
- *                                                                            *
- * Return value: SUCCEED - data successfully retrieved and stored in result   *
- *               NOTSUPPORTED - requested item is not supported               *
- *                                                                            *
- ******************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: retrieve data from Zabbix server (internally supported items)         *
+ *                                                                                *
+ * Parameters: item                     - [IN] item we are interested in          *
+ *             result                   - [OUT] value of requested item           *
+ *             config_comms             - [IN] Zabbix server/proxy configuration  *
+ *                                             for communication                  *
+ *             config_startup_time      - [IN] program startup time               *
+ *             config_java_gateway      - [IN]                                    *
+ *             config_java_gateway_port - [IN]                                    *
+ *                                                                                *
+ * Return value: SUCCEED - data successfully retrieved and stored in result       *
+ *               NOTSUPPORTED - requested item is not supported                   *
+ *                                                                                *
+ **********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time)
+		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -497,7 +499,8 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 	else if (0 == strcmp(tmp, "java"))			/* zabbix["java",...] */
 	{
 		if (SUCCEED != get_value_java(ZBX_JAVA_GATEWAY_REQUEST_INTERNAL, item, result,
-				config_comms->config_timeout, config_comms->config_source_ip))
+				config_comms->config_timeout, config_comms->config_source_ip, config_java_gateway,
+				config_java_gateway_port))
 		{
 			tmp1 = get_rparam(&request, 2);
 			/* the default error code "NOTSUPPORTED" renders nodata() trigger function nonfunctional */

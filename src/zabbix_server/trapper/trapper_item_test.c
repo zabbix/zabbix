@@ -142,7 +142,8 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks)
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_externalscripts,
+		const char *config_java_gateway, int config_java_gateway_port)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -389,7 +390,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		}
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
-				config_startup_time, program_type, progname);
+				config_startup_time, program_type, progname, config_externalscripts,
+				config_java_gateway, config_java_gateway_port);
 
 		switch (errcode)
 		{
@@ -449,7 +451,8 @@ out:
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks)
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_externalscripts,
+		const char *config_java_gateway, int config_java_gateway_port)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data;
@@ -487,7 +490,8 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		proxyid = 0;
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
-			progname, get_config_forks);
+			progname, get_config_forks, config_externalscripts, config_java_gateway,
+			config_java_gateway_port);
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
