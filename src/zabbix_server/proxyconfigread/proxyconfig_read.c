@@ -1402,7 +1402,7 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 			zbx_json_addint64(j, ZBX_PROTO_TAG_FULL_SYNC, 1);
 
 		zbx_json_adduint64(j, ZBX_PROTO_TAG_HOSTMAP_REVISION, hostmap_revision);
-		zbx_json_addint64(j, ZBX_PROTO_TAG_FAILOVER_DELAY, failover_delay);
+		zbx_json_addstring(j, ZBX_PROTO_TAG_FAILOVER_DELAY, failover_delay, ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(j);
 	}

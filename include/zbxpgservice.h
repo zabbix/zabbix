@@ -21,6 +21,7 @@
 #define ZABBIX_ZBXPGSERVICE_H
 
 #include "zbxipcservice.h"
+#include "zbxalgo.h"
 
 #define ZBX_IPC_SERVICE_PG_MANAGER		"pgmanager"
 
@@ -29,6 +30,7 @@
 #define ZBX_IPC_PGM_PROXY_SYNC_DATA		3
 #define ZBX_IPC_PGM_GET_STATS			4
 #define ZBX_IPC_PGM_STATS			5
+#define ZBX_IPC_PGM_PROXY_LASTACCESS		6
 #define ZBX_IPC_PGM_STOP			100
 
 #define ZBX_PROXY_SYNC_NONE	0
@@ -40,12 +42,24 @@
 
 typedef struct
 {
+	zbx_uint64_t	objid;
+	zbx_uint64_t	srcid;
+	zbx_uint64_t	dstid;
+}
+zbx_objmove_t;
+
+ZBX_VECTOR_DECL(objmove, zbx_objmove_t)
+
+typedef struct
+{
 	int			status;
 	int			proxy_online_num;
 	zbx_vector_uint64_t	proxyids;
 }
 zbx_pg_stats_t;
 
-int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error);
+void	zbx_pg_update_object_relocations(zbx_uint32_t code, zbx_vector_objmove_t *updates);
+int	zbx_pg_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error);
+void	zbx_pg_update_proxy_lastaccess(zbx_uint64_t proxyid, int lastaccess);
 
 #endif

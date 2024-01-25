@@ -406,7 +406,7 @@ int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request,
 
 		param2 = get_rparam(request, 1);
 
-		if (FAIL == zbx_pg_service_get_stats(param2, &stats, &error))
+		if (FAIL == zbx_pg_get_stats(param2, &stats, &error))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain proxy group statistics: %s", error));
 			zbx_free(error);

@@ -342,7 +342,7 @@ static void	pg_cache_reassign_hosts(zbx_pg_cache_t *cache, zbx_pg_group_t *group
 
 	int	min_hosts = INT32_MAX, max_hosts = 0, online_num = 0, hosts_num = 0;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", group->name, __func__, cache->group_updates.values_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s() group:%s", __func__, group->name, cache->group_updates.values_num);
 
 	/* find min/max host number of online proxies and remove hosts from offline proxies */
 	for (int i = 0; i < group->proxies.values_num; i++)

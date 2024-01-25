@@ -52,7 +52,6 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxkvs.h"
-#include "zbxpgservice.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
 
@@ -101,7 +100,6 @@ ZBX_PTR_VECTOR_IMPL(item_tag, zbx_item_tag_t *)
 ZBX_PTR_VECTOR_IMPL(dc_item, zbx_dc_item_t *)
 ZBX_PTR_VECTOR_IMPL(dc_trigger, zbx_dc_trigger_t *)
 ZBX_VECTOR_IMPL(host_key, zbx_host_key_t)
-ZBX_VECTOR_IMPL(objmove, zbx_objmove_t)
 
 static zbx_get_program_type_f	get_program_type_cb = NULL;
 static zbx_get_config_forks_f	get_config_forks_cb = NULL;
@@ -7363,45 +7361,6 @@ static void	DCsync_proxies(zbx_dbsync_t *sync, zbx_uint64_t revision, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
-static void	dc_notify_proxy_group_manager(zbx_uint32_t code, zbx_vector_objmove_t *updates)
-{
-	static zbx_ipc_socket_t	sock;
-
-	if (0 == updates->values_num)
-		return;
-
-	if (0 == sock.fd)
-	{
-		char	*error = NULL;
-
-		if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, 0, &error))
-		{
-			zabbix_log(LOG_LEVEL_CRIT, "Cannot connect to proxy group manager service: %s", error);
-			zbx_free(error);
-			exit(EXIT_FAILURE);
-		}
-	}
-
-	unsigned char	*data, *ptr;
-
-	ptr = data = (unsigned char *)zbx_malloc(NULL, sizeof(zbx_uint64_t) * 3 * (size_t)updates->values_num);
-
-	for (int i = 0; i < updates->values_num; i++)
-	{
-		ptr += zbx_serialize_value(ptr, updates->values[i].objid);
-		ptr += zbx_serialize_value(ptr, updates->values[i].srcid);
-		ptr += zbx_serialize_value(ptr, updates->values[i].dstid);
-	}
-
-	if (FAIL == zbx_ipc_socket_write(&sock, code, data, (zbx_uint32_t)(ptr - data)))
-	{
-		zabbix_log(LOG_LEVEL_CRIT, "Cannot send data to proxy group manager service");
-		exit(EXIT_FAILURE);
-	}
-
-	zbx_free(data);
-}
-
 void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids)
 {
 	zbx_hashset_iter_t	iter;
@@ -8487,7 +8446,7 @@ clean:
 
 	if (ZBX_DBSYNC_INIT != changelog_sync_mode)
 	{
-		dc_notify_proxy_group_manager(ZBX_IPC_PGM_HOST_PGROUP_UPDATE, &pg_host_reloc);
+		zbx_pg_update_object_relocations(ZBX_IPC_PGM_HOST_PGROUP_UPDATE, &pg_host_reloc);
 		zbx_vector_objmove_destroy(&pg_host_reloc);
 	}
 
@@ -14930,6 +14889,7 @@ void	zbx_dc_proxy_update_nodata(zbx_vector_uint64_pair_t *subscriptions)
 void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 {
 	ZBX_DC_PROXY	*proxy;
+	int		lastaccess = 0;
 
 	WRLOCK_CACHE;
 
@@ -14951,7 +14911,10 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			}
 
 			if (0 == lost && proxy->lastaccess != diff->lastaccess)
+			{
 				proxy->lastaccess = diff->lastaccess;
+				lastaccess = proxy->lastaccess;
+			}
 
 			/* proxy last access in database is updated separately in  */
 			/* every ZBX_PROXY_LASTACCESS_UPDATE_FREQUENCY seconds     */
@@ -15001,12 +14964,12 @@ void	zbx_dc_update_proxy(zbx_proxy_diff_t *diff)
 			ps_win->values_num += ds_win->values_num;
 			diff->flags &= (~ZBX_FLAGS_PROXY_DIFF_UPDATE_SUPPRESS_WIN);
 		}
-
-		proxy->revision = config->revision.config;
-		config->revision.proxy = config->revision.config;
 	}
 
 	UNLOCK_CACHE;
+
+	if (0 != lastaccess)
+		zbx_pg_update_proxy_lastaccess(diff->hostid, lastaccess);
 }
 
 /******************************************************************************

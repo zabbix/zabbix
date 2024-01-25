@@ -28,6 +28,7 @@
 #include "zbxvault.h"
 #include "zbxregexp.h"
 #include "zbxtagfilter.h"
+#include "zbxpgservice.h"
 
 #define	ZBX_NO_POLLER			255
 #define	ZBX_POLLER_TYPE_NORMAL		0
@@ -1363,16 +1364,6 @@ zbx_dc_item_type_timeouts_t;
 
 void	zbx_dc_get_proxy_timeouts(zbx_uint64_t proxy_hostid, zbx_dc_item_type_timeouts_t *timeouts);
 char	*zbx_dc_get_global_item_type_timeout(unsigned char item_type);
-
-typedef struct
-{
-	zbx_uint64_t	objid;
-	zbx_uint64_t	srcid;
-	zbx_uint64_t	dstid;
-}
-zbx_objmove_t;
-
-ZBX_VECTOR_DECL(objmove, zbx_objmove_t)
 
 /* proxy group manager local cache support */
 

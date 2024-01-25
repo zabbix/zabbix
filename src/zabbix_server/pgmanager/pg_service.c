@@ -72,6 +72,42 @@ static void	pg_update_host_pgroup(zbx_pg_service_t *pgs, zbx_ipc_message_t *mess
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: update proxy lastaccess                                           *
+ *                                                                            *
+ * Parameter: pgs     - [IN] proxy group service                              *
+ *            message - [IN] IPC message with proxy last access               *
+ *                                                                            *
+ ******************************************************************************/
+static void	pg_update_proxy_lastaccess(zbx_pg_service_t *pgs, zbx_ipc_message_t *message)
+{
+	unsigned char	*ptr = message->data;
+	zbx_uint64_t	proxyid;
+	int		lastaccess;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	ptr += zbx_deserialize_value(ptr, &proxyid);
+	ptr += zbx_deserialize_value(ptr, &lastaccess);
+
+	pg_cache_lock(pgs->cache);
+
+	zbx_pg_proxy_t 	*proxy;
+
+	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)))
+	{
+		proxy->lastaccess = lastaccess;
+		if (NULL != proxy->group)
+			pg_cache_queue_group_update(pgs->cache, proxy->group);
+
+	}
+
+	pg_cache_unlock(pgs->cache);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: get proxy configuration sync data                                 *
  *                                                                            *
  * Parameter: pgs     - [IN] proxy group service                              *
@@ -127,9 +163,8 @@ static void	pg_get_proxy_sync_data(zbx_pg_service_t *pgs, zbx_ipc_client_t *clie
 		proxy->sync_time = now;
 	}
 
-	zbx_serialize_prepare_str(failover_delay_len, failover_delay);
-
-	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t) + failover_delay_len;
+	data_len = sizeof(unsigned char) + sizeof(zbx_uint64_t);
+	zbx_serialize_prepare_str_len(data_len, failover_delay, failover_delay_len);
 
 	if (ZBX_PROXY_SYNC_PARTIAL == mode)
 	{
@@ -253,6 +288,9 @@ static void	*pg_service_entry(void *data)
 				case ZBX_IPC_PGM_GET_STATS:
 					pg_get_proxy_group_stats(pgs, client, message);
 					break;
+				case ZBX_IPC_PGM_PROXY_LASTACCESS:
+					pg_update_proxy_lastaccess(pgs, message);
+					break;
 				case ZBX_IPC_PGM_STOP:
 					goto out;
 			}
@@ -325,67 +363,4 @@ void	pg_service_destroy(zbx_pg_service_t *pgs)
 	void	*retval;
 
 	pthread_join(pgs->thread, &retval);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: get proxy group statistics                                       *
- *                                                                            *
- ******************************************************************************/
-int	zbx_pg_service_get_stats(const char *pg_name, zbx_pg_stats_t *pg_stats, char **error)
-{
-	zbx_ipc_socket_t	sock;
-	int			ret = FAIL, proxyids_num, status;
-	zbx_ipc_message_t	message = {0};
-	const unsigned char	*ptr = NULL;
-
-	if (FAIL == zbx_ipc_socket_open(&sock, ZBX_IPC_SERVICE_PG_MANAGER, SEC_PER_MIN, error))
-		return FAIL;
-
-	if (FAIL == zbx_ipc_socket_write(&sock, ZBX_IPC_PGM_GET_STATS, (const unsigned char *)pg_name,
-			(zbx_uint32_t)strlen(pg_name) + 1))
-	{
-		*error = zbx_strdup(NULL, "Cannot send request to proxy group manager service");
-		goto out;
-	}
-
-	if (FAIL == zbx_ipc_socket_read(&sock, &message))
-	{
-		*error = zbx_strdup(NULL, "Cannot read proxy group manager service response");
-		goto out;
-	}
-
-	ptr = message.data;
-	ptr += zbx_deserialize_value(ptr, &status);
-
-	if (-1 == status)
-	{
-		*error = zbx_dsprintf(NULL, "Unknown proxy group \"%s\"", pg_name);
-		goto out;
-	}
-
-	pg_stats->status = status;
-	ptr += zbx_deserialize_value(ptr, &pg_stats->proxy_online_num);
-	ptr += zbx_deserialize_value(ptr, &proxyids_num);
-
-	zbx_vector_uint64_create(&pg_stats->proxyids);
-	if (0 != proxyids_num)
-	{
-		zbx_vector_uint64_reserve(&pg_stats->proxyids, (size_t)proxyids_num);
-
-		for (int i = 0; i < proxyids_num; i++)
-		{
-			zbx_uint64_t	proxyid;
-
-			ptr += zbx_deserialize_value(ptr, &proxyid);
-			zbx_vector_uint64_append(&pg_stats->proxyids, proxyid);
-		}
-	}
-
-	ret = SUCCEED;
-out:
-	zbx_ipc_message_clean(&message);
-	zbx_ipc_socket_close(&sock);
-
-	return ret;
 }

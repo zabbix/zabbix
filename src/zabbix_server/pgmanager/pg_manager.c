@@ -47,6 +47,9 @@ static void	pgm_init(zbx_pg_cache_t *cache)
 
 	zbx_db_free_result(result);
 
+	if (0 == map_revision)
+		map_revision++;
+
 	pg_cache_init(cache, map_revision);
 }
 
@@ -228,14 +231,15 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 		}
 
 		if (0 != update_group)
-			pg_cache_queue_group_update(cache, proxy->group);
+			pg_cache_queue_group_update(cache, group);
 	}
 
 	for (int i = 0; i < cache->group_updates.values_num; i++)
 	{
-		int		online = 0, offline = 0, healthy = 0, total = group->proxies.values_num;
+		int	online = 0, offline = 0, healthy = 0, total;
 
 		group = cache->group_updates.values[i];
+		total = group->proxies.values_num;
 
 		tmp = zbx_strdup(NULL, group->failover_delay);
 		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
@@ -358,7 +362,7 @@ static void	pgm_db_flush_proxy_updates(char **sql, size_t *sql_alloc, size_t *sq
 			continue;
 
 		zbx_snprintf_alloc(sql, sql_alloc, sql_offset,
-				"update proxy set status=%d where proxyid=" ZBX_FS_UI64 ";\n",
+				"update proxy_rtdata set status=%d where proxyid=" ZBX_FS_UI64 ";\n",
 				proxies->values[i].status, proxies->values[i].objectid);
 
 		zbx_db_execute_overflowed_sql(sql, sql_alloc, sql_offset);
