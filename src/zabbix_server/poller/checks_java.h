@@ -25,9 +25,6 @@
 #define ZBX_JAVA_GATEWAY_REQUEST_INTERNAL	0
 #define ZBX_JAVA_GATEWAY_REQUEST_JMX		1
 
-extern char	*CONFIG_JAVA_GATEWAY;
-extern int	CONFIG_JAVA_GATEWAY_PORT;
-
 int	get_value_java(unsigned char request, const zbx_dc_item_t *item, AGENT_RESULT *result, int config_timeout,
 		const char *config_source_ip, const char *config_java_gateway, int config_java_gateway_port);
 void	get_values_java(unsigned char request, const zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,

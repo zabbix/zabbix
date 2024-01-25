@@ -23,8 +23,6 @@
 #include "zbxsysinfo.h"
 #include "zbxtime.h"
 
-//extern char	*CONFIG_EXTERNALSCRIPTS;
-
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieve data from script executed on Zabbix server               *
