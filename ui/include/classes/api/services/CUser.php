@@ -18,10 +18,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-use BaconQrCode\Renderer\Image\ImagickImageBackEnd;
-use BaconQrCode\Renderer\ImageRenderer;
-use BaconQrCode\Renderer\RendererStyle\RendererStyle;
-use BaconQrCode\Writer;
 use Duo\DuoUniversal\Client;
 use Duo\DuoUniversal\DuoException;
 use PragmaRX\Google2FA\Google2FA;
@@ -3389,8 +3385,6 @@ class CUser extends CApiService {
 			try {
 				$duo_client = new Client($data['mfa']['clientid'], $data['mfa']['client_secret'],
 					$data['mfa']['api_hostname'], $session_data['redirect_uri']);
-
-				$duo_client->healthCheck();
 			}
 			catch (DuoException $e) {
 				throw new Exception('Verify the values in Duo Universal Prompt MFA method are correct.'.
