@@ -3186,7 +3186,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 			{
 				/* ready to construct the final OID with index */
 
-				pl = strchr(items[j].snmp_oid, '[');
+				char	*pl = strchr(items[j].snmp_oid, '[');
 
 				*pl = '\0';
 				zbx_snmp_translate(oids_translated[j], items[j].snmp_oid, sizeof(oids_translated[j]));
