@@ -15576,6 +15576,8 @@ void	zbx_proxy_discovery_get(char **data)
 	zbx_hashset_iter_t	iter;
 	ZBX_DC_PROXY		*dc_proxy;
 
+	zbx_json_initarray(&json, ZBX_JSON_STAT_BUF_LEN);
+
 	RDLOCK_CACHE;
 
 	zbx_hashset_iter_reset(&config->proxies, &iter);

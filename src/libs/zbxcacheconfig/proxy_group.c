@@ -481,25 +481,6 @@ int	dc_get_host_redirect(const char *host, zbx_comms_redirect_t *redirect)
  * Purpose: set proxy failover delay in configuration cache                   *
  *                                                                            *
  ******************************************************************************/
-void	zbx_dc_set_proxy_failover_delay(const char *failover_delay)
-{
-	WRLOCK_CACHE;
-
-	int	found = (NULL == config->proxy_failover_delay_raw);
-
-	/* failover delay can be updated only by one process at time, */
-	/* so it can be checked without locking before update        */
-	if (0 == found || 0 != strcmp(config->proxy_failover_delay_raw, failover_delay))
-		dc_strpool_replace(found, &config->proxy_failover_delay_raw, failover_delay);
-
-	UNLOCK_CACHE;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: set proxy failover delay in configuration cache                   *
- *                                                                            *
- ******************************************************************************/
 void	dc_update_proxy_failover_delay(void)
 {
 	if (NULL != config->proxy_failover_delay_raw)
@@ -515,6 +496,25 @@ void	dc_update_proxy_failover_delay(void)
 		dc_strpool_release(config->proxy_failover_delay_raw);
 		config->proxy_failover_delay_raw = NULL;
 	}
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: set proxy failover delay in configuration cache                   *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_dc_set_proxy_failover_delay(const char *failover_delay)
+{
+	WRLOCK_CACHE;
+
+	int	found = (NULL == config->proxy_failover_delay_raw);
+
+	/* failover delay can be updated only by one process at time, */
+	/* so it can be checked without locking before update        */
+	if (0 == found || 0 != strcmp(config->proxy_failover_delay_raw, failover_delay))
+		dc_strpool_replace(found, &config->proxy_failover_delay_raw, failover_delay);
+
+	UNLOCK_CACHE;
 }
 
 /******************************************************************************

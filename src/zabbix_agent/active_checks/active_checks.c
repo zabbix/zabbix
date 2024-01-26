@@ -1868,7 +1868,7 @@ static void	send_heartbeat_msg(zbx_vector_addr_ptr_t *addrs, const zbx_config_tl
 
 	last_ret = ret;
 
-	zabbix_log(LOG_LEVEL_DEBUG, "Out %s()", __func__);
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 ZBX_THREAD_ENTRY(active_checks_thread, args)

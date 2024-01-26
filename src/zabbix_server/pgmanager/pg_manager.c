@@ -246,7 +246,8 @@ static void	pgm_update_status(zbx_pg_cache_t *cache)
 
 		tmp = zbx_strdup(tmp, group->min_online);
 		(void)zbx_dc_expand_user_and_func_macros(um_handle, &tmp, NULL, 0, NULL);
-		min_online = atoi(tmp);
+		if (0 == (min_online = atoi(tmp)))
+			min_online = 1;
 		zbx_free(tmp);
 
 		for (int j = 0; j < group->proxies.values_num; j++)

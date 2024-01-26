@@ -70,7 +70,7 @@ static int	zbx_tcp_connect_failover(zbx_socket_t *s, const char *source_ip, zbx_
 int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_addr_ptr_t *addrs, int timeout,
 		int connect_timeout, int retry_interval, int level, const zbx_config_tls_t *config_tls)
 {
-	int		res;
+	int		res = FAIL;
 	const char	*tls_arg1, *tls_arg2;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() [%s]:%d [timeout:%d, connection timeout:%d]", __func__,
@@ -94,7 +94,7 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 #endif
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
-			return FAIL;
+			goto out;
 	}
 
 	if (FAIL == (res = zbx_tcp_connect_failover(sock, source_ip, addrs, timeout, connect_timeout,
@@ -130,6 +130,8 @@ int	zbx_connect_to_server(zbx_socket_t *sock, const char *source_ip, zbx_vector_
 #endif
 		}
 	}
+out:
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(res));
 
 	return res;
 }
