@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,26 +20,11 @@
 package ceph
 
 import (
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/uri"
 )
-
-type command string
-
-// handlerFunc defines an interface must be implemented by handlers.
-type handlerFunc func(data map[command][]byte) (res interface{}, err error)
-
-type metricMeta struct {
-	commands []command
-	args     map[string]string
-	handler  handlerFunc
-}
-
-// handle runs metric's handler.
-func (m *metricMeta) handle(data map[command][]byte) (res interface{}, err error) {
-	return m.handler(data)
-}
 
 const (
 	keyDf            = "ceph.df.details"
@@ -99,9 +84,7 @@ var metricsMeta = map[string]metricMeta{
 	},
 }
 
-var (
-	uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"}
-)
+var uriDefaults = &uri.Defaults{Scheme: "https", Port: "8003"}
 
 // Common params: [URI|Session][,User][,ApiKey]
 var (
@@ -135,6 +118,25 @@ var metrics = metric.MetricSet{
 		[]*metric.Param{paramURI, paramUsername, paramAPIKey}, false),
 }
 
+type command string
+
+// handlerFunc defines an interface must be implemented by handlers.
+type handlerFunc func(data map[command][]byte) (res interface{}, err error)
+
+type metricMeta struct {
+	commands []command
+	args     map[string]string
+	handler  handlerFunc
+}
+
 func init() {
-	plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	err := plugin.RegisterMetrics(&impl, pluginName, metrics.List()...)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+// handle runs metric's handler.
+func (m *metricMeta) handle(data map[command][]byte) (res interface{}, err error) {
+	return m.handler(data)
 }

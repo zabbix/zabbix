@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,12 @@
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		const $form = jQuery('#gui-form');
+
+		$form.on('submit', () => {
+			$form.trimValues(['#work_period', '#history_period', '#period_default', '#max_period']);
+		});
+
 		$("#resetDefaults").click(function() {
 			overlayDialogue({
 				'title': <?= json_encode(_('Reset confirmation')) ?>,

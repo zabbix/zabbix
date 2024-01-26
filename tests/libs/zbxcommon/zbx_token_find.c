@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,6 +207,7 @@ void	zbx_mock_test_entry(void **state)
 			case ZBX_TOKEN_LLD_FUNC_MACRO:
 				compare_token_lld_func_macro_values(expression, &token);
 				break;
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 			case ZBX_TOKEN_FUNC_MACRO:
 				compare_token_func_macro_values(expression, &token);
 				break;

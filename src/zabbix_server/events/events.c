@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 
 #include "events.h"
 
-#include "../db_lengths.h"
-#include "../actions.h"
+#include "../db_lengths_constants.h"
+#include "../actions/actions.h"
 
 #include "zbxexpression.h"
 #include "zbxexport.h"
@@ -1992,7 +1992,7 @@ void	zbx_events_update_itservices(void)
 
 		zbx_service_serialize(&data, &data_alloc, &data_offset, recovery->eventid, recovery->r_event->clock,
 				recovery->r_event->ns, recovery->r_event->value, recovery->r_event->severity,
-				&recovery->r_event->tags);
+				&recovery->r_event->tags, 0);
 
 		recovery->r_event->tags.values_num = values_num;
 	}
@@ -2008,7 +2008,7 @@ void	zbx_events_update_itservices(void)
 			continue;
 
 		zbx_service_serialize(&data, &data_alloc, &data_offset, event->eventid, event->clock, event->ns,
-				event->value, event->severity, &event->tags);
+				event->value, event->severity, &event->tags, event->suppressed);
 	}
 
 	if (NULL == data)

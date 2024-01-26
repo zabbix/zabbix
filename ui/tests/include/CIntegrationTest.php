@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -45,6 +45,7 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_PROXY			= 'proxy';
 	const COMPONENT_AGENT			= 'agentd';
 	const COMPONENT_AGENT2			= 'agent2';
+	const COMPONENT_AGENT_3_0		= 'agentd_3.0';
 
 	// Zabbix component port constants.
 	const AGENT_PORT_SUFFIX = '50';
@@ -52,6 +53,7 @@ class CIntegrationTest extends CAPITest {
 	const PROXY_PORT_SUFFIX = '52';
 	const SERVER_HANODE1_PORT_SUFFIX = '61';
 	const AGENT2_PORT_SUFFIX = '53';
+	const AGENT_3_0_PORT_SUFFIX = '54';
 
 	/**
 	 * Components required by test suite.
@@ -114,6 +116,8 @@ class CIntegrationTest extends CAPITest {
 		foreach ($this->getAnnotationTokensByName($annotations, 'required-components') as $component) {
 			if ($component === 'agent') {
 				$component = self::COMPONENT_AGENT;
+			} else if ($component === 'agent_3.0') {
+				$component = self::COMPONENT_AGENT_3_0;
 			}
 
 			self::validateComponent($component);
@@ -307,7 +311,7 @@ class CIntegrationTest extends CAPITest {
 	private static function getComponents() {
 		return [
 			self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT, self::COMPONENT_AGENT2,
-			self::COMPONENT_SERVER_HANODE1
+			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_3_0
 		];
 	}
 	/**
@@ -348,6 +352,7 @@ class CIntegrationTest extends CAPITest {
 						self::waitForLogLineToBePresent($component, $line, false, 10, 1);
 						break;
 					case self::COMPONENT_AGENT:
+					case self::COMPONENT_AGENT_3_0:
 						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
 						break;
 
@@ -360,8 +365,6 @@ class CIntegrationTest extends CAPITest {
 
 			sleep(self::WAIT_ITERATION_DELAY);
 		}
-
-		var_dump(file_get_contents(self::getLogPath(self::COMPONENT_SERVER)));
 
 		throw new Exception('Failed to wait for component "'.$component.'" to start.');
 	}
@@ -508,6 +511,11 @@ class CIntegrationTest extends CAPITest {
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
 				'ControlSocket' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.sock',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX
+			],
+			self::COMPONENT_AGENT_3_0 => [
+				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.log',
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_3.0.pid',
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_3_0_PORT_SUFFIX
 			]
 		];
 
@@ -648,7 +656,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getClient($component) {
 		self::validateComponent($component);
 
-		if ($component === self::COMPONENT_AGENT || $component === self::COMPONENT_AGENT2) {
+		if ($component === self::COMPONENT_AGENT || $component === self::COMPONENT_AGENT2 || $component == self::COMPONENT_AGENT_3_0) {
 			throw new Exception('There is no client available for Zabbix Agent.');
 		}
 
@@ -665,7 +673,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getActiveComponent() {
 		$components = [];
 		foreach (array_merge(self::$suite_components, $this->case_components) as $component) {
-			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2) {
+			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2 && $component !== self::COMPONENT_AGENT_3_0) {
 				$components[] = $component;
 			}
 		}

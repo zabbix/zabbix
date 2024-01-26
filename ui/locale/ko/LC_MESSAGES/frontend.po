@@ -180,6 +180,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%2$s대 중 %1$s대의 요소에서 장애발생중"
 
+#: app/views/administration.miscconfig.edit.php:127
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:341
 #, c-format
 msgctxt "screen reader"
@@ -3450,6 +3460,10 @@ msgstr "호스트명을 일괄갱신할 수 없습니다"
 msgid "Cannot mass update visible host name."
 msgstr "호스트의 표시명은 일괄갱신할 수 없습니다."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -4899,6 +4913,10 @@ msgstr "컨텐츠 메뉴"
 msgid "Context name"
 msgstr "컨텍스트 이름"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr ""
@@ -5800,6 +5818,10 @@ msgstr "디폴트 인증"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "기본 호스트 인벤토리 모드"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7022,6 +7044,14 @@ msgstr "그래프 형식"
 msgid "Draw style"
 msgstr "종류"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7419,6 +7449,10 @@ msgstr "선택한 Web시나리오를 활성화 하시겠습니까?"
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
 msgstr "트래핑의 활성화"
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -9225,6 +9259,10 @@ msgstr "호스트 인벤토리의 개요"
 msgid "Host label type"
 msgstr "호스트의 라벨 타입"
 
+#: widgets/tophosts/includes/WidgetForm.php:159
+msgid "Host limit"
+msgstr ""
+
 #: widgets/dataover/includes/WidgetForm.php:65
 #: widgets/trigover/includes/WidgetForm.php:72
 msgid "Host location"
@@ -10717,6 +10755,18 @@ msgstr "처음 보기"
 msgid "Initial view is ignored if the default view is set."
 msgstr "기본 보기가 설정된 경우 초기 보기는 무시됩니다."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "삽입"
@@ -10889,6 +10939,11 @@ msgstr ""
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr ""
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "잘못된 YAML 파일 콘텐츠"
@@ -10916,6 +10971,10 @@ msgstr "메일 주소 \"%1$s\"가 올바르지 않습니다."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"의 미디어 타입의 메일 주소가 올바르지 않습니다."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -12341,6 +12400,10 @@ msgstr "수동 이벤트 조치"
 msgid "Manual host action"
 msgstr "수동 호스트 작업"
 
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
+
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
 msgstr "수동 문제 억제. 날짜-시간 입력은 상대 및 절대 시간 형식을 허용합니다."
@@ -12562,6 +12625,11 @@ msgstr "최대 이력 표시 기간"
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
 msgstr "개요 테이블의 최대 열 및 행 수"
+
+#: widgets/piechart/includes/WidgetForm.php:209
+#: widgets/svggraph/includes/WidgetForm.php:359
+msgid "Max number of rows"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -14217,6 +14285,11 @@ msgstr ""
 msgid "Not supported"
 msgstr "취득 불가"
 
+#: app/views/administration.miscconfig.edit.php:138
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
+
 #: include/hosts.inc.php:229
 msgid "Notes"
 msgstr "비고"
@@ -14587,6 +14660,10 @@ msgstr "최고 관리자만 보고서 소유자를 설정할 수 있습니다."
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "활성화된 호스트와 아이템의 트리거만 카운트"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "새 창에서 열기"
@@ -14725,6 +14802,10 @@ msgstr "Or"
 msgid "Order"
 msgstr ""
 
+#: widgets/tophosts/includes/WidgetForm.php:144
+msgid "Order by"
+msgstr ""
+
 #: widgets/tophosts/includes/WidgetForm.php:150
 msgid "Order column"
 msgstr ""
@@ -14848,6 +14929,10 @@ msgstr "아이템 이력의 보존기간을 덮어쓰기"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "아이템 트렌드의 보존기간을 덮어쓰기"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -19224,6 +19309,10 @@ msgstr "테스트문자열"
 msgid "Test subject"
 msgstr ""
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -19942,6 +20031,10 @@ msgstr "템플릿\"%1$s\"의 트리거는 템플릿\"%2$s\"의 트리거 와 의
 msgid "Trigger label type"
 msgstr "트리거 라벨 타입"
 
+#: widgets/toptriggers/includes/WidgetForm.php:76
+msgid "Trigger limit"
+msgstr ""
+
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
 msgstr "트리거 개요"
@@ -20266,6 +20359,10 @@ msgstr "URL이 올바르게 인코딩되지 않았습니다."
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "맵 \"%1$s\"의 URL명은 중복될 수 없습니다."
+
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -20833,6 +20930,10 @@ msgstr "업타임/다운타임"
 msgid "Use %{ref} in group filter to reference value of this user attribute."
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:123
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
 msgstr ""
@@ -21060,6 +21161,10 @@ msgstr "ID \"%1$s\"의 유저 그룹은 사용할 수 없습니다."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "유저 그룹"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22168,8 +22273,17 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr ""
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
+msgstr ""
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
 msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
@@ -22231,6 +22345,10 @@ msgstr "X축"
 
 #: app/views/administration.miscconfig.edit.php:120
 msgid "X-Frame-Options HTTP header"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:125
+msgid "X-Frame-Options HTTP header supported values:"
 msgstr ""
 
 #: include/views/js/monitoring.sysmaps.js.php:439
@@ -22681,6 +22799,11 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:122
 msgid "a special character"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:133
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2989
@@ -23612,6 +23735,12 @@ msgstr "잘못된 서식이 \"%1$s\" 부근에서 발견되었습니다."
 msgid "incorrect usage of function \"%1$s\""
 msgstr "함수 \"%1$s\"의 잘못된 사용"
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - 지정된 문자 또는 공백을 문자열의 지정된 위치에서 시작하여 문자열에 삽입합니다."
@@ -24157,6 +24286,10 @@ msgstr "범위 밖"
 #: hostinventoriesoverview.php:142 include/forms.inc.php:946
 msgid "not selected"
 msgstr "선택되지 않음"
+
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
@@ -24984,6 +25117,10 @@ msgstr ""
 #: app/views/js/correlation.edit.js.php:235
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
+msgstr ""
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
 msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193

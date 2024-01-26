@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,6 +24,7 @@ class CControllerAuditSettingsUpdate extends CController {
 	protected function checkInput(): bool {
 		$fields = [
 			'auditlog_enabled'	=> 'db config.auditlog_enabled|in 1',
+			'auditlog_mode'		=> 'db config.auditlog_mode|in 1',
 			'hk_audit_mode'		=> 'db config.hk_audit_mode|in 1',
 			'hk_audit'			=> 'db config.hk_audit|time_unit '.implode(':', [SEC_PER_DAY, 25 * SEC_PER_YEAR])
 		];
@@ -66,6 +67,10 @@ class CControllerAuditSettingsUpdate extends CController {
 		}
 
 		$settings = [CSettingsHelper::AUDITLOG_ENABLED => $this->getInput('auditlog_enabled', 0)];
+
+		if ($settings[CSettingsHelper::AUDITLOG_ENABLED] == 1) {
+			$settings[CSettingsHelper::AUDITLOG_MODE] = $this->getInput('auditlog_mode', 0);
+		}
 
 		$result_housekeeping = API::Housekeeping()->update($housekeeping);
 		$result_settings = API::Settings()->update($settings);

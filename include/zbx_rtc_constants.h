@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+#define ZBX_RTC_SERVICE_SYNC_NOTIFY		9998
 
 #define ZBX_IPC_RTC_MAX				9999
 

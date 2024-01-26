@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -312,7 +312,7 @@ $user_form_list
 			->setAriaRequired()
 	)
 	->addRow((new CLabel(_('Rows per page'), 'rows_per_page'))->setAsteriskMark(),
-		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6))
+		(new CNumericBox('rows_per_page', $data['rows_per_page'], 6, false, false, false))
 			->setWidth(ZBX_TEXTAREA_NUMERIC_STANDARD_WIDTH)
 			->setAriaRequired()
 	)

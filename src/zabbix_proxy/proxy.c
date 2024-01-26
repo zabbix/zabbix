@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 
+#include "zbxvmware.h"
 #include "zbxdbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
@@ -46,7 +47,6 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
-#include "../zabbix_server/vmware/vmware.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
@@ -313,7 +313,7 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
-char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*config_file		= NULL;
@@ -580,10 +580,15 @@ static void	zbx_set_defaults(void)
 	{
 		config_server_port = ZBX_DEFAULT_SERVER_PORT;
 	}
-	else
+	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode)
 	{
-		zabbix_log(LOG_LEVEL_WARNING, "ServerPort parameter is deprecated,"
-					" please specify port in Server parameter separated by ':' instead");
+		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is ignored for passive proxy"
+				" and is also deprecated");
+	}
+	else if (ZBX_PROXYMODE_ACTIVE == config_proxymode)
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "NOTE: ServerPort parameter is deprecated"
+				", please specify port in Server parameter (e.g. 127.0.0.1:10052)");
 	}
 }
 
@@ -636,7 +641,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	else if (ZBX_PROXYMODE_PASSIVE == config_proxymode && FAIL == zbx_validate_peer_list(config_server,
 			&ch_error))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"Server\" configuration parameter: %s", ch_error);
+		zabbix_log(LOG_LEVEL_CRIT, "unexpected Server parameter %s; for passive proxy, please specify"
+				" address or list of comma delimited addresses", ch_error);
 		zbx_free(ch_error);
 		err = 1;
 	}
@@ -647,7 +653,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
+	if (NULL != config_stats_allowed_ip && FAIL == zbx_validate_peer_list(config_stats_allowed_ip, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -715,15 +721,15 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		if (0 != config_proxyconfig_frequency)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "Deprecated \"ConfigFrequency\" configuration parameter cannot"
-					" be used together with \"ProxyConfigFrequency\" parameter");
+			zabbix_log(LOG_LEVEL_CRIT, "deprecated ConfigFrequency configuration parameter cannot"
+					" be used together with ProxyConfigFrequency parameter");
 			err = 1;
 		}
 		else
 		{
 			config_proxyconfig_frequency = config_confsyncer_frequency;
-			zabbix_log(LOG_LEVEL_WARNING, "\"ConfigFrequency\" configuration parameter is deprecated, "
-					"use \"ProxyConfigFrequency\" instead");
+			zabbix_log(LOG_LEVEL_WARNING, "ConfigFrequency configuration parameter is deprecated"
+					", please use ProxyConfigFrequency");
 		}
 	}
 
@@ -733,7 +739,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	if (FAIL == zbx_pb_parse_mode(config_proxy_buffer_mode_str, &config_proxy_buffer_mode))
 	{
-		zabbix_log(LOG_LEVEL_CRIT, "Invalid \"ProxyBufferMode\" configuration parameter value");
+		zabbix_log(LOG_LEVEL_CRIT, "invalid ProxyBufferMode configuration parameter value");
 		err = 1;
 	}
 
@@ -741,15 +747,15 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		if (0 != config_proxy_local_buffer)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyBufferMode\" configuration parameter cannot be"
-					" \"memory\" or \"hybrid\" when \"ProxyLocalBuffer\" parameter is set");
+			zabbix_log(LOG_LEVEL_CRIT, "ProxyBufferMode configuration parameter cannot be set to"
+					" \"memory\" or \"hybrid\" when ProxyLocalBuffer parameter is set");
 			err = 1;
 		}
 
 		if (0 == config_proxy_memory_buffer_size)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter must be set when"
-					" \"ProxyBufferMode\" parameter is \"memory\" or \"hybrid\"");
+			zabbix_log(LOG_LEVEL_CRIT, "ProxyMemoryBufferSize configuration parameter must be set when"
+					" ProxyBufferMode parameter is set to \"memory\" or \"hybrid\"");
 			err = 1;
 		}
 
@@ -757,15 +763,15 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		{
 			if (ZBX_CONFIG_DATA_CACHE_AGE_MIN > config_proxy_memory_buffer_age)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"ProxyMemoryBufferAge\" configuration"
+				zabbix_log(LOG_LEVEL_CRIT, "wrong value of ProxyMemoryBufferAge configuration"
 						" parameter");
 				err = 1;
 			}
 
 			if (config_proxy_memory_buffer_age >= config_proxy_offline_buffer * SEC_PER_HOUR)
 			{
-				zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter cannot be"
-						" greater than \"ProxyOfflineBuffer\" parameter");
+				zabbix_log(LOG_LEVEL_CRIT, "ProxyMemoryBufferAge configuration parameter cannot be"
+						" greater than ProxyOfflineBuffer parameter");
 				err = 1;
 			}
 		}
@@ -773,7 +779,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		if (0 != config_proxy_memory_buffer_size &&
 				ZBX_CONFIG_DATA_CACHE_SIZE_MIN > config_proxy_memory_buffer_size)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "wrong value of \"ProxyMemoryBufferSize\" configuration parameter");
+			zabbix_log(LOG_LEVEL_CRIT, "wrong value of ProxyMemoryBufferSize configuration parameter");
 			err = 1;
 
 		}
@@ -782,8 +788,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		if (0 != config_proxy_memory_buffer_size)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferSize\" configuration parameter can be set only"
-					" when \"ProxyBufferMode\" is \"memory\" or \"hybrid\"");
+			zabbix_log(LOG_LEVEL_CRIT, "ProxyMemoryBufferSize configuration parameter can be set only"
+					" when ProxyBufferMode is set to \"memory\" or \"hybrid\"");
 			err = 1;
 		}
 	}
@@ -792,8 +798,8 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	{
 		if (0 != config_proxy_memory_buffer_age)
 		{
-			zabbix_log(LOG_LEVEL_CRIT, "\"ProxyMemoryBufferAge\" configuration parameter can be set only"
-					" when \"ProxyBufferMode\" is \"hybrid\"");
+			zabbix_log(LOG_LEVEL_CRIT, "ProxyMemoryBufferAge configuration parameter can be set only"
+					" when ProxyBufferMode is set to \"hybrid\"");
 			err = 1;
 		}
 	}
@@ -1023,7 +1029,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"LogRemoteCommands",		&zbx_config_log_remote_commands,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
+		{"StatsAllowedIP",		&config_stats_allowed_ip,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"StartPreprocessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_PREPROCESSOR],		TYPE_INT,
 			PARM_OPT,	1,			1000},
@@ -1428,7 +1434,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,
-								get_config_forks};
+								get_config_forks, config_stats_allowed_ip};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
@@ -1443,7 +1449,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
-	zbx_thread_snmptrapper_args		snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_snmptrapper_args		snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
+								.config_ha_node_name = NULL};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
@@ -1704,7 +1711,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				thread_args.args = &proxyconfig_args;
 				zbx_thread_start(proxyconfig_thread, &thread_args, &zbx_threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc, rtc_process_request_func))
+				if (FAIL == zbx_rtc_wait_for_sync_finish(&rtc, rtc_process_request_func))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:

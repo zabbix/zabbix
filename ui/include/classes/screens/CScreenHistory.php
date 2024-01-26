@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -305,40 +305,40 @@ class CScreenHistory extends CScreenBase {
 				);
 
 				foreach ($history_data as $data) {
-					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
-						$data['value'] = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
-					}
-					else {
-						$data['value'] = rtrim($data['value'], " \t\r\n");
-						$data['value'] = zbx_nl2br($data['value']);
-					}
-
 					$item = $items[$data['itemid']];
 					$host = reset($item['hosts']);
 					$color = null;
 
-					if ($this->filter !== '' && $value_type != ITEM_VALUE_TYPE_BINARY) {
-						$haystack = mb_strtolower($data['value']);
-						$needle = mb_strtolower($this->filter);
-						$pos = mb_strpos($haystack, $needle);
+					if ($value_type == ITEM_VALUE_TYPE_BINARY) {
+						$value = italic(_('binary value'))->addClass(ZBX_STYLE_GREY);
+					}
+					else {
+						$data['value'] = rtrim($data['value'], " \t\r\n");
+						$value = zbx_nl2br($data['value']);
 
-						if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
-							$color = $this->markColor;
-						}
-						elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
-							$color = $this->markColor;
-						}
+						if ($this->filter !== '') {
+							$haystack = mb_strtolower($data['value']);
+							$needle = mb_strtolower($this->filter);
+							$pos = mb_strpos($haystack, $needle);
 
-						switch ($color) {
-							case MARK_COLOR_RED:
-								$color = ZBX_STYLE_RED;
-								break;
-							case MARK_COLOR_GREEN:
-								$color = ZBX_STYLE_GREEN;
-								break;
-							case MARK_COLOR_BLUE:
-								$color = ZBX_STYLE_BLUE;
-								break;
+							if ($pos !== false && $this->filterTask == FILTER_TASK_MARK) {
+								$color = $this->markColor;
+							}
+							elseif ($pos === false && $this->filterTask == FILTER_TASK_INVERT_MARK) {
+								$color = $this->markColor;
+							}
+
+							switch ($color) {
+								case MARK_COLOR_RED:
+									$color = ZBX_STYLE_RED;
+									break;
+								case MARK_COLOR_GREEN:
+									$color = ZBX_STYLE_GREEN;
+									break;
+								case MARK_COLOR_BLUE:
+									$color = ZBX_STYLE_BLUE;
+									break;
+							}
 						}
 					}
 
@@ -380,7 +380,7 @@ class CScreenHistory extends CScreenBase {
 						}
 					}
 
-					$row[] = (new CCol(new CPre($data['value'])))->addClass($color);
+					$row[] = (new CCol(new CPre($value)))->addClass($color);
 
 					$history_table->addRow($row);
 				}

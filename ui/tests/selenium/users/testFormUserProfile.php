@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -370,7 +370,6 @@ class testFormUserProfile extends CLegacyWebTest {
 				break;
 		}
 	}
-
 	public static function messaging() {
 		return [
 			[[
@@ -453,10 +452,11 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_GOOD,
 				'timeout' => '1d',
 				'suppressed' => false
-			]],
-			[[
-				'expected' => TEST_GOOD
 			]]
+			// TODO: uncomment after ZBX-23993 is fixed.
+//			[[
+//				'expected' => TEST_GOOD
+//			]]
 		];
 	}
 

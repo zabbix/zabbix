@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,6 +56,7 @@ class CExpressionParser extends CParser {
 	 *   'host_macro' => false            Allow {HOST.HOST} macro as host name part in the query.
 	 *   'host_macro_n' => false          Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
 	 *   'empty_host' => false            Allow empty hostname in the query string.
+	 *   'escape_backslashes' => true     Disable backslash escaping in history function parameters prior to v7.0.
 	 *
 	 * @var array
 	 */
@@ -66,7 +67,8 @@ class CExpressionParser extends CParser {
 		'calculated' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
-		'empty_host' => false
+		'empty_host' => false,
+		'escape_backslashes' => true
 	];
 
 	/**
@@ -617,7 +619,8 @@ class CExpressionParser extends CParser {
 			'calculated' => $options['calculated'],
 			'host_macro' => $options['host_macro'],
 			'host_macro_n' => $options['host_macro_n'],
-			'empty_host' => $options['empty_host']
+			'empty_host' => $options['empty_host'],
+			'escape_backslashes' => $options['escape_backslashes']
 		]);
 
 		if ($hist_function_parser->parse($source, $pos) == CParser::PARSE_FAIL) {

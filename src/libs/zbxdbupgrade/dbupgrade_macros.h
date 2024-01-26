@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -73,7 +73,7 @@ void	dbpatch_update_hist2common(zbx_dbpatch_function_t *function, int extended, 
 void	dbpatch_convert_function(zbx_dbpatch_function_t *function, char **replace, zbx_vector_ptr_t *functions);
 void	dbpatch_function_free(zbx_dbpatch_function_t *func);
 int	dbpatch_is_composite_constant(const char *str);
-void	dbpatch_strcpy_alloc_quoted(char **str, size_t *str_alloc, size_t *str_offset, const char *source);
+void	dbpatch_strcpy_alloc_quoted_compat(char **str, size_t *str_alloc, size_t *str_offset, const char *source);
 void	dbpatch_convert_params(char **out, const char *parameter, const zbx_vector_strloc_t *params, ...);
 
 zbx_dbpatch_function_t	*dbpatch_new_function(zbx_uint64_t functionid, zbx_uint64_t itemid, const char *name,

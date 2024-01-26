@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1110,7 +1110,7 @@ class testFormConnectors extends CWebTest {
 		// Change valid URI schemes on "Other configuration parameters" page.
 		$this->page->open('zabbix.php?action=miscconfig.edit');
 		$config_form = $this->query('name:otherForm')->asForm()->waitUntilVisible()->one();
-		$config_form->fill(['Valid URI schemes' => 'dns,message']);
+		$config_form->fill(['id:validate_uri_schemes' => true, 'id:uri_valid_schemes' => 'dns,message']);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 
@@ -1120,7 +1120,7 @@ class testFormConnectors extends CWebTest {
 
 		// Disable URI scheme validation.
 		$this->page->open('zabbix.php?action=miscconfig.edit')->waitUntilReady();
-		$config_form->fill(['Validate URI schemes' => false]);
+		$config_form->fill(['id:validate_uri_schemes' => false]);
 		$config_form->submit();
 		$this->assertMessage(TEST_GOOD, 'Configuration updated');
 

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -88,7 +88,7 @@ class testPageServicesSlaReport extends testSlaReport {
 
 		foreach (['From', 'To'] as $field_label) {
 			$field = $filter_form->getField($field_label)->query('xpath:./input')->one();
-			$this->assertEquals(10, $field->getAttribute('maxlength'));
+			$this->assertEquals(255, $field->getAttribute('maxlength'));
 			$this->assertEquals('YYYY-MM-DD', $field->getAttribute('placeholder'));
 		}
 

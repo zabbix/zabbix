@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -674,7 +674,7 @@ $formgrid
 $edit_source_timeouts_link = null;
 $custom_timeout_enabled = $item['custom_timeout'] == ZBX_ITEM_CUSTOM_TIMEOUT_ENABLED;
 
-if ($data['can_edit_source_timeouts'] && (($readonly && !$custom_timeout_enabled) || !$readonly)) {
+if ($data['can_edit_source_timeouts'] && (!$readonly || !$custom_timeout_enabled)) {
 	$edit_source_timeouts_link = $data['host']['proxyid']
 		? (new CLink(_('Timeouts')))
 			->setAttribute('data-proxyid', $data['host']['proxyid'])

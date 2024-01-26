@@ -37,114 +37,104 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            // Script for authenticating, receiving API token and supported service catalog from OpenStack Identity service.
             
             const request_path = '/v3/auth/tokens';
             
             function checkParams(params) {
-                ['api_url', 'app_cred_id', 'app_cred_secret'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                return params;
+            	['api_url', 'app_cred_id', 'app_cred_secret'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	return params;
             }
             
             function getHttpData(url, params, app_cred_id, app_cred_secret) {
-                const request = new HttpRequest();
+            	const request = new HttpRequest();
             
-                request.addHeader('Content-Type: application/json');
+            	request.addHeader('Content-Type: application/json');
             
-                // use correct format for authenticating with application credential
-                const request_body = {
-                    "auth": {
-                        "identity": {
-                            "methods": [
-                                "application_credential"
-                            ],
-                            "application_credential": {
-                                "id": app_cred_id,
-                                "secret": app_cred_secret
-                            }
-                        }
-                    }
-                };
+            	const request_body = {
+            		"auth": {
+            			"identity": {
+            				"methods": [
+            					"application_credential"
+            				],
+            				"application_credential": {
+            					"id": app_cred_id,
+            					"secret": app_cred_secret
+            				}
+            			}
+            		}
+            	};
             
-                // set proxy if needed
-                if (params['http_proxy']) {
-                    request.setProxy(params['http_proxy'])
-                    Zabbix.log(4, '[ Openstack Nova API ] Using http proxy: ' + params['http_proxy']);
-                }
+            	if (params['http_proxy']) {
+            		request.setProxy(params['http_proxy'])
+            		Zabbix.log(4, '[ Openstack Nova API ] Using http proxy: ' + params['http_proxy']);
+            	}
             
-                const response = request.post(url, JSON.stringify(request_body));
-                Zabbix.log(4, '[ Openstack Identity API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	const response = request.post(url, JSON.stringify(request_body));
+            	Zabbix.log(4, '[ Openstack Identity API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                // check if request status is OK
-                if (request.getStatus() !== 201) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    } else {
-                        throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                    }
-                }
+            	if (request.getStatus() !== 201) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		} else {
+            			throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            		}
+            	}
             
-                // return a list with request and response objects
-                return {'request': request, 'response': response};
+            	return {'request': request, 'response': response};
             }
             
             function parseHttpData(http_data) {
-                // parse header and check if it is valid
-                var token;
-                const headers = http_data['request'].getHeaders(true);
-                if (typeof headers === "object") {
-                    if (headers !== null) {
-                        try {
-                            token = headers["X-Subject-Token"][0]; // save received token
-                        } catch (error) {
-                            throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
-                        }
-                    } else {
-                        throw 'Response object is empty. Check debug log for more information.';
-                    }
-                } else {
-                    throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
-                }
+            	var token;
+            	const headers = http_data['request'].getHeaders(true);
+            	if (typeof headers === "object") {
+            		if (headers !== null) {
+            			try {
+            				token = headers["X-Subject-Token"][0];
+            			} catch (error) {
+            				throw 'Failed to parse response received from OpenStack Identity API. Check debug log for more information.';
+            			}
+            		} else {
+            			throw 'Response object is empty. Check debug log for more information.';
+            		}
+            	} else {
+            		throw 'Cannot process response data: received data is not an object. Check debug log for more information.';
+            	}
             
-                // define supported OpenStack services in Zabbix
-                const supported_services = ['nova'];
+            	const supported_services = ['nova'];
             
-                // parse the response body and filter out only the services supported by Zabbix with the needed data only
-                var ret = [];
-                const data = JSON.parse(http_data['response']);
-                // check if service catalog exists
-                if (data['token']['catalog']) {
-                    const service_catalog = data['token']['catalog'];
-                } else {
-                    throw 'Cannot find service catalog in HTTP response.'
-                }
+            	var ret = [];
+            	const data = JSON.parse(http_data['response']);
+            	if (data['token']['catalog']) {
+            		const service_catalog = data['token']['catalog'];
+            	} else {
+            		throw 'Cannot find service catalog in HTTP response.'
+            	}
             
-                service_catalog.forEach(function (service) {                // loop through service catalog
-                    if (supported_services.indexOf(service.name) > -1) {    // check if service is supported by Zabbix
-                        service.endpoints.forEach(function (endpoint) {     // loop through each endpoint for catalog
-                            if (endpoint.interface === 'public') {          // check if service has a public interface
-                                ret.push({                                  // if true, save service name, service url and token
-                                    'service_name': service.name[0].toUpperCase() + service.name.slice(1),  // capitalize first char in service_name
-                                    'service_url': endpoint.url,
-                                    'token': token
-                                });
-                            }
-                        })
-                    }
-                });
+            	service_catalog.forEach(function (service) {
+            		if (supported_services.indexOf(service.name) > -1) {
+            			service.endpoints.forEach(function (endpoint) {
+            				if (endpoint.interface === 'public') {
+            					ret.push({
+            						'service_name': service.name[0].toUpperCase() + service.name.slice(1),
+            						'service_url': endpoint.url,
+            						'token': token
+            					});
+            				}
+            			})
+            		}
+            	});
             
-                // return list of dictionaries of service name, url and access token
-                return JSON.stringify(ret);
+            	return JSON.stringify(ret);
             }
             
             const params = checkParams(JSON.parse(value)),
-                url = params.api_url,
-                auth_cred_id = params.app_cred_id,
-                auth_cred_secret = params.app_cred_secret;
+            	url = params.api_url,
+            	auth_cred_id = params.app_cred_id,
+            	auth_cred_secret = params.app_cred_secret;
             
             const httpData = getHttpData(url + request_path, params, auth_cred_id, auth_cred_secret);
             return parseHttpData(httpData);
@@ -515,95 +505,91 @@ zabbix_export:
           trends: '0'
           value_type: TEXT
           params: |
-            // Script for getting tenant usage statistics for a specific time period until now (year, month, week, day).
             
             const request_path = '/os-simple-tenant-usage';
             
             function checkParams(params) {
-                ['api_url', 'api_token', 'period'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                    if (field === 'period') {
-                        const supported_values = ['y', 'm', 'w', 'd']
-                        if (supported_values.indexOf(params[field]) === -1) {
-                            throw 'Tenant period not correctly set. Expected one of "y", "m", "w", "d"; received: ' + field + '.';
-                        }
-                    }
-                });
-                return params;
+            	['api_url', 'api_token', 'period'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            		if (field === 'period') {
+            			const supported_values = ['y', 'm', 'w', 'd']
+            			if (supported_values.indexOf(params[field]) === -1) {
+            				throw 'Tenant period not correctly set. Expected one of "y", "m", "w", "d"; received: ' + field + '.';
+            			}
+            		}
+            	});
+            	return params;
             }
             
             function buildUrl(url, period) {
-                const current_date = new Date();
-                var datetime_formatted = ''
-                switch (period) {
-                    case 'y':                                       // if user-selected period is this year
-                        datetime_formatted =
-                            current_date.getFullYear() + '-' +      // year
-                            '1-' +                                  // month
-                            '1T' +                                  // date
-                            '00:00:00'                              // time
-                        break;
-                    case 'm':                                       // if user-selected period is this month
-                        datetime_formatted =
-                        current_date.getFullYear() + '-' +          // year
-                            (current_date.getMonth() + 1) + '-' +   // month
-                        '1T' +                                      // date
-                        '00:00:00'                                  // time
-                        break;
-                    case 'w':                                       // if user-selected period is this week
-                        const first_date_of_week = current_date.getDate() - current_date.getDay() + 1
-                        datetime_formatted =
-                            current_date.getFullYear() + '-' +      // year
-                            (current_date.getMonth() + 1) + '-' +   // month
-                            first_date_of_week + 'T' +              // date
-                            '00:00:00'                              // time
-                        break;
-                    case 'd':                                       // if user-selected period is this day
-                        datetime_formatted =
-                            current_date.getFullYear() + '-' +      // year
-                            (current_date.getMonth() + 1) + '-' +   // month
-                            current_date.getDate() + 'T' +          // date
-                            '00:00:00'                              // time
-                        break;
-                }
+            	const current_date = new Date();
+            	var datetime_formatted = ''
+            	switch (period) {
+            		case 'y':
+            			datetime_formatted =
+            				current_date.getFullYear() + '-' +
+            				'1-' +
+            				'1T' +
+            				'00:00:00'
+            			break;
+            		case 'm':
+            			datetime_formatted =
+            			current_date.getFullYear() + '-' +
+            				(current_date.getMonth() + 1) + '-' +
+            			'1T' +
+            			'00:00:00'
+            			break;
+            		case 'w':
+            			const first_date_of_week = current_date.getDate() - current_date.getDay() + 1
+            			datetime_formatted =
+            				current_date.getFullYear() + '-' +
+            				(current_date.getMonth() + 1) + '-' +
+            				first_date_of_week + 'T' +
+            				'00:00:00'
+            			break;
+            		case 'd':
+            			datetime_formatted =
+            				current_date.getFullYear() + '-' +
+            				(current_date.getMonth() + 1) + '-' +
+            				current_date.getDate() + 'T' +
+            				'00:00:00'
+            			break;
+            	}
             
-                return url + request_path + '?' +
-                    'start=' + encodeURIComponent(datetime_formatted)
+            	return url + request_path + '?' +
+            		'start=' + encodeURIComponent(datetime_formatted)
             }
             
             function getHttpData(url, params, api_token) {
-                const request = new HttpRequest();
+            	const request = new HttpRequest();
             
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('X-Auth-Token: ' + api_token);
-                // set proxy if needed
-                if (params['http_proxy']) {
-                    request.setProxy(params['http_proxy'])
-                    Zabbix.log(4, '[ Openstack Nova API ] Using http proxy: ' + params['http_proxy']);
-                }
+            	request.addHeader('Content-Type: application/json');
+            	request.addHeader('X-Auth-Token: ' + api_token);
+            	if (params['http_proxy']) {
+            		request.setProxy(params['http_proxy'])
+            		Zabbix.log(4, '[ Openstack Nova API ] Using http proxy: ' + params['http_proxy']);
+            	}
             
-                const response = request.get(url, JSON.stringify(params));
-                Zabbix.log(4, '[ Openstack Nova API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	const response = request.get(url, JSON.stringify(params));
+            	Zabbix.log(4, '[ Openstack Nova API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                // check if request status is OK
-                if (request.getStatus() !== 200) {
-                    if (typeof (response.error && response.error.message) !== 'undefined') {
-                        throw response.error.message;
-                    } else {
-                        throw 'Failed to receive data: invalid response status code ( ' + request.getStatus() + ' ). Check debug log for more information.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (typeof (response.error && response.error.message) !== 'undefined') {
+            			throw response.error.message;
+            		} else {
+            			throw 'Failed to receive data: invalid response status code ( ' + request.getStatus() + ' ). Check debug log for more information.';
+            		}
+            	}
             
-                // return a list with request and response objects
-                return response;
+            	return response;
             }
             
             const params = checkParams(JSON.parse(value)),
-                url = params.api_url,
-                token = params.api_token,
-                period = params.period;
+            	url = params.api_url,
+            	token = params.api_token,
+            	period = params.period;
             
             return getHttpData(buildUrl(url, period), params, token);
           description: 'Gets a list of tenants and its data.'
@@ -806,9 +792,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'down',     // 0
-                          'up'        // 1
+                      const idx = [
+                      	'down',
+                      	'up'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -850,9 +836,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'disabled', // 0
-                          'enabled'   // 1
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -962,27 +948,27 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [           // 30 - Unknown (default)
-                          'SHUTOFF',          // 0
-                          'ACTIVE',           // 1
-                          'PAUSED',           // 2
-                          'BUILD',            // 3
-                          'DELETED',          // 4
-                          'ERROR',            // 5
-                          'HARD_REBOOT',      // 6
-                          'MIGRATING',        // 7
-                          'PASSWORD',         // 8
-                          'REBOOT',           // 9
-                          'REBUILD',          // 10
-                          'RESCUE',           // 11
-                          'RESIZE',           // 12
-                          'REVERT_RESIZE',    // 13
-                          'SHELVED',          // 14
-                          'SHELVED_OFFLOADED',// 15
-                          'SOFT_DELETED',     // 16
-                          'SUSPENDED',        // 17
-                          'UNKNOWN',          // 18
-                          'VERIFY_RESIZE',    // 19
+                      const idx = [
+                      	'SHUTOFF',
+                      	'ACTIVE',
+                      	'PAUSED',
+                      	'BUILD',
+                      	'DELETED',
+                      	'ERROR',
+                      	'HARD_REBOOT',
+                      	'MIGRATING',
+                      	'PASSWORD',
+                      	'REBOOT',
+                      	'REBUILD',
+                      	'RESCUE',
+                      	'RESIZE',
+                      	'REVERT_RESIZE',
+                      	'SHELVED',
+                      	'SHELVED_OFFLOADED',
+                      	'SOFT_DELETED',
+                      	'SUSPENDED',
+                      	'UNKNOWN',
+                      	'VERIFY_RESIZE',
                       ].indexOf(value);
                       return idx !== -1 ? idx : 30;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1124,9 +1110,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'down',     // 0
-                          'up'        // 1
+                      const idx = [
+                      	'down',
+                      	'up'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -1168,9 +1154,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [   // 10 - Unknown (default)
-                          'disabled', // 0
-                          'enabled'   // 1
+                      const idx = [
+                      	'disabled',
+                      	'enabled'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT

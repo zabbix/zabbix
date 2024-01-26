@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,6 @@ type Connection struct {
 	compress    bool
 	timeout     time.Duration
 	timeoutMode int
-	reserved    uint32
 }
 
 type Listener struct {
@@ -131,10 +130,6 @@ func (c *Connection) WriteString(s string) error {
 	return c.Write([]byte(s))
 }
 
-func (c *Connection) ReservedData() uint32 {
-	return c.reserved
-}
-
 func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 	const maxRecvDataSize = 128 * 1048576
 	var total int
@@ -189,8 +184,9 @@ func (c *Connection) read(r io.Reader, pending []byte) ([]byte, error) {
 		return nil, fmt.Errorf("Message is longer than expected.")
 	}
 
-	reservedSize = binary.LittleEndian.Uint32(s[9:13])
-	c.reserved = reservedSize
+	if 0 != (flags & zlibCompress) {
+		reservedSize = binary.LittleEndian.Uint32(s[9:13])
+	}
 
 	if int(expectedSize) == total-headerSize {
 		if 0 != (flags & zlibCompress) {
