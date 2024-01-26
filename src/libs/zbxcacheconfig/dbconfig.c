@@ -8346,6 +8346,9 @@ out:
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
+	if (0 == (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+		dc_update_proxy_failover_delay();
+
 	FINISH_SYNC;
 
 #ifdef HAVE_ORACLE
@@ -9042,7 +9045,8 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 		config->session_token = NULL;
 
 	config->proxy_hostname = (NULL != hostname ? dc_strdup(hostname) : NULL);
-	config->proxy_failover_delay = 0;
+	config->proxy_failover_delay_raw = NULL;
+	config->proxy_failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 	config->proxy_lastonline = 0;
 
 	zbx_dbsync_env_init(config);
@@ -15521,23 +15525,23 @@ static void	dc_proxy_discovery_add_row(struct zbx_json *json, const ZBX_DC_PROXY
 	{
 		zbx_dc_proxy_group_t	*pg;
 		char			*status;
-		int			failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
+		int			failover_delay;
 
 		pg = (zbx_dc_proxy_group_t *)zbx_hashset_search(&config->proxy_groups,
 				&dc_proxy->proxy_groupid);
 
 		zbx_json_addstring(json, "proxy_group", pg->name, ZBX_JSON_TYPE_STRING);
 
-		if ('{' == *pg->failover_delay)
+		const char	*ptr = pg->failover_delay;
+
+		if ('{' == *ptr)
 		{
-			const char	*value = NULL;
-
 			um_cache_resolve_const(config->um_cache, NULL, 0, pg->failover_delay, ZBX_MACRO_ENV_NONSECURE,
-					&value);
-
-			if (NULL != value)
-				(void)zbx_is_time_suffix(value, &failover_delay, ZBX_LENGTH_UNLIMITED);
+					&ptr);
 		}
+
+		if (FAIL == zbx_is_time_suffix(ptr, &failover_delay, ZBX_LENGTH_UNLIMITED))
+			failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
 
 		status = (now - dc_proxy->lastaccess >= failover_delay ? "offline" : "online");
 

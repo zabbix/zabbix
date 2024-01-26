@@ -2028,28 +2028,13 @@ static int	proxyconfig_prepare_proxy_group(zbx_vector_table_data_ptr_t *config_t
 		return FAIL;
 	}
 
-	int	failover_delay;
-	char	*buf = NULL;
-	size_t	buf_alloc = 0;
-
-	if (SUCCEED != zbx_json_value_by_name_dyn(jp, ZBX_PROTO_TAG_FAILOVER_DELAY, &buf, &buf_alloc, NULL))
+	if (SUCCEED != zbx_json_value_by_name(jp, ZBX_PROTO_TAG_FAILOVER_DELAY, tmp, sizeof(tmp), NULL))
 	{
 		*error = zbx_strdup(NULL, "no failover_delay tag in proxy group configuration");
 		return FAIL;
 	}
 
-	zbx_dc_um_handle_t	*um_handle;
-
-	um_handle = zbx_dc_open_user_macros();
-	(void)zbx_dc_expand_user_and_func_macros(um_handle, &buf, NULL, 0, NULL);
-	zbx_dc_close_user_macros(um_handle);
-
-	if (FAIL == zbx_is_time_suffix(buf, &failover_delay, ZBX_LENGTH_UNLIMITED))
-		failover_delay = ZBX_PG_DEFAULT_FAILOVER_DELAY;
-
-	zbx_free(buf);
-
-	zbx_dc_set_proxy_failover_delay(failover_delay);
+	zbx_dc_set_proxy_failover_delay(tmp);
 
 	int	full_sync = 0;
 

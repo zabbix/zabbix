@@ -1048,7 +1048,11 @@ typedef struct
 	char			autoreg_psk[HOST_TLS_PSK_LEN_MAX];
 	zbx_vps_monitor_t	vps_monitor;
 	char			*proxy_hostname;	/* hostname - proxy only */
-	int			proxy_failover_delay;	/* proxy group failover delay - proxy only */
+	int			proxy_failover_delay;		/* proxy group failover delay - proxy only    */
+	const char		*proxy_failover_delay_raw;	/* raw failover delay value - proxy only      */
+								/* the raw value contains data sent by server */
+								/* until it is parsed/converted to integer    */
+								/* value during next configuration sync	      */
 	int			proxy_lastonline;	/* last server connection timestamp - proxy only */
 }
 ZBX_DC_CONFIG;
