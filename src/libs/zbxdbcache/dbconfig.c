@@ -64,6 +64,10 @@ int	sync_in_progress = 0;
 
 ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 
+#define DC_ITEM_UPDATE_TRIGGER_NONE		0
+#define DC_ITEM_UPDATE_TRIGGER_REFRESH		1
+#define DC_ITEM_UPDATE_TRIGGER_NEW_ITEM		2
+
 /******************************************************************************
  *                                                                            *
  * Purpose: validate macro value when expanding user macros                   *
@@ -2819,7 +2823,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		if (0 == found)
 		{
 			item->triggers = NULL;
-			item->update_triggers = 0;
+
+			if (ZBX_DBSYNC_INIT == sync->mode)
+				item->update_triggers = DC_ITEM_UPDATE_TRIGGER_NONE;
+			else
+				item->update_triggers = DC_ITEM_UPDATE_TRIGGER_NEW_ITEM;
+
 			item->nextcheck = 0;
 			item->state = (unsigned char)atoi(row[12]);
 			ZBX_STR2UINT64(item->lastlogsize, row[20]);
@@ -5741,7 +5750,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 {
 	ZBX_DC_TRIGGER	**trigger;
 
-	item->update_triggers = 1;
+	item->update_triggers = DC_ITEM_UPDATE_TRIGGER_REFRESH;
 
 	if (NULL == item->triggers)
 		return;
@@ -5813,7 +5822,7 @@ static void	dc_trigger_update_cache(void)
 		}
 
 		/* cache item - trigger link */
-		if (0 != item->update_triggers)
+		if (DC_ITEM_UPDATE_TRIGGER_REFRESH == item->update_triggers)
 		{
 			itemtrig.first = item;
 			itemtrig.second = trigger;
@@ -5851,7 +5860,7 @@ static void	dc_trigger_update_cache(void)
 			}
 
 			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
-			item->update_triggers = 0;
+			item->update_triggers = DC_ITEM_UPDATE_TRIGGER_NONE;
 			item->triggers = (ZBX_DC_TRIGGER **)config->items.mem_realloc_func(item->triggers,
 					(size_t)(j - i + 1) * sizeof(ZBX_DC_TRIGGER *));
 
@@ -5971,7 +5980,7 @@ static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items
 
 		for (i = 0; i < items->values_num; i++)
 		{
-			if (0 != items->values[i]->update_triggers)
+			if (DC_ITEM_UPDATE_TRIGGER_REFRESH == items->values[i]->update_triggers)
 			{
 				zbx_uint64_pair_t	pair = {
 						.first = items->values[i]->itemid,
@@ -5980,6 +5989,8 @@ static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items
 
 				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
 			}
+			else
+				items->values[i]->update_triggers = DC_ITEM_UPDATE_TRIGGER_NONE;
 		}
 
 		if (0 != items->values_num)
