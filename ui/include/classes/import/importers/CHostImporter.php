@@ -128,7 +128,7 @@ class CHostImporter extends CImporter {
 				if ($this->options['templateLinkage']['createMissing']
 						&& array_key_exists($host['host'], $template_linkage)) {
 					API::Host()->massAdd([
-						'hosts' => $host,
+						'hosts' => ['hostid' => $host['hostid']],
 						'templates' => $template_linkage[$host['host']]
 					]);
 				}

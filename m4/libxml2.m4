@@ -53,7 +53,7 @@ AS_HELP_STRING([--with-libxml2@<:@=ARG@:>@],
 
     if test "$want_libxml2" = "yes"; then
         if test "$_libxml2_with" != "yes"; then
-            XML2_INCDIR=$_libxml2_with/include
+            XML2_INCDIR=$_libxml2_with/include/libxml2
             XML2_LIBDIR=$_libxml2_with/lib
             LIBXML2_CFLAGS="-I$XML2_INCDIR"
             LIBXML2_LDFLAGS="-L$XML2_LIBDIR"

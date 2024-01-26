@@ -96,8 +96,7 @@ class CControllerDashboardUpdate extends CController {
 			$db_dashboards = API::Dashboard()->get([
 				'output' => ['dashboardid'],
 				'selectPages' => ['widgets'],
-				'dashboardids' => $this->getInput('dashboardid'),
-				'editable' => true
+				'dashboardids' => $this->getInput('dashboardid')
 			]);
 
 			if (!$db_dashboards) {

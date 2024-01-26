@@ -308,7 +308,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 	}
 
 	if (event.newValue === event.oldValue) {
-		// This is expensive, but internet expoler just dispatched storage change event at write.
+		// This is expensive, but Internet Explorer just dispatched storage change event at write.
 		return;
 	}
 
@@ -323,7 +323,7 @@ ZBX_LocalStorage.prototype.handleStorageEvent = function(event) {
 	}
 
 	if (value.signature === ZBX_LocalStorage.signature) {
-		// Internet explorer just dispatched storage event onto current instance.
+		// Internet Explorer just dispatched storage event onto current instance.
 		return;
 	}
 
@@ -507,7 +507,7 @@ ZBX_LocalStorageKey.prototype.truncate = function() {
 };
 
 /**
- * Sunscribe a callback to key sync request.
+ * Subscribe a callback to key sync request.
  *
  * @param {callable} callback
  */

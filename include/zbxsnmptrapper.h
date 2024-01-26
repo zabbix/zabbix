@@ -25,6 +25,7 @@
 typedef struct
 {
 	const char	*config_snmptrap_file;
+	const char	*config_ha_node_name;
 }
 zbx_thread_snmptrapper_args;
 

@@ -1,6 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 
 SUBDIRS = \
+	actions \
 	dbconfig \
 	diag \
 	discoverer \
@@ -15,7 +16,6 @@ SUBDIRS = \
 	operations \
 	postinit \
 	proxypoller \
-	vmware \
 	taskmanager \
 	stats \
 	preproc \
@@ -33,9 +33,7 @@ sbin_PROGRAMS = zabbix_server
 noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
-	db_lengths.h \
-	actions.c \
-	actions.h \
+	db_lengths_constants.h \
 	zbxreport.h
 
 libzbxserver_a_CFLAGS = \
@@ -46,7 +44,7 @@ libzbxserver_a_CFLAGS = \
 	$(TLS_CFLAGS)
 
 zabbix_server_SOURCES = \
-	server.h \
+	server_constants.h \
 	server.c
 
 zabbix_server_LDADD = \
@@ -56,6 +54,7 @@ zabbix_server_LDADD = \
 	$(top_builddir)/src/libs/zbxalerter/libzbxalerter.a \
 	discoverer/libzbxdiscoverer.a \
 	events/libzbxevents.a \
+	actions/libzbxactions.a \
 	pinger/libzbxpinger.a \
 	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
@@ -69,7 +68,7 @@ zabbix_server_LDADD = \
 	escalator/libzbxescalator.a \
 	proxypoller/libzbxproxypoller.a \
 	proxyconfigread/libzbxproxyconfigread.a \
-	vmware/libzbxvmware.a \
+	$(top_builddir)/src/libs/zbxvmware/libzbxvmware.a \
 	taskmanager/libzbxtaskmanager_server.a \
 	connector/libconnector.a \
 	service/libservice.a \

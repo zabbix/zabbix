@@ -2056,6 +2056,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxshmem/Makefile
 	src/libs/zbxsnmptrapper/Makefile
 	src/libs/zbxstr/Makefile
+	src/libs/zbxvmware/Makefile
 	src/libs/zbxsysinfo/Makefile
 	src/libs/zbxsysinfo/agent/Makefile
 	src/libs/zbxsysinfo/aix/Makefile
@@ -2103,6 +2104,8 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/taskmanager/Makefile
 	src/zabbix_sender/Makefile
 	src/zabbix_server/Makefile
+	src/zabbix_server/actions/Makefile
+	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/connector/Makefile
 	src/zabbix_server/dbconfigworker/Makefile
 	src/zabbix_server/dbconfig/Makefile
@@ -2117,7 +2120,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/operations/Makefile
 	src/zabbix_server/pinger/Makefile
 	src/zabbix_server/poller/Makefile
-	src/zabbix_server/postinit/Makefile
 	src/zabbix_server/preproc/Makefile
 	src/zabbix_server/proxyconfigread/Makefile
 	src/zabbix_server/proxypoller/Makefile
@@ -2128,7 +2130,6 @@ AC_CONFIG_FILES([
 	src/zabbix_server/taskmanager/Makefile
 	src/zabbix_server/timer/Makefile
 	src/zabbix_server/trapper/Makefile
-	src/zabbix_server/vmware/Makefile
 	man/Makefile
 	])
 AC_OUTPUT

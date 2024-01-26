@@ -345,7 +345,7 @@ class testFormUpdateProblem extends CWebTest {
 			'id:severity' => ['value' => 'Not classified', 'enabled' => false],
 			'id:suppress_problem' => ['value' => false, 'enabled' => true],
 			'id:suppress_time_option' => ['value' => 'Until', 'enabled' => false],
-			'id:suppress_until_problem' => ['maxlength' => 19, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
+			'id:suppress_until_problem' => ['maxlength' => 255, 'value' => 'now+1d', 'enabled' => false, 'placeholder' => 'now+1d'],
 			'id:unsuppress_problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'unsuppress_enabled', false)],
 			'Close problem' => ['value' => false, 'enabled' => CTestArrayHelper::get($data, 'close_enabled', false)]
 		];
@@ -633,7 +633,7 @@ class testFormUpdateProblem extends CWebTest {
 						'id:severity' => 'High',
 						'id:suppress_problem' => true,
 						'id:suppress_time_option' => 'Until',
-						'id:suppress_until_problem' => 'now+14y'
+						'id:suppress_until_problem' => 'now+5y'
 					],
 					'db_check' => [
 						[
@@ -804,6 +804,7 @@ class testFormUpdateProblem extends CWebTest {
 			$this->assertMessage(TEST_GOOD, $message);
 
 			// Check db change.
+			// DB values "action" and "new_severity" may depend on previous test cases in data provider.
 			foreach ($data['db_check'] as $event) {
 				$sql = CDBHelper::getRow('SELECT message, action, new_severity, suppress_until'.
 						' FROM acknowledges'.
