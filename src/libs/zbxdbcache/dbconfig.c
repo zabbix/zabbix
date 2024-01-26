@@ -2820,10 +2820,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			item->triggers = NULL;
 
-			if (NULL == new_items)
-				item->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
-			else
+			if (NULL != new_items)
+			{
+				zbx_vector_dc_item_ptr_append(new_items, item);
 				item->update_triggers = ZBX_ITEM_UPDATE_TRIGGER_NEW_ITEM;
+			}
+			else
+				item->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
 
 			item->nextcheck = 0;
 			item->state = (unsigned char)atoi(row[12]);
@@ -2838,9 +2841,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 			zbx_vector_ptr_create_ext(&item->tags, __config_mem_malloc_func, __config_mem_realloc_func,
 					__config_mem_free_func);
-
-			if (NULL != new_items)
-				zbx_vector_dc_item_ptr_append(new_items, item);
 		}
 		else
 		{
