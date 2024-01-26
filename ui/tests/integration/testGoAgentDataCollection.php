@@ -198,6 +198,11 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
 		[
+			'key' => 'vfs.file.regmatch[/etc/hosts,127.0.0.1]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+		],
+		[
 			'key' => 'vfs.fs.discovery',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
@@ -245,6 +250,11 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'threshold' => 10000
+		],
+		[
+			'key' => 'vfs.dev.discovery[]',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
 		],
 		[
 			'key' => 'proc.cpu.util[,,,,avg1]',
@@ -312,6 +322,11 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'threshold' => 100000000,
 			'compareType' => self::COMPARE_AVERAGE
+		],
+		[
+			'key' => 'vfs.fs.get',
+			'type' => ITEM_TYPE_ZABBIX,
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
 		],
 		[
 			'key' => 'vm.memory.size[free]',
