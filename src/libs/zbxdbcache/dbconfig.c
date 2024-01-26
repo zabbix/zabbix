@@ -6026,7 +6026,6 @@ void	DCsync_configuration(unsigned char mode)
 
 	zbx_hashset_t			trend_queue;
 	zbx_vector_dc_item_ptr_t	new_items, *pnew_items = NULL;
-	zbx_vector_uint64_pair_t	vc_items;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -6738,41 +6737,7 @@ out:
 	config->status->last_update = 0;
 	config->sync_ts = time(NULL);
 
-	if (ZBX_DBSYNC_INIT != mode && 0 != new_items.values_num)
-	{
-		zbx_vector_uint64_pair_create(&vc_items);
-		zbx_vector_uint64_pair_reserve(&vc_items, new_items.values_num);
-
-		for (i = 0; i < new_items.values_num; i++)
-		{
-			if (NULL != new_items.values[i]->triggers)
-			{
-				zbx_uint64_pair_t	pair = {
-						.first = new_items.values[i]->itemid,
-						.second = (zbx_uint64_t)new_items.values[i]->value_type
-				};
-
-				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
-			}
-		}
-	}
-
 	FINISH_SYNC;
-
-	if (ZBX_DBSYNC_INIT == mode)
-	{
-		zbx_hashset_destroy(&trend_queue);
-	}
-	else
-	{
-		if (0 != new_items.values_num)
-		{
-			zbx_vc_add_new_items(&vc_items);
-			zbx_vector_uint64_pair_destroy(&vc_items);
-		}
-
-		zbx_vector_dc_item_ptr_destroy(&new_items);
-	}
 
 	zbx_dbsync_clear(&config_sync);
 	zbx_dbsync_clear(&autoreg_config_sync);
@@ -6809,10 +6774,10 @@ out:
 	zbx_dbsync_clear(&maintenance_host_sync);
 	zbx_dbsync_clear(&hgroup_host_sync);
 
-	zbx_dbsync_free_env();
-
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
+
+	zbx_dbsync_free_env();
 
 	if (NULL != pnew_items)
 	{
