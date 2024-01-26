@@ -93,7 +93,7 @@ class CWidgetFieldColumnsList extends CWidgetField {
 				->acceptDashboard()
 				->acceptWidget()
 				->setFlags(CWidgetField::FLAG_NOT_EMPTY | CWidgetField::FLAG_LABEL_ASTERISK)
-				->setFullName('/'.($column_index + 1));
+				->prefixLabel('/'.($column_index + 1));
 
 			if (array_key_exists('time_period', $value)) {
 				$time_period_field->setValue($value['time_period']);
