@@ -415,7 +415,6 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 	zbx_uint64_t		proxy_hostid;
 	int			ret;
 	char			*info;
-	size_t			truncated;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -448,12 +447,8 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp)
 
 	zbx_json_addstring(&json, ZBX_PROTO_TAG_RESPONSE, "success", ZBX_JSON_TYPE_STRING);
 	zbx_json_addobject(&json, ZBX_PROTO_TAG_DATA);
-	truncated = zbx_json_addstring_limit(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
-			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-	zbx_json_addstring(&json, ZBX_PROTO_TAG_TRUNCATED,
-			truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
-	zbx_json_adduint64(&json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+	zbx_json_addstring(&json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
+			ZBX_JSON_TYPE_STRING);
 	zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, CONFIG_TIMEOUT);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json.buffer);
