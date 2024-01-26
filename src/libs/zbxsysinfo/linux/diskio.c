@@ -303,13 +303,14 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 #define SCSI_TYPE_ROM			0x05
 	char		tmp[MAX_STRING_LEN];
 	zbx_stat_t	lstat_buf;
-	int		devtype_found, dev_bypass;
+	int		devtype_found, dev_bypass, uevent_found = 0;
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
 
 	if (0 == zbx_stat(tmp, stat_buf) && 0 != S_ISBLK(stat_buf->st_mode))
 	{
 		int	offset = 0;
+		char	sys_blkdev_pfx_uevent[MAX_STRING_LEN];
 
 		devtype_found = 0;
 		dev_bypass = 0;
@@ -345,25 +346,26 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 
 			if (0 == devtype_found)
 			{
-				zbx_snprintf(tmp, sizeof(tmp), ZBX_SYS_BLKDEV_PFX "%u:%u/uevent",
-						major(stat_buf->st_rdev), minor(stat_buf->st_rdev));
+				zbx_snprintf(sys_blkdev_pfx_uevent, sizeof(sys_blkdev_pfx_uevent),
+						ZBX_SYS_BLKDEV_PFX "%u:%u/uevent", major(stat_buf->st_rdev),
+						minor(stat_buf->st_rdev));
 
-				if (NULL != (f = fopen(tmp, "r")))
+				if (NULL != (f = fopen(sys_blkdev_pfx_uevent, "r")))
 				{
-					while (NULL != fgets(tmp, sizeof(tmp), f))
+					while (NULL != fgets(sys_blkdev_pfx_uevent, sizeof(sys_blkdev_pfx_uevent), f))
 					{
-						if (0 == strncmp(tmp, DEVTYPE_STR, DEVTYPE_STR_LEN))
+						if (0 == strncmp(sys_blkdev_pfx_uevent, DEVTYPE_STR, DEVTYPE_STR_LEN))
 						{
 							char	*p;
 							size_t	l;
 
-							l = strlen(tmp);
+							l = strlen(sys_blkdev_pfx_uevent);
 							/* dismiss trailing \n */
-							p = tmp + l - 1;
+							p = sys_blkdev_pfx_uevent + l - 1;
 							if ('\n' == *p)
 								*p = '\0';
 
-							devtype_found = 1;
+							uevent_found = 1;
 							offset = DEVTYPE_STR_LEN;
 							break;
 						}
@@ -377,7 +379,8 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 		{
 			zbx_json_addobject(j, NULL);
 			zbx_json_addstring(j, "{#DEVNAME}", entries->d_name, ZBX_JSON_TYPE_STRING);
-			zbx_json_addstring(j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset : "",
+			zbx_json_addstring(j, "{#DEVTYPE}", 1 == devtype_found ? tmp + offset :
+					(1 == uevent_found ? sys_blkdev_pfx_uevent : ""),
 					ZBX_JSON_TYPE_STRING);
 			zbx_json_close(j);
 		}
