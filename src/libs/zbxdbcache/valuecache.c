@@ -2512,7 +2512,8 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 		{
 			zbx_vc_item_t	item_local = {
 					.itemid = h->itemid,
-					.value_type = h->value_type
+					.value_type = h->value_type,
+					.last_accessed = (int)time(NULL)
 			};
 
 			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
@@ -2539,7 +2540,6 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 			/* try to remove old (unused) chunks if a new chunk was added */
 			if (head != item->head)
 				vch_item_clean_cache(item);
-
 		}
 	}
 
@@ -2850,7 +2850,7 @@ void	zbx_vc_flush_stats(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: add newly created items with triggers to value cachel              *
+ * Purpose: add newly created items with triggers to value cache              *
  *                                                                            *
  ******************************************************************************/
 void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
@@ -2872,7 +2872,8 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 			zbx_vc_item_t	item_local = {
 					.itemid = items->values[i].first,
 					.value_type = (unsigned char)items->values[i].second,
-					.status = ZBX_ITEM_STATUS_CACHED_ALL
+					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.last_accessed = (int)time(NULL)
 
 			};
 
