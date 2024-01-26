@@ -55,6 +55,107 @@ in:
   in_command: vfs.dev.discovery
   flags: 4
 ---
+test case: successfully called vfs_dev_read function
+in:
+  in_command: vfs.dev.read
+  flags: 4
+
+---
+test case: successfully called vfs_dev_write function
+in:
+  in_command: vfs.dev.write
+  flags: 4
+---
+test case: successfully called vfs_dir_count function
+in:
+  in_command: vfs.dir.count
+  flags: 4
+---
+test case: successfully called vfs_dir_get function
+in:
+  in_command: vfs.dir.get
+  flags: 4
+---
+test case: successfully called vfs_dir_size function
+in:
+  in_command: vfs.dir.size
+  flags: 4
+---
+test case: successfully called vfs_file_cksum function
+in:
+  in_command: vfs.file.cksum
+  flags: 4
+---
+test case: successfully called vfs_file_contents function
+in:
+  in_command: vfs.file.contents
+  flags: 4
+---
+test case: successfully called vfs_file_exists function
+in:
+  in_command: vfs.file.exists
+  flags: 4
+---
+test case: successfully called vfs_file_get function
+in:
+  in_command: vfs.file.get
+  flags: 4
+---
+test case: successfully called vfs_file_md5sum function
+in:
+  in_command: vfs.file.md5sum
+  flags: 4
+---
+test case: successfully called vfs_file_owner function
+in:
+  in_command: vfs.file.owner
+  flags: 4
+---
+test case: successfully called vfs_file_permissions function
+in:
+  in_command: vfs.file.permissions
+  flags: 4
+---
+test case: successfully called vfs_file_regexp function
+in:
+  in_command: vfs.file.regexp
+  flags: 4
+---
+test case: successfully called vfs_file_regmatch function
+in:
+  in_command: vfs.file.regmatch
+  flags: 4
+---
+test case: successfully called vfs_file_size function
+in:
+  in_command: vfs.file.size
+  flags: 4
+---
+test case: successfully called vfs_file_time function
+in:
+  in_command: vfs.file.time
+  flags: 4
+---
+test case: successfully called vfs_fs_discovery function
+in:
+  in_command: vfs.fs.discovery
+  flags: 4
+---
+test case: successfully called vfs_fs_get function
+in:
+  in_command: vfs.fs.get
+  flags: 4
+---
+test case: successfully called vfs_fs_inode function
+in:
+  in_command: vfs.fs.inode
+  flags: 4
+---
+test case: successfully called vfs_fs_size function
+in:
+  in_command: vfs.fs.size
+  flags: 4
+---
 test case: successfully called net_dns function
 in:
   in_command: net.dns[,zabbix.com]
