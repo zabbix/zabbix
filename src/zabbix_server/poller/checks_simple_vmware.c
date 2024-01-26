@@ -467,7 +467,7 @@ out:
  * Parameters: url       - [IN] vmware service URL                            *
  *             username  - [IN] vmware service username                       *
  *             password  - [IN] vmware service password                       *
- *             result    - [IN]                                               *
+ *             result    - [OUT]                                              *
  *             ret       - [OUT] operation result code                        *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
