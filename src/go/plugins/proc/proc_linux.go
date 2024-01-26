@@ -42,6 +42,7 @@ import (
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/procfs"
+	"zabbix.com/pkg/zbxregexp"
 )
 
 const (
@@ -617,6 +618,11 @@ func (p *PluginExport) exportProcMem(params []string) (result interface{}, err e
 		cmdRgx, err = regexp.Compile(cmdline)
 		if err != nil {
 			p.Debugf("Failed to compile provided regex expression '%s': %s", cmdline, err.Error())
+
+			if err = zbxregexp.ValidateForUnsupportedAssertions(cmdline); err != nil {
+				return nil, err
+			}
+
 			return 0, nil
 		}
 	}
@@ -767,6 +773,11 @@ func (p *PluginExport) exportProcNum(params []string) (interface{}, error) {
 	query, flags, err := p.prepareQuery(&procQuery{name, userName, cmdline, state})
 	if err != nil {
 		p.Debugf("Failed to prepare query: %s", err.Error())
+
+		if err = zbxregexp.ValidateForUnsupportedAssertions(cmdline); err != nil {
+			return nil, err
+		}
+
 		return count, nil
 	}
 
