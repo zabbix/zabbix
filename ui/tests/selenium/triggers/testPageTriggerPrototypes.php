@@ -18,8 +18,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 class testPageTriggerPrototypes extends CLegacyWebTest {
 
@@ -47,8 +48,8 @@ class testPageTriggerPrototypes extends CLegacyWebTest {
 	}
 
 	/**
-	* @dataProvider data
-	*/
+	 * @dataProvider data
+	 */
 	public function testPageTriggerPrototypes_CheckLayout($data) {
 		$drule = $data['d_name'];
 		$this->zbxTestLogin('zabbix.php?action=trigger.prototype.list&parent_discoveryid='.

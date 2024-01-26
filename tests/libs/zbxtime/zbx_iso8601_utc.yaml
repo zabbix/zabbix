@@ -46,8 +46,6 @@ in:
   param: 2022-09-12T14:46x15
 out:
   return: FAIL
-
-
 ---
 test case: Valid yyyy-mm-ddThh:mm:ss
 in:
@@ -132,9 +130,6 @@ in:
 out:
   datetime: 2022-09-12 14:46:15.123 -04:00
   return: SUCCEED
-
-
-
 ---
 test case: Valid yyyy-mm-dd hh:mm:ss
 in:
@@ -218,5 +213,12 @@ in:
   param: 2022-09-12 14:46:15.123 -04:00
 out:
   datetime: 2022-09-12 14:46:15.123 -04:00
+  return: SUCCEED
+---
+test case: Valid yyyy-mm-ddThh:mm:ss+hhmm
+in:
+  param: 2022-09-12T14:46:15+0400
+out:
+  datetime: 2022-09-12 14:46:15 +04:00
   return: SUCCEED
 

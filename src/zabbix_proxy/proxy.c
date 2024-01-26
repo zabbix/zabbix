@@ -1454,7 +1454,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
-	zbx_thread_snmptrapper_args		snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_snmptrapper_args		snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
+								.config_ha_node_name = NULL};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 
