@@ -302,23 +302,19 @@ static void	process_entry(struct dirent *entries, zbx_stat_t *stat_buf, int sysf
 /* SCSI device type CD/DVD-ROM. http://en.wikipedia.org/wiki/SCSI_Peripheral_Device_Type */
 #define SCSI_TYPE_ROM			0x05
 	char		tmp[MAX_STRING_LEN];
-	zbx_stat_t	lstat_buf;
-	int		devtype_found, dev_bypass, uevent_found = 0;
 
 	zbx_snprintf(tmp, sizeof(tmp), ZBX_DEV_PFX "%s", entries->d_name);
 
 	if (0 == zbx_stat(tmp, stat_buf) && 0 != S_ISBLK(stat_buf->st_mode))
 	{
-		int	offset = 0;
+		int	devtype_found = 0, dev_bypass = 0, uevent_found = 0, offset = 0;
 		char	sys_blkdev_pfx_uevent[MAX_STRING_LEN];
-
-		devtype_found = 0;
-		dev_bypass = 0;
 
 		if (1 == sysfs_found)
 		{
-			int	type;
-			FILE	*f;
+			int		type;
+			FILE		*f;
+			zbx_stat_t	lstat_buf;
 
 			if (0 == lstat(tmp, &lstat_buf))
 			{
