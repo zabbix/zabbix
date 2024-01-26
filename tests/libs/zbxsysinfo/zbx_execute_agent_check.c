@@ -146,3 +146,4 @@ WRAP_HELPER(net_dns_record, "net.dns.record")
 WRAP_HELPER(net_dns_perf, "net.dns.perf")
 WRAP_HELPER(net_tcp_port, "net.tcp.port")
 WRAP_HELPER(system_users_num, "system.users.num")
+#undef	WRAP_HELPER
