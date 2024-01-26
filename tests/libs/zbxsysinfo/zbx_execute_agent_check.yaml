@@ -50,6 +50,11 @@ in:
   in_command: vfs.dir.size[/var/log]
   flags: 4
 ---
+test case: successfully called vfs_dev_discovery function
+in:
+  in_command: vfs.dev.discovery
+  flags: 4
+---
 test case: successfully called net_dns function
 in:
   in_command: net.dns[,zabbix.com]

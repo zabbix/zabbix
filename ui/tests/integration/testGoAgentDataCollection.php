@@ -247,13 +247,13 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		],
 		[
 			'key' => 'vfs.dev.write[,operations]',
-			'type' => ITEM_TYPE_ZABBIX,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
 			'threshold' => 10000
 		],
 		[
 			'key' => 'vfs.dev.discovery[]',
-			'type' => ITEM_TYPE_ZABBIX,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 		],
 		[
@@ -325,7 +325,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		],
 		[
 			'key' => 'vfs.fs.get',
-			'type' => ITEM_TYPE_ZABBIX,
+			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
 		],
 		[
