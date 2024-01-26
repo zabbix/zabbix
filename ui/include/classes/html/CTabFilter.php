@@ -214,6 +214,10 @@ class CTabFilter extends CDiv {
 			'disabled' => true
 		];
 
+		$this->options['timeselector']['label'] = relativeDateToText($this->options['timeselector']['from'],
+			$this->options['timeselector']['to']
+		);
+
 		return $this;
 	}
 

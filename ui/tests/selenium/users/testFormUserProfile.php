@@ -370,9 +370,12 @@ class testFormUserProfile extends CLegacyWebTest {
 				break;
 		}
 	}
-
 	public static function messaging() {
 		return [
+			// TODO: remove this case and put it in the end of data after ZBX-23993 is fixed.
+			[[
+				'expected' => TEST_GOOD
+			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
@@ -453,10 +456,11 @@ class testFormUserProfile extends CLegacyWebTest {
 				'expected' => TEST_GOOD,
 				'timeout' => '1d',
 				'suppressed' => false
-			]],
-			[[
-				'expected' => TEST_GOOD
 			]]
+			// TODO: uncomment after ZBX-23993 is fixed.
+//			[[
+//				'expected' => TEST_GOOD
+//			]]
 		];
 	}
 

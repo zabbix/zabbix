@@ -143,15 +143,17 @@ exit:
  *                                                                            *
  * Parameters: hostid         - [IN]                                          *
  *             groupids       - [IN]                                          *
+ *             event          - [IN]  (for audit context)                     *
  *                                                                            *
  ******************************************************************************/
-static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids)
+static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t *groupids,
+		const zbx_db_event *event)
 {
-	zbx_db_result_t	result;
-	zbx_db_row_t	row;
-	zbx_uint64_t	groupid;
-	char		*sql = NULL;
-	size_t		sql_alloc = 256, sql_offset = 0;
+	zbx_db_result_t		result;
+	zbx_db_row_t		row;
+	zbx_uint64_t		groupid;
+	char			*sql = NULL;
+	size_t			sql_alloc = 256, sql_offset = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -185,27 +187,8 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 	}
 	zbx_db_free_result(result);
 
-	if (0 != groupids->values_num)
-	{
-		zbx_uint64_t	hostgroupid;
-		zbx_db_insert_t	db_insert;
-
-		hostgroupid = zbx_db_get_maxid_num("hosts_groups", groupids->values_num);
-
-		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", (char *)NULL);
-
-		zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
-
-		for (int i = 0; i < groupids->values_num; i++)
-		{
-			zbx_db_insert_add_values(&db_insert, hostgroupid, hostid, groupids->values[i]);
-			zbx_audit_hostgroup_update_json_add_group(hostid, hostgroupid, groupids->values[i]);
-			hostgroupid++;
-		}
-
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
+	if (0 < groupids->values_num)
+		zbx_host_groups_add(hostid, groupids, zbx_map_db_event_to_audit_context(event));
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -464,26 +447,32 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_execute(&db_insert_host_rtdata);
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
-				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
+				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+						ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
-					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode);
+				{
+					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode,
+							zbx_map_db_event_to_audit_context(event));
+				}
 
-				zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(hostid,
-						proxyid, host_unique, cfg->default_inventory_mode);
+				zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(
+						zbx_map_db_event_to_audit_context(event), hostid, proxyid, host_unique,
+						cfg->default_inventory_mode);
 
 				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
-						ZBX_CONN_DEFAULT);
+						ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
 
 				zbx_free(host_unique);
 
-				add_discovered_host_groups(hostid, &groupids);
+				add_discovered_host_groups(hostid, &groupids, event);
 			}
 			else
 			{
-				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
+				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 				interfaceid = zbx_db_add_interface(hostid, interface_type, 1, row[2], row[3], port,
-						ZBX_CONN_DEFAULT);
+						ZBX_CONN_DEFAULT, zbx_map_db_event_to_audit_context(event));
 			}
 
 			if (INTERFACE_TYPE_SNMP == interface_type)
@@ -502,7 +491,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				zbx_db_add_interface_snmp(interfaceid, version, SNMP_BULK_ENABLED, row[9], row[10],
 						securitylevel, row[12], row[13], authprotocol, privprotocol, row[16],
-						hostid);
+						hostid, zbx_map_db_event_to_audit_context(event));
 			}
 		}
 		zbx_db_free_result(result);
@@ -595,16 +584,19 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname, hostname,
 						tls_accepted, tls_accepted, psk_identity, psk);
 
-					zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
-							psk_identity, psk);
+					zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
+					zbx_audit_host_update_json_add_tls_and_psk(
+							zbx_map_db_event_to_audit_context(event), hostid, tls_accepted,
+							tls_accepted, psk_identity, psk);
 				}
 				else
 				{
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host",
 							"name", (char *)NULL);
 
-					zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
+					zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+							ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname,
 							hostname);
 				}
@@ -621,14 +613,19 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				zbx_db_insert_clean(&db_insert_host_rtdata);
 
 				if (HOST_INVENTORY_DISABLED != cfg->default_inventory_mode)
-					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode);
+				{
+					zbx_db_add_host_inventory(hostid, cfg->default_inventory_mode,
+							zbx_map_db_event_to_audit_context(event));
+				}
 
-				zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(hostid,
-						proxyid, hostname, cfg->default_inventory_mode);
+				zbx_audit_host_update_json_add_proxyid_and_hostname_and_inventory_mode(
+						zbx_map_db_event_to_audit_context(event), hostid, proxyid, hostname,
+						cfg->default_inventory_mode);
 
-				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,
+						zbx_map_db_event_to_audit_context(event));
 
-				add_discovered_host_groups(hostid, &groupids);
+				add_discovered_host_groups(hostid, &groupids, event);
 			}
 			else
 			{
@@ -637,7 +634,8 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				hostname = zbx_strdup(hostname, row2[2]);
 				*status = atoi(row2[3]);
 
-				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
+				zbx_audit_host_create_entry(zbx_map_db_event_to_audit_context(event),
+						ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
 				if (host_proxyid != proxyid)
 				{
@@ -646,11 +644,13 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 							" where hostid=" ZBX_FS_UI64,
 							zbx_db_sql_id_ins(proxyid), hostid);
 
-					zbx_audit_host_update_json_update_proxyid(hostid, host_proxyid,
+					zbx_audit_host_update_json_update_proxyid(
+							zbx_map_db_event_to_audit_context(event), hostid, host_proxyid,
 							proxyid);
 				}
 
-				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags);
+				zbx_db_add_interface(hostid, INTERFACE_TYPE_AGENT, useip, row[2], row[3], port, flags,
+						zbx_map_db_event_to_audit_context(event));
 			}
 			zbx_db_free_result(result2);
 out:
@@ -749,9 +749,11 @@ static void	discovered_host_tags_add_del(zbx_host_tag_op_t op, zbx_vector_uint64
  *                                                                              *
  * Parameters: hostid    - [IN] discovered host ID                              *
  *             host_tags - [IN] new state of host tags to save if not saved yet *
+ *             event     - [IN]                                                 *
  *                                                                              *
  *******************************************************************************/
-static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags)
+static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr_t *host_tags,
+		const zbx_db_event *event)
 {
 	int			new_tags_cnt = 0, res = SUCCEED;
 	zbx_vector_db_tag_ptr_t	upd_tags;
@@ -808,8 +810,8 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 
 				if (0 == tag->tagid)
 				{
-					zbx_audit_host_update_json_add_tag(hostid, hosttagid, tag->tag, tag->value,
-							ZBX_DB_TAG_NORMAL);
+					zbx_audit_host_update_json_add_tag(zbx_map_db_event_to_audit_context(event),
+							hostid, hosttagid, tag->tag, tag->value, ZBX_DB_TAG_NORMAL);
 					hosttagid++;
 				}
 			}
@@ -837,7 +839,10 @@ static void	discovered_host_tags_save(zbx_uint64_t hostid, zbx_vector_db_tag_ptr
 				zbx_db_tag_t	*tag = host_tags->values[i];
 
 				if (ZBX_FLAG_DB_TAG_REMOVE == tag->flags)
-					zbx_audit_host_update_json_delete_tag(hostid, tag->tagid);
+				{
+					zbx_audit_host_update_json_delete_tag(zbx_map_db_event_to_audit_context(event),
+							hostid, tag->tagid);
+				}
 			}
 		}
 		else
@@ -904,7 +909,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_create(&hostnames);
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
-	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames);
+	zbx_db_delete_hosts_with_prototypes(&hostids, &hostnames, zbx_map_db_event_to_audit_context(event));
 
 	zbx_db_execute("delete from autoreg_host where host='%s'", hostname);
 
@@ -912,7 +917,7 @@ void	op_host_del(const zbx_db_event *event)
 	zbx_vector_str_destroy(&hostnames);
 	zbx_vector_uint64_destroy(&hostids);
 
-	zbx_audit_host_del(hostid, hostname);
+	zbx_audit_host_del(zbx_map_db_event_to_audit_context(event), hostid, hostname);
 out:
 	zbx_free(hostname);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -946,7 +951,8 @@ void	op_host_enable(const zbx_db_event *event, zbx_config_t *cfg)
 				" where hostid=" ZBX_FS_UI64,
 				HOST_STATUS_MONITORED, hostid);
 
-		zbx_audit_host_update_json_update_host_status(hostid, status, HOST_STATUS_MONITORED);
+		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), hostid, status,
+				HOST_STATUS_MONITORED);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -980,7 +986,8 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg)
 				" set status=%d"
 				" where hostid=" ZBX_FS_UI64,
 				HOST_STATUS_NOT_MONITORED, hostid);
-		zbx_audit_host_update_json_update_host_status(hostid, status, HOST_STATUS_NOT_MONITORED);
+		zbx_audit_host_update_json_update_host_status(zbx_map_db_event_to_audit_context(event), hostid, status,
+				HOST_STATUS_NOT_MONITORED);
 	}
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
@@ -1012,7 +1019,7 @@ void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int in
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	zbx_db_set_host_inventory(hostid, inventory_mode);
+	zbx_db_set_host_inventory(hostid, inventory_mode, zbx_map_db_event_to_audit_context(event));
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1039,7 +1046,7 @@ void	op_groups_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	add_discovered_host_groups(hostid, groupids);
+	add_discovered_host_groups(hostid, groupids, event);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
@@ -1125,18 +1132,9 @@ void	op_groups_del(const zbx_db_event *event, zbx_vector_uint64_t *groupids)
 
 		if (0 != hostgroupids.values_num)
 		{
-			sql_offset = 0;
-			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-					"delete from hosts_groups"
-					" where hostid=" ZBX_FS_UI64
-						" and",
-					hostid);
-			zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "groupid", groupids->values,
-					groupids->values_num);
-
-			zbx_db_execute("%s", sql);
-
-			zbx_audit_host_hostgroup_delete(hostid, hostname, &hostgroupids, &found_groupids);
+			zbx_host_groups_remove(hostid, &hostgroupids);
+			zbx_audit_host_hostgroup_delete(zbx_map_db_event_to_audit_context(event), hostid, hostname,
+					&hostgroupids, &found_groupids);
 		}
 
 		zbx_vector_uint64_destroy(&found_groupids);
@@ -1172,7 +1170,8 @@ void	op_template_add(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 	if (0 == (hostid = add_discovered_host(event, &status, cfg)))
 		goto out;
 
-	if (SUCCEED != zbx_db_copy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL, &error))
+	if (SUCCEED != zbx_db_copy_template_elements(hostid, lnk_templateids, ZBX_TEMPLATE_LINK_MANUAL,
+			zbx_map_db_event_to_audit_context(event), &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot link template(s) %s", error);
 		zbx_free(error);
@@ -1202,7 +1201,8 @@ void	op_template_del(const zbx_db_event *event, zbx_vector_uint64_t *del_templat
 	if (0 == (hostid = select_discovered_host(event, &hostname)))
 		goto out;
 
-	if (SUCCEED != zbx_db_delete_template_elements(hostid, hostname, del_templateids, &error))
+	if (SUCCEED != zbx_db_delete_template_elements(hostid, hostname, del_templateids,
+			zbx_map_db_event_to_audit_context(event), &error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "cannot unlink template: %s", error);
 		zbx_free(error);
@@ -1271,10 +1271,24 @@ void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_ui
 	if (0 != del_optagids->values_num)
 		discovered_host_tags_add_del(ZBX_OP_HOST_TAGS_DEL, del_optagids, &host_tags);
 
-	discovered_host_tags_save(hostid, &host_tags);
+	discovered_host_tags_save(hostid, &host_tags, event);
 
 	zbx_vector_db_tag_ptr_clear_ext(&host_tags, zbx_db_tag_free);
 	zbx_vector_db_tag_ptr_destroy(&host_tags);
 out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
+}
+
+int	zbx_map_db_event_to_audit_context(const zbx_db_event *event)
+{
+	if (EVENT_SOURCE_AUTOREGISTRATION == event->source)
+	{
+		return ZBX_AUDIT_AUTOREGISTRATION_CONTEXT;
+	}
+	else if (EVENT_SOURCE_DISCOVERY == event->source)
+	{
+		return ZBX_AUDIT_NETWORK_DISCOVERY_CONTEXT;
+	}
+
+	return ZBX_AUDIT_ALL_CONTEXT;
 }

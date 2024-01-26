@@ -248,7 +248,7 @@ void	zbx_load_lld_override_operations(const zbx_vector_uint64_t *overrideids, ch
 
 		zbx_vector_lld_override_operation_append(ops, override_operation);
 
-		object_mask |= (1 << override_operation->operationtype);
+		object_mask |= (__UINT64_C(1) << override_operation->operationtype);
 	}
 	zbx_db_free_result(result);
 

@@ -319,7 +319,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, unucknowledged filter',
+						'Name' => 'Group, unacknowledged filter',
 						'Host groups' => 'Group for Problems Widgets',
 						'Acknowledgement status' => 'Unacknowledged'
 					],

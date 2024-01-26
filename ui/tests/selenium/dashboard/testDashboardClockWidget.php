@@ -244,7 +244,7 @@ class testDashboardClockWidget extends testWidgets {
 				$form->isRequired('Item');
 			}
 
-			$this->assertEquals($fields, $form->getLabels(CElementFilter::VISIBLE)->asText());
+			$this->assertEquals($fields, array_values($form->getLabels(CElementFilter::VISIBLE)->asText()));
 		}
 
 		// Check if Apply and Cancel button are clickable and there are two of them.
@@ -253,7 +253,7 @@ class testDashboardClockWidget extends testWidgets {
 				->filter(new CElementFilter(CElementFilter::CLICKABLE))->count()
 		);
 
-		// Check fileds' visibility depending on Analog or Digital clock type.
+		// Check fields' visibility depending on Analog or Digital clock type.
 		foreach (['Analog' => false, 'Digital' => true] as $type => $status) {
 			$form->fill(['Clock type' => $type]);
 

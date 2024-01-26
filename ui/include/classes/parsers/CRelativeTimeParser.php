@@ -161,6 +161,10 @@ class CRelativeTimeParser extends CParser {
 		$p++;
 
 		if (preg_match('/^(?P<offset_value>[0-9]+)(?P<offset_suffix>[yMwdhms])?/', substr($source, $p), $matches)) {
+			if (bccomp($matches['offset_value'], (string) ZBX_MAX_INT32) == 1) {
+				return false;
+			}
+
 			$this->tokens[] = [
 				'type' => self::ZBX_TOKEN_OFFSET,
 				'sign' => $sign_matches[0],
@@ -232,14 +236,14 @@ class CRelativeTimeParser extends CParser {
 					if ($token['suffix'] === 'm' || $token['suffix'] === 'h' || $token['suffix'] === 'd') {
 						$formats = $is_start
 							? [
-								'd' => 'Y-m-dT00:00:00O',
-								'm' => 'Y-m-dTH:i:00O',
-								'h' => 'Y-m-dTH:00:00O'
+								'd' => 'Y-m-d 00:00:00O',
+								'm' => 'Y-m-d H:i:00O',
+								'h' => 'Y-m-d H:00:00O'
 							]
 							: [
-								'd' => 'Y-m-dT23:59:59O',
-								'm' => 'Y-m-dTH:i:59O',
-								'h' => 'Y-m-dTH:59:59O'
+								'd' => 'Y-m-d 23:59:59O',
+								'm' => 'Y-m-d H:i:59O',
+								'h' => 'Y-m-d H:59:59O'
 							];
 
 						$date = new DateTime($date->format($formats[$token['suffix']]));

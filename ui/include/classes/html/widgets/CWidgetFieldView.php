@@ -88,6 +88,10 @@ abstract class CWidgetFieldView {
 		return $this;
 	}
 
+	public function getLabelClass(): ?string {
+		return $this->label_class_list ? implode(' ', $this->label_class_list) : null;
+	}
+
 	public function addLabelClass(?string $class): self {
 		if ($class !== null) {
 			$this->label_class_list[] = $class;

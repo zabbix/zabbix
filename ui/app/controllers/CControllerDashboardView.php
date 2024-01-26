@@ -166,6 +166,7 @@ class CControllerDashboardView extends CController {
 			'broadcast_requirements' => [],
 			'configuration_hash' => null
 		];
+
 		$error = null;
 
 		if ($this->hasInput('new')) {
@@ -202,12 +203,11 @@ class CControllerDashboardView extends CController {
 
 			if ($db_dashboards) {
 				$dashboard = $db_dashboards[0];
-				$dashboard['pages'] = CDashboardHelper::unsetInaccessibleFields($dashboard['pages']);
 
-				$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null);
-
-				$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
 				$stats['configuration_hash'] = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
+
+				$pages_raw = CDashboardHelper::unsetInaccessibleFields($dashboard['pages']);
+				$pages_prepared = CDashboardHelper::preparePages($pages_raw, null, true);
 
 				$dashboard = [
 					'dashboardid' => $db_dashboards[0]['dashboardid'],
@@ -215,7 +215,7 @@ class CControllerDashboardView extends CController {
 					'display_period' => $db_dashboards[0]['display_period'],
 					'auto_start' => $db_dashboards[0]['auto_start'],
 					'editable' => true,
-					'pages' => CDashboardHelper::preparePages($widgets_and_forms, $dashboard['pages'], true),
+					'pages' => $pages_prepared,
 					'owner' => [
 						'id' => CWebUser::$data['userid'],
 						'name' => CDashboardHelper::getOwnerName(CWebUser::$data['userid'])
@@ -226,6 +226,8 @@ class CControllerDashboardView extends CController {
 						'userGroups' => $db_dashboards[0]['userGroups']
 					]
 				];
+
+				$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($pages_prepared);
 			}
 			else {
 				$error = _('No permissions to referred object or it does not exist!');
@@ -263,12 +265,12 @@ class CControllerDashboardView extends CController {
 
 					$dashboard = array_shift($db_dashboards);
 
-					$widgets_and_forms = CDashboardHelper::prepareWidgetsAndForms($dashboard['pages'], null);
-
-					$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($widgets_and_forms);
 					$stats['configuration_hash'] = CDashboardHelper::getConfigurationHash($dashboard, $widget_defaults);
 
-					$dashboard['pages'] = CDashboardHelper::preparePages($widgets_and_forms, $dashboard['pages'], true);
+					$pages_raw = $dashboard['pages'];
+					$pages_prepared = CDashboardHelper::preparePages($pages_raw, null, true);
+
+					$dashboard['pages'] = $pages_prepared;
 
 					$dashboard['owner'] = [
 						'id' => $dashboard['userid'],
@@ -280,6 +282,8 @@ class CControllerDashboardView extends CController {
 						'filter' => ['dashboardid' => $dashboard['dashboardid']],
 						'limit' => 1
 					]);
+
+					$stats['broadcast_requirements'] = CDashboardHelper::getBroadcastRequirements($pages_prepared);
 
 					CProfile::update('web.dashboard.dashboardid', $dashboardid, PROFILE_TYPE_ID);
 				}

@@ -22,10 +22,12 @@
 namespace Widgets\PieChart\Actions;
 
 use API,
+	CAggFunctionData,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
 	CHousekeepingHelper,
+	CItemHelper,
 	CMacrosResolverHelper,
 	CParser,
 	CSimpleIntervalParser,
@@ -100,10 +102,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		$metrics = $this->getData($pie_chart_options);
 
-		if ($metrics['errors']) {
-			error($metrics['errors']);
-		}
-
 		$svg_data = $this->getSVGData($metrics['sectors'], $metrics['total_value']);
 
 		$data['vars']['sectors'] = $svg_data['svg_sectors'];
@@ -119,12 +117,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 	private function getData($options): array {
 		$metrics = [];
-		$errors = [];
 		$total_value = [];
 		$all_sectorids = [];
 
 		self::getItems($metrics, $options['data_sets'], $options['templateid'], $options['override_hostid']);
-		self::getChartDataSource($metrics, $errors, $options['data_source'], $options['time_period']);
+		self::getChartDataSource($metrics, $options['data_source'], $options['time_period']['time_from']);
 		self::getMetricsData($metrics, $options['time_period'], $options['legend_aggregation_show'],
 			$options['templateid'], $options['override_hostid']);
 		self::getSectorsData($metrics, $total_value, $options['merge_sectors'], $options['total_value'],
@@ -133,8 +130,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return [
 			'sectors' => $metrics,
 			'all_sectorids' => $all_sectorids,
-			'total_value' => $total_value,
-			'errors' => $errors
+			'total_value' => $total_value
 		];
 	}
 
@@ -344,102 +340,16 @@ class WidgetView extends CControllerDashboardWidgetView {
 		return $metrics;
 	}
 
-	private static function getChartDataSource(array &$metrics, array &$errors, int $data_source,
-			array $time_period): void {
-		/**
-		 * If data source is not specified, calculate it automatically. Otherwise, set given $data_source to each
-		 * $metric.
-		 */
+	private static function getChartDataSource(array &$metrics, int $data_source, int $time): void {
 		if ($data_source == WidgetForm::DATA_SOURCE_AUTO) {
-			/**
-			 * First, if global configuration setting "Override item history period" is enabled, override globally
-			 * specified "Data storage period" value to each metric custom history storage duration, converting it
-			 * to seconds. If "Override item history period" is disabled, item level field 'history' will be used
-			 * later, but now we are just storing the field name 'history' in array $to_resolve.
-			 *
-			 * Do the same with trends.
-			 */
-			$to_resolve = [];
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					$metric['history'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY));
-				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'history';
-			}
-
-			if (CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-				foreach ($metrics as &$metric) {
-					$metric['trends'] = timeUnitToSeconds(CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS));
-				}
-				unset($metric);
-			}
-			else {
-				$to_resolve[] = 'trends';
-			}
-
-			// If no global history and trend override enabled, resolve 'history' and/or 'trends' values for given $metric.
-			if ($to_resolve) {
-				$metrics = CMacrosResolverHelper::resolveTimeUnitMacros($metrics, $to_resolve);
-				$simple_interval_parser = new CSimpleIntervalParser();
-
-				foreach ($metrics as $num => &$metric) {
-					// Convert its values to seconds.
-					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_HISTORY_GLOBAL)) {
-						if ($simple_interval_parser->parse($metric['history']) != CParser::PARSE_SUCCESS) {
-							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'history',
-								_('invalid history storage period')
-							);
-							unset($metrics[$num]);
-						}
-						else {
-							$metric['history'] = timeUnitToSeconds($metric['history']);
-						}
-					}
-
-					if (!CHousekeepingHelper::get(CHousekeepingHelper::HK_TRENDS_GLOBAL)) {
-						if ($simple_interval_parser->parse($metric['trends']) != CParser::PARSE_SUCCESS) {
-							$errors[] = _s('Incorrect value for field "%1$s": %2$s.', 'trends',
-								_('invalid trend storage period')
-							);
-							unset($metrics[$num]);
-						}
-						else {
-							$metric['trends'] = timeUnitToSeconds($metric['trends']);
-						}
-					}
-				}
-				unset($metric);
-			}
-
-			foreach ($metrics as &$metric) {
-				/**
-				 * History as a data source is used in 2 cases:
-				 * 1) if trends are disabled (set to 0) either for particular $metric item or globally;
-				 * 2) if period for requested data is newer than the period of keeping history for particular $metric
-				 *    item.
-				 *
-				 * Use trends otherwise.
-				 */
-				$history = $metric['history'];
-				$trends = $metric['trends'];
-				$time_from = $time_period['time_from'];
-
-				$metric['source'] = ($trends == 0 || (time() - $history < $time_from))
-					? WidgetForm::DATA_SOURCE_HISTORY
-					: WidgetForm::DATA_SOURCE_TRENDS;
-			}
+			$metrics = CItemHelper::addDataSource($metrics, $time);
 		}
 		else {
 			foreach ($metrics as &$metric) {
-				$metric['source'] = $data_source;
+				$metric['source'] = $data_source == WidgetForm::DATA_SOURCE_TRENDS ? 'trends' : 'history';
 			}
+			unset($metric);
 		}
-
-		unset($metric);
 	}
 
 	private static function getMetricsData(array &$metrics, array $time_period, bool $legend_aggregation_show,
@@ -451,7 +361,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 			if ($metric['options']['dataset_aggregation'] == AGGREGATE_NONE) {
 				if ($legend_aggregation_show) {
-					$name = self::aggr_fnc2str($metric['options']['aggregate_function']).
+					$name = CItemHelper::getAggregateFunctionName($metric['options']['aggregate_function']).
 						'('.$metric['hosts'][0]['name'].NAME_DELIMITER.$metric['name'].')';
 				}
 				else {
@@ -467,7 +377,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$item = [
 				'itemid' => $metric['itemid'],
 				'value_type' => $metric['value_type'],
-				'source' => ($metric['source'] == WidgetForm::DATA_SOURCE_HISTORY) ? 'history' : 'trends'
+				'source' => $metric['source']
 			];
 
 			if (!array_key_exists($dataset_num, $dataset_metrics)) {
@@ -491,25 +401,15 @@ class WidgetView extends CControllerDashboardWidgetView {
 				continue;
 			}
 
-			$results = Manager::History()->getAggregationByInterval(
-				$metric['items'], $time_period['time_from'], $time_period['time_to'],
-				$metric['options']['aggregate_function'], $time_period['time_to']
+			$values = Manager::History()->getAggregatedValues($metric['items'],
+				$metric['options']['aggregate_function'], $time_period['time_from'], $time_period['time_to']
 			);
 
-			if (!$results) {
+			if (!$values) {
 				continue;
 			}
 
-			$values = [];
-
-			foreach ($results as $result) {
-				if ($metric['options']['aggregate_function'] == AGGREGATE_COUNT) {
-					$values[] = $result['data'][0]['count'];
-				}
-				else {
-					$values[] = $result['data'][0]['value'];
-				}
-			}
+			$values = array_column($values, 'value');
 
 			switch($metric['options']['dataset_aggregation']) {
 				case AGGREGATE_MAX:
@@ -578,6 +478,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 				if ($units_config['units_show'] == self::SHOW_UNITS_ON && $units_config['units_value'] !== '') {
 					$metric['units'] = $units_config['units_value'];
+				}
+				elseif (!CAggFunctionData::preservesUnits($metric['options']['aggregate_function'])) {
+					$metric['units'] = '';
 				}
 
 				if ($chart_units === null || $is_total) {
@@ -676,27 +579,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 	 */
 	private static function processPattern(array $patterns): ?array {
 		return in_array('*', $patterns, true) ? null : $patterns;
-	}
-
-	private static function aggr_fnc2str($calc_fnc) {
-		switch ($calc_fnc) {
-			case AGGREGATE_NONE:
-				return _('none');
-			case AGGREGATE_MIN:
-				return _('min');
-			case AGGREGATE_MAX:
-				return _('max');
-			case AGGREGATE_AVG:
-				return _('avg');
-			case AGGREGATE_COUNT:
-				return _('count');
-			case AGGREGATE_SUM:
-				return _('sum');
-			case AGGREGATE_FIRST:
-				return _('first');
-			case AGGREGATE_LAST:
-				return _('last');
-		}
 	}
 
 	private function getConfig(): array {

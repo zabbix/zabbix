@@ -27,6 +27,7 @@ window.tophosts_column_edit_form = new class {
 
 	init({form_name, thresholds, thresholds_colors}) {
 		this._$widget_form = $(`form[name="${form_name}"]`);
+
 		this._$thresholds_table = this._$widget_form.find('#thresholds_table');
 
 		$('[name="data"], [name="aggregate_function"], [name="display"], [name="history"]', this._$widget_form)
@@ -68,15 +69,19 @@ window.tophosts_column_edit_form = new class {
 			})
 			.on('afterremove.dynamicRows', () => this._update());
 
-		this._$widget_form.on('process.form', (e, overlay) => {
-			this.handleFormSubmit(e, overlay);
-		});
+		this._$widget_form[0].addEventListener('change', (e) => e.target.value = e.target.value.trim(),
+			{capture: true}
+		);
 
 		// Initialize form elements accessibility.
 		this._update();
 
 		this._$widget_form[0].style.display = '';
 		this._$widget_form[0].querySelector('[name="name"]').focus();
+
+		this._$widget_form.on('process.form', (e, overlay) => {
+			this.handleFormSubmit(e, overlay);
+		});
 	}
 
 	_update() {
@@ -85,11 +90,10 @@ window.tophosts_column_edit_form = new class {
 			<?= CWidgetFieldColumnsList::HISTORY_DATA_TRENDS ?>);
 		const data_item_value = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_ITEM_VALUE ?>);
 		const data_text = ($('[name="data"]').val() == <?= CWidgetFieldColumnsList::DATA_TEXT ?>);
-		const no_aggregate_function = $('[name="aggregate_function"]').val() == <?= AGGREGATE_NONE ?>;
+		const aggregate_function = parseInt(document.getElementById('aggregate_function').value);
 
 		$('#item', this._$widget_form).multiSelect(data_item_value ? 'enable' : 'disable');
-		$('[name="aggregate_function"],[name="timeshift"]', this._$widget_form).attr('disabled', !data_item_value);
-		$('[name="aggregate_interval"]', this._$widget_form).attr('disabled', !data_item_value || no_aggregate_function);
+		$('[name="aggregate_function"]', this._$widget_form).attr('disabled', !data_item_value);
 		$('[name="display"],[name="history"]', this._$widget_form).attr('disabled', !data_item_value);
 		$('[name="text"]', this._$widget_form).attr('disabled', !data_text);
 		$('[name="min"],[name="max"]', this._$widget_form).attr('disabled', display_as_is || !data_item_value);
@@ -98,16 +102,23 @@ window.tophosts_column_edit_form = new class {
 
 		// Toggle warning icons for non-numeric items settings.
 		if (data_item_value) {
-			document.getElementById('tophosts-column-aggregate-function-warning').style.display = no_aggregate_function
-				? 'none'
-				: '';
+			const aggregate_warning_functions = [<?= AGGREGATE_AVG ?>, <?= AGGREGATE_MIN ?>, <?= AGGREGATE_MAX ?>,
+				<?= AGGREGATE_SUM ?>
+			];
+
+			document.getElementById('tophosts-column-aggregate-function-warning').style.display =
+					aggregate_warning_functions.includes(aggregate_function)
+				? ''
+				: 'none';
+
 			document.getElementById('tophosts-column-display-warning').style.display = display_as_is ? 'none' : '';
 			document.getElementById('tophosts-column-history-data-warning').style.display = history_data_trends
 				? ''
 				: 'none';
-			document.getElementById('tophosts-column-thresholds-warning').style.display =
-				this._$thresholds_table[0].rows.length > 2 ? '' : 'none';
 		}
+
+		this._$widget_form[0].fields.time_period.disabled = !data_item_value
+			|| aggregate_function == <?= AGGREGATE_NONE ?>;
 
 		// Toggle visibility of disabled form elements.
 		$('.form-grid > label', this._$widget_form).each((i, elm) => {
@@ -119,27 +130,9 @@ window.tophosts_column_edit_form = new class {
 		});
 	}
 
-	#trimFields(fields) {
-		fields.name = fields.name.trim();
-
-		for (const field of ['text', 'timeshift', 'aggregate_interval', 'min', 'max', 'decimal_places']) {
-			if (field in fields) {
-				fields[field] = fields[field].trim();
-			}
-		}
-
-		if ('thresholds' in fields) {
-			for (const threshold of Object.values(fields.thresholds)) {
-				threshold.threshold = threshold.threshold.trim();
-			}
-		}
-
-		return fields;
-	}
-
 	handleFormSubmit(e, overlay) {
 		const curl = new Curl(e.target.getAttribute('action'));
-		const fields = this.#trimFields(getFormFields(e.target));
+		const fields = getFormFields(e.target);
 
 		fetch(curl.getUrl(), {
 			method: 'POST',

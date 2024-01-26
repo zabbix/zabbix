@@ -953,9 +953,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -988,9 +988,9 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                       parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2])
-                  return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
       tags:
         - tag: class
           value: software
@@ -1614,9 +1614,9 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                       parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2])
-                  return JSON.stringify(rabbit_version < 30810 ? [{'{#SINGLETON}': ''}] : []);
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version < 30810 ? [{ '{#SINGLETON}': '' }] : []);
         - uuid: ab89d103c015400fbbeecaaf9bf01400
           name: 'Health Check 3.8.10+ discovery'
           type: DEPENDENT
@@ -1646,9 +1646,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1692,9 +1692,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1739,9 +1739,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1786,9 +1786,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1832,9 +1832,9 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      switch(value){ 
-                      case '200': return 1 
-                      case '503': return 0 
+                      switch(value){
+                      case '200': return 1
+                      case '503': return 0
                       default: 2}
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1867,9 +1867,9 @@ zabbix_export:
               parameters:
                 - |
                   var rabbit_version = parseInt(value.split('.')[0]) * 10000 +
-                                       parseInt(value.split('.')[1]) * 100 +
-                                       parseInt(value.split('.')[2])
-                  return JSON.stringify(rabbit_version >= 30810 ? [{'{#SINGLETON}': ''}] : []);
+                  	parseInt(value.split('.')[1]) * 100 +
+                  	parseInt(value.split('.')[2]);
+                  return JSON.stringify(rabbit_version >= 30810 ? [{ '{#SINGLETON}': '' }] : []);
         - uuid: cc1d85b6045b44b38f588cd9a4c6c62d
           name: 'Queues discovery'
           type: DEPENDENT

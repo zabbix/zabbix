@@ -581,6 +581,10 @@ func (t *mockWatcherTask) Timeout() int {
 	return 3
 }
 
+func (t *mockWatcherTask) Delay() string {
+	return ""
+}
+
 type mockConfigerTask struct {
 	taskBase
 	sink    chan performer
