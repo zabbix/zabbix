@@ -133,52 +133,50 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Check Close button.
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 
-		// Check main (generic) fields.
-		$this->assertTrue(in_array('Show header', $form->getLabels()->asText()));
+		// Check the generic widget fields.
+		$form->checkValue(['Show header' => true]);
 
-		foreach (['Type', 'Name', 'Refresh interval'] as $label) {
-			$this->assertTrue($form->getLabel($label)->isClickable());
-		}
+		$main_fields = ['Type' => 'Pie chart', 'Show header' => true, 'Name' => '', 'Refresh interval' => 'Default (1 minute)'];
+		$this->assertEquals(array_keys($main_fields), $form->getLabels(CElementFilter::CLICKABLE)->asText());
 
-		foreach(['Type', 'Name', 'Refresh interval', 'Show header'] as $field) {
+		foreach (array_keys($main_fields) as $field) {
 			$this->assertTrue($form->getField($field)->isEnabled());
 		}
 
-		$form->checkValue(['Show header' => true]);
+		$form->checkValue($main_fields);
 
 		// Check tabs.
 		$this->assertEquals(['Data set', 'Displaying options', 'Time period', 'Legend'], $form->getTabs());
 
 		// Check Item pattern.
-		$this->assertNonUniformLabel('Data set #1', $form);
+		$dataset_fields = ['Aggregation function', 'Data set aggregation', 'Data set label'];
+		$this->assertTrue(!array_diff(array_merge($dataset_fields, ['Data set #1']),
+			$form->query('tag:label')->all()->filter(CElementFilter::CLICKABLE)->asText())
+		);
 
-		foreach (['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
-			$this->assertTrue($form->getLabel($label)->isClickable());
-		}
-
-		$this->assertTrue($form->query('xpath:.//li[@data-set="0"]//button[@title="Delete"]')->one()->isClickable());
-
-		foreach(['id:ds_0_hosts_', 'id:ds_0_items_'] as $selector) {
-			$this->assertTrue($form->query($selector)->one()->isClickable());
-		}
-
-		foreach(['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
+		foreach ($dataset_fields as $label) {
 			$this->assertTrue($form->getField($label)->isClickable());
 		}
 
 		$this->validateDataSetHintboxes($form);
 
-		// Check Add data set buttons.
-		foreach (['id:dataset-add', 'id:dataset-menu'] as $selector) {
+		$buttons = [
+			'id:ds_0_hosts_', // host multiselect
+			'id:ds_0_items_', // item multiselect
+			'xpath:.//li[@data-set="0"]//button[@title="Delete"]', // first data set delete icon
+			'id:dataset-add', // button "Add new data set"
+			'id:dataset-menu' // context menu of button "Add new data set"
+		];
+
+		foreach ($buttons as $selector) {
 			$this->assertTrue($form->query($selector)->one()->isClickable());
 		}
 
 		// Check Item list.
-		$this->addNewDataSet(self::TYPE_ITEM_LIST, $form);
-		$this->page->waitUntilReady();
+		$this->addNewDataSet($form, self::TYPE_ITEM_LIST);
+		$data_set2 = $this->query('xpath://ul[@id="data_sets"]/li[@data-set="1"]')->waitUntilVisible()->one();
 		$form->invalidate();
-
-		$this->assertNonUniformLabel('Data set #2', $form);
+		$this->assertEquals('Data set #2', $data_set2->query('xpath:./label')->one()->getText());
 
 		foreach(['Aggregation function', 'Data set aggregation', 'Data set label'] as $label) {
 			$this->assertTrue($form->getField($label)->isClickable());
@@ -348,14 +346,14 @@ class testDashboardPieChartWidget extends CWebTest {
 								'item' => ['Item*', 'one', 'two'],
 								'color' => '00BCD4',
 								'Aggregation function' => 'min',
-								'Data set aggregation' => 'none',
+								'Data set aggregation' => 'not used',
 								'Data set label' => 'Label 1'
 							],
 							[
 								'type' => self::TYPE_ITEM_LIST,
 								'host' => self::HOST_NAME_ITEM_LIST,
 								'Aggregation function' => 'max',
-								'Data set aggregation' => 'none',
+								'Data set aggregation' => 'not used',
 								'Data set label' => 'Label 2',
 								'items' => [
 									[
@@ -1229,7 +1227,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			}
 			else if ($i !== 0 || $deleted_first_set) {
 				// Only add a new Data set if it is not the first one or the first one was deleted.
-				$this->addNewDataSet($type, $form);
+				$this->addNewDataSet($form, $type);
 			}
 
 			$form->invalidate();
@@ -1260,17 +1258,16 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Adds a new Data set of the correct type.
 	 *
-	 * @param string       $type    type of the data set
-	 * @param CFormElement $form    widget edit form element
+	 * @param CFormElement $form      widget edit form element
+	 * @param string       $type      type of the data set
+	 * @param boolean      $button    for "Item pattern" only: use "Add new data set" button if true, or select from context menu if false
 	 */
-	protected function addNewDataSet($type, $form) {
-		if ($type === self::TYPE_ITEM_PATTERN) {
+	protected function addNewDataSet($form, $type = null, $button = true) {
+		if (($type === self::TYPE_ITEM_PATTERN || $type === null) && $button) {
 			$form->query('button:Add new data set')->one()->click();
 		}
 		else {
-			$dropdown_button = $form->query('id:dataset-menu')->one();
-			$dropdown_button->click();
-			$dropdown_button->asPopupButton()->getMenu()->select(self::TYPE_ITEM_LIST);
+			$this->query('id:dataset-menu')->asPopupButton()->one()->select($type);
 		}
 	}
 
