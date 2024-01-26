@@ -186,7 +186,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Displaying options tab.
 		$form->selectTab('Displaying options');
-		$this->page->waitUntilReady();
+		$this->query('id:displaying_options')->one()->waitUntilVisible();
 		$form->invalidate();
 
 		$this->assertNonUniformLabel('Merge sectors smaller than ', $form);
@@ -198,7 +198,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$radios = ['History data selection' => ['Auto', 'History', 'Trends'], 'Draw' => ['Pie', 'Doughnut']];
 
 		foreach ($radios as $radio => $labels) {
-			$radio_element = $form->getField($radio)->asSegmentedRadio();
+			$radio_element = $form->getField($radio);
 			$radio_element->isEnabled();
 			$this->assertEquals($labels, $radio_element->getLabels()->asText());
 		}
@@ -219,7 +219,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		$form->fill(['Draw' => 'Doughnut']);
-		$this->page->waitUntilReady();
+		$this->query('id:show_total_fields')->one()->waitUntilVisible();
 		$form->invalidate();
 
 		foreach(['Size', 'Decimal places', 'Units', 'Bold', 'Colour'] as $label) {
@@ -244,10 +244,10 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Time period tab.
 		$form->selectTab('Time period');
-		$this->page->waitUntilReady();
+		$this->query('id:time_period')->one()->waitUntilVisible();
 		$form->invalidate();
 
-		$time_period = $form->getField('Time period')->asSegmentedRadio();
+		$time_period = $form->getField('Time period');
 		$this->assertTrue($time_period->isEnabled());
 		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $time_period->getLabels()->asText());
 
@@ -275,7 +275,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Legend tab.
 		$form->selectTab('Legend');
-		$this->page->waitUntilReady();
+		$this->query('id:legend_tab')->one()->waitUntilVisible();
 		$form->invalidate();
 
 		foreach (['Show legend', 'Show aggregation function', 'Number of rows', 'Number of columns'] as $label) {
@@ -878,7 +878,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidgets()->first();
-		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilReady()->all()->asArray();
+		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
 
 		// Assert Pie chart sectors by inspecting 'data-hintbox-contents' attribute.
 		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
@@ -1242,7 +1242,7 @@ class testDashboardPieChartWidget extends CWebTest {
 				unset($data_set['host']);
 
 				// Select Items.
-				$table = $dialog->query('class:list-table')->asTable()->waitUntilReady()->one();
+				$table = $dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
 				foreach ($data_set['items'] as $item) {
 					$table->findRow('Name', $item['name'])->select();
 				}
