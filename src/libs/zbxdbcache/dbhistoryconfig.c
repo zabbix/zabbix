@@ -94,7 +94,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 			dst_item->units = NULL;
 	}
 
-	dst_item->has_trigger = (NULL == src_item->triggers ? 0 : 1);
+	dst_item->has_trigger = (ZBX_DC_ITEM_UPDATE_TRIGGER_NONE == src_item->update_triggers ? 0 : 1);
 }
 
 /******************************************************************************
