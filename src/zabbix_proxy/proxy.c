@@ -1438,6 +1438,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,
 								get_config_forks, config_stats_allowed_ip,
+								config_java_gateway, config_java_gateway_port,
 								config_externalscripts};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
