@@ -263,21 +263,21 @@ class CUser extends CApiService {
 	 * @param array $users
 	 */
 	private static function createForce(array &$users): void {
-		$ins_users = [];
+		$userids = DB::insert('users', $users);
 
-		foreach ($users as $user) {
-			unset($user['usrgrps'], $user['medias']);
-			$ins_users[] = $user;
-		}
-		$userids = DB::insert('users', $ins_users);
-
-		foreach ($users as $index => &$user) {
-			$user['userid'] = $userids[$index];
+		foreach ($users as &$user) {
+			$user['userid'] = array_shift($userids);
 		}
 		unset($user);
 
 		self::updateGroups($users);
+		self::updateUgSets($users);
 		self::updateMedias($users);
+
+		foreach ($users as &$user) {
+			unset($user['role_type']);
+		}
+		unset($user);
 
 		if (array_key_exists('ts_provisioned', $users[0])) {
 			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_ADD,
@@ -356,12 +356,9 @@ class CUser extends CApiService {
 		$this->checkDuplicates(array_column($users, 'username'));
 		$this->checkLanguages(array_column($users, 'lang'));
 
-		$roleids = array_flip(array_column($users, 'roleid'));
-		unset($roleids[0]);
-
-		if ($roleids) {
-			$this->checkRoles(array_keys($roleids));
-		}
+		$db_roles = self::getDbRoles($users);
+		self::checkRoles($users, $db_roles);
+		self::addRoleType($users, $db_roles);
 
 		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, []);
@@ -455,7 +452,6 @@ class CUser extends CApiService {
 
 		$superadminids_to_update = [];
 		$usernames = [];
-		$check_roleids = [];
 		$readonly_fields = array_fill_keys(['username', 'passwd'], 1);
 
 		foreach ($users as $i => &$user) {
@@ -497,8 +493,6 @@ class CUser extends CApiService {
 				if ($db_user['roleid'] == $readonly_superadmin_role['roleid']) {
 					$superadminids_to_update[] = $user['userid'];
 				}
-
-				$check_roleids[] = $user['roleid'];
 			}
 
 			if ($db_user['username'] !== ZBX_GUEST_USER) {
@@ -549,16 +543,16 @@ class CUser extends CApiService {
 			}
 		}
 
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::checkRoles($users, $db_roles);
+		self::addRoleType($users, $db_roles, $db_users);
+
 		self::addAffectedObjects($users, $db_users);
 
 		if ($usernames) {
 			$this->checkDuplicates($usernames);
 		}
 		$this->checkLanguages(zbx_objectValues($users, 'lang'));
-
-		if ($check_roleids) {
-			$this->checkRoles($check_roleids);
-		}
 
 		$this->checkUserdirectories($users);
 		$this->checkUserGroups($users, $db_users);
@@ -571,7 +565,7 @@ class CUser extends CApiService {
 	 * @param array $users
 	 * @param array $db_users
 	 */
-	public static function updateForce(array $users, array $db_users): void {
+	private static function updateForce(array $users, array $db_users): void {
 		$upd_users = [];
 
 		foreach ($users as $user) {
@@ -591,7 +585,14 @@ class CUser extends CApiService {
 
 		self::terminateActiveSessionsOnPasswordUpdate($users);
 		self::updateGroups($users, $db_users);
+		self::updateUgSets($users, $db_users);
 		self::updateMedias($users, $db_users);
+
+		foreach ($users as &$user) {
+			unset($user['role_type']);
+			unset($db_users[$user['userid']]['role_type']);
+		}
+		unset($user);
 
 		if (array_key_exists('ts_provisioned', $users[0])) {
 			self::addAuditLogByUser(null, CWebUser::getIp(), CProvisioning::AUDITLOG_USERNAME, CAudit::ACTION_UPDATE,
@@ -603,49 +604,78 @@ class CUser extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array $users
-	 * @param array $db_users
-	 */
 	private static function addAffectedObjects(array $users, array &$db_users): void {
-		$userids = ['usrgrps' => [], 'medias' => []];
+		self::addAffectedUserGroups($users, $db_users);
+		self::addAffectedMedias($users, $db_users);
+	}
+
+	private static function addAffectedUserGroups(array $users, array &$db_users): void {
+		$userids = [];
 
 		foreach ($users as $user) {
-			if (array_key_exists('usrgrps', $user)) {
-				$userids['usrgrps'][] = $user['userid'];
+			if (array_key_exists('usrgrps', $user) || self::ugSetUpdateRequired($user, $db_users[$user['userid']])) {
+				$userids[] = $user['userid'];
 				$db_users[$user['userid']]['usrgrps'] = [];
 			}
+		}
 
+		if (!$userids) {
+			return;
+		}
+
+		$options = [
+			'output' => ['id', 'usrgrpid', 'userid'],
+			'filter' => ['userid' => $userids]
+		];
+		$db_usrgrps = DBselect(DB::makeSql('users_groups', $options));
+
+		while ($db_usrgrp = DBfetch($db_usrgrps)) {
+			$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] =
+				array_diff_key($db_usrgrp, array_flip(['userid']));
+		}
+	}
+
+	private static function ugSetUpdateRequired(array $user, array $db_user): bool {
+		if ($user['role_type'] == $db_user['role_type']) {
+			return false;
+		}
+
+		if ($user['role_type'] !== null && $user['role_type'] != USER_TYPE_SUPER_ADMIN
+				&& ($db_user['role_type'] === null || $db_user['role_type'] == USER_TYPE_SUPER_ADMIN)) {
+			return true;
+		}
+
+		if (($user['role_type'] === null || $user['role_type'] == USER_TYPE_SUPER_ADMIN)
+				&& $db_user['role_type'] !== null && $db_user['role_type'] != USER_TYPE_SUPER_ADMIN) {
+			return true;
+		}
+
+		return false;
+	}
+
+	private static function addAffectedMedias(array $users, array &$db_users): void {
+		$userids = [];
+
+		foreach ($users as $user) {
 			if (array_key_exists('medias', $user)) {
-				$userids['medias'][] = $user['userid'];
+				$userids[] = $user['userid'];
 				$db_users[$user['userid']]['medias'] = [];
 			}
 		}
 
-		if ($userids['usrgrps']) {
-			$options = [
-				'output' => ['id', 'usrgrpid', 'userid'],
-				'filter' => ['userid' => $userids['usrgrps']]
-			];
-			$db_usrgrps = DBselect(DB::makeSql('users_groups', $options));
-
-			while ($db_usrgrp = DBfetch($db_usrgrps)) {
-				$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] =
-					array_diff_key($db_usrgrp, array_flip(['userid']));
-			}
+		if (!$userids) {
+			return;
 		}
 
-		if ($userids['medias']) {
-			$options = [
-				'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
-				'filter' => ['userid' => $userids['medias']]
-			];
-			$db_medias = DBselect(DB::makeSql('media', $options));
+		$options = [
+			'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
+			'filter' => ['userid' => $userids]
+		];
+		$db_medias = DBselect(DB::makeSql('media', $options));
 
-			while ($db_media = DBfetch($db_medias)) {
-				$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] =
-					array_diff_key($db_media, array_flip(['userid']));
-			}
+		while ($db_media = DBfetch($db_medias)) {
+			$db_users[$db_media['userid']]['medias'][$db_media['mediaid']] =
+				array_diff_key($db_media, array_flip(['userid']));
 		}
 	}
 
@@ -779,24 +809,78 @@ class CUser extends CApiService {
 	}
 
 	/**
+	 * @param array      $users
+	 * @param array|null $db_users
+	 */
+	private static function getDbRoles(array $users, array $db_users = null): array {
+		$roleids = [];
+
+		foreach ($users as $user) {
+			if (array_key_exists('roleid', $user) && $user['roleid'] != 0) {
+				$roleids[$user['roleid']] = true;
+			}
+
+			if ($db_users !== null && $db_users[$user['userid']]['roleid'] != 0) {
+				$roleids[$db_users[$user['userid']]['roleid']] = true;
+			}
+		}
+
+		if (!$roleids) {
+			return [];
+		}
+
+		return DB::select('role', [
+			'output' => ['type'],
+			'roleids' => array_keys($roleids),
+			'preservekeys' => true
+		]);
+	}
+
+	/**
 	 * Check for valid user roles.
 	 *
-	 * @param array $roleids
+	 * @param array      $users
+	 * @param array      $db_roles
 	 *
 	 * @throws APIException
 	 */
-	private function checkRoles(array $roleids): void {
-		$db_roles = DB::select('role', [
-			'output' => ['roleid'],
-			'roleids' => $roleids,
-			'preservekeys' => true
-		]);
-
-		foreach ($roleids as $roleid) {
-			if (!array_key_exists($roleid, $db_roles)) {
-				self::exception(ZBX_API_ERROR_PARAMETERS, _s('User role with ID "%1$s" is not available.', $roleid));
+	private static function checkRoles(array $users, array $db_roles): void {
+		foreach ($users as $i => $user) {
+			if (array_key_exists('roleid', $user) && $user['roleid'] != 0
+					&& !array_key_exists($user['roleid'], $db_roles)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/'.($i + 1),
+					_('object does not exist')
+				));
 			}
 		}
+	}
+
+	/**
+	 * @param array      $users
+	 * @param array      $db_roles
+	 * @param array|null $db_users
+	 */
+	private static function addRoleType(array &$users, array $db_roles, array &$db_users = null): void {
+		foreach ($users as &$user) {
+			$user['role_type'] = null;
+
+			if ($db_users !== null) {
+				$db_users[$user['userid']]['role_type'] = null;
+			}
+
+			if (array_key_exists('roleid', $user) && $user['roleid'] != 0) {
+				$user['role_type'] = $db_roles[$user['roleid']]['type'];
+			}
+
+			if ($db_users !== null && $db_users[$user['userid']]['roleid'] != 0) {
+				if (!array_key_exists('roleid', $user)) {
+					$user['role_type'] = $db_roles[$db_users[$user['userid']]['roleid']]['type'];
+				}
+
+				$db_users[$user['userid']]['role_type'] = $db_roles[$db_users[$user['userid']]['roleid']]['type'];
+			}
+		}
+		unset($user);
 	}
 
 	/**
@@ -1106,6 +1190,369 @@ class CUser extends CApiService {
 		unset($user);
 	}
 
+	private static function updateUgSets(array $users, array $db_users = null): void {
+		$ugsets = [];
+
+		foreach ($users as &$user) {
+			$usrgrpids = null;
+
+			if ($user['role_type'] !== null && $user['role_type'] != USER_TYPE_SUPER_ADMIN) {
+				if ($db_users === null) {
+					if (array_key_exists('usrgrps', $user) && $user['usrgrps']) {
+						$usrgrpids = array_column($user['usrgrps'], 'usrgrpid');
+					}
+				}
+				elseif ($db_users[$user['userid']]['role_type'] !== null
+						&& $db_users[$user['userid']]['role_type'] != USER_TYPE_SUPER_ADMIN) {
+					if (array_key_exists('usrgrps', $user)) {
+						$_usrgrpids = array_column($user['usrgrps'], 'usrgrpid');
+						$_db_usrgrpids = array_column($db_users[$user['userid']]['usrgrps'], 'usrgrpid');
+
+						if (array_diff($_usrgrpids, $_db_usrgrpids) || array_diff($_db_usrgrpids, $_usrgrpids)) {
+							$usrgrpids = $_usrgrpids;
+						}
+					}
+				}
+				else {
+					$_usrgrpids = array_key_exists('usrgrps', $user)
+						? array_column($user['usrgrps'], 'usrgrpid')
+						: array_column($db_users[$user['userid']]['usrgrps'], 'usrgrpid');
+
+					if ($_usrgrpids) {
+						$usrgrpids = $_usrgrpids;
+					}
+				}
+			}
+			elseif ($db_users !== null
+					&& $db_users[$user['userid']]['role_type'] !== null
+					&& $db_users[$user['userid']]['role_type'] != USER_TYPE_SUPER_ADMIN) {
+				$usrgrpids = [];
+			}
+
+			if ($usrgrpids !== null) {
+				$ugset_hash = self::getUgSetHash($usrgrpids);
+
+				$ugsets[$ugset_hash]['hash'] = $ugset_hash;
+				$ugsets[$ugset_hash]['usrgrpids'] = $usrgrpids;
+				$ugsets[$ugset_hash]['userids'][] = $user['userid'];
+			}
+		}
+		unset($user);
+
+		if ($ugsets) {
+			if ($db_users === null) {
+				self::createUserUgSets($ugsets);
+			}
+			else {
+				self::updateUserUgSets($ugsets);
+			}
+		}
+	}
+
+	private static function getUgSetHash(array $usrgrpids): string {
+		usort($usrgrpids, 'bccomp');
+
+		return hash('sha256', implode('|', $usrgrpids));
+	}
+
+	private static function createUserUgSets(array $ugsets): void {
+		$ins_user_ugsets = [];
+
+		$options = [
+			'output' => ['ugsetid', 'hash'],
+			'filter' => ['hash' => array_keys($ugsets)]
+		];
+		$result = DBselect(DB::makeSql('ugset', $options));
+
+		while ($row = DBfetch($result)) {
+			foreach ($ugsets[$row['hash']]['userids'] as $userid) {
+				$ins_user_ugsets[] = [
+					'userid' => $userid,
+					'ugsetid' => $row['ugsetid']
+				];
+			}
+
+			unset($ugsets[$row['hash']]);
+		}
+
+		if ($ugsets) {
+			self::createUgSets($ugsets);
+
+			foreach ($ugsets as $ugset) {
+				foreach ($ugset['userids'] as $userid) {
+					$ins_user_ugsets[] = [
+						'userid' => $userid,
+						'ugsetid' => $ugset['ugsetid']
+					];
+				}
+			}
+		}
+
+		DB::insert('user_ugset', $ins_user_ugsets, false);
+	}
+
+	private static function updateUserUgSets(array $ugsets): void {
+		$ins_user_ugsets = [];
+		$upd_user_ugsets = [];
+
+		$db_user_ugsetids = self::getDbUserUgSetIds($ugsets);
+		$db_ugsetids = array_flip($db_user_ugsetids);
+
+		$empty_ugset_hash = self::getUgSetHash([]);
+
+		if (array_key_exists($empty_ugset_hash, $ugsets)) {
+			DB::delete('user_ugset', ['userid' => $ugsets[$empty_ugset_hash]['userids']]);
+			unset($ugsets[$empty_ugset_hash]);
+		}
+
+		if ($ugsets) {
+			$options = [
+				'output' => ['ugsetid', 'hash'],
+				'filter' => ['hash' => array_keys($ugsets)]
+			];
+			$result = DBselect(DB::makeSql('ugset', $options));
+
+			while ($row = DBfetch($result)) {
+				$upd_userids = [];
+
+				foreach ($ugsets[$row['hash']]['userids'] as $userid) {
+					if (array_key_exists($userid, $db_user_ugsetids)) {
+						$upd_userids[] = $userid;
+						unset($db_user_ugsetids[$userid]);
+					}
+					else {
+						$ins_user_ugsets[] = [
+							'userid' => $userid,
+							'ugsetid' => $row['ugsetid']
+						];
+					}
+				}
+
+				if ($upd_userids) {
+					$upd_user_ugsets[] = [
+						'values' => ['ugsetid' => $row['ugsetid']],
+						'where' => ['userid' => $upd_userids]
+					];
+
+					if (array_key_exists($row['ugsetid'], $db_ugsetids)) {
+						unset($db_ugsetids[$row['ugsetid']]);
+					}
+				}
+
+				unset($ugsets[$row['hash']]);
+			}
+
+			if ($ugsets) {
+				self::createUgSets($ugsets);
+
+				foreach ($ugsets as $ugset) {
+					$upd_userids = [];
+
+					foreach ($ugset['userids'] as $userid) {
+						if (array_key_exists($userid, $db_user_ugsetids)) {
+							$upd_userids[] = $userid;
+							unset($db_user_ugsetids[$userid]);
+						}
+						else {
+							$ins_user_ugsets[] = [
+								'userid' => $userid,
+								'ugsetid' => $ugset['ugsetid']
+							];
+						}
+					}
+
+					if ($upd_userids) {
+						$upd_user_ugsets[] = [
+							'values' => ['ugsetid' => $ugset['ugsetid']],
+							'where' => ['userid' => $upd_userids]
+						];
+					}
+				}
+			}
+
+			if ($upd_user_ugsets) {
+				DB::update('user_ugset', $upd_user_ugsets);
+			}
+
+			if ($ins_user_ugsets) {
+				DB::insert('user_ugset', $ins_user_ugsets, false);
+			}
+		}
+
+		if ($db_ugsetids) {
+			self::deleteUnusedUgSets(array_keys($db_ugsetids));
+		}
+	}
+
+	private static function getDbUserUgSetIds(array $ugsets): array {
+		$userids = [];
+
+		foreach ($ugsets as $ugset) {
+			$userids = array_merge($userids, $ugset['userids']);
+		}
+
+		$options = [
+			'output' => ['userid', 'ugsetid'],
+			'userids' => $userids
+		];
+		$result = DBselect(DB::makeSql('user_ugset', $options));
+
+		$db_user_ugsetids = [];
+
+		while ($row = DBfetch($result)) {
+			$db_user_ugsetids[$row['userid']] = $row['ugsetid'];
+		}
+
+		return $db_user_ugsetids;
+	}
+
+	private static function createUgSets(array &$ugsets): void {
+		$ugsetids = DB::insert('ugset', $ugsets);
+
+		foreach ($ugsets as &$ugset) {
+			$ugset['ugsetid'] = array_shift($ugsetids);
+		}
+		unset($ugset);
+
+		self::createUgSetGroups($ugsets);
+
+		self::addUgSetPermissions($ugsets);
+		self::createPermissions($ugsets);
+	}
+
+	private static function createUgSetGroups(array $ugsets): void {
+		$ins_ugset_groups = [];
+
+		foreach ($ugsets as $ugset) {
+			foreach ($ugset['usrgrpids'] as $usrgrpid) {
+				$ins_ugset_groups[] = ['ugsetid' => $ugset['ugsetid'], 'usrgrpid' => $usrgrpid];
+			}
+		}
+
+		DB::insert('ugset_group', $ins_ugset_groups, false);
+	}
+
+	private static function addUgSetPermissions(array &$ugsets): void {
+		$ugset_indexes = [];
+
+		foreach ($ugsets as $i => &$ugset) {
+			$ugset['permissions'] = [];
+
+			foreach ($ugset['usrgrpids'] as $usrgrpid) {
+				$ugset_indexes[$usrgrpid][] = $i;
+			}
+		}
+		unset($ugset);
+
+		if (!$ugset_indexes) {
+			return;
+		}
+
+		$options = [
+			'output' => ['groupid', 'id', 'permission'],
+			'filter' => ['groupid' => array_keys($ugset_indexes)]
+		];
+		$result = DBselect(DB::makeSql('rights', $options));
+
+		while ($row = DBfetch($result)) {
+			foreach ($ugset_indexes[$row['groupid']] as $i) {
+				if (!array_key_exists($row['id'], $ugsets[$i]['permissions'])
+						|| ($ugsets[$i]['permissions'][$row['id']] != PERM_DENY
+							&& ($row['permission'] == PERM_DENY
+								|| $row['permission'] > $ugsets[$i]['permissions'][$row['id']]))) {
+					$ugsets[$i]['permissions'][$row['id']] = $row['permission'];
+				}
+			}
+		}
+	}
+
+	/**
+	 * @param array $ugsets
+	 */
+	private static function createPermissions(array $ugsets): void {
+		$ins_permissions = [];
+
+		$hgset_groupids = self::getHgSetGroupIds($ugsets);
+
+		foreach ($ugsets as $ugset) {
+			foreach ($hgset_groupids as $hgsetid => $groupids) {
+				if (!array_intersect(array_keys($ugset['permissions']), $groupids)) {
+					continue;
+				}
+
+				$max_permission = null;
+
+				foreach ($ugset['permissions'] as $groupid => $permission) {
+					if (!in_array($groupid, $groupids)) {
+						continue;
+					}
+
+					if ($max_permission === null
+							|| ($max_permission != PERM_DENY
+								&& ($permission == PERM_DENY || $permission > $max_permission))) {
+						$max_permission = $permission;
+					}
+				}
+
+				if ($max_permission != PERM_DENY) {
+					$ins_permissions[] = [
+						'ugsetid' => $ugset['ugsetid'],
+						'hgsetid' => $hgsetid,
+						'permission' => $max_permission
+					];
+				}
+			}
+		}
+
+		if ($ins_permissions) {
+			DB::insert('permission', $ins_permissions, false);
+		}
+	}
+
+	private static function getHgSetGroupIds(array $ugsets): array {
+		$groupids = [];
+
+		foreach ($ugsets as $ugset) {
+			foreach ($ugset['permissions'] as $groupid => $permission) {
+				$groupids[$groupid] = true;
+			}
+		}
+
+		$result = DBselect(
+			'SELECT hgg.hgsetid,hgg.groupid'.
+			' FROM hgset_group hgg'.
+			' WHERE hgg.hgsetid IN('.
+				'SELECT DISTINCT t1.hgsetid'.
+				' FROM hgset_group t1'.
+				' WHERE '.dbConditionId('t1.groupid', array_keys($groupids)).
+			')'
+		);
+
+		$hgset_groupids = [];
+
+		while ($row = DBfetch($result)) {
+			$hgset_groupids[$row['hgsetid']][] = $row['groupid'];
+		}
+
+		return $hgset_groupids;
+	}
+
+	private static function deleteUnusedUgSets(array $db_ugsetids): void {
+		$del_ugsetids = DBfetchColumn(DBselect(
+			'SELECT u.ugsetid'.
+			' FROM ugset u'.
+			' LEFT JOIN user_ugset uu ON u.ugsetid=uu.ugsetid'.
+			' WHERE '.dbConditionId('u.ugsetid', $db_ugsetids).
+				' AND uu.userid IS NULL'
+		), 'ugsetid');
+
+		if ($del_ugsetids) {
+			DB::delete('permission', ['ugsetid' => $del_ugsetids]);
+			DB::delete('ugset_group', ['ugsetid' => $del_ugsetids]);
+			DB::delete('ugset', ['ugsetid' => $del_ugsetids]);
+		}
+	}
+
 	/**
 	 * Auxiliary function for updateMedias().
 	 *
@@ -1204,22 +1651,13 @@ class CUser extends CApiService {
 	 */
 	public function delete(array $userids) {
 		$this->validateDelete($userids, $db_users);
-		self::deleteForce($userids);
-		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
 
-		return ['userids' => $userids];
-	}
-
-	/**
-	 * Delete data from users table, also delete related rows from tables:
-	 * media, profiles, users_groups, tokens, event_suppress.
-	 *
-	 * @param array $userids  Array of userid.
-	 */
-	public static function deleteForce(array $userids): void {
 		DB::delete('media', ['userid' => $userids]);
 		DB::delete('profiles', ['userid' => $userids]);
+
+		self::deleteUgSets($db_users);
 		DB::delete('users_groups', ['userid' => $userids]);
+
 		DB::update('token', [
 			'values' => ['creator_userid' => null],
 			'where' => ['creator_userid' => $userids]
@@ -1237,6 +1675,28 @@ class CUser extends CApiService {
 		CToken::deleteForce(array_keys($tokenids), false);
 
 		DB::delete('users', ['userid' => $userids]);
+
+		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_USER, $db_users);
+
+		return ['userids' => $userids];
+	}
+
+	private static function deleteUgSets(array $db_users): void {
+		$ugsets = [];
+		$ugset_hash = self::getUgSetHash([]);
+
+		foreach ($db_users as $db_user) {
+			if ($db_user['role'] && $db_user['role']['type'] != USER_TYPE_SUPER_ADMIN
+					&& $db_user['usrgrps']) {
+				$ugsets[$ugset_hash]['hash'] = $ugset_hash;
+				$ugsets[$ugset_hash]['usrgrpids'] = [];
+				$ugsets[$ugset_hash]['userids'][] = $db_user['userid'];
+			}
+		}
+
+		if ($ugsets) {
+			self::updateUserUgSets($ugsets);
+		}
 	}
 
 	/**
@@ -1253,6 +1713,8 @@ class CUser extends CApiService {
 
 		$db_users = $this->get([
 			'output' => ['userid', 'username', 'roleid'],
+			'selectRole' => ['type'],
+			'selectUsrgrps' => ['usrgrpid'],
 			'userids' => $userids,
 			'editable' => true,
 			'preservekeys' => true
@@ -1410,6 +1872,43 @@ class CUser extends CApiService {
 		}
 	}
 
+	public static function updateFromUserGroup(array $users, array $del_user_usrgrpids): void {
+		$db_users = DB::select('users', [
+			'output' => ['userid', 'username', 'roleid'],
+			'userids' => array_keys($users),
+			'preservekeys' => true
+		]);
+
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
+
+		self::addAffectedUserGroups($users, $db_users);
+		self::addUnchangedUserGroups($users, $db_users, $del_user_usrgrpids);
+
+		self::updateForce(array_values($users), $db_users);
+	}
+
+	private static function addUnchangedUserGroups(array &$users, array $db_users, array $del_user_usrgrpids): void {
+		foreach ($users as &$user) {
+			$usrgrpids = array_column($user['usrgrps'], 'usrgrpid');
+
+			foreach ($db_users[$user['userid']]['usrgrps'] as $db_group) {
+				if (!in_array($db_group['usrgrpid'], $usrgrpids)
+						&& (!array_key_exists($user['userid'], $del_user_usrgrpids)
+							|| !in_array($db_group['usrgrpid'], $del_user_usrgrpids[$user['userid']]))) {
+					$user['usrgrps'][] = ['usrgrpid' => $db_group['usrgrpid']];
+				}
+			}
+		}
+		unset($user);
+	}
+
+	public static function updateFromRole(array $users, array $db_users): void {
+		self::addAffectedUserGroups($users, $db_users);
+
+		self::updateForce($users, $db_users);
+	}
+
 	public function logout($user) {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => []];
 		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
@@ -1505,6 +2004,7 @@ class CUser extends CApiService {
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
+		unset($db_user['ugsetid']);
 
 		if ($db_user['attempt_failed'] != 0) {
 			self::resetFailedLoginAttempts($db_user);
@@ -1535,6 +2035,7 @@ class CUser extends CApiService {
 		self::addAdditionalFields($db_user);
 		self::setTimezone($db_user['timezone']);
 		self::createSession($db_user);
+		unset($db_user['ugsetid']);
 
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
@@ -1898,6 +2399,7 @@ class CUser extends CApiService {
 
 	private static function addAdditionalFields(array &$db_user): void {
 		$db_user['type'] = self::getUserType($db_user['roleid']);
+		$db_user['ugsetid'] = self::getUgSetId($db_user);
 		$db_user['userip'] = CWebUser::getIp();
 
 		if ($db_user['lang'] === LANG_DEFAULT) {
@@ -2047,6 +2549,7 @@ class CUser extends CApiService {
 			}
 
 			self::$userData = $db_user + ['sessionid' => $session['sessionid']];
+
 			$db_user['sessionid'] = $session['sessionid'];
 			$db_user['secret'] = $db_session['secret'];
 		}
@@ -2061,7 +2564,10 @@ class CUser extends CApiService {
 			]);
 
 			self::$userData = $db_user + ['token' => $session['token']];
+
 		}
+
+		unset($db_user['ugsetid']);
 
 		return $db_user;
 	}
@@ -2260,9 +2766,22 @@ class CUser extends CApiService {
 		unset($attrs['passwd']);
 		$user = array_intersect_key($idp_user_data, $attrs);
 		$user['medias'] = $this->sanitizeUserMedia($user['medias']);
+
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
+			'surname' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$users = [$user];
 
-		$this->validateCreate($users);
+		$db_roles = self::getDbRoles($users);
+		self::addRoleType($users, $db_roles);
+
 		$users[0]['ts_provisioned'] = time();
 		self::createForce($users);
 
@@ -2286,6 +2805,16 @@ class CUser extends CApiService {
 		));
 		$user = array_intersect_key($idp_user_data, $attrs);
 
+		$api_input_rules = ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
+			'username' =>	['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('users', 'username')],
+			'name' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'name')],
+			'surname' =>	['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('users', 'surname')]
+		]];
+
+		if (!CApiInputValidator::validate($api_input_rules, $user, '/', $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
+
 		$userid = $user['userid'];
 		$db_users = DB::select('users', [
 			'output' => ['userid', 'username', 'name', 'surname', 'roleid', 'userdirectoryid', 'ts_provisioned'],
@@ -2295,6 +2824,9 @@ class CUser extends CApiService {
 		$user['ts_provisioned'] = time();
 		$users = [$userid => $user];
 		$user += ['username' => $db_users[$userid]['username']];
+
+		$db_roles = self::getDbRoles($users, $db_users);
+		self::addRoleType($users, $db_roles, $db_users);
 
 		if (array_key_exists('medias', $user)) {
 			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
@@ -2337,6 +2869,22 @@ class CUser extends CApiService {
 		}
 
 		return DBfetchColumn(DBselect('SELECT type FROM role WHERE roleid='.zbx_dbstr($roleid)), 'type')[0];
+	}
+
+	private static function getUgSetId(array $db_user): ?string {
+		if ($db_user['roleid'] != 0 && $db_user['type'] != USER_TYPE_SUPER_ADMIN) {
+			$options = [
+				'output' => ['ugsetid'],
+				'userids' => $db_user['userid']
+			];
+			$row = DBfetch(DBselect(DB::makeSql('user_ugset', $options)));
+
+			if ($row) {
+				return $row['ugsetid'];
+			}
+		}
+
+		return 0;
 	}
 
 	protected function addRelatedObjects(array $options, array $result) {

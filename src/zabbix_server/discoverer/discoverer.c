@@ -958,6 +958,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			memset(&dhost, 0, sizeof(zbx_db_dhost));
 
+			zbx_db_begin();
+
 			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
 					result->now, result->unique_dcheckid, &result->services,
 					events_cbs->add_event_cb);
@@ -970,6 +972,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			if (NULL != events_cbs->clean_events_cb)
 				events_cbs->clean_events_cb();
+
+			zbx_db_commit();
 		}
 
 		zbx_discovery_close(handle);

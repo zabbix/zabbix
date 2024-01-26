@@ -58,6 +58,9 @@ class CAPITest extends CTest {
 			elseif (is_numeric($error)) {
 				$this->assertSame($error, $response['error']['code']);
 			}
+			elseif (is_callable($error)) {
+				$this->assertSame($error(), $response['error']['data']);
+			}
 		}
 	}
 

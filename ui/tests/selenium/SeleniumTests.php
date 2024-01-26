@@ -253,6 +253,14 @@ require_once dirname(__FILE__) . '/timeouts/testTimeoutsTemplates.php';
 require_once dirname(__FILE__).'/triggerDependencies/testHostTriggerDependencies.php';
 require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependencies.php';
 
+// Triggers.
+require_once dirname(__FILE__).'/triggers/testFormTrigger.php';
+require_once dirname(__FILE__).'/triggers/testFormTriggerPrototype.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggerDescription.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypes.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggers.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggerUrl.php';
+
 // Users.
 require_once dirname(__FILE__).'/users/testFormUser.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
@@ -276,9 +284,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
-require_once dirname(__FILE__).'/testPageTriggers.php';
-require_once dirname(__FILE__).'/testPageTriggerUrl.php';
-require_once dirname(__FILE__).'/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/testPageMaps.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItems.php';
 require_once dirname(__FILE__).'/testPageMassUpdateItemPrototypes.php';
@@ -289,7 +294,6 @@ require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
 */
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
-require_once dirname(__FILE__).'/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
@@ -310,8 +314,6 @@ require_once dirname(__FILE__).'/testFormMap.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormSysmap.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
-require_once dirname(__FILE__).'/testFormTrigger.php';
-require_once dirname(__FILE__).'/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/testFormValueMappingsHost.php';
 require_once dirname(__FILE__).'/testFormValueMappingsTemplate.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
@@ -557,6 +559,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testHostTriggerDependencies');
 		$suite->addTestSuite('testTemplateTriggerDependencies');
 
+		// Triggers.
+		$suite->addTestSuite('testFormTrigger');
+		$suite->addTestSuite('testFormTriggerPrototype');
+		$suite->addTestSuite('testPageTriggerDescription');
+		$suite->addTestSuite('testPageTriggerPrototypes');
+		$suite->addTestSuite('testPageTriggers');
+		$suite->addTestSuite('testPageTriggerUrl');
+
 		// Users.
 		$suite->addTestSuite('testFormUser');
 		$suite->addTestSuite('testFormUserMedia');
@@ -580,10 +590,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
-		$suite->addTestSuite('testPageTriggers');
-		$suite->addTestSuite('testPageTriggerDescription');
-		$suite->addTestSuite('testPageTriggerUrl');
-		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageMaintenance');
 		$suite->addTestSuite('testPageMaps');
 		$suite->addTestSuite('testPageMassUpdateItems');
@@ -616,8 +622,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testFormTabIndicators');
-		$suite->addTestSuite('testFormTrigger');
-		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testFormValueMappingsHost');
 		$suite->addTestSuite('testFormValueMappingsTemplate');
 		$suite->addTestSuite('testPageBrowserWarning');
