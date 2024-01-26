@@ -2820,7 +2820,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			item->triggers = NULL;
 
-			if (ZBX_DBSYNC_INIT == sync->mode)
+			if (NULL == new_items)
 				item->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
 			else
 				item->update_triggers = ZBX_ITEM_UPDATE_TRIGGER_NEW_ITEM;
@@ -6323,7 +6323,10 @@ void	DCsync_configuration(unsigned char mode)
 	FINISH_SYNC;
 
 	if (NULL != pnew_items)
+	{
 		dc_add_new_items_to_valuecache(pnew_items);
+		zbx_vector_dc_item_ptr_clear(pnew_items);
+	}
 
 	/* sync rest of the data */
 
@@ -6812,7 +6815,14 @@ out:
 		zbx_hashset_destroy(&trend_queue);
 
 	if (NULL != pnew_items)
+	{
+		/* Reset update trigger flags for items that could be left because of database errors. */
+		/* Can be done without locking as no other processes can remove items.                 */
+		for (i = 0; i < pnew_items->values_num; i++)
+			pnew_items->values[i]->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
+
 		zbx_vector_dc_item_ptr_destroy(pnew_items);
+	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();
