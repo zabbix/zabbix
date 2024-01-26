@@ -17,9 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
-
 #include "zbxdbhigh.h"
+#include "zbxcommon.h"
 
 ZBX_PTR_VECTOR_IMPL(db_tag_ptr, zbx_db_tag_t *)
 
