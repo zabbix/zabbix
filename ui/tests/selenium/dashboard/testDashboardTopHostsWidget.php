@@ -52,7 +52,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * Widget name for update.
 	 */
 	protected static $updated_name = 'Top hosts update';
-	protected static $itemids;
+	protected static $aggregation_itemids;
+	protected static $top_hosts_itemids;
 	protected static $dashboard_update;
 	protected static $dashboard_create;
 	protected static $dashboard_delete;
@@ -107,7 +108,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 		self::$dashboard_zoom = CDataHelper::get('ItemValueWidget.dashboard_zoom');
 		self::$dashboard_threshold = CDataHelper::get('ItemValueWidget.dashboard_threshold');
 		self::$dashboard_aggregation = CDataHelper::get('ItemValueWidget.dashboard_aggregation');
-		self::$itemids = CDataHelper::get('TopHostsWidget.itemids');
+		self::$aggregation_itemids = CDataHelper::get('ItemValueWidget.itemids');
+		self::$top_hosts_itemids = CDataHelper::get('TopHostsWidget.itemids');
+
+		// Add value to items for CheckTextItems test.
+		CDataHelper::addItemData(99086, 1000); // 1_item.
+		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_text'], 'Text for text item');
+		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_log'], 'Logs for text item');
+		CDataHelper::addItemData(self::$top_hosts_itemids['top_hosts_trap_char'], 'characters_here');
 	}
 
 	public function testDashboardTopHostsWidget_Layout() {

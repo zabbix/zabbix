@@ -262,7 +262,7 @@ class ItemValueWidget {
 				]
 			],
 			[
-				'name' => 'Item value widget: Dashboard for zoom filter check',
+				'name' => 'Dashboard for zoom filter check',
 				'pages' => [
 					[
 						'name' => 'Page with widgets'
@@ -270,7 +270,7 @@ class ItemValueWidget {
 				]
 			],
 			[
-				'name' => 'Item value widget: Dashboard for threshold(s) check',
+				'name' => 'Dashboard for threshold(s) check',
 				'pages' => [
 					[
 						'name' => 'Page with widgets'

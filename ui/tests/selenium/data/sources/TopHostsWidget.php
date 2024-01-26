@@ -54,12 +54,6 @@ class TopHostsWidget {
 		]);
 		$itemids = CDataHelper::getIds('name');
 
-		// Add value to item displayed in Top Hosts widget.
-		CDataHelper::addItemData(99086, 1000); // 1_item.
-		CDataHelper::addItemData($itemids['top_hosts_trap_text'], 'Text for text item');
-		CDataHelper::addItemData($itemids['top_hosts_trap_log'], 'Logs for text item');
-		CDataHelper::addItemData($itemids['top_hosts_trap_char'], 'characters_here');
-
 		// Create dashboards for Top host widget testing.
 		$response = CDataHelper::call('dashboard.create', [
 			[
