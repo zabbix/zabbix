@@ -201,6 +201,8 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 
 	for (sptr = (NULL != string ? string : buffer); '\0' != *sptr; sptr++)
 	{
+		const size_t	cur_len = len;
+
 		switch (*sptr)
 		{
 			case '"':  /* quotation mark */
@@ -212,36 +214,20 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 			case '\n': /* newline */
 			case '\r': /* carriage return */
 			case '\t': /* horizontal tab */
-				if (NULL == str_cutoff && (0 != max_size && 2 + len > max_size))
-				{
-					str_cutoff = sptr + 1;
-					len_cutoff = len;
-				}
-
 				len += 2;
 				break;
 			default:
 				/* RFC 8259 requires escaping control characters U+0000 - U+001F */
 				if (0x1f >= (unsigned char)*sptr)
-				{
-					if (NULL == str_cutoff && (0 != max_size && 6 + len > max_size))
-					{
-						str_cutoff = sptr + 1;
-						len_cutoff = len;
-					}
-
 					len += 6;
-				}
 				else
-				{
-					if (NULL == str_cutoff && (0 != max_size && 1 + len > max_size))
-					{
-						str_cutoff = sptr + 1;
-						len_cutoff = len;
-					}
-
 					len++;
-				}
+		}
+
+		if (NULL == str_cutoff && (0 != max_size && len > max_size))
+		{
+			str_cutoff = sptr + 1;
+			len_cutoff = cur_len;
 		}
 	}
 
@@ -250,7 +236,7 @@ static size_t	__zbx_json_stringsize_limit(const char *string, zbx_json_type_t ty
 
 	if (NULL != string && ZBX_JSON_TYPE_STRING == type)
 	{
-		len += 2;
+		len += 2;	/* "" */
 
 		if (NULL != str_cutoff)
 			len_cutoff += 2;
