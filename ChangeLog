@@ -1,6 +1,9 @@
 Changes for 7.0.0beta1
 
 New features:
+..F....... [ZBXNEXT-8925] set minimal supported PHP version to 8.0 (esekace)
+A.F.....S. [ZBXNEXT-8837] made it possible to turn-off audit logging specifically for LLD, network discovery and autoregistration (arimdjonoks, jfreibergs)
+A...I...S. [ZBXNEXT-5878,ZBXNEXT-8532] improved performance of permission checks for hosts, templates and API objects related to them; added strict validation for host group and template parameters of host API methods (asestakovs, vmaksimovs)
 .......PS. [ZBXNEXT-8823] implemented detection of SNMP engineId duplicates (dgoloscapov)
 .......PS. [ZBXNEXT-8891] updated max supported MySQL version to 8.2 (mprihodko)
 .........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
@@ -11,6 +14,11 @@ New features:
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
+..F.....S. [ZBX-20765] fixed empty PDF files in scheduled reports (averza, mprihodko)
+.......PS. [ZBX-21192] improved SNMP traps to resume processing from last record and timestamp when HA node is switched (vso)
+........S. [ZBX-23814] fixed {TRIGGER.VALUE} macro not working anymore (akozlovs, vso)
+...G...PS. [ZBX-23904] fixed build flags when using custom OpenSSL library (askolmeisters)
+..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
 .......PS. [ZBX-23967] fixed possible invalid free in walk2json (dgoloscapov)
 ........S. [ZBX-22371] fixed process tags option not adding tags for service events (vso)
 ...G...... [ZBX-17208] fix Zabbix agent 2 invalid command line flag handling (rzvejs)
