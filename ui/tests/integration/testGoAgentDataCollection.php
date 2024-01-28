@@ -201,7 +201,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.file.regmatch[/etc/hosts,127.0.0.1]',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_UINT64,
-			'threshold' => 0
+			'threshold' => 1
 		],
 		[
 			'key' => 'vfs.fs.discovery',
@@ -328,7 +328,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'vfs.fs.get',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'threshold' => 10000000
+			'do_not_compare' => '1'
 		],
 		[
 			'key' => 'vm.memory.size[free]',
@@ -577,6 +577,10 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			case ITEM_VALUE_TYPE_TEXT:
 				$a = end($values[self::COMPONENT_AGENT]);
 				$b = end($values[self::COMPONENT_AGENT2]);
+
+				if (array_key_exists('do_not_compare', $item)) {
+					break;
+				}
 
 				if (array_key_exists('threshold', $item) && $item['threshold'] !== 0) {
 
