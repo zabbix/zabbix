@@ -200,7 +200,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		[
 			'key' => 'vfs.file.regmatch[/etc/hosts,127.0.0.1]',
 			'type' => ITEM_TYPE_ZABBIX,
-			'valueType' => ITEM_VALUE_TYPE_UINT64
+			'valueType' => ITEM_VALUE_TYPE_UINT64,
+			'threshold' => 0
 		],
 		[
 			'key' => 'vfs.fs.discovery',
@@ -252,7 +253,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'threshold' => 10000
 		],
 		[
-			'key' => 'vfs.dev.discovery[]',
+			'key' => 'vfs.dev.discovery',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 			'valueType' => ITEM_VALUE_TYPE_TEXT
 		],
@@ -326,7 +327,8 @@ class testGoAgentDataCollection extends CIntegrationTest {
 		[
 			'key' => 'vfs.fs.get',
 			'type' => ITEM_TYPE_ZABBIX_ACTIVE,
-			'valueType' => ITEM_VALUE_TYPE_TEXT
+			'valueType' => ITEM_VALUE_TYPE_TEXT,
+			'threshold' => 10000000
 		],
 		[
 			'key' => 'vm.memory.size[free]',
