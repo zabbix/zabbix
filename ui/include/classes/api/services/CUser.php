@@ -3340,10 +3340,16 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		[$userid] = DB::select('sessions', [
+		$userid = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => ['sessionid' => $session_data['sessionid']]
 		]);
+
+		if (!$userid) {
+			throw new Exception(_('You must login to view this page.'));
+		}
+
+		$userid = $userid[0];
 
 		[$failed_login_data] = DB::select('users', [
 			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
@@ -3508,7 +3514,7 @@ class CUser extends CApiService {
 
 		$outdated = strtotime('-5 minutes');
 
-		$true = DBexecute(
+		DBexecute(
 			'DELETE FROM sessions'.
 				' WHERE '.dbConditionId('userid', [$data['userid']]).
 					' AND '.dbConditionInt('status', [ZBX_SESSION_VERIFICATION_REQUIRED]).
