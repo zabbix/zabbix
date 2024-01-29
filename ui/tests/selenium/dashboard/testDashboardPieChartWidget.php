@@ -160,6 +160,14 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$this->validateDataSetHintboxes($form);
 
+		$options = [
+			'Aggregation function' => ['last', 'min', 'max', 'avg', 'count', 'sum', 'first'],
+			'Data set aggregation' => ['not used', 'min', 'max', 'avg', 'count', 'sum']
+		];
+		foreach ($options as $dropdown => $expected_options) {
+			$this->assertEquals($expected_options, $form->getField($dropdown)->getOptions()->asText());
+		}
+
 		$buttons = [
 			'id:ds_0_hosts_', // host multiselect
 			'id:ds_0_items_', // item multiselect
@@ -203,9 +211,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertEquals($labels, $radio_element->getLabels()->asText());
 		}
 
-		$this->assertRangeLayout('Space between sectors', 'space', $form,
-				['min' => '0', 'max' => '10', 'step' => '1', 'value' => '1']
-		);
+		$this->assertRangeSliderParameters($form, 'Space between sectors', ['min' => '0', 'max' => '10', 'step' => '1']);
 
 		foreach (['merge' => true, 'merge_percent' => false, 'merge_color' => false] as $id => $enabled) {
 			$this->assertTrue($form->query('id', $id)->one()->isEnabled($enabled));
@@ -218,13 +224,23 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertTrue($form->query('id', $id)->one()->isEnabled());
 		}
 
+		$hidden_inputs = ['Width', 'Show total value', 'Size', 'Decimal places', 'Units', 'Bold', 'Colour'];
+
+		foreach($hidden_inputs as $label) {
+			$this->assertFalse($form->getField($label)->isVisible());
+		}
+
 		$form->fill(['Draw' => 'Doughnut']);
 		$this->query('id:show_total_fields')->one()->waitUntilVisible();
 		$form->invalidate();
 
-		foreach(['Size', 'Decimal places', 'Units', 'Bold', 'Colour'] as $label) {
-			$this->assertFalse($form->getField($label)->isEnabled());
+		foreach($hidden_inputs as $label) {
+			$this->assertTrue($form->getField($label)->isVisible());
+			$this->assertEquals(($label === 'Show total value' || $label === 'Width'), $form->getField($label)->isEnabled());
 		}
+
+		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
+		$form->checkValue(['Space between sectors' => 1, 'Width' => 50]);
 
 		$form->fill(['Show total value' => true]);
 
@@ -278,22 +294,14 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->query('id:legend_tab')->one()->waitUntilVisible();
 		$form->invalidate();
 
-		foreach (['Show legend', 'Show aggregation function', 'Number of rows', 'Number of columns'] as $label) {
-			$field = $form->getField($label);
-			$this->assertTrue($field->isEnabled());
-			$this->assertTrue($field->isVisible());
-		}
+		$form->checkValue(['Show legend' => true, 'Show aggregation function' => false, 'Number of rows' => 1, 'Number of columns' => 4]);
 
 		foreach (['Show legend' => true, 'Show aggregation function' => false] as $label => $checked) {
 			$this->assertTrue($form->getField($label)->isChecked($checked));
 		}
 
-		$this->assertRangeLayout('Number of rows', 'legend_lines', $form,
-				['min' => '1', 'max' => '10', 'step' => '1', 'value' => '1']
-		);
-		$this->assertRangeLayout('Number of columns', 'legend_columns', $form,
-				['min' => '1', 'max' => '4', 'step' => '1', 'value' => '4']
-		);
+		$this->assertRangeSliderParameters($form, 'Number of rows', ['min' => '1', 'max' => '10', 'step' => '1']);
+		$this->assertRangeSliderParameters($form, 'Number of columns', ['min' => '1', 'max' => '4', 'step' => '1']);
 
 		$form->fill(['Show legend' => false]);
 
@@ -304,9 +312,9 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		// Footer buttons.
-		foreach(['Add', 'Cancel'] as $button) {
-			$this->assertTrue($dialog->getFooter()->query('button', $button)->one()->isClickable());
-		}
+		$this->assertEquals(['Add', 'Cancel'],
+			$dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
+		);
 	}
 
 	public function getPieChartData() {
@@ -1019,15 +1027,11 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * @param CFormElement $form               parent form
 	 * @param array        $expected_values    the attribute values expected
 	 */
-	protected function assertRangeLayout($label, $input_id, $form, $expected_values) {
+	protected function assertRangeSliderParameters($form, $label, $expected_values) {
 		$range = $form->getField($label)->query('xpath:.//input[@type="range"]')->one();
 		foreach ($expected_values as $attribute => $expected_value) {
 			$this->assertEquals($expected_value, $range->getAttribute($attribute));
 		}
-
-		$input = $form->getField($label)->query('id', $input_id)->one();
-		$this->assertTrue($input->isClickable());
-		$this->assertEquals($expected_values['value'], $input->getValue());
 	}
 
 	/**
