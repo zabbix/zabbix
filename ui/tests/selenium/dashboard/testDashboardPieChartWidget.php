@@ -134,8 +134,6 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertTrue($dialog->query('xpath:.//button[@title="Close"]')->one()->isClickable());
 
 		// Check the generic widget fields.
-		$form->checkValue(['Show header' => true]);
-
 		$main_fields = ['Type' => 'Pie chart', 'Show header' => true, 'Name' => '', 'Refresh interval' => 'Default (1 minute)'];
 		$this->assertEquals(array_keys($main_fields), $form->getLabels(CElementFilter::CLICKABLE)->asText());
 
@@ -144,6 +142,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		$form->checkValue($main_fields);
+		$this->assertFieldAttributes($form, 'Name', ['placeholder' => 'default', 'maxlength' => 255]);
 
 		// Check tabs.
 		$this->assertEquals(['Data set', 'Displaying options', 'Time period', 'Legend'], $form->getTabs());
@@ -154,10 +153,15 @@ class testDashboardPieChartWidget extends CWebTest {
 			$form->query('tag:label')->all()->filter(CElementFilter::CLICKABLE)->asText())
 		);
 
-		foreach ($dataset_fields as $label) {
-			$this->assertTrue($form->getField($label)->isClickable());
-		}
-
+		$values = [
+			'xpath:.//input[@id="ds_0_color"]/..' => 'FF465C',
+			'xpath:.//div[@id="ds_0_hosts_"]/..' => '',
+			'xpath:.//div[@id="ds_0_items_"]/..' => '',
+			'Aggregation function' => 'last',
+			'Data set aggregation' => 'not used',
+			'Data set label' => ''
+		];
+		$form->checkValue($values);
 		$this->validateDataSetHintboxes($form);
 
 		$options = [
@@ -167,6 +171,12 @@ class testDashboardPieChartWidget extends CWebTest {
 		foreach ($options as $dropdown => $expected_options) {
 			$this->assertEquals($expected_options, $form->getField($dropdown)->getOptions()->asText());
 		}
+
+		foreach (['id:ds_0_hosts_' => 'host pattern','id:ds_0_items_' => 'item pattern'] as $selector => $placeholder) {
+			$this->assertFieldAttributes($form, $selector, ['placeholder' => $placeholder], true);
+		}
+
+		$this->assertFieldAttributes($form, 'Data set label', ['placeholder' => 'Data set #1', 'maxlength' => 255]);
 
 		$buttons = [
 			'id:ds_0_hosts_', // host multiselect
@@ -190,7 +200,19 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertTrue($form->getField($label)->isClickable());
 		}
 
+		$values = [
+			'Aggregation function' => 'last',
+			'Data set aggregation' => 'not used',
+			'Data set label' => ''
+		];
+		$form->checkValue($values);
+
+		foreach ($options as $dropdown => $expected_options) {
+			$this->assertEquals($expected_options, $form->getField($dropdown)->getOptions()->asText());
+		}
+
 		$this->validateDataSetHintboxes($form);
+		$this->assertFieldAttributes($form, 'Data set label', ['placeholder' => 'Data set #2', 'maxlength' => 255]);
 
 		// Displaying options tab.
 		$form->selectTab('Displaying options');
@@ -212,6 +234,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		$this->assertRangeSliderParameters($form, 'Space between sectors', ['min' => '0', 'max' => '10', 'step' => '1']);
+		$this->assertFieldAttributes($form, 'id:space', ['maxlength' => 2]);
 
 		foreach (['merge' => true, 'merge_percent' => false, 'merge_color' => false] as $id => $enabled) {
 			$this->assertTrue($form->query('id', $id)->one()->isEnabled($enabled));
@@ -219,6 +242,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$form->fill(['id:merge' => true]);
 		$form->invalidate();
+		$this->assertFieldAttributes($form, 'id:merge_percent', ['maxlength' => 2]);
 
 		foreach (['merge_percent', 'merge_color'] as $id) {
 			$this->assertTrue($form->query('id', $id)->one()->isEnabled());
@@ -240,6 +264,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
+		$this->assertFieldAttributes($form, 'id:width', ['maxlength' => 2]);
 		$form->checkValue(['Space between sectors' => 1, 'Width' => 50]);
 
 		$form->fill(['Show total value' => true]);
@@ -248,6 +273,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertTrue($form->getField($label)->isEnabled());
 		}
 
+		$this->assertFieldAttributes($form, 'Decimal places', ['maxlength' => 1]);
 		$this->assertFalse($form->getField('Units')->isEnabled());
 
 		$form->fill(['Size' => 'Custom']);
@@ -257,6 +283,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$form->fill(['id:units_show' => true]);
 		$this->assertTrue($form->getField('Units')->isEnabled());
+		$this->assertFieldAttributes($form, 'id:units', ['maxlength' => 2048]);
 
 		// Time period tab.
 		$form->selectTab('Time period');
@@ -272,6 +299,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertTrue($widget_field->isVisible());
 		$this->assertTrue($widget_field->isEnabled());
 		$this->assertTrue($form->isRequired('Widget'));
+		$this->assertFieldAttributes($form, 'Widget', ['placeholder' => 'type here to search'], true);
 		$widget_field->query('button:Select')->waitUntilClickable()->one()->click();
 		$widget_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
 		$this->assertEquals('Widget', $widget_dialog->getTitle());
@@ -285,6 +313,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertTrue($field->isEnabled());
 			$this->assertTrue($form->isRequired($label));
 			$this->assertTrue($field->query('id', 'time_period_'.strtolower($label).'_calendar')->one()->isClickable());
+			$this->assertFieldAttributes($form, $label, ['placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255], true);
 		}
 
 		$form->checkValue(['From' => 'now-1h', 'To' => 'now']);
@@ -1346,5 +1375,25 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		return $data_sets;
+	}
+
+	/**
+	 * Checks the 'placeholder' and 'maxlength' attributes of a field.
+	 *
+	 * @param CFormElement $form                form element of the field
+	 * @param string       $name                name (or selector) of the field
+	 * @param array        $attributes          the expected placeholder value (null skips this check)
+	 * @param bool         $find_in_children    true if the real input field is actually a child of the form field element
+	 */
+	protected function assertFieldAttributes($form, $name, $attributes, $find_in_children = false) {
+		$input = $form->getField($name);
+
+		if ($find_in_children) {
+			$input = $input->query('tag:input')->one();
+		}
+
+		foreach ($attributes as $attribute => $expected_value) {
+			$this->assertEquals($expected_value, $input->getAttribute($attribute));
+		}
 	}
 }
