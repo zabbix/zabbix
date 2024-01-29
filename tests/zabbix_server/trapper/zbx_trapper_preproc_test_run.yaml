@@ -267,24 +267,16 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 4",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: 4"
           },
           {
-            "result": "4",
-            "truncated": false,
-            "original_size": 1
+            "result": "4"
           },
           {
-            "result": "8",
-            "truncated": false,
-            "original_size": 1
+            "result": "8"
           }
         ],
-        "result": "8",
-        "truncated": false,
-        "original_size": 1
+        "result": "8"
       }
     }
 ---
@@ -373,9 +365,7 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 4",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: 4"
           },
           {
             "error": "/.*"
@@ -424,14 +414,10 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: x",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: x"
           },
           {
-            "result": "x",
-            "truncated": false,
-            "original_size": 1
+            "result": "x"
           },
           {
             "error": "/.*"
@@ -480,9 +466,7 @@ out:
       "data": {
         "steps": [
           {
-            "result": "4",
-            "truncated": false,
-            "original_size": 1
+            "result": "4"
           },
           {
             "result": null,
@@ -533,26 +517,18 @@ out:
       "data": {
         "steps": [
           {
-            "result": "4",
-            "truncated": false,
-            "original_size": 1
+            "result": "4"
           },
           {
             "result": "5",
-            "truncated": false,
-            "original_size": 1,
             "action": 2,
             "error": "/.*"
           },
           {
-            "result": "10",
-            "truncated": false,
-            "original_size": 2
+            "result": "10"
           }
         ],
-        "result": "10",
-        "truncated": false,
-        "original_size": 2
+        "result": "10"
       }
     }
 ---
@@ -595,9 +571,7 @@ out:
       "data": {
         "steps": [
           {
-            "result": "4",
-            "truncated": false,
-            "original_size": 1
+            "result": "4"
           },
           {
             "failed": "Validation error",
@@ -642,14 +616,10 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: x",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: x"
           },
           {
-            "result": "x",
-            "truncated": false,
-            "original_size": 1
+            "result": "x"
           }
         ],
         "error": "/.*"
@@ -684,14 +654,10 @@ out:
       "data": {
         "steps": [
           {
-            "result": "x",
-            "truncated": false,
-            "original_size": 1
+            "result": "x"
           }
         ],
-        "result": "x",
-        "truncated": false,
-        "original_size": 1
+        "result": "x"
       }
     }
 ---
@@ -726,14 +692,10 @@ out:
       "data": {
         "steps": [
           {
-            "result": "600",
-            "truncated": false,
-            "original_size": 3
+            "result": "600"
           }
         ],
-        "result": "600",
-        "truncated": false,
-        "original_size": 3
+        "result": "600"
       }
     }
 ---
@@ -768,14 +730,10 @@ out:
       "data": {
         "steps": [
           {
-            "result": "10",
-            "truncated": false,
-            "original_size": 2
+            "result": "10"
           }
         ],
-        "result": "10",
-        "truncated": false,
-        "original_size": 2
+        "result": "10"
       }
     }
 ---
@@ -874,9 +832,7 @@ out:
         "previous": true,
         "steps": [
           {
-            "result": "data: 4",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: 4"
           },
           {
             "error": "/.*"
@@ -930,14 +886,10 @@ out:
       "previous": true,
         "steps": [
           {
-            "result": "data: x",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: x"
           },
           {
-            "result": "x",
-            "truncated": false,
-            "original_size": 1
+            "result": "x"
           },
           {
             "error": "/.*"
@@ -990,24 +942,16 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 3",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: 3"
           },
           {
-            "result": "3",
-            "truncated": false,
-            "original_size": 1
+            "result": "3"
           },
           {
-            "result": "6",
-            "truncated": false,
-            "original_size": 1
+            "result": "6"
           }
         ],
-        "result": "6",
-        "truncated": false,
-        "original_size": 1
+        "result": "6"
       }
     }
 ---
@@ -1054,24 +998,16 @@ out:
       "data": {
         "steps": [
           {
-            "result": "data: 3",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: 3"
           },
           {
-            "result": "3",
-            "truncated": false,
-            "original_size": 1
+            "result": "3"
           },
           {
-            "result": "6",
-            "truncated": false,
-            "original_size": 1
+            "result": "6"
           }
         ],
-        "result": "6",
-        "truncated": false,
-        "original_size": 1
+        "result": "6"
       }
     }
 ---
@@ -1119,9 +1055,7 @@ out:
         "previous": true,
         "steps": [
           {
-            "result": "4",
-            "truncated": false,
-            "original_size": 1
+            "result": "4"
           },
           {
             "failed": "Validation error",
@@ -1171,14 +1105,10 @@ out:
         "previous": true,
         "steps": [
           {
-            "result": "data: x",
-            "truncated": false,
-            "original_size": 7
+            "result": "data: x"
           },
           {
-            "result": "x",
-            "truncated": false,
-            "original_size": 1
+            "result": "x"
           }
         ],
         "error": "/.*"
@@ -1217,14 +1147,10 @@ out:
       "data": {
         "steps": [
           {
-            "result": "x",
-            "truncated": false,
-            "original_size": 1
+            "result": "x"
           }
         ],
-        "result": "x",
-        "truncated": false,
-        "original_size": 1
+        "result": "x"
       }
     }
 ---
@@ -1265,19 +1191,13 @@ out:
       "data": {
         "steps": [
           {
-            "result": "10",
-            "truncated": false,
-            "original_size": 2
+            "result": "10"
           },
           {
-            "result": "1",
-            "truncated": false,
-            "original_size": 1
+            "result": "1"
           }
         ],
-        "result": "1",
-        "truncated": false,
-        "original_size": 1
+        "result": "1"
       }
     }
 ---
@@ -1318,19 +1238,13 @@ out:
       "data": {
         "steps": [
           {
-            "result": "10",
-            "truncated": false,
-            "original_size": 2
+            "result": "10"
           },
           {
-            "result": "10",
-            "truncated": false,
-            "original_size": 2
+            "result": "10"
           }
         ],
-        "result": "10",
-        "truncated": false,
-        "original_size": 2
+        "result": "10"
       }
     }
 ---
@@ -1356,9 +1270,7 @@ out:
       "response": "success",
       "data": {
         "steps": [],
-        "truncated": false,
-        "result": "%s",
-        "original_size": %llu
+        "result": "%s"
       }
     }
 ---
