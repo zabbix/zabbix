@@ -54,6 +54,10 @@ func (sp *sizeParams) handleHomeDir(path string, d fs.DirEntry) (int64, error) {
 	return parentSize, nil
 }
 
+func isRegularFile(mode uint32) bool {
+	return mode&0170000 != 0100000
+}
+
 func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 	i, err := d.Info()
 	if err != nil {
@@ -67,6 +71,10 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 		impl.Logger.Errf("failed to get file info for path %s", path)
 
 		return true
+	}
+
+	if isRegularFile(iStat.Mode) || iStat.Nlink <= 1 {
+		return false
 	}
 
 	iData := inodeData{

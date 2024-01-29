@@ -88,16 +88,16 @@ func hashFromFileInfo(i *syscall.ByHandleFileInformation) uint64 {
 	return uint64(i.FileIndexHigh)<<32 | uint64(i.FileIndexLow)
 }
 
-func getInodeData(path string) (inodeData, error) {
+func getInodeData(path string) (inodeData, bool, error) {
 	uPath, err := syscall.UTF16PtrFromString(path)
 	if err != nil {
-		return inodeData{}, err
+		return inodeData{}, false, err
 	}
 
 	attributes := uint32(syscall.FILE_FLAG_BACKUP_SEMANTICS | syscall.FILE_FLAG_OPEN_REPARSE_POINT)
 	h, err := syscall.CreateFile(uPath, 0, 0, nil, syscall.OPEN_EXISTING, attributes, 0)
 	if err != nil {
-		return inodeData{}, err
+		return inodeData{}, false, err
 	}
 
 	defer syscall.CloseHandle(h)
@@ -105,13 +105,17 @@ func getInodeData(path string) (inodeData, error) {
 	var i syscall.ByHandleFileInformation
 	err = syscall.GetFileInformationByHandle(h, &i)
 	if err != nil {
-		return inodeData{}, err
+		return inodeData{}, false, err
+	}
+
+	if i.NumberOfLinks <= 1 {
+		return inodeData{}, false, nil
 	}
 
 	dev := uint64(i.VolumeSerialNumber)
 	ino := hashFromFileInfo(&i)
 
-	return inodeData{dev, ino}, nil
+	return inodeData{dev, ino}, true, nil
 }
 
 func (cp *common) osSkip(path string, d fs.DirEntry) bool {
@@ -119,15 +123,19 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 		return true
 	}
 
-	iData, err := getInodeData(path)
+	iData, ok, err := getInodeData(path)
 	if err != nil {
 		impl.Logger.Errf("failed to get file info for path %s, %s", path, err.Error())
 
 		return true
 	}
 
-	_, ok := cp.files[iData]
-	if ok {
+	if !ok {
+		return false
+	}
+
+	_, found := cp.files[iData]
+	if found {
 		return true
 	}
 
