@@ -418,7 +418,6 @@ static void	add_service_problem_tag_index(zbx_hashset_t *service_problem_tags_in
 		value_eq_local.value = service_problem_tag->value;
 		if (NULL == (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
 		{
-
 			value_eq_local.value = zbx_strdup(NULL, service_problem_tag->value);
 			zbx_vector_service_problem_tag_ptr_create(&value_eq_local.service_problem_tags);
 			value_eq = zbx_hashset_insert(&tag_services->values, &value_eq_local, sizeof(value_eq_local));
@@ -427,6 +426,7 @@ static void	add_service_problem_tag_index(zbx_hashset_t *service_problem_tags_in
 		zbx_vector_service_problem_tag_ptr_append(&value_eq->service_problem_tags, service_problem_tag);
 	}
 }
+
 static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags_index,
 		zbx_service_problem_tag_t *service_problem_tag)
 {
@@ -441,11 +441,9 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 	}
 	else
 	{
-		int	i;
-
 		if (ZBX_SERVICE_TAG_OPERATOR_LIKE == service_problem_tag->op)
 		{
-			i = zbx_vector_service_problem_tag_ptr_search(&tag_services->service_problem_tags_like,
+			int	i = zbx_vector_service_problem_tag_ptr_search(&tag_services->service_problem_tags_like,
 					service_problem_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 			if (FAIL == i)
@@ -1754,7 +1752,7 @@ out:
 
 typedef struct
 {
-	zbx_service_t	*service;
+	zbx_service_t	*service; /* not owner, no need to cleanup */
 	int		severity;
 }
 zbx_service_severity_t;
@@ -2187,7 +2185,7 @@ static const zbx_service_update_t	*get_update_by_serviceid(const zbx_vector_serv
  *                                                                            *
  * Purpose: gets open problems for specified services                         *
  *                                                                            *
- * Parameters: serviceids      - [IN] service manager                         *
+ * Parameters: serviceids      - [IN]                                         *
  *             problem_service - [OUT] vector of eventid, serviceid pairs     *
  *                                                                            *
  ******************************************************************************/

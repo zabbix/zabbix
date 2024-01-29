@@ -324,7 +324,6 @@ void	mock_destroy_service_cache(void)
 		zbx_vector_service_problem_ptr_destroy(&service->service_problems);
 		zbx_vector_service_rule_ptr_clear_ext(&service->status_rules, zbx_service_rule_free);
 		zbx_vector_service_rule_ptr_destroy(&service->status_rules);
-		zbx_vector_service_rule_ptr_destroy(&service->status_rules);
 
 		zbx_free(service->name);
 	}
