@@ -797,6 +797,15 @@ out:
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: checks if there are change to maintenance that require immediate  *
+ *          update                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - a maintenance immediate update flag is set         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_dc_maintenance_check_immediate_update(void)
 {
 	int	ret;
