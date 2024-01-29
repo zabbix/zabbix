@@ -63,6 +63,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 	protected static $dashboard_zoom;
 	protected static $dashboard_threshold;
 	protected static $dashboard_aggregation;
+	const DEFAULT_WIDGET_NAME = 'Top hosts';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -1343,7 +1344,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		}
 		else {
 			// Make sure that the widget is present before saving the dashboard.
-			$header = CTestArrayHelper::get($data['main_fields'], 'Name', 'Top hosts');
+			$header = CTestArrayHelper::get($data['main_fields'], 'Name', self::DEFAULT_WIDGET_NAME);
 			$dashboard->getWidget($header);
 			$dashboard->save();
 
@@ -3668,7 +3669,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 */
 	public function testDashboardTopHostsWidget_ThresholdColor($data) {
 		$time = strtotime('now');
-		$default_name = 'Top hosts';
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_threshold);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
@@ -3701,14 +3701,279 @@ class testDashboardTopHostsWidget extends testWidgets {
 					: implode(', ', sscanf($threshold['color'], "%02x%02x%02x"));
 
 				$opacity = (array_key_exists('opacity', $data)) ? '0' : '1';
-				$this->assertEquals('rgba('.$rgb.', '.$opacity.')', $dashboard->getWidget($default_name)
+				$this->assertEquals('rgba('.$rgb.', '.$opacity.')', $dashboard->getWidget(self::DEFAULT_WIDGET_NAME)
 						->query('xpath:.//div[contains(@class, "dashboard-widget-tophosts")]/../..//td')->one()
 						->getCSSValue('background-color')
 				);
 			}
 		}
 
-		$dashboard->edit()->deleteWidget($default_name)->save();
+		// Necessary for test stability.
+		$dashboard->edit()->deleteWidget(self::DEFAULT_WIDGET_NAME)->save();
+	}
+
+	public static function getAggregationFunctionData() {
+		return [
+			// Widget with several columns with common item that used value mapping, different aggregation functions and time periods.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Min',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom'
+						],
+						[
+							'Name' => 'Max',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2h',
+							'id:time_period_to' => 'now-1h'
+						],
+						[
+							'Name' => 'Avg',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-7d',
+							'id:time_period_to' => 'now-5d'
+						],
+						[
+							'Name' => 'Avg 2',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-4d',
+							'id:time_period_to' => 'now-2d'
+						],
+						[
+							'Name' => 'Count',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-5h-30m',
+							'id:time_period_to' => 'now-14400' // -4 hours.
+						],
+						[
+							'Name' => 'Sum',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-360m',
+							'id:time_period_to' => 'now-240m'
+						],
+						[
+							'Name' => 'First',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h-30m',
+							'id:time_period_to' => 'now-30m'
+						],
+						[
+							'Name' => 'Last',
+							'Item' => 'Value mapping',
+							'Aggregation function' => 'last',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h-20m-600s',
+							'id:time_period_to' => 'now-1800s'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Value mapping',
+							'value' => '0',
+							'time' => 'now'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '0',
+							'time' => '-45 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-61 minute'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '0',
+							'time' => '-122 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-270 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '0',
+							'time' => '-275 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-276 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '0',
+							'time' => '-63 hours'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-3 days'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-6 days'
+						]
+					],
+					'result' => [
+						[
+							'Min' => 'Down (0)',
+							'Max' => 'Up (1)',
+							'Avg' => 'Up (1)',
+							'Avg 2' => '0.50', // Value mapping is ignored if value doesn't equals 0 or 1.
+							'Count' => '3.00', // Mapping is not used if aggregation function is 'sum' or 'count'.
+							'Sum' => '2.00',
+							'First' => 'Up (1)',
+							'Last' => 'Down (0)'
+						]
+					]
+				]
+			],
+			// Value mapping with aggregation function 'not used'.
+			[
+				[
+					'column_fields' => [
+						[
+							// Not used is default value for aggregation function field.
+							'Name' => 'Value mapping with aggregation function not used',
+							'Item' => 'Value mapping'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-15 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '0',
+							'time' => '-45 minutes'
+						],
+						[
+							'name' => 'Value mapping',
+							'value' => '1',
+							'time' => '-50 minutes'
+						]
+					],
+					'result' => [
+						[
+							'Value mapping with aggregation function not used' => 'Up (1)'
+						]
+					]
+
+				]
+			],
+			// Numeric items with aggregation function 'min' and 'max', decimal places and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (unsigned)',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Decimal places' => '9',
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom'
+						],
+						[
+							'Name' => 'Numeric (float)',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Decimal places' => '3',
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-3h',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+							[
+								'name' => 'Item with type of information - numeric (unsigned)',
+								'value' => '5',
+								'time' => '-5 minutes'
+							],
+							[
+								'name' => 'Item with type of information - numeric (float)',
+								'value' => '7.76',
+								'time' => '-6 minutes'
+							],
+							[
+								'name' => 'Item with type of information - numeric (unsigned)',
+								'value' => '4',
+								'time' => '-30 minutes'
+							],
+							[
+								'name' => 'Item with type of information - numeric (unsigned)',
+								'value' => '10',
+								'time' => '-61 minute'
+							],
+							[
+								'name' => 'Item with type of information - numeric (float)',
+								'value' => '7.77',
+								'time' => '-90 minutes'
+							],
+							[
+								'name' => 'Item with type of information - numeric (float)',
+								'value' => '7.78',
+								'time' => '-5 hours'
+							]
+					],
+					'result' => [
+						[
+							'Numeric (unsigned)' => '4.000000000',
+							'Numeric (float)' => '7.770'
+						]
+					]
+
+				]
+			]
+		];
+	}
+
+	/**
+	 * @backup !history, !history_log, !history_str, !history_text, !history_uint, !trends_uint, !trends
+	 *
+	 * @dataProvider getAggregationFunctionData
+	 */
+	public function testDashboardTopHostsWidget_AggregationFunctionData($data) {
+		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_aggregation)->waitUntilReady();
+		$dashboard = CDashboardElement::find()->one();
+		$dashboard->waitUntilReady();
+
+		foreach ($data['item_data'] as $params) {
+			$params['time'] = strtotime($params['time']);
+			CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], $params['time']);
+		}
+
+		// Update column.
+		$form = $dashboard->edit()->addWidget()->asForm();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
+		$this->fillColumnForm($data, 'create');
+		$form->submit();
+		$dashboard->save();
+		$dashboard->waitUntilReady();
+
+		$this->assertTableData($data['result']);
+
+		// Necessary for test stability.
+		$dashboard->edit()->deleteWidget(self::DEFAULT_WIDGET_NAME)->save();
 	}
 
 	/**
@@ -3775,6 +4040,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * Test function for assuring that binary items are not available in Top hosts widget.
 	 */
 	public function testDashboardTopHostsWidget_CheckAvailableItems() {
-		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create, 'Top hosts');
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_create, self::DEFAULT_WIDGET_NAME);
 	}
 }

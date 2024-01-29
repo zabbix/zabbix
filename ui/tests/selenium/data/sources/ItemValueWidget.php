@@ -288,7 +288,7 @@ class ItemValueWidget {
 								'name' => 'Widget for aggregation function data check',
 								'x' => 0,
 								'y' => 0,
-								'width' => 12,
+								'width' => 18,
 								'height' => 4,
 								'fields' => [
 									[
