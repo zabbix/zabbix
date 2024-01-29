@@ -130,6 +130,7 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 		return true
 	}
 
+	// inodeData is returned only for files with hardlinks
 	if !ok {
 		return false
 	}
