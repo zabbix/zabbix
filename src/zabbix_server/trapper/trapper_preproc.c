@@ -247,7 +247,7 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 	zbx_vector_ptr_t	steps, results, history;
 	zbx_timespec_t		ts[2];
 	zbx_preproc_result_t	*result;
-	size_t			uncut_size;
+	size_t			original_size;
 
 	zbx_vector_ptr_create(&steps);
 	zbx_vector_ptr_create(&results);
@@ -348,14 +348,14 @@ static int	trapper_preproc_test_run(const struct zbx_json_parse *jp, struct zbx_
 
 			if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				uncut_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+				original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
 						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
 						ZBX_JSON_TEST_DATA_MAX_SIZE);
 
-				if (uncut_size > ZBX_JSON_TEST_DATA_MAX_SIZE)
+				if (original_size > ZBX_JSON_TEST_DATA_MAX_SIZE)
 				{
 					zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-					zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, uncut_size);
+					zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
 				}
 			}
 			else if (NULL == result->error || ZBX_PREPROC_FAIL_DISCARD_VALUE == result->action)
@@ -373,14 +373,14 @@ err:
 
 		if (ZBX_VARIANT_NONE != result->value.type)
 		{
-			uncut_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+			original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
 					zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
 					ZBX_JSON_TEST_DATA_MAX_SIZE);
 
-			if (uncut_size > ZBX_JSON_TEST_DATA_MAX_SIZE)
+			if (original_size > ZBX_JSON_TEST_DATA_MAX_SIZE)
 			{
 				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, uncut_size);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
 			}
 		}
 		else
