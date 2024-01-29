@@ -18,903 +18,873 @@
 **/
 
 
-const ZBX_STYLE_SORTABLE = 'sortable';
-const ZBX_STYLE_SORTABLE_LIST = 'sortable-list';
-const ZBX_STYLE_SORTABLE_ITEM = 'sortable-item';
-const ZBX_STYLE_SORTABLE_DRAG_HANDLE = 'sortable-drag-handle';
-const ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
+class CSortable {
 
-const SORTABLE_EVENT_DRAG_START = 'sortable-drag-start';
-const SORTABLE_EVENT_DRAG_END = 'sortable-drag-end';
-const SORTABLE_EVENT_SORT = 'sortable-sort';
+	/**
+	 * Class applied to a sortable container.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_SORTABLE = 'sortable';
 
-class CSortable extends CBaseComponent {
+	/**
+	 * Class applied to a sortable container while token is being dragged.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
+
+	/**
+	 * Class applied to a token while it is being dragged.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_SORTABLE_DRAGGING_TOKEN = 'sortable-dragging-token';
+
+	/**
+	 * Event fired on start of dragging of a token.
+	 *
+	 * @type {string}
+	 */
+	static EVENT_DRAG_START = 'sortable-drag-start';
+
+	/**
+	 * Event fired on end of dragging of a token.
+	 *
+	 * @type {string}
+	 */
+	static EVENT_DRAG_END = 'sortable-drag-end';
+
+	/**
+	 * Event fired on end of dragging of a token, if sort order has changed.
+	 *
+	 * @type {string}
+	 */
+	static EVENT_SORT = 'sortable-sort';
+
+	static ANIMATION_SCROLL = 'scroll';
+
+	static LISTENERS_OFF = 'off';
+	static LISTENERS_SCROLL = 'scroll';
+	static LISTENERS_SCROLL_SORT = 'scroll-sort';
+
+	#target;
+
+	#is_vertical;
+
+	#selector_span;
+	#selector_freeze;
+	#selector_handle;
+
+	#is_enabled = false;
+	#is_enabled_sorting;
+
+	#animation_speed;
+	#animation_time_limit;
+
+	#tokens = [];
+	#tokens_loc = [];
+
+	#animations = new Map();
+	#animation_frame = null;
+
+	#scroll_pos = 0;
+
+	#is_dragging = false;
+	#drag_token = null;
+	#drag_index = -1;
+	#drag_index_original = -1;
+	#drag_delta = 0;
+	#overtake_tokens_loc = [];
+	#overtake_min = -1;
+	#overtake_max = -1;
+
+	#drag_scroll_timeout = null;
+	#drag_scroll_direction = 0;
+
+	#mutation_observer = null;
+
+	#skip_click = false;
 
 	/**
 	 * Create CSortable instance.
 	 *
-	 * @param {HTMLElement}  target
+	 * @param {HTMLElement} target                Sortable container.
+	 * @param {boolean}     is_vertical           Whether sorting is vertically oriented.
+	 * @param {string}      selector_span         Selector for matching first child element of multi-element tokens.
+	 * @param {string}      selector_freeze       Selector for matching frozen tokens (cannot change order).
+	 * @param {string}      selector_handle       Selector for matching a drag handle.
+	 * @param {boolean}     enable                Whether to enable the instance initially.
+	 * @param {boolean}     enable_sorting        Whether to enable sorting initially (or just scrolling).
+	 * @param {number}      animation_speed       Animation speed in pixels per second.
+	 * @param {number}      animation_time_limit  Animation time limit in seconds.
 	 *
 	 * @returns {CSortable}
 	 */
 	constructor(target, {
-		is_vertical,
-		is_sorting_enabled = true,
-		drag_scroll_delay_short = 150,
-		drag_scroll_delay_long = 400,
-		wheel_step = 100,
-		show_grabbing_cursor = true,
-		do_activate = true
-	}) {
-		super(target);
+		is_vertical = false,
 
-		this._is_vertical = is_vertical;
-		this._is_sorting_enabled = is_sorting_enabled;
-		this._drag_scroll_delay_short = drag_scroll_delay_short;
-		this._drag_scroll_delay_long = drag_scroll_delay_long;
-		this._wheel_step = wheel_step;
-		this._show_grabbing_cursor = show_grabbing_cursor;
+		selector_span = '',
+		selector_freeze = '',
+		selector_handle = '',
 
-		this._init();
-		this._registerEvents();
+		enable = true,
+		enable_sorting = true,
 
-		if (do_activate) {
-			this.activate();
+		animation_speed = 500,
+		animation_time_limit = .25
+	} = {}) {
+		this.#target = target;
+		this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE);
+		this.#target[is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
+
+		this.#is_vertical = is_vertical;
+
+		this.#selector_span = selector_span;
+		this.#selector_freeze = selector_freeze;
+		this.#selector_handle = selector_handle;
+
+		this.#is_enabled_sorting = enable_sorting;
+
+		this.#animation_speed = animation_speed;
+		this.#animation_time_limit = animation_time_limit;
+
+		this.#mutation_observer = new MutationObserver(this.#listeners.mutation);
+
+		if (enable) {
+			this.enable();
 		}
 	}
 
 	/**
-	 * Activate the interactive functionality.
-	 *
-	 * @returns {CSortable}
-	 */
-	activate() {
-		if (this._is_activated) {
-			throw Error('Instance already activated.');
-		}
-
-		this._fixListPos();
-
-		this._activateEvents();
-
-		this._is_activated = true;
-
-		return this;
-	}
-
-	/**
-	 * Deactivate the interactive functionality.
-	 *
-	 * @returns {CSortable}
-	 */
-	deactivate() {
-		if (!this._is_activated) {
-			throw Error('Instance already deactivated.');
-		}
-
-		this._cancelDragging();
-
-		this._deactivateEvents();
-
-		this._is_activated = false;
-
-		return this;
-	}
-
-	/**
-	 * Enable or disable the sorting functionality.
+	 * Enable or disable the instance.
 	 *
 	 * @param {boolean} enable
+	 */
+	enable(enable = true) {
+		if (enable === this.#is_enabled) {
+			return;
+		}
 
-	 * @returns {CSortable}
+		if (enable) {
+			this.#updateTokens();
+			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+		}
+		else {
+			this.#toggleListeners(CSortable.LISTENERS_OFF);
+			this.#disconnectMutationObserver();
+			this.#cancelSort();
+		}
+
+		this.#is_enabled = enable;
+	}
+
+	/**
+	 * Enable or disable sorting.
+	 *
+	 * @param {boolean} enable
 	 */
 	enableSorting(enable = true) {
-		if (this._is_sorting_enabled && !enable) {
-			this._cancelDragging();
+		if (this.#is_enabled && this.#is_enabled_sorting && !enable) {
+			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+			this.#cancelSort();
 		}
 
-		this._is_sorting_enabled = enable;
-
-		return this;
+		this.#is_enabled_sorting = enable;
 	}
 
 	/**
-	 * Get list element.
+	 * Scroll target token into view.
 	 *
-	 * @returns {HTMLUListElement}
+	 * @param {HTMLElement} element
 	 */
-	getList() {
-		return this._list;
-	}
-
-	/**
-	 * Is the list scrollable (not all items visible)?
-	 *
-	 * @returns {boolean}
-	 */
-	isScrollable() {
-		return !this._isPosEqual(this._getListPosMax(), 0);
-	}
-
-	/**
-	 * Insert item to the list before the reference item or at the end.
-	 *
-	 * @param {HTMLLIElement}      item
-	 * @param {HTMLLIElement|null} reference_item
-	 *
-	 * @returns {CSortable}
-	 */
-	insertItemBefore(item, reference_item = null) {
-		item.classList.add(ZBX_STYLE_SORTABLE_ITEM);
-		item.tabIndex = 0;
-
-		this._cancelDragging();
-		this._list.insertBefore(item, reference_item);
-
-		return this;
-	}
-
-	/**
-	 * Remove item from the list.
-	 *
-	 * @param {HTMLLIElement} item
-	 *
-	 * @returns {CSortable}
-	 */
-	removeItem(item) {
-		if (item.parentNode !== this._list) {
-			throw RangeError('Item does not belong to the list.');
+	scrollIntoView(element) {
+		if (this.#is_dragging || this.#drag_token !== null) {
+			return;
 		}
 
-		this._cancelDragging();
-		this._list.removeChild(item);
+		const token = this.#matchToken(element);
 
-		return this;
-	}
-
-	/**
-	 * Scroll item into view.
-	 *
-	 * @param {HTMLLIElement} item
-	 *
-	 * @returns {CSortable}
-	 */
-	scrollItemIntoView(item) {
-		if (item.parentNode !== this._list) {
-			throw RangeError('Item does not belong to the list.');
+		if (token !== null) {
+			this.#scrollIntoView(this.#tokens_loc.get(token));
 		}
-
-		const list_loc = this._getRectLoc(this._list.getBoundingClientRect());
-		const item_loc = this._getRectLoc(item.getBoundingClientRect());
-
-		this._scrollIntoView(item_loc.pos - list_loc.pos, item_loc.dim);
-
-		return this;
 	}
 
 	/**
-	 * Initialize the instance.
+	 * Destroy the instance.
 	 */
-	_init() {
-		this._target.classList.add(ZBX_STYLE_SORTABLE);
-
-		this._list = this._target.querySelector(`.${ZBX_STYLE_SORTABLE_LIST}`);
-
-		if (this._list === null) {
-			this._list = document.createElement('ul');
-			this._target.appendChild(this._list);
-		}
-
-		this._list.classList.add(ZBX_STYLE_SORTABLE_LIST);
-
-		this._list_pos = -parseFloat(getComputedStyle(this._list).getPropertyValue(
-			this._is_vertical ? 'top' : 'left'
-		));
-
-		this._drag_item = null;
-		this._drag_scroll_timeout = null;
-
-		this._is_activated = false;
+	destroy() {
+		this.enable(false);
+		this.#scrollTo(0);
+		this.#finishAnimations();
 	}
 
-	/**
-	 * Start dragging the item.
-	 *
-	 * @param {HTMLLIElement} drag_item  Dragged item.
-	 * @param {number}        pos        Starting axis position.
-	 */
-	_startDragging(drag_item, pos) {
-		this._drag_item_index_original = [...this._list.children].indexOf(drag_item);
+	#updateTokens() {
+		this.#tokens = [];
 
-		this._drag_item_index = this._drag_item_index_original;
-
-		const target_rect = this._target.getBoundingClientRect();
-		const target_loc = this._getRectLoc(target_rect);
-
-		const list_rect = this._list.getBoundingClientRect();
-		const list_loc = this._getRectLoc(list_rect);
-
-		const drag_item_rect = drag_item.getBoundingClientRect();
-		const drag_item_loc = this._getRectLoc(drag_item_rect);
-
-		this._drag_item_loc = {
-			pos: drag_item_loc.pos - target_loc.pos,
-			dim: drag_item_loc.dim
-		};
-
-		this._drag_item_event_delta_pos = this._drag_item_loc.pos - pos;
-
-		this._item_loc = [];
-
-		for (const item of this._list.children) {
-			if (item === drag_item) {
-				continue;
+		for (const element of this.#target.querySelectorAll(':scope > *')) {
+			if (this.#selector_span === '' || element.matches(this.#selector_span)) {
+				this.#tokens.push({
+					elements: [],
+					freeze: this.#selector_freeze !== '' && element.matches(this.#selector_freeze),
+					rel: 0
+				});
 			}
 
-			const item_rect = item.getBoundingClientRect();
-			const item_loc = this._getRectLoc(item_rect);
+			this.#tokens.at(-1).elements.push(element);
+		}
 
-			this._item_loc.push({
-				pos: item_loc.pos - list_loc.pos,
-				dim: item_loc.dim
+		this.#tokens_loc = this.#getTokensLoc(this.#tokens);
+	}
+
+	#getTokensLoc(tokens) {
+		this.#sortTokens(tokens);
+
+		const target_pos = this.#getTargetLoc().pos - this.#scroll_pos;
+
+		const tokens_loc = new Map();
+
+		for (const token of tokens) {
+			const client_loc = this.#getLoc(token.elements);
+
+			tokens_loc.set(token, {
+				pos: client_loc.pos - target_pos - token.rel,
+				dim: client_loc.dim
 			});
-
-			item.style.left = `${item_rect.x - list_rect.x}px`;
-			item.style.top = `${item_rect.y - list_rect.y}px`;
-			item.style.width = `${item_rect.width}px`;
-			item.style.height = `${item_rect.height}px`;
 		}
 
-		this._target.classList.add(ZBX_STYLE_SORTABLE_DRAGGING);
-		this._list.style.width = `${list_rect.width}px`;
-		this._list.style.height = `${list_rect.height}px`;
+		this.#sortTokens();
 
-		// Clone the dragging item not to disturb the original order while dragging.
-		this._drag_item = drag_item;
-		this._drag_item.style.left = `${drag_item_rect.x - target_rect.x}px`;
-		this._drag_item.style.top = `${drag_item_rect.y - target_rect.y}px`;
-		this._drag_item.style.width = `${drag_item_rect.width}px`;
-		this._drag_item.style.height = `${drag_item_rect.height}px`;
-
-		this._target.appendChild(this._drag_item);
-
-		// Hide the actual dragging item.
-		drag_item.classList.add(ZBX_STYLE_SORTABLE_DRAGGING);
-
-		// Set mouse cursor to "grabbing".
-		if (this._show_grabbing_cursor) {
-			this._dragging_style = document.createElement('style');
-			document.head.appendChild(this._dragging_style);
-			this._dragging_style.sheet.insertRule('* { cursor: grabbing !important; }');
-		}
-
-		this.fire(SORTABLE_EVENT_DRAG_START, {item: drag_item});
+		return tokens_loc;
 	}
 
-	/**
-	 * Drag the currently dragged item to a new position.
-	 *
-	 * @param {number} pos  New axis position.
-	 */
-	_drag(pos) {
-		const items = this._getNonDraggingItems();
+	#sortTokens(tokens = this.#tokens) {
+		this.#disconnectMutationObserver();
 
-		const target_rect = this._target.getBoundingClientRect();
-		const target_loc = this._getRectLoc(target_rect);
-
-		const drag_item_rect = this._drag_item.getBoundingClientRect();
-		const drag_item_loc = this._getRectLoc(drag_item_rect);
-
-		const drag_item_max_pos = target_loc.dim - drag_item_loc.dim;
-		this._drag_item_loc.pos = Math.max(0, Math.min(drag_item_max_pos, pos + this._drag_item_event_delta_pos));
-		this._drag_item.style[this._is_vertical ? 'top' : 'left'] = `${this._drag_item_loc.pos}px`;
-
-		const center_pos = this._list_pos + this._drag_item_loc.pos + this._drag_item_loc.dim / 2;
-
-		for (let index = this._drag_item_index - 1; index >= 0; index--) {
-			if (center_pos >= this._item_loc[index].pos + (this._item_loc[index].dim + this._drag_item_loc.dim) / 2) {
-				break;
+		for (const token of tokens) {
+			for (const element of token.elements) {
+				this.#target.appendChild(element);
 			}
-
-			this._drag_item_index--;
-			this._item_loc[index].pos += this._drag_item_loc.dim;
-			items[index].style[this._is_vertical ? 'top' : 'left'] = `${this._item_loc[index].pos}px`;
 		}
 
-		for (let index = this._drag_item_index; index < items.length; index++) {
-			if (center_pos <= this._item_loc[index].pos + (this._item_loc[index].dim - this._drag_item_loc.dim) / 2) {
-				break;
-			}
-
-			this._drag_item_index++;
-			this._item_loc[index].pos -= this._drag_item_loc.dim;
-			items[index].style[this._is_vertical ? 'top' : 'left'] = `${this._item_loc[index].pos}px`;
-		}
-
-		if (this._drag_item_loc.pos === 0) {
-			this._startDragScrolling(-1);
-		}
-		else if (this._drag_item_loc.pos === drag_item_max_pos) {
-			this._startDragScrolling(1);
-		}
-		else {
-			this._endDragScrolling();
-		}
+		this.#connectMutationObserver();
 	}
 
-	/**
-	 * End dragging the item.
-	 */
-	_endDragging() {
-		this._endDragScrolling();
+	#getTargetLoc() {
+		const client_rect = this.#target.getBoundingClientRect();
 
-		const drag_item_pos = (this._drag_item_index > 0)
-			? this._item_loc[this._drag_item_index - 1].pos + this._item_loc[this._drag_item_index - 1].dim
-			: 0;
-
-		this._scrollIntoView(drag_item_pos, this._drag_item_loc.dim);
+		return {
+			pos: this.#is_vertical ? client_rect.y : client_rect.x,
+			dim: this.#is_vertical ? client_rect.height : client_rect.width
+		};
 	}
 
-	/**
-	 * End dragging the item after the positional transitions have ended.
-	 */
-	_endDraggingAfterTransitions() {
-		const items = this._getNonDraggingItems();
+	#getLoc(elements) {
+		let pos = 0;
+		let pos_to = 0;
 
-		const drag_item = this._drag_item;
+		for (const element of elements) {
+			let loc;
 
-		this._list.insertBefore(drag_item, this._drag_item_index < items.length ? items[this._drag_item_index] : null);
+			if (getComputedStyle(element).display === 'contents') {
+				loc = this.#getLoc(element.children);
 
-		drag_item.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
-		drag_item.style.left = '';
-		drag_item.style.top = '';
-		drag_item.style.width = '';
-		drag_item.style.height = '';
-
-		this._target.classList.remove(ZBX_STYLE_SORTABLE_DRAGGING);
-		this._list.style.width = '';
-		this._list.style.height = '';
-
-		for (const item of items) {
-			item.style.left = '';
-			item.style.top = '';
-			item.style.width = '';
-			item.style.height = '';
-		}
-
-		// Re-focus the dragged item.
-		drag_item.focus();
-
-		this._drag_item = null;
-
-		// Reset mouse cursor.
-		if (this._show_grabbing_cursor) {
-			this._dragging_style.remove();
-		}
-
-		this.fire(SORTABLE_EVENT_DRAG_END, {item: drag_item});
-
-		if (this._drag_item_index !== this._drag_item_index_original) {
-			this.fire(SORTABLE_EVENT_SORT);
-		}
-	}
-
-	/**
-	 * Start list scrolling iteratively when the item is dragged to the beginning or to the end of the list.
-	 *
-	 * @param {number} direction  Either 1 or -1 for scrolling forward or backward respectively.
-	 */
-	_startDragScrolling(direction) {
-		if (this._drag_scroll_timeout === null) {
-			this._drag_scroll_tick = 0;
-			this._drag_scroll_timeout = setTimeout(() => {
-				this._dragScroll(direction);
-			}, this._getDragScrollDelay(0));
-		}
-	}
-
-	/**
-	 * Scroll the list by one item when the item is dragged to the beginning or to the end of the list.
-	 *
-	 * @param {number} direction  Either 1 or -1 for scrolling forward or backward respectively.
-	 */
-	_dragScroll(direction) {
-		const items = this._getNonDraggingItems();
-
-		const prev_item_pos = (this._drag_item_index > 0) ? this._item_loc[this._drag_item_index - 1].pos : 0;
-		const drag_item_pos = (this._drag_item_index > 0)
-			? prev_item_pos + this._item_loc[this._drag_item_index - 1].dim
-			: 0;
-
-		if (direction === -1) {
-			if (this._drag_item_index > 0) {
-				this._drag_item_index--;
-
-				this._setListPos(prev_item_pos);
-
-				this._item_loc[this._drag_item_index].pos += this._drag_item_loc.dim;
-				items[this._drag_item_index].style[this._is_vertical ? 'top' : 'left'] =
-					`${this._item_loc[this._drag_item_index].pos}px`;
+				if (loc.dim === 0) {
+					continue;
+				}
 			}
 			else {
-				this._scrollIntoView(drag_item_pos, this._drag_item_loc.dim);
+				const client_rect = element.getBoundingClientRect();
+
+				loc = {
+					pos: this.#is_vertical ? client_rect.y : client_rect.x,
+					dim: this.#is_vertical ? client_rect.height : client_rect.width
+				};
 			}
-		}
-		else {
-			const next_item_pos = (this._drag_item_index < items.length)
-				? this._item_loc[this._drag_item_index].pos
-				: drag_item_pos + this._drag_item_loc.dim;
 
-			const next_next_item_pos = (this._drag_item_index < items.length - 1)
-				? this._item_loc[this._drag_item_index + 1].pos
-				: next_item_pos + (
-					(this._drag_item_index < items.length) ? this._item_loc[this._drag_item_index].dim : 0
-				);
-
-			if (this._drag_item_index < items.length) {
-				const list_loc = this._getRectLoc(this._list.getBoundingClientRect());
-
-				this._setListPos(next_next_item_pos - list_loc.dim);
-
-				this._item_loc[this._drag_item_index].pos -= this._drag_item_loc.dim;
-				items[this._drag_item_index].style[this._is_vertical ? 'top' : 'left'] =
-					`${this._item_loc[this._drag_item_index].pos}px`;
-
-				this._drag_item_index++;
+			if (pos === 0 && pos_to === 0) {
+				pos = loc.pos;
+				pos_to = loc.pos + loc.dim;
 			}
 			else {
-				this._scrollIntoView(drag_item_pos, this._drag_item_loc.dim);
+				pos = Math.min(pos, loc.pos);
+				pos_to = Math.max(pos_to, loc.pos + loc.dim);
 			}
 		}
 
-		this._drag_scroll_timeout = setTimeout(() => this._dragScroll(direction),
-			this._getDragScrollDelay(++this._drag_scroll_tick)
+		return {
+			pos,
+			dim: pos_to - pos
+		};
+	}
+
+	#getAnimation(key) {
+		return this.#animations.get(key) ?? null;
+	}
+
+	#scheduleAnimation(key, from, to = null) {
+		if (this.#animations.size === 0) {
+			this.#animation_frame = requestAnimationFrame(() => this.#animate());
+		}
+
+		if (to === null) {
+			to = from;
+		}
+
+		this.#animations.set(key, {
+			from,
+			to,
+			time: performance.now(),
+			duration: Math.min(this.#animation_time_limit, Math.abs(from - to) / this.#animation_speed) * 1000
+		});
+	}
+
+	#clearAnimation(key) {
+		this.#animations.delete(key);
+
+		if (this.#animation_frame !== null && this.#animations.size === 0) {
+			cancelAnimationFrame(this.#animation_frame);
+			this.#animation_frame = null;
+		}
+	}
+
+	#animate() {
+		const time_now = performance.now();
+
+		const updates = new Map();
+
+		for (const [key, animation] of this.#animations) {
+			const to = this.#getAnimationProgress(animation, time_now);
+
+			updates.set(key, to);
+
+			if (to === animation.to) {
+				this.#animations.delete(key);
+			}
+		}
+
+		this.#update(updates);
+		this.#render();
+
+		this.#animation_frame = this.#animations.size > 0
+			? requestAnimationFrame(() => this.#animate())
+			: null;
+	}
+
+	#finishAnimations() {
+		const updates = new Map();
+
+		for (const [key, animation] of this.#animations) {
+			updates.set(key, animation.to);
+		}
+
+		this.#update(updates);
+		this.#render();
+
+		this.#animations.clear();
+
+		if (this.#animation_frame !== null) {
+			cancelAnimationFrame(this.#animation_frame);
+			this.#animation_frame = null;
+		}
+	}
+
+	#getAnimationProgress({from, to, time, duration}, time_now) {
+		if (time_now < time + duration && duration > 0) {
+			const progress = (time_now - time) / duration;
+			const progress_smooth = Math.sin(Math.PI * progress / 2);
+
+			return from + (to - from) * progress_smooth;
+		}
+
+		return to;
+	}
+
+	#update(updates) {
+		if (updates.has(CSortable.ANIMATION_SCROLL)) {
+			this.#scroll_pos = updates.get(CSortable.ANIMATION_SCROLL);
+		}
+
+		for (const token of this.#tokens) {
+			if (updates.has(token)) {
+				token.rel = updates.get(token);
+			}
+		}
+	}
+
+	#render() {
+		if (this.#is_dragging) {
+			let drag_rel = this.#getDragRelConstrained();
+
+			const drag_pos = this.#scroll_pos + this.#tokens_loc.get(this.#drag_token).pos + drag_rel;
+
+			let index;
+
+			for (index = this.#overtake_min; index < this.#overtake_max; index++) {
+				const token_loc = [...this.#overtake_tokens_loc[index + 1].values()][index];
+
+				if (token_loc.pos + token_loc.dim / 2 >= drag_pos) {
+					break;
+				}
+			}
+
+			if (index !== this.#drag_index) {
+				this.#overtake(index);
+
+				drag_rel = this.#getDragRelConstrained();
+			}
+
+			this.#applyRel(this.#drag_token.elements, drag_rel);
+		}
+
+		for (const token of this.#tokens) {
+			if (!this.#is_dragging || token !== this.#drag_token) {
+				this.#applyRel(token.elements, token.rel - this.#scroll_pos);
+			}
+		}
+	}
+
+	#matchToken(element) {
+		for (const token of this.#tokens) {
+			for (const token_element of token.elements) {
+				if (token_element.contains(element)) {
+					return token;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	#applyRel(elements, rel) {
+		for (const element of elements) {
+			if (getComputedStyle(element).display === 'contents') {
+				this.#applyRel(element.children, rel);
+			}
+			else {
+				element.style[this.#is_vertical ? 'top' : 'left'] = `${rel}px`;
+			}
+		}
+	}
+
+	#getDragConstraints() {
+		const drag_token_loc = this.#tokens_loc.get(this.#drag_token);
+
+		return {
+			tokens: {
+				min: this.#tokens_loc.get(this.#tokens[this.#overtake_min]).pos - drag_token_loc.pos - this.#scroll_pos,
+				max: this.#tokens_loc.get(this.#tokens[this.#overtake_max]).pos - drag_token_loc.pos - this.#scroll_pos
+			},
+			client: {
+				min: -drag_token_loc.pos,
+				max: this.#getTargetLoc().dim - drag_token_loc.pos - drag_token_loc.dim
+			}
+		};
+	}
+
+	#getDragRelConstrained(constraints = this.#getDragConstraints()) {
+		const min = Math.max(constraints.tokens.min, constraints.client.min);
+		const max = Math.min(constraints.tokens.max, constraints.client.max);
+
+		return Math.max(Math.min(this.#drag_token.rel, max), min);
+	}
+
+	#overtake(index) {
+		const drag_token_rel_delta = this.#tokens_loc.get(this.#drag_token).pos
+			- this.#overtake_tokens_loc[index].get(this.#drag_token).pos;
+
+		this.#drag_token.rel += drag_token_rel_delta;
+		this.#drag_delta += drag_token_rel_delta;
+
+		for (const [token, token_loc] of this.#overtake_tokens_loc[index]) {
+			if (token !== this.#drag_token) {
+				token.rel += this.#tokens_loc.get(token).pos - token_loc.pos;
+				this.#scheduleAnimation(token, token.rel, 0);
+			}
+		}
+
+		this.#drag_index = index;
+		this.#tokens = [...this.#overtake_tokens_loc[index].keys()];
+		this.#tokens_loc = this.#overtake_tokens_loc[index];
+
+		this.#sortTokens();
+	}
+
+	#scrollTo(pos) {
+		const animation = this.#getAnimation(CSortable.ANIMATION_SCROLL);
+
+		const pos_cur = animation !== null
+			? this.#getAnimationProgress(animation, performance.now())
+			: this.#scroll_pos;
+
+		const pos_min = 0;
+		const pos_max = this.#target[this.#is_vertical ? 'scrollHeight' : 'scrollWidth'] - this.#getTargetLoc().dim;
+
+		const pos_to = Math.max(pos_min, Math.min(pos_max, pos));
+
+		this.#scheduleAnimation(CSortable.ANIMATION_SCROLL, pos_cur, pos_to);
+
+		return pos_to - pos_cur;
+	}
+
+	#scrollRel(pos_rel) {
+		const animation = this.#getAnimation(CSortable.ANIMATION_SCROLL);
+
+		const pos_to = animation !== null ? animation.to : this.#scroll_pos;
+
+		return this.#scrollTo(
+			Math.sign(pos_rel) === Math.sign(pos_to - this.#scroll_pos)
+				? pos_rel + pos_to
+				: pos_rel + this.#scroll_pos
 		);
 	}
 
-	/**
-	 * End list scrolling iteratively when the item is dragged to the beginning or to the end of the list.
-	 */
-	_endDragScrolling() {
-		if (this._drag_scroll_timeout !== null) {
-			clearTimeout(this._drag_scroll_timeout);
-			this._drag_scroll_timeout = null;
+	#scrollIntoView({pos, dim}) {
+		return this.#scrollTo(Math.min(pos, Math.max(this.#scroll_pos, pos + dim - this.#getTargetLoc().dim)));
+	}
+
+	#startDrag(client_pos) {
+		this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
+
+		for (const element of this.#drag_token.elements) {
+			element.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
+		}
+
+		this.#overtake_tokens_loc = [];
+
+		this.#overtake_min = this.#drag_index;
+		this.#overtake_max = this.#drag_index;
+
+		while (this.#overtake_min >= 0 && !this.#tokens[this.#overtake_min].freeze) {
+			this.#overtake_min--;
+		}
+
+		while (this.#overtake_max < this.#tokens.length && !this.#tokens[this.#overtake_max].freeze) {
+			this.#overtake_max++;
+		}
+
+		this.#overtake_min++;
+		this.#overtake_max--;
+
+		for (let index = this.#overtake_min; index <= this.#overtake_max; index++) {
+			const tokens = [...this.#tokens];
+
+			tokens.splice(index, 0, ...tokens.splice(this.#drag_index, 1));
+
+			this.#overtake_tokens_loc[index] = this.#getTokensLoc(tokens);
+		}
+
+		this.#is_dragging = true;
+		this.#drag_token.rel -= this.#scroll_pos;
+		this.#drag_delta = this.#drag_token.rel - client_pos;
+
+		this.#clearAnimation(this.#drag_token);
+	}
+
+	#endDrag() {
+		this.#target.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
+
+		for (const element of this.#drag_token.elements) {
+			element.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
+		}
+
+		this.#cancelDragScroll();
+		this.#scheduleAnimation(this.#drag_token, this.#scroll_pos + this.#getDragRelConstrained(), 0);
+		this.#scrollIntoView(this.#tokens_loc.get(this.#drag_token));
+
+		this.#is_dragging = false;
+	}
+
+	#startSort(client_pos) {
+		if (!this.#is_dragging) {
+			this.#startDrag(client_pos);
+
+			this.#fire(CSortable.EVENT_DRAG_START, {index: this.#drag_index_original});
 		}
 	}
 
-	/**
-	 * Get the delay for a sequent list scrolling when the item is dragged to the beginning or to the end of the list.
-	 *
-	 * @param {number} iteration  Zero-based list scrolling iteration.
-	 *
-	 * @returns {number}
-	 */
-	_getDragScrollDelay(iteration) {
-		return (iteration === 0 || iteration > 2) ? this._drag_scroll_delay_short : this._drag_scroll_delay_long;
-	}
+	#endSort() {
+		if (this.#is_dragging) {
+			this.#endDrag();
 
-	/**
-	 * Cancel item dragging and return the item to its original position.
-	 */
-	_cancelDragging() {
-		if (this._drag_item !== null) {
-			// Simulate dropping the item at its original position.
+			this.#fire(CSortable.EVENT_DRAG_END, {index: this.#drag_index_original});
 
-			this._drag_item_index = this._drag_item_index_original;
-
-			this.fire('_dragcancel');
-		}
-	}
-
-	/**
-	 * Scroll the list by mouse wheel in the given direction.
-	 *
-	 * @param {number} direction  Either 1 or -1 for scrolling forward or backward respectively.
-	 * @param {number} pos        Mouse axis position.
-	 */
-	_wheel(direction, pos) {
-		// Prevent using wheel while scrolling by dragging.
-		if (this._drag_scroll_timeout !== null) {
-			return;
-		}
-
-		this._setListPos(Math.max(0, Math.min(this._getListPosMax(), this._list_pos + this._wheel_step * direction)));
-
-		if (this._drag_item !== null) {
-			this._drag(pos);
-		}
-	}
-
-	/**
-	 * Scroll the list as little as possible to fully contain the object with the given position and dimension.
-	 *
-	 * @param {number} pos  Object position in decimal pixels.
-	 * @param {number} dim  Object dimension in decimal pixels.
-	 */
-	_scrollIntoView(pos, dim) {
-		if (pos < this._list_pos) {
-			this._setListPos(pos);
-		}
-		else {
-			const list_loc = this._getRectLoc(this._list.getBoundingClientRect());
-
-			if (pos + dim > this._list_pos + list_loc.dim) {
-				this._setListPos(pos + dim - list_loc.dim);
-			}
-		}
-	}
-
-	/**
-	 * Scroll the list to the given position.
-	 *
-	 * @param {number} pos  Position in decimal pixels.
-	 */
-	_setListPos(pos) {
-		if (this._isPosEqual(pos, this._list_pos)) {
-			return;
-		}
-
-		this._list_pos = pos;
-		this._list.style[this._is_vertical ? 'top' : 'left'] = `-${pos}px`;
-	}
-
-	/**
-	 * Fix the list scroll position (on list resize).
-	 */
-	_fixListPos() {
-		const list_pos_max = this._getListPosMax();
-
-		if (this._list_pos > list_pos_max) {
-			this._setListPos(list_pos_max);
-		}
-	}
-
-	/**
-	 * Get the maximum scroll position of the list.
-	 *
-	 * @returns {number}  Position in decimal pixels.
-	 */
-	_getListPosMax() {
-		const items = this._getNonDraggingItems();
-
-		const list_loc = this._getRectLoc(this._list.getBoundingClientRect());
-
-		if (this._drag_item === null) {
-			if (items.length === 0) {
-				return 0;
+			if (this.#drag_index !== this.#drag_index_original) {
+				this.#fire(CSortable.EVENT_SORT, {
+					index: this.#drag_index_original,
+					index_to: this.#drag_index
+				});
 			}
 
-			const last_item_loc = this._getRectLoc(items[items.length - 1].getBoundingClientRect());
-
-			return Math.max(0, last_item_loc.pos + last_item_loc.dim - list_loc.pos - list_loc.dim);
+			this.#skip_click = true;
 		}
-		else {
-			if (items.length === 0) {
-				return Math.max(0, this._drag_item_loc.dim - list_loc.dim);
+
+		this.#drag_token = null;
+	}
+
+	#cancelSort() {
+		if (this.#is_dragging) {
+			if (this.#drag_index !== this.#drag_index_original) {
+				this.#overtake(this.#drag_index_original);
+			}
+		}
+
+		this.#endSort();
+	}
+
+	#requestDragScroll(direction = this.#drag_scroll_direction) {
+		if (this.#drag_scroll_timeout !== null) {
+			clearTimeout(this.#drag_scroll_timeout);
+		}
+
+		this.#drag_scroll_direction = direction;
+
+		this.#drag_scroll_timeout = setTimeout(() => {
+			this.#drag_scroll_timeout = null;
+
+			const index = this.#drag_index + this.#drag_scroll_direction;
+
+			if (index >= this.#overtake_min && index <= this.#overtake_max) {
+				this.#scrollIntoView(this.#tokens_loc.get(this.#tokens[index]));
+				this.#requestDragScroll();
+			}
+		}, this.#animation_time_limit * 1000);
+	}
+
+	#cancelDragScroll() {
+		if (this.#drag_scroll_timeout !== null) {
+			clearTimeout(this.#drag_scroll_timeout);
+			this.#drag_scroll_timeout = null;
+		}
+	}
+
+	#toggleListeners(mode) {
+		this.#target.removeEventListener('mousedown', this.#listeners.mouseDown);
+		this.#target.removeEventListener('click', this.#listeners.click, {capture: true});
+		this.#target.removeEventListener('wheel', this.#listeners.wheel);
+		this.#target.removeEventListener('keydown', this.#listeners.keydown);
+		this.#target.removeEventListener('focusin', this.#listeners.focusIn);
+
+		removeEventListener('mousemove', this.#listeners.mouseMove);
+		removeEventListener('mouseup', this.#listeners.mouseUp);
+		removeEventListener('wheel', this.#listeners.wheel, {capture: true});
+
+		switch (mode) {
+			case CSortable.LISTENERS_SCROLL:
+				this.#target.addEventListener('mousedown', this.#listeners.mouseDown);
+				this.#target.addEventListener('wheel', this.#listeners.wheel);
+				this.#target.addEventListener('keydown', this.#listeners.keydown);
+				this.#target.addEventListener('focusin', this.#listeners.focusIn);
+
+				break;
+
+			case CSortable.LISTENERS_SCROLL_SORT:
+				this.#target.addEventListener('mousedown', this.#listeners.mouseDown);
+				this.#target.addEventListener('click', this.#listeners.click, {capture: true});
+
+				addEventListener('mousemove', this.#listeners.mouseMove);
+				addEventListener('mouseup', this.#listeners.mouseUp);
+				addEventListener('wheel', this.#listeners.wheel, {passive: false, capture: true});
+
+				break;
+		}
+	}
+
+	#connectMutationObserver() {
+		this.#mutation_observer.observe(this.#target, {subtree: true, childList: true});
+	}
+
+	#disconnectMutationObserver() {
+		this.#mutation_observer.disconnect();
+	}
+
+	#listeners = {
+		mouseDown: (e) => {
+			const pos = this.#scroll_pos - this.#getTargetLoc().pos + (this.#is_vertical ? e.clientY : e.clientX);
+
+			this.#drag_token = null;
+
+			for (const [token, token_loc] of this.#tokens_loc) {
+				if (pos >= token_loc.pos + token.rel && pos < token_loc.pos + token_loc.dim + token.rel) {
+					this.#scrollIntoView(token_loc);
+
+					if (!this.#is_enabled_sorting || token.freeze) {
+						break;
+					}
+
+					if (this.#selector_handle !== '') {
+						const handle = e.target.closest(this.#selector_handle);
+
+						if (handle === null || !this.#target.contains(handle)) {
+							break;
+						}
+					}
+
+					this.#drag_token = token;
+					this.#drag_index = this.#tokens.indexOf(token);
+					this.#drag_index_original = this.#drag_index;
+
+					this.#toggleListeners(CSortable.LISTENERS_SCROLL_SORT);
+
+					break;
+				}
+			}
+		},
+
+		mouseMove: (e) => {
+			const client_pos = this.#is_vertical ? e.clientY : e.clientX;
+
+			this.#startSort(client_pos);
+
+			const rel_old = this.#drag_token.rel;
+
+			this.#drag_token.rel = this.#drag_delta + client_pos;
+
+			const constraints = this.#getDragConstraints();
+			const rel_new = this.#getDragRelConstrained(constraints);
+
+			if (rel_new === constraints.client.min && rel_new <= rel_old && this.#drag_token.rel < rel_new) {
+				this.#requestDragScroll(-1);
+			}
+			else if (rel_new === constraints.client.max && rel_new >= rel_old && this.#drag_token.rel > rel_new) {
+				this.#requestDragScroll(1);
+			}
+			else if (rel_new !== constraints.client.min && rel_new !== constraints.client.max) {
+				this.#cancelDragScroll();
 			}
 
-			const scroll_dim = (this._drag_item_index < items.length)
-				? this._item_loc[items.length - 1].pos + this._item_loc[items.length - 1].dim
-				: this._item_loc[items.length - 1].pos + this._item_loc[items.length - 1].dim + this._drag_item_loc.dim;
+			this.#render();
+		},
 
-			return Math.max(0, scroll_dim - list_loc.dim);
+		mouseUp: () => {
+			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+			this.#endSort();
+		},
+
+		click: (e) => {
+			if (this.#skip_click) {
+				this.#skip_click = false;
+
+				e.stopPropagation();
+			}
+		},
+
+		wheel: (e) => {
+			if (!this.#is_dragging && this.#drag_token !== null) {
+				const client_pos = this.#is_vertical ? e.clientY : e.clientX;
+
+				this.#startSort(client_pos);
+				this.#drag_token.rel = this.#drag_delta + client_pos;
+			}
+
+			this.#cancelDragScroll();
+
+			if (this.#scrollRel(e.deltaY !== 0 ? e.deltaY : e.deltaX) !== 0 || this.#is_dragging) {
+				e.preventDefault();
+			}
+
+			if (this.#is_dragging) {
+				e.stopPropagation();
+			}
+		},
+
+		keydown: (e) => {
+			if (!this.#is_enabled_sorting) {
+				return;
+			}
+
+			let direction;
+
+			if (e.ctrlKey && (e.key === 'ArrowLeft' || e.key === 'ArrowUp')) {
+				direction = -1;
+			}
+			else if (e.ctrlKey && (e.key === 'ArrowRight' || e.key === 'ArrowDown')) {
+				direction = 1;
+			}
+			else {
+				return;
+			}
+
+			const token = this.#matchToken(e.target);
+
+			if (token === null || token.freeze) {
+				return;
+			}
+
+			e.preventDefault();
+
+			const index = this.#tokens.indexOf(token);
+			const index_to = index + direction;
+
+			if (index_to < 0 || index_to > this.#tokens.length - 1 || this.#tokens[index_to].freeze) {
+				return;
+			}
+
+			this.#tokens.splice(index, 0, ...this.#tokens.splice(index_to, 1));
+			this.#tokens_loc = this.#getTokensLoc(this.#tokens);
+
+			e.target.focus();
+
+			this.#fire(CSortable.EVENT_SORT, {index, index_to});
+		},
+
+		focusIn: (e) => {
+			this.#target[this.#is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
+
+			const token = this.#matchToken(e.target);
+
+			if (token !== null) {
+				this.#scrollIntoView(this.#tokens_loc.get(token));
+			}
+		},
+
+		mutation: () => {
+			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+			this.#cancelSort();
+			this.#updateTokens();
 		}
-	}
+	};
 
 	/**
-	 * Get all list items except the one being dragged.
+	 * Attach event listener.
 	 *
-	 * @returns {HTMLElement[]}
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
+	 *
+	 * @returns {CSortable}
 	 */
-	_getNonDraggingItems() {
-		return [...this._list.children].filter((item) => !item.classList.contains(ZBX_STYLE_SORTABLE_DRAGGING));
+	on(type, listener, options = false) {
+		this.#target.addEventListener(type, listener, options);
+
+		return this;
 	}
 
 	/**
-	 * Get the position and dimension of the DOMRect, based on the current instance orientation.
+	 * Detach event listener.
 	 *
-	 * @param {DOMRect} rect
+	 * @param {string}       type
+	 * @param {function}     listener
+	 * @param {Object|false} options
 	 *
-	 * @returns {Object}
+	 * @returns {CSortable}
 	 */
-	_getRectLoc(rect) {
-		return (this._is_vertical
-			? {pos: rect.top, dim: rect.height}
-			: {pos: rect.left, dim: rect.width}
-		);
+	off(type, listener, options = false) {
+		this.#target.removeEventListener(type, listener, options);
+
+		return this;
 	}
 
 	/**
-	 * Check if decimal positions are equal by dismissing floating-point calculation errors.
+	 * Dispatch event.
 	 *
-	 * @param {number} pos_1  Decimal position.
-	 * @param {number} pos_2  Decimal position.
+	 * @param {string} type
+	 * @param {Object} detail
+	 * @param {Object} options
 	 *
 	 * @returns {boolean}
 	 */
-	_isPosEqual(pos_1, pos_2) {
-		return (Math.abs(pos_1 - pos_2) < 0.001);
-	}
-
-	/**
-	 * Register all DOM events.
-	 */
-	_registerEvents() {
-		let prevent_clicks;
-		let mouse_down_item;
-		let mouse_down_pos;
-		let mouse_move_request;
-		let mouse_move_pos;
-		let wheel_request;
-		let wheel_direction;
-		let wheel_pos;
-		let end_dragging_after_transitions;
-		let transitions_set;
-		let list_resize_observer;
-
-		this._events = {
-			targetClick: (e) => {
-				if (prevent_clicks) {
-					e.preventDefault();
-					e.stopImmediatePropagation();
-				}
-			},
-
-			targetScroll: () => {
-				// Prevent browsers from automatically scrolling focusable elements into view.
-				this._target[this._is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
-			},
-
-			wheel: (e) => {
-				if (mouse_down_item !== null) {
-					this._startDragging(mouse_down_item, mouse_down_pos);
-
-					mouse_down_item = null;
-
-					// Prevent clicks after dragging has ended.
-					prevent_clicks = true;
-				}
-
-				if (this._drag_item !== null) {
-					e.preventDefault();
-				}
-
-				wheel_direction = (e.deltaY !== 0) ? Math.sign(e.deltaY) : Math.sign(e.deltaX);
-				wheel_pos = this._is_vertical ? e.clientY : e.clientX;
-
-				if (wheel_request === null) {
-					wheel_request = requestAnimationFrame(() => {
-						this._wheel(wheel_direction, wheel_pos);
-						wheel_request = null;
-					});
-				}
-			},
-
-			listMouseDown: (e) => {
-				if (e.button !== 0) {
-					return;
-				}
-
-				if (!this._is_sorting_enabled) {
-					return;
-				}
-
-				// Prevent clicks while transitions are running.
-				if (transitions_set.size > 0) {
-					return;
-				}
-
-				mouse_down_item = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
-
-				// Interested in items and not the list itself.
-				if (mouse_down_item === null) {
-					return;
-				}
-
-				// Scroll item into view if it is partially visible.
-				this.scrollItemIntoView(mouse_down_item);
-
-				// Drag handle specified, but clicked elsewhere?
-				if (mouse_down_item.getElementsByClassName(ZBX_STYLE_SORTABLE_DRAG_HANDLE).length > 0
-						&& e.target.closest(`.${ZBX_STYLE_SORTABLE_DRAG_HANDLE}`) === null) {
-					mouse_down_item = null;
-
-					return;
-				}
-
-				// Prevent content selection while dragging the item.
-				e.preventDefault();
-
-				// Re-focus the item.
-				mouse_down_item.focus();
-
-				// Save initial mouse position.
-				mouse_down_pos = this._is_vertical ? e.clientY : e.clientX;
-
-				this.off('wheel', this._events.wheel);
-				window.addEventListener('mousemove', this._events.windowMouseMove);
-				window.addEventListener('mouseup', this._events.windowMouseUp);
-				window.addEventListener('wheel', this._events.wheel, {passive: false});
-			},
-
-			windowMouseMove: (e) => {
-				if (mouse_down_item !== null) {
-					this._startDragging(mouse_down_item, mouse_down_pos);
-
-					mouse_down_item = null;
-
-					// Prevent clicks after dragging has ended.
-					prevent_clicks = true;
-				}
-
-				mouse_move_pos = this._is_vertical ? e.clientY : e.clientX;
-
-				if (mouse_move_request === null) {
-					mouse_move_request = requestAnimationFrame(() => {
-						this._drag(mouse_move_pos);
-						mouse_move_request = null;
-					});
-				}
-			},
-
-			windowMouseUp: () => {
-				// Was dragging in progress?
-				if (mouse_down_item === null) {
-					const prev_list_pos = this._list_pos;
-
-					// Will occasionally update this._list_pos and start the transition later.
-					this._endDragging();
-
-					end_dragging_after_transitions = (transitions_set.size > 0
-						|| !this._isPosEqual(this._list_pos, prev_list_pos));
-
-					if (!end_dragging_after_transitions) {
-						this._endDraggingAfterTransitions();
-					}
-				}
-				else {
-					mouse_down_item = null;
-				}
-
-				prevent_clicks = false;
-
-				if (mouse_move_request !== null) {
-					cancelAnimationFrame(mouse_move_request);
-					mouse_move_request = null;
-				}
-
-				window.removeEventListener('mousemove', this._events.windowMouseMove);
-				window.removeEventListener('mouseup', this._events.windowMouseUp);
-				window.removeEventListener('wheel', this._events.wheel);
-				this.on('wheel', this._events.wheel, {passive: false});
-			},
-
-			listKeyDown: (e) => {
-				if (!this._is_sorting_enabled) {
-					return;
-				}
-
-				if (e.target.parentNode !== this._list) {
-					return;
-				}
-
-				if ((e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || !e.ctrlKey) {
-					return;
-				}
-
-				if (e.key === 'ArrowLeft' && e.target.previousElementSibling === null
-						|| e.key === 'ArrowRight' && e.target.nextElementSibling === null) {
-					return;
-				}
-
-				this.insertItemBefore(e.target, e.key === 'ArrowLeft'
-					? e.target.previousElementSibling
-					: e.target.nextElementSibling.nextElementSibling
-				);
-
-				e.preventDefault();
-
-				// Re-focus the moved item.
-				e.target.focus();
-
-				this.fire(SORTABLE_EVENT_SORT);
-			},
-
-			listFocusIn: (e) => {
-				const item = e.target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
-
-				if (item) {
-					this.scrollItemIntoView(item);
-				}
-			},
-
-			listRunTransition: (e) => {
-				if (e.propertyName === (this._is_vertical ? 'top' : 'left')) {
-					transitions_set.add(e.target);
-				}
-			},
-
-			listEndTransition: (e) => {
-				transitions_set.delete(e.target);
-
-				// Delete outdated targets.
-				for (const target of transitions_set) {
-					if (target === this._list) {
-						continue;
-					}
-
-					const item = target.closest(`.${ZBX_STYLE_SORTABLE_ITEM}`);
-
-					if (item === null || item.parentNode !== this._list) {
-						transitions_set.delete(target);
-					}
-				}
-
-				if (end_dragging_after_transitions && transitions_set.size === 0) {
-					this._endDraggingAfterTransitions();
-					end_dragging_after_transitions = false;
-				}
-			},
-
-			listResize: () => {
-				this._fixListPos();
-			},
-
-			_cancelDragging: () => {
-				// Actually dragging an item?
-				if (prevent_clicks || mouse_down_item !== null) {
-					this._events.windowMouseUp();
-				}
-			},
-		};
-
-		this._activateEvents = () => {
-			prevent_clicks = false;
-			mouse_down_item = null;
-			mouse_move_request = null;
-			wheel_request = null;
-			end_dragging_after_transitions = false;
-			transitions_set = new Set();
-
-			this.on('click', this._events.targetClick);
-			this.on('scroll', this._events.targetScroll);
-			this.on('wheel', this._events.wheel, {passive: false});
-			this.on('_dragcancel', this._events._cancelDragging);
-			this._list.addEventListener('mousedown', this._events.listMouseDown);
-			this._list.addEventListener('keydown', this._events.listKeyDown);
-			this._list.addEventListener('focusin', this._events.listFocusIn);
-			this._list.addEventListener('transitionrun', this._events.listRunTransition);
-			this._list.addEventListener('transitionend', this._events.listEndTransition);
-
-			list_resize_observer = new ResizeObserver(this._events.listResize);
-			list_resize_observer.observe(this._list);
-		};
-
-		this._deactivateEvents = () => {
-			if (wheel_request !== null) {
-				cancelAnimationFrame(wheel_request);
-			}
-
-			if (end_dragging_after_transitions) {
-				this._endDraggingAfterTransitions();
-			}
-
-			this.off('click', this._events.targetClick);
-			this.off('scroll', this._events.targetScroll);
-			this.off('wheel', this._events.wheel);
-			this.off('_dragcancel', this._events._cancelDragging);
-			this._list.removeEventListener('mousedown', this._events.listMouseDown);
-			this._list.removeEventListener('keydown', this._events.listKeyDown);
-			this._list.removeEventListener('focusin', this._events.listFocusIn);
-			this._list.removeEventListener('transitionrun', this._events.listRunTransition);
-			this._list.removeEventListener('transitionend', this._events.listEndTransition);
-
-			// Added by mousedown event handler.
-			window.removeEventListener('mousemove', this._events.windowMouseMove);
-			window.removeEventListener('mouseup', this._events.windowMouseUp);
-			window.removeEventListener('wheel', this._events.wheel);
-
-			list_resize_observer.disconnect();
-		};
+	#fire(type, detail = {}, options = {}) {
+		return this.#target.dispatchEvent(new CustomEvent(type, {...options, detail: {target: this, ...detail}}));
 	}
 }
