@@ -747,12 +747,6 @@ class CDashboardPage extends CBaseComponent {
 
 		widget_blocker.classList.add('dashboard-grid-widget-blocker');
 		this._dashboard_grid.prepend(widget_blocker);
-
-		const iframes = this._dashboard_grid.querySelectorAll('iframe');
-
-		for (let i = 0; i < iframes.length; i++) {
-			iframes[i].style.pointerEvents = 'none';
-		}
 	}
 
 	unblockInteraction() {
@@ -760,12 +754,6 @@ class CDashboardPage extends CBaseComponent {
 
 		if (widget_blocker !== null) {
 			widget_blocker.remove();
-		}
-
-		const iframes = this._dashboard_grid.querySelectorAll('iframe');
-
-		for (let i = 0; i < iframes.length; i++) {
-			iframes[i].style.pointerEvents = '';
 		}
 	}
 
