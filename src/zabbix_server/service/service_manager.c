@@ -461,7 +461,7 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 			value_eq_local.value = service_problem_tag->value;
 			if (NULL != (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
 			{
-				i = zbx_vector_service_problem_tag_ptr_search(&value_eq->service_problem_tags,
+				int	i = zbx_vector_service_problem_tag_ptr_search(&value_eq->service_problem_tags,
 						service_problem_tag, ZBX_DEFAULT_PTR_COMPARE_FUNC);
 
 				if (FAIL == i)
