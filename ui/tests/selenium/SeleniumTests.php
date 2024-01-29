@@ -153,6 +153,11 @@ require_once dirname(__FILE__).'/macros/testFormMacrosHost.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosHostPrototype.php';
 require_once dirname(__FILE__).'/macros/testFormMacrosTemplate.php';
 
+// Maps.
+require_once dirname(__FILE__).'/maps/testFormMap.php';
+require_once dirname(__FILE__).'/maps/testFormSysmap.php';
+require_once dirname(__FILE__).'/maps/testPageMaps.php';
+
 // Maintenance
 require_once dirname(__FILE__).'/maintenance/testFormMaintenance.php';
 require_once dirname(__FILE__).'/maintenance/testPageMaintenance.php';
@@ -230,11 +235,6 @@ require_once dirname(__FILE__).'/services/testPageServicesServicesMassUpdate.php
 require_once dirname(__FILE__).'/sla/testFormServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSla.php';
 require_once dirname(__FILE__).'/sla/testPageServicesSlaReport.php';
-
-// Sysmaps.
-require_once dirname(__FILE__).'/sysmaps/testFormMap.php';
-require_once dirname(__FILE__).'/sysmaps/testFormSysmap.php';
-require_once dirname(__FILE__).'/sysmaps/testPageMaps.php';
 
 // Tags.
 require_once dirname(__FILE__).'/tags/testFormTagsConnectors.php';
@@ -471,6 +471,15 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormMacrosHostPrototype');
 		$suite->addTestSuite('testFormMacrosTemplate');
 
+		// Maintenance.
+		$suite->addTestSuite('testFormMaintenance');
+		$suite->addTestSuite('testPageMaintenance');
+
+		// Maps.
+		$suite->addTestSuite('testFormMap');
+		$suite->addTestSuite('testFormSysmap');
+		$suite->addTestSuite('testPageMaps');
+
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
@@ -539,11 +548,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageServicesSla');
 		$suite->addTestSuite('testPageServicesSlaReport');
 
-		// Sysmaps.
-		$suite->addTestSuite('testFormMap');
-		$suite->addTestSuite('testFormSysmap');
-		$suite->addTestSuite('testPageMaps');
-
 		// Tags.
 		$suite->addTestSuite('testFormTagsConnectors');
 		$suite->addTestSuite('testFormTagsHost');
@@ -605,7 +609,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
-		$suite->addTestSuite('testPageMaintenance');
 /*
 		$suite->addTestSuite('testPageQueueDetails');
 		$suite->addTestSuite('testPageQueueOverview');
@@ -627,7 +630,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormLogin');
-		$suite->addTestSuite('testFormMaintenance');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testPageBrowserWarning');
