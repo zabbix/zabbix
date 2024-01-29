@@ -55,7 +55,8 @@ class CAuthenticationHelper {
 	public const SAML_SSO_URL = 'saml_sso_url';
 	public const SAML_USERNAME_ATTRIBUTE = 'saml_username_attribute';
 
-	protected static $params = [];
+	private static $params = [];
+	private static $params_public = [];
 
 	/**
 	 * Get the value of the given Authentication API object's field.
@@ -87,5 +88,20 @@ class CAuthenticationHelper {
 		}
 
 		return array_key_exists($field, self::$params) ? self::$params[$field] : null;
+	}
+
+	/**
+	 * Get the value of the given Authentication API object's field available to parts of the UI without authentication.
+	 *
+	 * @param string $field
+	 *
+	 * @return string|null
+	 */
+	public static function getPublic(string $field): ?string {
+		if (!self::$params_public) {
+			self::$params_public = CAuthentication::getPublic();
+		}
+
+		return array_key_exists($field, self::$params_public) ? self::$params_public[$field] : null;
 	}
 }

@@ -99,20 +99,7 @@ class CWebUser {
 				'extend' => self::$extend_session
 			]);
 
-			if (empty(self::$data)) {
-				CMessageHelper::clear();
-				self::$data = API::User()->login([
-					'username' => ZBX_GUEST_USER,
-					'password' => '',
-					'userData' => true
-				]);
-
-				if (empty(self::$data)) {
-					throw new Exception();
-				}
-			}
-
-			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+			if (!self::$data || self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				throw new Exception();
 			}
 
