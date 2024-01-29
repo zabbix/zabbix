@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -795,30 +795,6 @@ abstract class CControllerPopupItemTest extends CController {
 	}
 
 	/**
-	 * Transform front-end familiar array of parameters fields to the form server is capable to handle. Server expects
-	 * one object where parameter names are keys and parameter values are values. Note that parameter names are unique.
-	 *
-	 * @param array $data
-	 * @param array $data[name]   Indexed array of names.
-	 * @param array $data[value]  Indexed array of values.
-	 *
-	 * @return array
-	 */
-	protected function transformParametersFields(array $data): array {
-		$result = [];
-
-		if (array_key_exists('name', $data) && array_key_exists('value', $data)) {
-			foreach (array_keys($data['name']) as $num) {
-				if (array_key_exists($num, $data['value']) && $data['name'][$num] !== '') {
-					$result += [$data['name'][$num] => $data['value'][$num]];
-				}
-			}
-		}
-
-		return $result;
-	}
-
-	/**
 	 * Resolve macros used in preprocessing step parameter fields.
 	 *
 	 * @param array $steps  Steps from item test input form.
@@ -1192,8 +1168,8 @@ abstract class CControllerPopupItemTest extends CController {
 	 *
 	 * @param array $data  (optional) Appended with `item` and `host` parameters.
 	 */
-	protected function prepareTestData(array &$data = []): void {
-		$data += $this->getItemTestProperties($this->getInputAll(), true);
+	protected function prepareTestData(?array &$data = []): void {
+		$data = ($data === null ? [] : $data ) + $this->getItemTestProperties($this->getInputAll(), true);
 		$data = $this->resolveItemPropertyMacros($data);
 
 		if ($data['item']['type'] == ITEM_TYPE_CALCULATED) {
@@ -1250,6 +1226,16 @@ abstract class CControllerPopupItemTest extends CController {
 			unset($header);
 
 			$item['headers'] = implode("\r\n", $item['headers']);
+		}
+
+		if (array_key_exists('parameters', $item)) {
+			$parameters = [];
+
+			foreach ($item['parameters'] as $parameter) {
+				$parameters += [$parameter['name'] => $parameter['value']];
+			}
+
+			$data['parameters'] = $parameters;
 		}
 	}
 

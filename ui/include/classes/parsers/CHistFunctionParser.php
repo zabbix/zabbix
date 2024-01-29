@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,7 @@ class CHistFunctionParser extends CParser {
 	public const PARAM_TYPE_PERIOD = 1;
 	public const PARAM_TYPE_QUOTED = 2;
 	public const PARAM_TYPE_UNQUOTED = 3;
+	public const PARAM_TYPE_EMPTY = 4;
 
 	/**
 	 * An options array.
@@ -59,13 +60,13 @@ class CHistFunctionParser extends CParser {
 
 	private $query_parser;
 	private $period_parser;
-	private $time_parser;
-	private $size_parser;
 
 	/**
+	 * The list of parsers for unquoted parameters.
+	 *
 	 * @var array
 	 */
-	private $macro_parsers = [];
+	private $unquoted_param_parsers = [];
 
 	/**
 	 * Parsed function name.
@@ -99,14 +100,14 @@ class CHistFunctionParser extends CParser {
 			'usermacros' => $this->options['usermacros'],
 			'lldmacros' => $this->options['lldmacros']
 		]);
-		$this->size_parser = new CNumberParser(['with_size_suffix' => true]);
-		$this->time_parser = new CNumberParser(['with_time_suffix' => true, 'with_year' => true]);
-
+		$this->unquoted_param_parsers[] = new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true,
+			'with_year' => true
+		]);
 		if ($this->options['usermacros']) {
-			array_push($this->macro_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
+			array_push($this->unquoted_param_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
 		}
 		if ($this->options['lldmacros']) {
-			array_push($this->macro_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
+			array_push($this->unquoted_param_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
 		}
 	}
 
@@ -159,9 +160,6 @@ class CHistFunctionParser extends CParser {
 		$state = self::STATE_NEW;
 		$num = 0;
 
-		// The list of parsers for unquoted parameters.
-		$parsers = array_merge([$this->size_parser, $this->time_parser], $this->macro_parsers);
-
 		while (isset($source[$p])) {
 			switch ($state) {
 				// a new parameter started
@@ -191,7 +189,7 @@ class CHistFunctionParser extends CParser {
 							switch ($source[$p]) {
 								case ',':
 									$_parameters[$num++] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -200,7 +198,7 @@ class CHistFunctionParser extends CParser {
 
 								case ')':
 									$_parameters[$num] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -242,7 +240,7 @@ class CHistFunctionParser extends CParser {
 							switch ($source[$p]) {
 								case ',':
 									$_parameters[$num++] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -251,7 +249,7 @@ class CHistFunctionParser extends CParser {
 
 								case ')':
 									$_parameters[$num] = [
-										'type' => self::PARAM_TYPE_UNQUOTED,
+										'type' => self::PARAM_TYPE_EMPTY,
 										'pos' => $p,
 										'match' => '',
 										'length' => 0
@@ -270,12 +268,8 @@ class CHistFunctionParser extends CParser {
 									break;
 
 								default:
-									$length = 0;
-									$new_p = $p;
-
-									foreach ($parsers as $parser) {
-										if ($parser->parse($source, $p) != CParser::PARSE_FAIL
-												&& $parser->getLength() > $length) {
+									foreach ($this->unquoted_param_parsers as $parser) {
+										if ($parser->parse($source, $p) != CParser::PARSE_FAIL) {
 											$_parameters[$num] = [
 												'type' => self::PARAM_TYPE_UNQUOTED,
 												'pos' => $p,
@@ -283,17 +277,15 @@ class CHistFunctionParser extends CParser {
 												'length' => $parser->getLength()
 											];
 
-											$new_p = $p + $parser->getLength() - 1;
-											$length = $parser->getLength();
+											$p += $parser->getLength() - 1;
 											$state = self::STATE_END;
+											break;
 										}
 									}
 
 									if ($state != self::STATE_END) {
 										break 3;
 									}
-
-									$p = $new_p;
 							}
 						}
 					}
@@ -390,28 +382,47 @@ class CHistFunctionParser extends CParser {
 	 * Unquotes special symbols in the parameter.
 	 *
 	 * @param string $param
-	 * @param bool   $unescape_backslashes
+	 * @param array  $options
 	 *
 	 * @return string
 	 */
-	public static function unquoteParam(string $param, bool $unescape_backslashes = true): string {
-		$replace_pairs = $unescape_backslashes
-			? ['\\"' => '"', '\\\\' => '\\']
-			: ['\\"' => '"'];
+	public static function unquoteParam(string $param, array $options = []): string {
+		$options += ['unescape_backslashes' => true];
+		$replace_pairs = $options['unescape_backslashes'] ? ['\\"' => '"', '\\\\' => '\\'] : ['\\"' => '"'];
 
 		return strtr(substr($param, 1, -1), $replace_pairs);
 	}
 
 	/**
 	 * @param string $param
-	 * @param bool   $escape_backslashes
+	 * @param bool   $force
+	 * @param array  $options
 	 *
 	 * @return string
 	 */
-	public static function quoteParam(string $param, bool $escape_backslashes = true): string {
-		$replace_pairs = $escape_backslashes
-			? ['\\' => '\\\\', '"' => '\\"']
-			: ['"' => '\\"'];
+	public static function quoteParam(string $param, bool $force = false, array $options = []): string {
+		$options += ['usermacros' => false, 'lldmacros' => false, 'escape_backslashes' => true];
+
+		if (!$force) {
+
+			$unquoted_param_parsers = [new CNumberParser(['with_size_suffix' => true, 'with_time_suffix' => true,
+				'with_year' => true
+			])];
+			if ($options['usermacros']) {
+				array_push($unquoted_param_parsers, new CUserMacroParser, new CUserMacroFunctionParser);
+			}
+			if ($options['lldmacros']) {
+				array_push($unquoted_param_parsers, new CLLDMacroParser, new CLLDMacroFunctionParser);
+			}
+
+			foreach ($unquoted_param_parsers as $parser) {
+				if ($parser->parse($param) == CParser::PARSE_SUCCESS) {
+					return $param;
+				}
+			}
+		}
+
+		$replace_pairs = $options['escape_backslashes'] ? ['\\' => '\\\\', '"' => '\\"'] : ['"' => '\\"'];
 
 		return '"'.strtr($param, $replace_pairs).'"';
 	}
@@ -431,7 +442,7 @@ class CHistFunctionParser extends CParser {
 		$param = $this->parameters[$num];
 
 		return $param['type'] == self::PARAM_TYPE_QUOTED
-			? self::unquoteParam($param['match'], $this->options['escape_backslashes'])
+			? self::unquoteParam($param['match'], ['unescape_backslashes' => $this->options['escape_backslashes']])
 			: $param['match'];
 	}
 }

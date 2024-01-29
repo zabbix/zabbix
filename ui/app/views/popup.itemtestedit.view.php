@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -44,10 +44,9 @@ foreach ($data['inputs']['item'] as $name => $value) {
 		}
 	}
 	elseif (in_array($name, ['query_fields', 'headers', 'parameters'])) {
-		foreach (['name', 'value'] as $key) {
-			if (array_key_exists($key, $value)) {
-				$form->addVar($name.'['.$key.']', $value[$key]);
-			}
+		foreach ($value as $num => $row) {
+			$form->addVar($name.'['.$num.'][name]', $row['name']);
+			$form->addVar($name.'['.$num.'][value]', $row['value']);
 		}
 	}
 	else {

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ class testFormLogin extends CWebTest {
 					'login' => 'LDAP user',
 					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
-					'error_message' => 'LDAP authentication is disabled.'
+					'error_message' => 'Incorrect user name or password or account is temporarily blocked.'
 				]
 			],
 			[
@@ -50,7 +50,7 @@ class testFormLogin extends CWebTest {
 					'login' => 'no-access-to-the-frontend',
 					'password' => 'zabbix12345',
 					'expected' => TEST_BAD,
-					'error_message' => 'No permissions for system access.'
+					'error_message' => 'GUI access disabled.'
 				]
 			],
 			[

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,8 @@
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
+#include "postinit/postinit.h"
+
 #include "zbxexport.h"
 #include "zbxself.h"
 
@@ -35,6 +37,7 @@
 #include "zbxnix.h"
 #include "zbxcomms.h"
 
+#include "zbxvmware.h"
 #include "zbxalerter.h"
 #include "zbxdbsyncer.h"
 #include "dbconfig/dbconfig.h"
@@ -47,7 +50,6 @@
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"
 #include "proxypoller/proxypoller.h"
-#include "vmware/vmware.h"
 #include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
 #include "connector/connector_worker.h"
@@ -63,7 +65,6 @@
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
 #include "zbxhistory.h"
-#include "postinit.h"
 #include "zbxvault.h"
 #include "zbxtrends.h"
 #include "ha/ha.h"
@@ -1497,7 +1498,8 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
-	zbx_thread_snmptrapper_args	snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_snmptrapper_args	snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
+								.config_ha_node_name = CONFIG_HA_NODE_NAME};
 	zbx_thread_service_manager_args	serviceman_args = {zbx_config_timeout};
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,

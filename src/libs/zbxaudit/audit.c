@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,12 +30,20 @@
 #define AUDIT_USERNAME		"System"
 #define AUDIT_IP		""
 
-static int		audit_mode;
 static zbx_hashset_t	zbx_audit;
 
-int	zbx_get_audit_mode(void)
+static int		auditlog_mode;
+
+int	zbx_get_auditlog_mode(void)
 {
-	return audit_mode;
+	return auditlog_mode;
+}
+
+static int		auditlog_enabled;
+
+int	zbx_get_auditlog_enabled(void)
+{
+	return auditlog_enabled;
 }
 
 zbx_hashset_t	*zbx_get_audit_hashset(void)
@@ -61,8 +69,8 @@ zbx_audit_entry_t	*zbx_audit_entry_init(zbx_uint64_t id, const int id_table, con
 	return audit_entry;
 }
 
-zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table, const char *name, int audit_action,
-		int resource_type)
+zbx_audit_entry_t	*zbx_audit_entry_init_cuid(const char *cuid, const int id_table, const char *name,
+		int audit_action, int resource_type)
 {
 	zbx_audit_entry_t	*audit_entry;
 
@@ -264,12 +272,12 @@ static int	zbx_audit_compare_func(const void *d1, const void *d2)
 	return zbx_strcmp_null((*audit_entry_1)->cuid, (*audit_entry_2)->cuid);
 }
 
-void	zbx_audit_clean(void)
+void	zbx_audit_clean(int audit_context_mode)
 {
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
 
@@ -284,21 +292,22 @@ void	zbx_audit_clean(void)
 	zbx_hashset_destroy(&zbx_audit);
 }
 
-void	zbx_audit_init(int audit_mode_set)
+void	zbx_audit_init(int auditlog_enabled_set, int auditlog_mode_set, int audit_context_mode)
 {
-	audit_mode = audit_mode_set;
-	RETURN_IF_AUDIT_OFF();
+	auditlog_enabled = auditlog_enabled_set;
+	auditlog_mode = auditlog_mode_set;
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 #define AUDIT_HASHSET_DEF_SIZE	100
 	zbx_hashset_create(&zbx_audit, AUDIT_HASHSET_DEF_SIZE, zbx_audit_hash_func, zbx_audit_compare_func);
 #undef AUDIT_HASHSET_DEF_SIZE
 }
 
-void	zbx_audit_prepare(void)
+void	zbx_audit_prepare(int audit_context_mode)
 {
 	zbx_config_t	cfg;
 
-	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED);
-	zbx_audit_init(cfg.auditlog_enabled);
+	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
+	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, audit_context_mode);
 }
 
 static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
@@ -315,14 +324,14 @@ static int	zbx_audit_validate_entry(const zbx_audit_entry_t *entry)
 	}
 }
 
-void	zbx_audit_flush(void)
+void	zbx_audit_flush(int audit_context_mode)
 {
 	char			recsetid_cuid[CUID_LEN];
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 	zbx_db_insert_t		db_insert_audit;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	zbx_new_cuid(recsetid_cuid);
 	zbx_hashset_iter_reset(&zbx_audit, &iter);
@@ -345,17 +354,17 @@ void	zbx_audit_flush(void)
 	zbx_db_insert_execute(&db_insert_audit);
 	zbx_db_insert_clean(&db_insert_audit);
 
-	zbx_audit_clean();
+	zbx_audit_clean(audit_context_mode);
 }
 
-int	zbx_audit_flush_once(void)
+int	zbx_audit_flush_once(int audit_context_mode)
 {
 	char			recsetid_cuid[CUID_LEN];
 	int			ret = ZBX_DB_OK;
 	zbx_hashset_iter_t	iter;
 	zbx_audit_entry_t	**audit_entry;
 
-	if (ZBX_AUDITLOG_ENABLED != zbx_get_audit_mode())
+	if (ZBX_AUDITLOG_ENABLED != zbx_get_auditlog_enabled())
 		return ZBX_DB_OK;
 
 	zbx_new_cuid(recsetid_cuid);
@@ -398,7 +407,7 @@ int	zbx_audit_flush_once(void)
 			break;
 	}
 
-	zbx_audit_clean();
+	zbx_audit_clean(audit_context_mode);
 
 	return ret;
 }

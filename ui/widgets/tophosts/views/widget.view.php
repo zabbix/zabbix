@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,16 +77,22 @@ else {
 			if ($column_config['data'] == CWidgetFieldColumnsList::DATA_ITEM_VALUE
 					&& $column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS
 					&& array_key_exists('thresholds', $column_config)) {
-				foreach ($column_config['thresholds'] as $threshold) {
-					$threshold_value = $column['is_binary_units']
-						? $threshold['threshold_binary']
-						: $threshold['threshold'];
+				$is_numeric_data = in_array($column['item']['value_type'],
+					[ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64]
+				) || CAggFunctionData::isNumericResult($column_config['aggregate_function']);
 
-					if ($column['value'] < $threshold_value) {
-						break;
+				if ($is_numeric_data) {
+					foreach ($column_config['thresholds'] as $threshold) {
+						$threshold_value = $column['is_binary_units']
+							? $threshold['threshold_binary']
+							: $threshold['threshold'];
+
+						if ($column['value'] < $threshold_value) {
+							break;
+						}
+
+						$color = $threshold['color'];
 					}
-
-					$color = $threshold['color'];
 				}
 			}
 
@@ -117,12 +123,14 @@ else {
 						$column['value'] = _('binary value');
 					}
 					else {
-						$formatted_value = formatHistoryValue($column['value'], $column['item'], true, [
-							'decimals' => $column_config['decimal_places'],
-							'decimals_exact' => true,
-							'small_scientific' => false,
-							'zero_as_zero' => false
-						]);
+						$formatted_value = formatAggregatedHistoryValue($column['value'], $column['item'],
+							$column_config['aggregate_function'], false, true, [
+								'decimals' => $column_config['decimal_places'],
+								'decimals_exact' => true,
+								'small_scientific' => false,
+								'zero_as_zero' => false
+							]
+						);
 					}
 
 					if ($column_config['display'] == CWidgetFieldColumnsList::DISPLAY_AS_IS) {

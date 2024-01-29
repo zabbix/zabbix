@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,7 +101,7 @@ class testFormScheduledReport extends CWebTest {
 		$subscription_container = $form->getField('Subscriptions')->asTable();
 
 		// Report form fields maxlength attribute.
-		$maxlength_fields = ['Name' => 255, 'id:active_since' => 10, 'id:active_till' => 10, 'Subject' => 255,
+		$maxlength_fields = ['Name' => 255, 'id:active_since' => 255, 'id:active_till' => 255, 'Subject' => 255,
 			'Message' => 65535, 'Description' => 2048
 		];
 		foreach ($maxlength_fields as $field => $maxlength) {
@@ -1378,7 +1378,7 @@ class testFormScheduledReport extends CWebTest {
 					CPopupMenuElement::find()->waitUntilVisible()->one()->select('View related reports');
 					$table = COverlayDialogElement::find()->waitUntilReady()->one()->asTable();
 					$this->assertFalse($table->query('link', $name)->one(false)->isValid());
-					// Open another dahsboard and check related reports.
+					// Open another dashboard and check related reports.
 					$this->page->open('zabbix.php?action=dashboard.list')->waitUntilReady();
 					$this->query('link', $data['fields']['Dashboard'])->waitUntilClickable()->one()->click();
 				}

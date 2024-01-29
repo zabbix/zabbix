@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,8 +23,7 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#include"../vmware/vmware.h"
-#include "../vmware/vmware_perfcntr.h"
+#include "zbxvmware.h"
 #include "zbxxml.h"
 #include "zbxsysinfo.h"
 #include "zbxparam.h"

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,16 @@ class CWidgetPieChart extends CWidget {
 		if (this.getState() === WIDGET_STATE_ACTIVE && this.#pie_chart !== null) {
 			this.#pie_chart.setSize(this.#getSize());
 		}
+	}
+
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		if (this.#pie_chart !== null) {
+			readiness.push(this.#pie_chart.promiseRendered());
+		}
+
+		return Promise.all(readiness);
 	}
 
 	getUpdateRequestData() {

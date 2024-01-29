@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -528,7 +528,7 @@ out:
 
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		zbx_get_config_forks_f get_config_forks)
+		const char *progname, zbx_get_config_forks_f get_config_forks)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue, *value = NULL;
 	zbx_dc_item_t			item;
@@ -787,7 +787,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		}
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
-				config_startup_time, program_type);
+				config_startup_time, program_type, progname);
 
 		switch (errcode)
 		{
@@ -846,8 +846,8 @@ out:
 }
 
 static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, unsigned char program_type, zbx_get_config_forks_f get_config_forks,
-		struct zbx_json *json, char **error)
+		int config_startup_time, unsigned char program_type, const char *progname,
+		zbx_get_config_forks_f get_config_forks, struct zbx_json *json, char **error)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
@@ -898,7 +898,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 		proxyid = 0;
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
-			get_config_forks);
+			progname, get_config_forks);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json->buffer);
 
@@ -938,7 +938,7 @@ out:
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		zbx_get_config_forks_f get_config_forks)
+		const char *progname, zbx_get_config_forks_f get_config_forks)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -948,8 +948,8 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 
 	zbx_json_init(&json, 1024);
 
-	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, get_config_forks,
-			&json, &error)))
+	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
+			get_config_forks, &json, &error)))
 	{
 		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout);
 	}

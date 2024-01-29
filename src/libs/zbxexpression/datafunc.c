@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,21 +173,21 @@ int	expr_db_get_trigger_template_name(zbx_uint64_t triggerid, const zbx_uint64_t
 				" and i.itemid=f.itemid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			triggerid);
+
 	if (NULL != userid && USER_TYPE_SUPER_ADMIN != user_type)
 	{
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from hosts_groups hg,rights r,users_groups ug"
-					" where h.hostid=hg.hostid"
-						" and hg.groupid=r.id"
-						" and r.groupid=ug.usrgrpid"
-						" and ug.userid=" ZBX_FS_UI64
-					" group by hg.hostid"
-					" having min(r.permission)>=%d"
+					" from host_hgset hh,permission p,user_ugset uu"
+					" where h.hostid=hh.hostid"
+						" and hh.hgsetid=p.hgsetid"
+						" and p.ugsetid=uu.ugsetid"
+						" and uu.userid=" ZBX_FS_UI64
 				")",
-				*userid, PERM_READ);
+				*userid);
 	}
+
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by h.name");
 
 	result = zbx_db_select("%s", sql);
@@ -262,14 +262,13 @@ int	expr_db_get_trigger_hostgroup_name(zbx_uint64_t triggerid, const zbx_uint64_
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				" and exists("
 					"select null"
-					" from rights r,users_groups ug"
-					" where g.groupid=r.id"
-						" and r.groupid=ug.usrgrpid"
-						" and ug.userid=" ZBX_FS_UI64
-					" group by r.id"
-					" having min(r.permission)>=%d"
+					" from host_hgset hh,permission p,user_ugset uu"
+					" where i.hostid=hh.hostid"
+						" and hh.hgsetid=p.hgsetid"
+						" and p.ugsetid=uu.ugsetid"
+						" and uu.userid=" ZBX_FS_UI64
 				")",
-				*userid, PERM_READ);
+				*userid);
 	}
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, " order by g.name");
 

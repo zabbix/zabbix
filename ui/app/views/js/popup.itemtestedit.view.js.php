@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -215,9 +215,9 @@ function itemGetValueTest(overlay) {
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
 			jQuery('#value_warning', $form)
-				.toggle('warning' in ret)
-				.toggleClass('js-retrieved', 'warning' in ret)
-				.attr('data-hintbox-contents', ret.warning);
+				.toggle('value_warning' in ret)
+				.toggleClass('js-retrieved', 'value_warning' in ret)
+				.attr('data-hintbox-contents', ret.value_warning);
 
 			if (typeof ret.eol !== 'undefined') {
 				jQuery("input[value=" + ret.eol + "]", jQuery("#eol")).prop("checked", "checked");
@@ -318,9 +318,9 @@ function itemCompleteTest(overlay) {
 
 			jQuery('#value', $form).multilineInput('value', ret.value);
 			jQuery('#value_warning', $form)
-				.toggle('warning' in ret)
-				.toggleClass('js-retrieved', 'warning' in ret)
-				.attr('data-hintbox-contents', ret.warning);
+				.toggle('value_warning' in ret)
+				.toggleClass('js-retrieved', 'value_warning' in ret)
+				.attr('data-hintbox-contents', ret.value_warning);
 
 			if ('runtime_error' in ret && jQuery('#runtime_error', $form).length) {
 				jQuery('#runtime_error', $form).multilineInput('value', ret.runtime_error);
@@ -598,9 +598,14 @@ jQuery(document).ready(function($) {
 				<?php endif ?>
 			}
 			else {
-				$not_supported
-					.prop('disabled', false)
-					.trigger('change');
+				if ($not_supported.length) {
+					$not_supported
+						.prop('disabled', false)
+						.trigger('change');
+				}
+				else {
+					$('#value', $form).multilineInput('unsetReadOnly');
+				}
 				$('#value_warning').hide();
 
 				<?php if ($data['show_prev']): ?>
