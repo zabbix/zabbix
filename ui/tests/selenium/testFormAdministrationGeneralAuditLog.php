@@ -30,18 +30,21 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	public $config_link = 'zabbix.php?action=audit.settings.edit';
 	public $default_values = [
 		'Enable audit logging' => true,
+		'Log system actions' => true,
 		'Enable internal housekeeping' => true,
 		'Data storage period' => '31d'
 	];
 
 	public $custom_values = [
 		'Enable audit logging' => true,
+		'Log system actions' => true,
 		'Enable internal housekeeping' => true,
 		'Data storage period' => '400d'
 	];
 
 	public $db_default_values = [
 		'auditlog_enabled' => 1,
+		'auditlog_mode' => 1,
 		'hk_audit_mode' => 1,
 		'hk_audit' => '31d'
 	];
@@ -64,18 +67,36 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
 		$form->checkValue($this->default_values);
 
-		// Check if field "Data storage period" is disabled when options are in all possible ways.
+		// Check if fields "Data storage period" and "Logs system action" are disabled when options are in all possible ways.
 		$checkboxes = [
-			['audit' => true, 'housekeeping' => false],
-			['audit' => false, 'housekeeping' => true],
-			['audit' => false, 'housekeeping' => false],
-			['audit' => true, 'housekeeping' => true]
+			['audit' => true, 'actions' => true, 'housekeeping' => false],
+			['audit' => true, 'actions' => false, 'housekeeping' => false],
+			['audit' => false, 'actions' => true, 'housekeeping' => true],
+			['audit' => false, 'actions' => true, 'housekeeping' => false],
+			['audit' => true, 'actions' => true, 'housekeeping' => true],
+			['audit' => false, 'actions' => false, 'housekeeping' => false]
 		];
 
 		foreach ($checkboxes as $case) {
-			$form->fill(['Enable audit logging' => $case['audit'], 'Enable internal housekeeping' => $case['housekeeping']]);
+			$form->fill(['Log system actions' => $case['actions'], 'Enable audit logging' => $case['audit'],
+					'Enable internal housekeeping' => $case['housekeeping']]
+			);
 			$this->assertTrue($form->getField('Data storage period')->isEnabled($case['housekeeping']));
+			$this->assertTrue($form->getField('Log system actions')->isEnabled($case['audit']));
 		};
+
+		// Check hintbox.
+		$form->getLabel('Log system actions')->query('class:zi-help-filled-small')->one()->click();
+		$hint = $this->query('xpath:.//div[@data-hintboxid]')->waitUntilPresent();
+
+		// Assert text.
+		$this->assertEquals('Log changes by low-level discovery, network discovery and autoregistration',
+				$hint->one()->getText()
+		);
+
+		// Close the hint-box.
+		$hint->one()->query('xpath:.//button[@class="btn-overlay-close"]')->one()->click();
+		$hint->waitUntilNotPresent();
 
 		// Check fields "Data storage period" maxlength.
 		$this->assertEquals(32, $form->getField('Data storage period')->getAttribute('maxlength'));
@@ -113,6 +134,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '0',
 						'hk_audit' => '31d'
 					]
@@ -127,6 +149,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '0',
 						'hk_audit' => '31d'
 					]
@@ -137,11 +160,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '365d'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '365d'
 					]
@@ -157,6 +182,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '365d'
 					]
@@ -167,11 +193,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1440m'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1440m'
 					]
@@ -197,11 +225,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '13139999m'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '13139999m'
 					]
@@ -217,6 +247,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '24h'
 					]
@@ -227,11 +258,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '219000h'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '219000h'
 					]
@@ -247,6 +280,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '218999h'
 					]
@@ -257,11 +291,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1d'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1d'
 					]
@@ -277,6 +313,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1w'
 					]
@@ -287,11 +324,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86400s'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '86400s'
 					]
@@ -302,11 +341,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '788400000s'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788400000s'
 					]
@@ -322,6 +363,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788400000s'
 					]
@@ -337,6 +379,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '788399999s'
 					]
@@ -352,6 +395,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					],
 					'db' => [
 						'auditlog_enabled' => '0',
+						'auditlog_mode' => '1',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '9125d'
 					]
@@ -362,11 +406,13 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 				[
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1303w'
 					],
 					'db' => [
 						'auditlog_enabled' => '1',
+						'auditlog_mode' => '0',
 						'hk_audit_mode' => '1',
 						'hk_audit' => '1303w'
 					]
@@ -390,6 +436,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => 'test'
 					],
@@ -414,6 +461,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '¯\_(ツ)_/¯'
 					],
@@ -438,6 +486,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1s'
 					],
@@ -462,6 +511,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1439m'
 					],
@@ -486,6 +536,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => false,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '1h'
 					],
@@ -510,6 +561,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '86399s'
 					],
@@ -534,6 +586,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '9126d'
 					],
@@ -558,6 +611,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '-1s'
 					],
@@ -582,6 +636,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => '-1w'
 					],
@@ -606,6 +661,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 					'expected' => TEST_BAD,
 					'fields' => [
 						'Enable audit logging' => true,
+						'Log system actions' => true,
 						'Enable internal housekeeping' => true,
 						'Data storage period' => ''
 					],

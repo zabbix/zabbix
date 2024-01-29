@@ -206,7 +206,7 @@ class CControllerItemList extends CControllerItem {
 	 * Get subfilter with additional labels data.
 	 *
 	 * @param array $items       Array of items data without applied subfilter.
-	 * @param array $subfilters  Array of subfiter data.
+	 * @param array $subfilters  Array of subfilter data.
 	 *
 	 * @return array
 	 */

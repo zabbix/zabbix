@@ -22,11 +22,11 @@
 #include "audit/zbxaudit_proxy.h"
 #include "audit/zbxaudit.h"
 
-void	zbx_audit_proxy_config_reload(zbx_uint64_t proxyid, const char *name)
+void	zbx_audit_proxy_config_reload(int audit_context_mode, zbx_uint64_t proxyid, const char *name)
 {
 	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	local_audit_entry.id = proxyid;
 	local_audit_entry.cuid = NULL;
