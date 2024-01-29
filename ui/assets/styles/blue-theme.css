@@ -5607,10 +5607,9 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 .qr-code {
   --qr-bgcolor: #ffffff;
   --qr-color: #1f2c33;
-  padding: 8px; }
-
-.qr-code img {
-  margin: 0 auto; }
+  height: 190px;
+  width: 190px;
+  margin: 8px auto; }
 
 .menu-popup-overlay {
   position: fixed;

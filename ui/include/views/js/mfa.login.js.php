@@ -31,11 +31,12 @@
 		init({qr_code_url}) {
 			const qr_code_div = document.querySelector('.qr-code');
 			const styles = getComputedStyle(qr_code_div);
+			const size = qr_code_div.clientWidth;
 
 			new QRCode(qr_code_div, {
 				text: qr_code_url,
-				width: 190,
-				height: 190,
+				width: size,
+				height: size,
 				colorDark : styles.getPropertyValue('--qr-color'),
 				colorLight : styles.getPropertyValue('--qr-bgcolor'),
 				correctLevel : QRCode.CorrectLevel.H

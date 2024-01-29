@@ -1617,11 +1617,9 @@ select {
 	--qr-bgcolor: #{$ui-bg-color};
 	--qr-color: #{$font-color};
 
-	padding: 8px;
-}
-
-.qr-code img {
-	margin: 0 auto;
+	height: 190px;
+	width: 190px;
+	margin: 8px auto;
 }
 
 // Action Menus, Pop-up Menus.
