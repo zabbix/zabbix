@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T21:01:42Z'
+  date: '2023-12-28T08:16:31Z'
   groups:
     - uuid: 1d12408342854fd5a4436dd6d5d1bd4a
       name: Templates/Telephony
@@ -907,7 +907,7 @@ zabbix_export:
               history: '0'
               trends: '0'
               value_type: TEXT
-              description: 'Raw data for a IAX trunk.'
+              description: 'Raw data for an IAX trunk.'
               preprocessing:
                 - type: JSONPATH
                   parameters:

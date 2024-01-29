@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -238,6 +238,101 @@ class testFormNetworkDiscovery extends CWebTest {
 		}
 
 		$checks_dialog->query('xpath:.//button[@title="Close"]')->one()->waitUntilClickable()->click();
+	}
+
+	public static function getNoChangesData() {
+		return [
+			[
+				[
+					'action' => 'Simple update'
+				]
+			],
+			[
+				[
+					'action' => 'Add'
+				]
+			],
+			[
+				[
+					'action' => 'Update'
+				]
+			],
+			[
+				[
+					'action' => 'Clone'
+				]
+			],
+			[
+				[
+					'action' => 'Delete'
+				]
+			]
+		];
+	}
+
+	/**
+	 * Test for checking Discovery rule form's actions cancelling.
+	 *
+	 * @dataProvider getNoChangesData
+	 */
+	public function testFormNetworkDiscovery_NoChanges($data) {
+		// Add actions table to hash to check that dependent Action is also not changed.
+		$old_hash = $this->getHash().CDBHelper::getHash('SELECT * FROM actions');
+		$new_name = microtime(true).' Cancel '.self::CANCEL_RULE;
+
+		$this->page->login()->open('zabbix.php?action=discovery.list')->waitUntilReady();
+		$selector = ($data['action'] === 'Add') ? 'button:Create discovery rule' : ('link:'.self::CANCEL_RULE);
+		$this->query($selector)->waitUntilClickable()->one()->click();
+		$form = $this->query('id:discoveryForm')->waitUntilPresent()->one()->asForm();
+
+		if ($data['action'] === 'Delete') {
+			$form->query('button:Delete')->waitUntilClickable()->one()->click();
+			$this->page->dismissAlert();
+		}
+		else {
+			if ($data['action'] !== 'Simple update') {
+				// Fill form's fields.
+				$form->fill([
+					'Name' => $new_name,
+					'Discovery by proxy' => 'Passive proxy 1',
+					'Update interval' => '15s',
+					'Enabled' => false
+				]);
+
+				$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
+						->waitUntilClickable()->one()->click();
+				$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+				$checks_form = $checks_dialog->asForm();
+				$checks_form->fill([
+					'Check type' => 'SNMPv2 agent',
+					'Port range' => 99,
+					'SNMP community' => 'new cancel community',
+					'SNMP OID' => 'new cancel OID'
+				]);
+				$checks_form->submit();
+				$checks_dialog->waitUntilNotVisible();
+
+				$radios = [
+					'Device uniqueness criteria' => 'SNMPv2 agent (99) "new cancel OID"',
+					'Host name' => 'IP address',
+					'Visible name' => 'DNS name'
+				];
+
+				foreach ($radios as $label => $value) {
+					$form->getField($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
+				}
+
+				if ($data['action'] === 'Clone') {
+					$form->query('button', $data['action'])->one()->click();
+				}
+			}
+
+			$form->query('button', ($data['action'] === 'Simple update') ? 'Update' : 'Cancel')
+					->waitUntilClickable()->one()->click();
+		}
+
+		$this->page->assertHeader('Discovery rules');
+		$this->assertEquals($old_hash, $this->getHash().CDBHelper::getHash('SELECT * FROM actions'));
 	}
 
 	public function getCommonData() {
@@ -717,7 +812,7 @@ class testFormNetworkDiscovery extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Mimimal fields create'
+						'Name' => 'Minimal fields create'
 					],
 					'Checks' => [['default' => true]]
 				]
@@ -1877,101 +1972,6 @@ class testFormNetworkDiscovery extends CWebTest {
 		$this->query('link', $discovery_name)->waitUntilClickable()->one()->click();
 		$form->invalidate();
 		$this->compareChecksTable(['SNMPv3 agent "1"', 'SNMPv3 agent "1"']);
-	}
-
-	public static function getNoChangesData() {
-		return [
-			[
-				[
-					'action' => 'Simple update'
-				]
-			],
-			[
-				[
-					'action' => 'Add'
-				]
-			],
-			[
-				[
-					'action' => 'Update'
-				]
-			],
-			[
-				[
-					'action' => 'Clone'
-				]
-			],
-			[
-				[
-					'action' => 'Delete'
-				]
-			]
-		];
-	}
-
-	/**
-	 * Test for checking Discovery rule form's actions cancelling.
-	 *
-	 * @dataProvider getNoChangesData
-	 */
-	public function testFormNetworkDiscovery_NoChanges($data) {
-		// Add actions table to hash to check that dependent Action is also not changed.
-		$old_hash = $this->getHash().CDBHelper::getHash('SELECT * FROM actions');
-		$new_name = microtime(true).' Cancel '.self::CANCEL_RULE;
-
-		$this->page->login()->open('zabbix.php?action=discovery.list');
-		$selector = ($data['action'] === 'Add') ? 'button:Create discovery rule' : ('link:'.self::CANCEL_RULE);
-		$this->query($selector)->waitUntilClickable()->one()->click();
-		$form = $this->query('id:discoveryForm')->waitUntilPresent()->one()->asForm();
-
-		if ($data['action'] === 'Delete') {
-			$form->query('button:Delete')->waitUntilClickable()->one()->click();
-			$this->page->dismissAlert();
-		}
-		else {
-			if ($data['action'] !== 'Simple update') {
-				// Fill form's fields.
-				$form->fill([
-					'Name' => $new_name,
-					'Discovery by proxy' => 'Passive proxy 1',
-					'Update interval' => '15s',
-					'Enabled' => false
-				]);
-
-				$form->getFieldContainer('Checks')->query('button', $data['action'] === 'Add' ? 'Add' : 'Edit')
-						->waitUntilClickable()->one()->click();
-				$checks_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
-				$checks_form = $checks_dialog->asForm();
-				$checks_form->fill([
-					'Check type' => 'SNMPv2 agent',
-					'Port range' => 99,
-					'SNMP community' => 'new cancel community',
-					'SNMP OID' => 'new cancel OID'
-				]);
-				$checks_form->submit();
-				$checks_dialog->waitUntilNotVisible();
-
-				$radios = [
-					'Device uniqueness criteria' => 'SNMPv2 agent (99) "new cancel OID"',
-					'Host name' => 'IP address',
-					'Visible name' => 'DNS name'
-				];
-
-				foreach ($radios as $label => $value) {
-					$form->getField($label)->query('class:list-check-radio')->one()->asSegmentedRadio()->fill($value);
-				}
-
-				if ($data['action'] === 'Clone') {
-					$form->query('button', $data['action'])->one()->click();
-				}
-			}
-
-			$form->query('button', ($data['action'] === 'Simple update') ? 'Update' : 'Cancel')
-					->waitUntilClickable()->one()->click();
-		}
-
-		$this->page->assertHeader('Discovery rules');
-		$this->assertEquals($old_hash, $this->getHash().CDBHelper::getHash('SELECT * FROM actions'));
 	}
 
 	/**

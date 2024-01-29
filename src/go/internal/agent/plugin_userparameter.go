@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import (
 	"time"
 	"unicode"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxcmd"
@@ -204,7 +205,7 @@ func InitUserParameterPlugin(
 			fmt.Sprintf("User parameter: %s.", param.cmd),
 		)
 		if err != nil {
-			return nil, err
+			return nil, errs.Wrap(err, "failed to register user parameter metrics")
 		}
 	}
 

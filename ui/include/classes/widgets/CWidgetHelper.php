@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -761,7 +761,6 @@ class CWidgetHelper {
 	public static function getDatePicker(CWidgetFieldDatePicker $field): CDateSelector {
 		return (new CDateSelector($field->getName(), $field->getValue()))
 			->setAriaRequired(self::isAriaRequired($field))
-			->setMaxLength(DB::getFieldLength('widget_field', 'value_str'))
 			->setEnabled(($field->getFlags() & CWidgetField::FLAG_DISABLED) == 0);
 	}
 

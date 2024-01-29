@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,12 +23,14 @@ import (
 	"fmt"
 	"io/ioutil"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"github.com/fsnotify/fsnotify"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/watch"
-
-	"github.com/fsnotify/fsnotify"
 )
+
+var impl Plugin
 
 type watchRequest struct {
 	clientid uint64
@@ -50,7 +52,15 @@ type fsNotify interface {
 	removePath(path string)
 }
 
-var impl Plugin
+func init() {
+	impl.eventSources = make(map[string]*fileWatcher)
+	impl.manager = watch.NewManager(&impl)
+
+	err := plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) run() {
 	for {
@@ -103,8 +113,7 @@ type fileWatcher struct {
 	fsnotify fsNotify
 }
 
-type eventFilter struct {
-}
+type eventFilter struct{}
 
 func (w *eventFilter) Process(v interface{}) (value *string, err error) {
 	if b, ok := v.([]byte); !ok {
@@ -150,11 +159,4 @@ func (p *Plugin) addPath(path string) error {
 func (p *Plugin) removePath(path string) {
 	_ = p.watcher.Remove(path)
 	delete(p.eventSources, path)
-}
-
-func init() {
-	impl.eventSources = make(map[string]*fileWatcher)
-	impl.manager = watch.NewManager(&impl)
-
-	plugin.RegisterMetrics(&impl, "FileWatcher", "file.watch", "Monitor file contents.")
 }
