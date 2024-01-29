@@ -799,8 +799,13 @@ out:
 
 int	zbx_dc_maintenance_check_immediate_update(void)
 {
-	/* locking is not necessary */
-	return ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD & config->maintenance_update ? SUCCEED : FAIL;
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD & config->maintenance_update ? SUCCEED : FAIL;
+	UNLOCK_CACHE;
+
+	return ret;
 }
 
 /******************************************************************************
