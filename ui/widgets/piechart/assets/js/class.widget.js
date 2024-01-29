@@ -34,6 +34,16 @@ class CWidgetPieChart extends CWidget {
 		}
 	}
 
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		if (this.#pie_chart !== null) {
+			readiness.push(this.#pie_chart.promiseRendered());
+		}
+
+		return Promise.all(readiness);
+	}
+
 	getUpdateRequestData() {
 		return {
 			...super.getUpdateRequestData(),

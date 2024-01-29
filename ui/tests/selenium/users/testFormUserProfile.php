@@ -372,10 +372,6 @@ class testFormUserProfile extends CLegacyWebTest {
 	}
 	public static function messaging() {
 		return [
-			// TODO: remove this case and put it in the end of data after ZBX-23993 is fixed.
-			[[
-				'expected' => TEST_GOOD
-			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
