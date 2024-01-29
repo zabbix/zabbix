@@ -32,21 +32,21 @@ class TopHostsWidget {
 		CDataHelper::call('item.create', [
 			[
 				'name' => 'top_hosts_trap_text',
-				'key_' => 'top_hosts_trap_text',
+				'key_' => 'top_hosts_text',
 				'hostid' => 10084, // ЗАББИКС Сервер.
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			[
 				'name' => 'top_hosts_trap_log',
-				'key_' => 'top_hosts_trap_log',
+				'key_' => 'top_hosts_log',
 				'hostid' => 10084,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_LOG
 			],
 			[
 				'name' => 'top_hosts_trap_char',
-				'key_' => 'top_hosts_trap_char',
+				'key_' => 'top_hosts_char',
 				'hostid' => 10084,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_STR
