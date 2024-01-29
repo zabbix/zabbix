@@ -3506,11 +3506,13 @@ class CUser extends CApiService {
 			'where' => ['sessionid' => $data['sessionid']]
 		]);
 
-		$outdated = date('Y-m-d H:i:s', strtotime('+5 minutes'));
+		$outdated = strtotime('-5 minutes');
 
-		// Delete outdated sessions with required verification.
-		DBexecute('DELETE FROM sessions WHERE userid='.zbx_dbstr($data['userid']).' AND status='.
-			zbx_dbstr(ZBX_SESSION_VERIFICATION_REQUIRED).' AND lastaccess>'.zbx_dbstr($outdated)
+		$true = DBexecute(
+			'DELETE FROM sessions'.
+				' WHERE '.dbConditionId('userid', [$data['userid']]).
+					' AND '.dbConditionInt('status', [ZBX_SESSION_VERIFICATION_REQUIRED]).
+					' AND lastaccess<'.zbx_dbstr($outdated)
 		);
 
 		CWebUser::checkAuthentication($data['sessionid']);
