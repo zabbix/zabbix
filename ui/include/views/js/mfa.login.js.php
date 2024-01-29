@@ -37,8 +37,8 @@
 				text: qr_code_url,
 				width: size,
 				height: size,
-				colorDark : styles.getPropertyValue('--qr-color'),
-				colorLight : styles.getPropertyValue('--qr-bgcolor'),
+				colorDark : styles.color,
+				colorLight : styles.backgroundColor,
 				correctLevel : QRCode.CorrectLevel.H
 			});
 		}

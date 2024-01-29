@@ -5590,11 +5590,20 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   width: 100%; }
 
 .qr-code {
-  --qr-bgcolor: #ffffff;
-  --qr-color: #000000;
   height: 190px;
   width: 190px;
-  margin: 8px auto; }
+  margin: 8px auto;
+  color: #000000;
+  background-color: #ffffff; }
+
+.qr-code img {
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -o-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: pixelated;
+  image-rendering: optimize-contrast;
+  -ms-interpolation-mode: nearest-neighbor; }
 
 .menu-popup-overlay {
   position: fixed;
