@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,8 @@
 <script>
 	const view = {
 		init({host, dashboard, widget_defaults, time_period, web_layout_mode}) {
-			if (dashboard.pages[0].widgets.length !== 0) {
+			if (dashboard.pages.length > 1
+					|| (dashboard.pages.length === 1 && dashboard.pages[0].widgets.length !== 0)) {
 				timeControl.refreshPage = false;
 
 				ZABBIX.Dashboard = new CDashboard(document.querySelector('.<?= ZBX_STYLE_DASHBOARD ?>'), {

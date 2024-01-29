@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -68,7 +68,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-					->addRow(new CLabel(_('Tag'), 'tag'), $new_condition_tag);
+					->addRow(
+						(new CLabel(_('Tag'), 'tag'))->setAsteriskMark(),
+						$new_condition_tag
+					);
 				break;
 
 			// New event host group form elements.
@@ -97,7 +100,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Host groups'), 'groupids__ms'), $hostgroup_multiselect);
+					->addRow(
+						(new CLabel(_('Host groups'), 'groupids__ms'))->setAsteriskMark(),
+						$hostgroup_multiselect
+					);
 				break;
 
 			// Event tag pair form elements.
@@ -114,9 +120,15 @@ switch ($data['type']) {
 				$inline_js .= $new_condition_newtag->getPostJS();
 
 				$form_list
-					->addRow(new CLabel(_('Old tag name'), 'oldtag'), $new_condition_oldtag)
+					->addRow(
+						(new CLabel(_('Old tag name'), 'oldtag'))->setAsteriskMark(),
+						$new_condition_oldtag
+					)
 					->addRow(_('Operator'), [$operator, new CVar('operator', CONDITION_OPERATOR_EQUAL)])
-					->addRow(new CLabel(_('New tag name'), 'newtag'), $new_condition_newtag);
+					->addRow(
+						(new CLabel(_('New tag name'), 'newtag'))->setAsteriskMark(),
+						$new_condition_newtag
+					);
 				break;
 
 			// Old|New event tag value form elements.
@@ -134,7 +146,10 @@ switch ($data['type']) {
 				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_list
-					->addRow(new CLabel(_('Tag'), 'tag'), $new_condition_tag)
+					->addRow(
+						(new CLabel(_('Tag'), 'tag'))->setAsteriskMark(),
+						$new_condition_tag
+					)
 					->addRow(_('Operator'), $operator)
 					->addRow(new CLabel(_('Value'), 'value'), $new_condition_value);
 				break;
@@ -203,7 +218,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Triggers'), 'trigger_new_condition_ms'), $trigger_multiselect);
+					->addRow(
+						(new CLabel(_('Triggers'), 'trigger_new_condition_ms'))->setAsteriskMark(),
+						$trigger_multiselect
+					);
 				break;
 
 			// Trigger severity form elements.
@@ -245,7 +263,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Hosts'), 'host_new_condition_ms'), $host_multiselect);
+					->addRow(
+						(new CLabel(_('Hosts'), 'host_new_condition_ms'))->setAsteriskMark(),
+						$host_multiselect
+					);
 				break;
 
 			// Host group form elements.
@@ -275,7 +296,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Host groups'), 'hostgroup_new_condition_ms'), $hostgroup_multiselect);
+					->addRow(
+						(new CLabel(_('Host groups'), 'hostgroup_new_condition_ms'))->setAsteriskMark(),
+						$hostgroup_multiselect
+					);
 				break;
 
 			// Problem is suppressed form elements.
@@ -349,7 +373,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Templates'), 'template_new_condition_ms'), $template_multiselect);
+					->addRow(
+						(new CLabel(_('Templates'), 'template_new_condition_ms'))->setAsteriskMark(),
+						$template_multiselect
+					);
 				break;
 
 			// Time period form elements.
@@ -364,7 +391,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Value'), $new_condition_value);
+					->addRow(
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
+						$new_condition_value
+					);
 				break;
 
 			// Discovery host ip form elements.
@@ -379,7 +409,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Value'), $new_condition_value);
+					->addRow(
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
+						$new_condition_value
+					);
 				break;
 
 			// Discovery check form elements.
@@ -411,7 +444,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Discovery check'), $dcheck_popup_select);
+					->addRow(
+						(new CLabel(_('Discovery check')))->setAsteriskMark(),
+						$dcheck_popup_select
+					);
 				break;
 
 			// Discovery object form elements.
@@ -459,7 +495,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Discovery rules'), 'drule_new_condition_ms'), $drule_multiselect);
+					->addRow(
+						(new CLabel(_('Discovery rules'), 'drule_new_condition_ms'))->setAsteriskMark(),
+						$drule_multiselect
+					);
 				break;
 
 			// Discovery status form elements.
@@ -511,7 +550,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(new CLabel(_('Proxy'), 'proxy_new_condition_ms'), $proxy_multiselect);
+					->addRow(
+						(new CLabel(_('Proxy'), 'proxy_new_condition_ms'))->setAsteriskMark(),
+						$proxy_multiselect
+					);
 				break;
 
 			// Received value form elements.
@@ -521,10 +563,13 @@ switch ($data['type']) {
 				$inline_js .= $new_condition_value->getPostJS();
 
 				$form_list
-					->addRow(new CLabel(_('Operator'), 'label-operator'), (new CSelect('operator'))
-						->setValue(CONDITION_OPERATOR_EQUAL)
-						->setFocusableElementId('label-operator')
-						->addOptions(CSelect::createOptionsFromArray($operators_by_condition[CONDITION_TYPE_DVALUE]))
+					->addRow(new CLabel(_('Operator'), 'label-operator'),
+						(new CSelect('operator'))
+							->setValue(CONDITION_OPERATOR_EQUAL)
+							->setFocusableElementId('label-operator')
+							->addOptions(
+								CSelect::createOptionsFromArray($operators_by_condition[CONDITION_TYPE_DVALUE])
+							)
 					)
 					->addRow(new CLabel(_('Value'), 'value'), $new_condition_value);
 				break;
@@ -540,7 +585,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow(_('Value'), $new_condition_value);
+					->addRow(
+						(new CLabel(_('Value'), 'value'))->setAsteriskMark(),
+						$new_condition_value
+					);
 				break;
 
 			// Service type form elements.
@@ -574,8 +622,8 @@ switch ($data['type']) {
 					->addRow(_('Value'), $new_condition_value);
 				break;
 
-			// Trigger name form elements.
-			case CONDITION_TYPE_TRIGGER_NAME:
+			// Event name form elements.
+			case CONDITION_TYPE_EVENT_NAME:
 			// Host name form elements.
 			case CONDITION_TYPE_HOST_NAME:
 			// Host metadata form elements.
@@ -590,9 +638,13 @@ switch ($data['type']) {
 
 				$inline_js .= $new_condition_value->getPostJS();
 
+				$help_icon = $condition_type == CONDITION_TYPE_EVENT_NAME
+					? makeHelpIcon(_('Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings.'))
+					: null;
+
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow((new CLabel(_('Value'), 'value'))->setAsteriskMark(), $new_condition_value);
+					->addRow((new CLabel([_('Value'), $help_icon], 'value'))->setAsteriskMark(), $new_condition_value);
 				break;
 
 			// Event type form elements.
@@ -633,7 +685,10 @@ switch ($data['type']) {
 
 				$form_list
 					->addRow(_('Operator'), $operator)
-					->addRow((new CLabel(_('Services')))->setAsteriskMark(), $service_multiselect);
+					->addRow(
+						(new CLabel(_('Services'), 'service-new-condition_ms'))->setAsteriskMark(),
+						$service_multiselect
+					);
 				break;
 		}
 		break;

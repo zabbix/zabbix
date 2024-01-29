@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,9 +48,11 @@ class CTagFilterItem extends CBaseComponent {
 			changeOperation: (ev) => {
 				if (ev.target.value == TAG_OPERATOR_EXISTS || ev.target.value == TAG_OPERATOR_NOT_EXISTS) {
 					this._value.addClass('display-none');
+					this._value._target.closest('td').style.paddingRight = 0;
 				}
 				else {
 					this._value.removeClass('display-none');
+					this._value._target.closest('td').style.paddingRight = null;
 				}
 			}
 		}

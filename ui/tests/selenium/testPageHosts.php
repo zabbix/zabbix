@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,20 +19,28 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
 
 /**
  * @dataSource TagFilter, WebScenarios
  */
 class testPageHosts extends CLegacyWebTest {
+
+	/**
+	 * Attach MessageBehavior, TableBehavior and TagBehavior to the test.
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
+
 	public $HostName = 'ЗАББИКС Сервер';
 	public $HostGroup = 'Zabbix servers';
 	public $HostIp = '127.0.0.1';
 	public $HostPort = '10050';
-
-	use TagTrait;
-	use TableTrait;
 
 	public static function allHosts() {
 		return CDBHelper::getDataProvider(
@@ -51,10 +59,12 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestCheckHeader('Hosts');
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
 		$filter->submit();
+		$table->waitUntilReloaded();
 
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextPresent('Simple form test host');
@@ -227,10 +237,12 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByName() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Name')->fill($this->HostName);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestTextNotPresent('Displaying 0 of 0 found');
 	}
@@ -248,11 +260,13 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByProxy() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->waitUntilPresent()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 
 		$this->zbxTestClickXpathWait('//label[text()="Proxy"]');
 		$this->zbxTestClickButtonText('Apply');
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//td[text()='Proxy_1 for filter']");
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_2 with proxy']");
@@ -262,7 +276,7 @@ class testPageHosts extends CLegacyWebTest {
 		$this->zbxTestLaunchOverlayDialog('Proxies');
 		$this->zbxTestClickLinkTextWait('Proxy_1 for filter');
 		$this->zbxTestClickButtonText('Apply');
-		$this->zbxTestWaitForPageToLoad();
+		$table->waitUntilReloaded();
 		$this->zbxTestAssertElementPresentXpath("//tbody//a[text()='Host_1 with proxy']");
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}
@@ -282,6 +296,7 @@ class testPageHosts extends CLegacyWebTest {
 
 	public function testPageHosts_FilterByAllFields() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
+		$table = $this->query('class:list-table')->asTable()->one();
 		$filter = $this->query('name:zbx_filter')->asForm()->one();
 		$filter->query('button:Reset')->one()->click();
 		$filter->getField('Host groups')->select($this->HostGroup);
@@ -289,6 +304,7 @@ class testPageHosts extends CLegacyWebTest {
 		$filter->getField('IP')->fill($this->HostIp);
 		$filter->getField('Port')->fill($this->HostPort);
 		$filter->submit();
+		$table->waitUntilReloaded();
 		$this->zbxTestTextPresent($this->HostName);
 		$this->zbxTestAssertElementPresentXpath("//div[@class='table-stats'][text()='Displaying 1 of 1 found']");
 	}

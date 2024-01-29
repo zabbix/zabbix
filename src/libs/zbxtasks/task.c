@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -314,7 +314,7 @@ static int	tm_save_remote_command_tasks(zbx_tm_task_t **tasks, int tasks_num)
 
 	zbx_db_insert_prepare(&db_insert, "task_remote_command", "taskid", "command_type", "execute_on", "port",
 			"authtype", "username", "password", "publickey", "privatekey", "command", "alertid",
-			"parent_taskid", "hostid", NULL);
+			"parent_taskid", "hostid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -357,7 +357,7 @@ static int	tm_save_remote_command_result_tasks(zbx_tm_task_t **tasks, int tasks_
 	zbx_tm_remote_command_result_t	*data;
 
 	zbx_db_insert_prepare(&db_insert, "task_remote_command_result", "taskid", "status", "parent_taskid", "info",
-			NULL);
+			(char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -397,7 +397,7 @@ static int	tm_save_check_now_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	zbx_db_insert_t		db_insert;
 	zbx_tm_check_now_t	*data;
 
-	zbx_db_insert_prepare(&db_insert, "task_check_now", "taskid", "itemid", NULL);
+	zbx_db_insert_prepare(&db_insert, "task_check_now", "taskid", "itemid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -436,7 +436,7 @@ static int	tm_save_data_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	zbx_db_insert_t	db_insert;
 	zbx_tm_data_t	*data;
 
-	zbx_db_insert_prepare(&db_insert, "task_data", "taskid", "type", "data", "parent_taskid", NULL);
+	zbx_db_insert_prepare(&db_insert, "task_data", "taskid", "type", "data", "parent_taskid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -476,7 +476,7 @@ static int	tm_save_data_result_tasks(zbx_tm_task_t **tasks, int tasks_num)
 	zbx_db_insert_t		db_insert;
 	zbx_tm_data_result_t	*data;
 
-	zbx_db_insert_prepare(&db_insert, "task_result", "taskid", "status", "parent_taskid", "info", NULL);
+	zbx_db_insert_prepare(&db_insert, "task_result", "taskid", "status", "parent_taskid", "info", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{
@@ -552,7 +552,7 @@ static int	tm_save_tasks(zbx_tm_task_t **tasks, int tasks_num)
 			tasks[i]->taskid = taskid++;
 	}
 
-	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", "ttl", "proxy_hostid", NULL);
+	zbx_db_insert_prepare(&db_insert, "task", "taskid", "type", "status", "clock", "ttl", "proxy_hostid", (char *)NULL);
 
 	for (i = 0; i < tasks_num; i++)
 	{

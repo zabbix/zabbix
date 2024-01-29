@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ func (pc *passiveCheck) formatError(msg string) (data []byte) {
 }
 
 func (pc *passiveCheck) handleCheck(data []byte) {
-	// the timeout is one minute to allow agent connections (with max timeout of 30s) safely execute
+	// the timeout is one minute to allow see any timeout problem with passive checks
 	const timeoutForSinglePassiveChecks = time.Minute
 	// direct passive check timeout is handled by the scheduler
 	s, err := pc.scheduler.PerformTask(string(data), timeoutForSinglePassiveChecks, agent.PassiveChecksClientID)

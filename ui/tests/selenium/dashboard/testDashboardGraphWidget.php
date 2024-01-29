@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,9 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TagTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTagBehavior.php';
 
 /**
  * @backup widget, profiles
@@ -29,28 +30,32 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testDashboardGraphWidget extends CWebTest {
 
-	use TagTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
+	 * Attach MessageBehavior and TagBehavior to the test.
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			[
+				'class' => CTagBehavior::class,
+				'tag_selector' => 'id:tags_table_tags'
+			]
+		];
 	}
 
 	/*
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
 	 * because it can change.
 	 */
-	private $sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
+	const SQL = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
 			' w.width, w.height'.
 			' FROM widget_field wf'.
 			' INNER JOIN widget w'.
 			' ON w.widgetid=wf.widgetid ORDER BY wf.widgetid, wf.name, wf.value_int, wf.value_str, wf.value_groupid,'.
 			' wf.value_itemid, wf.value_graphid';
+
+	const DASHBOARD_URL = 'zabbix.php?action=dashboard.view&dashboardid=10330';
 
 	/*
 	 * Set "Graph" as default widget type.
@@ -105,7 +110,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @browsers chrome
 	 */
 	public function testDashboardGraphWidget_FormLayout() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$dashboard = CDashboardElement::find()->one()->edit();
 		$overlay = $dashboard->addWidget();
 		$form = $overlay->asForm();
@@ -130,9 +135,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Check validation of graph widget fields.
 	 */
 	private function validate($data, $tab) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Widget name'));
 
 		$this->fillDatasets(CTestArrayHelper::get($data, 'Data set'));
@@ -170,7 +175,7 @@ class testDashboardGraphWidget extends CWebTest {
 			$this->assertMessage(TEST_BAD, null, $data['error']);
 		}
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public static function getDatasetValidationData() {
@@ -706,7 +711,8 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Axes' => [
 						'id:lefty_min' => '10',
-						'id:lefty_max' => '5'
+						'id:lefty_max' => '5',
+						'id:lefty_units' => 'Auto'
 					],
 					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -715,7 +721,9 @@ class testDashboardGraphWidget extends CWebTest {
 				[
 					'Axes' => [
 						'id:lefty_min' => '-5',
-						'id:lefty_max' => '-10'
+						'id:lefty_max' => '-10',
+						'id:lefty_units' => 'Static',
+						'id:lefty_static_units' => 500
 					],
 					'error' => 'Invalid parameter "Left Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -756,7 +764,9 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Axes' => [
 						'id:righty_min' => '10',
-						'id:righty_max' => '5'
+						'id:righty_max' => '5',
+						'id:righty_units' => 'Static',
+						'id:righty_static_units' => 500
 					],
 					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -770,7 +780,8 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Axes' => [
 						'id:righty_min' => '-5',
-						'id:righty_max' => '-10'
+						'id:righty_max' => '-10',
+						'id:righty_units' => 'Auto'
 					],
 					'error' => 'Invalid parameter "Right Y/Max": Y axis MAX value must be greater than Y axis MIN value.'
 				]
@@ -1302,7 +1313,8 @@ class testDashboardGraphWidget extends CWebTest {
 							'host' => ',Zabbix Server',
 							'item' => ', Agent ping',
 							'options' => [
-								['Draw', 'Bar']
+								['Draw', 'Bar'],
+								['Missing data', 'Connected']
 							]
 						],
 						[
@@ -1535,7 +1547,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getCreateData
 	 */
 	public function testDashboardGraphWidget_Create($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		$this->fillForm($data, $form);
@@ -1828,7 +1840,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @backup widget
 	 */
 	public function testDashboardGraphWidget_Update($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration('Test cases for update');
 
 		$this->fillForm($data, $form);
@@ -1849,15 +1861,15 @@ class testDashboardGraphWidget extends CWebTest {
 	 */
 	public function testDashboardGraphWidget_SimpleUpdate() {
 		$name = 'Test cases for simple update and deletion';
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration($name);
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$this->saveGraphWidget($name);
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -2117,7 +2129,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Data set' => [
 						'host' => 'Zabbix*, new widget',
-						'item' => 'Agetn*, new widget'
+						'item' => 'Agent*, new widget'
 					]
 				]
 			],
@@ -2143,9 +2155,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getDashboardCancelData
 	 */
 	public function testDashboardGraphWidget_cancelDashboardUpdate($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill(CTestArrayHelper::get($data, 'main_fields', []));
 		$this->fillDataSets($data['Data set']);
@@ -2158,7 +2170,7 @@ class testDashboardGraphWidget extends CWebTest {
 
 		$dashboard->cancelEditing();
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	public static function getWidgetCancelData() {
@@ -2197,9 +2209,9 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getDashboardCancelData
 	 */
 	public function testDashboardGraphWidget_cancelWidgetEditing($data) {
-		$old_hash = CDBHelper::getHash($this->sql);
+		$old_hash = CDBHelper::getHash(self::SQL);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration(CTestArrayHelper::get($data, 'Existing widget', []));
 		$form->fill($data['main_fields']);
 		$this->fillDataSets($data['Data set']);
@@ -2215,7 +2227,7 @@ class testDashboardGraphWidget extends CWebTest {
 				CXPathHelper::escapeQuotes($data['main_fields']['Name']).']')->one(false)->isValid());
 		$dashboard->save();
 
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->sql));
+		$this->assertEquals($old_hash, CDBHelper::getHash(self::SQL));
 	}
 
 	/**
@@ -2224,7 +2236,7 @@ class testDashboardGraphWidget extends CWebTest {
 	public function testDashboardGraphWidget_Delete() {
 		$name = 'Test cases for simple update and deletion';
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->edit()->getWidget($name);
 		$this->assertEquals(true, $widget->isEditable());
@@ -2247,7 +2259,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Test disabled fields in "Data set" tab.
 	 */
 	public function testDashboardGraphWidget_DatasetDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		foreach (['Line', 'Points', 'Staircase', 'Bar'] as $option) {
@@ -2282,7 +2294,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * Test "From" and "To" fields in tab "Time period" by check/uncheck "Set custom time period".
 	 */
 	public function testDashboardGraphWidget_TimePeriodDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Time period');
 
@@ -2294,19 +2306,110 @@ class testDashboardGraphWidget extends CWebTest {
 	}
 
 	/*
-	 * Test enable/disable "Number of rows" field by check/uncheck "Show legend".
+	 * Test enable/disable "Number of rows" field, min/max values of input for slidebar.
 	 */
-	public function testDashboardGraphWidget_LegendDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+	public function testDashboardGraphWidget_LegendFieldValidation() {
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Legend');
-		$this->assertEnabledFields('Number of rows');
-		$form->fill(['Show legend' => false]);
-		$this->assertEnabledFields('Number of rows', false);
+
+		$show_legend = $form->getField('Show legend');
+		$this->assertTrue($show_legend->isChecked());
+
+		foreach ([true, false] as $state) {
+			$this->assertEnabledFields('Number of rows', $state);
+			$show_legend->fill(!$state);
+		}
+
+		$rows_input = $form->getField('id:legend_lines');
+		$this->assertEquals(1, $rows_input->getValue());
+		$this->assertEquals(1, $rows_input->getAttribute('maxlength'));
+
+		$element = $form->getField('Number of rows')->query('xpath:.//input[@type="range"]')->one();
+
+		foreach (['min' => 1, 'max' => 5] as $attribute_name => $attribute_value) {
+			$this->assertEquals($attribute_value, $element->getAttribute($attribute_name));
+		}
+	}
+
+	public static function getSlidebarData () {
+		return [
+			[
+				[
+					'new_value' => 1,
+					'expected' => [
+						'Number of rows' => 1
+					],
+					'range_percentage' => [
+						'Number of rows' => 0
+					]
+				]
+			],
+			[
+				[
+					'new_value' => 9,
+					'expected' => [
+						'Number of rows' => 5
+					],
+					'range_percentage' => [
+						'Number of rows' => 100
+					]
+				]
+			],
+			[
+				[
+					'new_value' => 0,
+					'expected' => [
+						'Number of rows' => 1
+					],
+					'range_percentage' => [
+						'Number of rows' => 0
+					]
+				]
+			],
+			[
+				[
+					'new_value' => 'a',
+					'expected' => [
+						'Number of rows' => 1
+					],
+					'range_percentage' => [
+						'Number of rows' => 0
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check data insertion in percentile fields data inputs and their display in range controls in Legend tab.
+	 *
+	 * @dataProvider getSlidebarData
+	 */
+	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
+		$this->page->login()->open(self::DASHBOARD_URL);
+		$form = $this->openGraphWidgetConfiguration();
+		$form->selectTab('Legend');
+
+		$field = $form->getField('id:legend_lines');
+		$field->fill($data['new_value']);
+
+		// JS should trigger a change action for the input, so that these changes would apply to the range control.
+		CElementQuery::getDriver()->executeScript('return jQuery(arguments[0]).trigger("change");', [$field]);
+
+		// Check the resulting value in input element and check positioning of the range control thumb element.
+		foreach ($data['expected'] as $field_name => $value) {
+			$field = $form->getField($field_name);
+			$this->assertEquals($value, $field->query('xpath:.//input[@type="text"]')->one()->getValue());
+
+			$this->assertEquals('left: '.$data['range_percentage'][$field_name].'%;', $field->query('class:range-control-thumb')
+					->one()->getAttribute('style')
+			);
+		}
 	}
 
 	public function testDashboardGraphWidget_ProblemsDisabledFields() {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 		$form->selectTab('Problems');
 
@@ -2376,7 +2479,7 @@ class testDashboardGraphWidget extends CWebTest {
 	 * @dataProvider getAxesDisabledFieldsData
 	 */
 	public function testDashboardGraphWidget_AxesDisabledFields($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=10330');
+		$this->page->login()->open(self::DASHBOARD_URL);
 		$form = $this->openGraphWidgetConfiguration();
 
 		$form->fill($data['Data set']);

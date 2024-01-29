@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ $item_form_list = (new CFormList('item-form-list'))
 // Append hosts interface select to form list.
 if ($data['single_host_selected'] && $data['context'] === 'host') {
 	$item_form_list->addRow(
-		(new CVisibilityBox('visible[interfaceid]', 'interfaceDiv', _('Original')))
+		(new CVisibilityBox('visible[interfaceid]', 'interface-field', _('Original')))
 			->setLabel(_('Host interface'))
 			->setAttribute('data-multiple-interface-types', $data['multiple_interface_types']),
 		(new CDiv([
@@ -63,7 +63,7 @@ if ($data['single_host_selected'] && $data['context'] === 'host') {
 				->addClass(ZBX_STYLE_RED)
 				->setId('interface_not_defined')
 				->addStyle('display: none;')
-		]))->setId('interfaceDiv'),
+		]))->setId('interface-field'),
 		'interface_row'
 	);
 }
@@ -202,10 +202,10 @@ $item_form_list
 $preprocessing_form_list = (new CFormList('preprocessing-form-list'))
 	// Append item pre-processing to form list.
 	->addRow(
-		(new CVisibilityBox('visible[preprocessing]', 'preprocessing_div', _('Original')))
+		(new CVisibilityBox('visible[preprocessing]', 'preprocessing-field', _('Original')))
 			->setLabel(_('Preprocessing steps')),
 		(new CDiv(getItemPreprocessing([], false, $data['preprocessing_types'])))
-			->setId('preprocessing_div')
+			->setId('preprocessing-field')
 	);
 
 $custom_intervals = (new CTable())
@@ -260,29 +260,19 @@ $custom_intervals->addRow([(new CButton('interval_add', _('Add')))
 	->addClass(ZBX_STYLE_BTN_LINK)
 	->addClass('element-table-add')]);
 
-// Prepare Update interval for form list.
-$update_interval = (new CTable())
-	->setId('update_interval')
-	->addRow([_('Delay'),
-		(new CDiv((new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH)))
-	])
-	->addRow(
-		(new CRow([
-			(new CCol(_('Custom intervals')))->addStyle('vertical-align: top;'),
-			new CCol($custom_intervals)
-		]))
-	);
-
 // Append update interval to form list.
 $item_form_list
 	// Append delay to form list.
 	->addRow(
 		(new CVisibilityBox('visible[delay]', 'update_interval', _('Original')))->setLabel(_('Update interval')),
-		$update_interval
+		(new CFormList('update_interval'))
+			->addClass(ZBX_STYLE_TABLE_SUBFORMS)
+			->addRow(_('Delay'), (new CTextBox('delay', ZBX_ITEM_DELAY_DEFAULT))->setWidth(ZBX_TEXTAREA_SMALL_WIDTH))
+			->addRow(_('Custom intervals'), $custom_intervals)
 	)
 	// Append history to form list.
 	->addRow(
-		(new CVisibilityBox('visible[history]', 'history_div', _('Original')))
+		(new CVisibilityBox('visible[history]', 'history-field', _('Original')))
 			->setLabel(_('History storage period')),
 		(new CDiv([
 			(new CRadioButtonList('history_mode', ITEM_STORAGE_CUSTOM))
@@ -295,11 +285,11 @@ $item_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('history_div')
+			->setId('history-field')
 	)
 	// Append trends to form list.
 	->addRow(
-		(new CVisibilityBox('visible[trends]', 'trends_div', _('Original')))->setLabel(_('Trend storage period')),
+		(new CVisibilityBox('visible[trends]', 'trends-field', _('Original')))->setLabel(_('Trend storage period')),
 		(new CDiv([
 			(new CRadioButtonList('trends_mode', ITEM_STORAGE_CUSTOM))
 				->addValue(_('Do not keep trends'), ITEM_STORAGE_CUSTOM)
@@ -311,7 +301,7 @@ $item_form_list
 				->setAriaRequired()
 		]))
 			->addClass('wrap-multiple-controls')
-			->setId('trends_div')
+			->setId('trends-field')
 	);
 
 // Append status to form list.
@@ -343,27 +333,25 @@ $item_form_list->addRow(
 // Append value map select when only one host or template is selected.
 if ($data['single_host_selected'] && ($data['context'] === 'template' || !$data['discovered_host'])) {
 	$item_form_list->addRow(
-		(new CVisibilityBox('visible[valuemapid]', 'valuemapid_div', _('Original')))->setLabel(_('Value mapping')),
-		(new CDiv([
-			(new CMultiSelect([
-				'name' => 'valuemapid',
-				'object_name' => 'valuemaps',
-				'multiple' => false,
-				'data' => [],
-				'popup' => [
-					'parameters' => [
-						'srctbl' => 'valuemaps',
-						'srcfld1' => 'valuemapid',
-						'dstfrm' => $form->getName(),
-						'dstfld1' => 'valuemapid',
-						'hostids' => [$data['hostid']],
-						'context' => $data['context'],
-						'editable' => true
-					]
+		(new CVisibilityBox('visible[valuemapid]', 'valuemapid-field', _('Original')))->setLabel(_('Value mapping')),
+		(new CMultiSelect([
+			'name' => 'valuemapid',
+			'object_name' => 'valuemaps',
+			'multiselect_id' => 'valuemapid-field',
+			'multiple' => false,
+			'data' => [],
+			'popup' => [
+				'parameters' => [
+					'srctbl' => 'valuemaps',
+					'srcfld1' => 'valuemapid',
+					'dstfrm' => $form->getName(),
+					'dstfld1' => 'valuemapid',
+					'hostids' => [$data['hostid']],
+					'context' => $data['context'],
+					'editable' => true
 				]
-			]))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('valuemapid_div')
+			]
+		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 	);
 }
 
@@ -382,10 +370,13 @@ $item_form_list->addRow(
 // Append master item select to form list.
 if ($data['single_host_selected']) {
 	if (!$data['prototype']) {
-		$master_item = (new CDiv([
+		$item_form_list->addRow(
+			(new CVisibilityBox('visible[master_itemid]', 'master-item-field', _('Original')))
+				->setLabel(_('Master item')),
 			(new CMultiSelect([
 				'name' => 'master_itemid',
 				'object_name' => 'items',
+				'multiselect_id' => 'master-item-field',
 				'multiple' => false,
 				'data' => [],
 				'popup' => [
@@ -401,59 +392,56 @@ if ($data['single_host_selected']) {
 				]
 			]))
 				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(true)
-		]))->setId('master_item');
+				->setAriaRequired()
+		);
 	}
 	else {
-		$master_item = [
-			(new CTextBox('master_itemname', '', true))
-				->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-				->setAriaRequired(),
-			(new CVar('master_itemid', '', 'master_itemid'))
-		];
-
-		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$master_item[] = (new CButton('button', _('Select')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->removeId()
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'items',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'only_hostid' => $data['hostid'],
-					'with_webitems' => 1,
-					'normal_only' => 1
-				]).', {dialogue_class: "modal-popup-generic"});'
-			);
-
-		$master_item[] = (new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN);
-		$master_item[] = (new CButton('button', _('Select prototype')))
-			->addClass(ZBX_STYLE_BTN_GREY)
-			->removeId()
-			->onClick(
-				'return PopUp("popup.generic", '.json_encode([
-					'srctbl' => 'item_prototypes',
-					'srcfld1' => 'itemid',
-					'srcfld2' => 'name',
-					'dstfrm' => $form->getName(),
-					'dstfld1' => 'master_itemid',
-					'dstfld2' => 'master_itemname',
-					'parent_discoveryid' => $data['parent_discoveryid']
-				]).', {dialogue_class: "modal-popup-generic"});'
-			);
+		$item_form_list->addRow(
+			(new CVisibilityBox('visible[master_itemid]', 'master-item-field', _('Original')))
+				->setLabel(_('Master item')),
+			(new CDiv([
+				(new CVar('master_itemname')),
+				[
+					(new CTextBox('master_itemname', '', true))
+						->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+						->setAriaRequired(),
+					(new CVar('master_itemid', '', 'master_itemid')),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('button', _('Select')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->removeId()
+						->onClick(
+							'return PopUp("popup.generic", '.json_encode([
+								'srctbl' => 'items',
+								'srcfld1' => 'itemid',
+								'srcfld2' => 'name',
+								'dstfrm' => $form->getName(),
+								'dstfld1' => 'master_itemid',
+								'dstfld2' => 'master_itemname',
+								'only_hostid' => $data['hostid'],
+								'with_webitems' => 1,
+								'normal_only' => 1
+							]).', {dialogue_class: "modal-popup-generic"});'
+						),
+					(new CDiv())->addClass(ZBX_STYLE_FORM_INPUT_MARGIN),
+					(new CButton('button', _('Select prototype')))
+						->addClass(ZBX_STYLE_BTN_GREY)
+						->removeId()
+						->onClick(
+							'return PopUp("popup.generic", '.json_encode([
+								'srctbl' => 'item_prototypes',
+								'srcfld1' => 'itemid',
+								'srcfld2' => 'name',
+								'dstfrm' => $form->getName(),
+								'dstfld1' => 'master_itemid',
+								'dstfld2' => 'master_itemname',
+								'parent_discoveryid' => $data['parent_discoveryid']
+							]).', {dialogue_class: "modal-popup-generic"});'
+						)
+				]
+			]))->setId('master-item-field')
+		);
 	}
-
-	$item_form_list->addRow(
-		(new CVisibilityBox('visible[master_itemid]', 'master_item', _('Original')))->setLabel(_('Master item')),
-		(new CDiv([
-			(new CVar('master_itemname')),
-			$master_item
-		]))->setId('master_item')
-	);
 }
 
 // Append description to form list.
@@ -469,7 +457,7 @@ $item_form_list->addRow(
  */
 $tags_form_list = (new CFormList('tags-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -480,7 +468,7 @@ $tags_form_list = (new CFormList('tags-form-list'))
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')
-		]))->setId('tags-div')
+		]))->setId('tags-field')
 	);
 
 $tabs = (new CTabView())

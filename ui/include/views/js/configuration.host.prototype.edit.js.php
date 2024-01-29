@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -34,6 +34,7 @@
 			<button class="<?= ZBX_STYLE_BTN_LINK ?> group-prototype-remove" type="button" name="remove">
 				<?= _('Remove') ?>
 			</button>
+			<input type="hidden" name="group_prototypes[#{i}][group_prototypeid]" value="#{group_prototypeid}" />
 		</td>
 	</tr>
 </script>
@@ -199,10 +200,15 @@
 		});
 
 		<?php if (!$data['host_prototype']['groupPrototypes']): ?>
-			addGroupPrototypeRow({'name': ''});
+			addGroupPrototypeRow({'name': '', 'group_prototypeid': ''});
 		<?php endif ?>
 		<?php foreach ($data['host_prototype']['groupPrototypes'] as $i => $groupPrototype): ?>
-			addGroupPrototypeRow(<?= json_encode(['name' => $groupPrototype['name']]) ?>);
+			addGroupPrototypeRow(<?= json_encode([
+				'name' => $groupPrototype['name'],
+				'group_prototypeid' => array_key_exists('group_prototypeid', $groupPrototype)
+					? $groupPrototype['group_prototypeid']
+					: null
+			]) ?>);
 		<?php endforeach ?>
 
 		<?php if ($data['host_prototype']['templateid']): ?>

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -679,7 +679,6 @@ else {
 		$filter_groupids = API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter_groupids,
-			'editable' => true,
 			'preservekeys' => true
 		]);
 		$filter_groupids_ms = CArrayHelper::renameObjectsKeys($filter_groupids, ['groupid' => 'id']);

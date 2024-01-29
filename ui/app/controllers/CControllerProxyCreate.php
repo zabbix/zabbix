@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,11 @@
 
 
 class CControllerProxyCreate extends CController {
+
+	/**
+	 * @var array
+	 */
+	private $clone_proxy;
 
 	protected function checkInput() {
 		$fields = [
@@ -68,28 +73,53 @@ class CControllerProxyCreate extends CController {
 	}
 
 	protected function checkPermissions() {
-		return $this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES);
+		if (!$this->checkAccess(CRoleHelper::UI_ADMINISTRATION_PROXIES)) {
+			return false;
+		}
+
+		$clone_psk = $this->hasInput('clone_proxyid') && $this->getInput('psk_edit_mode', 0) == 0;
+
+		if ($clone_psk) {
+			$clone_psk = $this->getInput('tls_connect', HOST_ENCRYPTION_NONE) == HOST_ENCRYPTION_PSK
+				|| ($this->getInput('tls_accept', HOST_ENCRYPTION_NONE) & HOST_ENCRYPTION_PSK);
+		}
+
+		if ($clone_psk) {
+			$this->clone_proxy = API::Proxy()->get([
+				'output' => ['tls_psk_identity', 'tls_psk'],
+				'proxyids' => $this->getInput('clone_proxyid')
+			]);
+
+			if (!$this->clone_proxy) {
+				return false;
+			}
+
+			$this->clone_proxy = $this->clone_proxy[0];
+		}
+
+		return true;
 	}
 
 	protected function doAction() {
-		$proxy = [];
+		$proxy = [
+			'tls_connect' => $this->getInput('tls_connect', HOST_ENCRYPTION_NONE),
+			'tls_accept' => $this->getInput('tls_accept', HOST_ENCRYPTION_NONE)
+		];
+		$fields = ['host', 'status', 'description'];
 
-		$this->getInputs($proxy, ['host', 'status', 'description', 'tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'tls_psk_identity', 'tls_psk'
-		]);
+		if ($proxy['tls_connect'] == HOST_ENCRYPTION_CERTIFICATE
+				|| ($proxy['tls_accept'] & HOST_ENCRYPTION_CERTIFICATE)) {
+			array_push($fields, 'tls_issuer', 'tls_subject');
+		}
 
-		if ($this->hasInput('clone_proxyid')
-				&& ((array_key_exists('tls_connect', $proxy) && $proxy['tls_connect'] == HOST_ENCRYPTION_PSK)
-					|| (array_key_exists('tls_accept', $proxy) && $proxy['tls_accept'] & HOST_ENCRYPTION_PSK))) {
-			$clone_proxies = API::Proxy()->get([
-				'output' => ['tls_psk_identity', 'tls_psk'],
-				'proxyids' => $this->getInput('clone_proxyid'),
-				'editable' => true
-			]);
-			$clone_proxy = reset($clone_proxies);
-
-			$proxy['tls_psk_identity'] = $clone_proxy['tls_psk_identity'];
-			$proxy['tls_psk'] = $clone_proxy['tls_psk'];
+		if ($proxy['tls_connect'] == HOST_ENCRYPTION_PSK || ($proxy['tls_accept'] & HOST_ENCRYPTION_PSK)) {
+			if ($this->getInput('psk_edit_mode', 0) == 1) {
+				array_push($fields, 'tls_psk', 'tls_psk_identity');
+			}
+			elseif ($this->hasInput('clone_proxyid')) {
+				$proxy['tls_psk_identity'] = $this->clone_proxy['tls_psk_identity'];
+				$proxy['tls_psk'] = $this->clone_proxy['tls_psk'];
+			}
 		}
 
 		if ($this->getInput('status', HOST_STATUS_PROXY_ACTIVE) == HOST_STATUS_PROXY_PASSIVE) {
@@ -97,8 +127,10 @@ class CControllerProxyCreate extends CController {
 			$this->getInputs($proxy['interface'], ['dns', 'ip', 'useip', 'port']);
 		}
 		else {
-			$proxy['proxy_address'] = $this->getInput('proxy_address', '');
+			array_push($fields, 'proxy_address');
 		}
+
+		$this->getInputs($proxy, $fields);
 
 		DBstart();
 

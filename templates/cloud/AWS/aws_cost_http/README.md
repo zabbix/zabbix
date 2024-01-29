@@ -7,7 +7,7 @@ The template to monitor AWS Cost Explorer by HTTP via Zabbix, which works withou
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the Cost Explorer API calls to list and retrieve metrics.
-For more information, please refer to the (Cost Explorer pricing)[https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/] page.
+For more information, please refer to the [Cost Explorer pricing](https://aws.amazon.com/aws-cost-management/aws-cost-explorer/pricing/) page.
 
 
 ## Requirements
@@ -36,7 +36,8 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement": [
         {
             "Action": [
-                 "ce:*"
+                "ce:GetDimensionValues",
+                "ce:GetCostAndUsage"
             ],
             "Effect": "Allow",
             "Resource": "*"
@@ -44,8 +45,33 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
 }
   ```
+If you are using role-based authorization, add the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "ce:GetDimensionValues",
+                "ce:GetCostAndUsage",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+Set macros "{$AWS.AUTH_TYPE}". Possible values: role_base, access_key.
 
-Set macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}.
+If you are using access key-based authorization, set the following macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}.
 
 For more information about managing access keys, see the [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -64,6 +90,8 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
+|{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|
 

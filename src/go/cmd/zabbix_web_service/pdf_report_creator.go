@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -48,6 +48,14 @@ type requestBody struct {
 
 func newRequestBody() *requestBody {
 	return &requestBody{"", make(map[string]string), make(map[string]string)}
+}
+
+// httpCookiesGet parses Cookie HTTP request header returns HTTP cookies
+func (b *requestBody) httpCookiesGet() []*http.Cookie {
+	r := http.Request{Header: http.Header{}}
+	r.Header.Add("Cookie", b.Header["Cookie"])
+
+	return r.Cookies()
 }
 
 func logAndWriteError(w http.ResponseWriter, errMsg string, code int) {
@@ -157,10 +165,25 @@ func (h *handler) report(w http.ResponseWriter, r *http.Request) {
 		"making chrome headless request with parameters url: %s, width: %s, height: %s for report request from %s",
 		u.String(), req.Parameters["width"], req.Parameters["height"], r.RemoteAddr)
 
+	var cookieParams []*network.CookieParam
+
+	for _, cookie := range req.httpCookiesGet() {
+		cookieParam := network.CookieParam{
+			Name:     cookie.Name,
+			Value:    cookie.Value,
+			URL:      req.URL,
+			Domain:   u.Hostname(),
+			SameSite: network.CookieSameSiteStrict,
+			HTTPOnly: true,
+		}
+
+		cookieParams = append(cookieParams, &cookieParam)
+	}
+
 	var buf []byte
 
 	if err = chromedp.Run(ctx, chromedp.Tasks{
-		network.SetExtraHTTPHeaders(network.Headers(map[string]interface{}{"Cookie": req.Header["Cookie"]})),
+		network.SetCookies(cookieParams),
 		emulation.SetDeviceMetricsOverride(width, height, 1, false),
 		navigateAndWaitFor(u.String(), "networkIdle"),
 		chromedp.ActionFunc(func(ctx context.Context) error {
@@ -209,10 +232,11 @@ func navigateAndWaitFor(url string, eventName string) chromedp.ActionFunc {
 //
 // waitFor blocks until eventName is received.
 // Examples of events you can wait for:
-//     init, DOMContentLoaded, firstPaint,
-//     firstContentfulPaint, firstImagePaint,
-//     firstMeaningfulPaintCandidate,
-//     load, networkAlmostIdle, firstMeaningfulPaint, networkIdle
+//
+//	init, DOMContentLoaded, firstPaint,
+//	firstContentfulPaint, firstImagePaint,
+//	firstMeaningfulPaintCandidate,
+//	load, networkAlmostIdle, firstMeaningfulPaint, networkIdle
 //
 // This is not super reliable, I've already found incidental cases where
 // networkIdle was sent before load. It's probably smart to see how

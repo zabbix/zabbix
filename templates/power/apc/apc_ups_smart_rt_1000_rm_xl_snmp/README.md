@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -160,9 +160,9 @@ This template has been tested on:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay|<p>The battery cartridge status:bit 0 Disconnectedbit 1 Overvoltagebit 2 NeedsReplacementbit 3 OvertemperatureCriticalbit 4 Chargerbit 5 TemperatureSensorbit 6 BusSoftStartbit 7 OvertemperatureWarningbit 8 GeneralErrorbit 9 Communicationbit 10 DisconnectedFramebit 11 FirmwareMismatch</p>|`find(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0`|Warning||
+|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery status is not okay|<p>The battery cartridge status:<br>bit 0 Disconnected<br>bit 1 Overvoltage<br>bit 2 NeedsReplacement<br>bit 3 OvertemperatureCritical<br>bit 4 Charger<br>bit 5 TemperatureSensor<br>bit 6 BusSoftStart<br>bit 7 OvertemperatureWarning<br>bit 8 GeneralError<br>bit 9 Communication<br>bit 10 DisconnectedFrame<br>bit 11 FirmwareMismatch</p>|`find(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.pack.status[upsHighPrecBatteryPackCartridgeStatus.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0{16})$")=0`|Warning||
 |{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery has high temperature||`min(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.temperature[upsHighPrecBatteryPackTemperature.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],{$TIME.PERIOD}) > {$BATTERY.TEMP.MAX.WARN}`|High||
-|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay|<p>The battery cartridge health.  bit 0 Battery lifetime okay  bit 1 Battery lifetime near end, order replacement cartridge  bit 2 Battery lifetime exceeded, replace battery  bit 3 Battery lifetime near end acknowledged, order replacement cartridge  bit 4 Battery lifetime exceeded acknowledged, replace battery  bit 5 Battery measured lifetime near end, order replacement cartridge  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</p>|`find(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0\|1]{15}$")=1`|Warning||
+|{#BATTERY_PACK}.{#CARTRIDGE_INDEX}: Battery lifetime is not okay|<p>The battery cartridge health.<br>  bit 0 Battery lifetime okay<br>  bit 1 Battery lifetime near end, order replacement cartridge<br>  bit 2 Battery lifetime exceeded, replace battery<br>  bit 3 Battery lifetime near end acknowledged, order replacement cartridge<br>  bit 4 Battery lifetime exceeded acknowledged, replace battery<br>  bit 5 Battery measured lifetime near end, order replacement cartridge<br>  bit 6 Battery measured lifetime near end acknowledged, order replacement cartridge</p>|`find(/APC Smart-UPS RT 1000 RM XL by SNMP/battery.pack.cartridge_health[upsHighPrecBatteryPackCartridgeHealth.{#BATTERY_PACK}.{#CARTRIDGE_INDEX}],,"regexp","^(0)[0\|1]{15}$")=1`|Warning||
 
 ### LLD rule External bad battery packs discovery
 

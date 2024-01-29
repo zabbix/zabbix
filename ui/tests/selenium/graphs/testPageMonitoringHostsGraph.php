@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup profiles, hosts
@@ -29,7 +29,14 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageMonitoringHostsGraph extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	/**
 	 * ID of the item used for graph creation and check.

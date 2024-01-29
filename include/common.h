@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -110,7 +110,7 @@ const char	*zbx_result_string(int result);
 #define MAX_BUFFER_LEN		65536
 #define MAX_ZBX_HOSTNAME_LEN	128
 #define MAX_ZBX_DNSNAME_LEN	255	/* maximum host DNS name length from RFC 1035 (without terminating '\0') */
-#define MAX_EXECUTE_OUTPUT_LEN	(512 * ZBX_KIBIBYTE)
+#define MAX_EXECUTE_OUTPUT_LEN	(16 * ZBX_MEBIBYTE)
 
 #define ZBX_MAX_UINT64		(~__UINT64_C(0))
 #define ZBX_MAX_UINT64_LEN	21
@@ -353,7 +353,7 @@ const char	*zbx_dservice_type_string(zbx_dservice_type_t service);
 #define CONDITION_TYPE_HOST_GROUP		0
 #define CONDITION_TYPE_HOST			1
 #define CONDITION_TYPE_TRIGGER			2
-#define CONDITION_TYPE_TRIGGER_NAME		3
+#define CONDITION_TYPE_EVENT_NAME		3
 #define CONDITION_TYPE_TRIGGER_SEVERITY		4
 /* #define CONDITION_TYPE_TRIGGER_VALUE		5	deprecated */
 #define CONDITION_TYPE_TIME_PERIOD		6
@@ -1012,6 +1012,7 @@ zbx_task_t;
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+#define ZBX_RTC_SERVICE_SYNC_NOTIFY		9998
 
 #define ZBX_IPC_RTC_MAX				9999
 
@@ -1233,6 +1234,10 @@ size_t	zbx_snprintf(char *str, size_t count, const char *fmt, ...) __zbx_attr_fo
 void	zbx_snprintf_alloc(char **str, size_t *alloc_len, size_t *offset, const char *fmt, ...)
 		__zbx_attr_format_printf(4, 5);
 
+#if defined(__hpux)
+int	zbx_hpux_vsnprintf_is_c99(void);
+#endif
+
 size_t	zbx_vsnprintf(char *str, size_t count, const char *fmt, va_list args);
 
 void	zbx_strncpy_alloc(char **str, size_t *alloc_len, size_t *offset, const char *src, size_t n);
@@ -1351,6 +1356,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+const char	*get_bom_econding(char *in, size_t in_size);
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
@@ -1388,13 +1394,17 @@ typedef struct
 zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+char	*zbx_find_buf_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf,
+		size_t szbyte);
 #define ZBX_READ_ERR		-1
 #define ZBX_READ_WRONG_ENCODING	-2
 int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);
+
+ssize_t	zbx_buf_readln(int fd, char *buf, size_t bufsz, const char *encoding, char **value, void **saveptr);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 
@@ -1476,6 +1486,9 @@ char	*zbx_dyn_escape_shell_single_quote(const char *arg);
 #define ZBX_PSK_FOR_AUTOREG		0x02				/* PSK can be used for host autoregistration */
 #define ZBX_PSK_FOR_PROXY		0x04				/* PSK is configured on proxy */
 
+#define ZBX_BACKSLASH_ESC_OFF		0
+#define ZBX_BACKSLASH_ESC_ON		1
+
 void	zbx_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 char	*zbx_function_param_unquote_dyn(const char *param, size_t len, int *quoted);
 int	zbx_function_param_quote(char **param, int forced);
@@ -1483,6 +1496,11 @@ int	zbx_function_validate_parameters(const char *expr, size_t *length);
 int	zbx_function_find(const char *expr, size_t *func_pos, size_t *par_l, size_t *par_r,
 		char *error, int max_error_len);
 char	*zbx_function_get_param_dyn(const char *params, int Nparam);
+
+void	zbx_function_param_parse_ext(const char *expr, zbx_uint32_t allowed_macros, int esc_bs, size_t *param_pos,
+		size_t *length, size_t *sep_pos);
+void	zbx_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
+void	zbx_lld_trigger_function_param_parse(const char *expr, size_t *param_pos, size_t *length, size_t *sep_pos);
 
 void	zbx_alarm_flag_set(void);
 void	zbx_alarm_flag_clear(void);
@@ -1827,9 +1845,11 @@ typedef enum
 	ERR_Z3005,
 	ERR_Z3006,
 	ERR_Z3007,
-	ERR_Z3008
+	ERR_Z3008,
+	ERR_Z3009
 }
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+#define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #endif

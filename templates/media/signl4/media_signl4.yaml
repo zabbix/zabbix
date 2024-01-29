@@ -105,6 +105,7 @@ zabbix_export:
         	}
         	else {
         		params['X-S4-Status'] = 'new';
+        		params['X-S4-SourceSystem'] = 'Zabbix';
         	}
         
             payload = JSON.stringify(params);

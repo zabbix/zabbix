@@ -43,11 +43,12 @@ zabbix_agentd_LDADD = \
 	libzbxagent.a \
 	logfiles/libzbxlogfiles.a \
 	$(top_builddir)/src/libs/zbxsysinfo/libzbxagentsysinfo.a \
-	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
+	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libfunclistsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspechostnamesysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/agent/libagentsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_builddir)/src/libs/zbxsysinfo/$(ARCH)/libspecsysinfo.a \
 	$(top_builddir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
 	$(top_builddir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
 	$(top_builddir)/src/libs/zbxlog/libzbxlog.a \

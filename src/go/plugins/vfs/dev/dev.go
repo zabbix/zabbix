@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -24,17 +24,9 @@ import (
 	"sync"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
-
-// Plugin -
-type Plugin struct {
-	plugin.Base
-	devices map[string]*devUnit
-	mutex   sync.Mutex
-}
-
-var impl Plugin
 
 const (
 	maxInactivityPeriod = time.Hour * 3
@@ -53,7 +45,48 @@ const (
 	statTypeOPS
 )
 
+var impl Plugin
+
+// Plugin -
+type Plugin struct {
+	plugin.Base
+	devices map[string]*devUnit
+	mutex   sync.Mutex
+}
+
 type historyIndex int
+
+type devIO struct {
+	sectors    uint64
+	operations uint64
+}
+
+type devStats struct {
+	clock int64
+	rx    devIO
+	tx    devIO
+}
+
+type devUnit struct {
+	name       string
+	head, tail historyIndex
+	accessed   time.Time
+	history    [maxHistory]devStats
+}
+
+func init() {
+	impl.devices = make(map[string]*devUnit)
+
+	err := plugin.RegisterMetrics(
+		&impl, "VFSDev",
+		"vfs.dev.read", "Disk read statistics.",
+		"vfs.dev.write", "Disk write statistics.",
+		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (h historyIndex) inc() historyIndex {
 	h++
@@ -77,24 +110,6 @@ func (h historyIndex) sub(value historyIndex) historyIndex {
 		h += maxHistory
 	}
 	return h
-}
-
-type devIO struct {
-	sectors    uint64
-	operations uint64
-}
-
-type devStats struct {
-	clock int64
-	rx    devIO
-	tx    devIO
-}
-
-type devUnit struct {
-	name       string
-	head, tail historyIndex
-	accessed   time.Time
-	history    [maxHistory]devStats
 }
 
 func (p *Plugin) Collect() (err error) {
@@ -239,12 +254,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		p.devices[devName] = &devUnit{name: devName, accessed: now}
 		return
 	}
-}
-
-func init() {
-	impl.devices = make(map[string]*devUnit)
-	plugin.RegisterMetrics(&impl, "VFSDev",
-		"vfs.dev.read", "Disk read statistics.",
-		"vfs.dev.write", "Disk write statistics.",
-		"vfs.dev.discovery", "List of block devices and their type. Used for low-level discovery.")
 }

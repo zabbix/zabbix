@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1021,72 +1021,6 @@ function getConditionFormula(conditions, evalType) {
 }(jQuery));
 
 jQuery(function ($) {
-	var verticalHeaderTables = {};
-
-	$.fn.makeVerticalRotation = function() {
-		this.each(function(i) {
-			var table = $(this);
-
-			if (table.data('rotated') == 1) {
-				return;
-			}
-			table.data('rotated', 1);
-
-			var cellsToRotate = $('.vertical_rotation', table),
-				betterCells = [];
-
-			// insert spans
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					text = $('<span>', {
-						text: cell.html()
-					}).css({'white-space': 'nowrap'});
-
-				cell.text('').append(text);
-			});
-
-			// rotate cells
-			cellsToRotate.each(function() {
-				var cell = $(this),
-					span = cell.children(),
-					height = cell.height(),
-					width = span.width(),
-					transform = (width / 2) + 'px ' + (width / 2) + 'px';
-
-				var css = {};
-
-				css['transform-origin'] = transform;
-				css['-webkit-transform-origin'] = transform;
-				css['-moz-transform-origin'] = transform;
-				css['-o-transform-origin'] = transform;
-
-				var divInner = $('<div>', {
-					'class': 'vertical_rotation_inner'
-				})
-					.css(css)
-					.append(span.text());
-
-				var div = $('<div>', {
-					height: width,
-					width: height
-				})
-					.append(divInner);
-
-				betterCells.push(div);
-			});
-
-			cellsToRotate.each(function(i) {
-				$(this).html(betterCells[i]);
-			});
-
-			table.on('remove', function() {
-				delete verticalHeaderTables[table.attr('id')];
-			});
-
-			verticalHeaderTables[table.attr('id')] = table;
-		});
-	};
-
 	if (ED && typeof sessionStorage.scrollTop !== 'undefined') {
 		$('.wrapper').scrollTop(sessionStorage.scrollTop);
 		sessionStorage.removeItem('scrollTop');

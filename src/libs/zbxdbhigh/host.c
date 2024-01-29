@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -974,7 +974,7 @@ static void	DBadd_to_housekeeper(const zbx_vector_uint64_t *ids, const char *fie
 
 	housekeeperid = DBget_maxid_num("housekeeper", count * ids->values_num);
 
-	zbx_db_insert_prepare(&db_insert, "housekeeper", "housekeeperid", "tablename", "field", "value", NULL);
+	zbx_db_insert_prepare(&db_insert, "housekeeper", "housekeeperid", "tablename", "field", "value", (char *)NULL);
 
 	for (i = 0; i < ids->values_num; i++)
 	{
@@ -3316,9 +3316,9 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		hostid = DBget_maxid_num("hosts", new_hosts);
 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "status", "flags", "templateid",
-				"discover", "custom_interfaces", NULL);
+				"discover", "custom_interfaces", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", NULL);
+		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_itemid", (char *)NULL);
 	}
 
 	if (new_hosts != host_prototypes->values_num || 0 != upd_group_prototypes || 0 != upd_hostmacros ||
@@ -3383,7 +3383,7 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		group_prototypeid = DBget_maxid_num("group_prototype", new_group_prototypes);
 
 		zbx_db_insert_prepare(&db_insert_gproto, "group_prototype", "group_prototypeid", "hostid", "name",
-				"groupid", "templateid", NULL);
+				"groupid", "templateid", (char *)NULL);
 	}
 
 	if (0 != new_hostmacros)
@@ -3391,14 +3391,14 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		new_hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
 		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
-				"description", "type", NULL);
+				"description", "type", (char *)NULL);
 	}
 
 	if (0 != new_tags)
 	{
 		hosttagid = DBget_maxid_num("host_tag", new_tags);
 
-		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", (char *)NULL);
 	}
 
 	if (0 != new_interfaces)
@@ -3406,18 +3406,18 @@ static void	DBhost_prototypes_save(const zbx_vector_ptr_t *host_prototypes,
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
 		zbx_db_insert_prepare(&db_insert_iface, "interface", "interfaceid", "hostid", "main", "type",
-				"useip", "ip", "dns", "port", NULL);
+				"useip", "ip", "dns", "port", (char *)NULL);
 	}
 
 	if (0 != new_snmp)
 	{
 		zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
 				"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
-				"privprotocol", "contextname", NULL);
+				"privprotocol", "contextname", (char *)NULL);
 	}
 
 	if (0 != new_inventory_modes)
-		zbx_db_insert_prepare(&db_insert_inventory_mode, "host_inventory", "hostid", "inventory_mode", NULL);
+		zbx_db_insert_prepare(&db_insert_inventory_mode, "host_inventory", "hostid", "inventory_mode", (char *)NULL);
 
 	for (i = 0; i < host_prototypes->values_num; i++)
 	{
@@ -4734,7 +4734,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		zbx_db_insert_prepare(&db_insert_htest, "httptest", "httptestid", "name", "delay", "status", "agent",
 				"authentication", "http_user", "http_password", "http_proxy", "retries", "hostid",
 				"templateid", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
-				"verify_host", NULL);
+				"verify_host", (char *)NULL);
 	}
 
 	if (0 != num_httptestfields)
@@ -4742,7 +4742,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		httptestfieldid = DBget_maxid_num("httptest_field", num_httptestfields);
 
 		zbx_db_insert_prepare(&db_insert_tfield, "httptest_field", "httptest_fieldid", "httptestid", "type",
-				"name", "value", NULL);
+				"name", "value", (char *)NULL);
 	}
 
 	if (0 != num_httpsteps)
@@ -4751,7 +4751,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 
 		zbx_db_insert_prepare(&db_insert_hstep, "httpstep", "httpstepid", "httptestid", "name", "no", "url",
 				"timeout", "posts", "required", "status_codes", "follow_redirects", "retrieve_mode",
-				"post_type", NULL);
+				"post_type", (char *)NULL);
 	}
 
 	if (0 != num_httptestitems)
@@ -4759,7 +4759,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		httptestitemid = DBget_maxid_num("httptestitem", num_httptestitems);
 
 		zbx_db_insert_prepare(&db_insert_htitem, "httptestitem", "httptestitemid", "httptestid", "itemid",
-				"type", NULL);
+				"type", (char *)NULL);
 	}
 
 	if (0 != num_httpstepitems)
@@ -4767,7 +4767,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		httpstepitemid = DBget_maxid_num("httpstepitem", num_httpstepitems);
 
 		zbx_db_insert_prepare(&db_insert_hsitem, "httpstepitem", "httpstepitemid", "httpstepid", "itemid",
-				"type", NULL);
+				"type", (char *)NULL);
 	}
 
 	if (0 != num_httpstepfields)
@@ -4775,7 +4775,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		httpstepfieldid = DBget_maxid_num("httpstep_field", num_httpstepfields);
 
 		zbx_db_insert_prepare(&db_insert_sfield, "httpstep_field", "httpstep_fieldid", "httpstepid", "type",
-				"name", "value", NULL);
+				"name", "value", (char *)NULL);
 	}
 
 	if (0 != num_httptesttags)
@@ -4783,7 +4783,7 @@ static void	DBsave_httptests(zbx_uint64_t hostid, const zbx_vector_ptr_t *httpte
 		httptesttagid = DBget_maxid_num("httptest_tag", num_httptesttags);
 
 		zbx_db_insert_prepare(&db_insert_httag, "httptest_tag", "httptesttagid", "httptestid", "tag", "value",
-				NULL);
+				(char *)NULL);
 	}
 
 	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
@@ -5288,7 +5288,8 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 
 	db_insert_htemplates = zbx_malloc(NULL, sizeof(zbx_db_insert_t));
 
-	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid", NULL);
+	zbx_db_insert_prepare(db_insert_htemplates, "hosts_templates",  "hosttemplateid", "hostid", "templateid",
+			(char *)NULL);
 
 	for (i = 0; i < lnk_templateids->values_num; i++)
 	{
@@ -5927,7 +5928,7 @@ void	DBadd_host_inventory(zbx_uint64_t hostid, int inventory_mode)
 {
 	zbx_db_insert_t	db_insert;
 
-	zbx_db_insert_prepare(&db_insert, "host_inventory", "hostid", "inventory_mode", NULL);
+	zbx_db_insert_prepare(&db_insert, "host_inventory", "hostid", "inventory_mode", (char *)NULL);
 	zbx_db_insert_add_values(&db_insert, hostid, inventory_mode);
 	zbx_db_insert_execute(&db_insert);
 	zbx_db_insert_clean(&db_insert);

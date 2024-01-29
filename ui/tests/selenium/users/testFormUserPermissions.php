@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role, users, usrgrp, module
@@ -30,7 +30,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormUserPermissions extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Id of role that created for future role rule change.
@@ -45,13 +55,6 @@ class testFormUserPermissions extends CWebTest {
 	 * @var integer
 	 */
 	protected static $admin_user;
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
 
 	/**
 	 * Function used to create roles.

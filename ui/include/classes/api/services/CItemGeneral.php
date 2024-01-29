@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1469,7 +1469,7 @@ abstract class CItemGeneral extends CApiService {
 							$types['lldmacros'] = true;
 						}
 
-						if (!(new CMacrosResolverGeneral)->getMacroPositions($params, $types)) {
+						if (!CMacrosResolverGeneral::getMacroPositions($params, $types)) {
 							self::exception(ZBX_API_ERROR_PARAMETERS, _s('Incorrect value for field "%1$s": %2$s.',
 								'params', _('a numeric value is expected')
 							));
@@ -2850,7 +2850,7 @@ abstract class CItemGeneral extends CApiService {
 					$types['lldmacros'] = true;
 				}
 
-				$matches = (new CMacrosResolverGeneral)->getMacroPositions($posts, $types);
+				$matches = CMacrosResolverGeneral::getMacroPositions($posts, $types);
 
 				$shift = 0;
 

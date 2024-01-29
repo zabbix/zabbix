@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -239,7 +239,7 @@ class testUserParametersReload extends CIntegrationTest {
 	 * @param string $lastvalue
 	 */
 	public function checkItemState(string $name, int $state, string $lastvalue = null) {
-		$wait_iterations = 5;
+		$wait_iterations = 20;
 		$wait_iteration_delay = 1;
 
 		for ($r = 0; $r < $wait_iterations; $r++) {

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1821,11 +1821,18 @@ class CExpressionParserTest extends TestCase {
 			['count(/host/key,1,"",  """")=0', null, CParser::PARSE_FAIL],
 
 			['find(/host/key,,"like","\\")=0', null, CParser::PARSE_FAIL],
-			['find(/host/key,,"like","\\\\")=0', null, CParser::PARSE_SUCCESS],
+			['find(/host/key2,,"like","\\\\")=0', null, CParser::PARSE_FAIL],
 			['find(/host/key,,"like","\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\\\\\"")=0', null, CParser::PARSE_SUCCESS],
 			['find(/host/key,,"like","\\""")=0', null, CParser::PARSE_FAIL],
 			['find(/host/key,,"like","\\"""")=0', null, CParser::PARSE_FAIL],
+
+			['find(/host/key,,"like","\\"\\"\\"")=0', null, CParser::PARSE_SUCCESS],
+			['find(/host/key,,"like","\\"\\"\\""")=0', null, CParser::PARSE_FAIL],
+			['find(/host/key,,"like","\\"\\\\\\"\\"")=0', null, CParser::PARSE_SUCCESS],
+			['find(/host/key,,"like","\\\\\\"\\\\")=0', null, CParser::PARSE_FAIL],
+			['find(/host/key,,"like","\\"\\\\"\\"")=0', null, CParser::PARSE_SUCCESS],
+			['find(/host/key,,"like","\\\\"\\\\")=0', null, CParser::PARSE_FAIL],
 
 			['find(/host/key,,"like",\")=0', null, CParser::PARSE_FAIL],
 			['find(/host/key,,"like",param\")=0', null, CParser::PARSE_FAIL],

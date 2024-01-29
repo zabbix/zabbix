@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMacrosBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
@@ -28,7 +28,17 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  */
 abstract class testFormMacros extends CLegacyWebTest {
 
-	use MacrosTrait;
+	/**
+	 * Attach Behaviors to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
+	}
 
 	const SQL_HOSTS = 'SELECT * FROM hosts ORDER BY hostid';
 
@@ -43,14 +53,6 @@ abstract class testFormMacros extends CLegacyWebTest {
 	public $revert_macro_1;
 	public $revert_macro_2;
 	public $revert_macro_object;
-	/**
-	 * Attach Behaviors to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public static function getHash() {
 		return CDBHelper::getHash(self::SQL_HOSTS);
@@ -649,12 +651,12 @@ abstract class testFormMacros extends CLegacyWebTest {
 							'index' => 0,
 							'macro' => '{$SNMP_COMMUNITY}',
 							'value' => 'new redefined value 1',
-							'description' => 'new redifined description 1'
+							'description' => 'new redefined description 1'
 						],
 						[
 							'macro' => '{$_}',
-							'value' => 'new redifined value 2',
-							'description' => 'new redifined description 2'
+							'value' => 'new redefined value 2',
+							'description' => 'new redefined description 2'
 						]
 					]
 				]

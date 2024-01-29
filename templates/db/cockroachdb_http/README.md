@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -113,7 +113,7 @@ Also, see the Macros section for a list of macros used to set trigger values.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |CockroachDB: Node is unhealthy|<p>Node's /health endpoint has returned HTTP 500 Internal Server Error which indicates unhealthy mode.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_health) = 500`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
-|CockroachDB: Node is not ready|<p>Node's /health?ready=1 endpoint has returned HTTP 503 Service Unavailable. Possible reasons:- node is in the wait phase of the node shutdown sequence;- node is unable to communicate with a majority of the other nodes in the cluster, likely because the cluster is unavailable due to too many nodes being down.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_readiness) = 503 and last(/CockroachDB by HTTP/cockroachdb.uptime) > 5m`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
+|CockroachDB: Node is not ready|<p>Node's /health?ready=1 endpoint has returned HTTP 503 Service Unavailable. Possible reasons:<br>- node is in the wait phase of the node shutdown sequence;<br>- node is unable to communicate with a majority of the other nodes in the cluster, likely because the cluster is unavailable due to too many nodes being down.</p>|`last(/CockroachDB by HTTP/cockroachdb.get_readiness) = 503 and last(/CockroachDB by HTTP/cockroachdb.uptime) > 5m`|Average|**Depends on**:<br><ul><li>CockroachDB: Service is down</li></ul>|
 |CockroachDB: Service is down||`last(/CockroachDB by HTTP/net.tcp.service["{$COCKROACHDB.API.SCHEME}","{HOST.CONN}","{$COCKROACHDB.API.PORT}"]) = 0`|Average||
 |CockroachDB: Clock offset is too high|<p>Cockroach-measured clock offset is nearing limit (by default, servers kill themselves at 400ms from the mean).</p>|`min(/CockroachDB by HTTP/cockroachdb.clock.offset,5m) > {$COCKROACHDB.CLOCK.OFFSET.MAX.WARN} * 0.001`|Warning||
 |CockroachDB: Version has changed||`last(/CockroachDB by HTTP/cockroachdb.version) <> last(/CockroachDB by HTTP/cockroachdb.version,#2) and length(last(/CockroachDB by HTTP/cockroachdb.version)) > 0`|Info||

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -320,6 +320,14 @@ void	DBrollback(void)
 
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
+	}
+	else
+	{
+		if (ZBX_DB_DOWN == zbx_db_txn_end_error() && ERR_Z3009 == zbx_db_last_errcode())
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
 	}
 }
 
@@ -1037,19 +1045,6 @@ int	zbx_db_check_tsdb_capabilities(struct zbx_db_version_info_t *db_version_info
 		goto out;
 	}
 
-	/* Timescale compression feature is available in PostgreSQL 10.2 and TimescaleDB 1.5.0 and newer */
-	/* in TimescaleDB Community Edition, and it is not available in TimescaleDB Apache 2 Edition.    */
-	/* timescaledb.license parameter is available in TimescaleDB API starting from TimescaleDB 2.0.  */
-	if (ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB > db_version_info->current_version)
-	{
-		zabbix_log(LOG_LEVEL_WARNING, "PostgreSQL version %lu is not supported with TimescaleDB, minimum"
-				" required is %d.", (unsigned long)db_version_info->current_version,
-				ZBX_POSTGRESQL_MIN_VERSION_WITH_TIMESCALEDB);
-		db_version_info->ext_err_code = ZBX_TIMESCALEDB_POSTGRES_TOO_OLD;
-		ret = FAIL;
-		goto out;
-	}
-
 	if (DB_VERSION_FAILED_TO_RETRIEVE == db_version_info->ext_flag)
 	{
 		db_version_info->ext_err_code = ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE;
@@ -1129,7 +1124,11 @@ out:
 }
 #endif
 
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 #ifdef HAVE_ORACLE
 #define MIN_NUM_BETWEEN	5	/* minimum number of consecutive values for using "between <id1> and <idN>" */
@@ -1379,7 +1378,11 @@ void	DBadd_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, co
 void	DBadd_str_condition_alloc(char **sql, size_t *sql_alloc, size_t *sql_offset, const char *fieldname,
 		const char **values, const int num)
 {
+#if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
+#define MAX_EXPRESSIONS	1000	/* tune according to batch size to avoid unnecessary or conditions */
+#else
 #define MAX_EXPRESSIONS	950
+#endif
 
 	int	i, cnt = 0;
 	char	*value_esc;
@@ -1927,7 +1930,7 @@ void	DBregister_host_flush(zbx_vector_ptr_t *autoreg_hosts, zbx_uint64_t proxy_h
 		autoreg_hostid = DBget_maxid_num("autoreg_host", create);
 
 		zbx_db_insert_prepare(&db_insert, "autoreg_host", "autoreg_hostid", "proxy_hostid", "host", "listen_ip",
-				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", NULL);
+				"listen_dns", "listen_port", "tls_accepted", "host_metadata", "flags", (char *)NULL);
 	}
 
 	if (0 != (update = autoreg_hosts->values_num - create))
@@ -2932,11 +2935,12 @@ out:
  *                                                                            *
  * Purpose: format bulk operation (insert, update) value list                 *
  *                                                                            *
- * Parameters: fields     - [IN] the field list                               *
- *             values     - [IN] the corresponding value list                 *
- *             values_num - [IN] the number of values to format               *
+ * Parameters: fields     - [IN] field list                                   *
+ *             values     - [IN] corresponding value list                     *
+ *             values_num - [IN] number of values to format                   *
  *                                                                            *
- * Return value: the formatted value list <value1>,<value2>...                *
+ * Return value: formatted value list <value1>,<value2>...                    *
+ *               or NULL if 'values' list was empty                           *
  *                                                                            *
  * Comments: The returned string is allocated by this function and must be    *
  *           freed by the caller later.                                       *
@@ -3363,7 +3367,8 @@ retry_oracle:
 			char	*str;
 
 			str = zbx_db_format_values((ZBX_FIELD **)self->fields.values, values, self->fields.values_num);
-			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(), str);
+			zabbix_log(LOG_LEVEL_DEBUG, "insert [txnlev:%d] [%s]", zbx_db_txn_level(),
+					ZBX_NULL2EMPTY_STR(str));
 			zbx_free(str);
 		}
 	}

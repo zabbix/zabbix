@@ -34,7 +34,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -154,7 +154,7 @@ Define macros according to your camera configuration
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Channel "{#CHANNEL_ID}": Invalid video stream resolution parameters|<p>expected: {$HIKVISION_STREAM_WIDTH} px x {$HIKVISION_STREAM_HEIGHT} pxreceived: {ITEM.LASTVALUE2} x {ITEM.LASTVALUE1}</p>|`last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_HEIGHT} or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_WIDTH}`|Warning|**Manual close**: Yes|
+|Channel "{#CHANNEL_ID}": Invalid video stream resolution parameters|<p>expected: {$HIKVISION_STREAM_WIDTH} px x {$HIKVISION_STREAM_HEIGHT} px<br>received: {ITEM.LASTVALUE2} x {ITEM.LASTVALUE1}</p>|`last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_HEIGHT} or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}])<>{$HIKVISION_STREAM_WIDTH}`|Warning|**Manual close**: Yes|
 |Channel "{#CHANNEL_ID}": Parameters of video stream are changed||`last(/Hikvision camera by HTTP/hikvision_cam.fixed_quality[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.fixed_quality[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.constant_bit_rate[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.constant_bit_rate[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_quality_control_type[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_quality_control_type[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_width[{#CHANNEL_ID}],#2) or last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}],#1)<>last(/Hikvision camera by HTTP/hikvision_cam.video_resolution_height[{#CHANNEL_ID}],#2)`|Info|**Manual close**: Yes|
 
 ## Feedback

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -257,12 +257,8 @@ $hostInventoriesTab->addTab('detailsTab', _('Details'), $detailsFormList);
 // append tabs and form
 $hostInventoriesTab->setFooter(makeFormFooter(null, [new CButtonCancel()]));
 
-$web_layout_mode = CViewHelper::loadLayoutMode();
-
 (new CWidget())
 	->setTitle(_('Host inventory'))
-	->setWebLayoutMode($web_layout_mode)
-	->setControls((new CList())->addItem(get_icon('kioskmode', ['mode' => $web_layout_mode])))
 	->addItem((new CForm())
 		->cleanItems()
 		->setAttribute('aria-labelledby', ZBX_STYLE_PAGE_TITLE)

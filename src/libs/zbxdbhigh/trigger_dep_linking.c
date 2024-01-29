@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -436,7 +436,7 @@ static int	DBadd_trigger_dependencies(zbx_vector_uint64_pair_t *links, zbx_hashs
 		triggerdepid = DBget_maxid_num("trigger_depends", links->values_num);
 
 		zbx_db_insert_prepare(&db_insert, "trigger_depends", "triggerdepid", "triggerid_down", "triggerid_up",
-				NULL);
+				(char *)NULL);
 
 		for (i = 0; i < links->values_num; i++)
 		{

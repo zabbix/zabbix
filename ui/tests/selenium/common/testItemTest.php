@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,27 +20,28 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * Base class for "Test item" function tests.
  */
 class testItemTest extends CWebTest {
 
-	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
-	const TEMPLATE_ID = 99137;	// 'Test Item Template'
-
-	use PreprocessingTrait;
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
 	}
+
+	const HOST_ID = 99136;		// 'Test item host' monitored by 'Active proxy 1'
+	const TEMPLATE_ID = 99137;	// 'Test Item Template'
 
 	/**
 	 * Test item button state data for item, item prototype and LLD.
@@ -76,7 +77,7 @@ class testItemTest extends CWebTest {
 	/**
 	 * Check test item button state depending on item type.
 	 *
-	 * @param arary		$data			data provider
+	 * @param array		$data			data provider
 	 * @param string	$item_name		item given name
 	 * @param string	$item_type		type of an item: item, prototype or lld rule
 	 * @param string	$success_text	text part of a success message
@@ -672,7 +673,7 @@ class testItemTest extends CWebTest {
 	/**
 	 * Check test item form.
 	 *
-	 * @param arary		$data			data provider
+	 * @param array		$data			data provider
 	 * @param boolean	$is_host		true if host, false if template
 	 * @param string	$id				id of a host, template or LLD rule
 	 * @param string	$items			pointer to form in URL

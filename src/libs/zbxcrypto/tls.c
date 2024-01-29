@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1997,11 +1997,15 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 		{
 			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_issuer() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_issuer, sizeof(tls_issuer), error))
+		{
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
+		}
 	}
 
 	if (NULL != subject && '\0' != *subject)
@@ -2010,11 +2014,15 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 		{
 			*error = zbx_dsprintf(*error, "gnutls_x509_crt_get_subject() failed: %d %s", res,
 					gnutls_strerror(res));
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
 		}
 
 		if (SUCCEED != zbx_x509_dn_gets(dn, tls_subject, sizeof(tls_subject), error))
+		{
+			gnutls_x509_crt_deinit(cert);
 			return FAIL;
+		}
 	}
 
 	gnutls_x509_crt_deinit(cert);
@@ -2028,13 +2036,19 @@ static int	zbx_verify_issuer_subject(const zbx_tls_context_t *tls_ctx, const cha
 	if (NULL != issuer && '\0' != *issuer)
 	{
 		if (SUCCEED != zbx_x509_dn_gets(X509_get_issuer_name(cert), tls_issuer, sizeof(tls_issuer), error))
+		{
+			X509_free(cert);
 			return FAIL;
+		}
 	}
 
 	if (NULL != subject && '\0' != *subject)
 	{
 		if (SUCCEED != zbx_x509_dn_gets(X509_get_subject_name(cert), tls_subject, sizeof(tls_subject), error))
+		{
+			X509_free(cert);
 			return FAIL;
+		}
 	}
 
 	X509_free(cert);

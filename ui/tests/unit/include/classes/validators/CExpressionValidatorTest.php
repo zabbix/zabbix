@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -50,9 +50,17 @@ class CExpressionValidatorTest extends TestCase {
 
 			['avg(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['kurtosis(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['mad(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['max(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['min(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['skewness(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['stddevpop(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['stddevsamp(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['sum(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['sumofsquares(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['varpop(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
+			['varsamp(last_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 
 			['avg(max_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],
 			['count(max_foreach(/host/key, 1))', ['calculated' => true], ['rc' => true, 'error' => null]],

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,15 +20,25 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 
 /**
  * Common code for cloning hosts and templates with preprocessing steps in items.
  */
 class testFormPreprocessingClone extends CWebTest {
 
-	use PreprocessingTrait;
+	/**
+	 * Attach MessageBehavior and PreprocessingBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	public $hostid;
 	public $itemid;
@@ -227,15 +237,6 @@ class testFormPreprocessingClone extends CWebTest {
 			'itemid' => $this->item_prototypeid,
 			'preprocessing' => $this->getItemPreprocessing()
 		]);
-	}
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
 	}
 
 	/**

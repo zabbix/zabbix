@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -184,8 +184,10 @@ static duk_ret_t	es_httprequest_ctor(duk_context *ctx)
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_HEADERDATA, request, err);
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_INTERFACE, CONFIG_SOURCE_IP, err);
 
+	duk_push_string(ctx, "\xff""\xff""d");
 	duk_push_pointer(ctx, request);
-	duk_put_prop_string(ctx, -2, "\xff""\xff""d");
+	duk_def_prop(ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	duk_push_c_function(ctx, es_httprequest_dtor, 1);
 	duk_set_finalizer(ctx, -2);
@@ -357,7 +359,12 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 	ZBX_CURL_SETOPT(ctx, request->handle, ZBX_CURLOPT_ACCEPT_ENCODING, "", err);
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
+#	if LIBCURL_VERSION_NUM >= 0x075500
+	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS", err);
+#	else
 	ZBX_CURL_SETOPT(ctx, request->handle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS, err);
+#	endif
 #endif
 
 	request->data_offset = 0;
@@ -369,6 +376,9 @@ static duk_ret_t	es_httprequest_query(duk_context *ctx, const char *http_request
 				curl_easy_strerror(err));
 		goto out;
 	}
+
+	if (NULL != request->data)
+		zbx_http_convert_to_utf8(request->handle, &request->data, &request->data_offset, &request->data_alloc);
 out:
 	zbx_free(url);
 	zbx_free(contents);

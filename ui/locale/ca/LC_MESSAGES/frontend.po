@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-03 06:24+0000\n"
+"PO-Revision-Date: 2023-12-16 13:08+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -197,6 +197,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s de %2$s element en estat problemàtic"
 msgstr[1] "%1$s de %2$s element en estat problemàtic"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr "%1$s o %2$s - permet que la pàgina només es vegi dins un marc del mateix origen que la mateixa pàgina"
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr "%1$s o %2$s - impedeix que la pàgina es vegi en un marc, independentment del lloc que ho provi"
 
 #: jsLoader.php:348
 #, c-format
@@ -2102,6 +2112,10 @@ msgstr "No es pot pas canviar el tipus d'usuari del propi rol."
 msgid "Cannot clear history"
 msgstr "No es pot pas esborrar l'historial"
 
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr "No es poden pas netejar l'historial i tendències"
+
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
 msgstr "No es poden pas clonar prototips de gràfics."
@@ -2539,6 +2553,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "No es pot pas desactivar el tipus de suport"
 msgstr[1] "No es poden pas desactivar els tipus de suport"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "No es pot desactivar el mòdul"
+msgstr[1] "No es poden desactivar els mòduls"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2622,6 +2642,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "No es pot pas activar el tipus de suport"
 msgstr[1] "No es poden pas activar els tipus de suport"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "No es pot activar el mòdul"
+msgstr[1] "No es poden activar els mòduls"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3362,6 +3388,10 @@ msgstr "No es pot pas actualitzar el manteniment"
 msgid "Cannot update media type"
 msgstr "No es pot pas actualitzar el tipus de suport"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr "No es pot actualitzar el mòdul"
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3731,6 +3761,14 @@ msgstr "Netejar l'historial"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Netejar historial i tendències"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr "Netegem l'historial i tendències dels elements triats?"
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr "Netegem l'historial i tendències dels escenaris web triats?"
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6748,6 +6786,10 @@ msgstr "Supervisió del registre d'esdeveniments. Retorna un registre"
 msgid "Event name"
 msgstr "Nom de l'esdeveniment"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr "El nom de l'esdeveniment coincideix amb el nom del trigger (amb macros ampliades) tret que s'especifiqui un nom d'esdeveniment personalitzat a la configuració del trigger."
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Parell d'etiquetes d'esdeveniment"
@@ -7962,6 +8004,10 @@ msgstr "Ressalteu la filera sencera"
 #: jsLoader.php:372
 msgid "History"
 msgstr "Història"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr "Històric i tendències netejats"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11938,6 +11984,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Mòdul esborrat: %1$s."
 msgstr[1] "Mòduls esborrats: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Mòdul desactivat"
+msgstr[1] "Mòduls desactivats"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11945,12 +11997,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Mòdul desactivat: %1$s."
 msgstr[1] "Mòduls desactivats: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Mòdul activat"
+msgstr[1] "Mòduls activats"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Mòdul activat: %1$s."
 msgstr[1] "Mòduls activats: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr "Mòdul actualitzat"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13064,6 +13126,11 @@ msgstr "Elements no heretats"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "No compatible"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr "Tingueu en compte que %1$s o %2$s es consideraran noms d'equips si s'empren sense cometes simples."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19158,6 +19225,10 @@ msgstr "Temps d'activitat del procés del servidor Zabbix, en segons."
 msgid "Uptime/Downtime"
 msgstr "Temps d'activitat/temps d'inactivitat"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr "Emprar capçalera HTTP X-Frame-Options"
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Empreu sol·licituds massives"
@@ -20560,6 +20631,10 @@ msgstr "Eix X"
 msgid "X-Frame-Options HTTP header"
 msgstr "Capçalera HTTP X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr "Valors compatibles amb la capçalera HTTP d'X-Frame-Options:"
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -20979,6 +21054,11 @@ msgstr "s'espera un temps relatiu"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "un caracter especial"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr "una cadena de noms d'equips separats per espais; afegir %1$s a la llista permet que la pàgina es vegi en un marc del mateix origen que la mateixa pàgina"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -22336,6 +22416,10 @@ msgstr "now() - Nombre de segons des de l'època"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "nombre"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr "l'objecte no existeix pas o pertany a un altre objecte"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

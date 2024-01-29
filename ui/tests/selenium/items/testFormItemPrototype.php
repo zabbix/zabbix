@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -618,7 +618,7 @@ class testFormItemPrototype extends CLegacyWebTest {
 		}
 
 		if ($type == 'SSH agent' && !isset($itemid)) {
-			$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>]');
+			$this->zbxTestAssertElementValue('key', 'ssh.run[<unique short description>,<ip>,<port>,<encoding>,<ssh options>]');
 		}
 
 		if ($type == 'TELNET agent' && !isset($itemid)) {

@@ -20,15 +20,12 @@
 
 AC_DEFUN([LIBSSH2_TRY_LINK],
 [
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <libssh2.h>
-],
-[
+]], [[
 	LIBSSH2_SESSION	*session;
 	session = libssh2_session_init();
-],
-found_ssh2="yes",)
+]])],[found_ssh2="yes"],[])
 ])dnl
 
 AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
@@ -49,7 +46,7 @@ AC_DEFUN([LIBSSH2_ACCEPT_VERSION],
 AC_DEFUN([LIBSSH2_CHECK_CONFIG],
 [
   AC_ARG_WITH(ssh2,[If you want to use SSH2 based checks:
-AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],
+AS_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, DIR is the SSH2 library install directory.])],
     [
 	if test "$withval" = "no"; then
 	    want_ssh2="no"
@@ -117,6 +114,13 @@ AC_HELP_STRING([--with-ssh2@<:@=DIR@:>@],[use SSH2 package @<:@default=no@:>@, D
     if test "x$found_ssh2" = "xyes"; then
       AC_DEFINE([HAVE_SSH2], 1, [Define to 1 if you have the 'libssh2' library (-lssh2)])
       AC_MSG_RESULT(yes)
+
+      ENUM_CHECK([LIBSSH2_METHOD_KEX],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_HOSTKEY],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_CRYPT_CS],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_CRYPT_SC],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_MAC_CS],[libssh2.h])
+      ENUM_CHECK([LIBSSH2_METHOD_MAC_SC],[libssh2.h])
     else
       AC_MSG_RESULT(no)
       SSH2_CFLAGS=""

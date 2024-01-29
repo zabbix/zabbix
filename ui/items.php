@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -905,7 +905,7 @@ elseif (hasRequest('check_now') && hasRequest('itemid')) {
 elseif (hasRequest('del_history') && hasRequest('itemid')) {
 	$result = (bool) API::History()->clear([getRequest('itemid')]);
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massenable', 'item.massdisable']) && hasRequest('group_itemid')) {
 	$itemids = getRequest('group_itemid');
@@ -984,7 +984,7 @@ elseif (hasRequest('action') && getRequest('action') === 'item.massclearhistory'
 		uncheckTableRows(getRequest('checkbox_hash'));
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.massdelete' && hasRequest('group_itemid')) {
 	$group_itemid = getRequest('group_itemid');
@@ -1479,8 +1479,7 @@ else {
 		'groups' => hasRequest('filter_groupids')
 			? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 				'output' => ['groupid', 'name'],
-				'groupids' => getRequest('filter_groupids'),
-				'editable' => true
+				'groupids' => getRequest('filter_groupids')
 			]), ['groupid' => 'id'])
 			: [],
 		'hosts' => $host_template_filter,

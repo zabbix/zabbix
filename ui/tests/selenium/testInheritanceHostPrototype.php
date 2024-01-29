@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
 
 /**
  * Test the creation of inheritance of new objects on a previously linked template.
@@ -28,7 +28,14 @@ require_once dirname(__FILE__).'/traits/MacrosTrait.php';
  */
 class testInheritanceHostPrototype extends CLegacyWebTest {
 
-	use MacrosTrait;
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CMacrosBehavior::class];
+	}
 
 	public static function getLayoutData() {
 		return [

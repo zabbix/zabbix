@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #include "db.h"
 #include "dbupgrade.h"
 #include "log.h"
+#include "zbxeval.h"
 
 extern unsigned char	program_type;
 
@@ -394,6 +395,251 @@ static int	DBpatch_6000020(void)
 {
 	return DBcreate_index("scripts", "scripts_3", "name,menu_path", 1);
 }
+
+static int	DBpatch_6000021(void)
+{
+	return DBcreate_index("dashboard_user", "dashboard_user_2", "userid", 0);
+}
+
+static int	DBpatch_6000022(void)
+{
+	return DBcreate_index("dashboard_usrgrp", "dashboard_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000023(void)
+{
+	return DBcreate_index("group_discovery", "group_discovery_1", "parent_group_prototypeid", 0);
+}
+
+static int	DBpatch_6000024(void)
+{
+	return DBcreate_index("group_prototype", "group_prototype_2", "groupid", 0);
+}
+
+static int	DBpatch_6000025(void)
+{
+	return DBcreate_index("group_prototype", "group_prototype_3", "templateid", 0);
+}
+
+static int	DBpatch_6000026(void)
+{
+	return DBcreate_index("host_discovery", "host_discovery_1", "parent_hostid", 0);
+}
+
+static int	DBpatch_6000027(void)
+{
+	return DBcreate_index("host_discovery", "host_discovery_2", "parent_itemid", 0);
+}
+
+static int	DBpatch_6000028(void)
+{
+	return DBcreate_index("hosts", "hosts_7", "templateid", 0);
+}
+
+static int	DBpatch_6000029(void)
+{
+	return DBcreate_index("interface_discovery", "interface_discovery_1", "parent_interfaceid", 0);
+}
+
+static int	DBpatch_6000030(void)
+{
+	return DBcreate_index("report", "report_2", "userid", 0);
+}
+
+static int	DBpatch_6000031(void)
+{
+	return DBcreate_index("report", "report_3", "dashboardid", 0);
+}
+
+static int	DBpatch_6000032(void)
+{
+	return DBcreate_index("report_user", "report_user_2", "userid", 0);
+}
+
+static int	DBpatch_6000033(void)
+{
+	return DBcreate_index("report_user", "report_user_3", "access_userid", 0);
+}
+
+static int	DBpatch_6000034(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000035(void)
+{
+	return DBcreate_index("report_usrgrp", "report_usrgrp_3", "access_userid", 0);
+}
+
+static int	DBpatch_6000036(void)
+{
+	return DBcreate_index("sysmaps", "sysmaps_4", "userid", 0);
+}
+
+static int	DBpatch_6000037(void)
+{
+	return DBcreate_index("sysmap_element_trigger", "sysmap_element_trigger_2", "triggerid", 0);
+}
+
+static int	DBpatch_6000038(void)
+{
+	return DBcreate_index("sysmap_user", "sysmap_user_2", "userid", 0);
+}
+
+static int	DBpatch_6000039(void)
+{
+	return DBcreate_index("sysmap_usrgrp", "sysmap_usrgrp_2", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000040(void)
+{
+	return DBcreate_index("tag_filter", "tag_filter_1", "usrgrpid", 0);
+}
+
+static int	DBpatch_6000041(void)
+{
+	return DBcreate_index("tag_filter", "tag_filter_2", "groupid", 0);
+}
+
+static int	DBpatch_6000042(void)
+{
+	return DBcreate_index("task", "task_2", "proxy_hostid", 0);
+}
+
+static int	DBpatch_6000043(void)
+{
+	return DBcreate_index("users", "users_3", "roleid", 0);
+}
+
+static int	DBpatch_6000044(void)
+{
+/* -------------------------------------------------------*/
+/* Formula:                                               */
+/* aggregate_function(last_foreach(filter))               */
+/* aggregate_function(last_foreach(filter,time))          */
+/*--------------------------------------------------------*/
+/* Relative positioning of tokens on a stack              */
+/*----------------------------+---------------------------*/
+/* Time is present in formula | Time is absent in formula */
+/*----------------------------+---------------------------*/
+/* [i-2] filter               |                           */
+/* [i-1] time                 | [i-1] filter              */
+/*   [i] last_foreach         |   [i] last_foreach        */
+/* [i+2] aggregate function   | [i+2]                     */
+/*----------------------------+---------------------------*/
+
+/* Offset in stack of tokens is relative to last_foreach() history function token, */
+/* assuming that time is present in formula. */
+#define OFFSET_TIME	(-1)
+#define TOKEN_LEN(loc)	(loc->r - loc->l + 1)
+#define LAST_FOREACH	"last_foreach"
+	DB_ROW			row;
+	DB_RESULT		result;
+	int			ret = SUCCEED;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	char			*sql = NULL, *params = NULL;
+	zbx_eval_context_t	ctx;
+	zbx_vector_uint64_t	del_idx;
+
+	zbx_eval_init(&ctx);
+	zbx_vector_uint64_create(&del_idx);
+
+	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	/* ITEM_TYPE_CALCULATED = 15 */
+	result = DBselect("select itemid,params from items where type=15 and params like '%%%s%%'", LAST_FOREACH);
+
+	while (SUCCEED == ret && NULL != (row = DBfetch(result)))
+	{
+		int	i;
+		char	*esc, *error = NULL;
+
+		zbx_eval_clear(&ctx);
+
+		if (FAIL == zbx_eval_parse_expression(&ctx, row[1], ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+		{
+			zabbix_log(LOG_LEVEL_WARNING, "%s: error parsing calculated item formula '%s' for itemid %s",
+					__func__, row[1], row[0]);
+			zbx_free(error);
+			continue;
+		}
+
+		zbx_vector_uint64_clear(&del_idx);
+
+		for (i = 0; i < ctx.stack.values_num; i++)
+		{
+			int		sec;
+			zbx_strloc_t	*loc;
+
+			if (ZBX_EVAL_TOKEN_HIST_FUNCTION != ctx.stack.values[i].type)
+				continue;
+
+			loc = &ctx.stack.values[i].loc;
+
+			if (0 != strncmp(LAST_FOREACH, &ctx.expression[loc->l], TOKEN_LEN(loc)))
+				continue;
+
+			/* if time is absent in formula */
+			if (ZBX_EVAL_TOKEN_ARG_QUERY == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			if (ZBX_EVAL_TOKEN_ARG_NULL == ctx.stack.values[i + OFFSET_TIME].type)
+				continue;
+
+			loc = &ctx.stack.values[i + OFFSET_TIME].loc;
+
+			if (FAIL == is_time_suffix(&ctx.expression[loc->l], &sec, (int)TOKEN_LEN(loc)) || 0 != sec)
+			{
+				continue;
+			}
+
+			zbx_vector_uint64_append(&del_idx, (zbx_uint32_t)(i + OFFSET_TIME));
+		}
+
+		if (0 == del_idx.values_num)
+			continue;
+
+		params = zbx_strdup(params, ctx.expression);
+
+		for (i = del_idx.values_num - 1; i >= 0; i--)
+		{
+			size_t		l, r;
+			zbx_strloc_t	*loc = &ctx.stack.values[(int)del_idx.values[i]].loc;
+
+			for (l = loc->l - 1; ',' != params[l]; l--) {}
+			for (r = loc->r + 1; ')' != params[r]; r++) {}
+
+			memmove(&params[l], &params[r], strlen(params) - r + 1);
+		}
+
+		esc = DBdyn_escape_string(params);
+		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+				"update items set params='%s' where itemid=%s;\n", esc, row[0]);
+		zbx_free(esc);
+
+		ret = DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
+	}
+	DBfree_result(result);
+
+	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
+
+	if (SUCCEED == ret && 16 < sql_offset)
+	{
+		if (ZBX_DB_OK > DBexecute("%s", sql))
+			ret = FAIL;
+	}
+
+	zbx_eval_clear(&ctx);
+	zbx_vector_uint64_destroy(&del_idx);
+
+	zbx_free(sql);
+	zbx_free(params);
+
+	return ret;
+#undef OFFSET_TIME
+#undef TOKEN_LEN
+#undef LAST_FOREACH
+}
 #endif
 
 DBPATCH_START(6000)
@@ -421,5 +667,29 @@ DBPATCH_ADD(6000017, 0, 0)
 DBPATCH_ADD(6000018, 0, 0)
 DBPATCH_ADD(6000019, 0, 0)
 DBPATCH_ADD(6000020, 0, 0)
+DBPATCH_ADD(6000021, 0, 0)
+DBPATCH_ADD(6000022, 0, 0)
+DBPATCH_ADD(6000023, 0, 0)
+DBPATCH_ADD(6000024, 0, 0)
+DBPATCH_ADD(6000025, 0, 0)
+DBPATCH_ADD(6000026, 0, 0)
+DBPATCH_ADD(6000027, 0, 0)
+DBPATCH_ADD(6000028, 0, 0)
+DBPATCH_ADD(6000029, 0, 0)
+DBPATCH_ADD(6000030, 0, 0)
+DBPATCH_ADD(6000031, 0, 0)
+DBPATCH_ADD(6000032, 0, 0)
+DBPATCH_ADD(6000033, 0, 0)
+DBPATCH_ADD(6000034, 0, 0)
+DBPATCH_ADD(6000035, 0, 0)
+DBPATCH_ADD(6000036, 0, 0)
+DBPATCH_ADD(6000037, 0, 0)
+DBPATCH_ADD(6000038, 0, 0)
+DBPATCH_ADD(6000039, 0, 0)
+DBPATCH_ADD(6000040, 0, 0)
+DBPATCH_ADD(6000041, 0, 0)
+DBPATCH_ADD(6000042, 0, 0)
+DBPATCH_ADD(6000043, 0, 0)
+DBPATCH_ADD(6000044, 0, 0)
 
 DBPATCH_END()

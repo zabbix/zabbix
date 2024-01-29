@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -91,7 +91,7 @@ if (getRequest('parent_discoveryid')) {
 		$hostPrototype = API::HostPrototype()->get([
 			'output' => API_OUTPUT_EXTEND,
 			'selectGroupLinks' => ['groupid'],
-			'selectGroupPrototypes' => ['name'],
+			'selectGroupPrototypes' => ['group_prototypeid', 'name'],
 			'selectTemplates' => ['templateid', 'name'],
 			'selectParentHost' => ['hostid'],
 			'selectMacros' => ['hostmacroid', 'macro', 'value', 'type', 'description'],
@@ -142,6 +142,13 @@ elseif (isset($_REQUEST['delete']) && isset($_REQUEST['hostid'])) {
 }
 elseif (isset($_REQUEST['clone']) && isset($_REQUEST['hostid'])) {
 	unset($_REQUEST['hostid']);
+
+	if (hasRequest('group_prototypes')) {
+		foreach ($_REQUEST['group_prototypes'] as &$group_prototype) {
+			unset($group_prototype['group_prototypeid']);
+		}
+		unset($group_prototype);
+	}
 
 	$warnings = [];
 

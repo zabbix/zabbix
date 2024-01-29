@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 require_once dirname(__FILE__) .'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 use Facebook\WebDriver\Exception\ElementClickInterceptedException;
 
 /**
@@ -31,7 +31,17 @@ use Facebook\WebDriver\Exception\ElementClickInterceptedException;
  */
 class testMassUpdateItems extends CWebTest{
 
-	use PreprocessingTrait;
+	/**
+	 * Attach PreprocessingBehavior and MessageBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
+	}
 
 	const HOSTID = 40001;	// Simple form test host.
 	const RULEID = 133800;	// testFormDiscoveryRule1 on Simple form test host.
@@ -60,15 +70,6 @@ class testMassUpdateItems extends CWebTest{
 					'not(contains(@style,"display: none"))]|./textarea[@name]'
 		]
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	/**
 	 * Add interface to host.
@@ -1160,7 +1161,7 @@ class testMassUpdateItems extends CWebTest{
 					],
 					'change' => [
 						'Type' => ['id' => 'type', 'value' => 'Dependent item'],
-						'Master item' => ['id' => 'master_item', 'value' => '7_IPMI']
+						'Master item' => ['id' => 'master-item-field', 'value' => '7_IPMI']
 					],
 					'expected_tags' => [
 						'15_Calculated' => [
@@ -1244,12 +1245,13 @@ class testMassUpdateItems extends CWebTest{
 					break;
 
 				case 'Update interval':
-					$container_table = $form->query('id:update_interval')->asTable()->one();
-					$container_table->getRow(0)->getColumn(1)->query('id:delay')->one()->fill($value['Delay']);
+					$update_interval_field = $form->getField('Update interval');
+					$update_interval_field->query('id:delay')->waitUntilVisible()->one()->fill($value['Delay']);
 
 					if (array_key_exists('Custom intervals', $value)) {
-						$container_table->getRow(1)->getColumn(1)->query('id:custom_intervals')->asMultifieldTable(
-								['mapping' => self::INTERVAL_MAPPING])->one()->fill($value['Custom intervals']);
+						$update_interval_field->query('id:custom_intervals')
+							->asMultifieldTable(['mapping' => self::INTERVAL_MAPPING])->one()
+							->fill($value['Custom intervals']);
 					}
 					break;
 

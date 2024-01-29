@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -106,7 +106,7 @@ This template has been tested on:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |{#NODENAME}: Version has changed|<p>{#NODENAME} version has changed. Acknowledge to close the problem manually.</p>|`last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#1)<>last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}],#2) and length(last(/NetApp AFF A700 by HTTP/netapp.node.version[{#NODENAME}]))>0`|Info|**Manual close**: Yes|
-|{#NODENAME}: Node state is abnormal|<p>The state of the node is different from up:booting - Node is booting up.down - Node has stopped or is dumping core.taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.degraded - Node has one or more critical services offline.unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.state[{#NODENAME}])<>"up")`|Average||
+|{#NODENAME}: Node state is abnormal|<p>The state of the node is different from up:<br>booting - Node is booting up.<br>down - Node has stopped or is dumping core.<br>taken_over - Node has been taken over by its HA partner and is not yet waiting for giveback.<br>waiting_for_giveback - Node has been taken over by its HA partner and is waiting for the HA partner to giveback disks.<br>degraded - Node has one or more critical services offline.<br>unknown - Node or its HA partner cannot be contacted and there is no information on the node's state.</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.state[{#NODENAME}])<>"up")`|Average||
 |{#NODENAME}: Node has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/NetApp AFF A700 by HTTP/netapp.nodes.uptime[{#NODENAME}])<10m`|Info|**Manual close**: Yes|
 |{#NODENAME}: Node has over temperature|<p>The hardware shuts down if the temperature exceeds critical thresholds(item's value is "over").</p>|`(last(/NetApp AFF A700 by HTTP/netapp.nodes.controller.over_temperature[{#NODENAME}])<>"normal")`|Average||
 

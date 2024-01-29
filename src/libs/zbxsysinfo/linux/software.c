@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -144,30 +144,29 @@ static int	dpkg_parser(const char *line, char *package, size_t max_package_len)
 	return SUCCEED;
 }
 
-static size_t	print_packages(char *buffer, size_t size, zbx_vector_str_t *packages, const char *manager)
+static void	print_packages(char **buffer, size_t *alloc_len, size_t *offset, zbx_vector_str_t *packages, const char *manager)
 {
-	size_t	offset = 0;
 	int	i;
 
 	if (NULL != manager)
-		offset += zbx_snprintf(buffer + offset, size - offset, "[%s]", manager);
+		zbx_snprintf_alloc(buffer, alloc_len, offset, "[%s]", manager);
+
 
 	if (0 < packages->values_num)
 	{
 		if (NULL != manager)
-			offset += zbx_snprintf(buffer + offset, size - offset, " ");
+			zbx_chrcpy_alloc(buffer, alloc_len, offset, ' ');
 
 		zbx_vector_str_sort(packages, ZBX_DEFAULT_STR_COMPARE_FUNC);
 
 		for (i = 0; i < packages->values_num; i++)
-			offset += zbx_snprintf(buffer + offset, size - offset, "%s, ", packages->values[i]);
+			zbx_snprintf_alloc(buffer, alloc_len, offset, "%s, ", packages->values[i]);
 
-		offset -= 2;
+		*offset -= 2;
 	}
 
-	buffer[offset] = '\0';
-
-	return offset;
+	if (NULL != *buffer)
+		(*buffer)[*offset] = '\0';
 }
 
 static ZBX_PACKAGE_MANAGER	package_managers[] =
@@ -182,9 +181,9 @@ static ZBX_PACKAGE_MANAGER	package_managers[] =
 
 int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	size_t			offset = 0;
+	size_t			output_alloc = 0, output_offset = 0;
 	int			ret = SYSINFO_RET_FAIL, show_pm, i, check_regex, check_manager;
-	char			buffer[MAX_BUFFER_LEN], *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
+	char			*output = NULL, *regex, *manager, *mode, tmp[MAX_STRING_LEN], *buf = NULL,
 				*package;
 	zbx_vector_str_t	packages;
 	ZBX_PACKAGE_MANAGER	*mng;
@@ -212,7 +211,6 @@ int	SYSTEM_SW_PACKAGES(AGENT_REQUEST *request, AGENT_RESULT *result)
 		return ret;
 	}
 
-	*buffer = '\0';
 	zbx_vector_str_create(&packages);
 
 	for (i = 0; NULL != package_managers[i].name; i++)
@@ -256,8 +254,8 @@ next:
 
 			if (1 == show_pm)
 			{
-				offset += print_packages(buffer + offset, sizeof(buffer) - offset, &packages, mng->name);
-				offset += zbx_snprintf(buffer + offset, sizeof(buffer) - offset, "\n");
+				print_packages(&output, &output_alloc, &output_offset, &packages, mng->name);
+				zbx_chrcpy_alloc(&output, &output_alloc, &output_offset, '\n');
 
 				zbx_vector_str_clear_ext(&packages, zbx_str_free);
 			}
@@ -268,19 +266,28 @@ next:
 
 	if (0 == show_pm)
 	{
-		print_packages(buffer + offset, sizeof(buffer) - offset, &packages, NULL);
+		print_packages(&output, &output_alloc, &output_offset, &packages, NULL);
 
 		zbx_vector_str_clear_ext(&packages, zbx_str_free);
 	}
-	else if (0 != offset)
-		buffer[--offset] = '\0';
+	else if (0 != output_offset) {
+		output[--output_offset] = '\0';
+	}
 
 	zbx_vector_str_destroy(&packages);
 
 	if (SYSINFO_RET_OK == ret)
-		SET_TEXT_RESULT(result, zbx_strdup(NULL, buffer));
+	{
+		if (NULL == output)
+			output = zbx_strdup(NULL, "");
+
+		SET_TEXT_RESULT(result, output);
+	}
 	else
+	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain package information."));
+		zbx_free(output);
+	}
 
 	return ret;
 }

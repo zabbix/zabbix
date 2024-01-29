@@ -18,7 +18,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -65,7 +65,7 @@ This template has been tested on:
 |----|-----------|----------|--------|--------------------------------|
 |Cert: SSL certificate is invalid|<p>SSL certificate has expired or it is issued for another domain.</p>|`find(/Website certificate by Zabbix agent 2/cert.validation,,"like","invalid")=1`|High||
 |Cert: SSL certificate expires soon|<p>The SSL certificate should be updated or it will become untrusted.</p>|`(last(/Website certificate by Zabbix agent 2/cert.not_after) - now()) / 86400 < {$CERT.EXPIRY.WARN}`|Warning|**Depends on**:<br><ul><li>Cert: SSL certificate is invalid</li></ul>|
-|Cert: Fingerprint has changed|<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Acknowledge to close the problem manually.There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p>|`last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)`|Info|**Manual close**: Yes|
+|Cert: Fingerprint has changed|<p>The SSL certificate fingerprint has changed. If you did not update the certificate, it may mean your certificate has been hacked. Acknowledge to close the problem manually.<br>There could be multiple valid certificates on some installations. In this case, the trigger will have a false positive. You can ignore it or disable the trigger.</p>|`last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint) <> last(/Website certificate by Zabbix agent 2/cert.sha1_fingerprint,#2)`|Info|**Manual close**: Yes|
 
 ## Feedback
 

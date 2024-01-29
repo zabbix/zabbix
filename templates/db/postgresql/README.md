@@ -53,6 +53,16 @@ chown zabbix:zabbix /var/lib/zabbix
 
 3. Copy the `template_db_postgresql.conf` file, containing user parameters, to the Zabbix agent configuration directory `/etc/zabbix/zabbix_agentd.d/` and restart Zabbix agent service.
 
+**Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, you can modify the connection string in user parameters. For example, to enable required encryption in transport mode without identity checks you could append `?sslmode=required` to the end of the connection string for all keys that use `psql`:
+
+```bash
+UserParameter=pgsql.bgwriter[*], psql -qtAX postgresql://"$3":"$4"@"$1":"$2"/"$5"?sslmode=required -f "/var/lib/zabbix/postgresql/pgsql.bgwriter.sql"
+```
+
+Consult the PostgreSQL documentation about [`protection modes`](https://www.postgresql.org/docs/current/libpq-ssl.html#LIBPQ-SSL-PROTECTION) and [`client connection parameters`](https://www.postgresql.org/docs/current/libpq-connect.html#LIBPQ-CONNECT-SSLMODE).
+
+Also, it is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the [`PostgreSQL documentation`](https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
+
 4. Edit the `pg_hba.conf` configuration file to allow connections for the user `zbx_monitor`. For example, you could add one of the following rows to allow local TCP connections from the same host:
 
 ```bash
@@ -146,7 +156,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by Zabbix agent/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
 |PostgreSQL: Response too long|<p>Response is taking too long (over {$PG.PING_TIME.MAX.WARN} for 5m).</p>|`min(/PostgreSQL by Zabbix agent/pgsql.ping.time["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.PING_TIME.MAX.WARN}`|Average|**Depends on**:<br><ul><li>PostgreSQL: Service is down</li></ul>|
 |PostgreSQL: Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by Zabbix agent/pgsql.ping["{$PG.HOST}","{$PG.PORT}"]) = 0`|High||
-|PostgreSQL: Streaming lag with {#MASTER} is too high|<p>Replication lag with master is higher than {$PG.REPL_LAG.MAX.WARN} for 5m.</p>|`min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.REPL_LAG.MAX.WARN}`|Average||
+|PostgreSQL: Streaming lag with master is too high|<p>Replication lag with master is higher than {$PG.REPL_LAG.MAX.WARN} for 5m.</p>|`min(/PostgreSQL by Zabbix agent/pgsql.replication.lag.sec["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m) > {$PG.REPL_LAG.MAX.WARN}`|Average||
 |PostgreSQL: Replication is down|<p>Replication is enabled and data streaming was down for 5m.</p>|`max(/PostgreSQL by Zabbix agent/pgsql.replication.status["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],5m)=0`|Average||
 |PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by Zabbix agent/pgsql.uptime["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]) < 10m`|Average||
 |PostgreSQL: Version has changed||`last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#1)<>last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"],#2) and length(last(/PostgreSQL by Zabbix agent/pgsql.version["{$PG.HOST}","{$PG.PORT}","{$PG.USER}","{$PG.PASSWORD}","{$PG.DATABASE}"]))>0`|Info||

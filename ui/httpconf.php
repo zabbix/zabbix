@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -186,7 +186,7 @@ elseif (isset($_REQUEST['clone']) && isset($_REQUEST['httptestid'])) {
 elseif (hasRequest('del_history') && hasRequest('httptestid')) {
 	$result = deleteHistoryByHttpTestIds([getRequest('httptestid')]);
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('add') || hasRequest('update')) {
 	if (hasRequest('update')) {
@@ -430,7 +430,7 @@ elseif (hasRequest('action') && getRequest('action') === 'httptest.massclearhist
 		uncheckTableRows(getRequest('hostid'));
 	}
 
-	show_messages($result, _('History cleared'), _('Cannot clear history'));
+	show_messages($result, _('History and trends cleared'), _('Cannot clear history and trends'));
 }
 elseif (hasRequest('action') && getRequest('action') === 'httptest.massdelete'
 		&& hasRequest('group_httptestid') && is_array(getRequest('group_httptestid'))) {
@@ -498,10 +498,6 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
-		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
 
@@ -540,7 +536,6 @@ if (isset($_REQUEST['form'])) {
 		$data['http_password'] = $db_httptest['http_password'];
 		$data['http_proxy'] = $db_httptest['http_proxy'];
 		$data['templated'] = (bool) $db_httptest['templateid'];
-
 		$data['verify_peer'] = $db_httptest['verify_peer'];
 		$data['verify_host'] = $db_httptest['verify_host'];
 		$data['ssl_cert_file'] = $db_httptest['ssl_cert_file'];
@@ -641,6 +636,10 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($db_httptest) {
+		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
 		$parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
 
 		$rw_templates = $data['host']['parentTemplates']
@@ -758,7 +757,6 @@ else {
 		? CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 			'output' => ['groupid', 'name'],
 			'groupids' => $filter['groups'],
-			'editable' => true,
 			'preservekeys' => true
 		]), ['groupid' => 'id'])
 		: [];

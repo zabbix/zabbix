@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,7 +21,6 @@ package main
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -29,6 +28,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/zbxflag"
 	"golang.org/x/sys/windows/svc"
 	"golang.org/x/sys/windows/svc/eventlog"
 	"golang.org/x/sys/windows/svc/mgr"
@@ -37,6 +37,8 @@ import (
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/monitor"
 )
+
+const usageMessageExampleConfPath = `C:\zabbix\zabbix_agent2.conf`
 
 var (
 	serviceName = "Zabbix Agent 2"
@@ -56,43 +58,58 @@ var (
 
 	fatalStopChan chan bool
 	startChan     chan bool
+	stopChan      = make(chan bool)
 )
 
-func loadOSDependentFlags() {
-	const (
-		svcInstallDefault     = false
-		svcInstallDescription = "Install Zabbix agent 2 as service"
-	)
-	flag.BoolVar(&svcInstallFlag, "install", svcInstallDefault, svcInstallDescription)
-	flag.BoolVar(&svcInstallFlag, "i", svcInstallDefault, svcInstallDescription+" (shorthand)")
-
-	const (
-		svcUninstallDefault     = false
-		svcUninstallDescription = "Uninstall Zabbix agent 2 from service"
-	)
-	flag.BoolVar(&svcUninstallFlag, "uninstall", svcUninstallDefault, svcUninstallDescription)
-	flag.BoolVar(&svcUninstallFlag, "d", svcUninstallDefault, svcUninstallDescription+" (shorthand)")
-
-	const (
-		svcStartDefault     = false
-		svcStartDescription = "Start Zabbix agent 2 service"
-	)
-	flag.BoolVar(&svcStartFlag, "start", svcStartDefault, svcStartDescription)
-	flag.BoolVar(&svcStartFlag, "s", svcStartDefault, svcStartDescription+" (shorthand)")
-
-	const (
-		svcStopDefault     = false
-		svcStopDescription = "Stop Zabbix agent 2 service"
-	)
-	flag.BoolVar(&svcStopFlag, "stop", svcStopDefault, svcStopDescription)
-	flag.BoolVar(&svcStopFlag, "x", svcStopDefault, svcStopDescription+" (shorthand)")
-
-	const (
-		svcMultipleDefault     = false
-		svcMultipleDescription = "For -i -d -s -x functions service name will\ninclude Hostname parameter specified in\nconfiguration file"
-	)
-	flag.BoolVar(&svcMultipleAgentFlag, "multiple-agents", svcMultipleDefault, svcMultipleDescription)
-	flag.BoolVar(&svcMultipleAgentFlag, "m", svcMultipleDefault, svcMultipleDescription+" (shorthand)")
+func osDependentFlags() zbxflag.Flags {
+	return zbxflag.Flags{
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "install",
+				Shorthand:   "i",
+				Description: "Install Zabbix agent 2 as service",
+			},
+			Default: false,
+			Dest:    &svcInstallFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "uninstall",
+				Shorthand:   "d",
+				Description: "Uninstall Zabbix agent 2 from service",
+			},
+			Default: false,
+			Dest:    &svcUninstallFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "start",
+				Shorthand:   "s",
+				Description: "Start Zabbix agent 2 service",
+			},
+			Default: false,
+			Dest:    &svcStartFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "stop",
+				Shorthand:   "x",
+				Description: "Stop Zabbix agent 2 service",
+			},
+			Default: false,
+			Dest:    &svcStopFlag,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:      "multiple-agents",
+				Shorthand: "m",
+				Description: "For -i -d -s -x functions service name will " +
+					"include Hostname parameter specified in configuration file",
+			},
+			Default: false,
+			Dest:    &svcMultipleAgentFlag,
+		},
+	}
 }
 
 func isWinLauncher() bool {
@@ -166,7 +183,9 @@ func validateExclusiveFlags() error {
 	}
 
 	if svcMultipleAgentFlag && count == 0 && !winServiceRun {
-		return errors.New("multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information")
+		return errors.New(
+			"multiple agents '-multiple-agents'('-m'), flag has to be used with another windows service flag, use help '-help'('-h'), for additional information",
+		)
 	}
 
 	return nil
@@ -286,7 +305,6 @@ func getAgentPath() (p string, err error) {
 
 	if i.Mode().IsDir() {
 		return p, fmt.Errorf("incorrect path to executable '%s'", p)
-
 	}
 
 	return
@@ -310,8 +328,10 @@ func svcInstall(conf string) error {
 		return errors.New("service already exists")
 	}
 
-	s, err = m.CreateService(serviceName, exepath, mgr.Config{StartType: mgr.StartAutomatic, DisplayName: serviceName,
-		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf)}, "-c", conf, "-f=false")
+	s, err = m.CreateService(serviceName, exepath, mgr.Config{
+		StartType: mgr.StartAutomatic, DisplayName: serviceName,
+		Description: "Provides system monitoring", BinaryPathName: fmt.Sprintf("%s -c %s -f=false", exepath, conf),
+	}, "-c", conf, "-f=false")
 	if err != nil {
 		return fmt.Errorf("failed to create service: %s", err.Error())
 	}
@@ -434,7 +454,11 @@ func runService() {
 
 type winService struct{}
 
-func (ws *winService) Execute(args []string, r <-chan svc.ChangeRequest, changes chan<- svc.Status) (ssec bool, errno uint32) {
+func (ws *winService) Execute(
+	args []string,
+	r <-chan svc.ChangeRequest,
+	changes chan<- svc.Status,
+) (ssec bool, errno uint32) {
 	changes <- svc.Status{State: svc.StartPending}
 	select {
 	case <-startChan:

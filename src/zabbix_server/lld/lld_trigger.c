@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2463,7 +2463,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		functionid = DBget_maxid_num("functions", new_functions);
 
 		zbx_db_insert_prepare(&db_insert_tfunctions, "functions", "functionid", "itemid", "triggerid",
-				"name", "parameter", NULL);
+				"name", "parameter", (char *)NULL);
 	}
 
 	if (0 != new_triggers)
@@ -2473,10 +2473,10 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "expression", "priority",
 				"status", "comments", "url", "type", "value", "state", "flags", "recovery_mode",
 				"recovery_expression", "correlation_mode", "correlation_tag", "manual_close", "opdata",
-				"event_name", NULL);
+				"event_name", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_tdiscovery, "trigger_discovery", "triggerid", "parent_triggerid",
-				NULL);
+				(char *)NULL);
 	}
 
 	if (0 != new_tags)
@@ -2484,7 +2484,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		triggertagid = DBget_maxid_num("trigger_tag", new_tags);
 
 		zbx_db_insert_prepare(&db_insert_ttags, "trigger_tag", "triggertagid", "triggerid", "tag", "value",
-				NULL);
+				(char *)NULL);
 	}
 
 	if (0 != new_dependencies)
@@ -2492,7 +2492,7 @@ static int	lld_triggers_save(zbx_uint64_t hostid, const zbx_vector_ptr_t *trigge
 		triggerdepid = DBget_maxid_num("trigger_depends", new_dependencies);
 
 		zbx_db_insert_prepare(&db_insert_tdepends, "trigger_depends", "triggerdepid", "triggerid_down",
-				"triggerid_up", NULL);
+				"triggerid_up", (char *)NULL);
 	}
 
 	if (SUCCEED != DBlock_hostid(hostid) || SUCCEED != DBlock_triggerids(&trigger_protoids))

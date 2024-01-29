@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -448,6 +448,13 @@ func (r *runner) getBasicDevices(jsonRunner bool) {
 	defer r.wg.Done()
 
 	for name := range r.names {
+		err := clearString(name)
+		if err != nil {
+			r.err <- zbxerr.ErrorCannotFetchData.Wrap(err)
+
+			return
+		}
+
 		devices, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j", name), false)
 		if err != nil {
 			r.err <- fmt.Errorf("Failed to execute smartctl: %s.", err.Error())
@@ -508,6 +515,16 @@ runner:
 				name = fmt.Sprintf("%s -d %s", raid.name, raid.rType)
 			} else {
 				name = fmt.Sprintf("%s -d %s,%d", raid.name, raid.rType, i)
+			}
+
+			err := clearString(name)
+			if err != nil {
+				r.plugin.Tracef(
+					"stopped looking for RAID devices of %s type, err: %s",
+					raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
+				)
+
+				continue runner
 			}
 
 			device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
@@ -580,6 +597,16 @@ func (r *runner) getMegaRaidDevices(jsonRunner bool) {
 		}
 
 		name := fmt.Sprintf("%s -d %s", raid.name, raid.rType)
+
+		err := clearString(name)
+		if err != nil {
+			r.plugin.Tracef(
+				"stopped looking for RAID devices of %s type, err: %s",
+				raid.rType, fmt.Errorf("failed to parse RAID disk data from smartctl: %s", err.Error()),
+			)
+
+			continue
+		}
 
 		device, err := r.plugin.executeSmartctl(fmt.Sprintf("-a %s -j ", name), false)
 		if err != nil {

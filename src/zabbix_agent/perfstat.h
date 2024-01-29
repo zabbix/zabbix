@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,9 +26,9 @@
 
 #include "perfmon.h"
 
-zbx_perf_counter_data_t	*add_perf_counter(const char *name, const char *counterpath, int interval,
+zbx_perf_counter_data_t	*zbx_add_perf_counter(const char *name, const char *counterpath, int interval,
 		zbx_perf_counter_lang_t lang, char **error);
-void			remove_perf_counter(zbx_perf_counter_data_t *counter);
+void			zbx_remove_perf_counter(zbx_perf_counter_data_t *counter);
 
 typedef enum
 {

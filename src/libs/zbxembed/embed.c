@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -332,13 +332,11 @@ int	zbx_es_init_env(zbx_es_t *es, char **error)
 
 	/* put environment object to be accessible from duktape C calls */
 	duk_push_global_stash(es->env->ctx);
+
+	duk_push_string(es->env->ctx, "\xff""\xff""zbx_env");
 	duk_push_pointer(es->env->ctx, (void *)es->env);
-	if (1 != duk_put_prop_string(es->env->ctx, -2, "\xff""\xff""zbx_env"))
-	{
-		*error = zbx_strdup(*error, duk_safe_to_string(es->env->ctx, -1));
-		duk_pop(es->env->ctx);
-		return FAIL;
-	}
+	duk_def_prop(es->env->ctx, -3, DUK_DEFPROP_HAVE_VALUE | DUK_DEFPROP_CLEAR_WRITABLE | DUK_DEFPROP_HAVE_ENUMERABLE |
+			DUK_DEFPROP_HAVE_CONFIGURABLE);
 
 	/* initialize HttpRequest and CurlHttpRequest prototypes */
 	if (FAIL == zbx_es_init_httprequest(es, error))
@@ -656,6 +654,10 @@ out:
 		zbx_json_close(es->env->json);
 		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration_ms(&es->env->start_time));
 	}
+
+	/* Duktape documentation recommends calling duk_gc() twice, see https://duktape.org/api#duk_gc */
+	duk_gc(es->env->ctx, 0);
+	duk_gc(es->env->ctx, 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
 			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),

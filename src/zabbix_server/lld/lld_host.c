@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1628,7 +1628,7 @@ static void	lld_groups_save_rights(zbx_vector_ptr_t *groups)
 
 	/* read the parent group rights */
 
-	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "id", "permission", "groupid", NULL);
+	zbx_db_insert_prepare(&db_insert, "rights", "rightid", "id", "permission", "groupid", (char *)NULL);
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select g.name,r.permission,r.groupid from hstgrp g,rights r"
 				" where r.id=g.groupid"
@@ -1773,10 +1773,10 @@ static void	lld_groups_save(zbx_vector_ptr_t *groups, const zbx_vector_ptr_t *gr
 
 		groupid = DBget_maxid_num("hstgrp", new_group_prototype_ids.values_num);
 
-		zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "flags", NULL);
+		zbx_db_insert_prepare(&db_insert, "hstgrp", "groupid", "name", "flags", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_gdiscovery, "group_discovery", "groupid", "parent_group_prototypeid",
-				"name", NULL);
+				"name", (char *)NULL);
 
 		zbx_vector_ptr_create(&new_groups);
 	}
@@ -2735,14 +2735,14 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "host", "name", "proxy_hostid", "ipmi_authtype",
 				"ipmi_privilege", "ipmi_username", "ipmi_password", "status", "flags", "tls_connect",
 				"tls_accept", "tls_issuer", "tls_subject", "tls_psk_identity", "tls_psk",
-				"custom_interfaces", NULL);
+				"custom_interfaces", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host", NULL);
+		zbx_db_insert_prepare(&db_insert_hdiscovery, "host_discovery", "hostid", "parent_hostid", "host", (char *)NULL);
 	}
 
 	if (0 != new_host_inventories)
 	{
-		zbx_db_insert_prepare(&db_insert_hinventory, "host_inventory", "hostid", "inventory_mode", NULL);
+		zbx_db_insert_prepare(&db_insert_hinventory, "host_inventory", "hostid", "inventory_mode", (char *)NULL);
 	}
 
 	if (0 != upd_hosts || 0 != upd_interfaces || 0 != upd_snmp || 0 != upd_hostmacros || 0 != upd_tags)
@@ -2754,7 +2754,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 	{
 		hostgroupid = DBget_maxid_num("hosts_groups", new_hostgroups);
 
-		zbx_db_insert_prepare(&db_insert_hgroups, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
+		zbx_db_insert_prepare(&db_insert_hgroups, "hosts_groups", "hostgroupid", "hostid", "groupid", (char *)NULL);
 	}
 
 	if (0 != new_hostmacros)
@@ -2762,7 +2762,7 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		hostmacroid = DBget_maxid_num("hostmacro", new_hostmacros);
 
 		zbx_db_insert_prepare(&db_insert_hmacro, "hostmacro", "hostmacroid", "hostid", "macro", "value",
-				"description", "type", NULL);
+				"description", "type", (char *)NULL);
 	}
 
 	if (0 != new_interfaces)
@@ -2770,24 +2770,24 @@ static void	lld_hosts_save(zbx_uint64_t parent_hostid, zbx_vector_ptr_t *hosts, 
 		interfaceid = DBget_maxid_num("interface", new_interfaces);
 
 		zbx_db_insert_prepare(&db_insert_interface, "interface", "interfaceid", "hostid", "type", "main",
-				"useip", "ip", "dns", "port", NULL);
+				"useip", "ip", "dns", "port", (char *)NULL);
 
 		zbx_db_insert_prepare(&db_insert_idiscovery, "interface_discovery", "interfaceid",
-				"parent_interfaceid", NULL);
+				"parent_interfaceid", (char *)NULL);
 	}
 
 	if (0 != new_snmp)
 	{
 		zbx_db_insert_prepare(&db_insert_snmp, "interface_snmp", "interfaceid", "version", "bulk", "community",
 				"securityname", "securitylevel", "authpassphrase", "privpassphrase", "authprotocol",
-				"privprotocol", "contextname", NULL);
+				"privprotocol", "contextname", (char *)NULL);
 	}
 
 	if (0 != new_tags)
 	{
 		hosttagid = DBget_maxid_num("host_tag", new_tags);
 
-		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert_tag, "host_tag", "hosttagid", "hostid", "tag", "value", (char *)NULL);
 	}
 
 	for (i = 0; i < hosts->values_num; i++)

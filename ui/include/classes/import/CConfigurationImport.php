@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -181,6 +181,7 @@ class CConfigurationImport {
 		$template_dashboards_refs = [];
 		$template_macros_refs = [];
 		$host_macros_refs = [];
+		$group_prototypes_refs = [];
 		$host_prototype_macros_refs = [];
 		$proxy_refs = [];
 		$host_prototypes_refs = [];
@@ -198,10 +199,8 @@ class CConfigurationImport {
 				$groups_refs += [$group['name'] => []];
 			}
 
-			if (array_key_exists('macros', $template)) {
-				foreach ($template['macros'] as $macro) {
-					$template_macros_refs[$template['uuid']][] = $macro['macro'];
-				}
+			foreach ($template['macros'] as $macro) {
+				$template_macros_refs[$template['uuid']][] = $macro['macro'];
 			}
 
 			if ($template['templates']) {
@@ -218,10 +217,8 @@ class CConfigurationImport {
 				$groups_refs += [$group['name'] => []];
 			}
 
-			if (array_key_exists('macros', $host)) {
-				foreach ($host['macros'] as $macro) {
-					$host_macros_refs[$host['host']][] = $macro['macro'];
-				}
+			foreach ($host['macros'] as $macro) {
+				$host_macros_refs[$host['host']][] = $macro['macro'];
 			}
 
 			if ($host['templates']) {
@@ -335,22 +332,29 @@ class CConfigurationImport {
 						$host_prototypes_refs['host'][$host][$discovery_rule['key_']][] = $host_prototype['host'];
 					}
 
+					foreach ($host_prototype['group_links'] as $group_link) {
+						$groups_refs += [$group_link['group']['name'] => []];
+					}
+
 					foreach ($host_prototype['group_prototypes'] as $group_prototype) {
-						if (isset($group_prototype['group'])) {
-							$groups_refs += [$group_prototype['group']['name'] => []];
+						if (array_key_exists('uuid', $host_prototype)) {
+							$group_prototypes_refs['uuid'][$host][$discovery_rule['key_']][$host_prototype['uuid']][] =
+								$group_prototype['name'];
+						}
+						else {
+							$group_prototypes_refs['host'][$host][$discovery_rule['key_']][$host_prototype['host']][] =
+								$group_prototype['name'];
 						}
 					}
 
-					if (array_key_exists('macros', $host_prototype)) {
-						foreach ($host_prototype['macros'] as $macro) {
-							if (array_key_exists('uuid', $host_prototype)) {
-								$host_prototype_macros_refs['uuid'][$host][$discovery_rule['key_']]
-									[$host_prototype['uuid']][] = $macro['macro'];
-							}
-							else {
-								$host_prototype_macros_refs['host'][$host][$discovery_rule['key_']]
-									[$host_prototype['host']][] = $macro['macro'];
-							}
+					foreach ($host_prototype['macros'] as $macro) {
+						if (array_key_exists('uuid', $host_prototype)) {
+							$host_prototype_macros_refs['uuid'][$host][$discovery_rule['key_']]
+								[$host_prototype['uuid']][] = $macro['macro'];
+						}
+						else {
+							$host_prototype_macros_refs['host'][$host][$discovery_rule['key_']]
+								[$host_prototype['host']][] = $macro['macro'];
 						}
 					}
 
@@ -588,6 +592,7 @@ class CConfigurationImport {
 		$this->referencer->addTemplateDashboards($template_dashboards_refs);
 		$this->referencer->addTemplateMacros($template_macros_refs);
 		$this->referencer->addHostMacros($host_macros_refs);
+		$this->referencer->addGroupPrototypes($group_prototypes_refs);
 		$this->referencer->addHostPrototypeMacros($host_prototype_macros_refs);
 		$this->referencer->addProxies($proxy_refs);
 		$this->referencer->addHostPrototypes($host_prototypes_refs);
@@ -1318,18 +1323,27 @@ class CConfigurationImport {
 					}
 
 					if ($host_prototypeid !== null) {
-						if (array_key_exists('macros', $host_prototype)) {
-							foreach ($host_prototype['macros'] as &$macro) {
-								$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
-									$macro['macro']
-								);
+						foreach ($host_prototype['groupPrototypes'] as &$group_prototype) {
+							$group_prototypeid = $this->referencer->findGroupPrototypeId($host_prototypeid,
+								$group_prototype['name']
+							);
 
-								if ($hostmacroid !== null) {
-									$macro['hostmacroid'] = $hostmacroid;
-								}
+							if ($group_prototypeid !== null) {
+								$group_prototype['group_prototypeid'] = $group_prototypeid;
 							}
-							unset($macro);
 						}
+						unset($group_prototype);
+
+						foreach ($host_prototype['macros'] as &$macro) {
+							$hostmacroid = $this->referencer->findHostPrototypeMacroid($host_prototypeid,
+								$macro['macro']
+							);
+
+							if ($hostmacroid !== null) {
+								$macro['hostmacroid'] = $hostmacroid;
+							}
+						}
+						unset($macro);
 
 						$host_prototype['hostid'] = $host_prototypeid;
 						$host_prototypes_to_update[] = $host_prototype;

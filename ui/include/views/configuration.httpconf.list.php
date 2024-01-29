@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,8 +214,8 @@ $button_list = [
 if ($data['context'] === 'host') {
 	$button_list += [
 		'httptest.massclearhistory' => [
-			'name' => _('Clear history'),
-			'confirm' => _('Delete history of selected web scenarios?')
+			'name' => _('Clear history and trends'),
+			'confirm' => _('Clear history and trends of selected web scenarios?')
 		]
 	];
 }

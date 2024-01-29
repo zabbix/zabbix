@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1112,10 +1112,10 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '1h', '0.5y']
 			],
 			[
-				'nodata(/host/key, "\\\\1h\\\\")', 0, [],
+				'nodata(/host/key, "\\\\1h")', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
-					'match' => 'nodata(/host/key, "\\\\1h\\\\")',
+					'match' => 'nodata(/host/key, "\\\\1h")',
 					'function' => 'nodata',
 					'parameters' => [
 						[
@@ -1135,12 +1135,12 @@ class CHistFunctionParserTest extends TestCase {
 						[
 							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
 							'pos' => 18,
-							'match' => '"\\\\1h\\\\"',
-							'length' => 8
+							'match' => '"\\\\1h"',
+							'length' => 6
 						]
 					]
 				],
-				['/host/key', '\\\\1h\\\\']
+				['/host/key', '\\\\1h']
 			],
 			[
 				'nodata(/host/key, "\\"")', 0, [],

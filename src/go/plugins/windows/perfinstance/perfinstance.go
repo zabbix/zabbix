@@ -10,20 +10,33 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/pdh"
 	"zabbix.com/pkg/win32"
 )
 
-//Plugin -
+var impl Plugin
+
+// Plugin -
 type Plugin struct {
 	plugin.Base
 	nextObjectRefresh  time.Time
 	nextEngNameRefresh time.Time
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(&impl, "WindowsPerfInstance",
+		"perf_instance.discovery", "Get Windows performance instance object list.",
+		"perf_instance_en.discovery", "Get Windows performance instance object English list.",
+	)
+	if err != nil {
+		panic(zbxerr.New("failed to register metrics").Wrap(err))
+	}
 
-//Export -
+	impl.SetCapacity(1)
+}
+
+// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (response interface{}, err error) {
 	if len(params) > 1 {
 		return nil, errors.New("Too many parameters.")
@@ -69,14 +82,6 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	}
 
 	return string(respJSON), nil
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "WindowsPerfInstance",
-		"perf_instance.discovery", "Get Windows performance instance object list.",
-		"perf_instance_en.discovery", "Get Windows performance instance object English list.",
-	)
-	impl.SetCapacity(1)
 }
 
 func (p *Plugin) refreshObjects() (err error) {

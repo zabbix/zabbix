@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -247,8 +247,121 @@ class C54ImportConverterTest extends CImportConverterTest {
 		];
 	}
 
+	public function importConverterDataProviderCalcItemFormula(): array {
+		$formulas = [
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],0s))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 0m))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 0h ))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 0d ))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"],  0w ))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"]))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], 15s))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], 15s))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], {$MACRO}))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], {$MACRO}))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], "{$MACRO: context}"))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 1h ))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"], "{$MACRO: context}"))'.
+					' or sum(last_foreach(/*/key?[group="Zabbix servers"], 1h ))',
+				'prototype' => false
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],{#LLD}))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],{#LLD}))',
+				'prototype' => true
+			],
+			[
+				'source' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],  {#LLD}))',
+				'expected' => 'sum(last_foreach(/*/key?[group="Zabbix servers"],  {#LLD}))',
+				'prototype' => true
+			]
+		];
+
+		$source_items = [];
+		$expected_items = [];
+		$source_item_prototypes = [];
+		$expected_item_prototypes = [];
+
+		foreach ($formulas as $formula) {
+			if (!$formula['prototype']) {
+				$source_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['source']];
+				$expected_items[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected']];
+			}
+			$source_item_prototypes[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['source']];
+			$expected_item_prototypes[] = ['type' => CXmlConstantName::CALCULATED, 'params' => $formula['expected']];
+		}
+
+		return [
+			[
+				[
+					'templates' => [
+						[
+							'items' => $source_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $source_item_prototypes
+								]
+							]
+						]
+					],
+					'hosts' => [
+						[
+							'items' => $source_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $source_item_prototypes
+								]
+							]
+						]
+					]
+				],
+				[
+					'templates' => [
+						[
+							'items' => $expected_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $expected_item_prototypes
+								]
+							]
+						]
+					],
+					'hosts' => [
+						[
+							'items' => $expected_items,
+							'discovery_rules' => [
+								[
+									'type' => CXmlConstantName::ZABBIX_PASSIVE,
+									'item_prototypes' => $expected_item_prototypes
+								]
+							]
+						]
+					]
+				]
+			]
+		];
+	}
+
 	/**
 	 * @dataProvider importConverterDataProvider
+	 * @dataProvider importConverterDataProviderCalcItemFormula
 	 *
 	 * @param array $data
 	 * @param array $expected

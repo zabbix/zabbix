@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -13512,7 +13512,7 @@ char	*dc_expand_user_macros_in_func_params(const char *params, zbx_uint64_t item
 		int	quoted;
 		char	*param, *resolved_param;
 
-		zbx_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
+		zbx_trigger_function_param_parse(ptr, &param_pos, &param_len, &sep_pos);
 
 		param = zbx_function_param_unquote_dyn(ptr + param_pos, param_len, &quoted);
 		resolved_param = dc_expand_user_macros(param, &item->hostid, 1);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -452,9 +452,8 @@ static int	endpoint_parse(char *endpoint_str, zbx_modbus_endpoint_t *endpoint)
 			endpoint->conn_info.serial.baudrate = ZBX_MODBUS_BAUDRATE_DEFAULT;
 			set_serial_params_default(&endpoint->conn_info.serial);
 		}
-
 #if !(defined(_WINDOWS) || defined(__MINGW32__))
-		if ('/' != *endpoint->conn_info.serial.port)
+		if (NULL != endpoint->conn_info.serial.port && '/' != *endpoint->conn_info.serial.port)
 		{
 			endpoint->conn_info.serial.port = zbx_dsprintf(endpoint->conn_info.serial.port, "/dev/%s",
 					endpoint->conn_info.serial.port);
@@ -819,6 +818,7 @@ int	MODBUS_GET(AGENT_REQUEST *request, AGENT_RESULT *result)
 			(unsigned short)total_count, result, &err))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot read modbus data: %s.", err));
+		zbx_free(err);
 		goto err;
 	}
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,6 +27,7 @@ package zbxlib
 #include "log.h"
 #include "../src/zabbix_agent/metrics.h"
 #include "../src/zabbix_agent/logfiles/logfiles.h"
+#include "../src/libs/zbxnix/fatal.h"
 
 extern int CONFIG_MAX_LINES_PER_SECOND;
 
@@ -191,21 +192,45 @@ int	process_value_cb(zbx_vector_ptr_t *addrs, zbx_vector_ptr_t *agent2_result, c
 	return SUCCEED;
 }
 
-static zbx_vector_pre_persistent_lp_t new_prep_vec(void)
-{
-	zbx_vector_pre_persistent_lp_t vect;
+#if !defined(__MINGW32__)
 
-	vect = (zbx_vector_pre_persistent_lp_t)zbx_malloc(NULL, sizeof(zbx_vector_pre_persistent_t));
-	zbx_vector_pre_persistent_create(vect);
-	return vect;
+static ZBX_THREAD_LOCAL struct sigaction sa_old;
+
+static void	fatal_signal_handler(int sig, siginfo_t *siginfo, void *context)
+{
+	zbx_log_fatal_info(context, ZBX_FATAL_LOG_FULL_INFO);
+
+	sigaction(SIGSEGV, &sa_old, NULL);
+	raise(sig);
 }
+#endif
 
-static void free_prep_vec(zbx_vector_pre_persistent_lp_t vect)
+static int	invoke_process_log_check(zbx_vector_ptr_t *agent2_result, zbx_vector_ptr_t *regexps,
+		ZBX_ACTIVE_METRIC *metric, zbx_process_value_func_t process_value_cb, zbx_uint64_t *lastlogsize_sent,
+		int *mtime_sent, char **error, zbx_uint64_t itemid)
 {
-	// In Agent2 this vector is expected to be empty because 'persistent directory' parameter is not allowed.
-	// Therefore a simplified cleanup is used.
-	zbx_vector_pre_persistent_destroy(vect);
-	zbx_free(vect);
+	int	ret;
+	zbx_vector_pre_persistent_t	vect;
+
+#if !defined(__MINGW32__)
+	struct sigaction	sa_new;
+	sigemptyset(&sa_new.sa_mask);
+	sa_new.sa_flags = SA_SIGINFO;
+	sa_new.sa_sigaction = fatal_signal_handler;
+	sigaction(SIGSEGV, &sa_new, &sa_old);
+#endif
+
+	zbx_vector_pre_persistent_create(&vect);
+
+	ret = process_log_check(NULL, agent2_result, regexps, metric, process_value_cb, lastlogsize_sent, mtime_sent, error,
+		&vect, itemid);
+
+#if !defined(__MINGW32__)
+	sigaction(SIGSEGV, &sa_old, NULL);
+#endif
+
+	zbx_vector_pre_persistent_destroy(&vect);
+	return ret;
 }
 */
 import "C"
@@ -214,6 +239,7 @@ import (
 	"errors"
 	"time"
 	"unsafe"
+
 	"git.zabbix.com/ap/plugin-support/log"
 	"zabbix.com/pkg/itemutil"
 )
@@ -274,6 +300,8 @@ func NewActiveMetric(key string, params []string, lastLogsize uint64, mtime int3
 	default:
 		return nil, errors.New("Unsupported item key.")
 	}
+
+	/* will be freed in FreeActiveMetric */
 	ckey := C.CString(itemutil.MakeKey(key, params))
 	log.Tracef("Calling C function \"new_metric()\"")
 	return unsafe.Pointer(C.new_metric(ckey, C.zbx_uint64_t(lastLogsize), C.int(mtime), C.int(flags))), nil
@@ -299,14 +327,12 @@ func ProcessLogCheck(data unsafe.Pointer, item *LogItem, refresh int, cblob unsa
 	result := C.new_log_result(C.int(item.Output.PersistSlotsAvailable()))
 
 	var cerrmsg *C.char
-	log.Tracef("Calling C function \"new_prep_vec()\"")
-	cprepVec := C.new_prep_vec() // In Agent2 it is always empty vector. Not used but required for linking.
-	log.Tracef("Calling C function \"process_log_check()\"")
-	ret := C.process_log_check(nil, C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
+
+	log.Tracef("Calling C function \"invoke_process_log_check()\"")
+
+	ret := C.invoke_process_log_check(C.zbx_vector_ptr_lp_t(unsafe.Pointer(result)), C.zbx_vector_ptr_lp_t(cblob),
 		C.ZBX_ACTIVE_METRIC_LP(data), C.zbx_process_value_func_t(C.process_value_cb), &clastLogsizeSent,
-		&cmtimeSent, &cerrmsg, cprepVec, C.zbx_uint64_t(itemid))
-	log.Tracef("Calling C function \"free_prep_vec()\"")
-	C.free_prep_vec(cprepVec)
+		&cmtimeSent, &cerrmsg, C.zbx_uint64_t(itemid))
 
 	// add cached results
 	var cvalue *C.char

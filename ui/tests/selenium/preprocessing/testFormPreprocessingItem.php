@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,8 +37,6 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	const INHERITANCE_HOSTID		= 15001;	// 'Template inheritance test host'
 	const INHERITED_ITEMID			= 15094;	// 'testInheritanceItemPreprocessing'
 	const CLONE_ITEMID				= 99102;	// 'Simple form test host' -> 'testFormItem'
-
-	use PreprocessingTrait;
 
 	public function getItemPreprocessingPrometheusData() {
 		return array_merge($this->getPrometheusData(), [

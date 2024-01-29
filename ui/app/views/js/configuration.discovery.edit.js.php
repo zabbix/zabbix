@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -335,19 +335,19 @@
 	 * @param {Overlay} overlay
 	 */
 	function submitDCheck(overlay) {
-		var $form = overlay.$dialogue.find('form');
+		const $form = overlay.$dialogue.find('form');
 
 		$form.trimValues([
 			'#ports', '#key_', '#snmp_community', '#snmp_oid', '#snmpv3_contextname', '#snmpv3_securityname',
 			'#snmpv3_authpassphrase', '#snmpv3_privpassphrase'
 		]);
 
-		var data = $form
-				.find('#type, #ports, input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
-				.serialize(),
-			dialogueid = $form
-				.closest("[data-dialogueid]")
-				.data('dialogueid');
+		const data = $form.find('#ports, >input[type=hidden], input:visible').serializeJSON();
+		const dialogueid = $form.closest("[data-dialogueid]").data('dialogueid');
+
+		[...$form[0].querySelectorAll('z-select')]
+				?.filter((element) => isVisible(element))
+				?.forEach((element) => data[element.name] = element.value);
 
 		if (!dialogueid) {
 			return false;
@@ -371,7 +371,7 @@
 				return jQuery(response.errors).insertBefore($form);
 			}
 			else {
-				var dcheck = response.params;
+				const dcheck = response.params;
 
 				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
 					dcheck.name += ' (' + dcheck.ports + ')';
@@ -403,17 +403,20 @@
 	 * @return {boolean}
 	 */
 	function hasDCheckDuplicates() {
-		var $form = jQuery(document.forms['dcheck_form']),
-			dcheckid = jQuery('#dcheckid').val(),
-			dcheck = $form
-				.find('#ports, >input[type=hidden], input[type=text]:visible, input[type=radio]:checked:visible')
-				.serializeJSON(),
-			fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
-				'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
-				'snmpv3_privpassphrase'
-			];
+		const form = document.forms['dcheck_form'];
+		const dcheckid = document.getElementById('dcheckid')?.value;
+		const dcheck = $([...form.querySelectorAll('#ports, input')]
+				?.filter((element) => isVisible(element)))
+				?.serializeJSON();
+		const fields = ['type', 'ports', 'snmp_community', 'key_', 'snmpv3_contextname', 'snmpv3_securityname',
+			'snmpv3_securitylevel', 'snmpv3_authprotocol', 'snmpv3_authpassphrase', 'snmpv3_privprotocol',
+			'snmpv3_privpassphrase'
+		];
 
-		dcheck['type'] = $form.find('z-select').val();
+		[...form.querySelectorAll('z-select')]
+				?.filter((element) => isVisible(element))
+				?.forEach((element) => dcheck[element.name] = element.value);
+
 		dcheck.dcheckid = dcheckid ? dcheckid : getUniqueId();
 
 		if (dcheck['type'] == <?= SVC_SNMPv1 ?> || dcheck['type'] == <?= SVC_SNMPv2c ?>
@@ -421,23 +424,19 @@
 			dcheck['key_'] = dcheck['snmp_oid'];
 		}
 
-		for (var zbx_dcheckid in ZBX_CHECKLIST) {
+		const check_fields = fields.filter((field) => field in dcheck);
+
+		for (const zbx_dcheckid in ZBX_CHECKLIST) {
 			if (ZBX_CHECKLIST[zbx_dcheckid]['type'] !== dcheck['type']) {
 				continue;
 			}
 
 			if (typeof dcheckid === 'undefined' || dcheckid != zbx_dcheckid) {
-				var duplicate_fields = fields
-					.map(function(value) {
-						return typeof dcheck[value] === 'undefined'
-							|| dcheck[value] === ''
-							|| ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value];
-					})
-					.filter(function(value) {
-						return !!value;
-					});
+				const duplicate_fields = check_fields
+					.map((value) => ZBX_CHECKLIST[zbx_dcheckid][value] === dcheck[value])
+					.filter((value) => !!value);
 
-				if (duplicate_fields.length === fields.length) {
+				if (duplicate_fields.length === check_fields.length) {
 					return true;
 				}
 			}

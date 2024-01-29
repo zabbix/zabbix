@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,6 +20,9 @@
 #include "common.h"
 #include "log.h"
 #include "zbxhttp.h"
+#include "zbxtypes.h"
+#include <stddef.h>
+#include "zbxalgo.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -335,7 +338,12 @@ int	zbx_http_get(const char *url, const char *header, long timeout, char **out, 
 
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
+#	if LIBCURL_VERSION_NUM >= 0x075500
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+#	else
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+#	endif
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
 		goto clean;
@@ -385,6 +393,56 @@ clean:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+}
+
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **body, size_t *size, size_t *allocated)
+{
+	char			*charset, *content_type = NULL;
+#ifdef CURLH_HEADER
+	struct curl_header	*type;
+	CURLHcode		h;
+
+	if (CURLHE_OK != (h = curl_easy_header(easyhandle, "Content-Type", 0,
+			CURLH_HEADER|CURLH_TRAILER|CURLH_CONNECT|CURLH_1XX|CURLH_PSEUDO, -1, &type)))
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "cannot retrieve Content-Type header:%u", h);
+	}
+	else
+	{
+		zabbix_log(LOG_LEVEL_DEBUG, "name '%s' value '%s' amount:%lu index:%lu"
+				" origin:%u", type->name, type->value, type->amount,
+				type->index, type->origin);
+
+		content_type = type->value;
+	}
+#else
+	CURLcode	err = curl_easy_getinfo(easyhandle, CURLINFO_CONTENT_TYPE, &content_type);
+
+	if (CURLE_OK != err || NULL == content_type)
+		zabbix_log(LOG_LEVEL_DEBUG,  "cannot get content type: %s", curl_easy_strerror(err));
+	else
+		zabbix_log(LOG_LEVEL_DEBUG, "content_type '%s'", content_type);
+#endif
+
+	charset = zbx_determine_charset(content_type, *body, *size);
+
+	if (0 != strcmp(charset, "UTF-8"))
+	{
+		char	*converted;
+
+		zabbix_log(LOG_LEVEL_DEBUG, "converting from charset '%s'", charset);
+
+		converted = convert_to_utf8(*body, *size, charset);
+		zbx_free(*body);
+
+		*body = converted;
+		*size = strlen(converted);
+		*allocated = *size;
+	}
+
+	zbx_free(charset);
+
+	zbx_replace_invalid_utf8(*body);
 }
 
 #endif

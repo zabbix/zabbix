@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -985,9 +985,9 @@ static void	save_template_items(zbx_uint64_t hostid, zbx_vector_ptr_t *items)
 				"timeout", "url", "query_fields", "posts", "status_codes", "follow_redirects",
 				"post_type", "http_proxy", "headers", "retrieve_mode", "request_method",
 				"output_format", "ssl_cert_file", "ssl_key_file", "ssl_key_password", "verify_peer",
-				"verify_host", "allow_traps", "discover", NULL);
+				"verify_host", "allow_traps", "discover", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", NULL);
+		zbx_db_insert_prepare(&db_insert_irtdata, "item_rtdata", "itemid", (char *)NULL);
 	}
 
 	if (0 != upd_items)
@@ -1060,7 +1060,7 @@ static void	save_template_lld_rules(zbx_vector_ptr_t *items, zbx_vector_ptr_t *r
 	if (0 != new_conditions)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_condition", "item_conditionid", "itemid", "operator", "macro",
-				"value", NULL);
+				"value", (char *)NULL);
 
 		/* insert lld rule conditions for new items */
 		for (i = 0; i < items->values_num; i++)
@@ -1283,7 +1283,7 @@ static void	save_template_discovery_prototypes(zbx_uint64_t hostid, zbx_vector_p
 		goto out;
 
 	zbx_db_insert_prepare(&db_insert, "item_discovery", "itemdiscoveryid", "itemid",
-					"parent_itemid", NULL);
+					"parent_itemid", (char *)NULL);
 
 	for (i = 0; i < prototypes.values_num; i++)
 	{
@@ -1529,7 +1529,7 @@ static void	copy_template_items_preproc(const zbx_vector_ptr_t *items)
 		new_preprocid = DBget_maxid_num("item_preproc", new_preproc_num);
 
 		zbx_db_insert_prepare(&db_insert, "item_preproc", "item_preprocid", "itemid", "step", "type", "params",
-				"error_handler", "error_handler_params", NULL);
+				"error_handler", "error_handler_params", (char *)NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1707,7 +1707,7 @@ static void	copy_template_item_tags(const zbx_vector_ptr_t *items)
 	if (0 != new_tag_num)
 	{
 		new_tagid = DBget_maxid_num("item_tag", new_tag_num);
-		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert, "item_tag", "itemtagid", "itemid", "tag", "value", (char *)NULL);
 	}
 
 	for (i = 0; i < items->values_num; i++)
@@ -1860,7 +1860,7 @@ static void	copy_template_item_script_params(const zbx_vector_ptr_t *items)
 	if (0 != new_param_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "item_parameter", "item_parameterid", "itemid", "name", "value",
-				NULL);
+				(char *)NULL);
 		item_parameter_id = DBget_maxid_num("item_parameter", new_param_num);
 	}
 
@@ -2026,7 +2026,7 @@ static void	copy_template_lld_macro_paths(const zbx_vector_ptr_t *items)
 	if (0 != new_lld_macro_num)
 	{
 		zbx_db_insert_prepare(&db_insert, "lld_macro_path", "lld_macro_pathid", "itemid", "lld_macro", "path",
-				NULL);
+				(char *)NULL);
 
 		new_lld_macro_pathid = DBget_maxid_num("lld_macro_path", new_lld_macro_num);
 	}
@@ -2229,10 +2229,10 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 		overrideid = DBget_maxid_num("lld_override", overrides->values_num);
 
 	zbx_db_insert_prepare(&db_insert, "lld_override", "lld_overrideid", "itemid", "name", "step", "evaltype",
-			"formula", "stop", NULL);
+			"formula", "stop", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_oconditions, "lld_override_condition", "lld_override_conditionid",
-			"lld_overrideid", "operator", "macro", "value", NULL);
+			"lld_overrideid", "operator", "macro", "value", (char *)NULL);
 
 	for (i = 0, operations_num = 0, conditions_num = 0; i < overrides->values_num; i++)
 	{
@@ -2248,29 +2248,30 @@ static void	save_template_lld_overrides(zbx_vector_ptr_t *overrides, zbx_hashset
 		override_conditionid = DBget_maxid_num("lld_override_condition", conditions_num);
 
 	zbx_db_insert_prepare(&db_insert_ooperations, "lld_override_operation", "lld_override_operationid",
-				"lld_overrideid", "operationobject", "operator", "value", NULL);
+				"lld_overrideid", "operationobject", "operator", "value", (char *)NULL);
 
-	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status", NULL);
+	zbx_db_insert_prepare(&db_insert_opstatus, "lld_override_opstatus", "lld_override_operationid", "status",
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_opdiscover, "lld_override_opdiscover", "lld_override_operationid", "discover",
-			NULL);
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_opperiod, "lld_override_opperiod", "lld_override_operationid", "delay",
-			NULL);
+			(char *)NULL);
 	zbx_db_insert_prepare(&db_insert_ophistory, "lld_override_ophistory", "lld_override_operationid", "history",
-			NULL);
+			(char *)NULL);
 	zbx_db_insert_prepare(&db_insert_optrends, "lld_override_optrends", "lld_override_operationid", "trends",
-			NULL);
+			(char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_opseverity, "lld_override_opseverity", "lld_override_operationid", "severity",
-			NULL);
+			(char *)NULL);
 	zbx_db_insert_prepare(&db_insert_optag, "lld_override_optag", "lld_override_optagid",
-			"lld_override_operationid", "tag", "value", NULL);
+			"lld_override_operationid", "tag", "value", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_optemplate, "lld_override_optemplate", "lld_override_optemplateid",
-				"lld_override_operationid", "templateid", NULL);
+				"lld_override_operationid", "templateid", (char *)NULL);
 	zbx_db_insert_prepare(&db_insert_opinventory, "lld_override_opinventory", "lld_override_operationid",
-			"inventory_mode", NULL);
+			"inventory_mode", (char *)NULL);
 
 	for (i = 0; i < overrides->values_num; i++)
 	{

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,7 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard, profiles
@@ -30,7 +31,17 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testDashboardForm extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
+	}
 
 	/**
 	 * Dashboard ids grouped by name.
@@ -71,15 +82,6 @@ class testDashboardForm extends CWebTest {
 		'Default page display period' => '1 hour',
 		'Start slideshow automatically' => false
 	];
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
-	}
 
 	public function prepareDashboardData() {
 		$response = CDataHelper::call('dashboard.create', [
@@ -854,7 +856,7 @@ class testDashboardForm extends CWebTest {
 
 				$db_names = CDBHelper::getAll($query);
 
-				// Database reult format is [['username' => 'Admin'], ['username' => 'Tag-user']]
+				// Database result format is [['username' => 'Admin'], ['username' => 'Tag-user']]
 				foreach ($db_names as $array) {
 					// Result format should be ['Admin', 'Tag-user'] to compare with table result in UI.
 					$result[] = $array[$key];

@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-06-28 07:18+0000\n"
+"PO-Revision-Date: 2024-01-12 04:04+0000\n"
 "Last-Translator: Alexey <alexey.pustovalov@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -208,6 +208,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s из %2$s элемента в состоянии проблемы"
 msgstr[1] "%1$s из %2$s элементов в состоянии проблемы"
 msgstr[2] "%1$s из %2$s элементов в состоянии проблемы"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
 
 #: jsLoader.php:348
 #, c-format
@@ -890,7 +900,7 @@ msgstr "Добавить узел сети"
 
 #: include/classes/widgets/views/widget.tophosts.form.view.php:75
 msgid "Add item column"
-msgstr "Добавить колонку элементов данных"
+msgstr "Добавьте колонку элементов данных"
 
 #: app/partials/massupdate.macros.tab.php:95
 #: app/partials/massupdate.valuemaps.tab.php:37
@@ -903,7 +913,7 @@ msgstr "Добавить несколько карт"
 
 #: include/classes/widgets/CWidgetHelper.php:1378
 msgid "Add new data set"
-msgstr "Добавить новый набор данных"
+msgstr "Новый набор данных"
 
 #: app/partials/configuration.host.edit.html.php:256
 #: include/views/configuration.host.prototype.edit.php:266
@@ -1022,7 +1032,7 @@ msgstr "Возраст"
 
 #: app/partials/monitoring.problem.filter.php:116
 msgid "Age less than"
-msgstr "Возраст менее чем"
+msgstr "Давность менее"
 
 #: app/views/administration.script.list.php:163 include/hosts.inc.php:1191
 #: include/items.inc.php:347 include/views/configuration.httpconf.edit.php:96
@@ -1786,7 +1796,7 @@ msgstr "По нижнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr "Bottom N"
+msgstr "Последние N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -2127,6 +2137,10 @@ msgstr "Не удалось изменить тип пользователя с�
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
 msgstr "Не удалось очистить историю"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr ""
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2594,6 +2608,13 @@ msgstr[0] "Не удалось деактивировать способ опо�
 msgstr[1] "Не удалось деактивировать способы оповещения"
 msgstr[2] "Не удалось деактивировать способы оповещения"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2689,6 +2710,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Не удалось активировать способ оповещения"
 msgstr[1] "Не удалось активировать способы оповещения"
 msgstr[2] "Не удалось активировать способы оповещения"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -2879,8 +2907,8 @@ msgstr "Нельзя иметь не пустое значение тега пр
 #, c-format
 msgid "Cannot import template \"%1$s\", linked template \"%2$s\" does not exist."
 msgid_plural "Cannot import template \"%1$s\", linked templates \"%2$s\" do not exist."
-msgstr[0] "Не удалось импортировать шаблон \"%1$s\", соединенный шаблон \"%2$s\" не существует."
-msgstr[1] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
+msgstr[0] "Не удалось импортировать шаблон \"%1$s\", присоединенный шаблон \"%2$s\" не существует."
+msgstr[1] "Не удалось импортировать шаблон \"%1$s\", присоединенные шаблоны \"%2$s\" не существуют."
 msgstr[2] "Не удалось импортировать шаблон \"%1$s\", соединенные шаблоны \"%2$s\" не существуют."
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1581
@@ -3063,7 +3091,7 @@ msgstr "Невозможно массово обновить видимое им
 #: include/classes/api/services/CHostBase.php:1080
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
-msgstr "Невозможно передать дубликаты ID шаблонов для соединения: %1$s."
+msgstr "Невозможно передать дубликаты ID шаблонов для присоединения: %1$s."
 
 #: include/classes/db/DB.php:958
 #, c-format
@@ -3439,6 +3467,10 @@ msgstr "Не удалось обновить обслуживание"
 msgid "Cannot update media type"
 msgstr "Не удалось обновить способ оповещений"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3692,15 +3724,15 @@ msgstr "Проверьте часть выражения начиная с \"%1$
 
 #: include/items.inc.php:1877
 msgid "Check for error in JSON"
-msgstr "Проверьте на ошибку в JSON"
+msgstr "Проверка на ошибку в JSON"
 
 #: include/items.inc.php:1881
 msgid "Check for error in XML"
-msgstr "Проверьте на ошибку в XML"
+msgstr "Проверка на ошибку в XML"
 
 #: include/items.inc.php:1885
 msgid "Check for error using regular expression"
-msgstr "Проверьте на ошибку при использовании регулярного выражения"
+msgstr "Проверка на ошибку при использовании регулярного выражения"
 
 #: include/items.inc.php:1889
 msgid "Check for not supported value"
@@ -3810,6 +3842,14 @@ msgstr "Очистить историю"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "Очистить историю и динамику изменений"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6834,6 +6874,10 @@ msgstr "Мониторинг журнала событий. Возвращает
 msgid "Event name"
 msgstr "Имя события"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "Пара тегов событий"
@@ -8051,6 +8095,10 @@ msgstr "Подсвечивать всю строку"
 #: jsLoader.php:372
 msgid "History"
 msgstr "История"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11153,7 +11201,7 @@ msgstr "Присоединенные шаблоны"
 
 #: include/views/configuration.template.list.php:127
 msgid "Linked to templates"
-msgstr "Соединения с шаблонам"
+msgstr "Присоединения к шаблонам"
 
 #: include/views/js/monitoring.sysmaps.js.php:733
 #: include/views/js/monitoring.sysmaps.js.php:744
@@ -12050,6 +12098,13 @@ msgstr[0] "Модуль удален: %1$s."
 msgstr[1] "Модуля удалено: %1$s."
 msgstr[2] "Модулей удалено: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -12058,6 +12113,13 @@ msgstr[0] "Модуль деактивирован: %1$s."
 msgstr[1] "Модуля деактивировано: %1$s."
 msgstr[2] "Модулей деактивировано: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
@@ -12065,6 +12127,10 @@ msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Модуль активирован: %1$s."
 msgstr[1] "Модуля активировано: %1$s."
 msgstr[2] "Модулей активировано: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -12491,7 +12557,7 @@ msgstr "Новое дополнительное правило"
 
 #: app/views/popup.tophosts.column.edit.php:249
 msgid "New column"
-msgstr "Новый столбец"
+msgstr "Новая колонка"
 
 #: app/controllers/CControllerPopupConditionActions.php:94
 #: app/controllers/CControllerPopupConditionEventCorr.php:87
@@ -13178,6 +13244,11 @@ msgstr "Без унаследованных элементов данных"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Не поддерживается"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -14299,11 +14370,11 @@ msgstr "Процент времени, когда виртуальная маш�
 
 #: graphs.php:55 include/views/configuration.graph.edit.php:151
 msgid "Percentile line (left)"
-msgstr "Процентная линия (слева)"
+msgstr "Линия процентиля (слева)"
 
 #: graphs.php:56 include/views/configuration.graph.edit.php:169
 msgid "Percentile line (right)"
-msgstr "Процентная линия (справа)"
+msgstr "Линия процентиля (справа)"
 
 #: include/classes/data/CItemData.php:917
 msgid "Performs a DNS query. Returns character string with the required type of information"
@@ -15390,14 +15461,14 @@ msgstr "Отчеты"
 #: include/views/configuration.item.edit.php:363
 #: include/views/configuration.item.prototype.edit.php:349
 msgid "Request body"
-msgstr "Запрос тела"
+msgstr "Тело запроса"
 
 #: app/views/popup.massupdate.item.php:90
 #: include/views/configuration.host.discovery.edit.php:296
 #: include/views/configuration.item.edit.php:352
 #: include/views/configuration.item.prototype.edit.php:338
 msgid "Request body type"
-msgstr "Типа запроса тела"
+msgstr "Тип тела запроса"
 
 #: host_discovery.php:428 host_discovery.php:800 items.php:895 items.php:1011
 msgid "Request sent successfully"
@@ -16498,7 +16569,7 @@ msgstr "Значение тега услуги"
 
 #: app/views/popup.sla.edit.php:122 app/views/sla.list.php:60
 msgid "Service tags"
-msgstr "Теги сервисов"
+msgstr "Теги услуг"
 
 #: app/views/popup.condition.common.php:564 include/actions.inc.php:56
 msgid "Service type"
@@ -17682,7 +17753,7 @@ msgstr "Группа шаблона"
 
 #: app/views/popup.import.php:34
 msgid "Template linkage"
-msgstr "Соединения с шаблонами"
+msgstr "Присоединение шаблонов"
 
 #: include/views/configuration.template.edit.php:192
 msgid "Template macros"
@@ -17762,7 +17833,7 @@ msgstr "Шаблоны \"%1$s\" отсоединены от узлов сети 
 
 #: app/partials/configuration.host.edit.html.php:215
 msgid "Templates linked by host discovery cannot be unlinked."
-msgstr "Шаблоны присоединенные обнаружением узлов сети нельзя отсоединить."
+msgstr "Шаблоны, присоединенные обнаружением узлов сети, нельзя отсоединить."
 
 #: app/controllers/CControllerPopupMassupdateTemplate.php:358
 msgid "Templates updated"
@@ -18242,7 +18313,7 @@ msgstr "По верхнему краю"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:132
 msgid "Top N"
-msgstr "Top N"
+msgstr "Первые N"
 
 #: include/classes/widgets/CWidgetConfig.php:75
 msgid "Top hosts"
@@ -19289,6 +19360,10 @@ msgstr "Время работы процесса Zabbix сервера в сек
 #: include/actions.inc.php:59
 msgid "Uptime/Downtime"
 msgstr "Доступен/Недоступен"
+
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
 
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
@@ -20699,6 +20774,10 @@ msgstr "Ось X"
 msgid "X-Frame-Options HTTP header"
 msgstr "HTTP заголовок X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -20763,7 +20842,7 @@ msgstr "МИН значение оси Y"
 
 #: include/views/configuration.graph.edit.php:352
 msgid "Y axis side"
-msgstr "Расположение оси"
+msgstr "Расположение оси Y"
 
 #: include/classes/widgets/CWidgetHelper.php:936
 #: include/classes/widgets/CWidgetHelper.php:1012
@@ -21118,6 +21197,11 @@ msgstr "ожидается относительное время"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "спецсимвол"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -22475,6 +22559,10 @@ msgstr "now() - Количество секунд начиная с Epoch"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "число"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr "объект не существует или принадлежит другому объекту"
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

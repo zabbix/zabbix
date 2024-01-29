@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ static void	add_discovered_host_groups(zbx_uint64_t hostid, zbx_vector_uint64_t 
 
 		hostgroupid = DBget_maxid_num("hosts_groups", groupids->values_num);
 
-		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", NULL);
+		zbx_db_insert_prepare(&db_insert, "hosts_groups", "hostgroupid", "hostid", "groupid", (char *)NULL);
 
 		zbx_vector_uint64_sort(groupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
@@ -431,7 +431,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				hostid = DBget_maxid("hosts");
 
 				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host", "name",
-						NULL);
+						(char *)NULL);
 				zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, host_unique,
 						hostname);
 				zbx_db_insert_execute(&db_insert);
@@ -564,7 +564,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid",
 							"host", "name", "tls_connect", "tls_accept",
-							"tls_psk_identity", "tls_psk", NULL);
+							"tls_psk_identity", "tls_psk", (char *)NULL);
 					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, hostname, hostname,
 						tls_accepted, tls_accepted, psk_identity, psk);
 
@@ -575,7 +575,7 @@ static zbx_uint64_t	add_discovered_host(const DB_EVENT *event, int *status, zbx_
 				else
 				{
 					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxy_hostid", "host",
-							"name", NULL);
+							"name", (char *)NULL);
 
 					zbx_audit_host_create_entry(AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_db_insert_add_values(&db_insert, hostid, proxy_hostid, hostname,
@@ -707,6 +707,8 @@ void	op_host_del(const DB_EVENT *event)
 	zbx_vector_str_append(&hostnames, zbx_strdup(NULL, hostname));
 
 	DBdelete_hosts_with_prototypes(&hostids, &hostnames);
+
+	DBexecute("delete from autoreg_host where host='%s'", hostname);
 
 	zbx_vector_str_clear_ext(&hostnames, zbx_str_free);
 	zbx_vector_str_destroy(&hostnames);

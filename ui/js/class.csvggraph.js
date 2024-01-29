@@ -1,6 +1,6 @@
 /*
  ** Zabbix
- ** Copyright (C) 2001-2023 Zabbix SIA
+ ** Copyright (C) 2001-2024 Zabbix SIA
  **
  ** This program is free software; you can redistribute it and/or modify
  ** it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
  *  - show_problems - show problems in hintbox when mouse is moved over the problem zone;
  *  - min_period - min period in seconds that must be s-boxed to change the data in dashboard timeselector.
  */
-jQuery(function ($) {
+(function ($) {
 	"use strict";
 
 	// Makes SBox selection cancelable pressing Esc.
@@ -679,4 +679,4 @@ jQuery(function ($) {
 
 		return methods.init.apply(this, arguments);
 	};
-});
+})(jQuery);

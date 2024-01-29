@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
 
 /**
  * @backup profiles
@@ -29,10 +29,19 @@ require_once dirname(__FILE__).'/traits/TableTrait.php';
  */
 class testPageTemplates extends CLegacyWebTest {
 
-	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
 
-	use TagTrait;
-	use TableTrait;
+	public $templateName = 'Huawei OceanStor 5300 V5 by SNMP';
 
 	public static function allTemplates() {
 		return CDBHelper::getRandomizedDataProvider(
@@ -418,7 +427,7 @@ class testPageTemplates extends CLegacyWebTest {
 		$template = 'Template for web scenario testing';
 		$hosts = ['Simple form test host'];
 
-		$this->page->login()->open('templates.php?page=3');
+		$this->page->login()->open('templates.php?page=4');
 		// Click on Hosts link in Template row.
 		$table = $this->query('class:list-table')->asTable()->one();
 		$table->findRow('Name', $template)->query('link:Hosts')->one()->click();

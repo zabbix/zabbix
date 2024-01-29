@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -452,7 +452,7 @@ static int	DBcopy_template_trigger_tags(const zbx_vector_uint64_t *new_triggerid
 
 	if (0 != insert_num)
 	{
-		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value", NULL);
+		zbx_db_insert_prepare(&db_insert, "trigger_tag", "triggertagid", "triggerid", "tag", "value", (char *)NULL);
 		tagid = DBget_maxid_num("trigger_tag", insert_num);
 	}
 
@@ -1266,10 +1266,10 @@ static int	execute_triggers_inserts(zbx_vector_trigger_copies_insert_t *trigger_
 
 	zbx_db_insert_prepare(&db_insert, "triggers", "triggerid", "description", "priority", "status", "comments",
 			"url", "type", "value", "state", "templateid", "flags", "recovery_mode", "correlation_mode",
-			"correlation_tag", "manual_close", "opdata", "discover", "event_name", NULL);
+			"correlation_tag", "manual_close", "opdata", "discover", "event_name", (char *)NULL);
 
 	zbx_db_insert_prepare(&db_insert_funcs, "functions", "functionid", "itemid", "triggerid", "name",
-			"parameter", NULL);
+			"parameter", (char *)NULL);
 
 	triggerid = triggerid2 = DBget_maxid_num("triggers", trigger_copies_insert->values_num);
 	functionid = DBget_maxid_num("functions", *funcs_insert_count);

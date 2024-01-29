@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,8 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/traits/MacrosTrait.php';
-require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
+
 require_once dirname(__FILE__).'/../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/common/testFormMacros.php';
 
@@ -29,17 +28,6 @@ use Facebook\WebDriver\WebDriverBy;
  * @backup globalmacro
  */
 class testFormAdministrationGeneralMacros extends testFormMacros {
-
-	/**
-	 * Attach MessageBehavior to the test.
-	 *
-	 * @return array
-	 */
-	public function getBehaviors() {
-		return [CMessageBehavior::class];
-	}
-
-	use MacrosTrait;
 
 	private $macroMaxLength = 255;
 	private $macroPlaceholder = '{$MACRO}';

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -704,6 +704,45 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(level) && NULL == out)
 		return;
 
+#if defined(__hpux)
+	if (SUCCEED != zbx_hpux_vsnprintf_is_c99())
+	{
+#define INITIAL_ALLOC_LEN	128
+
+		len = INITIAL_ALLOC_LEN;
+		buf = (char *)zbx_malloc(NULL, len);
+
+		while (1)
+		{
+			/* try printing and extending buffer until the buffer is large enough to */
+			/* store all data and 2 free bytes remain for adding '\n\0' */
+			int	bytes_written;
+
+			va_start(args, format);
+			bytes_written = vsnprintf(buf, len, format, args);
+			va_end(args);
+
+			if (0 <= bytes_written && 2 <= len - (size_t)bytes_written)
+			{
+				len = bytes_written;
+				goto finish;
+			}
+
+			if (-1 == bytes_written || (0 <= bytes_written && 2 > len - bytes_written))
+			{
+				len *= 2;
+				buf = (char *)zbx_realloc(buf, len);
+				continue;
+			}
+
+			zabbix_log(LOG_LEVEL_CRIT, "vsnprintf() returned %d", bytes_written);
+			THIS_SHOULD_NEVER_HAPPEN;
+			exit(EXIT_FAILURE);
+#undef INITIAL_ALLOC_LEN
+		}
+	}
+	/* HP-UX vsnprintf() looks C99-compliant, proceed with common implementation */
+#endif
 	va_start(args, format);
 	len = (size_t)vsnprintf(NULL, 0, format, args) + 2;
 	va_end(args);
@@ -714,6 +753,9 @@ void	zbx_strlog_alloc(int level, char **out, size_t *out_alloc, size_t *out_offs
 	len = (size_t)vsnprintf(buf, len, format, args);
 	va_end(args);
 
+#if defined(__hpux)
+finish:
+#endif
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(level))
 		zabbix_log(level, "%s", buf);
 

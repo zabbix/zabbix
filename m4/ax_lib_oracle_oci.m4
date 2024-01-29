@@ -55,9 +55,8 @@
 AC_DEFUN([AX_LIB_ORACLE_OCI],
 [
     AC_ARG_WITH([oracle],
-        AC_HELP_STRING([--with-oracle@<:@=ARG@:>@],
-            [use Oracle OCI API from given Oracle home (ARG=path); use existing ORACLE_HOME (ARG=yes); disable Oracle OCI support (ARG=no)]
-        ),
+        AS_HELP_STRING([--with-oracle@<:@=ARG@:>@],[use Oracle OCI API from given Oracle home (ARG=path); use existing ORACLE_HOME (ARG=yes); disable Oracle OCI support (ARG=no)
+        ]),
         [
         if test "$withval" = "no"; then
             want_oracle_oci="no"
@@ -76,9 +75,8 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
     )
 
     AC_ARG_WITH([oracle-include],
-        AC_HELP_STRING([--with-oracle-include@<:@=DIR@:>@],
-            [use Oracle OCI API headers from given path]
-        ),
+        AS_HELP_STRING([--with-oracle-include@<:@=DIR@:>@],[use Oracle OCI API headers from given path
+        ]),
         [
         if test "$withval" != "no"; then
             want_oracle_oci="yes"
@@ -88,9 +86,8 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
         [oracle_home_include_dir=""]
     )
     AC_ARG_WITH([oracle-lib],
-        AC_HELP_STRING([--with-oracle-lib@<:@=DIR@:>@],
-            [use Oracle OCI API libraries from given path]
-        ),
+        AS_HELP_STRING([--with-oracle-lib@<:@=DIR@:>@],[use Oracle OCI API libraries from given path
+        ]),
         [
         if test "$withval" != "no"; then
             want_oracle_oci="yes"

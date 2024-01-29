@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -706,12 +706,14 @@ out:
 static void tls_description(tls_t *tls, char **desc)
 {
 	X509	*cert;
-	char	*peer_issuer = NULL, *peer_subject = NULL, buf[TLS_MAX_BUF_LEN], *ptr = buf;
+	char	buf[TLS_MAX_BUF_LEN], *ptr = buf;
 
 	ptr += snprintf(ptr, sizeof(buf), "%s %s", SSL_get_version(tls->ssl), SSL_get_cipher(tls->ssl));
 
 	if ((sizeof(buf) - 1 > (size_t)(ptr - buf)) && NULL != (cert = SSL_get_peer_certificate(tls->ssl)))
 	{
+		char	*peer_issuer = NULL, *peer_subject = NULL;
+
 		if (0 == tls_get_x509_name(tls, X509_get_issuer_name(cert), &peer_issuer) &&
 			0 == tls_get_x509_name(tls, X509_get_subject_name(cert), &peer_subject))
 		{
@@ -723,10 +725,13 @@ static void tls_description(tls_t *tls, char **desc)
 						peer_issuer, peer_subject);
 			}
 		}
+
+		free(peer_issuer);
+		free(peer_subject);
+		X509_free(cert);
 	}
+
 	*desc = strdup(buf);
-	free(peer_issuer);
-	free(peer_subject);
 }
 
 //*****************************************************************************
@@ -1082,12 +1087,12 @@ func (c *tlsConn) verifyIssuerSubject(cfg *Config) (err error) {
 		var cSubject, cIssuer *C.char
 		if cfg.ServerCertIssuer != "" {
 			cIssuer = C.CString(cfg.ServerCertIssuer)
-			log.Tracef("Calling C function \"free()\"")
-			defer C.free(unsafe.Pointer(cSubject))
+			log.Tracef("Calling C function \"free(cIssuer)\"")
+			defer C.free(unsafe.Pointer(cIssuer))
 		}
 		if cfg.ServerCertSubject != "" {
 			cSubject = C.CString(cfg.ServerCertSubject)
-			log.Tracef("Calling C function \"free()\"")
+			log.Tracef("Calling C function \"free(cSubject)\"")
 			defer C.free(unsafe.Pointer(cSubject))
 		}
 		log.Tracef("Calling C function \"tls_validate_issuer_and_subject()\"")

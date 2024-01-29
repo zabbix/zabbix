@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -434,7 +434,8 @@ static int	check_db_parent_rule_tag_match(zbx_vector_uint64_t *parent_ids, zbx_v
 		zbx_free(tag_esc);
 	}
 
-	result = DBselect("%s) limit 1", sql);
+	zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, ')');
+	result = DBselectN(sql, 1);
 
 	if (NULL != DBfetch(result))
 	{
@@ -1159,7 +1160,7 @@ static void	add_command_alert(zbx_db_insert_t *db_insert, int alerts_num, zbx_ui
 	{
 		zbx_db_insert_prepare(db_insert, "alerts", "alertid", "actionid", "eventid", "clock", "message",
 				"status", "error", "esc_step", "alerttype", (NULL != r_event ? "p_eventid" : NULL),
-				NULL);
+				(char *)NULL);
 	}
 
 	now = (int)time(NULL);
@@ -1703,7 +1704,7 @@ static void	add_message_alert(const DB_EVENT *event, const DB_EVENT *r_event, zb
 			zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid",
 					"clock", "mediatypeid", "sendto", "subject", "message", "status", "error",
 					"esc_step", "alerttype", "acknowledgeid", "parameters",
-					(NULL != r_event ? "p_eventid" : NULL), NULL);
+					(NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
 		}
 
 		get_mediatype_params(event, r_event, actionid, userid, mediatypeid, row[1], subject, message, ack,
@@ -1737,7 +1738,7 @@ err_alert:
 
 		zbx_db_insert_prepare(&db_insert, "alerts", "alertid", "actionid", "eventid", "userid", "clock",
 				"subject", "message", "status", "retries", "error", "esc_step", "alerttype",
-				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), NULL);
+				"acknowledgeid", (NULL != r_event ? "p_eventid" : NULL), (char *)NULL);
 
 		if (NULL != r_event)
 		{

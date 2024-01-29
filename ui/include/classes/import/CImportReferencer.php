@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,7 @@ class CImportReferencer {
 	protected $template_dashboards = [];
 	protected $template_macros = [];
 	protected $host_macros = [];
+	protected $group_prototypes = [];
 	protected $host_prototype_macros = [];
 	protected $proxies = [];
 	protected $host_prototypes = [];
@@ -62,6 +63,7 @@ class CImportReferencer {
 	protected $db_template_dashboards;
 	protected $db_template_macros;
 	protected $db_host_macros;
+	protected $db_group_prototypes;
 	protected $db_host_prototype_macros;
 	protected $db_proxies;
 	protected $db_host_prototypes;
@@ -541,6 +543,25 @@ class CImportReferencer {
 	}
 
 	/**
+	 * Get group prototype ID by host prototype ID and group prototype name.
+	 *
+	 * @param string $hostid
+	 * @param string $name
+	 *
+	 * @return string|null
+	 */
+	public function findGroupPrototypeId(string $hostid, string $name): ?string {
+		if ($this->db_group_prototypes === null) {
+			$this->selectGroupPrototypes();
+		}
+
+		return (array_key_exists($hostid, $this->db_group_prototypes)
+				&& array_key_exists($name, $this->db_group_prototypes[$hostid]))
+			? $this->db_group_prototypes[$hostid][$name]
+			: null;
+	}
+
+	/**
 	 * Get macro ID by host prototype ID and macro name.
 	 *
 	 * @param string $hostid
@@ -902,6 +923,15 @@ class CImportReferencer {
 	 */
 	public function addHostMacros(array $macros): void {
 		$this->host_macros = $macros;
+	}
+
+	/**
+	 * Add group prototype names that need association with a database group prototype ID.
+	 *
+	 * @param array $group_prototypes
+	 */
+	public function addGroupPrototypes(array $group_prototypes): void {
+		$this->group_prototypes = $group_prototypes;
 	}
 
 	/**
@@ -1376,6 +1406,48 @@ class CImportReferencer {
 		}
 
 		$this->host_macros = [];
+	}
+
+	/**
+	 * Select group prototype IDs for previously added group prototype names.
+	 */
+	protected function selectGroupPrototypes(): void {
+		$this->db_group_prototypes = [];
+
+		$sql_where = [];
+
+		foreach ($this->group_prototypes as $type => $hosts) {
+			foreach ($hosts as $host => $lld_rules) {
+				foreach ($lld_rules as $lld_rule_key => $host_prototypes) {
+					foreach ($host_prototypes as $host_prototype_id => $gp_names) {
+						$sql_where[] = '('.
+							dbConditionString('h.host', [$host]).
+							' AND '.dbConditionString('i.key_', [$lld_rule_key]).
+							' AND '.dbConditionString('hp.'.$type, [$host_prototype_id]).
+							' AND '.dbConditionString('gp.name', $gp_names).
+						')';
+					}
+				}
+			}
+		}
+
+		if ($sql_where) {
+			$db_group_prototypes = DBselect(
+				'SELECT gp.group_prototypeid,gp.hostid,gp.name'.
+				' FROM group_prototype gp,hosts hp,host_discovery hd,items i,hosts h'.
+				' WHERE gp.hostid=hp.hostid'.
+					' AND hp.hostid=hd.hostid'.
+					' AND hd.parent_itemid=i.itemid'.
+					' AND i.hostid=h.hostid'.
+					' AND ('.implode(' OR ', $sql_where).')'
+			);
+
+			while ($row = DBfetch($db_group_prototypes)) {
+				$this->db_group_prototypes[$row['hostid']][$row['name']] = $row['group_prototypeid'];
+			}
+		}
+
+		$this->group_prototypes = [];
 	}
 
 	/**

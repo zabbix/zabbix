@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,9 +66,9 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 	},
 
 	onAdd: function(map) {
-		const div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
-		const btn = L.DomUtil.create('a', 'geomap-filter-button', div);
-		this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', div);
+		this._geomap_filter_div = L.DomUtil.create('div', 'leaflet-bar leaflet-control');
+
+		const btn = L.DomUtil.create('a', 'geomap-filter-button', this._geomap_filter_div);
 
 		btn.ariaLabel = t('Severity filter');
 		btn.title = t('Severity filter');
@@ -76,6 +76,8 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 		btn.href = '#';
 
 		if (!this._disabled) {
+			this.bar = L.DomUtil.create('ul', 'checkbox-list geomap-filter', this._geomap_filter_div);
+
 			for (const [severity, prop] of this._severity_levels) {
 				const li = L.DomUtil.create('li', '', this.bar);
 				const chbox = L.DomUtil.create('input', '', li);
@@ -92,19 +94,27 @@ L.Control.severityFilterFilterControl = L.Control.extend({
 				label.htmlFor = chBoxId;
 			}
 
-			L.DomEvent.on(btn, 'click', () => {this.bar.classList.toggle('collapsed')});
+			L.DomEvent.on(btn, 'click', () => {
+				if (!this._geomap_filter_div.classList.contains('disabled')) {
+					this.bar.classList.toggle('collapsed')
+				}
+			});
 			L.DomEvent.on(this.bar, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
-			L.DomEvent.on(div, 'change', () => {
+			L.DomEvent.on(this._geomap_filter_div, 'change', () => {
 				map.updateFilter([...this.bar.querySelectorAll('input[type="checkbox"]:checked')].map(n => n.value));
 			});
 		}
 		else {
-			div.classList.add('disabled');
+			this._geomap_filter_div.classList.add('disabled');
 		}
 
 		L.DomEvent.on(btn, 'dblclick', (e) => {L.DomEvent.stopPropagation(e)});
 
-		return div;
+		return this._geomap_filter_div;
+	},
+
+	disable: function() {
+		this._geomap_filter_div.classList.add('disabled');
 	},
 
 	close: function() {

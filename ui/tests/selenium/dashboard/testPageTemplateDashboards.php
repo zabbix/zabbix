@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,7 +20,7 @@
 
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @backup dashboard
@@ -29,7 +29,14 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testPageTemplateDashboards extends CWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
 	const TEMPLATEID = 99022;	// ID of the template for with a list of dashboards.
 	const DASHBOARDS = ['1st dashboard', '2nd dashboard', 'middle dashboard', 'z last dashboard'];

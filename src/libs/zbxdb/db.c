@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -77,8 +77,10 @@ static int		db_auto_increment;
 
 #if defined(HAVE_MYSQL)
 static MYSQL			*conn = NULL;
+static int			mysql_err_cnt = 0;
 static zbx_uint32_t		ZBX_MYSQL_SVERSION = ZBX_DBVERSION_UNDEFINED;
 static int			ZBX_MARIADB_SFORK = OFF;
+static int			txn_begin = 0;	/* transaction begin statement is executed */
 #elif defined(HAVE_ORACLE)
 #include "zbxalgo.h"
 
@@ -102,6 +104,10 @@ static ub4	OCI_DBserver_status(void);
 #define ORA_ERR_UNIQ_CONSTRAINT	-1
 
 #elif defined(HAVE_POSTGRESQL)
+#define ZBX_PG_READ_ONLY	"25006"
+#define ZBX_PG_UNIQUE_VIOLATION	"23505"
+#define ZBX_PG_DEADLOCK		"40P01"
+
 static PGconn			*conn = NULL;
 static unsigned int		ZBX_PG_BYTEAOID = 0;
 int			ZBX_TSDB_VERSION = -1;
@@ -157,7 +163,12 @@ static void	zbx_db_errlog(zbx_err_codes_t zbx_errno, int db_errno, const char *d
 			s = zbx_dsprintf(NULL, "query failed: [%d] %s", db_errno, last_db_strerror);
 			break;
 		case ERR_Z3008:
-			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno, last_db_strerror);
+			s = zbx_dsprintf(NULL, "query failed due to primary key constraint: [%d] %s", db_errno,
+					last_db_strerror);
+			break;
+		case ERR_Z3009:
+			s = zbx_dsprintf(NULL, "query failed due to read-only transaction: [%d] %s", db_errno,
+					last_db_strerror);
 			break;
 		default:
 			s = zbx_strdup(NULL, "unknown error");
@@ -337,11 +348,35 @@ static int	is_recoverable_mysql_error(int err_no)
 		case ER_UNKNOWN_COM_ERROR:
 		case ER_LOCK_DEADLOCK:
 		case ER_LOCK_WAIT_TIMEOUT:
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		case ER_CLIENT_INTERACTION_TIMEOUT:
+#endif
 #ifdef CR_SSL_CONNECTION_ERROR
 		case CR_SSL_CONNECTION_ERROR:
 #endif
 #ifdef ER_CONNECTION_KILLED
 		case ER_CONNECTION_KILLED:
+#endif
+			return SUCCEED;
+	}
+
+	return FAIL;
+}
+
+static int	is_inhibited_mysql_error(int err_no)
+{
+	if (1 < mysql_err_cnt)
+		return FAIL;
+
+	if (0 < txn_level && 0 == txn_begin)
+		return FAIL;
+
+	switch (err_no)
+	{
+		case CR_SERVER_GONE_ERROR:
+		case CR_SERVER_LOST:
+#ifdef ER_CLIENT_INTERACTION_TIMEOUT
+		case ER_CLIENT_INTERACTION_TIMEOUT:
 #endif
 			return SUCCEED;
 	}
@@ -354,7 +389,10 @@ static int	is_recoverable_postgresql_error(const PGconn *pg_conn, const PGresult
 	if (CONNECTION_OK != PQstatus(pg_conn))
 		return SUCCEED;
 
-	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), "40P01"))
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_DEADLOCK))
+		return SUCCEED;
+
+	if (0 == zbx_strcmp_null(PQresultErrorField(pg_result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
 		return SUCCEED;
 
 	return FAIL;
@@ -385,11 +423,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 {
 	int		ret = ZBX_DB_OK, last_txn_error, last_txn_level;
 #if defined(HAVE_MYSQL)
-#if LIBMYSQL_VERSION_ID >= 80000	/* my_bool type is removed in MySQL 8.0 */
-	bool		mysql_reconnect = 1;
-#else
-	my_bool		mysql_reconnect = 1;
-#endif
 	int		err_no = 0;
 #elif defined(HAVE_ORACLE)
 	char		*connect = NULL;
@@ -569,15 +602,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 		ret = ZBX_DB_FAIL;
 	}
 
-	/* The RECONNECT option setting is placed here, AFTER the connection	*/
-	/* is made, due to a bug in MySQL versions prior to 5.1.6 where it	*/
-	/* reset the options value to the default, regardless of what it was	*/
-	/* set to prior to the connection. MySQL allows changing connection	*/
-	/* options on an open connection, so setting it here is safe.		*/
-
-	if (ZBX_DB_OK == ret && 0 != mysql_options(conn, MYSQL_OPT_RECONNECT, &mysql_reconnect))
-		zabbix_log(LOG_LEVEL_WARNING, "Cannot set MySQL reconnect option.");
-
 	if (ZBX_DB_OK == ret)
 	{
 		/* in contrast to "set names utf8" results of this call will survive auto-reconnects */
@@ -607,6 +631,7 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 	if (ZBX_DB_FAIL == ret && SUCCEED == is_recoverable_mysql_error(err_no))
 		ret = ZBX_DB_DOWN;
 
+	mysql_err_cnt = ZBX_DB_OK == ret ? 0 : mysql_err_cnt + 1;
 #elif defined(HAVE_ORACLE)
 	ZBX_UNUSED(dbschema);
 	ZBX_UNUSED(tls_connect);
@@ -886,6 +911,12 @@ out:
 	if (ZBX_DB_OK != ret)
 		goto out;
 
+	if (0 < (ret = zbx_db_execute("pragma foreign_keys=on")))
+		ret = ZBX_DB_OK;
+
+	if (ZBX_DB_OK != ret)
+		goto out;
+
 	if (0 < (ret = zbx_db_execute("pragma temp_store=2")))
 		ret = ZBX_DB_OK;
 
@@ -1042,7 +1073,9 @@ int	zbx_db_begin(void)
 		zabbix_log(LOG_LEVEL_CRIT, "ERROR: nested transaction detected. Please report it to Zabbix Team.");
 		assert(0);
 	}
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 1;
+#endif
 	txn_level++;
 
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
@@ -1054,7 +1087,9 @@ int	zbx_db_begin(void)
 
 	if (ZBX_DB_DOWN == rc)
 		txn_level--;
-
+#if defined(HAVE_MYSQL)
+	txn_begin = 0;
+#endif
 	return rc;
 }
 
@@ -1482,7 +1517,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 		{
 			err_no = (int)mysql_errno(conn);
 			errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-			zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
+				zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
 
 			ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 		}
@@ -1505,7 +1543,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 				{
 					err_no = (int)mysql_errno(conn);
 					errcode = (ER_DUP_ENTRY == err_no ? ERR_Z3008 : ERR_Z3005);
-					zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
+					mysql_err_cnt++;
+
+					if (FAIL == is_inhibited_mysql_error(err_no))
+						zbx_db_errlog(errcode, err_no, mysql_error(conn), sql);
 
 					ret = (SUCCEED == is_recoverable_mysql_error(err_no) ? ZBX_DB_DOWN : ZBX_DB_FAIL);
 				}
@@ -1539,8 +1580,10 @@ int	zbx_db_vexecute(const char *fmt, va_list args)
 
 		zbx_postgresql_error(&error, result);
 
-		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), "23505"))
+		if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_UNIQUE_VIOLATION))
 			errcode = ERR_Z3008;
+		else if (0 == zbx_strcmp_null(PQresultErrorField(result, PG_DIAG_SQLSTATE), ZBX_PG_READ_ONLY))
+			errcode = ERR_Z3009;
 		else
 			errcode = ERR_Z3005;
 
@@ -1660,10 +1703,12 @@ DB_RESULT	zbx_db_vselect(const char *fmt, va_list args)
 	{
 		if (0 != mysql_query(conn, sql) || NULL == (result->result = mysql_store_result(conn)))
 		{
-			int err_no;
+			int err_no = (int)mysql_errno(conn);
 
-			err_no = (int)mysql_errno(conn);
-			zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
+			mysql_err_cnt++;
+
+			if (FAIL == is_inhibited_mysql_error(err_no))
+				zbx_db_errlog(ERR_Z3005, err_no, mysql_error(conn), sql);
 
 			DBfree_result(result);
 			result = (SUCCEED == is_recoverable_mysql_error(err_no) ? (DB_RESULT)ZBX_DB_DOWN : NULL);
@@ -2514,13 +2559,13 @@ int	zbx_db_version_check(const char *database, zbx_uint32_t current_version, zbx
 	else if (min_version > current_version && ZBX_DBVERSION_UNDEFINED != min_version)
 	{
 		flag = DB_VERSION_LOWER_THAN_MINIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is smaller than minimum of %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is older than minimum required %lu",
 				database, (unsigned long)current_version, (unsigned long)min_version);
 	}
 	else if (max_version < current_version && ZBX_DBVERSION_UNDEFINED != max_version)
 	{
 		flag = DB_VERSION_HIGHER_THAN_MAXIMUM;
-		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version is %lu which is higher than maximum of %lu",
+		zabbix_log(LOG_LEVEL_WARNING, "Unsupported DB! %s version %lu is newer than maximum allowed %lu",
 				database, (unsigned long)current_version, (unsigned long)max_version);
 	}
 	else if (min_supported_version > current_version && ZBX_DBVERSION_UNDEFINED != min_supported_version)

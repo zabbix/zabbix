@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -66,7 +66,7 @@ class CHostPrototype extends CHostBase {
 			'countOutput' =>			['type' => API_FLAG, 'default' => false],
 			'groupCount' =>				['type' => API_FLAG, 'default' => false],
 			'selectGroupLinks' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['groupid']), 'default' => null],
-			'selectGroupPrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['name']), 'default' => null],
+			'selectGroupPrototypes' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', ['group_prototypeid', 'name']), 'default' => null],
 			'selectDiscoveryRule' =>	['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $discovery_fields), 'default' => null],
 			'selectParentHost' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $hosts_fields), 'default' => null],
 			'selectInterfaces' =>		['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL, 'in' => implode(',', $interface_fields), 'default' => null],
@@ -400,7 +400,7 @@ class CHostPrototype extends CHostBase {
 		unset($host_prototype);
 
 		if ($options['selectGroupPrototypes'] === API_OUTPUT_EXTEND) {
-			$output = ['hostid', 'name'];
+			$output = ['group_prototypeid', 'hostid', 'name'];
 		}
 		else {
 			$output = array_unique(array_merge(['hostid'], $options['selectGroupPrototypes']));
@@ -474,9 +474,7 @@ class CHostPrototype extends CHostBase {
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('group_prototype', 'name')]
-			]],
+			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => self::getGroupPrototypeValidationFields()],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -574,7 +572,10 @@ class CHostPrototype extends CHostBase {
 	 */
 	protected function validateUpdate(array &$hosts, array &$db_hosts = null): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['hostid']], 'fields' => [
-			'hostid' =>	['type' => API_ID, 'flags' => API_REQUIRED]
+			'hostid' =>				['type' => API_ID, 'flags' => API_REQUIRED],
+			'groupPrototypes' =>	['type' => API_OBJECTS, 'flags' => API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['group_prototypeid']], 'fields' => [
+				'group_prototypeid' =>	['type' => API_ID]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $hosts, '/', $error)) {
@@ -593,6 +594,7 @@ class CHostPrototype extends CHostBase {
 		}
 
 		self::addInternalFields($db_hosts);
+		self::addAffectedGroupPrototypes($hosts, $db_hosts);
 
 		foreach ($hosts as $i => &$host) {
 			$db_host = $db_hosts[$host['hostid']];
@@ -607,9 +609,13 @@ class CHostPrototype extends CHostBase {
 				$api_input_rules = self::getInheritedValidationRules();
 			}
 
-			if (!CApiInputValidator::validate($api_input_rules, $host, '/'.($i + 1), $error)) {
+			$path = '/'.($i + 1);
+
+			if (!CApiInputValidator::validate($api_input_rules, $host, $path, $error)) {
 				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 			}
+
+			self::validateGroupPrototypes($host, $db_host, $path.'/groupPrototypes');
 		}
 		unset($host);
 
@@ -668,9 +674,7 @@ class CHostPrototype extends CHostBase {
 			'groupLinks' =>			['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY, 'uniq' => [['groupid']], 'fields' => [
 				'groupid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'groupPrototypes' =>	['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
-				'name' =>				['type' => API_HG_NAME, 'flags' => API_REQUIRED | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('group_prototype', 'name')]
-			]],
+			'groupPrototypes' =>	['type' => API_ANY],
 			'templates' =>			['type' => API_OBJECTS, 'flags' => API_NORMALIZE, 'uniq' => [['templateid']], 'fields' => [
 				'templateid' =>			['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
@@ -784,6 +788,62 @@ class CHostPrototype extends CHostBase {
 			]],
 			['else' => true, 'type' => API_OBJECTS, 'length' => 0]
 		]];
+	}
+
+	/**
+	 * @param bool $is_update
+	 */
+	private static function getGroupPrototypeValidationFields(bool $is_update = false): array {
+		$api_required = $is_update ? 0 : API_REQUIRED;
+
+		return ($is_update ? ['group_prototypeid' =>	['type' => API_ANY]] : []) + [
+			'name' =>	['type' => API_HG_NAME, 'flags' => $api_required | API_REQUIRED_LLD_MACRO, 'length' => DB::getFieldLength('group_prototype', 'name')]
+		];
+	}
+
+	/**
+	 * @param array  $host
+	 * @param array  $db_host
+	 * @param string $path
+	 *
+	 * @throws APIException
+	 */
+	private static function validateGroupPrototypes(array &$host, array $db_host, string $path): void {
+		if (!array_key_exists('groupPrototypes', $host)) {
+			return;
+		}
+
+		foreach ($host['groupPrototypes'] as $i => &$group_prototype) {
+			if (array_key_exists('group_prototypeid', $group_prototype)) {
+				if (!array_key_exists($group_prototype['group_prototypeid'], $db_host['groupPrototypes'])) {
+					self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', $path.'/'.($i + 1),
+						_('object does not exist or belongs to another object')
+					));
+				}
+
+				$db_group_prototype = $db_host['groupPrototypes'][$group_prototype['group_prototypeid']];
+
+				$group_prototype += array_intersect_key($db_group_prototype, array_flip(['name']));
+
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getGroupPrototypeValidationFields(true)];
+			}
+			else {
+				$api_input_rules = ['type' => API_OBJECT, 'fields' => self::getGroupPrototypeValidationFields()];
+			}
+
+			if (!CApiInputValidator::validate($api_input_rules, $group_prototype, $path.'/'.($i + 1), $error)) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+			}
+		}
+		unset($group_prototype);
+
+		$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['name']], 'fields' => [
+			'name' =>	['type' => API_HG_NAME]
+		]];
+
+		if (!CApiInputValidator::validateUniqueness($api_input_rules, $host['groupPrototypes'], $path, $error)) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		}
 	}
 
 	/**
@@ -969,7 +1029,8 @@ class CHostPrototype extends CHostBase {
 		$hostids = [];
 
 		foreach ($hosts as $host) {
-			if (array_key_exists('groupPrototypes', $host)) {
+			if (array_key_exists('groupPrototypes', $host)
+					&& !array_key_exists('groupPrototypes', $db_hosts[$host['hostid']])) {
 				$hostids[] = $host['hostid'];
 				$db_hosts[$host['hostid']]['groupPrototypes'] = [];
 			}
@@ -1252,8 +1313,8 @@ class CHostPrototype extends CHostBase {
 	/**
 	 * Check if host groups links are valid.
 	 *
-	 * @param array $hosts
-	 * @param array $db_hosts
+	 * @param array      $hosts
+	 * @param array|null $db_hosts
 	 *
 	 * @throws APIException
 	 */
@@ -1616,17 +1677,13 @@ class CHostPrototype extends CHostBase {
 				continue;
 			}
 
-			$db_group_prototypes = ($db_hosts !== null)
-				? array_column($db_hosts[$host['hostid']]['groupPrototypes'], null, 'name')
-				: [];
+			$db_group_prototypes = ($db_hosts !== null) ? $db_hosts[$host['hostid']]['groupPrototypes'] : [];
 			$changed = false;
 
 			foreach ($host['groupPrototypes'] as &$group_prototype) {
-				if (array_key_exists($group_prototype['name'], $db_group_prototypes)) {
-					$group_prototype['group_prototypeid'] =
-						$db_group_prototypes[$group_prototype['name']]['group_prototypeid'];
+				if (array_key_exists('group_prototypeid', $group_prototype)) {
 					$upd_group_prototype = DB::getUpdatedValues('group_prototype', $group_prototype,
-						$db_group_prototypes[$group_prototype['name']]
+						$db_group_prototypes[$group_prototype['group_prototypeid']]
 					);
 
 					if ($upd_group_prototype) {
@@ -1637,7 +1694,7 @@ class CHostPrototype extends CHostBase {
 						$changed = true;
 					}
 
-					unset($db_group_prototypes[$group_prototype['name']]);
+					unset($db_group_prototypes[$group_prototype['group_prototypeid']]);
 				}
 				else {
 					$ins_group_prototypes[] = ['hostid' => $host['hostid']] + $group_prototype;
@@ -1647,9 +1704,7 @@ class CHostPrototype extends CHostBase {
 			unset($group_prototype);
 
 			if ($db_group_prototypes) {
-				$del_group_prototypeids = array_merge($del_group_prototypeids,
-					array_column($db_group_prototypes, 'group_prototypeid')
-				);
+				$del_group_prototypeids = array_merge($del_group_prototypeids, array_keys($db_group_prototypes));
 				$changed = true;
 			}
 
@@ -2322,11 +2377,31 @@ class CHostPrototype extends CHostBase {
 		if (array_key_exists('groupPrototypes', $host)) {
 			$inh_host['groupPrototypes'] = [];
 
+			$inh_group_prototypeids = $inh_db_host !== null
+				? array_column($inh_db_host['groupPrototypes'], 'group_prototypeid', 'name')
+				: [];
+
 			foreach ($host['groupPrototypes'] as $group_prototype) {
-				$inh_host['groupPrototypes'][] = [
+				if ($db_host === null) {
+					$name = $group_prototype['name'];
+				}
+				else {
+					$name = array_key_exists($group_prototype['group_prototypeid'], $db_host['groupPrototypes'])
+						? $db_host['groupPrototypes'][$group_prototype['group_prototypeid']]['name']
+						: $group_prototype['name'];
+				}
+
+				$inh_group_prototype = [
 					'name' => $group_prototype['name'],
 					'templateid' => $group_prototype['group_prototypeid']
 				];
+
+				if (array_key_exists($name, $inh_group_prototypeids)) {
+					$inh_group_prototype = ['group_prototypeid' => $inh_group_prototypeids[$name]]
+						+ $inh_group_prototype;
+				}
+
+				$inh_host['groupPrototypes'][] = $inh_group_prototype;
 			}
 		}
 

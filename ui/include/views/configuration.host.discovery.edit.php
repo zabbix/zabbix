@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -778,20 +778,6 @@ $condition_table = (new CTable())
 	->addStyle('width: 100%;')
 	->setHeader([_('Label'), _('Macro'), '', _('Regular expression'), _('Action')]);
 
-$conditions = $data['conditions'];
-
-if (!$conditions) {
-	$conditions = [[
-		'macro' => '',
-		'operator' => CONDITION_OPERATOR_REGEXP,
-		'value' => '',
-		'formulaid' => num2letter(0)
-	]];
-}
-else {
-	$conditions = CConditionHelper::sortConditionsByFormulaId($conditions);
-}
-
 $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_REGEXP => _('matches'),
 	CONDITION_OPERATOR_NOT_REGEXP => _('does not match'),
@@ -799,8 +785,7 @@ $operators = CSelect::createOptionsFromArray([
 	CONDITION_OPERATOR_NOT_EXISTS => _('does not exist')
 ]);
 
-// fields
-foreach ($conditions as $i => $condition) {
+foreach ($data['conditions'] as $i => $condition) {
 	// formula id
 	$formulaid = [
 		new CSpan($condition['formulaid']),

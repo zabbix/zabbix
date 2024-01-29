@@ -27,7 +27,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -42,10 +42,9 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:Describe*",
-              "cloudwatch:Get*",
-              "cloudwatch:List*",
-              "rds:Describe*"
+                "cloudwatch:DescribeAlarms",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -54,7 +53,35 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
-Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+If you are using role-based authorization, set the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
+Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.RDS.INSTANCE.ID}"
+
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -74,6 +101,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
@@ -152,7 +180,7 @@ Additional information about metrics and used API methods:
 |AWS RDS: Failed to get instance data||`length(last(/AWS RDS instance by HTTP/aws.rds.instance_info.check))>0`|Warning||
 |AWS RDS: Failed to get alarms data||`length(last(/AWS RDS instance by HTTP/aws.rds.alarms.check))>0`|Warning||
 |AWS RDS: Failed to get events data||`length(last(/AWS RDS instance by HTTP/aws.rds.events.check))>0`|Warning||
-|AWS RDS: Read replica in error state|<p>The status of a read replica.False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
+|AWS RDS: Read replica in error state|<p>The status of a read replica.<br>False if the instance is in an error state.</p>|`last(/AWS RDS instance by HTTP/aws.rds.read_replica_state)=0`|Average||
 |AWS RDS: Burst balance is too low||`max(/AWS RDS instance by HTTP/aws.rds.burst_balance,5m)<{$AWS.RDS.BURST.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS RDS: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS RDS instance by HTTP/aws.rds.cpu.utilization,15m)>{$AWS.RDS.CPU.UTIL.WARN.MAX}`|Warning||
 |AWS RDS: Instance CPU Credit balance is too low|<p>The number of earned CPU credits has been less than {$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN} in the last 5 minutes.</p>|`max(/AWS RDS instance by HTTP/aws.rds.cpu.credit_balance,5m)<{$AWS.RDS.CPU.CREDIT.BALANCE.MIN.WARN}`|Warning||
@@ -176,7 +204,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS RDS Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS RDS Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS RDS instance by HTTP/aws.rds.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS RDS Alarms: "{#ALARM_NAME}" has 'Insufficient data' state||`last(/AWS RDS instance by HTTP/aws.rds.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Aurora metrics discovery

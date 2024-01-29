@@ -17,7 +17,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -128,10 +128,10 @@ Don't forget to change macros {$JENKINS.URL}.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Jenkins: Disk space is too low|<p>Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0`|Warning||
-|Jenkins: One or more Jenkins plugins failed to start|<p>A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0`|Info|**Manual close**: Yes|
-|Jenkins: Temporary space is too low|<p>Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0`|Warning||
-|Jenkins: There are deadlocked threads in Jenkins master JVM|<p>There are any deadlocked threads in the Jenkins master JVM.Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p>|`last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0`|Warning||
+|Jenkins: Disk space is too low|<p>Jenkins disk space monitors are reporting the disk space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.disk_space)=0 and length(last(/Jenkins by HTTP/jenkins.disk_space.message))>0`|Warning||
+|Jenkins: One or more Jenkins plugins failed to start|<p>A failure is typically indicative of a potential issue within the Jenkins installation that will either be solved by explicitly disabling the failing plugin(s) or by resolving the corresponding plugin dependency issues.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.plugins)=0 and length(last(/Jenkins by HTTP/jenkins.plugins.message))>0`|Info|**Manual close**: Yes|
+|Jenkins: Temporary space is too low|<p>Jenkins temporary space monitors are reporting the temporary space as less than the configured threshold. The message will reference the first node which fails this check.<br>Health check message: {{ITEM.LASTVALUE2}.regsub("(.*)",\1)}</p>|`last(/Jenkins by HTTP/jenkins.temporary_space)=0 and length(last(/Jenkins by HTTP/jenkins.temporary_space.message))>0`|Warning||
+|Jenkins: There are deadlocked threads in Jenkins master JVM|<p>There are any deadlocked threads in the Jenkins master JVM.<br>Health check message: {{ITEM.LASTVALUE2}.regsub('(.*)',\1)}</p>|`last(/Jenkins by HTTP/jenkins.thread_deadlock)=0 and length(last(/Jenkins by HTTP/jenkins.thread_deadlock.message))>0`|Warning||
 |Jenkins: Service has no online nodes||`last(/Jenkins by HTTP/jenkins.node.online)=0`|Average||
 |Jenkins: Version has changed|<p>The Jenkins version has changed. Acknowledge to close the problem manually.</p>|`last(/Jenkins by HTTP/jenkins.version,#1)<>last(/Jenkins by HTTP/jenkins.version,#2) and length(last(/Jenkins by HTTP/jenkins.version))>0`|Info|**Manual close**: Yes|
 |Jenkins: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Jenkins by HTTP/jenkins.system.uptime)<10m`|Info|**Manual close**: Yes|

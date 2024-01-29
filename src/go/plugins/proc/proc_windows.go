@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@ import (
 	"syscall"
 	"unsafe"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"golang.org/x/sys/windows"
 	"zabbix.com/pkg/win32"
@@ -38,6 +39,17 @@ type Plugin struct {
 }
 
 var impl Plugin
+
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Proc",
+		"proc.num", "The number of processes.",
+		"proc_info", "Various information about specific process(es).",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func getProcessUsername(pid uint32) (result string, err error) {
 	h, err := syscall.OpenProcess(windows.PROCESS_QUERY_LIMITED_INFORMATION, false, pid)
@@ -336,11 +348,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Proc",
-		"proc.num", "The number of processes.",
-		"proc_info", "Various information about specific process(es).",
-	)
 }

@@ -41,10 +41,8 @@
 AC_DEFUN([AX_LIB_SQLITE3],
 [
     AC_ARG_WITH([sqlite3],
-        AC_HELP_STRING(
-            [--with-sqlite3@<:@=ARG@:>@],
-            [use SQLite 3 library @<:@default=no@:>@, optionally specify the prefix for sqlite3 library]
-        ),
+        AS_HELP_STRING([--with-sqlite3@<:@=ARG@:>@],[use SQLite 3 library @<:@default=no@:>@, optionally specify the prefix for sqlite3 library
+        ]),
         [
         if test "$withval" = "no"; then
             want_sqlite3="no"

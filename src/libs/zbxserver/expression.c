@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2695,6 +2695,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 		raw_value = 0;
 		pos = token.loc.l;
 		inner_token = token;
+		ret = SUCCEED;
 
 		switch (token.type)
 		{
@@ -2727,7 +2728,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 					/* Ignore functions with macros not supporting them, but do not skip the */
 					/* whole token, nested macro should be resolved in this case. */
 					pos++;
-					continue;
+					ret = FAIL;
 				}
 				break;
 			case ZBX_TOKEN_USER_MACRO:
@@ -2749,7 +2750,8 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				continue;
 		}
 
-		ret = SUCCEED;
+		if (SUCCEED == ret)
+		{
 
 		if (0 != (macro_type & (MACRO_TYPE_MESSAGE_NORMAL | MACRO_TYPE_MESSAGE_RECOVERY |
 				MACRO_TYPE_MESSAGE_UPDATE |
@@ -2780,7 +2782,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 
 					pos = token.loc.r;
 				}
-				else if (ZBX_TOKEN_EXPRESSION_MACRO == token.type)
+				else if (ZBX_TOKEN_EXPRESSION_MACRO == inner_token.type)
 				{
 					zbx_timespec_t	ts;
 					char		*errmsg = NULL;
@@ -4708,6 +4710,7 @@ static int	substitute_simple_macros_impl(const zbx_uint64_t *actionid, const DB_
 				res = FAIL;
 			}
 		}
+		}
 
 		if (FAIL == ret)
 		{
@@ -6254,7 +6257,7 @@ int	substitute_function_lld_param(const char *e, size_t len, unsigned char key_i
 		size_t	param_pos, param_len, rel_len = len - (p - e);
 		int	quoted;
 
-		zbx_function_param_parse(p, &param_pos, &param_len, &sep_pos);
+		zbx_lld_trigger_function_param_parse(p, &param_pos, &param_len, &sep_pos);
 
 		/* copy what was before the parameter */
 		zbx_strncpy_alloc(exp, exp_alloc, exp_offset, p, param_pos);
@@ -6577,7 +6580,11 @@ exit:
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error(void *user_data, const xmlError *err)
+#endif
 {
 	zbx_libxml_error_t	*err_ctx;
 

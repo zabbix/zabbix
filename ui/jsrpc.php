@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -666,6 +666,7 @@ switch ($data['method']) {
 					'search' => ['name' => $search.($wildcard_enabled ? '*' : '')],
 					'searchWildcardsEnabled' => $wildcard_enabled,
 					'preservekeys' => true,
+					'sortfield' => 'name',
 					'limit' => $limit
 				];
 
@@ -680,6 +681,7 @@ switch ($data['method']) {
 					'filter' => array_key_exists('filter', $data) ? $data['filter'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'webitems' => array_key_exists('webitems', $data) ? $data['webitems'] : null,
+					'sortfield' => 'name',
 					'limit' => $limit
 				];
 
@@ -693,6 +695,7 @@ switch ($data['method']) {
 					'hostids' => array_key_exists('hostid', $data) ? $data['hostid'] : null,
 					'templated' => array_key_exists('real_hosts', $data) ? false : null,
 					'searchWildcardsEnabled' => $wildcard_enabled,
+					'sortfield' => 'name',
 					'limit' => $limit
 				];
 

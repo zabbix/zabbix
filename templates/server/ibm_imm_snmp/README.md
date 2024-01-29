@@ -37,7 +37,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -66,7 +66,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|IBM IMM: Overall system health status|<p>MIB: IMM-MIB</p><p>Indicates status of system health for the system in which the IMM resides. Value of 'nonRecoverable' indicates a severe error has occurred and the system may not be functioning. A value of 'critical' indicates that a error has occurred but the system is currently functioning properly. A value of 'nonCritical' indicates that a condition has occurred that may change the state of the system in the future but currently the system is working properly. A value of 'normal' indicates that the system is operating normally.</p>|SNMP agent|system.status[systemHealthStat.0]|
+|IBM IMM: Overall system health status|<p>MIB: IMM-MIB</p><p>Indicates status of system health for the system in which the IMM resides. Value of 'nonRecoverable' indicates a severe error has occurred and the system may not be functioning. A value of 'critical' indicates that an error has occurred but the system is currently functioning properly. A value of 'nonCritical' indicates that a condition has occurred that may change the state of the system in the future but currently the system is working properly. A value of 'normal' indicates that the system is operating normally.</p>|SNMP agent|system.status[systemHealthStat.0]|
 |IBM IMM: Hardware model name|<p>MIB: IMM-MIB</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |IBM IMM: Hardware serial number|<p>MIB: IMM-MIB</p><p>Machine serial number VPD information</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |IBM IMM: Uptime (network)|<p>MIB: SNMPv2-MIB</p><p>The time (in hundredths of a second) since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.net.uptime[sysUpTime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
@@ -186,7 +186,7 @@ Refer to the vendor documentation.
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |{#FAN_DESCR}: Fan status|<p>MIB: IMM-MIB</p><p>A description of the fan component status.</p>|SNMP agent|sensor.fan.status[fanHealthStatus.{#SNMPINDEX}]|
-|{#FAN_DESCR}: Fan speed, %|<p>MIB: IMM-MIB</p><p>Fan speed expressed in percent(%) of maximum RPM.</p><p>An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.</p><p>If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.</p>|SNMP agent|sensor.fan.speed.percentage[fanSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `(\d{1,3}) *%( of maximum)? \1`</p></li></ul>|
+|{#FAN_DESCR}: Fan speed, %|<p>MIB: IMM-MIB</p><p>Fan speed expressed in percent(%) of maximum RPM.</p><p>An octet string expressed as 'ddd% of maximum' where:d is a decimal digit or blank space for a leading zero.</p><p>If the fan is determined not to be running or the fan speed cannot be determined, the string will indicate 'Offline'.</p>|SNMP agent|sensor.fan.speed.percentage[fanSpeed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Regular expression: `(\d{1,3}) *%( of maximum)? \1`</p></li></ul>|
 
 ### Trigger prototypes for FAN Discovery
 

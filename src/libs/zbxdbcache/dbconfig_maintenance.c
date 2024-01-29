@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1473,6 +1473,14 @@ int	zbx_dc_get_event_maintenances(zbx_vector_ptr_t *event_queries, const zbx_vec
 			if (NULL == (trigger = (ZBX_DC_TRIGGER *)zbx_hashset_search(&config->triggers,
 					&query->triggerid)))
 			{
+				continue;
+			}
+
+			if (ZBX_FLAG_DISCOVERY_PROTOTYPE == trigger->flags)
+			{
+				zabbix_log(LOG_LEVEL_CRIT, "cannot process event for trigger prototype"
+						" (triggerid:" ZBX_FS_UI64 ")", trigger->triggerid);
+				THIS_SHOULD_NEVER_HAPPEN;
 				continue;
 			}
 

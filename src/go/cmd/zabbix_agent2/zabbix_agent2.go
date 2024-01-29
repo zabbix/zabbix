@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,19 +23,21 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
-
-	_ "zabbix.com/plugins"
 
 	"git.zabbix.com/ap/plugin-support/conf"
 	"git.zabbix.com/ap/plugin-support/log"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
+	"git.zabbix.com/ap/plugin-support/zbxerr"
+	"git.zabbix.com/ap/plugin-support/zbxflag"
 	"zabbix.com/internal/agent"
 	"zabbix.com/internal/agent/keyaccess"
-	"zabbix.com/internal/agent/remotecontrol"
 	"zabbix.com/internal/agent/resultcache"
+	"zabbix.com/internal/agent/runtimecontrol"
 	"zabbix.com/internal/agent/scheduler"
 	"zabbix.com/internal/agent/serverconnector"
 	"zabbix.com/internal/agent/serverlistener"
@@ -45,21 +47,70 @@ import (
 	"zabbix.com/pkg/tls"
 	"zabbix.com/pkg/version"
 	"zabbix.com/pkg/zbxlib"
+	_ "zabbix.com/plugins"
+)
+
+const runtimeCommandSendingTimeout = time.Second
+
+const runtimeControlHelpMessageFormat = //
+`Perform administrative functions (%s timeout)
+
+    Runtime control interface, available commands:
+      help                   list available commands
+      log_level_increase     Increase log level
+      log_level_decrease     Decrease log level
+      userparameter_reload   Reload user parameters
+      metrics                List available metrics
+      version                Display Agent version
+`
+
+const usageMessageFormat = //
+`Usage of Zabbix agent 2:
+  %[1]s [-c config-file]
+  %[1]s [-c config-file] [-v] -p
+  %[1]s [-c config-file] [-v] -t item-key
+  %[1]s [-c config-file] -R runtime-option
+  %[1]s -h
+  %[1]s -V
+`
+
+const helpMessageFormat = //
+`A Zabbix daemon for monitoring of various server parameters.
+
+Options:
+%[1]s
+
+Example: zabbix_agent2 -c %[2]s
+
+Report bugs to: <https://support.zabbix.com>
+Zabbix home page: <https://www.zabbix.com>
+Documentation: <https://www.zabbix.com/documentation>
+`
+
+var (
+	manager          *scheduler.Manager
+	listeners        []*serverlistener.ServerListener
+	serverConnectors []*serverconnector.Connector
+	closeChan        = make(chan bool)
 )
 
 type AgentUserParamOption struct {
 	UserParameter []string `conf:"optional"`
 }
 
-const remoteCommandSendingTimeout = time.Second
+// Arguments contains values of command line arguments.
+type Arguments struct {
+	configPath     string
+	foreground     bool
+	test           string
+	print          bool
+	verbose        bool
+	version        bool
+	runtimeCommand string
+	help           bool
+}
 
-var manager *scheduler.Manager
-var listeners []*serverlistener.ServerListener
-var serverConnectors []*serverconnector.Connector
-var closeChan = make(chan bool)
-var stopChan = make(chan bool)
-
-func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
+func processLoglevelIncreaseCommand(c *runtimecontrol.Client) (err error) {
 	if log.IncreaseLogLevel() {
 		message := fmt.Sprintf("Increased log level to %s", log.Level())
 		log.Infof(message)
@@ -72,7 +123,7 @@ func processLoglevelIncreaseCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-func processLoglevelDecreaseCommand(c *remotecontrol.Client) (err error) {
+func processLoglevelDecreaseCommand(c *runtimecontrol.Client) (err error) {
 	if log.DecreaseLogLevel() {
 		message := fmt.Sprintf("Decreased log level to %s", log.Level())
 		log.Infof(message)
@@ -85,17 +136,17 @@ func processLoglevelDecreaseCommand(c *remotecontrol.Client) (err error) {
 	return
 }
 
-func processMetricsCommand(c *remotecontrol.Client) (err error) {
+func processMetricsCommand(c *runtimecontrol.Client) (err error) {
 	data := manager.Query("metrics")
 	return c.Reply(data)
 }
 
-func processVersionCommand(c *remotecontrol.Client) (err error) {
+func processVersionCommand(c *runtimecontrol.Client) (err error) {
 	data := version.Long()
 	return c.Reply(data)
 }
 
-func processHelpCommand(c *remotecontrol.Client) (err error) {
+func processHelpCommand(c *runtimecontrol.Client) (err error) {
 	help := `Remote control interface, available commands:
 	log_level_increase - Increase log level
 	log_level_decrease - Decrease log level
@@ -106,31 +157,39 @@ func processHelpCommand(c *remotecontrol.Client) (err error) {
 	return c.Reply(help)
 }
 
-func processUserParamReloadCommand(c *remotecontrol.Client) (err error) {
+func processUserParamReloadCommand(c *runtimecontrol.Client) error {
 	var userparams AgentUserParamOption
 
-	if err = conf.LoadUserParams(&userparams); err != nil {
-		err = fmt.Errorf("Cannot load user parameters: %s", err)
+	err := conf.LoadUserParams(&userparams)
+	if err != nil {
+		err = fmt.Errorf("Cannot load user parameters: %s", err.Error())
 		log.Infof(err.Error())
-		return
+
+		return err
 	}
 
 	agent.Options.UserParameter = userparams.UserParameter
 
-	if res := manager.QueryUserParams(); res != "ok" {
-		err = fmt.Errorf("Failed to reload user parameters: %s", res)
+	status := manager.QueryUserParams()
+	if status != "ok" {
+		err := fmt.Errorf("Failed to reload user parameters: %s", status)
 		log.Infof(err.Error())
-		return
+
+		return err
 	}
 
 	message := "User parameters reloaded"
 	log.Infof(message)
-	err = c.Reply(message)
 
-	return
+	err = c.Reply(message)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
-func processRemoteCommand(c *remotecontrol.Client) (err error) {
+func processRemoteCommand(c *runtimecontrol.Client) (err error) {
 	params := strings.Fields(c.Request())
 	switch len(params) {
 	case 0:
@@ -161,26 +220,30 @@ func processRemoteCommand(c *remotecontrol.Client) (err error) {
 
 var pidFile *pidfile.File
 
-func run() (err error) {
+func run() error {
 	sigs := createSigsChan()
 
-	var control *remotecontrol.Conn
-	if control, err = remotecontrol.New(agent.Options.ControlSocket, remoteCommandSendingTimeout); err != nil {
-		return
+	control, err := runtimecontrol.New(agent.Options.ControlSocket, runtimeCommandSendingTimeout)
+	if err != nil {
+		return err
 	}
+
 	confirmService()
 	control.Start()
 
-loop:
+	defer control.Stop()
+
 	for {
 		select {
 		case sig := <-sigs:
 			if !handleSig(sig) {
-				break loop
+				return nil
 			}
 		case client := <-control.Client():
-			if rerr := processRemoteCommand(client); rerr != nil {
-				if rerr = client.Reply("error: " + rerr.Error()); rerr != nil {
+			err := processRemoteCommand(client)
+			if err != nil {
+				rerr := client.Reply(fmt.Sprintf("error: %s", err.Error()))
+				if rerr != nil {
 					log.Warningf("cannot reply to remote command: %s", rerr)
 				}
 			}
@@ -188,12 +251,10 @@ loop:
 			client.Close()
 		case serviceStop := <-closeChan:
 			if serviceStop {
-				break loop
+				return nil
 			}
 		}
 	}
-	control.Stop()
-	return nil
 }
 
 var (
@@ -211,81 +272,26 @@ var (
 func main() {
 	version.Init(applicationName, tls.CopyrightMessage(), copyrightMessageMQTT(), copyrightMessageModbus())
 
-	var confFlag string
-	const (
-		confDescription = "Path to the configuration file"
-	)
-	flag.StringVar(&confFlag, "config", confDefault, confDescription)
-	flag.StringVar(&confFlag, "c", confDefault, confDescription+" (shorthand)")
+	flagsUsage, fs, args, err := parseArgs()
+	if err != nil {
+		// parseArgs prints usage message on parse error,
+		// safe to allways exit 1.
+		os.Exit(1)
+	}
 
-	var foregroundFlag bool
-	const (
-		foregroundDefault     = true
-		foregroundDescription = "Run Zabbix agent in foreground"
-	)
-	flag.BoolVar(&foregroundFlag, "foreground", foregroundDefault, foregroundDescription)
-	flag.BoolVar(&foregroundFlag, "f", foregroundDefault, foregroundDescription+" (shorthand)")
+	if args.help {
+		fmt.Print(helpMessage(flagsUsage))
 
-	var testFlag string
-	const (
-		testDefault     = ""
-		testDescription = "Test specified item and exit"
-	)
-	flag.StringVar(&testFlag, "test", testDefault, testDescription)
-	flag.StringVar(&testFlag, "t", testDefault, testDescription+" (shorthand)")
-
-	var printFlag bool
-	const (
-		printDefault     = false
-		printDescription = "Print known items and exit"
-	)
-	flag.BoolVar(&printFlag, "print", printDefault, printDescription)
-	flag.BoolVar(&printFlag, "p", printDefault, printDescription+" (shorthand)")
-
-	var verboseFlag bool
-	const (
-		verboseDefault     = false
-		verboseDescription = "Enable verbose output for metric testing or printing"
-	)
-	flag.BoolVar(&verboseFlag, "verbose", verboseDefault, verboseDescription)
-	flag.BoolVar(&verboseFlag, "v", verboseDefault, verboseDescription+" (shorthand)")
-
-	var versionFlag bool
-	const (
-		versionDefault     = false
-		versionDescription = "Print program version and exit"
-	)
-	flag.BoolVar(&versionFlag, "version", versionDefault, versionDescription)
-	flag.BoolVar(&versionFlag, "V", versionDefault, versionDescription+" (shorthand)")
-
-	var remoteCommand string
-	const remoteDefault = ""
-	var remoteDescription = "Perform administrative functions (send 'help' for available commands) " +
-		"(" + remoteCommandSendingTimeout.String() + " timeout)"
-	flag.StringVar(&remoteCommand, "R", remoteDefault, remoteDescription)
-
-	var helpFlag bool
-	const (
-		helpDefault     = false
-		helpDescription = "Display this help message"
-	)
-	flag.BoolVar(&helpFlag, "help", helpDefault, helpDescription)
-	flag.BoolVar(&helpFlag, "h", helpDefault, helpDescription+" (shorthand)")
-
-	loadOSDependentFlags()
-	flag.Parse()
-	setServiceRun(foregroundFlag)
-
-	if helpFlag {
-		flag.Usage()
 		os.Exit(0)
 	}
+
+	setServiceRun(args.foreground)
 
 	var argConfig, argTest, argPrint, argVersion, argVerbose bool
 
 	// Need to manually check if the flag was specified, as default flag package
 	// does not offer automatic detection. Consider using third party package.
-	flag.Visit(func(f *flag.Flag) {
+	fs.Visit(func(f *flag.Flag) {
 		switch f.Name {
 		case "c", "config":
 			argConfig = true
@@ -305,8 +311,8 @@ func main() {
 		os.Exit(0)
 	}
 
-	var err error
-	if err = openEventLog(); err != nil {
+	err = openEventLog()
+	if err != nil {
 		fatalExit("", err)
 	}
 
@@ -317,7 +323,7 @@ func main() {
 		fatalExit("", err)
 	}
 
-	if err = conf.Load(confFlag, &agent.Options); err != nil {
+	if err = conf.Load(args.configPath, &agent.Options); err != nil {
 		if argConfig || !(argTest || argPrint) {
 			if eerr := eventLogErr(err); eerr != nil {
 				err = fmt.Errorf("%s and %s", err, eerr)
@@ -337,7 +343,7 @@ func main() {
 		fatalExit("cannot validate configuration", err)
 	}
 
-	if err = handleWindowsService(confFlag); err != nil {
+	if err = handleWindowsService(args.configPath); err != nil {
 		if eerr := eventLogErr(err); eerr != nil {
 			err = fmt.Errorf("%s and %s", err, eerr)
 		}
@@ -348,18 +354,21 @@ func main() {
 		fatalExit("cannot initialize logger", err)
 	}
 
-	if remoteCommand != "" {
+	if args.runtimeCommand != "" {
 		if agent.Options.ControlSocket == "" {
 			log.Errf("Cannot send remote command: ControlSocket configuration parameter is not defined")
 			os.Exit(0)
 		}
 
-		if reply, err := remotecontrol.SendCommand(agent.Options.ControlSocket, remoteCommand,
-			remoteCommandSendingTimeout); err != nil {
+		reply, err := runtimecontrol.SendCommand(
+			agent.Options.ControlSocket, args.runtimeCommand, runtimeCommandSendingTimeout,
+		)
+		if err != nil {
 			log.Errf("Cannot send remote command: %s", err)
-		} else {
-			log.Infof(reply)
+			os.Exit(1)
 		}
+
+		log.Infof(reply)
 		os.Exit(0)
 	}
 
@@ -411,7 +420,7 @@ func main() {
 		agent.SetPerformTask(scheduler.Scheduler(m).PerformTask)
 
 		if argTest {
-			checkMetric(m, testFlag)
+			checkMetric(m, args.test)
 		} else {
 			checkMetrics(m)
 		}
@@ -480,9 +489,10 @@ func main() {
 	if pidFile, err = pidfile.New(agent.Options.PidFile); err != nil {
 		fatalExit("cannot initialize PID file", err)
 	}
+
 	defer pidFile.Delete()
 
-	log.Infof("using configuration file: %s", confFlag)
+	log.Infof("using configuration file: %s", args.configPath)
 
 	if err = keyaccess.LoadRules(agent.Options.AllowKey, agent.Options.DenyKey); err != nil {
 		fatalExit("Failed to load key access rules", err)
@@ -513,7 +523,7 @@ func main() {
 		fatalExit("cannot load os dependent items", err)
 	}
 
-	if foregroundFlag {
+	if args.foreground {
 		if agent.Options.LogType != "console" {
 			fmt.Println(greeting)
 		}
@@ -532,7 +542,7 @@ func main() {
 	agent.FirstHostname = hostnames[0]
 	hostmessage := fmt.Sprintf("Zabbix Agent2 hostname: [%s]", agent.Options.Hostname)
 	log.Infof(hostmessage)
-	if foregroundFlag {
+	if args.foreground {
 		if agent.Options.LogType != "console" {
 			fmt.Println(hostmessage)
 		}
@@ -555,23 +565,24 @@ func main() {
 			idx++
 		}
 	}
+
 	agent.SetPerformTask(manager.PerformTask)
 
 	for _, listener := range listeners {
-		if err = listener.Start(); err != nil {
+		err = listener.Start()
+		if err != nil {
 			fatalExit("cannot start server listener", err)
 		}
 	}
 
 	if agent.Options.StatusPort != 0 {
-		if err = statuslistener.Start(manager, confFlag); err != nil {
+		err = statuslistener.Start(manager, args.configPath)
+		if err != nil {
 			fatalExit("cannot start HTTP listener", err)
 		}
 	}
 
-	if err == nil {
-		err = run()
-	}
+	err = run()
 	if err != nil {
 		log.Errf("cannot start agent: %s", err.Error())
 	}
@@ -601,11 +612,132 @@ func main() {
 	farewell := fmt.Sprintf("Zabbix Agent 2 stopped. (%s)", version.Long())
 	log.Infof(farewell)
 
-	if foregroundFlag && agent.Options.LogType != "console" {
+	if args.foreground && agent.Options.LogType != "console" {
 		fmt.Println(farewell)
 	}
 
 	waitServiceClose()
+}
+
+func parseArgs() (string, *flag.FlagSet, *Arguments, error) {
+	fs := flag.NewFlagSet("", flag.ContinueOnError)
+	fs.SetOutput(io.Discard)
+	// set to empty cause lib triggers Usage func on --help/-h and invalid
+	// flags error, we want to handle these cases manually
+	fs.Usage = func() {}
+
+	args := &Arguments{}
+
+	f := zbxflag.Flags{
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "config",
+				Shorthand: "c",
+				Description: fmt.Sprintf(
+					"Path to the configuration file (default: %q)", confDefault,
+				),
+			},
+			Default: confDefault,
+			Dest:    &args.configPath,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "foreground",
+				Shorthand:   "f",
+				Description: "Run Zabbix agent in foreground",
+			},
+			Default: true,
+			Dest:    &args.foreground,
+		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:        "test",
+				Shorthand:   "t",
+				Description: "Test specified item and exit",
+			},
+			Default: "",
+			Dest:    &args.test,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "print",
+				Shorthand:   "p",
+				Description: "Print known items and exit",
+			},
+			Default: false,
+			Dest:    &args.print,
+		},
+		&zbxflag.StringFlag{
+			Flag: zbxflag.Flag{
+				Name:      "runtime-control",
+				Shorthand: "R",
+				Description: fmt.Sprintf(
+					runtimeControlHelpMessageFormat,
+					runtimeCommandSendingTimeout.String(),
+				),
+			},
+			Default: "",
+			Dest:    &args.runtimeCommand,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "verbose",
+				Shorthand:   "v",
+				Description: "Enable verbose output for metric testing or printing",
+			},
+			Default: false,
+			Dest:    &args.verbose,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "help",
+				Shorthand:   "h",
+				Description: "Display this help message",
+			},
+			Default: false,
+			Dest:    &args.help,
+		},
+		&zbxflag.BoolFlag{
+			Flag: zbxflag.Flag{
+				Name:        "version",
+				Shorthand:   "V",
+				Description: "Print program version and exit",
+			},
+			Default: false,
+			Dest:    &args.version,
+		},
+		osDependentFlags(),
+	}
+
+	f.Register(fs)
+
+	err := fs.Parse(os.Args[1:])
+	if err != nil {
+		fmt.Printf("failed to parse flags: %s\n%s", err.Error(), usageMessage())
+
+		return "", nil, nil, zbxerr.ErrorOSExitZero
+	}
+
+	return f.Usage(), fs, args, nil
+}
+
+func usageMessage() string {
+	return fmt.Sprintf(
+		usageMessageFormat,
+		filepath.Base(os.Args[0]),
+	)
+}
+
+func helpMessage(flagsUsage string) string {
+	return fmt.Sprintf(
+		"%s\n%s",
+		usageMessage(),
+		fmt.Sprintf(
+			helpMessageFormat,
+			flagsUsage,
+			usageMessageExampleConfPath,
+		),
+	)
 }
 
 func fatalExit(message string, err error) {

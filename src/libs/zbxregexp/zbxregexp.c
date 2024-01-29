@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,11 +38,16 @@
 #endif
 
 #ifdef HAVE_PCRE2_H
-#define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
-#ifdef PCRE2_NO_AUTO_CAPTURE
-#define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
-#endif
-#define ZBX_REGEXP_CASELESS PCRE2_CASELESS
+#	define ZBX_REGEXP_MULTILINE PCRE2_MULTILINE
+#	ifdef PCRE2_NO_AUTO_CAPTURE
+#		define ZBX_REGEXP_NO_AUTO_CAPTURE PCRE2_NO_AUTO_CAPTURE
+#	endif
+#	define ZBX_REGEXP_CASELESS PCRE2_CASELESS
+#	ifdef PCRE2_MATCH_INVALID_UTF
+#		define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_MATCH_INVALID_UTF | PCRE2_UTF)
+#	else
+#		define ZBX_REGEXP_COMPILE_FLAGS	(PCRE2_UTF)
+#	endif
 #endif
 
 struct zbx_regexp
@@ -181,8 +186,8 @@ static int	regexp_compile(const char *pattern, int flags, zbx_regexp_t **regexp,
 #ifdef HAVE_PCRE2_H
 	*err_msg = NULL;
 
-	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED, PCRE2_UTF | flags,
-			&error, &error_offset, NULL)))
+	if (NULL == (pcre2_regexp = pcre2_compile((PCRE2_SPTR)pattern, PCRE2_ZERO_TERMINATED,
+			ZBX_REGEXP_COMPILE_FLAGS | flags, &error, &error_offset, NULL)))
 	{
 		*err_msg = decode_pcre2_compile_error(error, error_offset, flags);
 		return FAIL;
@@ -399,7 +404,9 @@ static int	regexp_exec(const char *string, const zbx_regexp_t *regexp, int flags
 	}
 	else
 	{
+#ifdef PCRE2_MATCH_INVALID_UTF
 		flags |= PCRE2_NO_UTF_CHECK;
+#endif
 
 		if (0 <= (r = pcre2_match(regexp->pcre2_regexp, (PCRE2_SPTR)string, PCRE2_ZERO_TERMINATED, 0, flags,
 			match_data, regexp->match_ctx)))

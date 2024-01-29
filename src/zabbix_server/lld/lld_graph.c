@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1055,9 +1055,9 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		zbx_db_insert_prepare(&db_insert, "graphs", "graphid", "name", "width", "height", "yaxismin",
 				"yaxismax", "show_work_period", "show_triggers", "graphtype", "show_legend", "show_3d",
 				"percent_left", "percent_right", "ymin_type", "ymin_itemid", "ymax_type",
-				"ymax_itemid", "flags", NULL);
+				"ymax_itemid", "flags", (char *)NULL);
 
-		zbx_db_insert_prepare(&db_insert_gdiscovery, "graph_discovery", "graphid", "parent_graphid", NULL);
+		zbx_db_insert_prepare(&db_insert_gdiscovery, "graph_discovery", "graphid", "parent_graphid", (char *)NULL);
 	}
 
 	if (0 != new_gitems)
@@ -1065,7 +1065,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		gitemid = DBget_maxid_num("graphs_items", new_gitems);
 
 		zbx_db_insert_prepare(&db_insert_gitems, "graphs_items", "gitemid", "graphid", "itemid", "drawtype",
-				"sortorder", "color", "yaxisside", "calc_fnc", "type", NULL);
+				"sortorder", "color", "yaxisside", "calc_fnc", "type", (char *)NULL);
 	}
 
 	if (0 != upd_graphs || 0 != upd_gitems.values_num || 0 != del_gitemids.values_num)

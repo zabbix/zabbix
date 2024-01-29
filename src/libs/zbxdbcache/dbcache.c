@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -386,7 +386,7 @@ static void	dc_insert_trends_in_db(ZBX_DC_TREND *trends, int trends_num, unsigne
 	zbx_db_insert_t	db_insert;
 
 	zbx_db_insert_prepare(&db_insert, table_name, "itemid", "clock", "num", "value_min", "value_avg",
-			"value_max", NULL);
+			"value_max", (char *)NULL);
 
 	for (i = 0; i < trends_num; i++)
 	{
@@ -451,7 +451,7 @@ static void	dc_remove_updated_trends(ZBX_DC_TREND *trends, int trends_num, const
 	{
 		sql_offset = 0;
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-				"select distinct itemid"
+				"select itemid"
 				" from %s"
 				" where clock>=%d and",
 				table_name, clocks[j]);
@@ -2357,7 +2357,7 @@ static void	dc_add_proxy_history(ZBX_DC_HISTORY *history, int history_num)
 
 	now = (int)time(NULL);
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "flags", "write_clock",
-			NULL);
+			(char *)NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2423,7 +2423,7 @@ static void	dc_add_proxy_history_meta(ZBX_DC_HISTORY *history, int history_num)
 
 	now = (int)time(NULL);
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "lastlogsize", "mtime",
-			"flags", "write_clock", NULL);
+			"flags", "write_clock", (char *)NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2492,7 +2492,7 @@ static void	dc_add_proxy_history_log(ZBX_DC_HISTORY *history, int history_num)
 
 	/* see hc_copy_history_data() for fields that might be uninitialized and need special handling here */
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "timestamp", "source", "severity",
-			"value", "logeventid", "lastlogsize", "mtime", "flags", "write_clock", NULL);
+			"value", "logeventid", "lastlogsize", "mtime", "flags", "write_clock", (char *)NULL);
 
 	for (i = 0; i < history_num; i++)
 	{
@@ -2556,7 +2556,7 @@ static void	dc_add_proxy_history_notsupported(ZBX_DC_HISTORY *history, int histo
 
 	now = (int)time(NULL);
 	zbx_db_insert_prepare(&db_insert, "proxy_history", "itemid", "clock", "ns", "value", "state", "write_clock",
-			NULL);
+			(char *)NULL);
 
 	for (i = 0; i < history_num; i++)
 	{

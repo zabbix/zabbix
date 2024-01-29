@@ -1,6 +1,6 @@
 --
 -- Zabbix
--- Copyright (C) 2001-2023 Zabbix SIA
+-- Copyright (C) 2001-2024 Zabbix SIA
 --
 -- This program is free software; you can redistribute it and/or modify
 -- it under the terms of the GNU General Public License as published by
@@ -48,6 +48,7 @@ FIELD		|rows_per_page	|t_integer	|50	|NOT NULL	|0
 FIELD		|timezone	|t_varchar(50)	|'default'|NOT NULL	|ZBX_NODATA
 FIELD		|roleid		|t_id		|	|NOT NULL	|0			|1|role
 UNIQUE		|1		|username
+INDEX		|3		|roleid
 
 TABLE|maintenances|maintenanceid|ZBX_DATA
 FIELD		|maintenanceid	|t_id		|	|NOT NULL	|0
@@ -96,6 +97,7 @@ INDEX		|3		|proxy_hostid
 INDEX		|4		|name
 INDEX		|5		|maintenanceid
 INDEX		|6		|name_upper
+INDEX		|7		|templateid
 UPD_TRIG_FUNC	|name		|name_upper	|hostid	|upper
 
 TABLE|hstgrp|groupid|ZBX_DATA
@@ -113,6 +115,8 @@ FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|0
 FIELD		|groupid	|t_id		|	|NULL		|0			|2|hstgrp	|		|RESTRICT
 FIELD		|templateid	|t_id		|	|NULL		|0			|3|group_prototype|group_prototypeid
 INDEX		|1		|hostid
+INDEX		|2		|groupid
+INDEX		|3		|templateid
 
 TABLE|group_discovery|groupid|ZBX_TEMPLATE
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|1|hstgrp
@@ -120,6 +124,7 @@ FIELD		|parent_group_prototypeid|t_id	|	|NOT NULL	|0			|2|group_prototype|group_
 FIELD		|name		|t_varchar(255)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+INDEX		|1		|parent_group_prototypeid
 
 TABLE|drules|druleid|ZBX_DATA
 FIELD		|druleid	|t_id		|	|NOT NULL	|0
@@ -833,6 +838,7 @@ FIELD		|show_suppressed|t_integer	|'0'	|NOT NULL	|0
 UNIQUE		|1		|name
 INDEX		|2		|backgroundid
 INDEX		|3		|iconmapid
+INDEX		|4		|userid
 
 TABLE|sysmaps_elements|selementid|ZBX_TEMPLATE
 FIELD		|selementid	|t_id		|	|NOT NULL	|0
@@ -902,6 +908,7 @@ FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
 FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,userid
+INDEX		|2		|userid
 
 TABLE|sysmap_usrgrp|sysmapusrgrpid|ZBX_TEMPLATE
 FIELD		|sysmapusrgrpid|t_id		|	|NOT NULL	|0
@@ -909,6 +916,7 @@ FIELD		|sysmapid	|t_id		|	|NOT NULL	|0			|1|sysmaps
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp
 FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
 UNIQUE		|1		|sysmapid,usrgrpid
+INDEX		|2		|usrgrpid
 
 TABLE|maintenances_hosts|maintenance_hostid|ZBX_DATA
 FIELD		|maintenance_hostid|t_id	|	|NOT NULL	|0
@@ -1304,10 +1312,13 @@ FIELD		|parent_itemid	|t_id		|	|NULL		|0			|3|items	|itemid		|RESTRICT
 FIELD		|host		|t_varchar(128)	|''	|NOT NULL	|ZBX_NODATA
 FIELD		|lastcheck	|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|ts_delete	|t_time		|'0'	|NOT NULL	|ZBX_NODATA
+INDEX		|1		|parent_hostid
+INDEX		|2		|parent_itemid
 
 TABLE|interface_discovery|interfaceid|0
 FIELD		|interfaceid	|t_id		|	|NOT NULL	|0			|1|interface
 FIELD		|parent_interfaceid|t_id	|	|NOT NULL	|0			|2|interface	|interfaceid
+INDEX		|1		|parent_interfaceid
 
 TABLE|profiles|profileid|0
 FIELD		|profileid	|t_id		|	|NOT NULL	|0
@@ -1399,8 +1410,10 @@ TABLE|tag_filter|tag_filterid|0
 FIELD		|tag_filterid	|t_id		|	|NOT NULL	|0
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0 			|1|usrgrp	|usrgrpid
 FIELD		|groupid	|t_id		|	|NOT NULL	|0			|2|hstgrp	|groupid
-FIELD		|tag	|t_varchar(255)	|'' |NOT NULL	|0
-FIELD		|value	|t_varchar(255)	|'' |NOT NULL	|0
+FIELD		|tag		|t_varchar(255)	|''	|NOT NULL	|0
+FIELD		|value		|t_varchar(255)	|''	|NOT NULL	|0
+INDEX		|1		|usrgrpid
+INDEX		|2		|groupid
 
 TABLE|event_recovery|eventid|0
 FIELD		|eventid	|t_id		|	|NOT NULL	|0			|1|events
@@ -1462,6 +1475,7 @@ FIELD		|clock		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|ttl		|t_integer	|'0'	|NOT NULL	|0
 FIELD		|proxy_hostid	|t_id		|	|NULL		|0			|1|hosts	|hostid
 INDEX		|1		|status,proxy_hostid
+INDEX		|2		|proxy_hostid
 
 TABLE|task_close_problem|taskid|0
 FIELD		|taskid		|t_id		|	|NOT NULL	|0			|1|task
@@ -1541,6 +1555,7 @@ FIELD		|selement_triggerid	|t_id	|	|NOT NULL	|0
 FIELD		|selementid		|t_id	|	|NOT NULL	|0			|1|sysmaps_elements
 FIELD		|triggerid		|t_id	|	|NOT NULL	|0			|2|triggers
 UNIQUE		|1			|selementid,triggerid
+INDEX		|2			|triggerid
 
 TABLE|httptest_field|httptest_fieldid|ZBX_TEMPLATE
 FIELD		|httptest_fieldid	|t_id		|	|NOT NULL	|0
@@ -1576,6 +1591,7 @@ FIELD		|dashboardid	|t_id		|	|NOT NULL	|0			|1|dashboard
 FIELD		|userid		|t_id		|	|NOT NULL	|0			|2|users
 FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
 UNIQUE		|1		|dashboardid,userid
+INDEX		|2		|userid
 
 TABLE|dashboard_usrgrp|dashboard_usrgrpid|ZBX_DASHBOARD
 FIELD		|dashboard_usrgrpid|t_id	|	|NOT NULL	|0
@@ -1583,6 +1599,7 @@ FIELD		|dashboardid	|t_id		|	|NOT NULL	|0			|1|dashboard
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0			|2|usrgrp
 FIELD		|permission	|t_integer	|'2'	|NOT NULL	|0
 UNIQUE		|1		|dashboardid,usrgrpid
+INDEX		|2		|usrgrpid
 
 TABLE|dashboard_page|dashboard_pageid|ZBX_DASHBOARD
 FIELD		|dashboard_pageid|t_id		|	|NOT NULL	|0
@@ -1838,6 +1855,8 @@ FIELD		|state		|t_integer	|'0'	|NOT NULL	|ZBX_NODATA
 FIELD		|lastsent	|t_time	|'0'		|NOT NULL	|ZBX_NODATA
 FIELD		|info		|t_varchar(2048)|''	|NOT NULL	|ZBX_NODATA
 UNIQUE		|1		|name
+INDEX		|2		|userid
+INDEX		|3		|dashboardid
 
 TABLE|report_param|reportparamid|ZBX_DATA
 FIELD		|reportparamid	|t_id		|	|NOT NULL	|0
@@ -1853,6 +1872,8 @@ FIELD		|userid		|t_id		|	|NOT NULL	|0		|2|users|userid
 FIELD		|exclude	|t_integer	|'0'	|NOT NULL	|0
 FIELD		|access_userid	|t_id		|	|NULL		|0		|3|users|userid		|RESTRICT
 INDEX		|1		|reportid
+INDEX		|2		|userid
+INDEX		|3		|access_userid
 
 TABLE|report_usrgrp|reportusrgrpid|ZBX_DATA
 FIELD		|reportusrgrpid|t_id		|	|NOT NULL	|0
@@ -1860,6 +1881,8 @@ FIELD		|reportid	|t_id		|	|NOT NULL	|0		|1|report|reportid
 FIELD		|usrgrpid	|t_id		|	|NOT NULL	|0		|2|usrgrp|usrgrpid
 FIELD		|access_userid	|t_id		|	|NULL		|0		|3|users|userid		|RESTRICT
 INDEX		|1		|reportid
+INDEX		|2		|usrgrpid
+INDEX		|3		|access_userid
 
 TABLE|service_problem_tag|service_problem_tagid|ZBX_DATA
 FIELD		|service_problem_tagid	|t_id		|	|NOT NULL	|0
@@ -1942,4 +1965,4 @@ TABLE|dbversion|dbversionid|
 FIELD		|dbversionid	|t_id		|	|NOT NULL	|0
 FIELD		|mandatory	|t_integer	|'0'	|NOT NULL	|
 FIELD		|optional	|t_integer	|'0'	|NOT NULL	|
-ROW		|1		|6000000	|6000020
+ROW		|1		|6000000	|6000044

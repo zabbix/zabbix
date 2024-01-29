@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -67,7 +67,6 @@ typedef struct
 	zbx_vector_ptr_t	writers;
 	zbx_queue_ptr_t		free_writers;
 
-	zbx_hashset_t		sessions;
 	zbx_hashset_t		reports;
 	zbx_hashset_t		batches;
 
@@ -118,15 +117,23 @@ zbx_rm_report_t;
 
 typedef struct
 {
+	zbx_uint64_t	userid;
+	char		*sid;
+	char		*cookie;
+}
+zbx_rm_session_t;
+
+typedef struct
+{
 	zbx_uint64_t		access_userid;
 	zbx_uint64_t		batchid;
 	int			report_width;
 	int			report_height;
 	char			*url;
-	char			*cookie;
 	char			*report_name;
 	zbx_vector_uint64_t	userids;
 	zbx_vector_ptr_pair_t	params;
+	zbx_rm_session_t	*session;
 
 	zbx_ipc_client_t	*client;
 }
@@ -145,17 +152,6 @@ typedef struct
 	zbx_vector_ptr_t	jobs;
 }
 zbx_rm_batch_t;
-
-/* user session, cached to generate authentication cookies */
-typedef struct
-{
-	zbx_uint64_t	userid;
-	char		*sid;
-	char		*cookie;
-	int		db_lastaccess;
-	int		lastaccess;
-}
-zbx_rm_session_t;
 
 typedef struct
 {
@@ -213,6 +209,29 @@ static void	rm_report_clean(zbx_rm_report_t *report)
 	zbx_vector_uint64_destroy(&report->users_excl);
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: close session                                                     *
+ *                                                                            *
+ * Parameters: session - [IN]                                                 *
+ *                                                                            *
+ * Comments: The session is deleted from the database to ensure that it is    *
+ *           impossible to authenticate a user with it in Zabbix frontend.    *
+ *                                                                            *
+ ******************************************************************************/
+static void	rm_session_close(zbx_rm_session_t *session)
+{
+	if (ZBX_DB_OK > DBexecute("delete from sessions where sessionid='%s'", session->sid))
+	{
+		zabbix_log(LOG_LEVEL_WARNING, "Report manager failed to delete web session from database, user ID = "
+				ZBX_FS_UI64 ".", session->userid);
+	}
+
+	zbx_free(session->sid);
+	zbx_free(session->cookie);
+	zbx_free(session);
+}
+
 static void	rm_job_free(zbx_rm_job_t *job)
 {
 	if (NULL != job->client)
@@ -220,7 +239,8 @@ static void	rm_job_free(zbx_rm_job_t *job)
 
 	zbx_free(job->report_name);
 	zbx_free(job->url);
-	zbx_free(job->cookie);
+
+	rm_session_close(job->session);
 
 	zbx_vector_uint64_destroy(&job->userids);
 	report_destroy_params(&job->params);
@@ -254,7 +274,6 @@ static int	rm_init(zbx_rm_t *manager, char **error)
 
 	zbx_vector_ptr_create(&manager->writers);
 	zbx_queue_ptr_create(&manager->free_writers);
-	zbx_hashset_create(&manager->sessions, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&manager->reports, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_hashset_create(&manager->batches, 0, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_binary_heap_create(&manager->report_queue, rm_report_compare_nextcheck, ZBX_BINARY_HEAP_OPTION_DIRECT);
@@ -290,18 +309,12 @@ out:
 static void	rm_destroy(zbx_rm_t *manager)
 {
 	zbx_hashset_iter_t	iter;
-	zbx_rm_session_t	*session;
 	zbx_rm_report_t		*report;
 	zbx_rm_job_t		*job;
 	zbx_rm_batch_t		*batch;
 
 	while (SUCCEED == zbx_list_pop(&manager->job_queue, (void **)&job))
 		rm_job_free(job);
-
-	zbx_hashset_iter_reset(&manager->sessions, &iter);
-	while (NULL != (session = (zbx_rm_session_t *)zbx_hashset_iter_next(&iter)))
-		zbx_free(session->sid);
-	zbx_hashset_destroy(&manager->sessions);
 
 	zbx_hashset_iter_reset(&manager->reports, &iter);
 	while (NULL != (report = (zbx_rm_report_t *)zbx_hashset_iter_next(&iter)))
@@ -420,103 +433,37 @@ static char	*report_create_cookie(zbx_rm_t *manager, const char *sessionid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get specified user session, creating one if necessary             *
+ * Purpose: start a new session for the specified user                        *
  *                                                                            *
  * Parameters: manager - [IN]                                                 *
  *             userid  - [IN]                                                 *
  *                                                                            *
  * Return value: session                                                      *
  *                                                                            *
- * Comments: When returning new session it's cached and also stored in        *
- *           database.                                                        *
- *           When returning cached session database is checked if the session *
- *           is not removed. In that case a new session is created.           *
+ * Comments: New session it is stored in database.                            *
  *                                                                            *
  ******************************************************************************/
-static	zbx_rm_session_t	*rm_get_session(zbx_rm_t *manager, zbx_uint64_t userid)
+static zbx_rm_session_t	*rm_session_start(zbx_rm_t *manager, zbx_uint64_t userid)
 {
+	zbx_db_insert_t		db_insert;
 	zbx_rm_session_t	*session;
-	int			now;
 
-	now = (int)time(NULL);
+	session = (zbx_rm_session_t *)zbx_malloc(NULL, sizeof(zbx_rm_session_t));
+	session->userid = userid;
+	session->sid = zbx_create_token(0);
+	session->cookie = report_create_cookie(manager, session->sid);
 
-	if (NULL != (session = (zbx_rm_session_t *)zbx_hashset_search(&manager->sessions, &userid)))
+	zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", (char *)NULL);
+	zbx_db_insert_add_values(&db_insert, session->sid, userid, (int)time(NULL), ZBX_SESSION_ACTIVE);
+	if (SUCCEED != zbx_db_insert_execute(&db_insert))
 	{
-		DB_RESULT	result;
-
-		result = DBselect("select NULL from sessions where sessionid='%s'", session->sid);
-		if (NULL == DBfetch(result))
-		{
-			zbx_hashset_remove_direct(&manager->sessions, session);
-			session = NULL;
-		}
-		DBfree_result(result);
+		zabbix_log(LOG_LEVEL_WARNING, "Report manager failed to write web session to database, user ID = "
+				ZBX_FS_UI64 ".", session->userid);
 	}
 
-	if (NULL == session)
-	{
-		zbx_rm_session_t	session_local;
-		zbx_db_insert_t		db_insert;
-
-		session_local.userid = userid;
-		session = (zbx_rm_session_t *)zbx_hashset_insert(&manager->sessions, &session_local,
-				sizeof(session_local));
-
-		session->sid = zbx_create_token(0);
-		session->cookie = report_create_cookie(manager, session->sid);
-		session->db_lastaccess = now;
-
-		zbx_db_insert_prepare(&db_insert, "sessions", "sessionid", "userid", "lastaccess", "status", NULL);
-		zbx_db_insert_add_values(&db_insert, session->sid, userid, now, ZBX_SESSION_ACTIVE);
-		zbx_db_insert_execute(&db_insert);
-		zbx_db_insert_clean(&db_insert);
-	}
-
-	session->lastaccess = now;
+	zbx_db_insert_clean(&db_insert);
 
 	return session;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: flushes session lastaccess changes to database                    *
- *                                                                            *
- * Parameters: manager - [IN]                                                 *
- *                                                                            *
- ******************************************************************************/
-static void	rm_db_flush_sessions(zbx_rm_t *manager)
-{
-	zbx_hashset_iter_t	iter;
-	zbx_rm_session_t	*session;
-	char			*sql = NULL;
-	size_t			sql_alloc = 0, sql_offset = 0;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	DBbegin();
-	DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	zbx_hashset_iter_reset(&manager->sessions, &iter);
-	while (NULL != (session = (zbx_rm_session_t *)zbx_hashset_iter_next(&iter)))
-	{
-		if (session->lastaccess == session->db_lastaccess)
-			continue;
-
-		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update sessions set lastaccess=%d"
-				" where sessionid='%s';\n", session->lastaccess, session->sid);
-		DBexecute_overflowed_sql(&sql, &sql_alloc, &sql_offset);
-		session->db_lastaccess = session->lastaccess;
-	}
-
-	DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-	if (16 < sql_offset)
-		DBexecute("%s", sql);
-
-	DBcommit();
-	zbx_free(sql);
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
 /******************************************************************************
@@ -708,7 +655,6 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 {
 	zbx_rm_job_t		*job;
 	size_t			url_alloc = 0, url_offset = 0;
-	zbx_rm_session_t	*session;
 	struct tm		from, to;
 	int			i;
 
@@ -748,8 +694,7 @@ static zbx_rm_job_t	*rm_create_job(zbx_rm_t *manager, const char *report_name, z
 	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&from=%s", rm_time_to_urlfield(&from));
 	zbx_snprintf_alloc(&job->url, &url_alloc, &url_offset, "&to=%s", rm_time_to_urlfield(&to));
 
-	session = rm_get_session(manager, access_userid);
-	job->cookie = zbx_strdup(NULL, session->cookie);
+	job->session = rm_session_start(manager, access_userid);
 
 	job->access_userid = access_userid;
 	job->report_width = report_width;
@@ -1583,7 +1528,7 @@ static int	rm_writer_process_job(zbx_rm_writer_t *writer, zbx_rm_job_t *job, cha
 		goto out;
 	}
 
-	size = report_serialize_begin_report(&data, job->report_name, job->url, job->cookie, job->report_width,
+	size = report_serialize_begin_report(&data, job->report_name, job->url, job->session->cookie, job->report_width,
 			job->report_height, &job->params);
 
 	if (SUCCEED != zbx_ipc_client_send(writer->client, ZBX_IPC_REPORTER_BEGIN_REPORT, data, size))
@@ -2169,7 +2114,7 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 {
 	zbx_uint64_t		dashboardid, userid, access_userid;
 	zbx_vector_ptr_pair_t	params;
-	int			report_time, ret, width, height;
+	int			report_time, ret, width, height, i;
 	unsigned char		period;
 	zbx_rm_job_t		*job;
 	char			*name;
@@ -2180,6 +2125,16 @@ static int	rm_test_report(zbx_rm_t *manager, zbx_ipc_client_t *client, zbx_ipc_m
 			&period, &params);
 
 	rm_get_report_dimensions(dashboardid, &width, &height);
+
+	for (i = 0; i < params.values_num; i++)
+	{
+		if (0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_BODY) ||
+				0 == strcmp(params.values[i].first, ZBX_REPORT_PARAM_SUBJECT))
+		{
+			substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+					NULL, (char **)&params.values[i].second, MACRO_TYPE_REPORT, NULL, 0);
+		}
+	}
 
 	if (NULL != (job = rm_create_job(manager, name, dashboardid, access_userid, report_time, period, &userid, 1,
 			width, height, &params, error)))
@@ -2276,7 +2231,7 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	char			*error = NULL;
 	zbx_ipc_client_t	*client;
 	zbx_ipc_message_t	*message;
-	double			time_stat, time_idle = 0, time_now, sec, time_sync, time_flush_sessions, time_flush;
+	double			time_stat, time_idle = 0, time_now, sec, time_sync, time_flush;
 	int			ret, processed_num = 0, created_num = 0;
 	zbx_rm_t		manager;
 	zbx_timespec_t		timeout;
@@ -2304,7 +2259,6 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 	/* initialize statistics */
 	time_stat = zbx_time();
 	time_sync = 0;
-	time_flush_sessions = time_stat;
 	time_flush = time_stat;
 
 	zbx_setproctitle("%s #%d started", get_process_type_string(process_type), process_num);
@@ -2323,12 +2277,6 @@ ZBX_THREAD_ENTRY(report_manager_thread, args)
 			time_idle = 0;
 			created_num = 0;
 			processed_num = 0;
-		}
-
-		if (SEC_PER_HOUR < time_now - time_flush_sessions)
-		{
-			rm_db_flush_sessions(&manager);
-			time_flush_sessions = time_now;
 		}
 
 		if (ZBX_FLUSH_INTERVAL < time_now - time_flush)

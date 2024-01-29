@@ -29,7 +29,9 @@ SERVER_tests = \
 	zbx_get_report_nextcheck \
 	zbx_ltrim_utf8 \
 	zbx_rtrim_utf8 \
-	zbx_get_week_number
+	zbx_get_week_number \
+	zbx_function_param_parse_ext \
+	zbx_buf_readln
 endif
 
 noinst_PROGRAMS = $(SERVER_tests)
@@ -78,6 +80,7 @@ COMMON_LIB_FILES = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxmedia/libzbxmedia.a \
 	$(top_srcdir)/src/libs/zbxxml/libzbxxml.a \
+	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxcrypto/libzbxcrypto.a \
@@ -178,6 +181,7 @@ calculate_item_nextcheck_unreachable_LDADD += @SERVER_LIBS@
 calculate_item_nextcheck_unreachable_LDFLAGS = @SERVER_LDFLAGS@
 
 calculate_item_nextcheck_unreachable_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
 
 zbx_function_get_param_dyn_SOURCES = \
 	zbx_function_get_param_dyn.c \
@@ -536,5 +540,30 @@ zbx_get_week_number_LDFLAGS = @SERVER_LDFLAGS@
 
 zbx_get_week_number_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
+zbx_function_param_parse_ext_SOURCES = \
+	zbx_function_param_parse_ext.c \
+	$(COMMON_SRC_FILES)
+
+zbx_function_param_parse_ext_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_function_param_parse_ext_LDADD += @SERVER_LIBS@
+
+zbx_function_param_parse_ext_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_function_param_parse_ext_CFLAGS = $(COMMON_COMPILER_FLAGS)
+
+zbx_buf_readln_SOURCES = \
+	$(COMMON_SRC_FILES) \
+	zbx_buf_readln.c
+
+zbx_buf_readln_LDADD = \
+	$(COMMON_LIB_FILES)
+
+zbx_buf_readln_LDADD += @SERVER_LIBS@
+
+zbx_buf_readln_LDFLAGS = @SERVER_LDFLAGS@
+
+zbx_buf_readln_CFLAGS = $(COMMON_COMPILER_FLAGS)
 
 endif

@@ -28,7 +28,7 @@ GRANT pg_monitor TO zbx_monitor;
 ```
 
 2. Edit the `pg_hba.conf` configuration file to allow TCP connections for the user `zbx_monitor`. For example, you could add one of the following rows to allow local connections from the same host:
-  
+
 ```bash
 # TYPE  DATABASE        USER            ADDRESS                 METHOD
   host       all        zbx_monitor     localhost               trust
@@ -40,11 +40,23 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 3. Install the PostgreSQL ODBC driver. Check the [`Zabbix documentation`](https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/odbc_checks/) for details about ODBC checks and [`recommended parameters page`](https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/odbc_checks/unixodbc_postgresql).
 
-4. Set the ODBC driver with the `{$PG.DRIVER}` macro to the name of the driver which will be used for monitoring (from the `odbcinst.ini` file) or specify the path to the driver file (for example `/usr/lib64/psqlodbcw.so`).
+4. Set up the connection string with the `{$PG.CONNSTRING}` macro. The minimum required parameters are:
 
-5. Specify the host name or IP address in the `{$PG.HOST}` macro. Adjust the port number with `{$PG.PORT}` macro if needed.
+- `Driver=` - set the name of the driver which will be used for monitoring (from the `odbcinst.ini` file) or specify the path to the driver file (for example `/usr/lib64/psqlodbcw.so`);
+- `Servername=` - set the host name or IP address of the PostgreSQL instance;
+- `Port=` - adjust the port number if needed.
 
-6. Set the password that you specified in step 1 in the macro `{$PG.PASSWORD}`.
+**Note:** if you want to use SSL/TLS encryption to protect communications with the remote PostgreSQL instance, you can also specify encryption parameters here.
+
+It is assumed that you set up the PostgreSQL instance to work in the desired encryption mode. Check the [`PostgreSQL documentation`](https://www.postgresql.org/docs/current/ssl-tcp.html) for details.
+
+For example, to enable required encryption in transport mode without identity checks, the connection string could look like this (replace `<instanceip>` with the address of the PostgreSQL instance):
+
+```
+Servername=<instanceip>;Port=5432;Driver=/usr/lib64/psqlodbcw.so;SSLmode=require
+```
+
+5. Set the password that you specified in step 1 in the macro `{$PG.PASSWORD}`.
 
 ### Macros used
 
@@ -52,9 +64,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |----|-----------|-------|
 |{$PG.PASSWORD}|<p>PostgreSQL user password.</p>|`<Put the password here>`|
 |{$PG.USER}|<p>PostgreSQL username.</p>|`zbx_monitor`|
-|{$PG.DRIVER}|<p>Name or path to the PostgreSQL driver. For example: `PostgreSQL`, `/usr/lib64/psqlodbcw.so`.</p>|`<Set the PostgreSQL driver here>`|
-|{$PG.HOST}|<p>Hostname or IP of PostgreSQL host.</p>|`localhost`|
-|{$PG.PORT}|<p>PostgreSQL service port.</p>|`5432`|
+|{$PG.CONNSTRING}|<p>Connection string for the PostgreSQL instance.</p>|`Macro too long. Please see the template.`|
 |{$PG.LLD.FILTER.DBNAME}|<p>Filter of discoverable databases.</p>|`.+`|
 |{$PG.CONN_TOTAL_PCT.MAX.WARN}|<p>Maximum percentage of current connections for trigger expression.</p>|`90`|
 |{$PG.DATABASE}|<p>Default PostgreSQL database for the connection.</p>|`postgres`|
@@ -68,15 +78,16 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PostgreSQL: Get bgwriter|<p>Collect all metrics from pg_stat_bgwriter:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p>|Database monitor|db.odbc.select[pgsql.bgwriter,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get archive|<p>Collect archive status metrics.</p>|Database monitor|db.odbc.select[pgsql.archive,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get dbstat|<p>Collect all metrics from pg_stat_database per database:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get dbstat sum|<p>Collect all metrics from pg_stat_database as sums for all databases:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get connections sum|<p>Collect all metrics from pg_stat_activity:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p>|Database monitor|db.odbc.select[pgsql.connections.sum,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Database monitor|db.odbc.select[pgsql.wal.stat,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Database monitor|db.odbc.select[pgsql.locks,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Database monitor|db.odbc.select[pgsql.replication.process,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|PostgreSQL: Get queries|<p>Collect all metrics by query execution time.</p>|Database monitor|db.odbc.select[pgsql.queries,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Get bgwriter|<p>Collect all metrics from pg_stat_bgwriter:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-BGWRITER-VIEW</p>|Database monitor|db.odbc.select[pgsql.bgwriter,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get archive|<p>Collect archive status metrics.</p>|Database monitor|db.odbc.select[pgsql.archive,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get dbstat|<p>Collect all metrics from pg_stat_database per database:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get dbstat sum|<p>Collect all metrics from pg_stat_database as sums for all databases:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-DATABASE-VIEW</p>|Database monitor|db.odbc.select[pgsql.dbstat.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get connections sum|<p>Collect all metrics from pg_stat_activity:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#PG-STAT-ACTIVITY-VIEW</p>|Database monitor|db.odbc.select[pgsql.connections.sum,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get WAL|<p>Collect write-ahead log (WAL) metrics.</p>|Database monitor|db.odbc.select[pgsql.wal.stat,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get locks|<p>Collect all metrics from pg_locks per database:</p><p>https://www.postgresql.org/docs/current/explicit-locking.html#LOCKING-TABLES</p>|Database monitor|db.odbc.select[pgsql.locks,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Get replication|<p>Collect metrics from the pg_stat_replication, which contains information about the WAL sender process, showing statistics about replication to that sender's connected standby server.</p>|Database monitor|db.odbc.select[pgsql.replication.process,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
+|PostgreSQL: Get queries|<p>Collect all metrics by query execution time.</p>|Database monitor|db.odbc.select[pgsql.queries,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Version|<p>PostgreSQL version.</p>|Database monitor|db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
 |WAL: Bytes written|<p>WAL write, in bytes.</p>|Dependent item|pgsql.wal.write<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.write`</p></li><li>Change per second</li></ul>|
 |WAL: Bytes received|<p>WAL receive, in bytes.</p>|Dependent item|pgsql.wal.receive<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.receive`</p></li><li>Change per second</li></ul>|
 |WAL: Segments count|<p>Number of WAL segments.</p>|Dependent item|pgsql.wal.count<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.count`</p></li></ul>|
@@ -120,31 +131,32 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |Connections sum: Waiting|<p>Total number of waiting connections:</p><p>https://www.postgresql.org/docs/current/monitoring-stats.html#WAIT-EVENT-TABLE</p>|Dependent item|pgsql.connections.sum.waiting<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.waiting`</p></li></ul>|
 |Connections sum: Idle in transaction (aborted)|<p>Total number of connections in a transaction state but not executing a query, and where one of the statements in the transaction caused an error.</p>|Dependent item|pgsql.connections.sum.idle_in_transaction_aborted<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.idle_in_transaction_aborted`</p></li></ul>|
 |Connections sum: Disabled|<p>Total number of disabled connections.</p>|Dependent item|pgsql.connections.sum.disabled<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.disabled`</p></li></ul>|
-|PostgreSQL: Age of oldest xid|<p>Age of oldest xid.</p>|Database monitor|db.odbc.select[pgsql.oldest.xid,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Database monitor|db.odbc.select[pgsql.autovacuum.count,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|PostgreSQL: Age of oldest xid|<p>Age of oldest xid.</p>|Database monitor|db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Count of autovacuum workers|<p>Number of autovacuum workers.</p>|Database monitor|db.odbc.select[pgsql.autovacuum.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
 |PostgreSQL: Cache hit ratio, %|<p>Cache hit ratio.</p>|Calculated|pgsql.cache.hit|
-|PostgreSQL: Uptime|<p>Time since the server started.</p>|Database monitor|db.odbc.select[pgsql.uptime,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.b,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.sec,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.recovery_role,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Replication: Standby count|<p>Number of standby servers.</p>|Database monitor|db.odbc.select[pgsql.replication.count,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.status,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
-|PostgreSQL: Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Database monitor|db.odbc.select[pgsql.ping,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|PostgreSQL: Uptime|<p>Time since the server started.</p>|Database monitor|db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Replication: Lag in bytes|<p>Replication lag with master, in bytes.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.b,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Replication: Lag in seconds|<p>Replication lag with master, in seconds.</p>|Database monitor|db.odbc.select[pgsql.replication.lag.sec,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Replication: Recovery role|<p>Replication role: 1 — recovery is still in progress (standby mode), 0 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.recovery_role,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Replication: Standby count|<p>Number of standby servers.</p>|Database monitor|db.odbc.select[pgsql.replication.count,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Replication: Status|<p>Replication status: 0 — streaming is down, 1 — streaming is up, 2 — master mode.</p>|Database monitor|db.odbc.select[pgsql.replication.status,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
+|PostgreSQL: Ping|<p>Used to test a connection to see if it is alive. It is set to 0 if the query is unsuccessful.</p>|Database monitor|db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Check for not supported value</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Triggers
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|PostgreSQL: Version has changed||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#1)<>last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"],#2) and length(last(/PostgreSQL by ODBC/db.odbc.select[pgsql.version,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]))>0`|Info||
 |PostgreSQL: Total number of connections is too high|<p>Total number of current connections exceeds the limit of {$PG.CONN_TOTAL_PCT.MAX.WARN}% out of the maximum number of concurrent connections to the database server (the "max_connections" setting).</p>|`min(/PostgreSQL by ODBC/pgsql.connections.sum.total_pct,5m) > {$PG.CONN_TOTAL_PCT.MAX.WARN}`|Average||
-|PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]) > 18000000`|Average||
-|PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]) < 10m`|Average||
-|PostgreSQL: Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"])=0`|High||
+|PostgreSQL: Oldest xid is too big||`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.oldest.xid,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) > 18000000`|Average||
+|PostgreSQL: Service has been restarted|<p>PostgreSQL uptime is less than 10 minutes.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.uptime,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]) < 10m`|Average||
+|PostgreSQL: Service is down|<p>Last test of a connection was unsuccessful.</p>|`last(/PostgreSQL by ODBC/db.odbc.select[pgsql.ping,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"])=0`|High||
 
 ### LLD rule Replication discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Replication discovery|<p>Discovers replication lag metrics.</p>|Database monitor|db.odbc.select[pgsql.replication.process.discovery,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
+|Replication discovery|<p>Discovers replication lag metrics.</p>|Database monitor|db.odbc.select[pgsql.replication.process.discovery,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `3h`</p></li></ul>|
 
 ### Item prototypes for Replication discovery
 
@@ -159,7 +171,7 @@ For more information please read the PostgreSQL documentation `https://www.postg
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Database discovery|<p>Discovers databases (DB) in the database management system (DBMS), except:</p><p>- templates;</p><p>- default "postgres" DB;</p><p>- DBs that do not allow connections.</p>|Database monitor|db.odbc.select[pgsql.db.discovery,,"Servername={$PG.HOST};Port={$PG.PORT};Database={$PG.DATABASE};Driver={$PG.DRIVER}"]|
+|Database discovery|<p>Discovers databases (DB) in the database management system (DBMS), except:</p><p>- templates;</p><p>- default "postgres" DB;</p><p>- DBs that do not allow connections.</p>|Database monitor|db.odbc.select[pgsql.db.discovery,,"Database={$PG.DATABASE};{$PG.CONNSTRING}"]|
 
 ### Item prototypes for Database discovery
 
@@ -168,9 +180,9 @@ For more information please read the PostgreSQL documentation `https://www.postg
 |DB [{#DBNAME}]: Get dbstat|<p>Get dbstat metrics for database "{#DBNAME}".</p>|Dependent item|pgsql.dbstat.get_metrics["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DBNAME}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB [{#DBNAME}]: Get locks|<p>Get locks metrics for database "{#DBNAME}".</p>|Dependent item|pgsql.locks.get_metrics["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DBNAME}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
 |DB [{#DBNAME}]: Get queries|<p>Get queries metrics for database "{#DBNAME}".</p>|Dependent item|pgsql.queries.get_metrics["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$['{#DBNAME}']`</p><p>⛔️Custom on fail: Discard value</p></li></ul>|
-|DB [{#DBNAME}]: Database age|<p>Database age.</p>|Database monitor|db.odbc.select[pgsql.db.age,,"Servername={$PG.HOST};Port={$PG.PORT};Database={#DBNAME};Driver={$PG.DRIVER}"]|
-|DB [{#DBNAME}]: Bloating tables|<p>Number of bloating tables.</p>|Database monitor|db.odbc.select[pgsql.db.bloating_tables,,"Servername={$PG.HOST};Port={$PG.PORT};Database={#DBNAME};Driver={$PG.DRIVER}"]|
-|DB [{#DBNAME}]: Database size|<p>Database size.</p>|Database monitor|db.odbc.select[pgsql.db.size,,"Servername={$PG.HOST};Port={$PG.PORT};Database={#DBNAME};Driver={$PG.DRIVER}"]|
+|DB [{#DBNAME}]: Database age|<p>Database age.</p>|Database monitor|db.odbc.select[pgsql.db.age,,"Database={#DBNAME};{$PG.CONNSTRING}"]|
+|DB [{#DBNAME}]: Bloating tables|<p>Number of bloating tables.</p>|Database monitor|db.odbc.select[pgsql.db.bloating_tables,,"Database={#DBNAME};{$PG.CONNSTRING}"]|
+|DB [{#DBNAME}]: Database size|<p>Database size.</p>|Database monitor|db.odbc.select[pgsql.db.size,,"Database={#DBNAME};{$PG.CONNSTRING}"]|
 |DB [{#DBNAME}]: Blocks hit per second|<p>Total number of times per second disk blocks were found already in the buffer cache, so that a read was not necessary.</p>|Dependent item|pgsql.dbstat.blks_hit.rate["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blks_hit`</p></li><li>Change per second</li></ul>|
 |DB [{#DBNAME}]: Disk blocks read per second|<p>Total number of disk blocks read per second in this database.</p>|Dependent item|pgsql.dbstat.blks_read.rate["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.blks_read`</p></li><li>Change per second</li></ul>|
 |DB [{#DBNAME}]: Detected conflicts per second|<p>Total number of queries canceled due to conflicts with recovery in this database per second.</p>|Dependent item|pgsql.dbstat.conflicts.rate["{#DBNAME}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.conflicts`</p></li><li>Change per second</li></ul>|

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,28 +20,29 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CPreprocessingBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/PreprocessingTrait.php';
 
 /**
  * @backup items
  */
 class testItemTypeSelection extends CWebTest {
 
-	use PreprocessingTrait;
-
-	const HOSTID = 40001;
-	const LLDID = 90001;
-	const PROTOTYPE = true;
-
 	/**
-	 * Attach Message behavior to the test.
+	 * Attach MessageBehavior and PreprocessingBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return ['class' => CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CPreprocessingBehavior::class
+		];
 	}
+
+	const HOSTID = 40001;
+	const LLDID = 90001;
+	const PROTOTYPE = true;
 
 	public static function getItemData() {
 		return [

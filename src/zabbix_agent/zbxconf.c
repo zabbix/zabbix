@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -197,7 +197,7 @@ void	load_perf_counters(const char **def_lines, const char **eng_lines)
 				goto pc_fail;
 			}
 
-			if (NULL == add_perf_counter(name, counterpath, period, lang, &error))
+			if (NULL == zbx_add_perf_counter(name, counterpath, period, lang, &error))
 			{
 				if (NULL == error)
 					error = zbx_strdup(error, "Failed to add new performance counter.");

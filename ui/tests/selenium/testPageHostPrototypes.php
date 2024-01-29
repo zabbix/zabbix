@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,20 +19,27 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
 
 /**
  * @backup hosts
  */
 class testPageHostPrototypes extends CLegacyWebTest {
 
-	use TableTrait;
+	/**
+	 * Attach TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [CTableBehavior::class];
+	}
 
-	const DICROVERY_RULE_ID = 90001;
+	const DISCOVERY_RULE_ID = 90001;
 	const HOST_PROTOTYPES_COUNT = 8;
 
 	public function testPageHostPrototypes_CheckLayout() {
-		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DICROVERY_RULE_ID.'&context=host');
+		$this->zbxTestLogin('host_prototypes.php?parent_discoveryid='.self::DISCOVERY_RULE_ID.'&context=host');
 		$this->zbxTestCheckTitle('Configuration of host prototypes');
 		$this->zbxTestCheckHeader('Host prototypes');
 

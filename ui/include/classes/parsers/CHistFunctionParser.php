@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -329,15 +329,10 @@ class CHistFunctionParser extends CParser {
 					$_parameters[$num]['match'] .= $source[$p];
 					$_parameters[$num]['length']++;
 
-					if ($source[$p] === '"') {
+					if ($source[$p] === '"' && $source[$p - 1] !== '\\') {
 						$state = self::STATE_END;
 					}
-					elseif ($source[$p] === '\\' && isset($source[$p + 1])
-							&& ($source[$p + 1] === '"' || $source[$p + 1] === '\\')) {
-						$_parameters[$num]['match'] .= $source[$p + 1];
-						$_parameters[$num]['length']++;
-						$p++;
-					}
+
 					break;
 
 				// end of parameters

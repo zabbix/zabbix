@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -193,9 +193,12 @@ class testFormTemplateDashboards extends CWebTest {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		$this->checkDialogue('Dashboard properties');
+		// TODO: added updateViewport due to unstable test on Jenkins, scroll appears for 0.5 seconds
+		// after closing the overlay dialog and incorrect click location of $control_buttons occurs.
+		$this->page->updateViewport();
 
 		// Check the default new dashboard state (title, empty, editable).
-		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilVisible();
+		$dashboard = CDashboardElement::find()->asDashboard()->one()->waitUntilReady();
 		$this->assertEquals('Dashboards', $dashboard->getTitle());
 		$this->assertTrue($dashboard->isEditable());
 		$this->assertTrue($dashboard->isEmpty());
@@ -215,7 +218,7 @@ class testFormTemplateDashboards extends CWebTest {
 
 			switch ($selector) {
 				case 'id:dashboard-config':
-					$controls->waitUntilVisible()->query($selector)->waitUntilClickable()->one()->click();
+					$controls->query($selector)->waitUntilClickable()->one()->click();
 					$this->checkDialogue('Dashboard properties');
 					break;
 

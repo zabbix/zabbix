@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -367,7 +367,6 @@ if ($filter['groups']) {
 	$filter['groups'] = CArrayHelper::renameObjectsKeys(API::HostGroup()->get([
 		'output' => ['groupid', 'name'],
 		'groupids' => $filter['groups'],
-		'editable' => true,
 		'preservekeys' => true
 	]), ['groupid' => 'id']);
 
@@ -609,13 +608,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		$conditions = getRequest('conditions', []);
 		ksort($conditions);
 		$conditions = array_values($conditions);
-		foreach ($conditions as $condition) {
-			if (!zbx_empty($condition['macro'])) {
-				$condition['macro'] = mb_strtoupper($condition['macro']);
 
-				$lld_rule_filter['conditions'][] = $condition;
+		foreach ($conditions as $condition) {
+			if ($condition['macro'] === '' && $condition['value'] === '') {
+				continue;
 			}
+
+			$condition['macro'] = mb_strtoupper($condition['macro']);
+
+			$lld_rule_filter['conditions'][] = $condition;
 		}
+
 		if ($lld_rule_filter['evaltype'] == CONDITION_EVAL_TYPE_EXPRESSION) {
 			// if only one or no conditions are left, reset the evaltype to and/or and clear the formula
 			if (count($lld_rule_filter['conditions']) <= 1) {
@@ -843,9 +846,17 @@ if (hasRequest('form')) {
 
 	$data = getItemFormData($form_item, ['form' => getRequest('form'), 'is_discovery_rule' => true]);
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
-	$data['evaltype'] = getRequest('evaltype');
+	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = getRequest('conditions', []);
+
+	foreach ($data['conditions'] as $i => $condition) {
+		if ($condition['macro'] === '' && $condition['value'] === '') {
+			unset($data['conditions'][$i]);
+		}
+	}
+
+	$data['conditions'] = sortLldRuleFilterConditions($data['conditions'], $data['evaltype']);
 	$data['lld_macro_paths'] = getRequest('lld_macro_paths', []);
 	$data['overrides'] = getRequest('overrides', []);
 	$data['host'] = $host;
@@ -877,9 +888,20 @@ if (hasRequest('form')) {
 		$data['lifetime'] = $item['lifetime'];
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
-		$data['conditions'] = $item['filter']['conditions'];
+		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
 		$data['lld_macro_paths'] = $item['lld_macro_paths'];
+
 		$data['overrides'] = $item['overrides'];
+
+		foreach ($data['overrides'] as &$override) {
+			if ($override['filter']['conditions']) {
+				$override['filter']['conditions'] = sortLldRuleFilterConditions($override['filter']['conditions'],
+					$override['filter']['evaltype']
+				);
+			}
+		}
+		unset($override);
+
 		// Sort overrides to be listed in step order.
 		CArrayHelper::sort($data['overrides'], ['step']);
 	}
@@ -887,6 +909,15 @@ if (hasRequest('form')) {
 	elseif (hasRequest('clone')) {
 		unset($data['itemid']);
 		$data['form'] = 'clone';
+	}
+
+	if (!$data['conditions']) {
+		$data['conditions'] = [[
+			'macro' => '',
+			'operator' => CONDITION_OPERATOR_REGEXP,
+			'value' => '',
+			'formulaid' => num2letter(0)
+		]];
 	}
 
 	if ($data['type'] != ITEM_TYPE_JMX) {

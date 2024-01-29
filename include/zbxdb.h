@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -189,8 +189,8 @@ typedef enum
 {	/* db extension error codes shared with FRONTEND */
 	ZBX_EXT_ERR_UNDEFINED = 0,
 	ZBX_EXT_SUCCEED = 1,
-	ZBX_TIMESCALEDB_POSTGRES_TOO_OLD,
-	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE,
+	/*ZBX_TIMESCALEDB_POSTGRES_TOO_OLD, obsoleted since Zabbix 7.0 */
+	ZBX_TIMESCALEDB_VERSION_FAILED_TO_RETRIEVE = 3,
 	ZBX_TIMESCALEDB_VERSION_LOWER_THAN_MINIMUM,
 	ZBX_TIMESCALEDB_VERSION_NOT_SUPPORTED,
 	ZBX_TIMESCALEDB_VERSION_HIGHER_THAN_MAXIMUM,

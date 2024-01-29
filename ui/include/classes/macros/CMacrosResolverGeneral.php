@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -95,7 +95,7 @@ class CMacrosResolverGeneral {
 	 */
 	protected function hasMacros(array $texts, array $types) {
 		foreach ($texts as $text) {
-			if ($this->getMacroPositions($text, $types)) {
+			if (self::getMacroPositions($text, $types)) {
 				return true;
 			}
 		}
@@ -142,7 +142,7 @@ class CMacrosResolverGeneral {
 	 *
 	 * @return array
 	 */
-	public function getMacroPositions($text, array $types) {
+	public static function getMacroPositions($text, array $types) {
 		$macros = [];
 		$extract_usermacros = array_key_exists('usermacros', $types);
 		$extract_macros = array_key_exists('macros', $types);
@@ -426,18 +426,23 @@ class CMacrosResolverGeneral {
 			$macros['expr_macros'] = [];
 
 			$expr_macro_parser = new CExpressionMacroParser();
+			$expr_macro_function_parser = new CExpressionMacroFunctionParser();
 		}
 
 		if ($extract_expr_macros_host) {
 			$macros['expr_macros_host'] = [];
+			$options = ['host_macro' => true, 'empty_host' => true];
 
-			$expr_macro_parser_host = new CExpressionMacroParser(['host_macro' => true, 'empty_host' => true]);
+			$expr_macro_parser_host = new CExpressionMacroParser($options);
+			$expr_macro_function_parser_host = new CExpressionMacroFunctionParser($options);
 		}
 
 		if ($extract_expr_macros_host_n) {
 			$macros['expr_macros_host_n'] = [];
+			$options = ['host_macro_n' => true, 'empty_host' => true];
 
-			$expr_macro_parser_host_n = new CExpressionMacroParser(['host_macro_n' => true, 'empty_host' => true]);
+			$expr_macro_parser_host_n = new CExpressionMacroParser($options);
+			$expr_macro_function_parser_host_n = new CExpressionMacroFunctionParser($options);
 		}
 
 		foreach ($texts as $text) {
@@ -463,24 +468,13 @@ class CMacrosResolverGeneral {
 						if ($macro_func_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macro_parser = $macro_func_parser->getMacroParser();
 							$function_parser = $macro_func_parser->getFunctionParser();
-							$function_parameters = [];
-
-							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw['type']) {
-									case C10FunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw['raw'];
-										break;
-
-									case C10FunctionParser::PARAM_QUOTED:
-										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
-										break;
-								}
-							}
 
 							$macros['macro_funcs'][$key][$macro_func_parser->getMatch()] = [
 								'macro' => $macro_parser->getMacro(),
-								'function' => $function_parser->getFunction(),
-								'parameters' => $function_parameters
+								'macrofunc' => [
+									'function' => $function_parser->getFunction(),
+									'parameters' => $function_parser->getParams()
+								]
 							];
 							$pos += $macro_func_parser->getLength() - 1;
 							continue 2;
@@ -519,25 +513,14 @@ class CMacrosResolverGeneral {
 						if ($macro_func_n_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
 							$macro_n_parser = $macro_func_n_parser->getMacroParser();
 							$function_parser = $macro_func_n_parser->getFunctionParser();
-							$function_parameters = [];
-
-							foreach ($function_parser->getParamsRaw()['parameters'] as $param_raw) {
-								switch ($param_raw['type']) {
-									case C10FunctionParser::PARAM_UNQUOTED:
-										$function_parameters[] = $param_raw['raw'];
-										break;
-
-									case C10FunctionParser::PARAM_QUOTED:
-										$function_parameters[] = C10FunctionParser::unquoteParam($param_raw['raw']);
-										break;
-								}
-							}
 
 							$macros['macro_funcs_n'][$key][$macro_func_n_parser->getMatch()] = [
 								'macro' => $macro_n_parser->getMacro(),
 								'f_num' => $macro_n_parser->getReference(),
-								'function' => $function_parser->getFunction(),
-								'parameters' => $function_parameters
+								'macrofunc' => [
+									'function' => $function_parser->getFunction(),
+									'parameters' => $function_parser->getParams()
+								]
 							];
 							$pos += $macro_func_n_parser->getLength() - 1;
 							continue 2;
@@ -590,6 +573,33 @@ class CMacrosResolverGeneral {
 					}
 				}
 
+				if ($extract_expr_macros && $expr_macro_function_parser->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_function_parser
+						->getExpressionMacroParser()
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$function_parser = $expr_macro_function_parser->getFunctionParser();
+
+						$macros['expr_macros'][$expr_macro_function_parser->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: '',
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+						];
+						$pos += $expr_macro_function_parser->getLength() - 1;
+						continue;
+					}
+				}
+
 				if ($extract_expr_macros_host && $expr_macro_parser_host->parse($text, $pos) != CParser::PARSE_FAIL) {
 					$tokens = $expr_macro_parser_host
 						->getExpressionParser()
@@ -606,6 +616,35 @@ class CMacrosResolverGeneral {
 								: ''
 						];
 						$pos += $expr_macro_parser_host->getLength() - 1;
+						continue;
+					}
+				}
+
+				if ($extract_expr_macros_host
+						&& $expr_macro_function_parser_host->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_function_parser_host
+						->getExpressionMacroParser()
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$function_parser = $expr_macro_function_parser_host->getFunctionParser();
+
+						$macros['expr_macros_host'][$expr_macro_function_parser_host->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: '',
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+
+						];
+						$pos += $expr_macro_function_parser_host->getLength() - 1;
 						continue;
 					}
 				}
@@ -627,6 +666,34 @@ class CMacrosResolverGeneral {
 								: ''
 						];
 						$pos += $expr_macro_parser_host_n->getLength() - 1;
+						continue;
+					}
+				}
+
+				if ($extract_expr_macros_host_n
+						&& $expr_macro_function_parser_host_n->parse($text, $pos) != CParser::PARSE_FAIL) {
+					$tokens = $expr_macro_function_parser_host_n
+						->getExpressionMacroParser()
+						->getExpressionParser()
+						->getResult()
+						->getTokens();
+
+					if (self::isCalculableExpression($tokens)) {
+						$function_parser = $expr_macro_function_parser_host_n->getFunctionParser();
+
+						$macros['expr_macros_host_n'][$expr_macro_function_parser_host_n->getMatch()] = [
+							'function' => $tokens[0]['data']['function'],
+							'host' => $tokens[0]['data']['parameters'][0]['data']['host'],
+							'key' => $tokens[0]['data']['parameters'][0]['data']['item'],
+							'sec_num' => array_key_exists(1, $tokens[0]['data']['parameters'])
+								? $tokens[0]['data']['parameters'][1]['data']['sec_num']
+								: '',
+							'macrofunc' => [
+								'function' => $function_parser->getFunction(),
+								'parameters' => $function_parser->getParams()
+							]
+						];
+						$pos += $expr_macro_function_parser_host_n->getLength() - 1;
 						continue;
 					}
 				}
@@ -799,7 +866,7 @@ class CMacrosResolverGeneral {
 					$forced = true;
 				}
 
-				$matched_macros = $this->getMacroPositions($param, $types);
+				$matched_macros = self::getMacroPositions($param, $types);
 
 				foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 					$param = substr_replace($param, $macros[$macro], $pos, strlen($macro));
@@ -1078,7 +1145,7 @@ class CMacrosResolverGeneral {
 								}
 
 								$macro_value = $data['parameters'][1];
-								$matched_macros = $this->getMacroPositions($macro_value, ['replacements' => true]);
+								$matched_macros = self::getMacroPositions($macro_value, ['replacements' => true]);
 
 								foreach (array_reverse($matched_macros, true) as $pos => $macro) {
 									$macro_value = substr_replace($macro_value,
@@ -1137,6 +1204,112 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
+	 * Calculates regular expression substitution. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
+	 * parameters or regular expression.
+	 *
+	 * @param string $value        [IN] The input value.
+	 * @param array  $parameters   [IN] The function parameters.
+	 * @param bool   $insensitive  [IN] Case insensitive match.
+	 *
+	 * @return string
+	 */
+	private static function macrofuncRegsub(string $value, array $parameters, bool $insensitive): string {
+		if (count($parameters) != 2) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		set_error_handler(function ($errno, $errstr) {});
+		$rc = preg_match('/'.$parameters[0].'/'.($insensitive ? 'i' : ''), $value, $matches);
+		restore_error_handler();
+
+		if ($rc === false) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$macro_values = [];
+		foreach (self::getMacroPositions($parameters[1], ['replacements' => true]) as $macro) {
+			$macro_values[$macro] = array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '';
+		}
+
+		return strtr($parameters[1], $macro_values);
+	}
+
+	/**
+	 * Calculates number formatting macro function. Returns UNRESOLVED_MACRO_STRING in case of incorrect function
+	 * parameters or value. Formatting is not applied to integer values.
+	 *
+	 * @param string $value        [IN] The input value.
+	 * @param array  $parameters   [IN] The function parameters.
+	 *
+	 * @return string
+	 */
+	private static function macrofuncFmtnum(string $value, array $parameters): string {
+		if (count($parameters) != 1 || $parameters[0] == '') {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		$parser = new CNumberParser(['with_float' => false]);
+
+		if ($parser->parse($value) == CParser::PARSE_SUCCESS) {
+			return $value;
+		}
+
+		$parser = new CNumberParser();
+
+		if ($parser->parse($value) != CParser::PARSE_SUCCESS) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		if (!ctype_digit($parameters[0]) || (int) $parameters[0] > 20) {
+			return UNRESOLVED_MACRO_STRING;
+		}
+
+		return sprintf('%.'.$parameters[0].'f', (float) $value);
+	}
+
+	/**
+	 * Calculates macro function. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
+	 *
+	 * @param string $value                    [IN] The input value.
+	 * @param array  $macrofunc                [IN]
+	 * @param string $macrofunc['function']    [IN] The function name.
+	 * @param array  $macrofunc['parameters']  [IN] The function parameters.
+	 *
+	 * @return string
+	 */
+	private static function calcMacrofunc(string $value, array $macrofunc) {
+		switch ($macrofunc['function']) {
+			case 'regsub':
+			case 'iregsub':
+				return self::macrofuncRegsub($value, $macrofunc['parameters'], $macrofunc['function'] === 'iregsub');
+
+			case 'fmtnum':
+				return self::macrofuncFmtnum($value, $macrofunc['parameters']);
+		}
+
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	/**
+	 * Calculates macro function for expression macros. Returns UNRESOLVED_MACRO_STRING in case of unsupported function.
+	 *
+	 * @param string $value                    [IN] The input value.
+	 * @param array  $macrofunc                [IN]
+	 * @param string $macrofunc['function']    [IN] The function name.
+	 * @param array  $macrofunc['parameters']  [IN] The function parameters.
+	 *
+	 * @return string
+	 */
+	private static function calcExpressionMacrofunc(string $value, array $macrofunc) {
+		switch ($macrofunc['function']) {
+			case 'fmtnum':
+				return self::macrofuncFmtnum($value, $macrofunc['parameters']);
+		}
+
+		return UNRESOLVED_MACRO_STRING;
+	}
+
+	/**
 	 * Get item macros.
 	 *
 	 * @param array $macros
@@ -1145,8 +1318,8 @@ class CMacrosResolverGeneral {
 	 * @param array $macro_values
 	 * @param array $triggers
 	 * @param array $options
-	 * @param bool  $options['events]               Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
-	 * @param bool  $options['html]
+	 * @param bool  $options['events']              Resolve {ITEM.VALUE} macro using 'clock' and 'ns' fields.
+	 * @param bool  $options['html']
 	 *
 	 * @return array
 	 */
@@ -1207,41 +1380,13 @@ class CMacrosResolverGeneral {
 				}
 
 				foreach ($tokens as $token) {
-					$macro_value = UNRESOLVED_MACRO_STRING;
-
 					if ($value !== null) {
-						if (array_key_exists('function', $token)) {
-							if ($token['function'] !== 'regsub' && $token['function'] !== 'iregsub') {
-								continue;
-							}
-
-							if (count($token['parameters']) != 2) {
-								continue;
-							}
-
-							$ci = ($token['function'] === 'iregsub') ? 'i' : '';
-
-							set_error_handler(function ($errno, $errstr) {});
-							$rc = preg_match('/'.$token['parameters'][0].'/'.$ci, $value, $matches);
-							restore_error_handler();
-
-							if ($rc === false) {
-								continue;
-							}
-
-							$macro_value = $token['parameters'][1];
-							$matched_macros = $this->getMacroPositions($macro_value, ['replacements' => true]);
-
-							foreach (array_reverse($matched_macros, true) as $pos => $macro) {
-								$macro_value = substr_replace($macro_value,
-									array_key_exists($macro[1], $matches) ? $matches[$macro[1]] : '',
-									$pos, strlen($macro)
-								);
-							}
-						}
-						else {
-							$macro_value = formatHistoryValue($value, $function);
-						}
+						$macro_value = array_key_exists('macrofunc', $token)
+							? self::calcMacrofunc($value, $token['macrofunc'])
+							: formatHistoryValue($value, $function);
+					}
+					else {
+						$macro_value = UNRESOLVED_MACRO_STRING;
 					}
 
 					if ($options['html']) {
@@ -1402,14 +1547,18 @@ class CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Get expression macros like "{?avg(/host/key, 1d)}".
+	 * Get expression macros like "{?avg(/host/key, 1d)}" or {{?min(/host/key, 1h)}.fmtnum(2)}.
 	 *
-	 * @param array $macros
-	 * @param array $macros[<macro>]['function']
-	 * @param array $macros[<macro>]['host']
-	 * @param array $macros[<macro>]['key']
-	 * @param array $macros[<macro>]['sec_num']
-	 * @param array $macro_values
+	 * @param array  $macros
+	 * @param array  $macros[<macro>]
+	 * @param string $macros[<macro>]['function']
+	 * @param string $macros[<macro>]['host']
+	 * @param string $macros[<macro>]['key']
+	 * @param string $macros[<macro>]['sec_num']
+	 * @param array  $macros[<macro>]['macrofunc']                (optional)
+	 * @param string $macros[<macro>]['macrofunc']['function']
+	 * @param array  $macros[<macro>]['macrofunc']['parameters']
+	 * @param array  $macro_values
 	 *
 	 * @return array
 	 */
@@ -1421,11 +1570,17 @@ class CMacrosResolverGeneral {
 		$function_data = [];
 
 		foreach ($macros as $macro => $data) {
+			$macro_data = ['macro' => $macro];
+			if (array_key_exists('macrofunc', $data)) {
+				$macro_data['macrofunc'] = $data['macrofunc'];
+			}
+
 			if ($data['function'] === 'last') {
-				$function_data['last'][$data['host']][$data['key']][] = $macro;
+				$function_data['last'][$data['host']][$data['key']][] = $macro_data;
 			}
 			else {
-				$function_data['other'][$data['host']][$data['key']][$data['function']][$data['sec_num']][] = $macro;
+				$function_data['other'][$data['host']][$data['key']][$data['function']][$data['sec_num']][] =
+					$macro_data;
 			}
 		}
 
@@ -1443,12 +1598,15 @@ class CMacrosResolverGeneral {
 					]);
 
 					foreach ($db_items as $db_item) {
-						$value = $db_item['lastclock']
-							? formatHistoryValue($db_item['lastvalue'], $db_item)
-							: UNRESOLVED_MACRO_STRING;
-
-						foreach ($keys[$db_item['key_']] as $_macro) {
-							$macro_values[$_macro] = $value;
+						foreach ($keys[$db_item['key_']] as $macro_data) {
+							if ($db_item['lastclock']) {
+								$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+									? self::calcExpressionMacrofunc($db_item['lastvalue'], $macro_data['macrofunc'])
+									: formatHistoryValue($db_item['lastvalue'], $db_item);
+							}
+							else {
+								$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
+							}
 						}
 					}
 				}
@@ -1467,8 +1625,15 @@ class CMacrosResolverGeneral {
 							foreach ($sec_nums as $sec_num => $_macros) {
 								$value = getItemFunctionalValue($db_item, $function, $sec_num);
 
-								foreach ($_macros as $_macro) {
-									$macro_values[$_macro] = $value;
+								foreach ($_macros as $macro_data) {
+									if ($value !== null) {
+										$macro_values[$macro_data['macro']] = array_key_exists('macrofunc', $macro_data)
+											? self::calcExpressionMacrofunc($value, $macro_data['macrofunc'])
+											: convertUnits(['value' => $value, 'units' => $db_item['units']]);
+									}
+									else {
+										$macro_values[$macro_data['macro']] = UNRESOLVED_MACRO_STRING;
+									}
 								}
 							}
 						}

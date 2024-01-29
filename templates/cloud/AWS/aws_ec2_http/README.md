@@ -27,7 +27,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -42,10 +42,9 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement":[
         {
           "Action":[
-              "cloudwatch:Describe*",
-              "cloudwatch:Get*",
-              "cloudwatch:List*",
-              "ec2:Describe*"
+              "ec2:DescribeVolumes",
+              "cloudwatch:"DescribeAlarms",
+              "cloudwatch:GetMetricData"
           ],
           "Effect":"Allow",
           "Resource":"*"
@@ -54,9 +53,37 @@ Add the following required permissions to your Zabbix IAM policy in order to col
   }
   ```
 
+If you are using role-based authorization, set the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "ec2:DescribeVolumes",
+                "cloudwatch:"DescribeAlarms",
+                "cloudwatch:GetMetricData"
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
+
 For more information, see the [EC2 policies](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/security-iam.html) on the AWS website.
 
-Set macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}", "{$AWS.REGION}", "{$AWS.EC2.INSTANCE.ID}"
+Set macros "{$AWS.AUTH_TYPE}", "{$AWS.REGION}", "{$AWS.EC2.INSTANCE.ID}".
+
+If you are using access key-based authorization, set the following macros "{$AWS.ACCESS.KEY.ID}", "{$AWS.SECRET.ACCESS.KEY}"
 
 For more information about manage access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys)
 
@@ -77,6 +104,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon EC2 Region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.EC2.INSTANCE.ID}|<p>EC2 instance ID.</p>||
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.MATCHES}|<p>Filter of discoverable volumes by type.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
@@ -137,8 +165,8 @@ Additional information about metrics and used API methods:
 |AWS EC2: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/AWS EC2 by HTTP/aws.ec2.cpu_utilization,15m)>{$AWS.EC2.CPU.UTIL.WARN.MAX}`|Warning||
 |AWS EC2: Byte Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.byte_balance,5m)<{$AWS.EBS.BYTE.CREDIT.BALANCE.MIN.WARN}`|Warning||
 |AWS EC2: I/O Credit balance is too low||`max(/AWS EC2 by HTTP/aws.ec2.ebs.io_balance,5m)<{$AWS.EBS.IO.CREDIT.BALANCE.MIN.WARN}`|Warning||
-|AWS EC2: Instance status check failed|<p>These checks detect problems that require your involvement to repair.The following are examples of problems that can cause instance status checks to fail:Failed system status checksIncorrect networking or startup configurationExhausted memoryCorrupted file systemIncompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||
-|AWS EC2: System status check failed|<p>These checks detect underlying problems with your instance that require AWS involvement to repair.The following are examples of problems that can cause system status checks to fail:Loss of network connectivityLoss of system powerSoftware issues on the physical hostHardware issues on the physical host that impact network reachability</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1`|Average||
+|AWS EC2: Instance status check failed|<p>These checks detect problems that require your involvement to repair.<br>The following are examples of problems that can cause instance status checks to fail:<br><br>Failed system status checks<br>Incorrect networking or startup configuration<br>Exhausted memory<br>Corrupted file system<br>Incompatible kernel</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_instance)=1`|Average||
+|AWS EC2: System status check failed|<p>These checks detect underlying problems with your instance that require AWS involvement to repair.<br>The following are examples of problems that can cause system status checks to fail:<br><br>Loss of network connectivity<br>Loss of system power<br>Software issues on the physical host<br>Hardware issues on the physical host that impact network reachability</p>|`last(/AWS EC2 by HTTP/aws.ec2.status_check_failed_system)=1`|Average||
 
 ### LLD rule Instance Alarms discovery
 
@@ -158,7 +186,7 @@ Additional information about metrics and used API methods:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
+|AWS EC2 Alarms: "{#ALARM_NAME}" has 'Alarm' state|<p>Alarm "{#ALARM_NAME}" has 'Alarm' state. <br>Reason: {ITEM.LASTVALUE2}</p>|`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS EC2 by HTTP/aws.ec2.alarm.state_reason["{#ALARM_NAME}"]))>0`|Average||
 |AWS EC2 Alarms: "{#ALARM_NAME}" has 'Insufficient data' state||`last(/AWS EC2 by HTTP/aws.ec2.alarm.state["{#ALARM_NAME}"])=1`|Info||
 
 ### LLD rule Instance Volumes discovery

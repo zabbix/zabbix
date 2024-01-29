@@ -126,7 +126,10 @@ database (required) — database name.
 
 **mysql.replication.discovery[\<commonParams\>]** — Returns replication information in LLD format.   
 
-**mysql.replication.get_slave_status[\<commonParams\>]** — Returns replication status.
+**mysql.replication.get_slave_status[\<commonParams\>,\<masterHost\>]** — Returns replication status.
+
+*Parameters:*  
+`masterHost` (optional) — the name of the master host.
 
 **mysql.get_status_variables[\<commonParams\>]** — Returns values of global status variables.
 

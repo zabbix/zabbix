@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-03-20 12:48+0000\n"
+"PO-Revision-Date: 2024-01-29 01:39+0000\n"
 "Last-Translator: 璞玉 <puyu@bbqi.cc>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: zh_CN\n"
@@ -79,7 +79,7 @@ msgstr "依赖项和主项的 \"ruleid\" 必须匹配"
 #: include/views/js/configuration.host.discovery.edit.js.php:86
 #: include/views/js/item.preprocessing.js.php:171
 msgid "$.path.to.node"
-msgstr ""
+msgstr "$.节点.路径"
 
 #: include/classes/api/services/CDRule.php:556
 #, c-format
@@ -191,6 +191,16 @@ msgstr[0] "%1$s 分"
 msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "处于问题状态的 %2$s 元素的 %1$s"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
 
 #: jsLoader.php:348
 #, c-format
@@ -345,11 +355,11 @@ msgstr "最近500个值"
 #: app/views/js/popup.itemtestedit.view.js.php:37
 #: app/views/js/popup.itemtestedit.view.js.php:44
 msgid "<empty string>"
-msgstr ""
+msgstr "<空字符串>"
 
 #: include/forms.inc.php:1406 include/views/js/item.preprocessing.js.php:220
 msgid "<label name>"
-msgstr ""
+msgstr "<标签名称>"
 
 #: include/views/monitoring.sysmap.edit.php:127
 msgid "<manual>"
@@ -363,12 +373,12 @@ msgstr ""
 
 #: app/views/administration.script.edit.php:109
 msgid "<sub-menu/sub-menu/...>"
-msgstr ""
+msgstr "<子菜单/子菜单/...>"
 
 #: jsLoader.php:185
 msgctxt "abbreviation of severity level"
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: include/classes/widgets/CWidgetHelper.php:952
 msgid "ADD OVERRIDE"
@@ -896,7 +906,7 @@ msgstr "添加原型"
 
 #: app/controllers/CControllerPopupScheduledReportEdit.php:127
 msgid "Add scheduled report"
-msgstr "添加定时报表"
+msgstr "添加计划报表"
 
 #: app/views/js/administration.userrole.edit.js.php:210
 msgid "Add services"
@@ -1001,7 +1011,7 @@ msgstr "agent 加密"
 
 #: include/classes/data/CItemData.php:817
 msgid "Agent host metadata. Returns string"
-msgstr ""
+msgstr "Agent主机元数据。返回字符串"
 
 #: include/classes/data/CItemData.php:821
 msgid "Agent host name. Returns string"
@@ -1013,7 +1023,7 @@ msgstr "agent代理程序的接口"
 
 #: include/classes/data/CItemData.php:829
 msgid "Agent variant check. Returns 1 - for Zabbix agent; 2 - for Zabbix agent 2"
-msgstr ""
+msgstr "Agent类型检查。返回1 - Zabbix agent；2 - Zabbix agent2"
 
 #: include/classes/widgets/CWidgetHelper.php:1317
 msgid "Aggregate"
@@ -1286,7 +1296,7 @@ msgstr "算法"
 #: app/views/popup.tophosts.column.edit.php:150
 #: include/classes/helpers/CServiceHelper.php:148
 msgid "As is"
-msgstr ""
+msgstr "不变"
 
 #: include/views/monitoring.history.php:102
 msgid "As plain text"
@@ -1295,7 +1305,7 @@ msgstr "纯文字"
 #: app/views/administration.authentication.edit.php:275
 #: app/views/administration.authentication.edit.php:309
 msgid "Assertions"
-msgstr ""
+msgstr "断言"
 
 #: include/hosts.inc.php:149
 msgid "Asset tag"
@@ -1338,17 +1348,17 @@ msgstr "用户角色\"%1$s\"至少需要启用一个UI页面。"
 
 #: app/controllers/CControllerPopupLldOperation.php:122
 msgid "At least one action is mandatory."
-msgstr ""
+msgstr "至少需要执行一项操作。"
 
 #: include/classes/api/services/CUser.php:614
 #: include/classes/api/services/CUser.php:1286
 #, c-format
 msgid "At least one active user must exist with role \"%1$s\"."
-msgstr ""
+msgstr "至少需要存在一个角色为“%1$s”的活动用户."
 
 #: include/classes/api/services/CMaintenance.php:683
 msgid "At least one day of the week or day of the month must be specified."
-msgstr ""
+msgstr "至少需要指定一周中的一天或一个月中的一天。"
 
 #: include/classes/api/services/CMaintenance.php:382
 #: include/classes/api/services/CMaintenance.php:574
@@ -1359,7 +1369,7 @@ msgstr "至少选择一个主机群组或主机。"
 #: include/classes/api/services/CHostGroup.php:1111
 #: include/classes/api/services/CHostGroup.php:1268
 msgid "At least one host or template must be specified."
-msgstr ""
+msgstr "至少需要指定一个主机或模板。"
 
 #: include/classes/setup/CFrontendSetup.php:241
 msgid "At least one of MySQL, PostgreSQL or Oracle should be supported."
@@ -1375,7 +1385,7 @@ msgstr "必须至少设置一个执行内容。"
 
 #: app/controllers/CControllerPopupAcknowledgeCreate.php:172
 msgid "At least one update operation or message is mandatory"
-msgstr ""
+msgstr "至少需要指定一个更新操作或消息内容"
 
 #: app/views/popup.acknowledge.edit.php:105
 msgid "At least one update operation or message must exist."
@@ -1401,15 +1411,15 @@ msgstr "尝试次数"
 
 #: app/views/administration.geomaps.edit.php:88
 msgid "Attribution"
-msgstr ""
+msgstr "根因"
 
 #: app/views/administration.geomaps.edit.php:90
 msgid "Attribution HTML"
-msgstr ""
+msgstr "HTML属性"
 
 #: app/views/administration.geomaps.edit.php:86
 msgid "Attribution text"
-msgstr ""
+msgstr "属性文字"
 
 #: app/views/administration.housekeeping.edit.php:178
 #: include/classes/helpers/CMenuHelper.php:148
@@ -1601,7 +1611,7 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:93
 msgid "Avoid easy-to-guess passwords"
-msgstr ""
+msgstr "避免使用弱密码"
 
 #: include/classes/widgets/views/widget.svggraph.form.view.php:307
 msgid "Axes"
@@ -1632,7 +1642,7 @@ msgstr "背景图片"
 #: include/classes/widgets/CWidgetHelper.php:971
 #: include/classes/widgets/CWidgetHelper.php:1219
 msgid "Bar"
-msgstr ""
+msgstr "柱状图"
 
 #: app/views/administration.authentication.edit.php:175
 msgid "Base DN"
@@ -1642,7 +1652,7 @@ msgstr "基于 DN"
 #: include/classes/widgets/CWidgetHelper.php:954
 #: include/classes/widgets/CWidgetHelper.php:1210
 msgid "Base color"
-msgstr ""
+msgstr "基色"
 
 #: include/httptest.inc.php:28
 msgid "Basic"
@@ -1650,11 +1660,11 @@ msgstr "基础的"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:250
 msgid "Before value"
-msgstr ""
+msgstr "前值"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:253
 msgid "Below value"
-msgstr ""
+msgstr "低值"
 
 #: app/views/administration.authentication.edit.php:187
 msgid "Bind DN"
@@ -1667,11 +1677,11 @@ msgstr "绑定密码"
 #: app/controllers/CControllerPopupTriggerExpr.php:428
 #: app/controllers/CControllerPopupTriggerExpr.php:461
 msgid "Bits to shift"
-msgstr ""
+msgstr "移位"
 
 #: app/views/popup.triggerexpr.php:110
 msgid "Bitwise functions"
-msgstr ""
+msgstr "按位函数"
 
 #: app/views/administration.user.list.php:143
 msgid "Blocked"
@@ -1700,7 +1710,7 @@ msgstr "body 和 headers"
 #: include/classes/widgets/forms/CWidgetFormItem.php:275
 #: include/classes/widgets/forms/CWidgetFormItem.php:335
 msgid "Bold"
-msgstr ""
+msgstr "粗体"
 
 #: include/graphs.inc.php:59 include/views/js/monitoring.sysmaps.js.php:780
 #: include/views/js/monitoring.sysmaps.js.php:870
@@ -1717,7 +1727,7 @@ msgstr "边"
 
 #: include/views/js/monitoring.sysmaps.js.php:595
 msgid "Border color"
-msgstr ""
+msgstr "边框颜色"
 
 #: include/views/js/monitoring.sysmaps.js.php:573
 msgid "Border type"
@@ -1729,7 +1739,7 @@ msgstr "边框宽度"
 
 #: app/controllers/CControllerUserUpdateGeneral.php:106
 msgid "Both passwords must be equal."
-msgstr ""
+msgstr "两次密码必须相同。"
 
 #: include/classes/widgets/forms/CWidgetFormItem.php:108
 #: include/classes/widgets/forms/CWidgetFormItem.php:189
@@ -1743,7 +1753,7 @@ msgstr "底部"
 
 #: include/classes/widgets/forms/CWidgetFormTopHosts.php:133
 msgid "Bottom N"
-msgstr ""
+msgstr "倒数N"
 
 #: jsLoader.php:276
 msgid "Bring forward"
@@ -1823,20 +1833,20 @@ msgstr ""
 
 #: include/classes/data/CItemData.php:1061
 msgid "CPU utilization percentage. Returns float"
-msgstr ""
+msgstr "CPU 使用率. 返回浮点数"
 
 #: app/views/popup.itemtestedit.view.php:300
 msgid "CRLF"
-msgstr ""
+msgstr "换行"
 
 #: include/items.inc.php:1829
 msgid "CSV to JSON"
-msgstr ""
+msgstr "CSV 转 JSON"
 
 #: include/classes/validators/CApiInputValidator.php:2717
 #: include/classes/validators/CNewValidator.php:310
 msgid "CUID is expected"
-msgstr ""
+msgstr "需用CUID"
 
 #: include/items.inc.php:100 include/views/configuration.graph.edit.php:177
 #: include/views/configuration.graph.edit.php:252
@@ -1890,7 +1900,7 @@ msgstr "取消"
 #: app/controllers/CControllerTokenCreate.php:44
 #: app/controllers/CControllerTokenCreate.php:105
 msgid "Cannot add API token"
-msgstr ""
+msgstr "无法添加 API 令牌"
 
 #: include/classes/api/services/CGraph.php:517
 #: include/classes/api/services/CGraph.php:531
@@ -1916,7 +1926,7 @@ msgstr "无法添加关联"
 #: jsLoader.php:133
 #, c-format
 msgid "Cannot add dashboard page: maximum number of %1$d dashboard pages has been added."
-msgstr ""
+msgstr "无法添加仪表盘页面：已添加最多 %1$d 个仪表盘页面。"
 
 #: include/classes/api/services/CTrigger.php:979
 #: include/classes/api/services/CTriggerPrototype.php:788
@@ -1986,7 +1996,7 @@ msgstr "无法添加报警媒介类型"
 #, c-format
 msgid "Cannot add module: %1$s."
 msgid_plural "Cannot add modules: %1$s."
-msgstr[0] ""
+msgstr[0] "无法添加模块：%1$s."
 
 #: include/classes/api/services/CGraph.php:40
 #, c-format
@@ -2014,7 +2024,7 @@ msgstr "无法添加正则表达式"
 
 #: app/controllers/CControllerScheduledReportCreate.php:152
 msgid "Cannot add scheduled report"
-msgstr ""
+msgstr "无法添加计划报表"
 
 #: app/controllers/CControllerScriptCreate.php:60
 #: app/controllers/CControllerScriptCreate.php:155
@@ -2045,7 +2055,7 @@ msgstr "无法添加用户"
 #: app/controllers/CControllerUsergroupCreate.php:51
 #: app/controllers/CControllerUsergroupCreate.php:101
 msgid "Cannot add user group"
-msgstr ""
+msgstr "无法添加用户组"
 
 #: httpconf.php:198
 msgid "Cannot add web scenario"
@@ -2053,12 +2063,12 @@ msgstr "不能添加web场景"
 
 #: jsLoader.php:134
 msgid "Cannot add widget: not enough free space on the dashboard."
-msgstr ""
+msgstr "无法添加小部件：仪表盘上的可用空间不足。"
 
 #: jsLoader.php:343
 msgctxt "screen reader"
 msgid "Cannot be removed"
-msgstr ""
+msgstr "无法移除"
 
 #: include/classes/validators/CLdapAuthValidator.php:79
 msgid "Cannot bind anonymously to LDAP server."
@@ -2073,15 +2083,19 @@ msgstr "无法绑定到 LDAP 服务器。"
 #: include/forms.inc.php:1990 include/forms.inc.php:2000
 #, c-format
 msgid "Cannot build expression tree: %1$s."
-msgstr ""
+msgstr "无法构建表达式树：%1$s。"
 
 #: include/classes/api/services/CRole.php:792
 msgid "Cannot change the user type of own role."
-msgstr ""
+msgstr "无法更改自己角色的用户类型。"
 
 #: httpconf.php:189 httpconf.php:433 items.php:901 items.php:981
 msgid "Cannot clear history"
 msgstr "无法清除历史"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "Cannot clear history and trends"
+msgstr "无法清除历史和趋势"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2112,7 +2126,7 @@ msgstr "不能连接到数据库。"
 
 #: include/views/js/configuration.httpconf.edit.js.php:182
 msgid "Cannot convert POST data:"
-msgstr ""
+msgstr "无法转换 POST 数据："
 
 #: graphs.php:390
 msgid "Cannot copy graph"
@@ -2172,13 +2186,13 @@ msgstr "无法创建图标映射"
 
 #: app/controllers/CControllerScheduledReportCreate.php:59
 msgid "Cannot create scheduled report"
-msgstr ""
+msgstr "无法创建计划报表"
 
 #: include/classes/api/services/CService.php:2373
 #: include/classes/api/services/CService.php:2397
 #, c-format
 msgid "Cannot create service \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法创建服务 \"%1$s\": %2$s。"
 
 #: include/classes/setup/CSetupWizard.php:878
 msgid "Cannot create the configuration file."
@@ -2187,7 +2201,7 @@ msgstr "无法创建配置文件。"
 #: app/controllers/CControllerUserroleCreate.php:103
 #: app/controllers/CControllerUserroleCreate.php:150
 msgid "Cannot create user role"
-msgstr ""
+msgstr "无法创建用户角色"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "Cannot delete API token"
@@ -2211,7 +2225,7 @@ msgstr "无法删除动作"
 #: include/classes/api/services/CRole.php:375
 #, c-format
 msgid "Cannot delete assigned user role \"%1$s\"."
-msgstr ""
+msgstr "无法删除已分配的用户角色\"%1$s\"。"
 
 #: app/controllers/CControllerCorrelationDelete.php:68
 msgid "Cannot delete correlation"
@@ -2290,7 +2304,7 @@ msgstr "无法删除图片"
 #: include/classes/api/services/CHostInterface.php:636
 #, c-format
 msgid "Cannot delete interface for discovered host \"%1$s\"."
-msgstr ""
+msgstr "无法删除自动发现主机\"%1$s\"的接口。"
 
 #: include/classes/api/services/CHost.php:1142
 msgid "Cannot delete inventory."
@@ -2339,7 +2353,7 @@ msgstr[0] "无法删除agent代理程序"
 #: include/classes/api/services/CRole.php:369
 #, c-format
 msgid "Cannot delete readonly user role \"%1$s\"."
-msgstr ""
+msgstr "无法删除只读用户角色\"%1$s\"。"
 
 #: app/controllers/CControllerRegExDelete.php:55
 msgid "Cannot delete regular expression"
@@ -2374,7 +2388,7 @@ msgstr[0] "无法删除服务"
 #: include/classes/api/services/CService.php:470
 #, c-format
 msgid "Cannot delete service \"%1$s\": %2$s."
-msgstr ""
+msgstr "无法删除服务 \"%1$s\": %2$s。"
 
 #: templates.php:462 templates.php:476 templates.php:542
 msgid "Cannot delete template"
@@ -2491,6 +2505,11 @@ msgid "Cannot disable media type"
 msgid_plural "Cannot disable media types"
 msgstr[0] "无法禁用消息介质类型"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2562,6 +2581,11 @@ msgstr[0] "无法启用监控项目"
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "无法启用消息介质类型"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3292,6 +3316,10 @@ msgstr "无法更新维护"
 msgid "Cannot update media type"
 msgstr "无法更新媒介型态"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3659,6 +3687,14 @@ msgstr "清除历史"
 #: include/views/configuration.item.edit.php:1071
 msgid "Clear history and trends"
 msgstr "清除历史和趋势"
+
+#: include/views/configuration.item.list.php:293
+msgid "Clear history and trends of selected items?"
+msgstr ""
+
+#: include/views/configuration.httpconf.list.php:218
+msgid "Clear history and trends of selected web scenarios?"
+msgstr ""
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6658,6 +6694,10 @@ msgstr "事件日志监控。返回日志"
 msgid "Event name"
 msgstr "事件名称"
 
+#: app/views/popup.condition.common.php:642
+msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
+msgstr ""
+
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
 msgstr "事件标签对"
@@ -7870,6 +7910,10 @@ msgstr "高亮整行"
 #: jsLoader.php:372
 msgid "History"
 msgstr "历史记录"
+
+#: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
+msgid "History and trends cleared"
+msgstr ""
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -11823,10 +11867,20 @@ msgid "Module deleted: %1$s."
 msgid_plural "Modules deleted: %1$s."
 msgstr[0] ""
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
+msgstr[0] ""
+
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
 msgstr[0] ""
 
 #: app/controllers/CControllerModuleUpdate.php:145
@@ -11834,6 +11888,10 @@ msgstr[0] ""
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -12947,6 +13005,11 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "不支持的"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19023,6 +19086,10 @@ msgstr "Zabbix服务器进程的在线时间单位秒."
 msgid "Uptime/Downtime"
 msgstr "在线/不在线"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "使用大量请求"
@@ -20418,6 +20485,10 @@ msgstr "X轴"
 msgid "X-Frame-Options HTTP header"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -20833,6 +20904,11 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2530
@@ -22191,6 +22267,10 @@ msgstr "now() - UNIX 时间"
 #: include/forms.inc.php:1315 include/views/js/item.preprocessing.js.php:149
 msgid "number"
 msgstr "数字"
+
+#: include/classes/api/services/CHostPrototype.php:820
+msgid "object does not exist or belongs to another object"
+msgstr ""
 
 #: app/views/monitoring.widget.problemhosts.view.php:127
 #: include/blocks.inc.php:504

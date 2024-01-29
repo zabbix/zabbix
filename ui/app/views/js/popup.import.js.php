@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -114,7 +114,7 @@ function openImportComparePopup(overlay) {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title);
+		const message_box = makeMessageBox('bad', messages, title, true, true);
 
 		message_box.insertBefore(form);
 	})
@@ -169,7 +169,7 @@ function submitImportPopup(overlay) {
 			messages = [<?= json_encode(_('Unexpected server error.')) ?>];
 		}
 
-		const message_box = makeMessageBox('bad', messages, title);
+		const message_box = makeMessageBox('bad', messages, title, true, true);
 
 		message_box.insertBefore(form);
 	})

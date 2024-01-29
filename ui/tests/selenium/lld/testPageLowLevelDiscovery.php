@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -20,8 +20,8 @@
 
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
  * @dataSource DiscoveredHosts, HostGroups
@@ -30,20 +30,21 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
-	use TableTrait;
-
-	const HOST_ID = 90001;
-
-	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
 	 *
 	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	const HOST_ID = 90001;
+
+	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
@@ -293,7 +294,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 						'Host groups' => 'Templates/Databases'
 					],
 					'context' => 'template',
-					'rows' => 86
+					'rows' => 90
 				]
 			],
 			[
@@ -458,11 +459,11 @@ class testPageLowLevelDiscovery extends CWebTest {
 					'filter' => [
 						'Type' => 'Database monitor',
 						'Update interval' => '1h',
-						'Name'=> 'Non-local database'
+						'Name'=> 'PDB'
 					],
 					'context' => 'template',
 					'expected' => [
-						'Non-local database discovery'
+						'PDB discovery'
 					]
 				]
 			],

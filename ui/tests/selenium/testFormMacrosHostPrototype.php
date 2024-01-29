@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,6 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+require_once dirname(__FILE__).'/behaviors/CMacrosBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/common/testFormMacros.php';
 
 /**
@@ -25,11 +27,21 @@ require_once dirname(__FILE__).'/common/testFormMacros.php';
  */
 class testFormMacrosHostPrototype extends testFormMacros {
 
+	/**
+	 * Attach MacrosBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CMacrosBehavior::class,
+			CMessageBehavior::class
+		];
+	}
+
 	// Parent LLD for Host prototypes 'Discovery rule 1' host: 'Host for host prototype tests'.
 	const LLD_ID		= 90001;
 	const IS_PROTOTYPE	= true;
-
-	use MacrosTrait;
 
 	/**
 	 * The name of the host for updating macros, id=99200.

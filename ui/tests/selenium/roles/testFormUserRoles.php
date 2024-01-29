@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,8 +21,8 @@
 
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
-require_once dirname(__FILE__).'/../traits/TableTrait.php';
 
 /**
  * @backup role, module, users
@@ -34,16 +34,19 @@ require_once dirname(__FILE__).'/../traits/TableTrait.php';
  */
 class testFormUserRoles extends CWebTest {
 
-	use TableTrait;
-
-	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid ORDER BY r.roleid, rr.role_ruleid';
-
 	/**
-	 * Attach MessageBehavior to the test.
+	 * Attach MessageBehavior and TableBehavior to the test.
+	 *
+	 * @return array
 	 */
 	public function getBehaviors() {
-		return [CMessageBehavior::class];
+		return [
+			CMessageBehavior::class,
+			CTableBehavior::class
+		];
 	}
+
+	const ROLE_SQL = 'SELECT * FROM role r INNER JOIN role_rule rr ON rr.roleid = r.roleid ORDER BY r.roleid, rr.role_ruleid';
 
 	/**
 	 * Id of role that created for future update.
@@ -1449,7 +1452,7 @@ class testFormUserRoles extends CWebTest {
 			$multiselect->edit();
 			$dialog->invalidate();
 
-			// Filter out all unwanted services befoce checking table content.
+			// Filter out all unwanted services before checking table content.
 			$dialog->query('name:filter_name')->one()->fill('Service for delete');
 			$dialog->query('button:Filter')->one()->click();
 			$dialog->waitUntilReady();

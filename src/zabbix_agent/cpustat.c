@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -175,7 +175,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 			if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 				goto clean;
 
-			if (NULL == (pcpus->cpu_counter[idx] = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+			if (NULL == (pcpus->cpu_counter[idx] = zbx_add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
 					PERF_COUNTER_LANG_DEFAULT, &error)))
 			{
 				goto clean;
@@ -223,7 +223,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 					goto clean;
 
 				if (NULL == (pcpus->cpu_counter[gidx * cpus_per_group + idx] =
-						add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+						zbx_add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
 								PERF_COUNTER_LANG_DEFAULT, &error)))
 				{
 					goto clean;
@@ -239,7 +239,7 @@ int	init_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	if (ERROR_SUCCESS != zbx_PdhMakeCounterPath(__func__, &cpe, counterPath))
 		goto clean;
 
-	if (NULL == (pcpus->queue_counter = add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
+	if (NULL == (pcpus->queue_counter = zbx_add_perf_counter(NULL, counterPath, MAX_COLLECTOR_PERIOD,
 			PERF_COUNTER_LANG_DEFAULT, &error)))
 	{
 		goto clean;
@@ -308,12 +308,12 @@ void	free_cpu_collector(ZBX_CPUS_STAT_DATA *pcpus)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 #ifdef _WINDOWS
-	remove_perf_counter(pcpus->queue_counter);
+	zbx_remove_perf_counter(pcpus->queue_counter);
 	pcpus->queue_counter = NULL;
 
 	for (idx = 0; idx <= pcpus->count; idx++)
 	{
-		remove_perf_counter(pcpus->cpu_counter[idx]);
+		zbx_remove_perf_counter(pcpus->cpu_counter[idx]);
 		pcpus->cpu_counter[idx] = NULL;
 	}
 #else

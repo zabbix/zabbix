@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		$dropdowns = [
 			'media_type' => array_merge(['all'], $all_media),
 			'period' => ['Daily', 'Weekly', 'Monthly', 'Yearly'],
-			'year' => array_reverse(range(date("Y"), date("Y",strtotime("-11 year"))))
+			'year' => array_reverse(range(date("Y"), 2012))
 		];
 		$default_selected = [
 			'media_type' => 'all',
@@ -66,7 +66,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 		sort($user_alias);
 
 		$users = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th[@class="vertical_rotation"]'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/span[@class="text-vertical"]'));
 		foreach ($elements as $i => $element) {
 			$users[] = $element->getText();
 		}
@@ -199,7 +199,7 @@ class testPageReportsNotifications extends CLegacyWebTest {
 
 		// Get user column number in table
 		$user_column_number = [];
-		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th[@class="vertical_rotation"]'));
+		$elements = $this->webDriver->findElements(WebDriverBy::xpath('//th/span[@class="text-vertical"]'));
 		foreach ($elements as $index => $element) {
 			// 2 is column of month plus column count begin from 1 not from 0
 			$user_column_number[$element->getText()] = $index + 2;

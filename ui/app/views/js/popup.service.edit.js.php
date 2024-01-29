@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -290,7 +290,9 @@ window.service_edit_popup = new class {
 			parameters = {row_index};
 		}
 
-		const overlay = PopUp('popup.service.statusrule.edit', parameters, {dialogueid: 'service_status_rule_edit'});
+		const overlay = PopUp('popup.service.statusrule.edit', parameters,
+			{dialogueid: 'service_status_rule_edit', dialogue_class: 'modal-popup-medium'}
+		);
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			if (row !== null) {
@@ -400,7 +402,7 @@ window.service_edit_popup = new class {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add child services')) ?>,
 			exclude_serviceids
-		}, {dialogueid: 'services'});
+		}, {dialogueid: 'services', dialogue_class: 'modal-popup-generic'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			for (const service of e.detail) {
@@ -430,7 +432,7 @@ window.service_edit_popup = new class {
 		const overlay = PopUp('popup.services', {
 			title: <?= json_encode(_('Add parent services')) ?>,
 			exclude_serviceids
-		}, {dialogueid: 'services'});
+		}, {dialogueid: 'services', dialogue_class: 'modal-popup-generic'});
 
 		overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 			const data = [];

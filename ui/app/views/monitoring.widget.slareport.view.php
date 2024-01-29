@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ elseif (!$data['has_serviceid']) {
 	foreach ($data['sli']['periods'] as $period) {
 		$header[] = CSlaHelper::getPeriodTag((int) $data['sla']['period'], $period['period_from'], $period['period_to'],
 			$data['sla']['timezone']
-		)->addClass($data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY ? 'date-vertical' : null);
+		)->addClass($data['sla']['period'] != ZBX_SLA_PERIOD_ANNUALLY ? ZBX_STYLE_TEXT_VERTICAL : null);
 	}
 
 	$report->setHeader($header);
@@ -130,7 +130,7 @@ else {
 
 $output = [
 	'name' => $data['name'],
-	'body' => (new CDiv($report))->addClass('dashboard-grid-widget-slareport')->toString()
+	'body' => (new CDiv($report))->toString()
 ];
 
 if (($messages = getMessages()) !== null) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@ import (
 	"time"
 	"unicode"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"zabbix.com/pkg/itemutil"
 	"zabbix.com/pkg/zbxcmd"
@@ -106,7 +107,11 @@ func (p *UserParameterPlugin) cmd(key string, params []string) (string, error) {
 }
 
 // Export -
-func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
+func (p *UserParameterPlugin) Export(
+	key string,
+	params []string,
+	ctx plugin.ContextProvider,
+) (result interface{}, err error) {
 	s, err := p.cmd(key, params)
 	if err != nil {
 		return nil, err
@@ -119,52 +124,94 @@ func (p *UserParameterPlugin) Export(key string, params []string, ctx plugin.Con
 		return nil, err
 	}
 
-	p.Debugf("command:'%s' length:%d output:'%.20s'", s, len(stdoutStderr), stdoutStderr)
+	p.Debugf(
+		"command:'%s' length:%d output:'%.20s'",
+		s,
+		len(stdoutStderr),
+		stdoutStderr,
+	)
 
 	return stdoutStderr, nil
 }
 
-func InitUserParameterPlugin(userParameterConfig []string, unsafeUserParameters int, userParameterDir string) (keys []string, err error) {
-	params := make(map[string]*parameterInfo)
+func InitUserParameterPlugin(
+	userParameterConfig []string,
+	unsafeUserParameters int,
+	userParameterDir string,
+) ([]string, error) {
+	var (
+		keys   = make([]string, 0, len(userParameterConfig))
+		params = make(map[string]*parameterInfo)
+	)
 
-	for i := 0; i < len(userParameterConfig); i++ {
-		s := strings.SplitN(userParameterConfig[i], ",", 2)
-		if len(s) != 2 {
-			return nil, fmt.Errorf("cannot add user parameter \"%s\": not comma-separated", userParameterConfig[i])
+	for _, userParam := range userParameterConfig {
+		// split by first comma.
+		parts := strings.SplitN(userParam, ",", 2) //nolint:gomnd
+		if len(parts) != 2 {                       //nolint:gomnd
+			return nil, fmt.Errorf(
+				"cannot add user parameter %q: not comma-separated", userParam,
+			)
 		}
 
-		key, p, err := itemutil.ParseKey(s[0])
+		key, keyParams, err := itemutil.ParseKey(parts[0])
 		if err != nil {
-			return nil, fmt.Errorf("cannot add user parameter \"%s\": %s", userParameterConfig[i], err)
+			return nil, fmt.Errorf(
+				"cannot add user parameter %q: %s", userParam, err.Error(),
+			)
 		}
 
 		if acc, _ := plugin.Get(key); acc != nil {
-			return nil, fmt.Errorf(`cannot register user parameter "%s": key already used`, userParameterConfig[i])
+			return nil, fmt.Errorf(
+				"cannot register user parameter %q: key already used",
+				userParam,
+			)
 		}
 
-		if len(strings.TrimSpace(s[1])) == 0 {
-			return nil, fmt.Errorf("cannot add user parameter \"%s\": command is missing", userParameterConfig[i])
+		_, ok := params[key]
+		if ok {
+			return nil, fmt.Errorf(
+				"cannot register user parameter %q: duplicate user parameter",
+				userParam,
+			)
 		}
 
-		parameter := &parameterInfo{cmd: s[1]}
+		if len(strings.TrimSpace(parts[1])) == 0 {
+			return nil, fmt.Errorf(
+				"cannot add user parameter %q: command is missing", userParam,
+			)
+		}
 
-		if len(p) == 1 && p[0] == "*" {
+		parameter := &parameterInfo{cmd: parts[1]}
+
+		if len(keyParams) == 1 && keyParams[0] == "*" {
 			parameter.flexible = true
-		} else if len(p) != 0 {
-			return nil, fmt.Errorf("cannot add user parameter \"%s\": syntax error", userParameterConfig[i])
+		}
+
+		if len(keyParams) != 0 && !parameter.flexible {
+			return nil, fmt.Errorf(
+				"cannot add user parameter %q: syntax error", userParam,
+			)
 		}
 
 		params[key] = parameter
 		keys = append(keys, key)
 	}
 
+	for key, param := range params {
+		err := plugin.RegisterMetrics(
+			&userParameter,
+			"UserParameter",
+			key,
+			fmt.Sprintf("User parameter: %s.", param.cmd),
+		)
+		if err != nil {
+			return nil, errs.Wrap(err, "failed to register user parameter metrics")
+		}
+	}
+
 	userParameter.parameters = params
 	userParameter.unsafeUserParameters = unsafeUserParameters
 	userParameter.userParameterDir = userParameterDir
-
-	for _, key := range keys {
-		plugin.RegisterMetrics(&userParameter, "UserParameter", key, fmt.Sprintf("User parameter: %s.", userParameter.parameters[key].cmd))
-	}
 
 	return keys, nil
 }

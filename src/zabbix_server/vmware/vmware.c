@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1966,7 +1966,12 @@ static int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easy
 
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
+#	if LIBCURL_VERSION_NUM >= 0x075500
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+#	else
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, opt = CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+#	endif
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 		goto out;
@@ -2296,6 +2301,8 @@ static int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL 
 			unit = ZBX_VMWARE_UNIT_MEGABYTESPERSECOND;				\
 		else if (0 == strcmp("megaHertz",val))						\
 			unit = ZBX_VMWARE_UNIT_MEGAHERTZ;					\
+		else if (0 == strcmp("nanosecond",val))						\
+			unit = ZBX_VMWARE_UNIT_NANOSECOND;					\
 		else if (0 == strcmp("microsecond",val))					\
 			unit = ZBX_VMWARE_UNIT_MICROSECOND;					\
 		else if (0 == strcmp("millisecond",val))					\
@@ -7047,7 +7054,11 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error(void *user_data, const xmlError *err)
+#endif
 {
 	ZBX_UNUSED(user_data);
 	ZBX_UNUSED(err);

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1939,7 +1939,12 @@ static int	jsonpath_regexp_match(const char *text, const char *pattern, double *
 static void	jsonpath_index_append_result(zbx_hashset_t *index, const char *name, zbx_jsonobj_t *obj,
 		zbx_jsonobj_t *value)
 {
+#if defined(__hpux)
+	/* fix for compiling with HP-UX bundled cc compiler */
+	zbx_jsonobj_index_el_t	el_local = {NULL}, *el;
+#else
 	zbx_jsonobj_index_el_t	el_local = {.value = NULL}, *el;
+#endif
 	size_t			value_alloc = 0, value_offset = 0;
 	zbx_jsonobj_ref_t	ref;
 

@@ -29,13 +29,17 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     "Statement": [
         {
             "Action": [
-                "cloudwatch:Describe*",
-                "cloudwatch:Get*",
-                "cloudwatch:List*",
-                "ec2:Describe*",
-                "rds:Describe*",
-                "ecs:Describe*",
-                "ecs:List*",
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "ec2:DescribeInstances",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeRegions",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances",
+                "ecs:DescribeClusters",
+                "ecs:ListServices",
+                "ecs:ListTasks",
+                "ecs:ListClusters",
                 "s3:ListAllMyBuckets",
                 "s3:GetBucketLocation"
             ],
@@ -45,10 +49,46 @@ Add the following required permissions to your Zabbix IAM policy in order to col
     ]
 }
   ```
-
+If you are using role-based authorization, add the appropriate permissions:
+```json
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "iam:PassRole",
+            "Resource": "arn:aws:iam::<<--account-id-->>:role/<<--role_name-->>"
+        },
+        {
+            "Sid": "VisualEditor1",
+            "Effect": "Allow",
+            "Action": [
+                "cloudwatch:DescribeAlarms",
+                "cloudwatch:GetMetricData",
+                "ec2:DescribeInstances",
+                "ec2:DescribeVolumes",
+                "ec2:DescribeRegions",
+                "rds:DescribeEvents",
+                "rds:DescribeDBInstances",
+                "ecs:DescribeClusters",
+                "ecs:ListServices",
+                "ecs:ListTasks",
+                "ecs:ListClusters",
+                "s3:ListAllMyBuckets",
+                "s3:GetBucketLocation",
+                "ec2:AssociateIamInstanceProfile",
+                "ec2:ReplaceIamInstanceProfileAssociation"
+            ],
+            "Resource": "*"
+        }
+    ]
+}
+```
 To gather Request metrics, enable [Requests metrics](https://docs.aws.amazon.com/AmazonS3/latest/userguide/cloudwatch-monitoring.html) on your Amazon S3 buckets from the AWS console.
 
-Set the following macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}, {$AWS.REGION}.
+Set macros "{$AWS.AUTH_TYPE}". Possible values: role_base, access_key.
+
+If you are using access key-based authorization, set the following macros {$AWS.ACCESS.KEY.ID}, {$AWS.SECRET.ACCESS.KEY}.
 
 For more information about managing access keys, see [official documentation](https://docs.aws.amazon.com/general/latest/gr/aws-sec-cred-types.html#access-keys-and-secret-access-keys).
 
@@ -73,9 +113,11 @@ Additional information about the metrics and used API methods:
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
-|{$AWS.REGION}|<p>Amazon EC2 region code.</p>|`us-west-1`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.EC2.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable EC2 instances by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.EC2.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable EC2 instances by region.</p>|`.*`|
+|{$AWS.EC2.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered EC2 instances by region.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.ECS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable ECS clusters by name.</p>|`.*`|
 |{$AWS.ECS.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered ECS clusters by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.ECS.LLD.FILTER.STATUS.MATCHES}|<p>Filter of discoverable ECS clusters by status.</p>|`ACTIVE`|
@@ -84,6 +126,10 @@ Additional information about the metrics and used API methods:
 |{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered S3 buckets by namespace.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.RDS.LLD.FILTER.NAME.MATCHES}|<p>Filter of discoverable RDS instances by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.NAME.NOT_MATCHES}|<p>Filter to exclude discovered RDS instances by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.RDS.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable RDS instances by region.</p>|`.*`|
+|{$AWS.RDS.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered RDS instances by region.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.ECS.LLD.FILTER.REGION.MATCHES}|<p>Filter of discoverable ECS clusters by region.</p>|`.*`|
+|{$AWS.ECS.LLD.FILTER.REGION.NOT_MATCHES}|<p>Filter to exclude discovered ECS clusters by region.</p>|`CHANGE_IF_NEEDED`|
 
 ### LLD rule S3 buckets discovery
 

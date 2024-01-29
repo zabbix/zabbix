@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -98,7 +98,12 @@ class CControllerPopupLldOverride extends CController {
 					unset($page_options['overrides_filters'][$i]);
 				}
 			}
-			$page_options['overrides_filters'] = array_values($page_options['overrides_filters']);
+
+			if ($page_options['overrides_filters']) {
+				$page_options['overrides_filters'] = sortLldRuleFilterConditions($page_options['overrides_filters'],
+					$page_options['overrides_evaltype']
+				);
+			}
 
 			// Return collected error messages.
 			if (($messages = getMessages()) !== null) {
@@ -126,6 +131,15 @@ class CControllerPopupLldOverride extends CController {
 			);
 		}
 		else {
+			if (!$page_options['overrides_filters']) {
+				$page_options['overrides_filters'][] = [
+					'macro' => '',
+					'operator' => CONDITION_OPERATOR_REGEXP,
+					'value' => '',
+					'formulaid' => num2letter(0)
+				];
+			}
+
 			$data = [
 				'title' => _('Override'),
 				'options' => $page_options,

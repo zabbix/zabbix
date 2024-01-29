@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,19 +19,28 @@
 **/
 
 require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
-require_once dirname(__FILE__).'/traits/TagTrait.php';
-require_once dirname(__FILE__).'/traits/TableTrait.php';
+require_once dirname(__FILE__).'/behaviors/CTableBehavior.php';
+require_once dirname(__FILE__).'/behaviors/CTagBehavior.php';
 
 use Facebook\WebDriver\WebDriverBy;
 
 class testPageTriggers extends CLegacyWebTest {
 
+	/**
+	 * Attach TagBehavior and TableBehavior to the test.
+	 *
+	 * @return array
+	 */
+	public function getBehaviors() {
+		return [
+			CTableBehavior::class,
+			CTagBehavior::class
+		];
+	}
+
 	public $hostid = 99050;
 
 	private $selector = 'xpath://form[@name="triggersForm"]/table[@class="list-table"]';
-
-	use TagTrait;
-	use TableTrait;
 
 	public static function data() {
 		return CDBHelper::getDataProvider(

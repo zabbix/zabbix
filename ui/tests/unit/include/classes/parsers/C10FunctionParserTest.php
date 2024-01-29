@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -539,7 +539,7 @@ class C10FunctionParserTest extends TestCase {
 			'params_raw' => $function_parser->getParamsRaw()
 		]);
 		$this->assertSame(strlen($expected['match']), $function_parser->getLength());
-		$this->assertSame(count($unquoted_params), $function_parser->getParamsNum());
+		$this->assertSame($unquoted_params, $function_parser->getParams());
 
 		for ($n = 0, $count = $function_parser->getParamsNum(); $n < $count; $n++) {
 			$this->assertSame($unquoted_params[$n], $function_parser->getParam($n));

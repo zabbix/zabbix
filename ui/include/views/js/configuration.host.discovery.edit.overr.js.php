@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -827,7 +827,8 @@
 		this.$form.parent().find('.msg-bad, .msg-good').remove();
 
 		var form_data = this.$form.serializeJSON();
-		if (Object.keys(form_data.overrides_filters).length <= 1) {
+
+		if (!('overrides_filters' in form_data) || Object.keys(form_data.overrides_filters).length <= 1) {
 			delete form_data.overrides_formula;
 			delete form_data.overrides_evaltype;
 		}

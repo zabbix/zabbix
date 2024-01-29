@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,12 +43,11 @@ class testFormFilterProblems extends testFormFilter {
 	protected static $triggerids;
 
 	/**
-	 * Time when events were created.
+	 * Current time.
 	 *
 	 * @var int
 	 */
-	protected static $two_yeasr_ago_1;
-	protected static $two_years_ago_2;
+	protected static $time;
 
 	public $url = 'zabbix.php?action=problem.view&show_timeline=0';
 	public $table_selector = 'class:list-table';
@@ -99,37 +98,22 @@ class testFormFilterProblems extends testFormFilter {
 		$this->assertArrayHasKey('triggerids', $triggers);
 		self::$triggerids = CDataHelper::getIds('description');
 
-		// Make timestamp a little less 1 year ago.
-		self::$two_yeasr_ago_1 = time()-62985600;
+		// Create events and problems.
+		self::$time = time();
+		$trigger_data = [
+			[
+				'name' => 'Filter problems trigger 0',
+				'time' => self::$time - 62985600 // now - 729 days.
+			],
+			[
+				'name' => 'Filter problems trigger 1',
+				'time' => self::$time - 62983800 // now - 728 days 23 hours and 30 minutes.
+			]
+		];
 
-		// Make timestamp a little less than 2 years ago.
-		self::$two_years_ago_2 = time()-62983800;
-
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005500, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 0']).', '.self::$two_yeasr_ago_1.', 0, 1, '.
-				zbx_dbstr('Filter problems trigger 0').', 0)'
-		);
-
-		DBexecute('INSERT INTO events (eventid, source, object, objectid, clock, ns, value, name, severity) VALUES (1005501, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 1']).', '.self::$two_years_ago_2.', 0, 1, '.
-		zbx_dbstr('Filter problems trigger 1').', 1)'
-		);
-
-		// Create problems.
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005500, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 0']).', '.self::$two_yeasr_ago_1.', 0, '.
-				zbx_dbstr('Filter problems trigger 0').', 0)'
-		);
-
-		DBexecute('INSERT INTO problem (eventid, source, object, objectid, clock, ns, name, severity) VALUES (1005501, 0, 0, '.
-				zbx_dbstr(self::$triggerids['Filter problems trigger 1']).', '.self::$two_years_ago_2.', 0, '.
-				zbx_dbstr('Filter problems trigger 1').', 1)'
-		);
-
-		// Change triggers' state to Problem.
-		DBexecute('UPDATE triggers SET value = 1 WHERE description IN ('.zbx_dbstr('Filter problems trigger 0').', '.
-				zbx_dbstr('Filter problems trigger 1').')'
-		);
+		foreach ($trigger_data as $params) {
+			CDBHelper::setTriggerProblem($params['name'], TRIGGER_VALUE_TRUE, ['clock' => $params['time']]);
+		}
 	}
 
 	public static function getCheckCreatedFilterData() {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -306,7 +306,12 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 
 #if LIBCURL_VERSION_NUM >= 0x071304
 	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
+#	if LIBCURL_VERSION_NUM >= 0x075500
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
+#	else
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+#	endif
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err)));
 		goto clean;
@@ -378,11 +383,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 				goto clean;
 			}
 
-			if (FAIL == zbx_is_utf8(body.data))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
-				goto clean;
-			}
+			zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
 
 			if (HTTP_STORE_JSON == item->output_format)
 			{
@@ -396,12 +397,7 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_HEADERS:
-			if (FAIL == zbx_is_utf8(header.data))
-			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
-				goto clean;
-			}
-
+			zbx_replace_invalid_utf8(header.data);
 			if (HTTP_STORE_JSON == item->output_format)
 			{
 				zbx_json_init(&json, ZBX_JSON_STAT_BUF_LEN);
@@ -422,11 +418,15 @@ int	get_value_http(const DC_ITEM *item, AGENT_RESULT *result)
 			}
 			break;
 		case ZBX_RETRIEVE_MODE_BOTH:
-			if (FAIL == zbx_is_utf8(header.data) || (NULL != body.data && FAIL == zbx_is_utf8(body.data)))
+			zbx_replace_invalid_utf8(header.data);
+
+			if (NULL == body.data)
 			{
-				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned invalid UTF-8 sequence"));
+				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Server returned empty content"));
 				goto clean;
 			}
+
+			zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
 
 			if (HTTP_STORE_JSON == item->output_format)
 			{

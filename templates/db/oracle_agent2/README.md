@@ -16,7 +16,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -41,6 +41,8 @@ Test availability:
 |{$ORACLE.DBNAME.NOT_MATCHES}|<p>This macro is used in discovery of the database. It can be overridden on host level or its linked template level.</p>|`PDB\$SEED`|
 |{$ORACLE.TABLESPACE.NAME.MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`.*`|
 |{$ORACLE.TABLESPACE.NAME.NOT_MATCHES}|<p>This macro is used in tablespace discovery. It can be overridden on host level or its linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.</p>|`90`|
+|{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}|<p>High severity alert threshold for the maximum percentage of tablespace usage from maximum tablespace size (used bytes/max bytes) for a trigger expression.</p>|`95`|
 |{$ORACLE.TBS.USED.PCT.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p>|`90`|
 |{$ORACLE.TBS.USED.PCT.MAX.HIGH}|<p>High severity alert threshold for the maximum percentage of tablespace usage (used bytes/allocated bytes) for a trigger expression.</p>|`95`|
 |{$ORACLE.TBS.UTIL.PCT.MAX.WARN}|<p>Warning severity alert threshold for the maximum percentage of tablespace utilization (allocated bytes/max bytes) for a trigger expression.</p>|`80`|
@@ -219,6 +221,7 @@ Test availability:
 |Oracle TBS '{#TABLESPACE}': Tablespace free, bytes|<p>Free bytes of the allocated space.</p>|Dependent item|oracle.tbs_free_bytes["{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].free_bytes.first()`</p></li></ul>|
 |Oracle TBS '{#TABLESPACE}': Tablespace usage, percent|<p>Used bytes/allocated bytes*100.</p>|Dependent item|oracle.tbs_used_file_pct["{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].used_file_pct.first()`</p></li></ul>|
 |Oracle TBS '{#TABLESPACE}': Tablespace allocated, percent|<p>Allocated bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_pct["{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].used_pct_max.first()`</p></li></ul>|
+|Oracle TBS '{#TABLESPACE}': Tablespace usage from MAX, percent|<p>Used bytes/max bytes*100.</p>|Dependent item|oracle.tbs_used_from_max_pct["{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].used_from_max_pct.first()`</p></li></ul>|
 |Oracle TBS '{#TABLESPACE}': Open status|<p>The tablespace status where:</p><p>1 - 'ONLINE';</p><p>2 - 'OFFLINE';</p><p>3 - 'READ ONLY'.</p>|Dependent item|oracle.tbs_status["{#TABLESPACE}"]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..['{#TABLESPACE}'].status.first()`</p></li></ul>|
 
 ### Trigger prototypes for Tablespace discovery
@@ -229,6 +232,8 @@ Test availability:
 |Oracle TBS '{#TABLESPACE}': Tablespace usage is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_file_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.HIGH}`|High||
 |Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high</li></ul>|
 |Oracle TBS '{#TABLESPACE}': Tablespace utilization is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.UTIL.PCT.MAX.HIGH}`|High||
+|Oracle TBS '{#TABLESPACE}': Tablespace usage from MAX is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.WARN}`|Warning|**Depends on**:<br><ul><li>Oracle TBS '{#TABLESPACE}': Tablespace utilization from MAX is too high</li></ul>|
+|Oracle TBS '{#TABLESPACE}': Tablespace utilization from MAX is too high||`min(/Oracle by Zabbix agent 2/oracle.tbs_used_from_max_pct["{#TABLESPACE}"],5m)>{$ORACLE.TBS.USED.PCT.FROM.MAX.HIGH}`|High||
 |Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE|<p>The tablespace is in the offline state.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"])=2`|Warning||
 |Oracle TBS '{#TABLESPACE}': Tablespace status has changed|<p>Oracle tablespace status has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.tbs_status["{#TABLESPACE}"],#2)`|Info|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Oracle TBS '{#TABLESPACE}': Tablespace is OFFLINE</li></ul>|
 
@@ -251,7 +256,7 @@ Test availability:
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Archivelog '{#DEST_NAME}': Log Archive is not valid|<p>The trigger will launch if the archive log destination is not in one of these states:2 - 'DEFERRED';3 - 'VALID'.</p>|`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2`|High||
+|Archivelog '{#DEST_NAME}': Log Archive is not valid|<p>The trigger will launch if the archive log destination is not in one of these states:<br>2 - 'DEFERRED';<br>3 - 'VALID'.</p>|`last(/Oracle by Zabbix agent 2/oracle.archivelog_log_status["{#DEST_NAME}"])<2`|High||
 
 ### LLD rule ASM disk groups discovery
 

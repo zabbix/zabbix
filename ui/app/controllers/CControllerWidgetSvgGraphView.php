@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -38,10 +38,37 @@ class CControllerWidgetSvgGraphView extends CControllerWidget {
 			'content_width' => 'int32|ge '.self::GRAPH_WIDTH_MIN.'|le '.self::GRAPH_WIDTH_MAX,
 			'content_height' => 'int32|ge '.self::GRAPH_HEIGHT_MIN.'|le '.self::GRAPH_HEIGHT_MAX,
 			'preview' => 'in 1',
-			'from' => 'string',
-			'to' => 'string',
+			'from' => 'range_time',
+			'to' => 'range_time',
 			'fields' => 'json'
 		]);
+	}
+
+	protected function checkInput() {
+		$ret = parent::checkInput();
+
+		if ($ret && !$this->getInput('preview', 0)) {
+			$fields = [
+				'from' =>	'required',
+				'to' =>		'required'
+			];
+
+			$validator = new CNewValidator(array_intersect_key($this->getInputAll(), $fields), $fields);
+
+			foreach ($validator->getAllErrors() as $error) {
+				info($error);
+			}
+
+			$ret = !$validator->isErrorFatal() && !$validator->isError();
+
+			if (!$ret) {
+				$this->setResponse((new CControllerResponseData([
+					'main_block' => json_encode(['messages' => getMessages()->toString()])
+				]))->disableView());
+			}
+		}
+
+		return $ret;
 	}
 
 	protected function doAction() {

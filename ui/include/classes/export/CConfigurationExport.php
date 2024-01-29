@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ class CConfigurationExport {
 	 * Constructor.
 	 *
 	 * @param array $options                IDs of elements that should be exported.
-	 * @param array $templateids_to_unlink  Template IDs with parent template ids that should be unlinked.
+	 * @param array $unlink_templates_data  Template IDs with parent template ids that should be unlinked.
 	 */
 	public function __construct(array $options, array $unlink_templates_data = []) {
 		$this->options = array_merge([
@@ -795,13 +795,6 @@ class CConfigurationExport {
 			// Unset unnecessary filter field and prepare the operations.
 			if ($item['overrides']) {
 				foreach ($item['overrides'] as &$override) {
-					if (array_key_exists('filter', $override)) {
-						if (!$override['filter']['conditions']) {
-							unset($override['filter']);
-						}
-						unset($override['filter']['eval_formula']);
-					}
-
 					foreach ($override['operations'] as &$operation) {
 						if (array_key_exists('opstatus', $operation)) {
 							$operation['status'] = $operation['opstatus']['status'];
@@ -1623,8 +1616,8 @@ class CConfigurationExport {
 			$host = reset($graph['hosts']);
 
 			$ids[$id] = [
-				'name' => $graph['name'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'name' => $graph['name']
 			];
 		}
 
@@ -1659,8 +1652,8 @@ class CConfigurationExport {
 			$host = reset($item['hosts']);
 
 			$ids[$id] = [
-				'key' => $item['key_'],
-				'host' => $host['host']
+				'host' => $host['host'],
+				'key' => $item['key_']
 			];
 		}
 

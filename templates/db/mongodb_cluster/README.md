@@ -19,7 +19,7 @@ This template has been tested on:
 
 ## Configuration
 
-> Zabbix should be configured according to instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
+> Zabbix should be configured according to the instructions in the [Templates out of the box](https://www.zabbix.com/documentation/6.0/manual/config/templates_out_of_the_box) section.
 
 ## Setup
 
@@ -96,7 +96,7 @@ Test availability: `zabbix_get -s mongos.node -k 'mongodb.ping["{$MONGODB.CONNST
 |MongoDB cluster: Version has changed|<p>MongoDB cluster version has changed. Acknowledge to close the problem manually.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#1)<>last(/MongoDB cluster by Zabbix agent 2/mongodb.version,#2) and length(last(/MongoDB cluster by Zabbix agent 2/mongodb.version))>0`|Info|**Manual close**: Yes|
 |MongoDB cluster: Mongos server has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/MongoDB cluster by Zabbix agent 2/mongodb.uptime)<10m`|Info|**Manual close**: Yes|
 |MongoDB cluster: Failed to fetch info data|<p>Zabbix has not received data for items for the last 10 minutes</p>|`nodata(/MongoDB cluster by Zabbix agent 2/mongodb.uptime,10m)=1`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>MongoDB cluster: Connection to mongos proxy is unavailable</li></ul>|
-|MongoDB cluster: Available connections is low|<p>Too few available connections.Consider this value in combination with the value of connections current to understand the connection load on the database.</p>|`max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}`|Warning||
+|MongoDB cluster: Available connections is low|<p>Too few available connections.<br>Consider this value in combination with the value of connections current to understand the connection load on the database.</p>|`max(/MongoDB cluster by Zabbix agent 2/mongodb.connections.available,5m)<{$MONGODB.CONNS.AVAILABLE.MIN.WARN}`|Warning||
 |MongoDB cluster: Too many cursors opened by MongoDB for clients||`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.open.total,5m)>{$MONGODB.CURSOR.OPEN.MAX.WARN}`|Warning||
 |MongoDB cluster: Too many cursors are timing out||`min(/MongoDB cluster by Zabbix agent 2/mongodb.cursor.timed_out.rate,5m)>{$MONGODB.CURSOR.TIMEOUT.MAX.WARN}`|Warning||
 

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -432,6 +432,8 @@ static void	DCdump_interfaces(void)
 		}
 
 		zabbix_log(LOG_LEVEL_TRACE, "%s", if_msg);
+
+		offset = 0;
 	}
 
 	zbx_free(if_msg);

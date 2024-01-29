@@ -1,0 +1,204 @@
+---
+test case: Parameters ' '
+in:
+  params: ' '
+  macros: []
+  escape_bs: 0
+out:
+  params: []
+---
+test case: Parameters 'a'
+in:
+  params: 'a'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - 'a'
+---
+test case: Parameters 'a,b)'
+in:
+  params: 'a,b)'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - 'a'
+  - 'b'
+---
+test case: Parameters ' a , b '
+in:
+  params: ' a , b '
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - 'a '
+  - 'b '
+---
+test case: Parameters '{$M:a,b}'
+in:
+  params: '{$M:a,b}'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '{$M:a'
+  - 'b}'
+---
+test case: Parameters '{$M:a,b}' with user macros
+in:
+  params: '{$M:a,b}'
+  macros: [ZBX_TOKEN_USER_MACRO]
+  escape_bs: 0
+out:
+  params: 
+  - '{$M:a,b}'
+---
+test case: Parameters '"{$M:a,b}"'
+in:
+  params: '"{$M:a,b}"'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"{$M:a,b}"'
+---
+test case: Parameters '{{#L}.f(a,b)}'
+in:
+  params: '{{#L}.f(a,b)}'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '{{#L}.f(a'
+  - 'b'
+---
+test case: Parameters '{{#L}.f(a,b)}' with lld macros
+in:
+  params: '{{#L}.f(a,b)}'
+  macros: [ZBX_TOKEN_LLD_MACRO,ZBX_TOKEN_LLD_FUNC_MACRO]
+  escape_bs: 0
+out:
+  params: 
+  - '{{#L}.f(a,b)}'
+---
+test case: Parameters ' "a" '
+in:
+  params: ' "a" '
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"a"'
+---
+test case: Parameters '"a,b"'
+in:
+  params: '"a,b"'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"a,b"'
+---
+test case: Parameters '"a\b",c'
+in:
+  params: '"a\b",c'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"a\b"'
+  - 'c'
+---
+test case: Parameters '"a\"b",c'
+in:
+  params: '"a\"b",c'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"a\"b"'
+  - 'c'
+---
+test case: Parameters '"a\\",b\\"",c'
+in:
+  params: '"a\\",b\\"",c'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"a\\",b\\""'
+  - 'c'
+---
+test case: Parameters '"a\b",c' with backslash escaping
+in:
+  params: '"a\b",c'
+  macros: []
+  escape_bs: 1
+out:
+  params: 
+   - '"a\b"'
+   - 'c'
+---
+test case: Parameters '"a\"b",c' with backslash escaping
+in:
+  params: '"a\"b",c'
+  macros: []
+  escape_bs: 1
+out:
+  params: 
+  - '"a\"b"'
+  - 'c'
+---
+test case: Parameters '"a\\",b\\"",c'
+in:
+  params: '"a\\",b\\"",c'
+  macros: []
+  escape_bs: 1
+out:
+  params: 
+  - '"a\\"'
+  - 'b\\""'
+  - 'c'
+---
+test case: Parameters ' "a,b'
+in:
+  params: ' "a,b'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '"a,b'
+---
+test case: Parameters 'a",b'
+in:
+  params: 'a",b'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - 'a"'
+  - 'b'
+---
+test case: Parameters '{$A, {$M:a,b}'
+in:
+  params: '{$A, {$M:a,b}'
+  macros: []
+  escape_bs: 0
+out:
+  params: 
+  - '{$A'
+  - '{$M:a'
+  - 'b}'
+---
+test case: Parameters '{$A, {$M:a,b}' with user macros
+in:
+  params: '{$A, {$M:a,b}'
+  macros: [ZBX_TOKEN_USER_MACRO]
+  escape_bs: 0
+out:
+  params: 
+  - '{$A'
+  - '{$M:a,b}'
+...
