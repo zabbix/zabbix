@@ -2000,14 +2000,16 @@ static int	DBpatch_6050162(void)
 
 static int	DBpatch_6050163(void)
 {
-	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL,
+			0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_6050164(void)
 {
-	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL,
+			0};
 
 	return DBadd_field("scripts", &field);
 }
@@ -3209,6 +3211,13 @@ static int	DBpatch_6050208(void)
 	return SUCCEED;
 #endif
 }
+
+static int	DBpatch_6050209(void)
+{
+	const zbx_db_field_t	field = {"auditlog_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3422,5 +3431,6 @@ DBPATCH_ADD(6050205, 0, 1)
 DBPATCH_ADD(6050206, 0, 1)
 DBPATCH_ADD(6050207, 0, 1)
 DBPATCH_ADD(6050208, 0, 1)
+DBPATCH_ADD(6050209, 0, 1)
 
 DBPATCH_END()

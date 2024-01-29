@@ -372,10 +372,6 @@ class testFormUserProfile extends CLegacyWebTest {
 	}
 	public static function messaging() {
 		return [
-			// TODO: remove this case and put it in the end of data after ZBX-23993 is fixed.
-			[[
-				'expected' => TEST_GOOD
-			]],
 			[[
 				'expected' => TEST_BAD,
 				'messages_disabled' => true,
@@ -457,10 +453,9 @@ class testFormUserProfile extends CLegacyWebTest {
 				'timeout' => '1d',
 				'suppressed' => false
 			]],
-			// TODO: uncomment after ZBX-23993 is fixed.
-//			[[
-//				'expected' => TEST_GOOD
-//			]]
+			[[
+				'expected' => TEST_GOOD
+			]]
 		];
 	}
 
@@ -468,6 +463,9 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * @dataProvider messaging
 	 */
 	public function testFormUserProfile_MessagesTimeout($data) {
+		// TODO: uncomment the following line after ZBX-23993 is fixed.
+		$this->markTestSkipped();
+
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Messaging');

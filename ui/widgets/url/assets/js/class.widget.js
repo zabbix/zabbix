@@ -20,6 +20,22 @@
 
 class CWidgetUrl extends CWidget {
 
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		const iframe = this._target.querySelector('iframe');
+
+		if (iframe !== null) {
+			readiness.push(
+				new Promise(resolve => {
+					iframe.addEventListener('load', () => setTimeout(resolve, 200));
+				})
+			);
+		}
+
+		return Promise.all(readiness);
+	}
+
 	getUpdateRequestData() {
 		const use_dashboard_host = this._dashboard.templateid !== null
 			|| CWidgetBase.FOREIGN_REFERENCE_KEY in this.getFields().override_hostid;
