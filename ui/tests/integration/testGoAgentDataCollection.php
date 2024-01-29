@@ -342,12 +342,7 @@ class testGoAgentDataCollection extends CIntegrationTest {
 			'key' => 'zabbix.stats[127.0.0.1,'.PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX.']',
 			'type' => ITEM_TYPE_ZABBIX,
 			'valueType' => ITEM_VALUE_TYPE_TEXT,
-			'threshold' => 500,
-			// Removing initial block ->
-			// {"response":"success","data":{"boottime":1683011633,"uptime":113,<- ,
-			// since uptime is flaky (e.g. values "113" and "114" on agent 1 and 2 can appear)
-			// Assuming the uptime takes 3 digits. Update threshold if uptime number of digits changes.
-			'threshold_before' => 65
+			'do_not_compare' => '1'
 		]
 	];
 
@@ -586,12 +581,6 @@ class testGoAgentDataCollection extends CIntegrationTest {
 
 					$a = substr($a, 0, $item['threshold']);
 					$b = substr($b, 0, $item['threshold']);
-				}
-
-				if (array_key_exists('threshold_before', $item) && $item['threshold_before'] !== 0) {
-
-					$a = substr($a, $item['threshold_before']);
-					$b = substr($b, $item['threshold_before']);
 				}
 
 				$this->assertEquals($a, $b, 'Strings do not match for '.$item['key']);
