@@ -54,7 +54,7 @@ class testDashboardItemValueWidget extends testWidgets {
 	protected static $dashboard_aggregation;
 	protected static $old_name = 'New widget';
 	protected static $threshold_widget = 'Widget with thresholds';
-	const DATA_WIDET = 'Widget for aggregation function data check';
+	const DATA_WIDGET = 'Widget for aggregation function data check';
 
 	/**
 	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
@@ -3875,12 +3875,12 @@ class testDashboardItemValueWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
 
-		$form = $dashboard->getWidget(self::DATA_WIDET)->edit();
+		$form = $dashboard->getWidget(self::DATA_WIDGET)->edit();
 		$form->fill($data['fields']);
 		$form->submit();
 		$dashboard->save();
 		$dashboard->waitUntilReady();
-		$content = $dashboard->getWidget(self::DATA_WIDET)->getContent();
+		$content = $dashboard->getWidget(self::DATA_WIDGET)->getContent();
 		$item_value = $content->query('class:value')->one()->getText();
 
 		if (array_key_exists('units', $data)) {
