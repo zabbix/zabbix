@@ -649,7 +649,7 @@ static int	update_host_maintenances(void)
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
 #define ZBX_MAINTENANCE_TIMER_DELAY	SEC_PER_MIN
-	time_t			nextcheck = 0, update_time = 0;
+	time_t			schedule_time = 0, update_time = 0;
 	char			*info = NULL;
 	size_t			info_alloc = 0, info_offset = 0;
 	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
@@ -680,7 +680,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 		{
 			zbx_maintenance_timer_t	maintenance_timer;
 
-			if (ZBX_MAINTENANCE_TIMER_DELAY <= sec - (double)nextcheck)
+			if (ZBX_MAINTENANCE_TIMER_DELAY <= sec - (double)schedule_time)
 				maintenance_timer = MAINTENANCE_TIMER_PENDING;
 			else
 				maintenance_timer = MAINTENANCE_TIMER_INITIALIZED;
@@ -696,7 +696,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				update = zbx_dc_update_maintenances(maintenance_timer);
 
 				/* force maintenance updates at server startup */
-				if (0 == nextcheck)
+				if (0 == schedule_time)
 					update = SUCCEED;
 
 				/* update hosts if there are modified (stopped, started, changed) maintenances */
@@ -742,12 +742,12 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_dc_maintenance_reset_update_flag(process_num);
 		}
 
-		if (nextcheck != update_time)
+		if (schedule_time != update_time)
 		{
 			update_time -= update_time % 60;
-			nextcheck = update_time;
+			schedule_time = update_time;
 
-			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)nextcheck))))
+			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)schedule_time))))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",
