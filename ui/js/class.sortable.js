@@ -158,6 +158,15 @@ class CSortable {
 	}
 
 	/**
+	 * Get sortable container.
+	 *
+	 * @returns {HTMLElement}
+	 */
+	getTarget() {
+		return this.#target;
+	}
+
+	/**
 	 * Enable or disable the instance.
 	 *
 	 * @param {boolean} enable
@@ -173,7 +182,7 @@ class CSortable {
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
-			this.#disconnectMutationObserver();
+			this.#unobserveTokens();
 			this.#cancelSort();
 		}
 
@@ -195,7 +204,7 @@ class CSortable {
 	}
 
 	/**
-	 * Scroll target token into view.
+	 * Scroll the target token into view.
 	 *
 	 * @param {HTMLElement} element
 	 */
@@ -209,6 +218,15 @@ class CSortable {
 		if (token !== null) {
 			this.#scrollIntoView(this.#tokens_loc.get(token));
 		}
+	}
+
+	/**
+	 * Check whether the sortable container is scrollable.
+	 *
+	 * @returns {boolean}
+	 */
+	isScrollable() {
+		return this.#getScrollMax() > 0;
 	}
 
 	/**
@@ -260,7 +278,7 @@ class CSortable {
 	}
 
 	#sortTokens(tokens = this.#tokens) {
-		this.#disconnectMutationObserver();
+		this.#unobserveTokens();
 
 		for (const token of tokens) {
 			for (const element of token.elements) {
@@ -268,7 +286,7 @@ class CSortable {
 			}
 		}
 
-		this.#connectMutationObserver();
+		this.#observeTokens();
 	}
 
 	#getTargetLoc() {
@@ -511,6 +529,10 @@ class CSortable {
 		this.#sortTokens();
 	}
 
+	#getScrollMax() {
+		return this.#target[this.#is_vertical ? 'scrollHeight' : 'scrollWidth'] - this.#getTargetLoc().dim;
+	}
+
 	#scrollTo(pos) {
 		const animation = this.#getAnimation(CSortable.ANIMATION_SCROLL);
 
@@ -518,10 +540,7 @@ class CSortable {
 			? this.#getAnimationProgress(animation, performance.now())
 			: this.#scroll_pos;
 
-		const pos_min = 0;
-		const pos_max = this.#target[this.#is_vertical ? 'scrollHeight' : 'scrollWidth'] - this.#getTargetLoc().dim;
-
-		const pos_to = Math.max(pos_min, Math.min(pos_max, pos));
+		const pos_to = Math.max(0, Math.min(this.#getScrollMax(), pos));
 
 		this.#scheduleAnimation(CSortable.ANIMATION_SCROLL, pos_cur, pos_to);
 
@@ -697,11 +716,16 @@ class CSortable {
 		}
 	}
 
-	#connectMutationObserver() {
-		this.#mutation_observer.observe(this.#target, {subtree: true, childList: true});
+	#observeTokens() {
+		this.#mutation_observer.observe(this.#target, {
+			subtree: true,
+			childList: true,
+			attributes: true,
+			characterData: true
+		});
 	}
 
-	#disconnectMutationObserver() {
+	#unobserveTokens() {
 		this.#mutation_observer.disconnect();
 	}
 
