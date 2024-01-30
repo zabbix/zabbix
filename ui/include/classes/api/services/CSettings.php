@@ -85,9 +85,10 @@ class CSettings extends CApiService {
 	 */
 	public static function getPublic(): array {
 		$output_fields = ['default_theme', 'show_technical_errors', 'severity_color_0', 'severity_color_1',
-			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'custom_color',
-			'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color', 'default_lang',
-			'default_timezone', 'x_frame_options', 'auditlog_enabled'
+			'severity_color_2', 'severity_color_3', 'severity_color_4', 'severity_color_5', 'severity_name_0',
+			'severity_name_1', 'severity_name_2', 'severity_name_3', 'severity_name_4', 'severity_name_5',
+			'custom_color', 'problem_unack_color', 'problem_ack_color', 'ok_unack_color', 'ok_ack_color',
+			'default_lang', 'default_timezone', 'x_frame_options', 'auditlog_enabled'
 		];
 
 		$db_settings = DB::select('config', ['output' => $output_fields]);
