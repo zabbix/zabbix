@@ -37,6 +37,7 @@
 #include "zbx_item_constants.h"
 #include "zbxpreproc.h"
 #include "zbxcrypto.h"
+#include "zbxhash.h"
 
 static int	trap_fd = -1;
 static off_t	trap_lastsize;
