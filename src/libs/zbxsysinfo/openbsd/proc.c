@@ -353,7 +353,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (SUCCEED == proc_argv(proc[i].ZBX_P_PID, &argv, &argv_alloc, &argc))
 			{
 				collect_args(argv, argc, &args, &args_alloc);
-				if (0 == zbx_regexp_match_precompiled(procargs, proccomm_rxp))
+				if (0 == zbx_regexp_match_precompiled(args, proccomm_rxp))
 					comm_ok = 1;
 			}
 		}
@@ -578,7 +578,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (SUCCEED == proc_argv(proc[i].ZBX_P_PID, &argv, &argv_alloc, &argc))
 			{
 				collect_args(argv, argc, &args, &args_alloc);
-				if (0 == zbx_regexp_match_precompiled(procargs, proccomm_rxp))
+				if (0 == zbx_regexp_match_precompiled(args, proccomm_rxp))
 					comm_ok = 1;
 			}
 		}
@@ -828,7 +828,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 		else
 			continue;
 
-		if (NULL != proccomm && '\0' != *proccomm && 0 != zbx_regexp_match_precompiled(procargs, proccomm_rxp))
+		if (NULL != proccomm && '\0' != *proccomm && 0 != zbx_regexp_match_precompiled(args, proccomm_rxp))
 			continue;
 
 		pw = getpwuid(proc[i].ZBX_P_UID);
