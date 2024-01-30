@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CSVGGauge {
 
 	static ZBX_STYLE_CLASS =					'svg-gauge';
