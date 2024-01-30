@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-19 20:59+0000\n"
+"PO-Revision-Date: 2024-01-27 12:58+0000\n"
 "Last-Translator: ERIC <eric78.zabbix@orange.fr>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: fr\n"
@@ -12269,6 +12269,10 @@ msgstr "Longitude de l'emplacement"
 msgid "Log"
 msgstr "Journal"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr "Consigner les modifications par découverte de bas niveau, découverte de réseau et enregistrement automatique"
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Supervision d'un fichier de log avec support de la rotation. Retourne un log"
@@ -12276,6 +12280,10 @@ msgstr "Supervision d'un fichier de log avec support de la rotation. Retourne un
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Supervision d'un fichier de log. Retourne un log"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr "Consigner les actions du système"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -15053,6 +15061,10 @@ msgstr "Surcharger la période d'historique des éléments"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Surcharger la période de tendances des éléments"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Remplacer le sélecteur de période de temps"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -22417,9 +22429,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "Avec problèmes"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Avec ce paramètre, seules les données numériques seront affichées."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Avec ce paramètre, seuls les éléments numériques seront affichés dans cette colonne."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Avec ce paramètre, seuls les éléments numériques seront affichés."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -24421,6 +24442,10 @@ msgstr "pas dans"
 msgid "not selected"
 msgstr "non sélectionné"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "non utilisé"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now () - Nombre de secondes écoulées depuis le temps Epoch"
@@ -24429,9 +24454,29 @@ msgstr "now () - Nombre de secondes écoulées depuis le temps Epoch"
 msgid "number"
 msgstr "nombre"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr "l'objet n'existe pas"
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "l'objet n'existe pas ou appartient à un autre objet"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr "l'objet n'existe pas ou vous n'avez aucune autorisation sur celui-ci"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"

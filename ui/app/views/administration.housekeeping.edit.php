@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -214,7 +214,9 @@ $house_keeper_tab = (new CFormList())
 		$timescaledb_error = $timescaledb_error !== '' ? makeErrorIcon($timescaledb_error) : null;
 
 		$compression_status_checkbox = (new CCheckBox('compression_status'))
-			->setChecked($data['compression_status'] == 1)
+			->setChecked($data['compression_availability'] && $data['compression_status'] == 1
+				|| $data['compression_not_detected']
+			)
 			->setEnabled($data['compression_availability']);
 
 		$house_keeper_tab

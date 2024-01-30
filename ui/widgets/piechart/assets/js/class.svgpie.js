@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -236,6 +236,13 @@ class CSVGPie {
 	#sector_observer;
 
 	/**
+	 * Rendered promise.
+	 *
+	 * @type {Promise<void>}
+	 */
+	#rendered_promise = Promise.resolve();
+
+	/**
 	 * @param {Object} padding             Inner padding of the root SVG element.
 	 *        {number} padding.horizontal
 	 *        {number} padding.vertical
@@ -428,7 +435,7 @@ class CSVGPie {
 				.data(this.#pieGenerator(is), key);
 		}
 
-		this.#arcs_container
+		this.#rendered_promise = this.#arcs_container
 			.selectAll(`.${CSVGPie.ZBX_STYLE_ARC_PLACEHOLDER}, .${CSVGPie.ZBX_STYLE_ARC_STROKE}, .${CSVGPie.ZBX_STYLE_ARC}`)
 			.transition()
 			.duration(CSVGPie.ANIMATE_DURATION_WHOLE)
@@ -576,6 +583,15 @@ class CSVGPie {
 	 */
 	destroy() {
 		this.#svg.node().remove();
+	}
+
+	/**
+	 * Get rendered promise.
+	 *
+	 * @returns {Promise<void>}
+	 */
+	promiseRendered() {
+		return this.#rendered_promise;
 	}
 
 	/**

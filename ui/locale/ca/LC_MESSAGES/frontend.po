@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-19 11:57+0000\n"
+"PO-Revision-Date: 2024-01-27 08:33+0000\n"
 "Last-Translator: Xevi Noè i Nogueiras <xevi.noe@gmail.com>\n"
 "Language-Team: none\n"
 "Language: ca\n"
@@ -12268,6 +12268,10 @@ msgstr "Longitud de la ubicació"
 msgid "Log"
 msgstr "Registre"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr "Enregistra els canvis per descoberta de baix nivell, descoberta de xarxa i autoregistre"
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Supervisió de fitxers de registre amb suport de rotació de registre. Retorna un registre"
@@ -12275,6 +12279,10 @@ msgstr "Supervisió de fitxers de registre amb suport de rotació de registre. R
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Supervisió del fitxer de registre. Retorna un registre"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr "Enregistra les accions del sistema"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -15052,6 +15060,10 @@ msgstr "Anul·la el període d'historial d'elements"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Anul·la el període de tendència de l'element"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Anul·lar la tria de període de temps"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -22416,9 +22428,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "Amb problemes"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Amb aquesta configuració només veureu dades numèriques."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Amb aquesta configuració només es mostraran els elements numèrics en aquesta columna."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Amb aquesta configuració només veureu elements numèrics."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -24420,6 +24441,10 @@ msgstr "no a"
 msgid "not selected"
 msgstr "no triat"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "no emprat"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Nombre de segons des de l'època"
@@ -24428,9 +24453,29 @@ msgstr "now() - Nombre de segons des de l'època"
 msgid "number"
 msgstr "nombre"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr "l'objecte no existeix pas"
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "l'objecte no existeix pas o pertany a un altre objecte"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr "l'objecte no existeix, o no hi teniu pas permisos"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"

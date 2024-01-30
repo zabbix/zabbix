@@ -1111,7 +1111,7 @@ zabbix_export:
               parameters:
                 - |
                   return JSON.stringify(value.split("\n").map(function (name) {
-                      return ({"{#DBNAME}": name});
+                  	return ({"{#DBNAME}": name});
                   }));
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1381,7 +1381,7 @@ zabbix_export:
                 - |
                   var matches = value.match(/Master_Host.*>(.*)<.*/);
                   if (matches) {
-                      return JSON.stringify([{"{#MASTERHOST}": matches[1]}]);
+                  	return JSON.stringify([{"{#MASTERHOST}": matches[1]}]);
                   }
                   
                   return '[]';

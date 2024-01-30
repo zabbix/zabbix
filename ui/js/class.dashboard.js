@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -37,6 +37,8 @@ const DASHBOARD_EVENT_APPLY_PROPERTIES = 'dashboard-apply-properties';
 const DASHBOARD_EVENT_CONFIGURATION_OUTDATED = 'dashboard-configuration-outdated';
 
 class CDashboard {
+
+	static ZBX_STYLE_IS_READY = 'is-ready';
 
 	static REFERENCE_DASHBOARD = 'DASHBOARD';
 
@@ -513,7 +515,7 @@ class CDashboard {
 			unique_id: this._createUniqueId()
 		});
 
-		this._dashboard_pages.set(dashboard_page, {});
+		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
 			dashboard_page.addWidgetFromData({
@@ -938,6 +940,8 @@ class CDashboard {
 
 		this._promiseSelectDashboardPage(dashboard_page, {is_async})
 			.then(() => {
+				this._updateReadyState();
+
 				if (!this._is_edit_mode) {
 					this._keepSteadyConfigurationChecker();
 
@@ -982,7 +986,7 @@ class CDashboard {
 		this._selected_dashboard_page = dashboard_page;
 
 		if (this._selected_dashboard_page.getState() === DASHBOARD_PAGE_STATE_INITIAL) {
-			this.#startDashboardPage(this._selected_dashboard_page);
+			this._startDashboardPage(this._selected_dashboard_page);
 		}
 
 		this._activateDashboardPage(this._selected_dashboard_page);
@@ -992,7 +996,8 @@ class CDashboard {
 		}
 	}
 
-	#startDashboardPage(dashboard_page) {
+	_startDashboardPage(dashboard_page) {
+		dashboard_page.on(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.start();
@@ -1035,6 +1040,7 @@ class CDashboard {
 	}
 
 	#destroyDashboardPage(dashboard_page) {
+		dashboard_page.off(CDashboardPage.EVENT_READY, this._events.dashboardPageReady);
 		dashboard_page.off(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
 
 		dashboard_page.destroy();
@@ -1085,6 +1091,17 @@ class CDashboard {
 		const data = this._dashboard_pages.get(dashboard_page);
 
 		return tabs.indexOf(data.tab);
+	}
+
+	/**
+	 * Update readiness state of the dashboard.
+	 *
+	 * Readiness state is updated on switching dashboard pages and as soon as the selected page gets fully loaded.
+	 */
+	_updateReadyState() {
+		const data = this._dashboard_pages.get(this._selected_dashboard_page);
+
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, data.is_ready);
 	}
 
 	save() {
@@ -2043,6 +2060,14 @@ class CDashboard {
 		let user_interaction_animation_frame = null;
 
 		this._events = {
+			dashboardPageReady: (e) => {
+				const data = this._dashboard_pages.get(e.detail.target);
+
+				data.is_ready = true;
+
+				this._updateReadyState();
+			},
+
 			dashboardPageRequireDataSource: (e) => {
 				if (e.detail.reference === CDashboard.REFERENCE_DASHBOARD) {
 					return;

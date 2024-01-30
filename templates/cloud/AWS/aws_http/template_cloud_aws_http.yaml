@@ -167,7 +167,7 @@ zabbix_export:
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-                        Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
+                    Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
             
                     response = request.post(url, data);
             
@@ -189,18 +189,23 @@ zabbix_export:
                 },
             
                 tagToNameInstances: function (instance) {
-                    var tags = AWS.getField(instance, 'tagSet.item'),
-                        instanceName = AWS.getField(instance, 'instanceId');
-                    if (!Array.isArray(tags))
-                        tags = [tags]
-                    tags.forEach(
-                        function (tag) {
-                            if (String(AWS.getField(tag, 'key')) === 'Name') {
-                                instanceName = AWS.getField(tag, 'value');
+                    try {
+                        var tags = AWS.getField(instance, 'tagSet.item'),
+                            instanceName = AWS.getField(instance, 'instanceId');
+                        if (!Array.isArray(tags))
+                            tags = [tags]
+                        tags.forEach(
+                            function (tag) {
+                                if (String(AWS.getField(tag, 'key')) === 'Name') {
+                                    instanceName = AWS.getField(tag, 'value');
+                                }
                             }
-                        }
-                    );
-                    return instanceName;
+                        );
+                        return instanceName;
+                    }
+                    catch (error){
+                        return AWS.getField(instance, 'instanceId');
+                    }
                 },
             
                 listRegions: function () {

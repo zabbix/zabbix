@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1014,7 +1014,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 
 		if (0 != graph->graphid)
 		{
-			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_UPDATE, graph->graphid,
+			zbx_audit_graph_create_entry(ZBX_AUDIT_LLD_CONTEXT,ZBX_AUDIT_ACTION_UPDATE, graph->graphid,
 					(NULL == graph->name_orig) ? graph->name : graph->name_orig,
 					ZBX_FLAG_DISCOVERY_CREATED);
 		}
@@ -1027,7 +1027,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			{
 				zbx_vector_uint64_append(&del_gitemids, gitem->gitemid);
 
-				zbx_audit_graph_update_json_delete_gitems(graph->graphid,
+				zbx_audit_graph_update_json_delete_gitems(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid);
 				continue;
 			}
@@ -1101,13 +1101,14 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					(int)show_3d, percent_left, percent_right, (int)ymin_type, graph->ymin_itemid,
 					(int)ymax_type, graph->ymax_itemid, (int)ZBX_FLAG_DISCOVERY_CREATED);
 
-			zbx_audit_graph_create_entry(ZBX_AUDIT_ACTION_ADD, graphid, graph->name,
+			zbx_audit_graph_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_ADD, graphid, graph->name,
 					ZBX_FLAG_DISCOVERY_CREATED);
 
-			zbx_audit_graph_update_json_add_data(graphid, graph->name, width, height, yaxismin, yaxismax, 0,
-					(int)show_work_period, (int)show_triggers, (int)graphtype, (int)show_legend,
-					(int)show_3d, percent_left, percent_right, (int)ymin_type, (int)ymax_type,
-					graph->ymin_itemid, graph->ymax_itemid,	ZBX_FLAG_DISCOVERY_CREATED, 0);
+			zbx_audit_graph_update_json_add_data(ZBX_AUDIT_LLD_CONTEXT, graphid, graph->name, width,
+					height, yaxismin, yaxismax, 0, (int)show_work_period, (int)show_triggers,
+					(int)graphtype, (int)show_legend, (int)show_3d, percent_left, percent_right,
+					(int)ymin_type, (int)ymax_type, graph->ymin_itemid, graph->ymax_itemid,
+					ZBX_FLAG_DISCOVERY_CREATED, 0);
 
 			zbx_db_insert_add_values(&db_insert_gdiscovery, graphid, parent_graphid);
 
@@ -1127,8 +1128,8 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				zbx_free(name_esc);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_name(graph->graphid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-						graph->name_orig, graph->name);
+				zbx_audit_graph_update_json_update_name(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->name_orig, graph->name);
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_WIDTH))
@@ -1136,7 +1137,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%swidth=%d", d, width);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_width(graph->graphid,
+				zbx_audit_graph_update_json_update_width(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->width_orig, width);
 			}
 
@@ -1145,7 +1146,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sheight=%d", d, height);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_height(graph->graphid,
+				zbx_audit_graph_update_json_update_height(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->height_orig, height);
 			}
 
@@ -1155,7 +1156,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						yaxismin);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_yaxismin(graph->graphid,
+				zbx_audit_graph_update_json_update_yaxismin(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->yaxismin_orig, yaxismin);
 			}
 
@@ -1165,7 +1166,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						yaxismax);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_yaxismax(graph->graphid,
+				zbx_audit_graph_update_json_update_yaxismax(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->yaxismax_orig, yaxismax);
 			}
 
@@ -1175,9 +1176,9 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)show_work_period);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_show_work_period(graph->graphid,
-						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->show_work_period_orig,
-						(int)show_work_period);
+				zbx_audit_graph_update_json_update_show_work_period(ZBX_AUDIT_LLD_CONTEXT,
+						graph->graphid, (int)ZBX_FLAG_DISCOVERY_CREATED,
+						graph->show_work_period_orig, (int)show_work_period);
 			}
 
 			if (0 != (graph->flags & ZBX_FLAG_LLD_GRAPH_UPDATE_SHOW_TRIGGERS))
@@ -1186,7 +1187,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)show_triggers);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_show_triggers(graph->graphid,
+				zbx_audit_graph_update_json_update_show_triggers(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->show_triggers_orig,
 						(int)show_triggers);
 			}
@@ -1197,7 +1198,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)graphtype);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_graphtype(graph->graphid,
+				zbx_audit_graph_update_json_update_graphtype(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)graph->graphtype_orig,
 						(int)graphtype);
 			}
@@ -1208,7 +1209,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)show_legend);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_show_legend(graph->graphid,
+				zbx_audit_graph_update_json_update_show_legend(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)graph->show_legend_orig,
 						(int)show_legend);
 			}
@@ -1218,7 +1219,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sshow_3d=%d", d, (int)show_3d);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_show_3d(graph->graphid,
+				zbx_audit_graph_update_json_update_show_3d(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)graph->show_3d_orig,
 						(int)show_3d);
 			}
@@ -1229,7 +1230,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						percent_left);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_percent_left(graph->graphid,
+				zbx_audit_graph_update_json_update_percent_left(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->percent_left_orig,
 						percent_left);
 			}
@@ -1240,7 +1241,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						"%spercent_right=" ZBX_FS_DBL64_SQL, d, percent_right);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_percent_right(graph->graphid,
+				zbx_audit_graph_update_json_update_percent_right(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->percent_right_orig,
 						percent_right);
 			}
@@ -1251,7 +1252,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)ymin_type);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_ymin_type(graph->graphid,
+				zbx_audit_graph_update_json_update_ymin_type(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)graph->ymin_type_orig,
 						(int)ymin_type);
 			}
@@ -1262,7 +1263,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						zbx_db_sql_id_ins(graph->ymin_itemid));
 				d = ",";
 
-				zbx_audit_graph_update_json_update_ymin_itemid(graph->graphid,
+				zbx_audit_graph_update_json_update_ymin_itemid(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->ymin_itemid_orig,
 						graph->ymin_itemid);
 			}
@@ -1273,7 +1274,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)ymax_type);
 				d = ",";
 
-				zbx_audit_graph_update_json_update_ymax_type(graph->graphid,
+				zbx_audit_graph_update_json_update_ymax_type(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, (int)graph->ymax_type_orig,
 						(int)ymax_type);
 			}
@@ -1283,7 +1284,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 				zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%symax_itemid=%s", d,
 						zbx_db_sql_id_ins(graph->ymax_itemid));
 
-				zbx_audit_graph_update_json_update_ymax_itemid(graph->graphid,
+				zbx_audit_graph_update_json_update_ymax_itemid(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
 						(int)ZBX_FLAG_DISCOVERY_CREATED, graph->ymax_itemid_orig,
 						graph->ymax_itemid);
 			}
@@ -1308,10 +1309,10 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 						(int)gitem->drawtype, gitem->sortorder, gitem->color,
 						(int)gitem->yaxisside, (int)gitem->calc_fnc, (int)gitem->type);
 
-				zbx_audit_graph_update_json_add_gitems(graph->graphid, (int)ZBX_FLAG_DISCOVERY_CREATED,
-						gitemid, (int)gitem->drawtype, gitem->sortorder, gitem->color,
-						(int)gitem->yaxisside, (int)gitem->calc_fnc,(int)gitem->type,
-						gitem->itemid);
+				zbx_audit_graph_update_json_add_gitems(ZBX_AUDIT_LLD_CONTEXT, graph->graphid,
+						(int)ZBX_FLAG_DISCOVERY_CREATED, gitemid, (int)gitem->drawtype,
+						gitem->sortorder, gitem->color, (int)gitem->yaxisside,
+						(int)gitem->calc_fnc, (int)gitem->type, gitem->itemid);
 
 				gitem->gitemid = gitemid++;
 			}
@@ -1330,7 +1331,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "itemid=" ZBX_FS_UI64, gitem->itemid);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_gitem_update_itemid(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_itemid(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, gitem->itemid_orig,
 					gitem->itemid);
 		}
@@ -1340,7 +1341,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%sdrawtype=%d", d, (int)gitem->drawtype);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_gitem_update_drawtype(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_drawtype(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, (int)gitem->drawtype_orig,
 					(int)gitem->drawtype);
 		}
@@ -1350,7 +1351,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%ssortorder=%d", d, gitem->sortorder);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_gitem_update_sortorder(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_sortorder(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, gitem->sortorder_orig,
 					gitem->sortorder);
 		}
@@ -1363,7 +1364,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			zbx_free(color_esc);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_gitem_update_color(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_color(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, gitem->color_orig,
 					gitem->color);
 		}
@@ -1374,7 +1375,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 					(int)gitem->yaxisside);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_gitem_update_yaxisside(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_yaxisside(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, (int)gitem->yaxisside_orig,
 					(int)gitem->yaxisside);
 		}
@@ -1384,7 +1385,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%scalc_fnc=%d", d, (int)gitem->calc_fnc);
 			d = ",";
 
-			zbx_audit_graph_update_json_update_gitem_update_calc_fnc(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_calc_fnc(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, (int)gitem->calc_fnc_orig,
 					(int)gitem->calc_fnc);
 		}
@@ -1393,7 +1394,7 @@ static int	lld_graphs_save(zbx_uint64_t hostid, zbx_uint64_t parent_graphid, zbx
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "%stype=%d", d, (int)gitem->type);
 
-			zbx_audit_graph_update_json_update_gitem_update_type(gitem->graphid,
+			zbx_audit_graph_update_json_update_gitem_update_type(ZBX_AUDIT_LLD_CONTEXT, gitem->graphid,
 					(int)ZBX_FLAG_DISCOVERY_CREATED, gitem->gitemid, (int)gitem->type_orig,
 					(int)gitem->type);
 		}

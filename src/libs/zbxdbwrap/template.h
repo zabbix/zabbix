@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -192,7 +192,7 @@ typedef struct
 }
 zbx_template_item_t;
 
-void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
-void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item,
-			zbx_uint64_t hostid);
+void	DBcopy_template_items(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, int audit_context_mode);
+void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t itemid,
+		const zbx_template_item_t *item, zbx_uint64_t hostid);
 #endif

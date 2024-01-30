@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,6 +35,7 @@
 #include "zbxnix.h"
 #include "zbxself.h"
 
+#include "zbxvmware.h"
 #include "zbxdbsyncer.h"
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
@@ -46,7 +47,6 @@
 #include "proxyconfig/proxyconfig.h"
 #include "datasender/datasender.h"
 #include "taskmanager/taskmanager_proxy.h"
-#include "../zabbix_server/vmware/vmware.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
 #include "zbxdiag.h"
@@ -1449,7 +1449,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_dbsyncer_args		dbsyncer_args = {&events_cbs, config_histsyncer_frequency};
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
-	zbx_thread_snmptrapper_args		snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_snmptrapper_args		snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
+								.config_ha_node_name = NULL};
 
 	zbx_rtc_process_request_ex_func_t	rtc_process_request_func = NULL;
 

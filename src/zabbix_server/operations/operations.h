@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,5 +35,7 @@ void	op_host_disable(const zbx_db_event *event, zbx_config_t *cfg);
 void	op_host_inventory_mode(const zbx_db_event *event, zbx_config_t *cfg, int inventory_mode);
 void	op_add_del_tags(const zbx_db_event *event, zbx_config_t *cfg, zbx_vector_uint64_t *new_optagids,
 		zbx_vector_uint64_t *del_optagids);
+
+int	zbx_map_db_event_to_audit_context(const zbx_db_event *event);
 
 #endif
