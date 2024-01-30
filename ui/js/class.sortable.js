@@ -95,6 +95,7 @@ class CSortable {
 	#drag_index = -1;
 	#drag_index_original = -1;
 	#drag_delta = 0;
+	#drag_style;
 	#overtake_tokens_loc = [];
 	#overtake_min = -1;
 	#overtake_max = -1;
@@ -544,12 +545,6 @@ class CSortable {
 	}
 
 	#startDrag(client_pos) {
-		this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
-
-		for (const element of this.#drag_token.elements) {
-			element.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
-		}
-
 		this.#overtake_tokens_loc = [];
 
 		this.#overtake_min = this.#drag_index;
@@ -582,12 +577,6 @@ class CSortable {
 	}
 
 	#endDrag() {
-		this.#target.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
-
-		for (const element of this.#drag_token.elements) {
-			element.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
-		}
-
 		this.#cancelDragScroll();
 		this.#scheduleAnimation(this.#drag_token, this.#scroll_pos + this.#getDragRelConstrained(), 0);
 		this.#scrollIntoView(this.#tokens_loc.get(this.#drag_token));
@@ -599,6 +588,16 @@ class CSortable {
 		if (!this.#is_dragging) {
 			this.#startDrag(client_pos);
 
+			this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
+
+			for (const element of this.#drag_token.elements) {
+				element.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
+			}
+
+			this.#drag_style = document.createElement('style');
+			document.head.appendChild(this.#drag_style);
+			this.#drag_style.sheet.insertRule('* { pointer-events: none; cursor: grabbing !important; }');
+
 			this.#fire(CSortable.EVENT_DRAG_START, {index: this.#drag_index_original});
 		}
 	}
@@ -606,6 +605,14 @@ class CSortable {
 	#endSort() {
 		if (this.#is_dragging) {
 			this.#endDrag();
+
+			this.#target.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
+
+			for (const element of this.#drag_token.elements) {
+				element.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
+			}
+
+			this.#drag_style.remove();
 
 			this.#fire(CSortable.EVENT_DRAG_END, {index: this.#drag_index_original});
 
