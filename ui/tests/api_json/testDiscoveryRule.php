@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2076,7 +2076,7 @@ class testDiscoveryRule extends CAPITest {
 				],
 				'expected_error' => null
 			],
-			'Test successful update of lld_macro_paths by replaceing them with exact values' => [
+			'Test successful update of lld_macro_paths by replacing them with exact values' => [
 				'discoveryrule' => [
 					'itemid' => '110006',
 					'lld_macro_paths' => [

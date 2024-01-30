@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ typedef struct
 	zbx_get_config_str_f	get_fping_location;
 	zbx_get_config_str_f	get_fping6_location;
 	zbx_get_config_str_f	get_tmpdir;
+	zbx_get_progname_f	get_progname;
 }
 zbx_config_icmpping_t;
 

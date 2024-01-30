@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,6 +72,9 @@ const WIDGET_EVENT_DELETE = 'widget-delete';
  */
 class CWidgetBase {
 
+	// Widget ready event: informs the dashboard page that the widget has been fully loaded (fired once).
+	static EVENT_READY = 'widget-ready';
+
 	// Require data source event: informs the dashboard page to load the referred foreign data source.
 	static EVENT_REQUIRE_DATA_SOURCE = 'widget-require-data-source';
 
@@ -88,6 +91,8 @@ class CWidgetBase {
 	#broadcast_cache = new Map();
 
 	#feedback_cache = new Map();
+
+	#ready_promise = null;
 
 	/**
 	 * Widget constructor. Invoked by a dashboard page.
@@ -1329,6 +1334,15 @@ class CWidgetBase {
 				this.#fields_referred_data_updated.clear();
 
 				this.#broadcastDefaults();
+
+				if (this.#ready_promise === null) {
+					this.#ready_promise = this.promiseReady();
+					this.#ready_promise.then(() => {
+						if (this._state !== WIDGET_STATE_DESTROYED) {
+							this.fire(CWidgetBase.EVENT_READY);
+						}
+					});
+				}
 			})
 			.catch((exception) => {
 				if (this._update_abort_controller.signal.aborted) {
@@ -1349,6 +1363,12 @@ class CWidgetBase {
 	 * Stub method redefined in class.widget.js.
 	 */
 	promiseUpdate() {
+	}
+
+	/**
+	 * Stub method redefined in class.widget.js.
+	 */
+	promiseReady() {
 	}
 
 	// Widget view methods.
@@ -1558,8 +1578,8 @@ class CWidgetBase {
 			this._hide_preloader_animation_frame = null;
 		}
 
-		this._body.classList.add('is-loading');
-		this._body.classList.remove('is-loading-fadein', 'delayed-15s');
+		this._contents.classList.add('is-loading');
+		this._contents.classList.remove('is-loading-fadein', 'delayed-15s');
 	}
 
 	/**
@@ -1573,7 +1593,7 @@ class CWidgetBase {
 		}
 
 		this._hide_preloader_animation_frame = requestAnimationFrame(() => {
-			this._body.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
+			this._contents.classList.remove('is-loading', 'is-loading-fadein', 'delayed-15s');
 			this._hide_preloader_animation_frame = null;
 		});
 	}
@@ -1589,7 +1609,7 @@ class CWidgetBase {
 			this._hide_preloader_animation_frame = null;
 		}
 
-		this._body.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
+		this._contents.classList.add('is-loading', 'is-loading-fadein', 'delayed-15s');
 	}
 
 	/**

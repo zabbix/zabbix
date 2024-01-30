@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -83,6 +83,7 @@ typedef struct
 	int		disable_until;
 	char		error[ZBX_INTERFACE_ERROR_LEN_MAX];
 	int		errors_from;
+	int		version;
 }
 zbx_dc_interface_t;
 
@@ -112,6 +113,7 @@ typedef struct
 	char			host[ZBX_HOSTNAME_BUF_LEN];
 	zbx_dc_interface_t	interface;
 	int			ret;
+	int			version;
 	AGENT_RESULT		result;
 }
 zbx_dc_item_context_t;
@@ -395,14 +397,29 @@ zbx_dc_proxy_t;
 
 typedef struct
 {
-	zbx_uint64_t		actionid;
-	char			*formula;
-	unsigned char		eventsource;
-	unsigned char		evaltype;
-	unsigned char		opflags;
-	zbx_vector_ptr_t	conditions;
+	zbx_uint64_t			conditionid;
+	zbx_uint64_t			actionid;
+	char				*value;
+	char				*value2;
+	unsigned char			conditiontype;
+	unsigned char			op;
+	zbx_vector_uint64_t		eventids;
+}
+zbx_condition_t;
+ZBX_PTR_VECTOR_DECL(condition_ptr, zbx_condition_t *)
+
+typedef struct
+{
+	zbx_uint64_t			actionid;
+	char				*formula;
+	unsigned char			eventsource;
+	unsigned char			evaltype;
+	unsigned char			opflags;
+	zbx_vector_condition_ptr_t	conditions;
 }
 zbx_action_eval_t;
+
+ZBX_PTR_VECTOR_DECL(action_eval_ptr, zbx_action_eval_t *)
 
 typedef struct
 {
@@ -459,6 +476,7 @@ typedef struct
 	unsigned char	autoreg_tls_accept;
 	char		*default_timezone;
 	int		auditlog_enabled;
+	int		auditlog_mode;
 
 	/* database configuration data for ZBX_CONFIG_DB_EXTENSION_* extensions */
 	zbx_config_db_t	db;
@@ -477,6 +495,7 @@ zbx_config_t;
 #define ZBX_CONFIG_FLAGS_AUTOREG_TLS_ACCEPT		__UINT64_C(0x0000000000000080)
 #define ZBX_CONFIG_FLAGS_DEFAULT_TIMEZONE		__UINT64_C(0x0000000000000100)
 #define ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED		__UINT64_C(0x0000000000000200)
+#define ZBX_CONFIG_FLAGS_AUDITLOG_MODE			__UINT64_C(0x0000000000000400)
 
 typedef struct
 {
@@ -556,7 +575,7 @@ typedef struct
 	zbx_hashset_t		conditions;
 
 	/* Configuration synchronization timestamp of the rules. */
-	/* Update the cache if this timesamp is less than the    */
+	/* Update the cache if this timestamp is less than the   */
 	/* current configuration synchronization timestamp.      */
 	int			sync_ts;
 }
@@ -737,11 +756,13 @@ zbx_synced_new_config_t;
 typedef struct zbx_dc_um_shared_handle zbx_dc_um_shared_handle_t;
 typedef struct zbx_um_cache zbx_um_cache_t;
 
-void	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
+zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config_t synced,
 		zbx_vector_uint64_t *deleted_itemids, const zbx_config_vault_t *config_vault,
 		int proxyconfig_frequency);
 void	zbx_dc_sync_kvs_paths(const struct zbx_json_parse *jp_kvs_paths, const zbx_config_vault_t *config_vault,
-		const char *config_source_ip);
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location);
+void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector_uint64_t *hostids);
 int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_get_config_forks_f get_config_forks,
 		zbx_uint64_t conf_cache_size, char **error);
 void	zbx_free_configuration_cache(void);
@@ -883,6 +904,7 @@ int	zbx_dc_interface_activate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts
 int	zbx_dc_interface_deactivate(zbx_uint64_t interfaceid, const zbx_timespec_t *ts, int unavailable_delay,
 		int unreachable_period, int unreachable_delay, zbx_agent_availability_t *in,
 		zbx_agent_availability_t *out, const char *error_msg);
+void	zbx_dc_set_interface_version(zbx_uint64_t interfaceid, int version);
 
 #define ZBX_QUEUE_FROM_DEFAULT	6	/* default lower limit for delay (in seconds) */
 #define ZBX_QUEUE_TO_INFINITY	-1	/* no upper limit for delay */
@@ -928,7 +950,7 @@ int	zbx_dc_set_interfaces_availability(zbx_vector_availability_ptr_t *availabili
 
 int	zbx_dc_reset_interfaces_availability(zbx_vector_availability_ptr_t *interfaces);
 
-void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags);
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags);
 
 int	zbx_dc_get_interfaces_availability(zbx_vector_ptr_t *interfaces, int *ts);
 void	zbx_dc_touch_interfaces_availability(const zbx_vector_uint64_t *interfaceids);

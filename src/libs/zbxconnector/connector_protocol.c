@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, si
 	zbx_serialize_prepare_value(data_len, connector_object->ts.sec);
 	zbx_serialize_prepare_value(data_len, connector_object->ts.ns);
 	zbx_serialize_prepare_str_len(data_len, connector_object->str, error_len);
-	zbx_serialize_prepare_vector_uint64_len(data_len, connector_object->ids, vector_uint64_len);
+	zbx_serialize_prepare_vector_uint64_len(data_len, (&connector_object->ids), vector_uint64_len);
 
 	if (NULL == *data)
 		*data = (unsigned char *)zbx_calloc(NULL, (*data_alloc = MAX(1024, data_len)), 1);
@@ -50,7 +50,7 @@ void	zbx_connector_serialize_object(unsigned char **data, size_t *data_alloc, si
 	ptr += zbx_serialize_value(ptr, connector_object->ts.sec);
 	ptr += zbx_serialize_value(ptr, connector_object->ts.ns);
 	ptr += zbx_serialize_str(ptr, connector_object->str, error_len);
-	zbx_serialize_vector_uint64(ptr, connector_object->ids, vector_uint64_len);
+	zbx_serialize_vector_uint64(ptr, (&connector_object->ids), vector_uint64_len);
 }
 
 void	zbx_connector_deserialize_object(const unsigned char *data, zbx_uint32_t size,

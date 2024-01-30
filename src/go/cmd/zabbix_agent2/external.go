@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,6 +28,7 @@ import (
 	"time"
 
 	"git.zabbix.com/ap/plugin-support/conf"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/plugin/comms"
 	"zabbix.com/internal/agent"
@@ -81,7 +82,10 @@ func initExternalPlugins(options *agent.AgentOptions) (string, error) {
 		}
 		accessor.Initial = false
 
-		plugin.RegisterMetrics(accessor, name, accessor.Params...)
+		err = plugin.RegisterMetrics(accessor, name, accessor.Params...)
+		if err != nil {
+			return "", errs.Wrap(err, "failed to register metrics")
+		}
 	}
 
 	return socket, nil

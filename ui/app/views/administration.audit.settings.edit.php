@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,6 +43,17 @@ $audit_settings_tab = (new CFormGrid())
 	->addItem([
 		new CLabel(_('Enable audit logging'), 'auditlog_enabled'),
 		new CFormField((new CCheckBox('auditlog_enabled'))->setChecked($data['auditlog_enabled'] == 1))
+	])
+	->addItem([
+		new CLabel([
+			_('Log system actions'),
+			makeHelpIcon(_('Log changes by low-level discovery, network discovery and autoregistration'))
+		], 'auditlog_mode'),
+		new CFormField(
+			(new CCheckBox('auditlog_mode'))
+				->setEnabled($data['auditlog_enabled'] == 1)
+				->setChecked($data['auditlog_mode'] == 1)
+		)
 	])
 	->addItem([
 		new CLabel(_('Enable internal housekeeping'), 'hk_audit_mode'),

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,7 +137,8 @@ static int	get_fping_out(const char *fping, const char *address, char **out, cha
 		return FAIL;
 	}
 
-	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", config_icmpping->get_tmpdir(), progname);
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_XXXXXX", config_icmpping->get_tmpdir(),
+			config_icmpping->get_progname());
 
 	mode = umask(077);
 	fd = mkstemp(filename);
@@ -1012,8 +1013,8 @@ static int	hosts_ping(ZBX_FPING_HOST *hosts, int hosts_count, int requests_count
 	if ('\0' == *tmpfile_uniq)
 		zbx_snprintf(tmpfile_uniq, sizeof(tmpfile_uniq), "%li", zbx_get_thread_id());
 
-	zbx_snprintf(filename, sizeof(filename), "%s/%s_%s.pinger", config_icmpping->get_tmpdir(), progname,
-			tmpfile_uniq);
+	zbx_snprintf(filename, sizeof(filename), "%s/%s_%s.pinger", config_icmpping->get_tmpdir(),
+			config_icmpping->get_progname(), tmpfile_uniq);
 
 #ifdef HAVE_IPV6
 	if (NULL != config_icmpping->get_source_ip())

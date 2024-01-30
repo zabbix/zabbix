@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,8 @@ package zbxlib
 #include "zbxcommon.h"
 
 int	zbx_agent_pid;
+
+ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
 void handleZabbixLog(int level, const char *message);
 
@@ -64,7 +66,7 @@ int	zbx_redirect_stdio(const char *filename)
 
 void	log_init(void)
 {
-	zbx_init_library_common(zbx_log_go_impl);
+	zbx_init_library_common(zbx_log_go_impl, get_zbx_progname);
 }
 
 */

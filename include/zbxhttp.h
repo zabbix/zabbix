@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -72,15 +72,19 @@ typedef size_t	(*zbx_curl_cb_t)(void *ptr, size_t size, size_t nmemb, void *user
 
 int	zbx_http_prepare_callbacks(CURL *easyhandle, zbx_http_response_t *header, zbx_http_response_t *body,
 		zbx_curl_cb_t header_cb, zbx_curl_cb_t body_cb, char *errbuf, char **error);
+
 int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char *ssl_key_file,
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
-		const char *config_source_ip, char **error);
+		const char *config_source_ip, const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error);
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		const char *token, char **error);
 char	*zbx_http_parse_header(char **headers);
 
 int	zbx_http_get(const char *url, const char *header, long timeout, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, char **out, long *response_code, char **error);
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, char **out,
+		long *response_code, char **error);
 
 #define HTTP_REQUEST_GET	0
 #define HTTP_REQUEST_POST	1
@@ -98,7 +102,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		const char *ssl_key_password, unsigned char verify_peer, unsigned char verify_host,
 		unsigned char authtype, const char *username, const char *password, const char *token,
 		unsigned char post_type, unsigned char output_format, const char *config_source_ip,
-		char **error);
+		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
+		const char *config_ssl_key_location, char **error);
 
 CURLcode	zbx_http_request_sync_perform(CURL *easyhandle, zbx_http_context_t *context, int attempt_interval,
 		int check_response_code);

@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -188,8 +188,10 @@ class CControllerDashboardWidgetEdit extends CController {
 		}
 
 		if ($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]) {
+			$name_field = $this->hasInput('templateid') ? 'name' : 'name_resolved';
+
 			$db_items = API::Item()->get([
-				'output' => ['name'],
+				'output' => [$name_field],
 				'selectHosts' => ['name'],
 				'itemids' => array_keys($ids[ZBX_WIDGET_FIELD_TYPE_ITEM]),
 				'webitems' => true,
@@ -199,7 +201,7 @@ class CControllerDashboardWidgetEdit extends CController {
 			foreach ($db_items as $itemid => $item) {
 				$captions[ZBX_WIDGET_FIELD_TYPE_ITEM][$itemid] = [
 					'id' => $itemid,
-					'name' => $item['name'],
+					'name' => $item[$name_field],
 					'prefix' => $item['hosts'][0]['name'].NAME_DELIMITER
 				];
 			}

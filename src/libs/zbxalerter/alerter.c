@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -145,17 +145,18 @@ static char	*create_email_inreplyto(zbx_uint64_t mediatypeid, const char *sendto
 	return str;
 }
 
-/***********************************************************************************
- *                                                                                 *
- * Purpose: processes email alert                                                  *
- *                                                                                 *
- * Parameters: socket           - [IN] connection socket                           *
- *             ipc_message      - [IN] ipc message with media type and alert data  *
- *             config_source_ip - [IN]                                             *
- *                                                                                 *
- ***********************************************************************************/
+/****************************************************************************************
+ *                                                                                      *
+ * Purpose: processes email alert                                                       *
+ *                                                                                      *
+ * Parameters: socket                 - [IN] connection socket                          *
+ *             ipc_message            - [IN] ipc message with media type and alert data *
+ *             config_source_ip       - [IN]                                            *
+ *             config_ssl_ca_location - [IN]                                            *
+ *                                                                                      *
+ ****************************************************************************************/
 static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *ipc_message,
-		const char *config_source_ip)
+		const char *config_source_ip, const char *config_ssl_ca_location)
 {
 	zbx_uint64_t	alertid, mediatypeid, eventid;
 	char		*sendto, *subject, *message, *smtp_server, *smtp_helo, *smtp_email, *username, *password,
@@ -171,7 +172,8 @@ static void	alerter_process_email(zbx_ipc_socket_t *socket, zbx_ipc_message_t *i
 	inreplyto = create_email_inreplyto(mediatypeid, sendto, eventid);
 	ret = send_email(smtp_server, smtp_port, smtp_helo, smtp_email, sendto, inreplyto, subject, message,
 			smtp_security, smtp_verify_peer, smtp_verify_host, smtp_authentication, username, password,
-			content_type, ALARM_ACTION_TIMEOUT, config_source_ip, error, sizeof(error));
+			content_type, ALARM_ACTION_TIMEOUT, config_source_ip, config_ssl_ca_location, error,
+			sizeof(error));
 
 	alerter_send_result(socket, NULL, ret, (SUCCEED == ret ? NULL : error), NULL);
 
@@ -371,7 +373,8 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 		switch (message.code)
 		{
 			case ZBX_IPC_ALERTER_EMAIL:
-				alerter_process_email(&alerter_socket, &message, alerter_args_in->config_source_ip);
+				alerter_process_email(&alerter_socket, &message, alerter_args_in->config_source_ip,
+						alerter_args_in->config_ssl_ca_location);
 				break;
 			case ZBX_IPC_ALERTER_SMS:
 				alerter_process_sms(&alerter_socket, &message);

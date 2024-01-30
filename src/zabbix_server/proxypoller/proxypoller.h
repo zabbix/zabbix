@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -33,6 +33,9 @@ typedef struct
 	int				config_timeout;
 	int				config_trapper_timeout;
 	const char			*config_source_ip;
+	const char			*config_ssl_ca_location;
+	const char			*config_ssl_cert_location;
+	const char			*config_ssl_key_location;
 	const zbx_events_funcs_t	*events_cbs;
 	int				proxyconfig_frequency;
 	int				proxydata_frequency;

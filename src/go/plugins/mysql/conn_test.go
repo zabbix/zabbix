@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,13 +23,12 @@ import (
 	"reflect"
 	"testing"
 
-	"git.zabbix.com/ap/plugin-support/metric"
 	"git.zabbix.com/ap/plugin-support/tlsconfig"
 )
 
 func Test_getTLSDetails(t *testing.T) {
 	type args struct {
-		params map[string]string
+		ck connKey
 	}
 	tests := []struct {
 		name    string
@@ -40,14 +39,13 @@ func Test_getTLSDetails(t *testing.T) {
 		{
 			"required",
 			args{
-				map[string]string{
-					metric.SessionParam: "test",
-					tlsConnectParam:     "required",
-					uriParam:            "127.0.0.1",
+
+				connKey{
+					tlsConnect: "required",
+					rawUri:     "127.0.0.1",
 				},
 			},
 			&tlsconfig.Details{
-				SessionName:        "test",
 				TlsConnect:         "required",
 				RawUri:             "127.0.0.1",
 				AllowedConnections: map[string]bool{disable: true, require: true, verifyCa: true, verifyFull: true},
@@ -57,15 +55,13 @@ func Test_getTLSDetails(t *testing.T) {
 		{
 			"verify_ca",
 			args{
-				map[string]string{
-					metric.SessionParam: "test",
-					tlsConnectParam:     "verify_ca",
-					tlsCAParam:          "path/to/ca",
-					uriParam:            "127.0.0.1",
+				connKey{
+					tlsConnect: "verify_ca",
+					tlsCA:      "path/to/ca",
+					rawUri:     "127.0.0.1",
 				},
 			},
 			&tlsconfig.Details{
-				SessionName:        "test",
 				TlsConnect:         "verify_ca",
 				TlsCaFile:          "path/to/ca",
 				RawUri:             "127.0.0.1",
@@ -76,17 +72,15 @@ func Test_getTLSDetails(t *testing.T) {
 		{
 			"verify_full and check clients certs",
 			args{
-				map[string]string{
-					metric.SessionParam: "test",
-					tlsConnectParam:     "verify_ca",
-					tlsCAParam:          "path/to/ca",
-					tlsCertParam:        "path/to/cert",
-					tlsKeyParam:         "path/to/key",
-					uriParam:            "127.0.0.1",
+				connKey{
+					tlsConnect: "verify_ca",
+					tlsCA:      "path/to/ca",
+					tlsCert:    "path/to/cert",
+					tlsKey:     "path/to/key",
+					rawUri:     "127.0.0.1",
 				},
 			},
 			&tlsconfig.Details{
-				SessionName:        "test",
 				TlsConnect:         "verify_ca",
 				TlsCaFile:          "path/to/ca",
 				TlsCertFile:        "path/to/cert",
@@ -99,10 +93,9 @@ func Test_getTLSDetails(t *testing.T) {
 		{
 			"missing ca file",
 			args{
-				map[string]string{
-					metric.SessionParam: "test",
-					tlsConnectParam:     "verify_ca",
-					uriParam:            "127.0.0.1",
+				connKey{
+					tlsConnect: "verify_ca",
+					rawUri:     "127.0.0.1",
 				},
 			},
 			nil,
@@ -111,12 +104,11 @@ func Test_getTLSDetails(t *testing.T) {
 		{
 			"missing client key file",
 			args{
-				map[string]string{
-					metric.SessionParam: "test",
-					tlsConnectParam:     "verify_ca",
-					tlsCAParam:          "path/to/ca",
-					tlsCertParam:        "path/to/cert",
-					uriParam:            "127.0.0.1",
+				connKey{
+					tlsConnect: "verify_ca",
+					tlsCA:      "path/to/ca",
+					tlsCert:    "path/to/cert",
+					rawUri:     "127.0.0.1",
 				},
 			},
 			nil,
@@ -125,12 +117,11 @@ func Test_getTLSDetails(t *testing.T) {
 		{
 			"missing client cert file",
 			args{
-				map[string]string{
-					metric.SessionParam: "test",
-					tlsConnectParam:     "verify_ca",
-					tlsCAParam:          "path/to/ca",
-					tlsKeyParam:         "path/to/key",
-					uriParam:            "127.0.0.1",
+				connKey{
+					tlsConnect: "verify_ca",
+					tlsCA:      "path/to/ca",
+					tlsKey:     "path/to/key",
+					rawUri:     "127.0.0.1",
 				},
 			},
 			nil,
@@ -139,7 +130,7 @@ func Test_getTLSDetails(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := getTLSDetails(tt.args.params)
+			got, err := getTLSDetails(tt.args.ck)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("getTLSDetails() error = %v, wantErr %v", err, tt.wantErr)
 

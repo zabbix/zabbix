@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -185,8 +185,12 @@ class CControllerMenuPopup extends CController {
 			}
 
 			$all_scripts = CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS)
-				? API::Script()->getScriptsByHosts([$data['hostid']])[$data['hostid']]
+				? API::Script()->getScriptsByHosts(['hostid' => $data['hostid']])
 				: [];
+
+			if ($all_scripts) {
+				$all_scripts = array_key_exists($data['hostid'], $all_scripts) ? $all_scripts[$data['hostid']] : [];
+			}
 
 			$scripts = [];
 			$urls = [];
@@ -255,37 +259,8 @@ class CControllerMenuPopup extends CController {
 				}
 			}
 
-			foreach (array_values($scripts) as $script) {
-				$menu_data['scripts'][] = [
-					'name' => $script['name'],
-					'menu_path' => $script['menu_path'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
-
-			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
-					'label' => $url['name'],
-					'menu_path' => $url['menu_path'],
-					'url' => $url['url'],
-					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
-					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
-				];
-			}
-
-			if (array_key_exists('urls', $menu_data)) {
-				foreach ($menu_data['urls'] as &$url) {
-					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert('.
-							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
-						');';
-						unset($url['target'], $url['rel']);
-					}
-				}
-				unset($url);
-			}
+			$menu_data = self::addScripts($menu_data, $scripts);
+			$menu_data = self::addUrls($menu_data, $urls);
 
 			if (array_key_exists('tags', $data)) {
 				$menu_data['tags'] = $data['tags'];
@@ -310,7 +285,7 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataItem(array $data) {
 		$db_items = API::Item()->get([
-			'output' => ['hostid', 'key_', 'name', 'flags', 'type', 'value_type', 'history', 'trends'],
+			'output' => ['hostid', 'key_', 'name_resolved', 'flags', 'type', 'value_type', 'history', 'trends'],
 			'selectHosts' => ['host'],
 			'selectTriggers' => ['triggerid', 'description'],
 			'itemids' => $data['itemid'],
@@ -343,7 +318,7 @@ class CControllerMenuPopup extends CController {
 				'type' => 'item',
 				'backurl' => $data['backurl'],
 				'itemid' => $data['itemid'],
-				'name' => $db_item['name'],
+				'name' => $db_item['name_resolved'],
 				'key' => $db_item['key_'],
 				'hostid' => $db_item['hostid'],
 				'host' => $db_item['hosts'][0]['host'],
@@ -584,7 +559,7 @@ class CControllerMenuPopup extends CController {
 						$db_triggers = API::Trigger()->get([
 							'output' => ['triggerid', 'description'],
 							'selectHosts' => ['hostid', 'name', 'status'],
-							'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+							'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 							'triggerids' => array_column($selement['elements'], 'triggerid'),
 							'preservekeys' => true
 						]);
@@ -603,7 +578,7 @@ class CControllerMenuPopup extends CController {
 							}
 							unset($item);
 
-							CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+							CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 							$with_hostname = count($hosts) > 1;
 
@@ -614,8 +589,8 @@ class CControllerMenuPopup extends CController {
 
 								$items[] = [
 									'name' => $with_hostname
-										? $item['hostname'].NAME_DELIMITER.$item['name']
-										: $item['name'],
+										? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+										: $item['name_resolved'],
 									'params' => [
 										'itemid' => $item['itemid'],
 										'action' => in_array(
@@ -699,7 +674,7 @@ class CControllerMenuPopup extends CController {
 		$db_triggers = API::Trigger()->get([
 			'output' => ['expression', 'url_name', 'url', 'comments', 'manual_close'],
 			'selectHosts' => ['hostid', 'name', 'status'],
-			'selectItems' => ['itemid', 'hostid', 'name', 'value_type', 'type'],
+			'selectItems' => ['itemid', 'hostid', 'name_resolved', 'value_type', 'type'],
 			'triggerids' => $data['triggerid'],
 			'preservekeys' => true
 		]);
@@ -735,7 +710,7 @@ class CControllerMenuPopup extends CController {
 			}
 			unset($item);
 
-			CArrayHelper::sort($db_trigger['items'], ['name', 'hostname', 'itemid']);
+			CArrayHelper::sort($db_trigger['items'], ['name_resolved', 'hostname', 'itemid']);
 
 			$with_hostname = count($hosts) > 1;
 			$items = [];
@@ -743,8 +718,8 @@ class CControllerMenuPopup extends CController {
 			foreach ($db_trigger['items'] as $item) {
 				$items[] = [
 					'name' => $with_hostname
-						? $item['hostname'].NAME_DELIMITER.$item['name']
-						: $item['name'],
+						? $item['hostname'].NAME_DELIMITER.$item['name_resolved']
+						: $item['name_resolved'],
 					'params' => [
 						'itemid' => $item['itemid'],
 						'action' => in_array($item['value_type'], [ITEM_VALUE_TYPE_FLOAT, ITEM_VALUE_TYPE_UINT64])
@@ -823,7 +798,7 @@ class CControllerMenuPopup extends CController {
 			$scripts_by_events = [];
 
 			if (CWebUser::checkAccess(CRoleHelper::ACTIONS_EXECUTE_SCRIPTS) && $event) {
-				$scripts_by_events = API::Script()->getScriptsByEvents([$event['eventid']]);
+				$scripts_by_events = API::Script()->getScriptsByEvents(['eventid' => $event['eventid']]);
 			}
 
 			// Filter only event scope scripts and get rid of excess spaces and create full name with menu path included.
@@ -879,40 +854,11 @@ class CControllerMenuPopup extends CController {
 			$scripts = self::sortEntitiesByMenuPath($scripts);
 			$urls = self::sortEntitiesByMenuPath($urls);
 
-			foreach (array_values($scripts) as $script) {
-				$menu_data['scripts'][] = [
-					'name' => $script['name'],
-					'menu_path' => $script['menu_path'],
-					'scriptid' => $script['scriptid'],
-					'confirmation' => $script['confirmation']
-				];
-			}
+			$menu_data = self::addScripts($menu_data, $scripts);
+			$menu_data = self::addUrls($menu_data, $urls);
 
 			if ($scripts) {
 				$menu_data['csrf_tokens']['scriptexec'] = CCsrfTokenHelper::get('scriptexec');
-			}
-
-			foreach (array_values($urls) as $url) {
-				$menu_data['urls'][] = [
-					'label' => $url['name'],
-					'menu_path' => $url['menu_path'],
-					'url' => $url['url'],
-					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : '',
-					'confirmation' => $url['confirmation'],
-					'rel' => 'noopener'.(ZBX_NOREFERER ? ' noreferrer' : '')
-				];
-			}
-
-			if (array_key_exists('urls', $menu_data)) {
-				foreach ($menu_data['urls'] as &$url) {
-					if (!CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
-						$url['url'] = 'javascript: alert('.
-							json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).
-						');';
-						unset($url['target'], $url['rel']);
-					}
-				}
-				unset($url);
 			}
 
 			return $menu_data;
@@ -927,8 +873,8 @@ class CControllerMenuPopup extends CController {
 	 * Process menu path and sort scripts or URLs according to it.
 	 *
 	 * @param array  $entities                 Scripts and URLs.
-	 * @param string $entities[]['name']       Name of the ccript or URL.
-	 * @param string $entities[]['menu_path']  Menu path of the ccript or URL.
+	 * @param string $entities[]['name']       Name of the script or URL.
+	 * @param string $entities[]['menu_path']  Menu path of the script or URL.
 	 *
 	 * @return array
 	 */
@@ -980,6 +926,52 @@ class CControllerMenuPopup extends CController {
 	 */
 	private static function getMenuDataTriggerMacro() {
 		return ['type' => 'trigger_macro'];
+	}
+
+	private static function addScripts(array $menu_data, array $scripts): array {
+		$fields = ['name', 'menu_path', 'scriptid', 'confirmation', 'manualinput', 'manualinput_prompt',
+			'manualinput_validator_type', 'manualinput_validator', 'manualinput_default_value'
+		];
+
+		foreach ($scripts as $script) {
+			$menu_data['scripts'][] = array_intersect_key($script, array_flip($fields));
+		}
+
+		return $menu_data;
+	}
+
+	private static function addUrls(array $menu_data, array $urls): array {
+		$fields = ['scriptid', 'manualinput', 'manualinput_prompt', 'manualinput_validator_type',
+			'manualinput_validator', 'manualinput_default_value'
+		];
+
+		foreach ($urls as $url) {
+			$menu_data_parameters = [
+				'label' => $url['name'],
+				'menu_path' => $url['menu_path'],
+				'confirmation' => $url['confirmation']
+			];
+
+			if (CHtmlUrlValidator::validate($url['url'], ['allow_user_macro' => false])) {
+				$menu_data_parameters += [
+					'url' => $url['url'],
+					'target' => $url['new_window'] == ZBX_SCRIPT_URL_NEW_WINDOW_YES ? '_blank' : ''
+				];
+			}
+			else {
+				$menu_data_parameters += [
+					'url' => 'javascript: alert('.json_encode(_s('Provided URL "%1$s" is invalid.', $url['url'])).');'
+				];
+			}
+
+			if (array_key_exists('scriptid', $url)) {
+				$menu_data_parameters += array_intersect_key($url, array_flip($fields));
+			}
+
+			$menu_data['urls'][] = $menu_data_parameters;
+		}
+
+		return $menu_data;
 	}
 
 	protected function doAction() {

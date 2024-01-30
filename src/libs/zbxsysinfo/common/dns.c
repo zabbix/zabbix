@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -286,9 +286,14 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 		freeaddrinfo(hres);
 #endif
 	if (NULL == zone_str || '\0' == *zone_str)
-		zbx_strscpy(zone, "zabbix.com");
+	{
+		SET_MSG_RESULT(result, zbx_strdup(NULL, "Second parameter cannot be empty."));
+		return SYSINFO_RET_FAIL;
+	}
 	else
+	{
 		zbx_strscpy(zone, zone_str);
+	}
 
 	param = get_rparam(request, 2);
 
@@ -350,7 +355,7 @@ static int	dns_query(AGENT_REQUEST *request, AGENT_RESULT *result, int short_ans
 
 		if (FAIL == zbx_ip_reverse(zone, &reversed_zone, &error))
 		{
-			SET_MSG_RESULT(result, zbx_strdup(NULL, error));
+			SET_MSG_RESULT(result, error);
 
 			return SYSINFO_RET_FAIL;
 		}

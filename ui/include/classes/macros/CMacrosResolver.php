@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -402,7 +402,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	 * @param bool   $options['html']				  Returns formatted trigger expression. Default: false.
 	 * @param bool   $options['resolve_usermacros']	  Resolve user macros. Default: false.
 	 * @param bool   $options['resolve_macros']		  Resolve macros in item keys and functions. Default: false.
-	 * @param bool   $options['resolve_functionids']  Resolve finctionid macros. Default: true.
+	 * @param bool   $options['resolve_functionids']  Resolve functionid macros. Default: true.
 	 * @param array  $options['sources']			  An array of the field names. Default: ['expression'].
 	 * @param string $options['context']              Additional parameter in URL to identify main section.
 	 *                                                Default: 'host'.
@@ -700,7 +700,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					$token_types[] = CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION;
 				}
 
-				$rigth_parentheses = [];
+				$right_parentheses = [];
 				$tokens = $expression_parser->getResult()->getTokensOfTypes($token_types);
 
 				foreach ($tokens as $token) {
@@ -709,14 +709,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
 						case CExpressionParserResult::TOKEN_TYPE_USER_MACRO:
 						case CExpressionParserResult::TOKEN_TYPE_STRING:
-							foreach ($rigth_parentheses as $pos => $value) {
+							foreach ($right_parentheses as $pos => $value) {
 								if ($pos < $token['pos']) {
 									if ($pos_left != $pos) {
 										$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
 									}
 									$expression[] = bold($value);
 									$pos_left = $pos + strlen($value);
-									unset($rigth_parentheses[$pos]);
+									unset($right_parentheses[$pos]);
 								}
 							}
 							if ($pos_left != $token['pos']) {
@@ -731,8 +731,8 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 					switch ($token['type']) {
 						case CExpressionParserResult::TOKEN_TYPE_MATH_FUNCTION:
 							$expression[] = bold($token['data']['function'].'(');
-							$rigth_parentheses[$token['pos'] + $token['length'] - 1] = ')';
-							ksort($rigth_parentheses, SORT_NUMERIC);
+							$right_parentheses[$token['pos'] + $token['length'] - 1] = ')';
+							ksort($right_parentheses, SORT_NUMERIC);
 							break;
 
 						case CExpressionParserResult::TOKEN_TYPE_FUNCTIONID_MACRO:
@@ -759,13 +759,13 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 				}
 
 				$len = strlen($trigger[$source]);
-				foreach ($rigth_parentheses as $pos => $value) {
+				foreach ($right_parentheses as $pos => $value) {
 					if ($pos_left != $pos) {
 						$expression[] = substr($trigger[$source], $pos_left, $pos - $pos_left);
 					}
 					$expression[] = bold($value);
 					$pos_left = $pos + strlen($value);
-					unset($rigth_parentheses[$pos]);
+					unset($right_parentheses[$pos]);
 				}
 				if ($pos_left != $len) {
 					$expression[] = substr($trigger[$source], $pos_left);
@@ -1795,54 +1795,73 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 	}
 
 	/**
-	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros
-	 * and user data macros.
+	 * Resolve macros for manual host action scripts. Resolves host macros, interface macros, inventory, user macros,
+	 * user data macros and manual input macro.
 	 *
-	 * @param array $data                        Array of unersolved macros.
-	 * @param array $data[<hostid>]              Array of scripts. Contains script ID as keys.
-	 * @param array $data[<hostid>][<scriptid>]  Script fields to resolve macros for.
+	 * @param array  $data                          Array of unresolved macros.
+	 * @param array  $data[<hostid>]                Array of scripts. Contains script ID as keys.
+	 * @param array  $data[<hostid>][<scriptid>]    Script fields to resolve macros for.
+	 * @param array  $manualinput_values
+	 * @param string $manualinput_values[<hostid>]  Value for resolving {MANUALINPUT} macros.
 	 *
 	 * Example input:
-	 *     array (
-	 *         10084 => array (
-	 *             57 => array (
+	 *     $data = [
+	 *         10084 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Are you sure you want to edit {HOST.HOST} now?',
 	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid={HOST.ID}'
-	 *             ),
-	 *             61 => array(
-	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?'
-	 *             )
-	 *         )
-	 *     )
+	 *             ],
+	 *             61 => [
+	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
+	 *                 'manualinput_prompt' => 'Add manualinput value for script execution with {HOST.HOST}:'
+	 *             ],
+	 *             42 => [
+	 *                 'manualinput_prompt' => 'Enter port number',
+	 *                 'url' => 'http://localhost:{MANUALINPUT}'
+	 *             ]
+	 *         ]
+	 *     ];
+	 *
+	 *     $manualinput_values = [
+	 *         10084 => 8080
+	 *     ];
 	 *
 	 * Output:
-	 *     array (
-	 *         10084 => array (
-	 *             57 => array (
+	 *     [
+	 *         10084 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Are you sure you want to edit Zabbix server now?',
 	 *                 'url' => 'http://zabbix/ui/zabbix.php?action=host.edit&hostid=10084'
-	 *             ),
-	 *             61 => array (
-	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?'
-	 *             )
-	 *         )
-	 *     )
+	 *             ],
+	 *             61 => [
+	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
+	 *                 'manualinput_prompt' => 'Add manualinput value for script execution with Zabbix server:
+	 *             ],
+	 *             42 => [
+	 *                 'manualinput_prompt' => 'Enter port number',
+	 *                 'url' => 'http://localhost:8080'
+	 *             ]
+	 *         ]
+	 *     ]
 	 *
 	 * @return array
 	 */
-	public static function resolveManualHostActionScripts(array $data): array {
+	public static function resolveManualHostActionScripts(array $data, array $manualinput_values): array {
 		$types = [
 			'macros' => [
 				'host' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.NAME}', '{HOST.HOST}'],
 				'interface' => ['{IPADDRESS}', '{HOST.IP}', '{HOST.DNS}', '{HOST.CONN}'],
 				'inventory' => array_keys(self::getSupportedHostInventoryMacrosMap()),
-				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}']
+				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
+				'manualinput' => ['{MANUALINPUT}']
 			],
 			'usermacros' => true
 		];
 
 		$macro_values = [];
-		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => [], 'usermacros' => []];
+		$macros = ['host' => [], 'interface' => [], 'inventory' => [], 'user_data' => [], 'usermacros' => [],
+			'manualinput' => []
+		];
 
 		foreach ($data as $hostid => $script) {
 			$texts = [];
@@ -1870,6 +1889,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInventoryMacrosByHostId($macros['inventory'], $macro_values);
 		$macro_values = self::getUserDataMacros($macros['user_data'], $macro_values);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
+		$macro_values = self::getManualInputMacros($macros['manualinput'], $macro_values, $manualinput_values);
 
 		foreach ($data as $hostid => &$scripts) {
 			if (array_key_exists($hostid, $macro_values)) {
@@ -1889,53 +1909,81 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 
 	/**
 	 * Resolve macros for manual event action scripts. Resolves host<1-9> macros, interface<1-9> macros,
-	 * inventory<1-9> macros, user macros, event macros and user data macros.
+	 * inventory<1-9> macros, user macros, event macros, user data macros and manual input macro.
 	 *
-	 * @param array $data                                  Array of unersolved macros.
-	 * @param array $data[<eventid>]                       Array of scripts. Contains script ID as keys.
-	 * @param array $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
-	 * @param array $events                                Array of events.
-	 * @param array $events[<eventid>]                     Event fields.
-	 * @param array $events[<eventid>][hosts]              Array of hosts that created the event.
-	 * @param array $events[<eventid>][hosts][][<hostid>]  Host ID.
-	 * @param array $events[<eventid>][objectid]           Trigger ID.
+	 * @param array  $data                                  Array of unresolved macros.
+	 * @param array  $data[<eventid>]                       Array of scripts. Contains script ID as keys.
+	 * @param array  $data[<eventid>][<scriptid>]           Script fields to resolve macros for.
+	 * @param array  $events                                Array of events.
+	 * @param array  $events[<eventid>]                     Event fields.
+	 * @param array  $events[<eventid>][hosts]              Array of hosts that created the event.
+	 * @param array  $events[<eventid>][hosts][][<hostid>]  Host ID.
+	 * @param array  $events[<eventid>][objectid]           Trigger ID.
+	 * @param array  $manualinput_values
+	 * @param string $manualinput_values[<eventid>]         Value for resolving {MANUALINPUT} macros.
 	 *
 	 * Example input:
-	 *     array (
-	 *         19 => array (
-	 *             57 => array (
+	 *     $data = [
+	 *         19 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Responsible hosts {HOST.HOST1}, {HOST.HOST2}! Navigate to triggers?',
 	 *                 'url' => 'http://zabbix/ui/triggers.php?context=host&filter_hostids[]={HOST.ID1}&filter_hostids[]={HOST.ID2}&filter_set=1'
-	 *             ),
-	 *             61 => array(
-	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?'
-	 *             )
-	 *         )
-	 *     )
+	 *             ],
+	 *             61 => [
+	 *                 'confirmation' => 'Hello, {USER.FULLNAME}! Execute script?',
+	 *                 'manualinput_prompt' => 'Execute script for {HOST.HOST}?'
+	 *             ],
+	 *             42 => [
+	 *                 'manualinput_prompt' => 'Enter port number',
+	 *                 'url' => 'http://localhost:{MANUALINPUT}'
+	 *             ]
+	 *         ]
+	 *     ];
+	 *
+	 *     $events = [
+	 *         19 => [
+	 *             'hosts' => [
+	 *                 ['hostid' => 10084],
+	 *                 ['hostid' => 10134]
+	 *             ],
+	 *             'objectid' => 23507
+	 *         ]
+	 *     ];
+	 *
+	 *     $manualinput_values = [
+	 *         19 => 8080
+	 *     ];
 	 *
 	 * Output:
-	 *     array (
-	 *         19 => array (
-	 *             57 => array (
+	 *     [
+	 *         19 => [
+	 *             57 => [
 	 *                 'confirmation' => 'Responsible hosts Zabbix server, Zabbix PC! Navigate to triggers?',
 	 *                 'url' => 'http://zabbix/ui/triggers.php?context=host&filter_hostids[]=10084&filter_hostids[]=10134&filter_set=1'
 	 *             ),
-	 *             61 => array (
-	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?'
-	 *             )
-	 *         )
-	 *     )
+	 *             61 => [
+	 *                 'confirmation' => 'Hello, Zabbix Administrator! Execute script?',
+	 *                 'manualinput_prompt' => 'Execute script for Zabbix server?'
+	 *             ],
+	 *             42 => [
+	 *                 'manualinput_prompt' => 'Enter port number',
+	 *                 'url' => 'http://localhost:8080'
+	 *             ]
+	 *         ]
+	 *     ]
 	 *
 	 * @return array
 	 */
-	public static function resolveManualEventActionScripts(array $data, array $events): array {
+	public static function resolveManualEventActionScripts(array $data, array $events,
+			array $manualinput_values): array {
 		$types = [
 			'macros' => [
 				'event' => ['{EVENT.ID}', '{EVENT.NAME}', '{EVENT.NSEVERITY}', '{EVENT.SEVERITY}', '{EVENT.STATUS}',
 					'{EVENT.VALUE}', '{EVENT.CAUSE.ID}', '{EVENT.CAUSE.NAME}', '{EVENT.CAUSE.NSEVERITY}',
 					'{EVENT.CAUSE.SEVERITY}', '{EVENT.CAUSE.STATUS}', '{EVENT.CAUSE.VALUE}'
 				],
-				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}']
+				'user_data' => ['{USER.ALIAS}', '{USER.USERNAME}', '{USER.FULLNAME}', '{USER.NAME}', '{USER.SURNAME}'],
+				'manualinput' => ['{MANUALINPUT}']
 			],
 			'macros_n' => [
 				'host_n' => ['{HOSTNAME}', '{HOST.ID}', '{HOST.HOST}', '{HOST.NAME}'],
@@ -1946,7 +1994,9 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		];
 
 		$macro_values = [];
-		$macros = ['user_data' => [], 'host_n' => [], 'interface_n' => [], 'inventory_n' => [], 'usermacros' => []];
+		$macros = ['user_data' => [], 'host_n' => [], 'interface_n' => [], 'inventory_n' => [], 'usermacros' => [],
+			'manualinput' => []
+		];
 
 		foreach ($data as $eventid => $script) {
 			$texts = [];
@@ -1955,13 +2005,14 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 			}
 
 			$matched_macros = self::extractMacros($texts, $types);
-
 			$event = $events[$eventid];
 
-			foreach ($matched_macros['macros']['user_data'] as $token => $_data) {
-				$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
-				$macros['user_data'][$eventid][$_data['macro']][] =
-					['token' => $token] + array_intersect_key($_data, ['macrofunc' => null]);
+			foreach (['user_data', 'manualinput'] as $sub_type) {
+				foreach ($matched_macros['macros'][$sub_type] as $token => $_data) {
+					$macro_values[$eventid][$token] = UNRESOLVED_MACRO_STRING;
+					$macros[$sub_type][$eventid][$_data['macro']][] =
+						['token' => $token] + array_intersect_key($_data, ['macrofunc' => null]);
+				}
 			}
 
 			foreach ($matched_macros['macros_n'] as $sub_type => $macro_data) {
@@ -2061,6 +2112,7 @@ class CMacrosResolver extends CMacrosResolverGeneral {
 		$macro_values = self::getInterfaceNMacros($macros['interface_n'], $macro_values, $trigger_hosts_by_f_num);
 		$macro_values = self::getInventoryNMacros($macros['inventory_n'], $macro_values, $trigger_hosts_by_f_num);
 		$macro_values = self::getUserMacros($macros['usermacros'], $macro_values);
+		$macro_values = self::getManualInputMacros($macros['manualinput'], $macro_values, $manualinput_values);
 
 		foreach ($data as $eventid => &$scripts) {
 			if (array_key_exists($eventid, $macro_values)) {

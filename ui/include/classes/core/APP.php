@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,8 +19,8 @@
 **/
 
 
-if (version_compare(PHP_VERSION, '7.4.0', '<')) {
-	echo sprintf('Minimum required PHP version is %1$s.', '7.4.0');
+if (version_compare(PHP_VERSION, '8.0.0', '<')) {
+	echo sprintf('Minimum required PHP version is %1$s.', '8.0.0');
 	exit;
 }
 

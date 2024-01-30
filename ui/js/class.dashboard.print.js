@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,7 +28,9 @@ class CDashboardPrint extends CDashboard {
 		this._state = DASHBOARD_STATE_ACTIVE;
 
 		for (const dashboard_page of this.getDashboardPages()) {
-			this.#activateDashboardPage(dashboard_page);
+			this._startDashboardPage(dashboard_page);
+
+			dashboard_page.activate();
 		}
 	}
 
@@ -56,7 +58,7 @@ class CDashboardPrint extends CDashboard {
 			unique_id: this._createUniqueId()
 		});
 
-		this._dashboard_pages.set(dashboard_page, {});
+		this._dashboard_pages.set(dashboard_page, {is_ready: false});
 
 		for (const widget_data of widgets) {
 			dashboard_page.addWidgetFromData({
@@ -69,10 +71,17 @@ class CDashboardPrint extends CDashboard {
 		return dashboard_page;
 	}
 
-	#activateDashboardPage(dashboard_page) {
-		dashboard_page.on(CDashboardPage.EVENT_REQUIRE_DATA_SOURCE, this._events.dashboardPageRequireDataSource);
+	_updateReadyState() {
+		let is_ready = true;
 
-		dashboard_page.start();
-		dashboard_page.activate();
+		for (const data of this._dashboard_pages.values()) {
+			if (!data.is_ready) {
+				is_ready = false;
+
+				break;
+			}
+		}
+
+		this._target.classList.toggle(CDashboard.ZBX_STYLE_IS_READY, is_ready);
 	}
 }

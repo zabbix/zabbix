@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -100,7 +100,7 @@ class CLdap {
 	protected $placeholders = [];
 
 	/**
-	 * Estabilished LDAP connection resource, for PHP8.1.0+ LDAP\Connection class instance.
+	 * Established LDAP connection resource, for PHP8.1.0+ LDAP\Connection class instance.
 	 *
 	 * @var bool|resource|LDAP\Connection
 	 */

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -43,11 +43,12 @@ class CExpressionMacroParser extends CParser {
 	 * An options array.
 	 *
 	 * Supported options:
-	 *   'usermacros' => false    Enable user macros usage in expression.
-	 *   'lldmacros' => false     Enable low-level discovery macros usage in expression.
-	 *   'host_macro' => false    Allow {HOST.HOST} macro as host name part in the query.
-	 *   'host_macro_n' => false  Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
-	 *   'empty_host' => false    Allow empty hostname in the query string.
+	 *   'usermacros' => false         Enable user macros usage in expression.
+	 *   'lldmacros' => false          Enable low-level discovery macros usage in expression.
+	 *   'host_macro' => false         Allow {HOST.HOST} macro as host name part in the query.
+	 *   'host_macro_n' => false       Allow {HOST.HOST} and {HOST.HOST<1-9>} macros as host name part in the query.
+	 *   'empty_host' => false         Allow empty hostname in the query string.
+	 *   'escape_backslashes' => true  Disable backslash escaping in history function parameters prior to v7.0.
 	 *
 	 * @var array
 	 */
@@ -56,7 +57,8 @@ class CExpressionMacroParser extends CParser {
 		'lldmacros' => false,
 		'host_macro' => false,
 		'host_macro_n' => false,
-		'empty_host' => false
+		'empty_host' => false,
+		'escape_backslashes' => true
 	];
 
 	/**
@@ -72,7 +74,8 @@ class CExpressionMacroParser extends CParser {
 			'lldmacros' => $this->options['lldmacros'],
 			'host_macro' => $this->options['host_macro'],
 			'host_macro_n' => $this->options['host_macro_n'],
-			'empty_host' => $this->options['empty_host']
+			'empty_host' => $this->options['empty_host'],
+			'escape_backslashes' => $this->options['escape_backslashes']
 		]);
 	}
 

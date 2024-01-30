@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ class testDataDisplayInGraphs extends CWebTest {
 	protected static $hostid;
 	protected static $itemids;
 	protected static $dashboardid;
+	protected static $db_type;
 
 	const TIMESTAMPS = [
 		'history' => [
@@ -71,28 +72,34 @@ class testDataDisplayInGraphs extends CWebTest {
 						'key_' => 'item_key_1',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '1m'
+						'delay' => '1m',
+						'history' => '9125d',
+						'trends' => 0
 					],
 					[
 						'name' => 'Item for history data display 2',
 						'key_' => 'item_key_2',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '1m'
+						'delay' => '1m',
+						'history' => '9125d',
+						'trends' => 0
 					],
 					[
 						'name' => 'Item for trends data display 1',
 						'key_' => 'item_key_3',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '2h'
+						'delay' => '2h',
+						'trends' => '9125d'
 					],
 					[
 						'name' => 'Item for trends data display 2',
 						'key_' => 'item_key_4',
 						'type' => ITEM_TYPE_ZABBIX,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '2h'
+						'delay' => '2h',
+						'trends' => '9125d'
 					],
 					[
 						'name' => 'Item for pie chart 1',
@@ -2103,6 +2110,9 @@ class testDataDisplayInGraphs extends CWebTest {
 		]);
 
 		self::$dashboardid = $dashboard_responce['dashboardids'][0];
+
+		global $DB;
+		self::$db_type = $DB['TYPE'];
 	}
 
 	public function getMonitoringGraphData() {
@@ -2197,7 +2207,7 @@ class testDataDisplayInGraphs extends CWebTest {
 				$graph->waitUntilClassesNotPresent('is-loading');
 			}
 
-			$this->assertScreenshot($charts_table, $screenshot_string.$show);
+			$this->assertScreenshot($charts_table, $screenshot_string.$show.self::$db_type);
 
 			// Switch back to normal view to avoid impacting following scenarios.
 			if (CTestArrayHelper::get($data, 'kiosk_mode')) {
@@ -2240,7 +2250,7 @@ class testDataDisplayInGraphs extends CWebTest {
 
 		// Wait for the image source to change and check graph screenshot.
 		$image->waitUntilAttributesNotPresent(['src' => $old_source]);
-		$screenshot_id = 'latest_data_'.$data['type'];
+		$screenshot_id = 'latest_data_'.$data['type'].self::$db_type;
 		$this->assertScreenshot($this->query('class:center')->one(), $screenshot_id);
 
 		$this->checkKioskMode('class:center', $screenshot_id);
@@ -2310,7 +2320,7 @@ class testDataDisplayInGraphs extends CWebTest {
 			$dashboard->waitUntilReady();
 		}
 
-		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg');
+		$screenshot_id = 'dashboard_'.$data['page'].'_page_'.CTestArrayHelper::get($data, 'type', 'svg').self::$db_type;
 		$this->assertScreenshot($dashboard, $screenshot_id);
 
 		$this->checkKioskMode('class:dashboard-grid', $screenshot_id);

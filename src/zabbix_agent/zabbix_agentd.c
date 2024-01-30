@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -29,11 +29,11 @@
 #include "zbxthreads.h"
 #include "zbx_rtc_constants.h"
 
-static char	*CONFIG_PID_FILE = NULL;
+static char	*config_pid_file = NULL;
 
-static char	*zbx_config_hosts_allowed	= NULL;
+static char	*zbx_config_hosts_allowed = NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_hostnames, NULL)
-char	*CONFIG_HOSTNAME_ITEM		= NULL;
+static char	*config_hostname_item = NULL;
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata, NULL)
 ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_host_metadata_item, NULL)
 static char	*zbx_config_host_interface = NULL;
@@ -42,42 +42,30 @@ ZBX_GET_CONFIG_VAR2(ZBX_THREAD_LOCAL char *, const char *, zbx_config_hostname, 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 1)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
-
-static int	zbx_config_listen_port			= ZBX_DEFAULT_AGENT_PORT;
-static char	*zbx_config_listen_ip			= NULL;
-static int	zbx_config_refresh_active_checks	= 5;
-
+static int	zbx_config_listen_port = ZBX_DEFAULT_AGENT_PORT;
+static char	*zbx_config_listen_ip = NULL;
+static int	zbx_config_refresh_active_checks = 5;
 ZBX_GET_CONFIG_VAR2(char*, const char *, zbx_config_source_ip, NULL)
-
-int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-
-int	zbx_config_buffer_size		= 100;
-int	zbx_config_buffer_send		= 5;
-
+static int	config_log_level = LOG_LEVEL_WARNING;
+static int	zbx_config_buffer_size = 100;
+static int	zbx_config_buffer_send = 5;
 static int	zbx_config_max_lines_per_second	= 20;
 static int	zbx_config_eventlog_max_lines_per_second = 20;
-
-char	*CONFIG_LOAD_MODULE_PATH	= NULL;
-
-char	**CONFIG_ALIASES		= NULL;
-char	**CONFIG_LOAD_MODULE		= NULL;
-char	**zbx_config_user_parameters	= NULL;
-char	*CONFIG_USER_PARAMETER_DIR	= NULL;
+static char	*config_load_module_path = NULL;
+static char	**config_aliases = NULL;
+static char	**config_load_module = NULL;
+static char	**zbx_config_user_parameters = NULL;
+static char	*config_user_parameter_dir = NULL;
 #if defined(_WINDOWS)
-char	**CONFIG_PERF_COUNTERS		= NULL;
-char	**CONFIG_PERF_COUNTERS_EN	= NULL;
+static char	**config_perf_counters = NULL;
+static char	**config_perf_counters_en = NULL;
 #endif
 
-char	*CONFIG_USER			= NULL;
-
-/* SSL parameters */
-char	*CONFIG_SSL_CA_LOCATION;
-char	*CONFIG_SSL_CERT_LOCATION;
-char	*CONFIG_SSL_KEY_LOCATION;
+static char	*config_user = NULL;
 
 static zbx_config_tls_t	*zbx_config_tls = NULL;
 
-int	CONFIG_TCP_MAX_BACKLOG_SIZE	= SOMAXCONN;
+static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 int	zbx_config_heartbeat_frequency	= 60;
 
@@ -102,10 +90,8 @@ int	zbx_config_heartbeat_frequency	= 60;
 
 #include "zbxcrypto.h"
 
-const char	*progname = NULL;
-
 /* application TITLE */
-const char	title_message[] = "zabbix_agentd"
+static const char	title_message[] = "zabbix_agentd"
 #if defined(_WIN64)
 				" Win64"
 #elif defined(_WIN32)
@@ -119,10 +105,10 @@ const char	title_message[] = "zabbix_agentd"
 	;
 /* end of application TITLE */
 
-const char	syslog_app_name[] = "zabbix_agentd";
+static const char	syslog_app_name[] = "zabbix_agentd";
 
 /* application USAGE message */
-const char	*usage_message[] = {
+static const char	*usage_message[] = {
 	"[-c config-file]", NULL,
 	"[-c config-file]", "-p", NULL,
 	"[-c config-file]", "-t item-key", NULL,
@@ -142,7 +128,7 @@ const char	*usage_message[] = {
 /* end of application USAGE message */
 
 /* application HELP message */
-const char	*help_message[] = {
+static const char	*help_message[] = {
 	"A Zabbix daemon for monitoring of various server parameters.",
 	"",
 	"Options:",
@@ -236,30 +222,17 @@ static char	shortopts[] =
 	;
 /* end of COMMAND LINE OPTIONS */
 
-static char		*TEST_METRIC = NULL;
-int			threads_num = 0;
-ZBX_THREAD_HANDLE	*threads = NULL;
-static int		*threads_flags;
-
-unsigned char  program_type = ZBX_PROGRAM_TYPE_AGENTD;
-
-static unsigned char	get_program_type(void)
-{
-	return program_type;
-}
-
-#if defined(_WINDOWS) || defined(__MINGW32__)
-static const char	*get_progname(void)
-{
-	return progname;
-}
-#endif
-
+static char			*TEST_METRIC = NULL;
+ZBX_GET_CONFIG_VAR(int, zbx_threads_num, 0)
+ZBX_GET_CONFIG_VAR(ZBX_THREAD_HANDLE*, zbx_threads, NULL)
+static int			*threads_flags;
+ZBX_GET_CONFIG_VAR(unsigned char, zbx_program_type, ZBX_PROGRAM_TYPE_AGENTD)
+ZBX_GET_CONFIG_VAR2(const char *, const char *, zbx_progname, NULL)
 ZBX_GET_CONFIG_VAR(int, zbx_config_timeout, 3)
 
 static zbx_thread_activechk_args	*config_active_args = NULL;
 
-int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+static int	config_forks[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_POLLER */
 	0, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */
@@ -299,15 +272,14 @@ int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	0, /* ZBX_PROCESS_TYPE_ODBCPOLLER */
 	0, /* ZBX_PROCESS_TYPE_CONNECTORWORKER*/
 	0, /* ZBX_PROCESS_TYPE_HTTPAGENT_POLLER */
-	0 /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	0, /* ZBX_PROCESS_TYPE_AGENT_POLLER */
+	0 /* ZBX_PROCESS_TYPE_DBCONFIGWORKER */
 };
 
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 
 static zbx_config_log_t	log_file_cfg	= {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
-
-char	*opt = NULL;
 
 #ifdef _WINDOWS
 void	zbx_co_uninitialize();
@@ -325,21 +297,21 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 		/* fail if the main process is queried */
 		return FAIL;
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_COLLECTOR]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_COLLECTOR]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_COLLECTOR;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_COLLECTOR];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_COLLECTOR];
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_LISTENER]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_LISTENER;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_LISTENER];
 
 	}
-	else if (local_server_num <= (server_count += CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS]))
+	else if (local_server_num <= (server_count += config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS]))
 	{
 		*local_process_type = ZBX_PROCESS_TYPE_ACTIVE_CHECKS;
-		*local_process_num = local_server_num - server_count + CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS];
+		*local_process_num = local_server_num - server_count + config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS];
 	}
 	else
 		return FAIL;
@@ -349,7 +321,7 @@ int	get_process_info_by_thread(int local_server_num, unsigned char *local_proces
 
 static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 {
-	int		i, ret = SUCCEED;
+	int		ret = SUCCEED;
 	char		ch;
 #ifdef _WINDOWS
 	unsigned int	opt_mask = 0;
@@ -461,8 +433,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 #endif
 
 	/* every option may be specified only once */
-
-	for (i = 0; NULL != longopts[i].name; i++)
+	for (int i = 0; NULL != longopts[i].name; i++)
 	{
 		ch = (char)longopts[i].val;
 
@@ -538,7 +509,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 			break;
 		default:
 			zbx_error("mutually exclusive options used");
-			zbx_usage();
+			zbx_print_usage(usage_message, zbx_progname);
 			ret = FAIL;
 			goto out;
 	}
@@ -556,7 +527,7 @@ static int	parse_commandline(int argc, char **argv, ZBX_TASK_EX *t)
 	/* always permutes command line arguments regardless of POSIXLY_CORRECT environment variable. */
 	if (argc > zbx_optind)
 	{
-		for (i = zbx_optind; i < argc; i++)
+		for (int i = zbx_optind; i < argc; i++)
 			zbx_error("invalid parameter \"%s\"", argv[i]);
 
 		ret = FAIL;
@@ -608,7 +579,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set configuration defaults                                        *
+ * Purpose: sets configuration defaults                                       *
  *                                                                            *
  ******************************************************************************/
 static void	set_defaults(void)
@@ -618,12 +589,12 @@ static void	set_defaults(void)
 
 	if (NULL == zbx_config_hostnames)
 	{
-		if (NULL == CONFIG_HOSTNAME_ITEM)
-			CONFIG_HOSTNAME_ITEM = zbx_strdup(CONFIG_HOSTNAME_ITEM, "system.hostname");
+		if (NULL == config_hostname_item)
+			config_hostname_item = zbx_strdup(config_hostname_item, "system.hostname");
 
 		zbx_init_agent_result(&result);
 
-		if (SUCCEED == zbx_execute_agent_check(CONFIG_HOSTNAME_ITEM, ZBX_PROCESS_LOCAL_COMMAND |
+		if (SUCCEED == zbx_execute_agent_check(config_hostname_item, ZBX_PROCESS_LOCAL_COMMAND |
 				ZBX_PROCESS_WITH_ALIAS, &result, ZBX_CHECK_TIMEOUT_UNDEFINED) &&
 				NULL != (value = ZBX_GET_STR_RESULT(&result)))
 		{
@@ -639,11 +610,11 @@ static void	set_defaults(void)
 			zbx_config_hostnames = zbx_strdup(zbx_config_hostnames, *value);
 		}
 		else
-			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", CONFIG_HOSTNAME_ITEM);
+			zabbix_log(LOG_LEVEL_WARNING, "failed to get system hostname from [%s])", config_hostname_item);
 
 		zbx_free_agent_result(&result);
 	}
-	else if (NULL != CONFIG_HOSTNAME_ITEM)
+	else if (NULL != config_hostname_item)
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "both Hostname and HostnameItem defined, using [%s]",
 				zbx_config_hostnames);
@@ -662,11 +633,11 @@ static void	set_defaults(void)
 	}
 
 #ifndef _WINDOWS
-	if (NULL == CONFIG_LOAD_MODULE_PATH)
-		CONFIG_LOAD_MODULE_PATH = zbx_strdup(CONFIG_LOAD_MODULE_PATH, DEFAULT_LOAD_MODULE_PATH);
+	if (NULL == config_load_module_path)
+		config_load_module_path = zbx_strdup(config_load_module_path, DEFAULT_LOAD_MODULE_PATH);
 
-	if (NULL == CONFIG_PID_FILE)
-		CONFIG_PID_FILE = (char *)"/tmp/zabbix_agentd.pid";
+	if (NULL == config_pid_file)
+		config_pid_file = (char *)"/tmp/zabbix_agentd.pid";
 #endif
 	if (NULL == log_file_cfg.log_type_str)
 		log_file_cfg.log_type_str = zbx_strdup(log_file_cfg.log_type_str, ZBX_OPTION_LOGTYPE_FILE);
@@ -674,22 +645,21 @@ static void	set_defaults(void)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate listed host names                                        *
+ * Purpose: validates listed host names                                       *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 {
-	char	*ch_error;
-	int	i;
-
 	if (0 == hostnames->values_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"Hostname\" configuration parameter is not defined");
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < hostnames->values_num; i++)
+	for (int i = 0; i < hostnames->values_num; i++)
 	{
+		char	*ch_error;
+
 		if (FAIL == zbx_check_hostname(hostnames->values[i], &ch_error))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "invalid \"Hostname\" configuration parameter: '%s': %s",
@@ -702,16 +672,17 @@ static void	zbx_validate_config_hostnames(zbx_vector_str_t *hostnames)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: validate configuration parameters                                 *
+ * Purpose: validates configuration parameters                                *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_validate_config(ZBX_TASK_EX *task)
 {
-	char	*ch_error;
 	int	err = 0;
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
+	if (0 != config_forks[ZBX_PROCESS_TYPE_LISTENER])
 	{
+		char	*ch_error;
+
 		if (NULL == zbx_config_hosts_allowed)
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "StartAgents is not 0, parameter \"Server\" must be defined");
@@ -733,7 +704,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 	}
 
 	/* make sure active or passive check is enabled */
-	if (0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS] && 0 == CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
+	if (0 == config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS] && 0 == config_forks[ZBX_PROCESS_TYPE_LISTENER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "either active or passive checks must be enabled");
 		err = 1;
@@ -788,24 +759,24 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 static int	add_serveractive_host_cb(const zbx_vector_addr_ptr_t *addrs, zbx_vector_str_t *hostnames, void *data)
 {
-	int	i, forks, new_forks;
+	int	forks, new_forks;
 
 	ZBX_UNUSED(data);
 	/* add at least one fork */
 	new_forks = 0 < hostnames->values_num ? hostnames->values_num : 1;
 
-	forks = CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS];
-	CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS] += new_forks;
+	forks = config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS];
+	config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS] += new_forks;
 	config_active_args = (zbx_thread_activechk_args *)zbx_realloc(config_active_args,
-			sizeof(zbx_thread_activechk_args) * (size_t)CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS]);
+			sizeof(zbx_thread_activechk_args) * (size_t)config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS]);
 
-	for (i = 0; i < new_forks; i++, forks++)
+	for (int i = 0; i < new_forks; i++, forks++)
 	{
 		zbx_vector_addr_ptr_create(&config_active_args[forks].addrs);
 		zbx_addr_copy(&config_active_args[forks].addrs, addrs);
 
 		config_active_args[forks].zbx_config_tls = zbx_config_tls;
-		config_active_args[forks].zbx_get_program_type_cb_arg = get_program_type;
+		config_active_args[forks].zbx_get_program_type_cb_arg = get_zbx_program_type;
 		config_active_args[forks].config_file = config_file;
 		config_active_args[forks].config_timeout = zbx_config_timeout;
 		config_active_args[forks].config_source_ip = zbx_config_source_ip;
@@ -893,9 +864,10 @@ static int	load_enable_remote_commands(const char *value, const struct cfg_line 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: load configuration from config file                               *
+ * Purpose: loads configuration from config file                              *
  *                                                                            *
- * Parameters: requirement - produce error if config file missing or not      *
+ * Parameters: requirement - [IN] produce error if config file missing or not *
+ *                    task - [IN/OUT]                                         *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
@@ -916,7 +888,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"Hostname",			&zbx_config_hostnames,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
-		{"HostnameItem",		&CONFIG_HOSTNAME_ITEM,			TYPE_STRING,
+		{"HostnameItem",		&config_hostname_item,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"HostMetadata",		&zbx_config_host_metadata,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -931,7 +903,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		{"BufferSend",			&zbx_config_buffer_send,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 #ifndef _WINDOWS
-		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
+		{"PidFile",			&config_pid_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
@@ -942,15 +914,15 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1024},
 		{"Timeout",			&zbx_config_timeout,			TYPE_INT,
 			PARM_OPT,	1,			30},
-		{"ListenPort",			&zbx_config_listen_port,	       	TYPE_INT,
+		{"ListenPort",			&zbx_config_listen_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"ListenIP",			&zbx_config_listen_ip,			TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
+		{"DebugLevel",			&config_log_level,			TYPE_INT,
 			PARM_OPT,	0,			5},
-		{"StartAgents",			&CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER],TYPE_INT,
+		{"StartAgents",			&config_forks[ZBX_PROCESS_TYPE_LISTENER],TYPE_INT,
 			PARM_OPT,	0,			100},
 		{"RefreshActiveChecks",		&zbx_config_refresh_active_checks,	TYPE_INT,
 			PARM_OPT,	MIN_ACTIVE_CHECKS_REFRESH_FREQUENCY,
@@ -963,26 +935,26 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1},
 		{"UnsafeUserParameters",	&zbx_config_unsafe_user_parameters,	TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"Alias",			&CONFIG_ALIASES,			TYPE_MULTISTRING,
+		{"Alias",			&config_aliases,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{"UserParameter",		&zbx_config_user_parameters,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"UserParameterDir",		&CONFIG_USER_PARAMETER_DIR,		TYPE_STRING,
+		{"UserParameterDir",		&config_user_parameter_dir,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 #ifndef _WINDOWS
-		{"LoadModulePath",		&CONFIG_LOAD_MODULE_PATH,		TYPE_STRING,
+		{"LoadModulePath",		&config_load_module_path,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"LoadModule",			&CONFIG_LOAD_MODULE,			TYPE_MULTISTRING,
+		{"LoadModule",			&config_load_module,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 		{"AllowRoot",			&config_allow_root,			TYPE_INT,
 			PARM_OPT,	0,			1},
-		{"User",			&CONFIG_USER,				TYPE_STRING,
+		{"User",			&config_user,				TYPE_STRING,
 			PARM_OPT,	0,			0},
 #endif
 #ifdef _WINDOWS
-		{"PerfCounter",			&CONFIG_PERF_COUNTERS,			TYPE_MULTISTRING,
+		{"PerfCounter",			&config_perf_counters,			TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
-		{"PerfCounterEn",		&CONFIG_PERF_COUNTERS_EN,		TYPE_MULTISTRING,
+		{"PerfCounterEn",		&config_perf_counters_en,		TYPE_MULTISTRING,
 			PARM_OPT,	0,			0},
 #endif
 		{"TLSConnect",			&(zbx_config_tls->connect),		TYPE_STRING,
@@ -1021,7 +993,7 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DenyKey",			&parser_load_key_access_rule,		TYPE_CUSTOM,
 			PARM_OPT,	0,			0},
-		{"ListenBacklog",		&CONFIG_TCP_MAX_BACKLOG_SIZE,		TYPE_INT,
+		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
 		{"HeartbeatFrequency",		&zbx_config_heartbeat_frequency,	TYPE_INT,
 			PARM_OPT,	0,			3600},
@@ -1032,14 +1004,14 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 	parser_load_key_access_rule.cfg_custom_parameter_parser_func = load_key_access_rule;
 
 	/* initialize multistrings */
-	zbx_strarr_init(&CONFIG_ALIASES);
+	zbx_strarr_init(&config_aliases);
 	zbx_strarr_init(&zbx_config_user_parameters);
 #ifndef _WINDOWS
-	zbx_strarr_init(&CONFIG_LOAD_MODULE);
+	zbx_strarr_init(&config_load_module);
 #endif
 #ifdef _WINDOWS
-	zbx_strarr_init(&CONFIG_PERF_COUNTERS);
-	zbx_strarr_init(&CONFIG_PERF_COUNTERS_EN);
+	zbx_strarr_init(&config_perf_counters);
+	zbx_strarr_init(&config_perf_counters_en);
 #endif
 	parse_cfg_file(config_file, cfg, requirement, ZBX_CFG_STRICT, ZBX_CFG_EXIT_FAILURE);
 
@@ -1071,8 +1043,8 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 		zbx_validate_config_hostnames(&hostnames);
 		zbx_validate_config(task);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_validate_config(zbx_config_tls, CONFIG_FORKS[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
-				CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER], get_program_type);
+		zbx_tls_validate_config(zbx_config_tls, config_forks[ZBX_PROCESS_TYPE_ACTIVE_CHECKS],
+				config_forks[ZBX_PROCESS_TYPE_LISTENER], get_zbx_program_type);
 #endif
 	}
 
@@ -1084,19 +1056,19 @@ static void	zbx_load_config(int requirement, ZBX_TASK_EX *task)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free configuration memory                                         *
+ * Purpose: frees configuration memory                                        *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_free_config(void)
 {
-	zbx_strarr_free(&CONFIG_ALIASES);
+	zbx_strarr_free(&config_aliases);
 	zbx_strarr_free(&zbx_config_user_parameters);
 #ifndef _WINDOWS
-	zbx_strarr_free(&CONFIG_LOAD_MODULE);
+	zbx_strarr_free(&config_load_module);
 #endif
 #ifdef _WINDOWS
-	zbx_strarr_free(&CONFIG_PERF_COUNTERS);
-	zbx_strarr_free(&CONFIG_PERF_COUNTERS_EN);
+	zbx_strarr_free(&config_perf_counters);
+	zbx_strarr_free(&config_perf_counters_en);
 #endif
 }
 
@@ -1108,7 +1080,7 @@ static void	zbx_free_config(void)
  ******************************************************************************/
 static const char	*get_pid_file_path(void)
 {
-	return CONFIG_PID_FILE;
+	return config_pid_file;
 }
 #endif
 
@@ -1192,7 +1164,8 @@ static void	signal_redirect_cb(int flags, zbx_signal_handler_f sigusr_handler)
 		case ZBX_RTC_USER_PARAMETERS_RELOAD:
 			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_ACTIVE_CHECKS, ZBX_RTC_GET_DATA(flags), flags,
 					NULL);
-			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags, NULL);
+			zbx_signal_process_by_type(ZBX_PROCESS_TYPE_LISTENER, ZBX_RTC_GET_DATA(flags), flags,
+					NULL);
 			break;
 		default:
 			if (NULL != sigusr_handler)
@@ -1228,7 +1201,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);
@@ -1265,7 +1238,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	}
 #endif
 #ifndef _WINDOWS
-	if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout, 1))
+	if (FAIL == zbx_load_modules(config_load_module_path, config_load_module, zbx_config_timeout, 1))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 		zbx_free_service_resources(FAIL);
@@ -1281,10 +1254,10 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (0 != CONFIG_FORKS[ZBX_PROCESS_TYPE_LISTENER])
+	if (0 != config_forks[ZBX_PROCESS_TYPE_LISTENER])
 	{
 		if (FAIL == zbx_tcp_listen(&listen_sock, zbx_config_listen_ip, (unsigned short)zbx_config_listen_port,
-				zbx_config_timeout))
+				zbx_config_timeout, config_tcp_max_backlog_size))
 		{
 			zabbix_log(LOG_LEVEL_CRIT, "listener failed: %s", zbx_socket_strerror());
 			zbx_free_service_resources(FAIL);
@@ -1315,20 +1288,20 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		zbx_free(error);
 	}
 	else
-		load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
+		load_perf_counters(config_perf_counters, config_perf_counters_en);
 #endif
 	zbx_free_config();
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_parent(get_program_type);
+	zbx_tls_init_parent(get_zbx_program_type);
 #endif
 	/* --- START THREADS ---*/
 
-	for (threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
-		threads_num += CONFIG_FORKS[i];
+	for (zbx_threads_num = 0, i = 0; i < ZBX_PROCESS_TYPE_COUNT; i++)
+		zbx_threads_num += config_forks[i];
 
 #ifdef _WINDOWS
-	if (MAXIMUM_WAIT_OBJECTS < threads_num)
+	if (MAXIMUM_WAIT_OBJECTS < zbx_threads_num)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "Too many agent threads. Please reduce the StartAgents configuration"
 				" parameter or the number of active servers in ServerActive configuration parameter.");
@@ -1336,16 +1309,16 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	threads = (ZBX_THREAD_HANDLE *)zbx_calloc(threads, (size_t)threads_num, sizeof(ZBX_THREAD_HANDLE));
-	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)threads_num, sizeof(int));
+	zbx_threads = (ZBX_THREAD_HANDLE *)zbx_calloc(zbx_threads, (size_t)zbx_threads_num, sizeof(ZBX_THREAD_HANDLE));
+	threads_flags = (int *)zbx_calloc(threads_flags, (size_t)zbx_threads_num, sizeof(int));
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "agent #0 started [main process]");
 
-	for (i = 0; i < threads_num; i++)
+	for (i = 0; i < zbx_threads_num; i++)
 	{
 		zbx_thread_args_t		*thread_args;
 		zbx_thread_info_t		*thread_info;
-		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_program_type,
+		zbx_thread_listener_args	listener_args = {&listen_sock, zbx_config_tls, get_zbx_program_type,
 								config_file, zbx_config_timeout,
 								zbx_config_hosts_allowed, zbx_config_user_parameters};
 
@@ -1358,22 +1331,22 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 			exit(EXIT_FAILURE);
 		}
 
-		thread_info->program_type = program_type;
+		thread_info->program_type = zbx_program_type;
 		thread_info->server_num = i + 1;
 		thread_args->args = NULL;
 
 		switch (thread_info->process_type)
 		{
 			case ZBX_PROCESS_TYPE_COLLECTOR:
-				zbx_thread_start(collector_thread, thread_args, &threads[i]);
+				zbx_thread_start(collector_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_LISTENER:
 				thread_args->args = &listener_args;
-				zbx_thread_start(listener_thread, thread_args, &threads[i]);
+				zbx_thread_start(listener_thread, thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_ACTIVE_CHECKS:
 				thread_args->args = &config_active_args[j++];
-				zbx_thread_start(active_checks_thread, thread_args, &threads[i]);
+				zbx_thread_start(active_checks_thread, thread_args, &zbx_threads[i]);
 				break;
 		}
 #ifndef _WINDOWS
@@ -1385,7 +1358,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_set_parent_signal_handler(zbx_on_exit);	/* must be called after all threads are created */
 
 	/* wait for an exiting thread */
-	res = WaitForMultipleObjectsEx(threads_num, threads, FALSE, INFINITE, FALSE);
+	res = WaitForMultipleObjectsEx(zbx_threads_num, zbx_threads, FALSE, INFINITE, FALSE);
 
 	if (ZBX_IS_RUNNING())
 	{
@@ -1434,17 +1407,17 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: free service resources allocated by main thread                   *
+ * Purpose: frees service resources allocated by main thread                  *
  *                                                                            *
  ******************************************************************************/
 void	zbx_free_service_resources(int ret)
 {
-	if (NULL != threads)
+	if (NULL != zbx_threads)
 	{
 		/* wait for all child processes to exit */
-		zbx_threads_kill_and_wait(threads, threads_flags, threads_num, ret);
+		zbx_threads_kill_and_wait(zbx_threads, threads_flags, zbx_threads_num, ret);
 
-		zbx_free(threads);
+		zbx_free(zbx_threads);
 		zbx_free(threads_flags);
 	}
 #ifdef HAVE_PTHREAD_PROCESS_SHARED
@@ -1478,13 +1451,18 @@ int	main(int argc, char **argv)
 #ifdef _WINDOWS
 	int		ret;
 #endif
-	zbx_init_library_common(zbx_log_impl);
+	argv = zbx_setproctitle_init(argc, argv);
+	zbx_progname = get_program_name(argv[0]);
+
+	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 	zbx_init_library_sysinfo(get_zbx_config_timeout, get_zbx_config_enable_remote_commands,
 			get_zbx_config_log_remote_commands, get_zbx_config_unsafe_user_parameters,
 			get_zbx_config_source_ip, get_zbx_config_hostname, get_zbx_config_hostnames,
 			get_zbx_config_host_metadata, get_zbx_config_host_metadata_item);
 #if defined(_WINDOWS) || defined(__MINGW32__)
-	zbx_init_library_win32(&get_progname);
+	zbx_init_library_win32(get_zbx_progname);
+#else
+	zbx_init_library_nix(get_zbx_progname);
 #endif
 #ifdef _WINDOWS
 	/* Provide, so our process handles errors instead of the system itself. */
@@ -1494,8 +1472,6 @@ int	main(int argc, char **argv)
 	SetErrorMode(SEM_FAILCRITICALERRORS);
 #endif
 	zbx_config_tls = zbx_config_tls_new();
-	argv = zbx_setproctitle_init(argc, argv);
-	progname = get_program_name(argv[0]);
 
 	if (SUCCEED != parse_commandline(argc, argv, &t))
 		exit(EXIT_FAILURE);
@@ -1506,7 +1482,7 @@ int	main(int argc, char **argv)
 	{
 		zbx_config_log_t	log_cfg	= {NULL, NULL, ZBX_LOG_TYPE_SYSTEM, 1};
 
-		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, NULL);
+		zbx_open_log(&log_cfg, LOG_LEVEL_WARNING, syslog_app_name, NULL);
 	}
 #endif
 
@@ -1523,7 +1499,8 @@ int	main(int argc, char **argv)
 		exit(EXIT_FAILURE);
 	}
 #endif
-	zbx_init_library_cfg(program_type, config_file);
+
+	zbx_init_library_cfg(zbx_program_type, config_file);
 
 	/* this is needed to set default hostname in zbx_load_config() */
 	zbx_init_metrics();
@@ -1531,13 +1508,13 @@ int	main(int argc, char **argv)
 	switch (t.task)
 	{
 		case ZBX_TASK_SHOW_USAGE:
-			zbx_usage();
+			zbx_print_usage(usage_message, zbx_progname);
 			exit(EXIT_FAILURE);
 			break;
 #ifndef _WINDOWS
 		case ZBX_TASK_RUNTIME_CONTROL:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			exit(SUCCEED == zbx_sigusr_send(t.data, CONFIG_PID_FILE) ? EXIT_SUCCESS : EXIT_FAILURE);
+			exit(SUCCEED == zbx_sigusr_send(t.data, config_pid_file) ? EXIT_SUCCESS : EXIT_FAILURE);
 			break;
 #else
 		case ZBX_TASK_INSTALL_SERVICE:
@@ -1576,8 +1553,8 @@ int	main(int argc, char **argv)
 		case ZBX_TASK_TEST_CONFIG:
 			printf("Validating configuration file \"%s\"\n", config_file);
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			load_aliases(CONFIG_ALIASES);
-			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+			load_aliases(config_aliases);
+			zbx_set_user_parameter_dir(config_user_parameter_dir);
 
 			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
 			{
@@ -1603,19 +1580,19 @@ int	main(int argc, char **argv)
 				zbx_free(error);
 			}
 			else
-				load_perf_counters(CONFIG_PERF_COUNTERS, CONFIG_PERF_COUNTERS_EN);
+				load_perf_counters(config_perf_counters, config_perf_counters_en);
 #else
 			zbx_set_common_signal_handlers(zbx_on_exit);
 #endif
 #ifndef _WINDOWS
-			if (FAIL == zbx_load_modules(CONFIG_LOAD_MODULE_PATH, CONFIG_LOAD_MODULE, zbx_config_timeout,
+			if (FAIL == zbx_load_modules(config_load_module_path, config_load_module, zbx_config_timeout,
 					0))
 			{
 				zabbix_log(LOG_LEVEL_CRIT, "loading modules failed, exiting...");
 				exit(EXIT_FAILURE);
 			}
 #endif
-			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
+			zbx_set_user_parameter_dir(config_user_parameter_dir);
 
 			if (FAIL == load_user_parameters(zbx_config_user_parameters, &error))
 			{
@@ -1624,7 +1601,7 @@ int	main(int argc, char **argv)
 				exit(EXIT_FAILURE);
 			}
 
-			load_aliases(CONFIG_ALIASES);
+			load_aliases(config_aliases);
 			zbx_free_config();
 			if (ZBX_TASK_TEST_METRIC == t.task)
 				zbx_test_parameter(TEST_METRIC);
@@ -1646,7 +1623,7 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_VERSION:
-			zbx_version();
+			zbx_print_version(title_message);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 			printf("\n");
 			zbx_tls_version();
@@ -1658,13 +1635,13 @@ int	main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 			break;
 		case ZBX_TASK_SHOW_HELP:
-			zbx_help(config_file);
+			zbx_print_help(config_file, help_message, usage_message, zbx_progname);
 			exit(EXIT_SUCCESS);
 			break;
 		default:
 			zbx_load_config(ZBX_CFG_FILE_REQUIRED, &t);
-			zbx_set_user_parameter_dir(CONFIG_USER_PARAMETER_DIR);
-			load_aliases(CONFIG_ALIASES);
+			zbx_set_user_parameter_dir(config_user_parameter_dir);
+			load_aliases(config_aliases);
 #ifdef _WINDOWS
 			if (0 == (t.flags & ZBX_TASK_FLAG_FOREGROUND))
 				zbx_close_log();
@@ -1675,8 +1652,9 @@ int	main(int argc, char **argv)
 #if defined(ZABBIX_SERVICE)
 	zbx_service_start(t.flags);
 #elif defined(ZABBIX_DAEMON)
-	zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
-			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb);
+	zbx_daemon_start(config_allow_root, config_user, t.flags, get_pid_file_path, zbx_on_exit,
+			log_file_cfg.log_type, log_file_cfg.log_file_name, signal_redirect_cb, get_zbx_threads,
+			get_zbx_threads_num);
 #endif
 	exit(EXIT_SUCCESS);
 }

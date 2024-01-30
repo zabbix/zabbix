@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@ abstract class CControllerCharts extends CController {
 			$filter_items = API::Item()->get([
 				'output' => ['itemid'],
 				'hostids' => $hostids,
-				'search' => ['name' => $name],
+				'search' => ['name_resolved' => $name],
 				'preservekeys' => true
 			]);
 
@@ -75,13 +75,13 @@ abstract class CControllerCharts extends CController {
 
 		$items = [];
 		if ($graph_items || $filter_items) {
-			$items = API::Item()->get([
-				'output' => ['itemid', 'name'],
+			$items = CArrayHelper::renameObjectsKeys(API::Item()->get([
+				'output' => ['itemid', 'name_resolved'],
 				'hostids' => $hostids,
 				'itemids' => array_keys($graph_items + $filter_items),
 				'selectTags' => ['tag', 'value'],
 				'preservekeys' => true
-			]);
+			]), ['name_resolved' => 'name']);
 		}
 
 		return $this->addTagsToGraphs($graphs, $items);
@@ -125,15 +125,15 @@ abstract class CControllerCharts extends CController {
 	 * @return array
 	 */
 	protected function getSimpleGraphs(array $hostids, string $name): array {
-		return API::Item()->get([
-			'output' => ['itemid', 'name'],
+		return CArrayHelper::renameObjectsKeys(API::Item()->get([
+			'output' => ['itemid', 'name_resolved'],
 			'selectTags' => ['tag', 'value'],
 			// TODO VM: filter by tags
 			'hostids' => $hostids,
-			'search' => $name !== '' ? ['name' => $name] : null,
+			'search' => $name !== '' ? ['name_resolved' => $name] : null,
 			'filter' => ['value_type' => [ITEM_VALUE_TYPE_UINT64, ITEM_VALUE_TYPE_FLOAT]],
 			'preservekeys' => true
-		]);
+		]), ['name_resolved' => 'name']);
 	}
 
 	/**

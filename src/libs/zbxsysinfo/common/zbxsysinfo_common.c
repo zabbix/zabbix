@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,9 +78,9 @@ static zbx_metric_t	parameters_common[] =
 	{"vfs.dir.count",	CF_HAVEPARAMS,	vfs_dir_count,		VFS_TEST_DIR},
 	{"vfs.dir.get",		CF_HAVEPARAMS,	vfs_dir_get,		VFS_TEST_DIR},
 
-	{"net.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"},
-	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"},
-	{"net.dns.perf",	CF_HAVEPARAMS,	net_dns_perf,		",zabbix.com"},
+	{"net.dns",		CF_HAVEPARAMS,	net_dns,		NULL},
+	{"net.dns.record",	CF_HAVEPARAMS,	net_dns_record,		NULL},
+	{"net.dns.perf",	CF_HAVEPARAMS,	net_dns_perf,		NULL},
 	{"net.tcp.dns",		CF_HAVEPARAMS,	net_dns,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.dns.query",	CF_HAVEPARAMS,	net_dns_record,		",zabbix.com"}, /* deprecated */
 	{"net.tcp.port",	CF_HAVEPARAMS,	net_tcp_port,		",80"},

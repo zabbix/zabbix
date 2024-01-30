@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1062,7 +1062,7 @@ int	pp_execute_step(zbx_pp_context_t *ctx, zbx_pp_cache_t *cache, zbx_dc_um_shar
 
 	if (NULL != um_handle)
 	{
-		char	*error = NULL;
+		char		*error = NULL;
 		unsigned char	env = ZBX_PREPROC_SCRIPT == step->type ? ZBX_MACRO_ENV_SECURE : ZBX_MACRO_ENV_NONSECURE;
 
 		if (SUCCEED != zbx_dc_expand_user_and_func_macros_from_cache(um_handle->um_cache, &params, &hostid, 1,
@@ -1243,8 +1243,12 @@ void	pp_execute(zbx_pp_context_t *ctx, zbx_pp_item_preproc_t *preproc, zbx_pp_ca
 				ts, preproc->steps + i, &history_value, &history_ts, config_source_ip))
 		{
 			zbx_variant_copy(&value_raw, value_out);
-			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(value_out, preproc->steps + i)))
+
+			if (ZBX_PREPROC_FAIL_DEFAULT == (action = pp_error_on_fail(um_handle, preproc->hostid, value_out,
+					preproc->steps + i)))
+			{
 				zbx_variant_clear(&value_raw);
+			}
 		}
 		else
 		{

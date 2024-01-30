@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -131,20 +131,19 @@ class CDiscoveryRule extends CItemGeneral {
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
-			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
+			}
 
-			$sqlParts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', $userGroups).
-				' WHERE i.hostid=hgg.hostid'.
-				' GROUP BY hgg.hostid'.
-				' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.zbx_dbstr($permission).
-				')';
+			$sqlParts['from'][] = 'host_hgset hh';
+			$sqlParts['from'][] = 'permission p';
+			$sqlParts['where'][] = 'i.hostid=hh.hostid';
+			$sqlParts['where'][] = 'hh.hgsetid=p.hgsetid';
+			$sqlParts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+			if ($options['editable']) {
+				$sqlParts['where'][] = 'p.permission='.PERM_READ_WRITE;
+			}
 		}
 
 		// templateids
@@ -313,7 +312,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 			$result = $this->addRelatedObjects($options, $result);
 			$result = $this->unsetExtraFields($result, ['hostid'], $options['output']);
-			$result = $this->unsetExtraFields($result, ['name_upper']);
 
 			foreach ($result as &$rule) {
 				// unset the fields that are returned in the filter
@@ -353,12 +351,6 @@ class CDiscoveryRule extends CItemGeneral {
 
 	protected function applyQueryOutputOptions($tableName, $tableAlias, array $options, array $sqlParts) {
 		$sqlParts = parent::applyQueryOutputOptions($tableName, $tableAlias, $options, $sqlParts);
-
-		$upcased_index = array_search($tableAlias.'.name_upper', $sqlParts['select']);
-
-		if ($upcased_index !== false) {
-			unset($sqlParts['select'][$upcased_index]);
-		}
 
 		if ((!$options['countOutput'] && ($this->outputIsRequested('state', $options['output'])
 				|| $this->outputIsRequested('error', $options['output'])))
@@ -3350,7 +3342,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		// Master item should exists for LLD rule with type dependent item.
+		// Master item should exist for LLD rule with type dependent item.
 		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_items = DBfetchArray(DBselect(
 				'SELECT i1.itemid'.

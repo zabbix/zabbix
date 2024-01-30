@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,13 +19,19 @@
 
 #include "zbxcacheconfig.h"
 #include "dbconfig.h"
-#include "zbxexpression.h"
-#include "actions.h"
+#include "user_macro.h"
+
+#include "zbx_trigger_constants.h"
+#include "zbx_host_constants.h"
 #include "zbx_item_constants.h"
+#include "zbxalgo.h"
 #include "zbxdbhigh.h"
 #include "zbxtagfilter.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
 
 ZBX_PTR_VECTOR_IMPL(connector_filter, zbx_connector_filter_t)
+ZBX_PTR_VECTOR_IMPL(action_eval_ptr, zbx_action_eval_t *)
 
 static void	dc_get_history_sync_host(zbx_history_sync_host_t *dst_host, const ZBX_DC_HOST *src_host,
 		unsigned int mode)
@@ -102,10 +108,11 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
  ******************************************************************************/
 static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_history_sync_item_t *item)
 {
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
+
 	if (NULL != item->trends_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->trends_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_dc_expand_user_and_func_macros(um_handle, &item->trends_period, &item->host.hostid, 1, NULL);
 
 		if (SUCCEED != zbx_is_time_suffix(item->trends_period, &item->trends_sec, ZBX_LENGTH_UNLIMITED))
 			item->trends_sec = ZBX_HK_PERIOD_MAX;
@@ -118,8 +125,7 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 	if (NULL != item->history_period)
 	{
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &item->host.hostid, NULL, NULL, NULL, NULL, NULL,
-				NULL, NULL, &item->history_period, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+		zbx_dc_expand_user_and_func_macros(um_handle, &item->history_period, &item->host.hostid, 1, NULL);
 
 		if (SUCCEED != zbx_is_time_suffix(item->history_period, &item->history_sec, ZBX_LENGTH_UNLIMITED))
 			item->history_sec = ZBX_HK_PERIOD_MAX;
@@ -129,6 +135,8 @@ static void	dc_items_convert_hk_periods(const zbx_config_hk_t *config_hk, zbx_hi
 
 		item->history = (0 != item->history_sec);
 	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 /******************************************************************************
@@ -374,24 +382,22 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 
 /******************************************************************************
  *                                                                            *
- * Purpose: copies configuration cache action conditions to the specified     *
- *          vector                                                            *
+ * Purpose: copies configuration cache action conditions to specified vector  *
  *                                                                            *
- * Parameters: dc_action  - [IN] the source action                            *
- *             conditions - [OUT] the conditions vector                       *
+ * Parameters: dc_action  - [IN] source action                                *
+ *             conditions - [OUT]                                             *
  *                                                                            *
  ******************************************************************************/
-static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_ptr_t *conditions)
+static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vector_condition_ptr_t *conditions)
 {
-	int				i;
 	zbx_condition_t			*condition;
 	zbx_dc_action_condition_t	*dc_condition;
 
-	zbx_vector_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
+	zbx_vector_condition_ptr_reserve(conditions, (size_t)dc_action->conditions.values_num);
 
-	for (i = 0; i < dc_action->conditions.values_num; i++)
+	for (int i = 0; i < dc_action->conditions.values_num; i++)
 	{
-		dc_condition = (zbx_dc_action_condition_t *)dc_action->conditions.values[i];
+		dc_condition = dc_action->conditions.values[i];
 
 		condition = (zbx_condition_t *)zbx_malloc(NULL, sizeof(zbx_condition_t));
 
@@ -403,17 +409,20 @@ static void	dc_action_copy_conditions(const zbx_dc_action_t *dc_action, zbx_vect
 		condition->value2 = zbx_strdup(NULL, dc_condition->value2);
 		zbx_vector_uint64_create(&condition->eventids);
 
-		zbx_vector_ptr_append(conditions, condition);
+		zbx_vector_condition_ptr_append(conditions, condition);
 	}
 }
+
+ZBX_PTR_VECTOR_IMPL(condition_ptr, zbx_condition_t *)
 
 /******************************************************************************
  *                                                                            *
  * Purpose: creates action evaluation data from configuration cache action    *
  *                                                                            *
- * Parameters: dc_action - [IN] the source action                             *
+ * Parameters:                                                                *
+ *             dc_action - [IN] source action                                 *
  *                                                                            *
- * Return value: the action evaluation data                                   *
+ * Return value: action evaluation data                                       *
  *                                                                            *
  * Comments: The returned value must be freed with zbx_action_eval_free()     *
  *           function later.                                                  *
@@ -430,29 +439,32 @@ static zbx_action_eval_t	*dc_action_eval_create(const zbx_dc_action_t *dc_action
 	action->evaltype = dc_action->evaltype;
 	action->opflags = dc_action->opflags;
 	action->formula = zbx_strdup(NULL, dc_action->formula);
-	zbx_vector_ptr_create(&action->conditions);
+	zbx_vector_condition_ptr_create(&action->conditions);
 
 	dc_action_copy_conditions(dc_action, &action->conditions);
 
 	return action;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: gets action evaluation data                                       *
- *                                                                            *
- * Parameters: actions         - [OUT] the action evaluation data             *
- *             uniq_conditions - [OUT] unique conditions that actions         *
- *                                     point to (several sources)             *
- *             opflags         - [IN] flags specifying which actions to get   *
- *                                    based on their operation classes        *
- *                                    (see ZBX_ACTION_OPCLASS_* defines)      *
- *                                                                            *
- * Comments: The returned actions and conditions must be freed with           *
- *           zbx_action_eval_free() function later.                           *
- *                                                                            *
- ******************************************************************************/
-void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsigned char opflags)
+ZBX_PTR_VECTOR_IMPL(dc_action_condition_ptr, zbx_dc_action_condition_t *)
+
+/*************************************************************************************
+ *                                                                                   *
+ * Purpose: gets action evaluation data                                              *
+ *                                                                                   *
+ * Parameters:                                                                       *
+ *     actions                          - [OUT] action evaluation data               *
+ *     uniq_conditions                  - [OUT] unique conditions that actions       *
+ *                                              point to (several sources)           *
+ *     opflags                          - [IN] flags specifying which actions to get *
+ *                                             based on their operation classes      *
+ *                                             (see ZBX_ACTION_OPCLASS_* defines)    *
+ *                                                                                   *
+ * Comments: The returned actions and conditions must be freed with                  *
+ *           zbx_action_eval_free() function later.                                  *
+ *                                                                                   *
+ *************************************************************************************/
+void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_action_eval_ptr_t *actions, unsigned char opflags)
 {
 	const zbx_dc_action_t		*dc_action;
 	zbx_hashset_iter_t		iter;
@@ -466,7 +478,7 @@ void	zbx_dc_config_history_sync_get_actions_eval(zbx_vector_ptr_t *actions, unsi
 	while (NULL != (dc_action = (const zbx_dc_action_t *)zbx_hashset_iter_next(&iter)))
 	{
 		if (0 != (opflags & dc_action->opflags))
-			zbx_vector_ptr_append(actions, dc_action_eval_create(dc_action));
+			zbx_vector_action_eval_ptr_append(actions, dc_action_eval_create(dc_action));
 	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
@@ -876,22 +888,30 @@ void	zbx_connector_filter_free(zbx_connector_filter_t connector_filter)
 
 static void	substitute_orig_unmasked(const char *orig, char **data)
 {
-	if (NULL == strstr(orig, "{$"))
-		return;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros_secure();
 
-	*data = zbx_strdup(*data, orig);
-	zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-			data, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	if (NULL != strstr(orig, "{$"))
+	{
+		*data = zbx_strdup(*data, orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, data, NULL, 0, NULL);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 static void	substitute_orig(const char *orig, char **data)
 {
-	if (NULL == strstr(orig, "{$"))
-		return;
+	zbx_dc_um_handle_t	*um_handle = zbx_dc_open_user_macros();
 
-	*data = zbx_strdup(*data, orig);
-	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, data,
-			ZBX_MACRO_TYPE_COMMON, NULL, 0);
+	if (NULL != strstr(orig, "{$"))
+	{
+		*data = zbx_strdup(*data, orig);
+
+		zbx_dc_expand_user_and_func_macros(um_handle, data, NULL, 0, NULL);
+	}
+
+	zbx_dc_close_user_macros(um_handle);
 }
 
 void	zbx_dc_config_history_sync_get_connectors(zbx_hashset_t *connectors, zbx_hashset_iter_t *connector_iter,

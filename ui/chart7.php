@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -41,7 +41,8 @@ $fields = [
 	'legend' =>			[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null],
 	'i' =>				[T_ZBX_STR,			O_OPT, P_ONLY_ARRAY,	null,		null],
 	'items' =>			[T_ZBX_STR,			O_OPT, P_ONLY_TD_ARRAY,	null,		null],
-	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
+	'widget_view' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null],
+	'resolve_macros' =>	[T_ZBX_INT,			O_OPT, null,	IN('0,1'),			null]
 ];
 if (!check_fields($fields)) {
 	session_write_close();
@@ -124,9 +125,11 @@ $graph->showLegend(getRequest('legend', 0));
 $graph->setWidth(getRequest('width', 400));
 $graph->setHeight(getRequest('height', 300));
 
+$resolve_macros = (bool) getRequest('resolve_macros', 0);
+
 foreach ($items as $item) {
 	if ($db_items[$item['itemid']]['value_type'] != ITEM_VALUE_TYPE_BINARY) {
-		$graph->addItem($item['itemid'], $item['calc_fnc'], $item['color'], $item['type']);
+		$graph->addItem($item['itemid'], $resolve_macros, $item['calc_fnc'], $item['color'], $item['type']);
 	}
 }
 $graph->draw();

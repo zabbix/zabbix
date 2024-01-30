@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -334,6 +334,14 @@ void	zbx_db_rollback(void)
 
 		zbx_db_close();
 		zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
+	}
+	else
+	{
+		if (ZBX_DB_DOWN == zbx_db_txn_end_error() && ERR_Z3009 == zbx_db_last_errcode())
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
 	}
 }
 
@@ -2989,8 +2997,22 @@ int	zbx_db_insert_execute(zbx_db_insert_t *self)
 #ifdef HAVE_ORACLE
 	for (i = 0; i < self->fields.values_num; i++)
 	{
+		char	*field_prefix, *field_suffix;
+
+		if (0 != (self->table->fields[i].flags & ZBX_UPPER))
+		{
+			field_prefix = "upper(";
+			field_suffix = ")";
+		}
+		else
+		{
+			field_prefix = "";
+			field_suffix = "";
+		}
+
 		zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, delim[0 == i]);
-		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ":%d", i + 1);
+		zbx_snprintf_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, "%s:%d%s",
+				field_prefix, i + 1, field_suffix);
 	}
 	zbx_chrcpy_alloc(&sql_command, &sql_command_alloc, &sql_command_offset, ')');
 
@@ -3077,15 +3099,26 @@ retry_oracle:
 				case ZBX_TYPE_SHORTTEXT:
 				case ZBX_TYPE_LONGTEXT:
 				case ZBX_TYPE_CUID:
-					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+					if (0 != (field->flags & ZBX_UPPER))
+					{
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "upper(\'");
+					}
+					else
+						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);
-					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
+
+					if (0 != (field->flags & ZBX_UPPER))
+					{
+						zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "\')");
+					}
+					else
+						zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 					break;
 				case ZBX_TYPE_BLOB:
 					zbx_chrcpy_alloc(&sql, &sql_alloc, &sql_offset, '\'');
 #if defined(HAVE_MYSQL) || defined(HAVE_POSTGRESQL)
 					decode_and_escape_binary_value_for_sql(&(value->str));
-#elif defined(HAVE_ORACLE)
 					/* Oracle converts base64 to binary when it formats prepared statement */
 #endif
 					zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, value->str);

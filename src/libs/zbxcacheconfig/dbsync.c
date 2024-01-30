@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -858,7 +858,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 {
 	zbx_db_result_t	result;
 
-#define SELECTED_CONFIG_FIELD_COUNT	42	/* number of columns in the following zbx_db_select() */
+#define SELECTED_CONFIG_FIELD_COUNT	43	/* number of columns in the following zbx_db_select() */
 
 	if (NULL == (result = zbx_db_select("select discovery_groupid,snmptrap_logging,"
 				"severity_name_0,severity_name_1,severity_name_2,"
@@ -871,7 +871,7 @@ int	zbx_dbsync_compare_config(zbx_dbsync_t *sync)
 				"compression_status,compress_older,instanceid,default_timezone,hk_events_service,"
 				"auditlog_enabled,timeout_zabbix_agent,timeout_simple_check,timeout_snmp_agent,"
 				"timeout_external_check,timeout_db_monitor,timeout_http_agent,timeout_ssh_agent,"
-				"timeout_telnet_agent,timeout_script"
+				"timeout_telnet_agent,timeout_script,auditlog_mode"
 			" from config"
 			" order by configid")))	/* if you change number of columns in zbx_db_select(), */
 						/* adjust SELECTED_CONFIG_FIELD_COUNT */

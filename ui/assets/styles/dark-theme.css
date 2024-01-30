@@ -1588,8 +1588,8 @@ button {
 
 .dashboard-navigation {
   display: flex;
-  margin-top: 10px;
-  padding-bottom: 2px; }
+  margin-top: 2px;
+  margin-bottom: 6px; }
   .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.btn-dashboard-previous-page, .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.btn-dashboard-next-page {
     display: inline-block; }
 
@@ -1667,7 +1667,7 @@ button {
 
 .dashboard-grid {
   position: relative;
-  margin: 0 -4px -4px -4px;
+  margin: -4px;
   z-index: 3;
   transition: margin-top 0.3s; }
   .dashboard-grid.reserve-header-lines-1 {
@@ -2155,8 +2155,7 @@ button {
   .dashboard-widget-graph-link:link {
     border: 0; }
 
-.dashboard-grid-widget-body.is-loading::before,
-.dashboard-grid-iterator-body.is-loading::before {
+.dashboard-grid-iterator-contents.is-loading::before {
   margin: calc(.25rem + 1px); }
 
 .dashboard-list .dashboard-list-item {
@@ -3343,6 +3342,8 @@ section {
   .status-container [class^="status-"]:not(:last-of-type) {
     border-top-right-radius: 0;
     border-bottom-right-radius: 0; }
+  .status-container [class^="status-"][data-hintbox='1'] {
+    cursor: pointer; }
 
 .status-na-bg,
 .status-info-bg,
@@ -3567,10 +3568,10 @@ section {
   .filter-container.tabfilter-container .form-buttons [name="filter_update"] {
     margin-right: 20px; }
   .filter-container.tabfilter-container .tabfilter-content-container {
-    border: 1px solid #303030;
-    background-color: #2b2b2b;
     padding: 10px 0;
-    margin-bottom: 6px; }
+    margin-bottom: 8px;
+    background-color: #2b2b2b;
+    border: 1px solid #303030; }
     .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed {
       padding: 0 0 10px 0; }
       .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
@@ -3879,6 +3880,9 @@ z-select {
     display: none;
     z-index: 20000;
     max-height: 362px;
+    max-width: 453px;
+    box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
     border: 1px solid;
     box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
@@ -3888,6 +3892,7 @@ z-select {
       height: inherit;
       box-sizing: border-box;
       min-height: 24px;
+      max-width: 453px;
       padding: 5px;
       line-height: normal;
       color: #f2f2f2;
@@ -3916,9 +3921,12 @@ z-select {
         font-weight: bold; }
     .z-select .list > li > ul,
     z-select .list > li > ul {
+      display: grid;
+      grid-template-columns: minmax(max-content, 1fr);
       margin: 5px -5px -5px; }
       .z-select .list > li > ul li,
       z-select .list > li > ul li {
+        padding-right: 15px;
         padding-left: 15px; }
     .z-select .list.fall-upwards,
     z-select .list.fall-upwards {
@@ -5003,10 +5011,11 @@ form.is-loading {
   text-align: right; }
 
 .filter-container {
-  background-color: #2b2b2b;
-  border: 1px solid #303030;
+  position: relative;
   padding: 10px 0;
-  position: relative; }
+  margin-bottom: 8px;
+  background-color: #2b2b2b;
+  border: 1px solid #303030; }
   .filter-container .table {
     border-bottom: 1px solid #383838; }
   .filter-container .filter-forms {
@@ -5256,9 +5265,10 @@ select {
   opacity: 0; }
   .checkbox-radio + label span {
     position: relative;
+    box-sizing: border-box;
     display: inline-block;
-    width: 14px;
-    height: 14px;
+    width: 16px;
+    height: 16px;
     margin-right: 4px;
     vertical-align: text-bottom;
     background-color: #383838;

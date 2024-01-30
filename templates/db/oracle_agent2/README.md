@@ -69,7 +69,7 @@ Test availability:
 |----|-----------|----|-----------------------|
 |Oracle: Ping|<p>Test the connection to Oracle Database state.</p>|Zabbix agent|oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `10m`</p></li></ul>|
 |Oracle: Get instance state|<p>The item gets its state of the current instance.</p>|Zabbix agent|oracle.instance.info["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]|
-|Oracle: Version|<p>The Oracle Server version.</p>|Dependent item|oracle.version<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.version`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Oracle: Version|<p>The Oracle Server version.</p>|Zabbix agent|oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Oracle: Uptime|<p>The Oracle instance uptime expressed in seconds.</p>|Dependent item|oracle.uptime<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.uptime`</p></li></ul>|
 |Oracle: Instance status|<p>The status of the instance.</p>|Dependent item|oracle.instance_status<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.status`</p></li></ul>|
 |Oracle: Archiver state|<p>The status of automatic archiving.</p>|Dependent item|oracle.archiver_state<p>**Preprocessing**</p><ul><li><p>JSON Path: `$..archiver.first()`</p></li></ul>|
@@ -145,7 +145,7 @@ Test availability:
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Oracle: Connection to database is unavailable|<p>Connection to Oracle Database is currently unavailable.</p>|`last(/Oracle by Zabbix agent 2/oracle.ping["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"])=0`|Disaster||
-|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.version,#1)<>last(/Oracle by Zabbix agent 2/oracle.version,#2) and length(last(/Oracle by Zabbix agent 2/oracle.version))>0`|Info|**Manual close**: Yes|
+|Oracle: Version has changed|<p>The Oracle DB version has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],#1)<>last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"],#2) and length(last(/Oracle by Zabbix agent 2/oracle.version["{$ORACLE.CONNSTRING}","{$ORACLE.USER}","{$ORACLE.PASSWORD}","{$ORACLE.SERVICE}"]))>0`|Info|**Manual close**: Yes|
 |Oracle: Failed to fetch info data|<p>Zabbix has not received any data for the items for the last 5 minutes. The database might be unavailable for connecting.</p>|`nodata(/Oracle by Zabbix agent 2/oracle.uptime,30m)=1`|Info||
 |Oracle: Host has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Oracle by Zabbix agent 2/oracle.uptime)<10m`|Info|**Manual close**: Yes|
 |Oracle: Instance name has changed|<p>Oracle DB Instance name has changed. Acknowledge to close the problem manually.</p>|`last(/Oracle by Zabbix agent 2/oracle.instance_name,#1)<>last(/Oracle by Zabbix agent 2/oracle.instance_name,#2) and length(last(/Oracle by Zabbix agent 2/oracle.instance_name))>0`|Info|**Manual close**: Yes|

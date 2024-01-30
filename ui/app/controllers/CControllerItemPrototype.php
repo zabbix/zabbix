@@ -1,7 +1,7 @@
 <?php declare(strict_types=0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -155,15 +155,15 @@ abstract class CControllerItemPrototype extends CController {
 			$ret = false;
 		}
 
-		return $ret && $this->validateRefferedObjects();
+		return $ret && $this->validateReferredObjects();
 	}
 
 	/**
-	 * Validate for reffered objects exists and user have access.
+	 * Validate for referred objects exists and user have access.
 	 *
 	 * @return bool
 	 */
-	protected function validateRefferedObjects(): bool {
+	protected function validateReferredObjects(): bool {
 		$ret = true;
 
 		if ($this->hasInput('itemid')) {

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,7 +22,8 @@
 #include "zbxcacheconfig.h"
 
 #ifdef HAVE_LIBCURL
-int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result)
+int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, AGENT_RESULT *result)
 {
 	char			*out = NULL, *error = NULL;
 	int			ret;
@@ -35,7 +36,8 @@ int	get_value_http(const zbx_dc_item_t *item, const char *config_source_ip, AGEN
 			item->query_fields, item->headers, item->posts, item->retrieve_mode, item->http_proxy,
 			item->follow_redirects, item->timeout, 1, item->ssl_cert_file, item->ssl_key_file,
 			item->ssl_key_password, item->verify_peer, item->verify_host, item->authtype, item->username,
-			item->password, NULL, item->post_type, item->output_format, config_source_ip, &error))
+			item->password, NULL, item->post_type, item->output_format, config_source_ip,
+			config_ssl_ca_location, config_ssl_cert_location, config_ssl_key_location, &error))
 	{
 		CURLcode	err = zbx_http_request_sync_perform(context.easyhandle, &context, 0,
 				ZBX_HTTP_IGNORE_RESPONSE_CODE);

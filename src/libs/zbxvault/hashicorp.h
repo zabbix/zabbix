@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 #include "zbxalgo.h"
 
 int	zbx_hashicorp_kvs_get(const char *vault_url, const char *token, const char *ssl_cert_file,
-		const char *ssl_key_file, const char *config_source_ip, const char *path, long timeout,
-		zbx_hashset_t *kvs, char **error);
-
+		const char *ssl_key_file, const char *config_source_ip, const char *config_ssl_ca_location,
+		const char *config_ssl_cert_location, const char *config_ssl_key_location, const char *path,
+		long timeout, zbx_hashset_t *kvs, char **error);
 #endif

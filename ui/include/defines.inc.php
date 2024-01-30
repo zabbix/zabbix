@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,11 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-define('ZABBIX_VERSION',		'7.0.0alpha8');
+define('ZABBIX_VERSION',		'7.0.0beta1');
 define('ZABBIX_API_VERSION',	'7.0.0');
 define('ZABBIX_EXPORT_VERSION',	'7.0');
 
-define('ZABBIX_DB_VERSION',		6050149);
+define('ZABBIX_DB_VERSION',		6050209);
 
 define('DB_VERSION_SUPPORTED',						0);
 define('DB_VERSION_LOWER_THAN_MINIMUM',				1);
@@ -34,7 +34,7 @@ define('DB_VERSION_HIGHER_THAN_MAXIMUM_ERROR',		6);
 define('DB_VERSION_HIGHER_THAN_MAXIMUM_WARNING',	7);
 
 define('ZABBIX_COPYRIGHT_FROM',	'2001');
-define('ZABBIX_COPYRIGHT_TO',	'2023');
+define('ZABBIX_COPYRIGHT_TO',	'2024');
 
 define('ZBX_DOCUMENTATION_URL', 'https://www.zabbix.com/documentation');
 
@@ -124,6 +124,12 @@ define('ZBX_SEARCH_TYPE_PATTERN',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_AGENT',	0);
 define('ZBX_SCRIPT_EXECUTE_ON_SERVER',	1);
 define('ZBX_SCRIPT_EXECUTE_ON_PROXY',	2);
+
+define('ZBX_SCRIPT_MANUALINPUT_DISABLED',	0);
+define('ZBX_SCRIPT_MANUALINPUT_ENABLED',	1);
+
+define('ZBX_SCRIPT_MANUALINPUT_TYPE_STRING',	0);
+define('ZBX_SCRIPT_MANUALINPUT_TYPE_LIST',		1);
 
 define('ZBX_PROXY_VERSION_ANY_OUTDATED', -2);
 define('ZBX_PROXY_VERSION_UNDEFINED', 0);
@@ -1574,6 +1580,7 @@ define('API_ALLOW_GLOBAL_REGEX',		0x02000);
 define('API_ALLOW_UNEXPECTED',			0x04000);
 define('API_ALLOW_DNS',					0x08000);
 define('API_ALLOW_RANGE',				0x10000);
+define('API_ALLOW_MANUALINPUT_MACRO',	0x20000);
 
 // JSON error codes.
 if (!defined('JSON_ERROR_NONE')) {

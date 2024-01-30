@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,6 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_SSL_VERIFYHOST, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_FOLLOWLOCATION, 0L)) ||
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)) ||
-			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_HEADER, 1L)) ||
 			(NULL != sysinfo_get_config_source_ip() &&
 			CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_INTERFACE,
 					sysinfo_get_config_source_ip()))) ||
@@ -185,8 +184,11 @@ static int	curl_page_get(char *url, int timeout, char **buffer, char **error)
 	{
 		if (NULL != buffer)
 		{
-			zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
-			zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
+			if (NULL != body.data)
+			{
+				zbx_http_convert_to_utf8(easyhandle, &body.data, &body.offset, &body.allocated);
+				zbx_strncpy_alloc(&header.data, &header.allocated, &header.offset, body.data, body.offset);
+			}
 			*buffer = header.data;
 			header.data = NULL;
 		}

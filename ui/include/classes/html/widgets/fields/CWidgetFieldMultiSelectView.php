@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -99,16 +99,17 @@ abstract class CWidgetFieldMultiSelectView extends CWidgetFieldView {
 
 	public function getJavaScript(): string {
 		return '
-			new CWidgetFieldMultiselect('.json_encode([
-				'field_name' => $this->field->getName(),
-				'field_value' => $this->field->getValue(),
-				'in_type' => $this->field->getInType(),
-				'default_prevented' => $this->field->isDefaultPrevented(),
-				'widget_accepted' => $this->field->isWidgetAccepted(),
-				'dashboard_accepted' => $this->field->isDashboardAccepted(),
-				'object_labels' => $this->getObjectLabels(),
-				'params' => $this->getView()->getParams()
-			]).');
+			document.forms["'.$this->form_name.'"].fields["'.$this->field->getName().'"] =
+				new CWidgetFieldMultiselect('.json_encode([
+					'field_name' => $this->field->getName(),
+					'field_value' => $this->field->getValue(),
+					'in_type' => $this->field->getInType(),
+					'default_prevented' => $this->field->isDefaultPrevented(),
+					'widget_accepted' => $this->field->isWidgetAccepted(),
+					'dashboard_accepted' => $this->field->isDashboardAccepted(),
+					'object_labels' => $this->getObjectLabels(),
+					'params' => $this->getView()->getParams()
+				]).');
 		';
 	}
 

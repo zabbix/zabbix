@@ -415,22 +415,22 @@ zabbix_export:
               parameters:
                 - |
                   function getField(data, path) {
-                      var steps = path.split('.');
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field was not found: ' + path;
-                          }
+                  	var steps = path.split('.');
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field was not found: ' + path;
+                  		}
                   
-                          data = data[step];
-                      }
+                  		data = data[step];
+                  	}
                   
-                      return data;
+                  	return data;
                   }
                   
                   var data = JSON.parse(value),
-                      mem_total = getField(data,'ocs.data.nextcloud.system.mem_total'),
-                      mem_free = getField(data,'ocs.data.nextcloud.system.mem_free');
+                  	mem_total = getField(data,'ocs.data.nextcloud.system.mem_total'),
+                  	mem_free = getField(data,'ocs.data.nextcloud.system.mem_free');
                   
                   return Math.ceil(100 - mem_free / mem_total * 100);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -551,22 +551,22 @@ zabbix_export:
               parameters:
                 - |
                   function getField(data, path) {
-                      var steps = path.split('.');
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field was not found: ' + path;
-                          }
+                  	var steps = path.split('.');
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field was not found: ' + path;
+                  		}
                   
-                          data = data[step];
-                      }
+                  		data = data[step];
+                  	}
                   
-                      return data;
+                  	return data;
                   }
                   
                   var data = JSON.parse(value),
-                      php_total = getField(data,'ocs.data.server.php.memory_limit'),
-                      php_free = getField(data,'ocs.data.server.php.opcache.memory_usage.used_memory');
+                  	php_total = getField(data,'ocs.data.server.php.memory_limit'),
+                  	php_free = getField(data,'ocs.data.server.php.opcache.memory_usage.used_memory');
                   
                   return Math.ceil(php_free / php_total * 100);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -773,22 +773,22 @@ zabbix_export:
               parameters:
                 - |
                   function getField(data, path) {
-                      var steps = path.split('.');
-                      for (var i = 0; i < steps.length; i++) {
-                          var step = steps[i];
-                          if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                              throw 'Required field was not found: ' + path;
-                          }
+                  	var steps = path.split('.');
+                  	for (var i = 0; i < steps.length; i++) {
+                  		var step = steps[i];
+                  		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                  			throw 'Required field was not found: ' + path;
+                  		}
                   
-                          data = data[step];
-                      }
+                  		data = data[step];
+                  	}
                   
-                      return data;
+                  	return data;
                   }
                   
                   var data = JSON.parse(value),
-                      swap_total = getField(data,'ocs.data.nextcloud.system.swap_total'),
-                      swap_free = getField(data,'ocs.data.nextcloud.system.swap_free');
+                  	swap_total = getField(data,'ocs.data.nextcloud.system.swap_total'),
+                  	swap_free = getField(data,'ocs.data.nextcloud.system.swap_free');
                   
                   return Math.ceil(100 - swap_free / swap_total * 100);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -993,24 +993,24 @@ zabbix_export:
                   parameters:
                     - |
                       function getField(data, path) {
-                          var steps = path.split('.');
-                          for (var i = 0; i < steps.length; i++) {
-                              var step = steps[i];
-                              if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                                  throw 'Required field was not found: ' + path;
-                              }
+                      	var steps = path.split('.');
+                      	for (var i = 0; i < steps.length; i++) {
+                      		var step = steps[i];
+                      		if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                      			throw 'Required field was not found: ' + path;
+                      		}
                       
-                              data = data[step];
-                          }
+                      		data = data[step];
+                      	}
                       
-                          return data;
+                      	return data;
                       }
                       
                       var data = JSON.parse(value),
-                          lastlogin = getField(data,'ocs.data.lastLogin');
+                      	lastlogin = getField(data,'ocs.data.lastLogin');
                       
                       if (lastlogin === '0')
-                          return -1
+                      	return -1
                       
                       return Math.floor((Date.now() - lastlogin) / 1000 / 86400);
                 - type: DISCARD_UNCHANGED_HEARTBEAT

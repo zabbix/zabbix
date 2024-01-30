@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.  
+The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
@@ -33,9 +33,9 @@ This template has been tested on:
 
 The template get AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.  
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect Amazon RDS metrics.  
+Add the following required permissions to your Zabbix IAM policy in order to collect Amazon RDS metrics.
 ```json
 {
     "Version":"2012-10-17",
@@ -101,7 +101,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.REGION}|<p>Amazon RDS Region code.</p>|`us-west-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`role_base`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|

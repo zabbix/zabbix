@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -311,7 +311,8 @@ const char	*get_program_type_string(unsigned char program_type);
 #define ZBX_PROCESS_TYPE_AGENT_POLLER		41
 #define ZBX_PROCESS_TYPE_SNMP_POLLER		42
 #define ZBX_PROCESS_TYPE_INTERNAL_POLLER	43
-#define ZBX_PROCESS_TYPE_COUNT			44	/* number of process types */
+#define ZBX_PROCESS_TYPE_DBCONFIGWORKER		44
+#define ZBX_PROCESS_TYPE_COUNT			45	/* number of process types */
 
 /* special processes that are not present worker list */
 #define ZBX_PROCESS_TYPE_EXT_FIRST		126
@@ -426,17 +427,11 @@ while (0)
 	zbx_error("ERROR [file and function: <%s,%s>, revision:%s, line:%d] Something impossible has just"	\
 			" happened.", __FILE__, __func__, ZABBIX_REVISION, __LINE__)
 
-extern const char	*progname;
-extern const char	title_message[];
-extern const char	syslog_app_name[];
-extern const char	*usage_message[];
-extern const char	*help_message[];
-
 #define ARRSIZE(a)	(sizeof(a) / sizeof(*a))
 
-void	zbx_help(const char *param);
-void	zbx_usage(void);
-void	zbx_version(void);
+void	zbx_print_help(const char *param, const char **help_message, const char **usage_message, const char *progname);
+void	zbx_print_usage(const char **usage_message, const char *progname);
+void	zbx_print_version(const char *title_message);
 
 const char	*get_program_name(const char *path);
 typedef unsigned char	(*zbx_get_program_type_f)(void);
@@ -779,7 +774,7 @@ static	type2	get_##varname(void) \
 
 typedef void (*zbx_log_func_t)(int level, const char *fmt, va_list args);
 
-void	zbx_init_library_common(zbx_log_func_t log_func);
+void	zbx_init_library_common(zbx_log_func_t log_func, zbx_get_progname_f get_progname);
 void	zbx_log_handle(int level, const char *fmt, ...);
 int	zbx_get_log_level(void);
 void	zbx_set_log_level(int level);

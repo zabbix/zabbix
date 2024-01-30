@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -22,8 +22,14 @@ package uptime
 import (
 	"errors"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/std"
+)
+
+var (
+	impl  Plugin
+	stdOs std.Os
 )
 
 // Plugin -
@@ -31,8 +37,14 @@ type Plugin struct {
 	plugin.Base
 }
 
-var impl Plugin
-var stdOs std.Os
+func init() {
+	stdOs = std.NewOs()
+
+	err := plugin.RegisterMetrics(&impl, "Uptime", "system.uptime", "Returns system uptime in seconds.")
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
@@ -40,9 +52,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, errors.New("Too many parameters.")
 	}
 	return getUptime()
-}
-
-func init() {
-	stdOs = std.NewOs()
-	plugin.RegisterMetrics(&impl, "Uptime", "system.uptime", "Returns system uptime in seconds.")
 }

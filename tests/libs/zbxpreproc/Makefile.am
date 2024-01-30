@@ -12,8 +12,42 @@ COMMON_SRC_FILES = \
 	../../zbxmocktest.h
 
 JSON_LIBS = \
+	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreprocbase.a \
+	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc_service.a \
+	$(top_srcdir)/src/libs/zbxrtc/libzbxrtc.a \
+	$(top_srcdir)/src/libs/zbxdiag/libzbxdiag.a \
+	$(top_srcdir)/src/libs/zbxcachevalue/libzbxcachevalue.a \
+	$(top_srcdir)/src/libs/zbxexport/libzbxexport.a \
+	$(top_srcdir)/src/libs/zbxhistory/libzbxhistory.a \
+	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
+	$(top_srcdir)/src/libs/zbxcacheconfig/libzbxcacheconfig.a \
+	$(top_srcdir)/src/libs/zbxtrends/libzbxtrends.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/simple/libsimplesysinfo.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/alias/libalias.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_httpmetrics.a \
+	$(top_srcdir)/src/libs/zbxsysinfo/common/libcommonsysinfo_http.a \
+	$(top_srcdir)/src/libs/zbxshmem/libzbxshmem.a \
+	$(top_srcdir)/src/libs/zbxself/libzbxself.a \
+	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
+	$(top_srcdir)/src/libs/zbxparam/libzbxparam.a \
+	$(top_srcdir)/src/libs/zbxavailability/libzbxavailability.a \
+	$(top_srcdir)/src/libs/zbxtagfilter/libzbxtagfilter.a \
+	$(top_srcdir)/src/libs/zbxconnector/libzbxconnector.a \
+	$(top_srcdir)/src/libs/zbxexec/libzbxexec.a \
+	$(top_srcdir)/src/libs/zbxdb/libzbxdb.a \
+	$(top_srcdir)/src/libs/zbxmodules/libzbxmodules.a \
+	$(top_srcdir)/src/libs/zbxevent/libzbxevent.a \
+	$(top_srcdir)/src/libs/zbxdbhigh/libzbxdbhigh.a \
+	$(top_srcdir)/src/libs/zbxdbwrap/libzbxdbwrap.a \
+	$(top_srcdir)/src/libs/zbxdbschema/libzbxdbschema.a \
+	$(top_srcdir)/src/libs/zbxvault/libzbxvault.a \
+	$(top_builddir)/src/libs/zbxkvs/libzbxkvs.a \
+	$(top_srcdir)/src/libs/zbxexpr/libzbxexpr.a \
 	$(top_srcdir)/src/libs/zbxtimekeeper/libzbxtimekeeper.a \
 	$(top_srcdir)/src/libs/zbxipcservice/libzbxipcservice.a \
 	$(top_srcdir)/src/libs/zbxembed/libzbxembed.a \
@@ -32,6 +66,7 @@ JSON_LIBS = \
 	$(top_srcdir)/src/libs/zbxconf/libzbxconf.a \
 	$(top_srcdir)/src/libs/zbxtime/libzbxtime.a \
 	$(top_srcdir)/src/libs/zbxalgo/libzbxalgo.a \
+	$(top_srcdir)/src/libs/zbxfile/libzbxfile.a \
 	$(top_srcdir)/src/libs/zbxip/libzbxip.a \
 	$(top_srcdir)/src/libs/zbxnix/libzbxnix.a \
 	$(top_srcdir)/src/libs/zbxstr/libzbxstr.a \
