@@ -152,8 +152,8 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
  * Purpose: parses preprocessing test request                                 *
  *                                                                            *
  * Parameters: jp_item      - [IN] item object of the request                 *
- *             jp_options   - [IN] item object of the request                 *
- *             jp_steps     - [IN] item object of the request                 *
+ *             jp_options   - [IN] options object of the request              *
+ *             jp_steps     - [IN] steps object of the request                *
  *             value        - [IN] item value for preprocessing               *
  *             value_size   - [IN] size of the item value for preprocessing   *
  *             values       - [OUT] the values to test optional               *
@@ -334,11 +334,10 @@ out:
  * Purpose: executes preprocessing test request                               *
  *                                                                            *
  * Parameters: jp_item    - [IN] item object of the request                   *
- *             jp_options - [IN] item object of the request                   *
- *             jp_steps   - [IN] item object of the request                   *
+ *             jp_options - [IN] options object of the request                *
+ *             jp_steps   - [IN] steps object of the request                  *
  *             value      - [IN] item value for preprocessing                 *
  *             value_size - [IN] size of the item value for preprocessing     *
- *             json       - [OUT] the output json                             *
  *             json       - [OUT] the output json                             *
  *             error      - [OUT] the error message                           *
  *                                                                            *
@@ -363,7 +362,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 	zbx_pp_result_t			*result;
 	zbx_vector_pp_result_ptr_t	results;
 	zbx_pp_history_t		history;
-	size_t				truncated;
+	size_t				original_size;
 
 	zbx_vector_pp_step_ptr_create(&steps);
 	zbx_vector_pp_result_ptr_create(&results);
@@ -432,11 +431,14 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 	{
 		zbx_json_addobject(json, NULL);
 
-		truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1],
+		original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1],
 			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
-				truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
-		zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+
+		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+		{
+			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+		}
 
 		zbx_json_close(json);
 	}
@@ -472,13 +474,15 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 			}
 			else if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+				original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
 						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
 						ZBX_JSON_TEST_DATA_MAX_SIZE);
-				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
-						truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false",
-						ZBX_JSON_TYPE_TRUE);
-				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+
+				if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+				{
+					zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+					zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+				}
 			}
 			else
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
@@ -495,12 +499,15 @@ err:
 
 		if (ZBX_VARIANT_NONE != result->value.type)
 		{
-			truncated = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
+			original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
 					zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
 					ZBX_JSON_TEST_DATA_MAX_SIZE);
-			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
-					truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+
+			if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+			{
+				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+			}
 		}
 		else
 			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
@@ -533,8 +540,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	char				tmp[MAX_STRING_LEN + 1], **pvalue, *value = NULL;
 	zbx_dc_item_t			item;
 	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
-	struct zbx_json_parse		jp_item, jp_host, jp_options, jp_steps, jp_interface, jp_details,
-					jp_script_params;
+	struct zbx_json_parse		jp_item, jp_host, jp_steps, jp_interface, jp_details, jp_script_params;
 	AGENT_RESULT			result;
 	int				errcode, ret = FAIL;
 	size_t				value_size = 0;
@@ -542,13 +548,11 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	// item JSON object presence is checked in the calling function
-	zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item);
+	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+		THIS_SHOULD_NEVER_HAPPEN;
 
 	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
 		zbx_json_open("{}", &jp_host);
-
-	if (FAIL == zbx_json_brackets_by_name(jp_data, ZBX_PROTO_TAG_OPTIONS, &jp_options))
-		zbx_json_open("{}", &jp_options);
 
 	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
 		jp_steps.end = jp_steps.start = NULL;
@@ -619,7 +623,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 	item.headers = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_HTTP_HEADERS, table_items, "headers");
 
-	item.ssl_cert_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items, "ssl_cert_file");
+	item.ssl_cert_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_CERT_FILE, table_items,
+			"ssl_cert_file");
 	item.ssl_key_file = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_FILE, table_items, "ssl_key_file");
 	item.ssl_key_password = db_string_from_json_dyn(&jp_item, ZBX_PROTO_TAG_SSL_KEY_PASSWORD, table_items,
 			"ssl_key_password");
@@ -656,8 +661,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 	}
 	else
 	{
-		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns", item.interface.dns_orig,
-				sizeof(item.interface.dns_orig));
+		db_string_from_json(&jp_interface, ZBX_PROTO_TAG_ADDRESS, table_interface, "dns",
+				item.interface.dns_orig, sizeof(item.interface.dns_orig));
 		item.interface.addr = item.interface.dns_orig;
 	}
 
@@ -674,9 +679,10 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		table_interface_snmp = zbx_db_get_table("interface_snmp");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_VERSION, table_interface_snmp, "version", &item.snmp_version);
-	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp, "community");
-	item.snmpv3_securityname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_SECURITYNAME, table_interface_snmp,
-			"securityname");
+	item.snmp_community = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_COMMUNITY, table_interface_snmp,
+			"community");
+	item.snmpv3_securityname = db_string_from_json_dyn(&jp_details, ZBX_PROTO_TAG_SECURITYNAME,
+			table_interface_snmp, "securityname");
 
 	db_uchar_from_json(&jp_details, ZBX_PROTO_TAG_SECURITYLEVEL, table_interface_snmp, "securitylevel",
 			&item.snmpv3_securitylevel);
@@ -776,7 +782,8 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 			zbx_eval_context_t	ctx;
 			char			*error = NULL;
 
-			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION, &error))
+			if (FAIL == zbx_eval_parse_expression(&ctx, item.params, ZBX_EVAL_PARSE_CALC_EXPRESSION,
+					&error))
 			{
 				zbx_eval_set_exception(&ctx, zbx_dsprintf(NULL, "Cannot parse formula: %s", error));
 				zbx_free(error);
@@ -854,7 +861,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL;
 	zbx_uint64_t		proxyid;
 	int			ret = FAIL;
-	size_t			truncated, value_size = 0;
+	size_t			original_size, value_size = 0;
 
 	zbx_user_init(&user);
 
@@ -910,11 +917,15 @@ preproc_test:
 	{
 		zbx_json_addobject(json, ZBX_PROTO_TAG_ITEM);
 
-		truncated = zbx_json_addstring_limit(json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR,
-			info, ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
-		zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED,
-				truncated > ZBX_JSON_TEST_DATA_MAX_SIZE ? "true" : "false", ZBX_JSON_TYPE_TRUE);
-		zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, truncated);
+		original_size = zbx_json_addstring_limit(json, SUCCEED == ret ?
+				ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info, ZBX_JSON_TYPE_STRING,
+				ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+		{
+			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+		}
 
 		zbx_json_close(json);
 

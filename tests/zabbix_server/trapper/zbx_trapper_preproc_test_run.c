@@ -211,6 +211,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_handle_t	handle;
 	zbx_uint64_t		random_gen_length = 0, expected_data_len = 0;
 	size_t			tmp_alloc = 0, tmp_offset = 0;
+
 	ZBX_UNUSED(state);
 
 	zbx_json_init(&out, 1024);
@@ -248,8 +249,7 @@ void	zbx_mock_test_entry(void **state)
 		required_length += append_len = strlen(value_append);
 		value_override = (char *)malloc((required_length + 1) * sizeof(char));
 
-		for (size_t i = 0; i < random_gen_length; i++)
-			value_override[i] = (char)((unsigned char)'a' + rand() % 26);
+		memset(value_override, (int)'a', random_gen_length);
 
 		for (size_t i = 0; i < append_len; i++)
 			value_override[i + random_gen_length] = value_append[i];
@@ -292,15 +292,9 @@ void	zbx_mock_test_entry(void **state)
 	else
 		zbx_mock_assert_json_eq("Output", response, out.buffer);
 
-	if (NULL != value_override)
-	{
-		zbx_free(value_override);
-		zbx_free(request_override);
-
-		if (response != NULL)
-			zbx_free(response_override);
-	}
-
+	zbx_free(value_override);
+	zbx_free(request_override);
+	zbx_free(response_override);
 	zbx_free(error);
 	zbx_json_free(&out);
 }
