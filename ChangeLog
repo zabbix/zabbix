@@ -28,7 +28,7 @@ Bug fixes:
 ..F....... [ZBX-22715] fixed map shape dimension changes on resizing in scaled browser mode (ddauksa)
 .......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
 .......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
-..F....... [ZBX-23874] fixed undefined array key error for map elements wih URL (esekace, Ivo)
+..F....... [ZBX-23874] fixed undefined array key error for map elements with URL (esekace, Ivo)
 ...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
 .........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
 ..F....... [ZBX-23883] fixed PHP runtime error while using "/d", "/m" or "/h" modifiers in the time selector with some time zones (Sasha)
