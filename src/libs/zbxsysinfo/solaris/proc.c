@@ -332,12 +332,12 @@ static int	proc_match_user(const zbx_sysinfo_proc_t *proc, const struct passwd *
  * Purpose: checks if the process command line matches filter                 *
  *                                                                            *
  ******************************************************************************/
-static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const char *cmdline)
+static int	proc_match_cmdline(const zbx_sysinfo_proc_t *proc, const zbx_regexp_t *cmdline)
 {
 	if (NULL == cmdline)
 		return SUCCEED;
 
-	if (NULL != proc->cmdline && NULL != zbx_regexp_match(proc->cmdline, cmdline, NULL))
+	if (NULL != proc->cmdline && 0 == zbx_regexp_match_precompiled(proc->cmdline, cmdline))
 		return SUCCEED;
 
 	return FAIL;
@@ -367,7 +367,7 @@ static int	proc_match_zone(const zbx_sysinfo_proc_t *proc, zbx_uint64_t flags, z
  *                                                                            *
  ******************************************************************************/
 static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd *usrinfo, const char *procname,
-		const char *cmdline)
+		const zbx_regexp_t *cmdline)
 {
 	if (SUCCEED != proc_match_user(proc, usrinfo))
 		return FAIL;
@@ -383,7 +383,7 @@ static int	proc_match_props(const zbx_sysinfo_proc_t *proc, const struct passwd 
 
 int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *memtype = NULL;
+	char			*procname, *proccomm, *param, *memtype = NULL, *rxp_error = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
@@ -392,6 +392,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t		mem_size = 0, byte_value = 0;
 	double			pct_size = 0.0, pct_value = 0.0;
 	size_t			*p_value;
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -443,7 +444,18 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+	{
 		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			return SYSINFO_RET_FAIL;
+		}
+	}
 	else
 		proccomm = NULL;
 
@@ -483,7 +495,7 @@ int	PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm_rxp))
 		{
 			if (NULL != p_value)
 			{
@@ -542,12 +554,15 @@ out:
 			SET_DBL_RESULT(result, pct_size);
 	}
 
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
+
 	return SYSINFO_RET_OK;
 }
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *zone_parameter;
+	char			*procname, *proccomm, *param, *zone_parameter, *rxp_error = NULL;
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
@@ -556,6 +571,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zoneid_t		zoneid;
 	int			zoneflag;
 #endif
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (5 < request->nparam)
 	{
@@ -607,7 +623,18 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
+	{
 		proc_props |= ZBX_SYSINFO_PROC_CMDLINE;
+
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			return SYSINFO_RET_FAIL;
+		}
+	}
 	else
 		proccomm = NULL;
 
@@ -663,7 +690,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (SUCCEED != proc_get_process_info(entries->d_name, proc_props, &proc, &psinfo))
 			continue;
 
-		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm))
+		if (SUCCEED == proc_match_props(&proc, usrinfo, procname, proccomm_rxp))
 		{
 #ifdef HAVE_ZONE_H
 			if (SUCCEED != proc_match_zone(&proc, zoneflag, zoneid))
@@ -689,6 +716,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
+
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
 	return SYSINFO_RET_OK;
 }
