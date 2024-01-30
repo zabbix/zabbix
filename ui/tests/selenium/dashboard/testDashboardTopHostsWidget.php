@@ -3941,7 +3941,730 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Numeric (float)' => '7.770'
 						]
 					]
-
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'avg', default decimal places and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (unsigned) with avg',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-30m',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '2',
+							'time' => '-30 seconds'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '3',
+							'time' => '-45 seconds'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '10',
+							'time' => '-60 seconds'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '15',
+							'time' => '-90 seconds'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (unsigned) with avg' => '7.50'
+						]
+					]
+				]
+			],
+			// Item with units, aggregation function 'count' and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Units should not appear',
+							'Item' => 'Item with units',
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h-20m-30s',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with units',
+							'value' => '2',
+							'time' => '-10 minutes'
+						],
+						[
+							'name' => 'Item with units',
+							'value' => '95',
+							'time' => '-15 minutes'
+						]
+					],
+					'result' => [
+						[
+							'Units should not appear' => '2.00' // Item units are not shown if aggregation function is 'count'.
+						]
+					]
+				]
+			],
+			// Item with units, aggregation function 'sum' and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Units should appear',
+							'Item' => 'Item with units',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h-20m-30s',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with units',
+							'value' => '2',
+							'time' => '-10 minutes'
+						],
+						[
+							'name' => 'Item with units',
+							'value' => '95',
+							'time' => '-15 minutes'
+						]
+					],
+					'result' => [
+						[
+							'Units should appear' => '97.00 %'
+						]
+					]
+				]
+			],
+			// Numeric (float) item with aggregation function 'first' and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'First',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2M',
+							'id:time_period_to' => 'now-1M'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '11.11',
+							'time' => '-10 days'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '12.55',
+							'time' => '-40 days'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '12.01',
+							'time' => '-45 days'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '12.99',
+							'time' => '-50 days'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '121.12',
+							'time' => '-70 days'
+						]
+					],
+					'result' => [
+						[
+							'First' => '12.99'
+						]
+					]
+				]
+			],
+			// Numeric (float) item with aggregation function 'last' and Custom time period with absolute time.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Last',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Aggregation function' => 'last',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '2024-01-17 00:00:00',
+							'id:time_period_to' => '2024-01-18 00:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '12.33',
+							'time' => '2024-01-17 04:00:00'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '12.55',
+							'time' => '2024-01-17 08:00:00'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '12.99',
+							'time' => '2024-01-17 11:00:00'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '11.99',
+							'time' => '2024-01-17 12:00:00'
+						]
+					],
+					'result' => [
+						[
+							'Last' => '11.99'
+						]
+					]
+				]
+			],
+			// Non-numeric (Text) item with aggregation function 'count' and Custom time period with relative time.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Non-numeric (Text) item with aggregation function count',
+							'Item' => 'Item with type of information - Text',
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2y-1M-2w-1d-10h-30m-20s',
+							'id:time_period_to' => 'now-1y-1M-2w-1d-10h-30m-20s'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 1',
+							'time' => '-1 year -1 month -2 weeks -2 days -10 hours -30 minutes -20 seconds'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 2',
+							'time' => '-1 year -1 month -2 weeks -1 day -20 hours -30 minutes -20 seconds'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 3',
+							'time' => '-1 year -1 month -3 weeks -2 days -10 hours -30 minutes -20 seconds'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 4',
+							'time' => '-1 year -2 month -2 weeks -2 days -10 hours -30 minutes -20 seconds'
+						]
+					],
+					'result' => [
+						[
+							'Non-numeric (Text) item with aggregation function count' => '4.00'
+						]
+					]
+				]
+			],
+			// Non-numeric items with aggregation function 'min'/'max'/'avg'/'sum' and Custom time period.
+			[
+				[
+					'non-numeric' => true,
+					'column_fields' => [
+						[
+							'Name' => 'log item with  aggregation function min',
+							'Item' => 'Item with type of information - Log',
+							'Aggregation function' => 'min', // only numeric items will be displayed.
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2y',
+							'id:time_period_to' => 'now-1y'
+						],
+						[
+							'Name' => 'Character item with  aggregation function max',
+							'Item' => 'Item with type of information - Character',
+							'Aggregation function' => 'max', // only numeric items will be displayed.
+							'Time period' => 'Custom',
+							'id:time_period_from' => '2023-12-12 00:00:00',
+							'id:time_period_to' => '2023-12-12 10:00:00'
+						],
+						[
+							'Name' => 'Text item with aggregation function avg',
+							'Item' => 'Item with type of information - Text',
+							'Aggregation function' => 'avg', // only numeric items will be displayed.
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1d',
+							'id:time_period_to' => 'now'
+						],
+						[
+							'Name' => 'Log item with  aggregation function sum',
+							'Item' => 'Item with type of information - Log',
+							'Aggregation function' => 'sum', // only numeric items will be displayed.
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1d',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'Text 1',
+							'time' => '-1 hour'
+						],
+						[
+							'name' => 'Item with type of information - Log',
+							'value' => 'Log 1',
+							'time' => '-2 hours'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'Text 2',
+							'time' => '-1 day -1 hour'
+						],
+						[
+							'name' => 'Item with type of information - Log',
+							'value' => 'Log 2',
+							'time' => '-1 day -2 hours'
+						],
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character 1',
+							'time' => '2023-12-12 05:00:00'
+						],
+						[
+							'name' => 'Item with type of information - Log',
+							'value' => 'log 1',
+							'time' => '-15 month'
+						]
+					]
+				]
+			],
+			// Non-numeric (Character) item with aggregation function 'first' and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Non-numeric (Character) item with aggregation function first',
+							'Item' => 'Item with type of information - Character',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1d',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character 1',
+							'time' => '-1 hour'
+						],
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character 2',
+							'time' => '-10 hours'
+						],
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character 3',
+							'time' => '-1 day -1 hour'
+						]
+					],
+					'result' => [
+						[
+							'Non-numeric (Character) item with aggregation function first' => 'Character 2'
+						]
+					]
+				]
+			],
+			// Non-numeric (Text) item with aggregation function 'last' and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Non-numeric (Text) item with aggregation function last',
+							'Item' => 'Item with type of information - Text',
+							'Aggregation function' => 'last',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1d',
+							'id:time_period_to' => 'now'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 2',
+							'time' => '-1 hour'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 1',
+							'time' => '-1 hour -1 minute'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'text 3',
+							'time' => '-8 days'
+						]
+					],
+					'result' => [
+						[
+							'Non-numeric (Text) item with aggregation function last' => 'text 2'
+						]
+					]
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'avg', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (unsigned) item with trends and aggregation function avg',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h',
+							'id:time_period_to' => 'now',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => [
+								[
+									'num' => '3',
+									'avg' => '4',
+									'min' => '2',
+									'max' => '7'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => [
+								[
+									'num' => '5',
+									'avg' => '5',
+									'min' => '1',
+									'max' => '8'
+								]
+							],
+							'time' => '-1 hour'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (unsigned) item with trends and aggregation function avg' => '4.00'
+						]
+					]
+				]
+			],
+			// Numeric (float) item with aggregation function 'min', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (float) item with trends and aggregation function min',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2h',
+							'id:time_period_to' => 'now-1h',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '10',
+									'avg' => '3.33',
+									'min' => '1.11',
+									'max' => '5.55'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '11',
+									'avg' => '2.22',
+									'min' => '1.51',
+									'max' => '3.33'
+								]
+							],
+							'time' => '-1 hour'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '51',
+									'avg' => '5.55',
+									'min' => '1.09',
+									'max' => '8.88'
+								]
+							],
+							'time' => '-2 hours'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (float) item with trends and aggregation function min' => '1.51'
+						]
+					]
+				]
+			],
+			// Numeric (float) item with aggregation function 'max', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (float) item with trends and aggregation function max',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-3h',
+							'id:time_period_to' => 'now-2h',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '101',
+									'avg' => '5.89',
+									'min' => '1.77',
+									'max' => '11.10'
+								]
+							],
+							'time' => '-2 hours'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '101',
+									'avg' => '5.87',
+									'min' => '1.05',
+									'max' => '11.11'
+								]
+							],
+							'time' => '-3 hours'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (float) item with trends and aggregation function max' => '11.10'
+						]
+					]
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'count', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (unsigned) item with trends and aggregation function count',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h',
+							'id:time_period_to' => 'now',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => [
+								[
+									'num' => '7',
+									'avg' => '5',
+									'min' => '1',
+									'max' => '8'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => [
+								[
+									'num' => '9',
+									'avg' => '3',
+									'min' => '2',
+									'max' => '7'
+								]
+							],
+							'time' => '-1 hour'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (unsigned) item with trends and aggregation function count' => '7.00' // num result.
+						]
+					]
+				]
+			],
+			// Numeric (float) item with aggregation function 'sum', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (float) item with trends and aggregation function sum',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2d',
+							'id:time_period_to' => 'now-1d',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '5',
+									'avg' => '3.33',
+									'min' => '1.11',
+									'max' => '55.55'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '7',
+									'avg' => '7.77',
+									'min' => '3.33',
+									'max' => '11.11'
+								]
+							],
+							'time' => '-1 day'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (float) item with trends and aggregation function sum' => '54.39' // num * avg result.
+						]
+					]
+				]
+			],
+			// Numeric (unsigned) item with aggregation function 'first', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (unsigned) item with trends and aggregation function first',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2w',
+							'id:time_period_to' => 'now-1w',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => [
+								[
+									'num' => '168',
+									'avg' => '8',
+									'min' => '2',
+									'max' => '14'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => [
+								[
+									'num' => '336',
+									'avg' => '6',
+									'min' => '4',
+									'max' => '8'
+								]
+							],
+							'time' => '-1 week'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (unsigned) item with trends and aggregation function first' => '6.00' // avg result.
+						]
+					]
+				]
+			],
+			// Numeric (float) item with aggregation function 'last', trends history data and Custom time period.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Numeric (float) item with trends and aggregation function last',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Aggregation function' => 'last',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1w',
+							'id:time_period_to' => 'now',
+							'History data' => 'Trends'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '168',
+									'avg' => '8.11',
+									'min' => '2.58',
+									'max' => '17.89'
+								]
+							],
+							'time' => 'now'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => [
+								[
+									'num' => '336',
+									'avg' => '6.78',
+									'min' => '4.13',
+									'max' => '8.09'
+								]
+							],
+							'time' => '-1 week'
+						]
+					],
+					'result' => [
+						[
+							'Numeric (float) item with trends and aggregation function last' => '8.11' // avg result.
+						]
+					]
 				]
 			]
 		];
@@ -3970,7 +4693,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
-		$this->assertTableData($data['result']);
+		if (array_key_exists('non-numeric', $data)) {
+			$this->assertTableData();
+		}
+		else {
+			$this->assertTableData($data['result']);
+		}
 
 		// Necessary for test stability.
 		$dashboard->edit()->deleteWidget(self::DEFAULT_WIDGET_NAME)->save();
