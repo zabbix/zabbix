@@ -23,7 +23,7 @@ require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 
 /**
- * @backup hosts, widget, profiles
+ * @backup widget
  *
  * @onBefore prepareData
  */
@@ -120,8 +120,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	 */
 	public function testDashboardPieChartWidget_Layout() {
 		// Open the create form.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = $this->openDashboard();
 		$form = $dashboard->edit()->addWidget()->asForm();
 
 		$dialog = COverlayDialogElement::find()->one();
@@ -295,6 +294,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $time_period->getLabels()->asText());
 
 		$form->fill(['Time period' => 'Widget']);
+		$form->checkValue(['Widget' => '']);
 		$widget_field = $form->getField('Widget');
 		$this->assertTrue($widget_field->isVisible());
 		$this->assertTrue($widget_field->isEnabled());
@@ -306,6 +306,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$widget_dialog->close();
 
 		$form->fill(['Time period' => 'Custom']);
+		$form->checkValue(['From' => 'now-1h', 'To' => 'now']);
 
 		foreach (['From', 'To'] as $label) {
 			$field = $form->getField($label);
@@ -316,18 +317,12 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertFieldAttributes($form, $label, ['placeholder' => 'YYYY-MM-DD hh:mm:ss', 'maxlength' => 255], true);
 		}
 
-		$form->checkValue(['From' => 'now-1h', 'To' => 'now']);
-
 		// Legend tab.
 		$form->selectTab('Legend');
 		$this->query('id:legend_tab')->one()->waitUntilVisible();
 		$form->invalidate();
 
 		$form->checkValue(['Show legend' => true, 'Show aggregation function' => false, 'Number of rows' => 1, 'Number of columns' => 4]);
-
-		foreach (['Show legend' => true, 'Show aggregation function' => false] as $label => $checked) {
-			$this->assertTrue($form->getField($label)->isChecked($checked));
-		}
 
 		$this->assertRangeSliderParameters($form, 'Number of rows', ['min' => '1', 'max' => '10', 'step' => '1']);
 		$this->assertRangeSliderParameters($form, 'Number of columns', ['min' => '1', 'max' => '4', 'step' => '1']);
@@ -557,6 +552,36 @@ class testDashboardPieChartWidget extends CWebTest {
 					'error' => 'Invalid parameter "merge_percent": value must be one of 1-10.'
 				]
 			],
+			// Total value custom size missing.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Displaying options' => [
+							'Draw' => 'Doughnut',
+							'Show total value' => true,
+							'id:value_size_type' => 'Custom',
+							'id:value_size_custom_input' => ''
+						]
+					],
+					'error' => 'Invalid parameter "value_size": value must be one of 1-100.'
+				]
+			],
+			// Total value custom size out of range.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Displaying options' => [
+							'Draw' => 'Doughnut',
+							'Show total value' => true,
+							'id:value_size_type' => 'Custom',
+							'id:value_size_custom_input' => '101'
+						]
+					],
+					'error' => 'Invalid parameter "value_size": value must be one of 1-100.'
+				]
+			],
 			// Decimal places value too big.
 			[
 				[
@@ -655,13 +680,6 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Test opening Pie chart edit form and saving without any changes.
-	 */
-	public function testDashboardPieChartWidget_SimpleUpdate(){
-		$this->createUpdatePieChart(null, 'Simple update widget', true);
-	}
-
-	/**
 	 * Test updating of Pie chart.
 	 *
 	 * @dataProvider getPieChartData
@@ -670,11 +688,96 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->createUpdatePieChart($data, 'Edit widget');
 	}
 
+	public function getSimpleUpdateAndCanceData() {
+		return [
+			// Simple update.
+			[
+				[
+					'update' => true,
+					'save_widget' => true,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel update widget.
+			[
+				[
+					'update' => true,
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'update' => true,
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			],
+			// Cancel create widget.
+			[
+				[
+					'save_widget' => true,
+					'save_dashboard' => false
+				]
+			],
+			[
+				[
+					'save_widget' => false,
+					'save_dashboard' => true
+				]
+			]
+		];
+	}
+
 	/**
-	 * Test opening Pie chart edit form and saving without any changes.
+	 * Test simple update, cancel update and cancel create scenarios.
+	 *
+	 * @dataProvider getSimpleUpdateAndCanceData
+	 *
+	 * @param $data
+	 * @return void
 	 */
-	public function testDashboardPieChartWidget_CancelUpdate(){
-		$this->createUpdatePieChart(null, 'Simple update widget', false, true);
+	public  function testDashboardPieChartWidget_SimpleUpdateAndCancel($data) {
+		$update = CTestArrayHelper::get($data, 'update', false);
+		$widget_name = md5(serialize($data));
+
+		if ($update) {
+			$this->createCleanWidget($widget_name);
+		}
+
+		// Get a hash for DB data comparison.
+		$hash_sql = 'SELECT * FROM widget w INNER JOIN widget_field wf ON w.widgetid=wf.widgetid ORDER BY w.widgetid';
+		$old_hash = CDBHelper::getHash($hash_sql);
+
+		$dashboard = $this->openDashboard();
+		$old_widget_count = $dashboard->getWidgets()->count();
+
+		$form = $update
+			? $dashboard->edit()->getWidget($widget_name)->edit()
+			: $dashboard->edit()->addWidget()->asForm();
+
+		// Fill mandatory fields in the create scenario.
+		if (!$update) {
+			$this->fillForm([], $form);
+		}
+
+		// Save the widget or cancel.
+		if (CTestArrayHelper::get($data, 'save_widget')) {
+			$form->submit();
+		}
+		else {
+			COverlayDialogElement::find()->one()->query('button:Cancel')->one()->click();
+		}
+
+		// Save the dashboard if needed.
+		if (CTestArrayHelper::get($data, 'save_dashboard')) {
+			$dashboard->save();
+		}
+
+		// Assert that the count of widgets and DB hash has not changed.
+		$dashboard = $this->openDashboard(false);
+		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		$this->assertEquals($old_hash, CDBHelper::getHash($hash_sql));
 	}
 
 	/**
@@ -686,8 +789,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$widget_id = CDBHelper::getValue('SELECT widgetid FROM widget WHERE name='.zbx_dbstr($name));
 
 		// Delete the widget and save dashboard.
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = $this->openDashboard();
 		$old_widget_count = $dashboard->getWidgets()->count();
 		$dashboard->edit()->deleteWidget($name)->save();
 		$this->page->waitUntilReady();
@@ -912,8 +1014,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			]
 		);
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = $this->openDashboard();
 		$widget = $dashboard->getWidgets()->first();
 		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
 
@@ -981,43 +1082,25 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Creates or updates a widget according to data from data provider.
 	 *
-	 * @param array $data                 data from data provider
+	 * @param array  $data                data from data provider
 	 * @param string $edit_widget_name    if this is set, then a widget named like this is updated
+	 * @param bool   $simple_update       true will perform a simple update
+	 * @param bool   $cancel_update       true will cancel the update
 	 */
-	protected function createUpdatePieChart($data, $edit_widget_name = null, $simple_update = false, $cancel_update = false) {
+	protected function createUpdatePieChart($data, $edit_widget_name = null) {
 		if ($edit_widget_name) {
 			$this->createCleanWidget($edit_widget_name);
 		}
 
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
+		$dashboard = $this->openDashboard();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
 		$form = $edit_widget_name
 			? $dashboard->edit()->getWidget($edit_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		if ($simple_update || $cancel_update) {
-			// Set the expected data for simple update and update cancel.
-			$data = [
-				'fields' => [
-					'main_fields' => ['Name' => $edit_widget_name],
-					'Data set' => ['item' => 'Test Items', 'host' => 'Test Host']
-				]
-			];
-		}
-		else {
-			// Fill form if not a simple update.
-			$this->fillForm($data['fields'], $form);
-		}
-
-		// Submit (if not cancelling).
-		if ($cancel_update) {
-			COverlayDialogElement::find()->one()->query('button:Cancel')->one()->click();
-		}
-		else {
-			$form->submit();
-		}
+		$this->fillForm($data['fields'], $form);
+		$form->submit();
 
 		// Assert the result.
 		$this->assertEditFormAfterSave($data, $dashboard);
@@ -1093,6 +1176,8 @@ class testDashboardPieChartWidget extends CWebTest {
 						[
 							'name' => $widget_name,
 							'type' => 'piechart',
+							'width' => 8,
+							'height' => 4,
 							'fields' => [
 								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Host'],
 								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'Test Items'],
@@ -1106,31 +1191,21 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Calculates widget name from field data in data provider.
-	 * If no name is provided, then use an MD5 as the name so that it is unique.
-	 *
-	 * @param array $fields    field data for calculating the widget name
-	 */
-	protected function calculateWidgetName($fields) {
-		return (array_key_exists('main_fields', $fields) && array_key_exists('Name', $fields['main_fields']))
-				? $fields['main_fields']['Name']
-				: md5(serialize($fields));
-	}
-
-	/**
 	 * Asserts that the data is saved and displayed as expected in the Edit form.
 	 *
 	 * @param array             $data         data from data provider
 	 * @param CDashboardElement $dashboard    dashboard element
 	 */
 	protected function assertEditFormAfterSave($data, $dashboard) {
-		$count_sql = 'SELECT NULL FROM widget WHERE name='.zbx_dbstr($this->calculateWidgetName($data['fields']));
+		$widget_name = CTestArrayHelper::get($data['fields'], 'main_fields.Name', md5(serialize($data['fields'])));
+		$count_sql = 'SELECT NULL FROM widget WHERE name='.zbx_dbstr($widget_name);
+
 
 		if (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
 			COverlayDialogElement::ensureNotPresent();
 
 			// Save Dashboard.
-			$widget = $dashboard->getWidget($this->calculateWidgetName($data['fields']));
+			$widget = $dashboard->getWidget($widget_name);
 			$widget->query('xpath:.//div[contains(@class, "is-loading")]')->waitUntilNotPresent();
 			$widget->getContent()->query('class:svg-pie-chart')->waitUntilVisible();
 			$dashboard->save();
@@ -1142,7 +1217,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 			// Check main fields
 			$main_fields = CTestArrayHelper::get($data['fields'], 'main_fields', []);
-			$main_fields['Name'] = $this->calculateWidgetName($data['fields']);
+			$main_fields['Name'] = $widget_name;
 			$form->checkValue($main_fields);
 
 			$data_sets = $this->extractDataSets($data['fields']);
@@ -1203,7 +1278,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	protected function fillForm($fields, $form) {
 		// Fill main fields.
 		$main_fields = CTestArrayHelper::get($fields, 'main_fields', []);
-		$main_fields['Name'] = $this->calculateWidgetName($fields);
+		$main_fields['Name'] = CTestArrayHelper::get($fields, 'main_fields.Name', md5(serialize($fields)));
 		$form->fill($main_fields);
 
 		// Fill datasets.
@@ -1279,7 +1354,7 @@ class testDashboardPieChartWidget extends CWebTest {
 				foreach ($data_set['items'] as $item) {
 					$table->findRow('Name', $item['name'])->select();
 				}
-				$dialog->query('xpath:.//div[@class="overlay-dialogue-footer"]//button[text()="Select"]')->one()->click();
+				$dialog->getFooter()->query('button:Select')->one()->click();
 				$dialog->waitUntilNotVisible();
 			}
 
@@ -1395,5 +1470,21 @@ class testDashboardPieChartWidget extends CWebTest {
 		foreach ($attributes as $attribute => $expected_value) {
 			$this->assertEquals($expected_value, $input->getAttribute($attribute));
 		}
+	}
+
+	/**
+	 * Opens the Pie chart dashboard.
+	 *
+	 * @param  login                skips logging in if set to false
+	 *
+	 * @return CDashboardElement    dashboard element of the Pie chart dashboard
+	 */
+	protected function openDashboard($login = true) {
+		if ($login) {
+			$this->page->login();
+		}
+
+		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid)->waitUntilReady();
+		return CDashboardElement::find()->one();
 	}
 }
