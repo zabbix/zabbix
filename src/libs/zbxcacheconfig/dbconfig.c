@@ -19,6 +19,7 @@
 
 #include "dbconfig.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxtasks.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
@@ -8873,7 +8874,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER))
 	{
-		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_FALSE;
+		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_NONE;
 		config->maintenance_update_flags = (zbx_uint64_t *)__config_shmem_malloc_func(NULL,
 				sizeof(zbx_uint64_t) * zbx_maintenance_update_flags_num());
 		memset(config->maintenance_update_flags, 0, sizeof(zbx_uint64_t) * zbx_maintenance_update_flags_num());

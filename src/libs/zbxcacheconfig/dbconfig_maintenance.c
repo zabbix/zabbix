@@ -811,7 +811,7 @@ int	zbx_dc_maintenance_check_immediate_update(void)
 	int	ret;
 
 	RDLOCK_CACHE;
-	ret = ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD & config->maintenance_update ? SUCCEED : FAIL;
+	ret = 0 != (ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD & config->maintenance_update) ? SUCCEED : FAIL;
 	UNLOCK_CACHE;
 
 	return ret;
@@ -830,7 +830,7 @@ int	zbx_dc_maintenance_check_immediate_update(void)
  *           and period start/end time.                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_update_maintenances(int timer_expired)
+int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 {
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
@@ -846,7 +846,7 @@ int	zbx_dc_update_maintenances(int timer_expired)
 	WRLOCK_CACHE;
 
 	/* force recalculation on configuration changes only periodically when timer expires */
-	if (SUCCEED == timer_expired)
+	if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
 	{
 		if (0 != (ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE & config->maintenance_update))
 			ret = SUCCEED;
@@ -923,8 +923,8 @@ int	zbx_dc_update_maintenances(int timer_expired)
 		}
 	}
 
-	if (SUCCEED == timer_expired)
-		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_FALSE;
+	if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_NONE;
 	else
 		config->maintenance_update &= ~ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD;
 

@@ -678,21 +678,22 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (1 == process_num)
 		{
-			int	timer_expired;
+			zbx_maintenance_timer_t	maintenance_timer;
 
-			if (sec - (double)maintenance_time >= ZBX_MAINTENANCE_TIMER_DELAY)
-				timer_expired = SUCCEED;
+			if (ZBX_MAINTENANCE_TIMER_DELAY <= sec - (double)maintenance_time)
+				maintenance_timer = MAINTENANCE_TIMER_PENDING;
 			else
-				timer_expired = FAIL;
+				maintenance_timer = MAINTENANCE_TIMER_INITIALIZED;
 
 			/* start update process only when all timers have finished their updates */
-			if ((SUCCEED == zbx_dc_maintenance_check_immediate_update() || SUCCEED == timer_expired) &&
+			if ((SUCCEED == zbx_dc_maintenance_check_immediate_update() ||
+					MAINTENANCE_TIMER_PENDING == maintenance_timer) &&
 					FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
-				update = zbx_dc_update_maintenances(timer_expired);
+				update = zbx_dc_update_maintenances(maintenance_timer);
 
 				/* force maintenance updates at server startup */
 				if (0 == maintenance_time)
@@ -704,7 +705,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				else
 					hosts_num = 0;
 
-				if (SUCCEED == timer_expired)
+				if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
 					db_remove_expired_event_suppress_data((time_t)sec);
 
 				if (SUCCEED == update)
@@ -722,7 +723,7 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						"updated %d hosts, suppressed %d events in " ZBX_FS_DBL " sec",
 						hosts_num, events_num, zbx_time() - sec);
 
-				if (SUCCEED == timer_expired)
+				if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
 					update_time = (time_t)sec;
 			}
 		}
