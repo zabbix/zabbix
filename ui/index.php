@@ -60,8 +60,9 @@ if ($request !== '' && !CHtmlUrlValidator::validateSameSite($request)) {
 	$request = '';
 }
 
-if (!hasRequest('form') && CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
-		&& CAuthenticationHelper::get(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
+if (!hasRequest('form')
+		&& CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED
+		&& CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_LOGIN_FORM) == ZBX_AUTH_FORM_HTTP
 		&& !hasRequest('enter')) {
 	redirect('index_http.php');
 }
@@ -88,10 +89,10 @@ if (CWebUser::isLoggedIn() && !CWebUser::isGuest()) {
 $messages = get_and_clear_messages();
 
 echo (new CView('general.login', [
-	'http_login_url' => (CAuthenticationHelper::get(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED)
+	'http_login_url' => (CAuthenticationHelper::getPublic(CAuthenticationHelper::HTTP_AUTH_ENABLED) == ZBX_AUTH_HTTP_ENABLED)
 		? (new CUrl('index_http.php'))->setArgument('request', getRequest('request'))
 		: '',
-	'saml_login_url' => (CAuthenticationHelper::get(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED)
+	'saml_login_url' => (CAuthenticationHelper::getPublic(CAuthenticationHelper::SAML_AUTH_ENABLED) == ZBX_AUTH_SAML_ENABLED)
 		? (new CUrl('index_sso.php'))->setArgument('request', getRequest('request'))
 		: '',
 	'guest_login_url' => CWebUser::isGuestAllowed() ? (new CUrl())->setArgument('enter', ZBX_GUEST_USER) : '',

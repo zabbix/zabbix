@@ -102,20 +102,7 @@ class CWebUser {
 				'extend' => self::$extend_session
 			]);
 
-			if (empty(self::$data)) {
-				CMessageHelper::clear();
-				self::$data = API::User()->login([
-					'username' => ZBX_GUEST_USER,
-					'password' => '',
-					'userData' => true
-				]);
-
-				if (empty(self::$data)) {
-					throw new Exception();
-				}
-			}
-
-			if (self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
+			if (!self::$data || self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
 				throw new Exception();
 			}
 
@@ -155,8 +142,8 @@ class CWebUser {
 			'sessionid' => CEncryptHelper::generateKey(),
 			'username' => ZBX_GUEST_USER,
 			'userid' => 0,
-			'lang' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_LANG),
-			'theme' => CSettingsHelper::getGlobal(CSettingsHelper::DEFAULT_THEME),
+			'lang' => CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_LANG),
+			'theme' => CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_THEME),
 			'type' => 0,
 			'gui_access' => GROUP_GUI_ACCESS_SYSTEM,
 			'debug_mode' => false,

@@ -55,7 +55,7 @@ class CControllerNotificationsGet extends CController {
 		$this->disableCsrfValidation();
 		$this->notifications = [];
 		$this->settings = getMessageSettings();
-		$ok_timeout = (int) timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
+		$ok_timeout = (int) timeUnitToSeconds(CSettingsHelper::getPublic(CSettingsHelper::OK_PERIOD));
 		$timeout = (int) timeUnitToSeconds($this->settings['timeout']);
 		$this->settings['timeout'] = $timeout;
 		$this->settings['ok_timeout'] = min([$timeout, $ok_timeout]);
