@@ -273,7 +273,7 @@ static int	config_max_concurrent_checks_per_poller	= 1000;
 static int	config_log_level		= LOG_LEVEL_WARNING;
 
 static char	*config_externalscripts		= NULL;
-int	config_allow_unsupported_db_versions = 0;
+static int	config_allow_unsupported_db_versions = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
@@ -284,10 +284,10 @@ static int	config_server_port;
 static char	*config_hostname	= NULL;
 static char	*config_hostname_item	= NULL;
 
-char	*zbx_config_snmptrap_file	= NULL;
+static char	*zbx_config_snmptrap_file	= NULL;
 
-char	*config_java_gateway		= NULL;
-int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
+static char	*config_java_gateway	= NULL;
+static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 

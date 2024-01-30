@@ -315,17 +315,17 @@ static zbx_uint64_t	config_vmware_cache_size	= 8 * ZBX_MEBIBYTE;
 static int	config_unreachable_period		= 45;
 static int	config_unreachable_delay		= 15;
 static int	config_max_concurrent_checks_per_poller	= 1000;
-int		config_log_level		= LOG_LEVEL_WARNING;
+static int	config_log_level		= LOG_LEVEL_WARNING;
 static char	*config_externalscripts		= NULL;
-int		config_allow_unsupported_db_versions = 0;
+static int	config_allow_unsupported_db_versions = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-char		*zbx_config_snmptrap_file	= NULL;
+static char	*zbx_config_snmptrap_file	= NULL;
 static char	*config_java_gateway		= NULL;
-int		config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
+static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
