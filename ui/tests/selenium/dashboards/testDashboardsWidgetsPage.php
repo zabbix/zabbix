@@ -26,13 +26,13 @@ require_once dirname(__FILE__) . '/../../include/CWebTest.php';
  *
  * @dataSource Actions, LoginUsers, AllItemValueTypes, UserPermissions, Proxies
  */
-class testPageDashboardWidgets extends CWebTest {
+class testDashboardsWidgetsPage extends CWebTest {
 
 	/**
 	 * Default selected widget type.
 	 * The widget type should not be changed in frontend and in DB.
 	 */
-	public function testPageDashboardWidgets_checkUnchangedWidgetType() {
+	public function testDashboardsWidgetsPage_checkUnchangedWidgetType() {
 		// Opening widget configuration form for new widget first time.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$dashboard = CDashboardElement::find()->one()->edit();
@@ -98,7 +98,7 @@ class testPageDashboardWidgets extends CWebTest {
 	/**
 	 * Widget type should be inherited from the one that was selected last time.
 	 */
-	public function testPageDashboardWidgets_checkWidgetTypeRemembering() {
+	public function testDashboardsWidgetsPage_checkWidgetTypeRemembering() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 		$dashboard = CDashboardElement::find()->one()->edit();
 		// Opening widget configuration form for new Clock widget.
@@ -132,7 +132,7 @@ class testPageDashboardWidgets extends CWebTest {
 	/**
 	 * Check "Problem Hosts" widget.
 	 */
-	public function testPageDashboardWidgets_checkProblemHostsWidget() {
+	public function testDashboardsWidgetsPage_checkProblemHostsWidget() {
 		// Authorize user and open the page with the desired widget.
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1000');
 
@@ -176,7 +176,7 @@ class testPageDashboardWidgets extends CWebTest {
 	/**
 	 * Create dashboard with clock widget.
 	 */
-	public function testPageDashboardWidgets_checkDashboardCreate() {
+	public function testDashboardsWidgetsPage_checkDashboardCreate() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 
 		$this->query('button:Create dashboard')->one()->click();
@@ -236,7 +236,7 @@ class testPageDashboardWidgets extends CWebTest {
 	/**
 	 * Edit widget.
 	 */
-	public function testPageDashboardWidgets_checkProblemWidgetEdit() {
+	public function testDashboardsWidgetsPage_checkProblemWidgetEdit() {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid=1');
 
 		$dashboard = CDashboardElement::find()->one()->edit();

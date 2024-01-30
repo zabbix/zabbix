@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 use Facebook\WebDriver\WebDriverBy;
@@ -25,13 +26,13 @@ use Facebook\WebDriver\WebDriverBy;
 /**
  * @backup profiles
  */
-class testDashboardViewMode extends CLegacyWebTest {
+class testDashboardsViewMode extends CLegacyWebTest {
 
 	/**
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
 	 */
-	public function testDashboardViewMode_CheckLayoutForDifferentUsers() {
+	public function testDashboardsViewMode_CheckLayoutForDifferentUsers() {
 		$users = ['super-admin', 'admin', 'user', 'guest'];
 		foreach ($users as $user) {
 			switch ($user) {
@@ -77,7 +78,7 @@ class testDashboardViewMode extends CLegacyWebTest {
 		}
 	}
 
-	public function testDashboardViewMode_KioskMode() {
+	public function testDashboardsViewMode_KioskMode() {
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&dashboardid=1', false);
 		$this->zbxTestCheckHeader('Global view');
 		$this->zbxTestAssertElementPresentXpath("//header");
@@ -99,7 +100,7 @@ class testDashboardViewMode extends CLegacyWebTest {
 		$this->zbxTestAssertElementPresentXpath('//ul[@class="breadcrumbs"]');
 	}
 
-	public function testDashboardViewMode_KioskModeUrlParameter() {
+	public function testDashboardsViewMode_KioskModeUrlParameter() {
 		// Set layout mode to kiosk view.
 		$this->zbxTestLogin('zabbix.php?action=dashboard.view&kiosk=1', false);
 		$this->zbxTestWaitForPageToLoad();

@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
@@ -29,7 +30,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @dataSource LoginUsers, UserPermissions
  */
-class testDashboardForm extends CWebTest {
+class testDashboardsForm extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -170,7 +171,7 @@ class testDashboardForm extends CWebTest {
 		self::$ids = CDataHelper::getIds('name');
 	}
 
-	public function testDashboardForm_Layout() {
+	public function testDashboardsForm_Layout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list')->waitUntilReady();
 		$this->query('button:Create dashboard')->one()->click();
 		$this->page->assertHeader('New dashboard');
@@ -302,7 +303,7 @@ class testDashboardForm extends CWebTest {
 	 *
 	 * @dataProvider getPropertiesData
 	 */
-	public function testDashboardForm_Create($data) {
+	public function testDashboardsForm_Create($data) {
 		$old_hash = ($data['expected'] === TEST_BAD) ? $this->getHash() : null;
 		$this->page->login()->open('zabbix.php?action=dashboard.view&new=1');
 		$dashboard = CDashboardElement::find()->one();
@@ -315,7 +316,7 @@ class testDashboardForm extends CWebTest {
 	 *
 	 * @dataProvider getPropertiesData
 	 */
-	public function testDashboardForm_Update($data) {
+	public function testDashboardsForm_Update($data) {
 		$old_hash = ($data['expected'] === TEST_BAD || empty($data['dashboard_properties'])) ? $this->getHash() : null;
 
 		if (CTestArrayHelper::get($data, 'dashboard_properties.Name', false) && $data['expected'] === TEST_GOOD) {
@@ -422,7 +423,7 @@ class testDashboardForm extends CWebTest {
 	 *
 	 * @dataProvider getCancelCreateData
 	 */
-	public function testDashboardForm_CancelCreate($data) {
+	public function testDashboardsForm_CancelCreate($data) {
 		$old_hash = $this->getHash();
 
 		$this->page->login()->open('zabbix.php?action=dashboard.list')->waitUntilReady();
@@ -500,7 +501,7 @@ class testDashboardForm extends CWebTest {
 	 *
 	 * @dataProvider getCancelData
 	 */
-	public function testDashboardForm_Cancel($data) {
+	public function testDashboardsForm_Cancel($data) {
 		$old_hash = $this->getHash();
 
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids['Dashboard for update']);
@@ -543,7 +544,7 @@ class testDashboardForm extends CWebTest {
 		$this->assertEquals($old_hash, $this->getHash());
 	}
 
-	public function testDashboardForm_Clone() {
+	public function testDashboardsForm_Clone() {
 		$original_values = [
 			'Name' => 'Dashboard for clone and delete',
 			'Owner' => 'guest',
@@ -744,7 +745,7 @@ class testDashboardForm extends CWebTest {
 	 *
 	 * @dataProvider getShareData
 	 */
-	public function testDashboardForm_SharingPopup($data) {
+	public function testDashboardsForm_SharingPopup($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$ids[$data['dashboard']]);
 		CDashboardElement::find()->one()->waitUntilReady();
 		$this->query('id:dashboard-actions')->one()->click();
@@ -895,7 +896,7 @@ class testDashboardForm extends CWebTest {
 		}
 	}
 
-	public function testDashboardForm_Delete() {
+	public function testDashboardsForm_Delete() {
 		$pageid = CDBHelper::getValue('SELECT dashboard_pageid FROM dashboard_page WHERE dashboardid='.
 				zbx_dbstr(self::$ids['Dashboard for clone and delete']));
 		$widgetid = CDBHelper::getValue('SELECT widgetid FROM widget WHERE dashboard_pageid='.zbx_dbstr($pageid));

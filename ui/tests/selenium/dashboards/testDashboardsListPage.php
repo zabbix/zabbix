@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
@@ -25,7 +26,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 /**
  * @backup dashboard, dashboard_user, dashboard_usrgrp
  */
-class testPageDashboardList extends CWebTest {
+class testDashboardsListPage extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -39,7 +40,7 @@ class testPageDashboardList extends CWebTest {
 		];
 	}
 
-	public function testPageDashboardList_CheckLayout() {
+	public function testDashboardsListPage_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->page->assertTitle('Dashboards');
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -138,7 +139,7 @@ class testPageDashboardList extends CWebTest {
 	/**
 	 * @dataProvider getCheckFilterData
 	 */
-	public function testPageDashboardList_CheckFilter($data) {
+	public function testDashboardsListPage_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$start_rows_count = $table->getRows()->count();
@@ -160,7 +161,7 @@ class testPageDashboardList extends CWebTest {
 	/**
 	 * Check that My and Sharing tags displays correctly in Dashboard Lists for Admin.
 	 */
-	public function testPageDashboardList_CheckOwners() {
+	public function testDashboardsListPage_CheckOwners() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -186,7 +187,7 @@ class testPageDashboardList extends CWebTest {
 		}
 	}
 
-	public function testPageDashboardList_DeleteSingleDashboard() {
+	public function testDashboardsListPage_DeleteSingleDashboard() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$dashboard_name = 'Testing share dashboard';
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -205,7 +206,7 @@ class testPageDashboardList extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE name='.zbx_dbstr($dashboard_name)));
 	}
 
-	public function testPageDashboardList_DeleteAllDashboards() {
+	public function testDashboardsListPage_DeleteAllDashboards() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->selectTableRows();
 		$this->query('button:Delete')->one()->click();

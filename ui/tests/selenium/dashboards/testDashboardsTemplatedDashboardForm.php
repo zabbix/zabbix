@@ -22,6 +22,7 @@
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
+
 use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
 
 /**
@@ -31,7 +32,7 @@ use Facebook\WebDriver\Exception\UnexpectedAlertOpenException;
  *
  * @onBefore prepareTemplateDashboardsData
  */
-class testFormTemplateDashboards extends CWebTest {
+class testDashboardsTemplatedDashboardForm extends CWebTest {
 
 	const UPDATE_TEMPLATEID = 50000;	// ID of the "Template ZBX6663 First" template used for template dashboards tests.
 	const HOST_FOR_TEMPLATE = 99015;	// ID of the "Empty host" host to which a template with dashboards will be linked.
@@ -544,7 +545,7 @@ class testFormTemplateDashboards extends CWebTest {
 		]);
 	}
 
-	public function testFormTemplateDashboards_Layout() {
+	public function testDashboardsTemplatedDashboardForm_Layout() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		$this->checkDialogue('Dashboard properties');
@@ -2093,7 +2094,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 *
 	 * @dataProvider getWidgetDefaultLayoutData
 	 */
-	public function testFormTemplateDashboards_WidgetDefaultLayout($data) {
+	public function testDashboardsTemplatedDashboardForm_WidgetDefaultLayout($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		COverlayDialogElement::find()->one()->waitUntilVisible()->close();
@@ -2463,7 +2464,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 *
 	 * @dataProvider getDashboardPropertiesData
 	 */
-	public function testFormTemplateDashboards_DashboardPropertiesCreate($data) {
+	public function testDashboardsTemplatedDashboardForm_DashboardPropertiesCreate($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::UPDATE_TEMPLATEID);
 		$this->query('button:Create dashboard')->one()->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
@@ -2482,7 +2483,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 *
 	 * @dataProvider getDashboardPropertiesData
 	 */
-	public function testFormTemplateDashboards_DashboardPropertiesUpdate($data) {
+	public function testDashboardsTemplatedDashboardForm_DashboardPropertiesUpdate($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
 		$this->query('id:dashboard-config')->one()->waitUntilClickable()->click();
 		$form = COverlayDialogElement::find()->asForm()->one()->waitUntilVisible();
@@ -2497,7 +2498,7 @@ class testFormTemplateDashboards extends CWebTest {
 	/**
 	 * Function that checks that no changes occur after saving a template dashboard without changes.
 	 */
-	public function testFormTemplateDashboards_SimpleUpdate() {
+	public function testDashboardsTemplatedDashboardForm_SimpleUpdate() {
 		$old_hash = CDBHelper::getHash(self::WIDGET_SQL);
 
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_with_widgets);
@@ -2510,7 +2511,7 @@ class testFormTemplateDashboards extends CWebTest {
 	/**
 	 * Function that checks that no changes occur after cancelling a template dashboard update.
 	 */
-	public function testFormTemplateDashboards_Cancel() {
+	public function testDashboardsTemplatedDashboardForm_Cancel() {
 		$old_hash = CDBHelper::getHash(self::WIDGET_SQL);
 		$fields = [
 			'Name' => 'Cancel dashboard update',
@@ -4198,7 +4199,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 *
 	 * @dataProvider getWidgetData
 	 */
-	public function testFormTemplateDashboards_CreateWidget($data) {
+	public function testDashboardsTemplatedDashboardForm_CreateWidget($data) {
 		try {
 			$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$empty_dashboardid);
 		}
@@ -4232,7 +4233,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 *
 	 * @dataProvider getWidgetData
 	 */
-	public function testFormTemplateDashboards_UpdateWidget($data) {
+	public function testDashboardsTemplatedDashboardForm_UpdateWidget($data) {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.edit&dashboardid='.self::$dashboardid_for_update);
 		CDashboardElement::find()->one()->getWidget(self::$previous_widget_name)->edit();
 
@@ -4306,7 +4307,7 @@ class testFormTemplateDashboards extends CWebTest {
 	 *
 	 * @onBefore prepareHostLinkageToTemplateData
 	 */
-	public function testFormTemplateDashboards_ViewDashboardOnHost() {
+	public function testDashboardsTemplatedDashboardForm_ViewDashboardOnHost() {
 		$this->page->login()->open('zabbix.php?action=host.dashboard.view&hostid='.self::HOST_FOR_TEMPLATE);
 		$this->query('xpath://span[text()="Dashboard with all widgets"]')->one()->waitUntilVisible()->click();
 		$this->page->waitUntilReady();

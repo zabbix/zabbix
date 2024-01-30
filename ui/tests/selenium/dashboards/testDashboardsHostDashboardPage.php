@@ -28,7 +28,7 @@ define('CURRENT_YEAR', date("Y"));
  *
  * @backup hosts
  */
-class testPageHostDashboards extends CWebTest {
+class testDashboardsHostDashboardPage extends CWebTest {
 
 	const HOST_NAME = 'Host for Host Dashboards';
 	const TEMPLATE_NAME = 'Template for '.self::HOST_NAME;
@@ -98,7 +98,7 @@ class testPageHostDashboards extends CWebTest {
 	/**
 	 * Check layout.
 	 */
-	public function testPageHostDashboards_Layout() {
+	public function testDashboardsHostDashboardPage_Layout() {
 		$this->openDashboardsForHost(self::HOST_NAME);
 
 		$this->page->assertTitle('Dashboards');
@@ -143,7 +143,7 @@ class testPageHostDashboards extends CWebTest {
 	/**
 	 * Open and close the Kiosk mode.
 	 */
-	public function testPageHostDashboards_CheckKioskMode() {
+	public function testDashboardsHostDashboardPage_CheckKioskMode() {
 		$this->openDashboardsForHost(self::HOST_NAME);
 
 		// Test Kiosk mode.
@@ -282,7 +282,7 @@ class testPageHostDashboards extends CWebTest {
 	 *
 	 * @dataProvider getCheckFiltersData
 	 */
-	public function testPageHostDashboards_CheckFilters($data) {
+	public function testDashboardsHostDashboardPage_CheckFilters($data) {
 		$this->openDashboardsForHost(self::HOST_NAME);
 		$filter = CFilterElement::find()->one();
 		$form = $filter->asForm(['normalized' => true]);
@@ -414,7 +414,7 @@ class testPageHostDashboards extends CWebTest {
 	 *
 	 * @dataProvider getCheckNavigationTabsData
 	 */
-	public function testPageHostDashboards_CheckNavigationTabs($data) {
+	public function testDashboardsHostDashboardPage_CheckNavigationTabs($data) {
 		// Create the required entities in database.
 		$api_dashboards = $this->createHostWithDashboards($data);
 
@@ -505,7 +505,7 @@ class testPageHostDashboards extends CWebTest {
 	 *
 	 * @dataProvider getCheckNavigationButtonsData
 	 */
-	public function testPageHostDashboards_CheckNavigationButtons($data) {
+	public function testDashboardsHostDashboardPage_CheckNavigationButtons($data) {
 		$this->openDashboardsForHost($data['host_name']);
 
 		$previous = $this->query($data['previous_button_selector'])->one();
@@ -555,7 +555,7 @@ class testPageHostDashboards extends CWebTest {
 	/**
 	 * Check Dashboard navigation using the dropdown.
 	 */
-	public function testPageHostDashboards_CheckNavigationDropdown() {
+	public function testDashboardsHostDashboardPage_CheckNavigationDropdown() {
 		// Create a Host with some Dashboards.
 		$data = [
 			'host_name' => 'Dashboards for dropdown',

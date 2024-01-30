@@ -18,6 +18,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 require_once dirname(__FILE__) . '/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
@@ -27,7 +28,7 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  *
  * @onBefore prepareTemplateDashboardsData
  */
-class testPageTemplateDashboards extends CWebTest {
+class testDashboardsTemplatedDashboardPage extends CWebTest {
 
 	/**
 	 * Attach TableBehavior to the test.
@@ -63,7 +64,7 @@ class testPageTemplateDashboards extends CWebTest {
 		}
 	}
 
-	public function testPageTemplateDashboards_Layout() {
+	public function testDashboardsTemplatedDashboardPage_Layout() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::TEMPLATEID);
 		$this->page->assertHeader('Dashboards');
 		$this->page->assertTitle('Configuration of dashboards');
@@ -103,7 +104,7 @@ class testPageTemplateDashboards extends CWebTest {
 	/**
 	 * @backup profiles
 	 */
-	public function testPageTemplateDashboards_Sort() {
+	public function testDashboardsTemplatedDashboardPage_Sort() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::TEMPLATEID);
 		$header = $this->query('link:Name')->one()->waitUntilClickable();
 
@@ -123,7 +124,7 @@ class testPageTemplateDashboards extends CWebTest {
 		}
 	}
 
-	public function testPageTemplateDashboards_Delete() {
+	public function testDashboardsTemplatedDashboardPage_Delete() {
 		$this->page->login()->open('zabbix.php?action=template.dashboard.list&templateid='.self::TEMPLATEID);
 		$table = $this->query('class:list-table')->asTable()->one()->waitUntilVisible();
 		$table->findRows('Name', self::DASHBOARDS_2_DELETE)->select();

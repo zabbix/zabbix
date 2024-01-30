@@ -44,36 +44,38 @@ require_once dirname(__FILE__).'/connectors/testFormConnectors.php';
 require_once dirname(__FILE__).'/connectors/testPageConnectors.php';
 
 // Dashboards.
-require_once dirname(__FILE__).'/dashboard/testDashboardClockWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardCopyWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardDynamicItemWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteGraphsWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardFavoriteMapsWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardForm.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGaugeWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGeomapWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGraphPrototypeWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardGraphWidgetSelectedHosts.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardHostAvailabilityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardItemValueWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardPages.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardPlainTextWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardProblemsBySeverityWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardProblemsWidgetDisplay.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardSlaReportWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardSystemInformationWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardTopHostsWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardTopTriggersWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardTriggerOverviewWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardURLWidget.php';
-require_once dirname(__FILE__).'/dashboard/testDashboardViewMode.php';
-require_once dirname(__FILE__).'/dashboard/testFormTemplateDashboards.php';
-require_once dirname(__FILE__).'/dashboard/testPageDashboardList.php';
-require_once dirname(__FILE__).'/dashboard/testPageDashboardWidgets.php';
-require_once dirname(__FILE__).'/dashboard/testPageHostDashboards.php';
-require_once dirname(__FILE__).'/dashboard/testPageTemplateDashboards.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsForm.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsHostDashboardPage.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsListPage.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsPages.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsTemplatedDashboardForm.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsTemplatedDashboardPage.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsViewMode.php';
+require_once dirname(__FILE__).'/dashboards/testDashboardsWidgetsPage.php';
+
+// Dashboard widgets.
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardClockWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardCopyWidgets.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardDynamicItemWidgets.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteGraphsWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGaugeWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardHostAvailabilityWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardItemValueWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardPlainTextWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsBySeverityWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardProblemsWidgetDisplay.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardSlaReportWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardSystemInformationWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopHostsWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTopTriggersWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardTriggerOverviewWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardURLWidget.php';
 
 // Event correlation.
 require_once dirname(__FILE__).'/eventCorrelation/testFormEventCorrelation.php';
@@ -362,12 +364,21 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageConnectors');
 
 		// Dashboards.
+		$suite->addTestSuite('testDashboardsForm');
+		$suite->addTestSuite('testDashboardsHostDashboardPage');
+		$suite->addTestSuite('testDashboardsListPage');
+		$suite->addTestSuite('testDashboardsPages');
+		$suite->addTestSuite('testDashboardsTemplatedDashboardForm');
+		$suite->addTestSuite('testDashboardsTemplatedDashboardPage');
+		$suite->addTestSuite('testDashboardsViewMode');
+		$suite->addTestSuite('testDashboardsWidgetsPage');
+
+		// Dashboard widgets.
 		$suite->addTestSuite('testDashboardClockWidget');
 		$suite->addTestSuite('testDashboardCopyWidgets');
 		$suite->addTestSuite('testDashboardDynamicItemWidgets');
 		$suite->addTestSuite('testDashboardFavoriteGraphsWidget');
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
-		$suite->addTestSuite('testDashboardForm');
 		$suite->addTestSuite('testDashboardGaugeWidget');
 		$suite->addTestSuite('testDashboardGeomapWidget');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
@@ -375,7 +386,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
 		$suite->addTestSuite('testDashboardHostAvailabilityWidget');
 		$suite->addTestSuite('testDashboardItemValueWidget');
-		$suite->addTestSuite('testDashboardPages');
 		$suite->addTestSuite('testDashboardPlainTextWidget');
 		$suite->addTestSuite('testDashboardProblemsBySeverityWidget');
 		$suite->addTestSuite('testDashboardProblemsWidget');
@@ -386,12 +396,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardTopTriggersWidget');
 		$suite->addTestSuite('testDashboardTriggerOverviewWidget');
 		$suite->addTestSuite('testDashboardURLWidget');
-		$suite->addTestSuite('testDashboardViewMode');
-		$suite->addTestSuite('testFormTemplateDashboards');
-		$suite->addTestSuite('testPageDashboardList');
-		$suite->addTestSuite('testPageDashboardWidgets');
-		$suite->addTestSuite('testPageHostDashboards');
-		$suite->addTestSuite('testPageTemplateDashboards');
 
 		// Event correlation.
 		$suite->addTestSuite('testFormEventCorrelation');
