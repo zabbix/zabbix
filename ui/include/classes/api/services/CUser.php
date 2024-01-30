@@ -38,9 +38,7 @@ class CUser extends CApiService {
 		'login' => [],
 		'logout' => ['min_user_type' => USER_TYPE_ZABBIX_USER],
 		'unblock' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN],
-		'getconfirmdata' => [],
-		'confirm' => []
+		'provision' => ['min_user_type' => USER_TYPE_SUPER_ADMIN]
 	];
 
 	protected $tableName = 'users';
@@ -3329,35 +3327,17 @@ class CUser extends CApiService {
 	 *                     data['state']
 	 *                     data['prompt_uri']
 	 */
-	public function getConfirmData(array $session_data): array {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' => 		['type' => API_STRING_UTF8, 'flags' => API_REQUIRED],
-			'mfaid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
-			'redirect_uri' =>	['type' => API_STRING_UTF8]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $session_data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
-		}
-
+	public static function getConfirmData(array $session_data): array {
 		$userid = DB::select('sessions', [
 			'output' => ['userid'],
 			'filter' => ['sessionid' => $session_data['sessionid']]
 		]);
 
 		if (!$userid) {
-			throw new Exception(_('You must login to view this page.'));
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
 		}
 
 		$userid = $userid[0];
-
-		[$failed_login_data] = DB::select('users', [
-			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
-			'userids' => $userid,
-			'limit' => 1
-		]);
-
-		self::checkLoginTemporarilyBlocked($failed_login_data);
 
 		[$mfa] = DB::select('mfa', [
 			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
@@ -3367,16 +3347,17 @@ class CUser extends CApiService {
 		]);
 
 		$data = [
+			'sessionid' => $session_data['sessionid'],
 			'mfa' => $mfa,
 			'userid' => $userid['userid']
 		];
 
 		if ($mfa['type'] == MFA_TYPE_TOTP) {
-			$totp_generator = $this->createTotpGenerator($data);
+			$totp_generator = self::createTotpGenerator($data['mfa']);
 
 			$user_totp_secret = DB::select('mfa_totp_secret', [
 				'output' => ['totp_secret'],
-				'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid]
+				'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
 			]);
 
 			if (!$user_totp_secret) {
@@ -3393,8 +3374,8 @@ class CUser extends CApiService {
 					$data['mfa']['api_hostname'], $session_data['redirect_uri']);
 			}
 			catch (DuoException $e) {
-				throw new Exception('Verify the values in Duo Universal Prompt MFA method are correct.'.
-					$e->getMessage()
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					'Verify the values in Duo Universal Prompt MFA method are correct.'. $e->getMessage()
 				);
 			}
 
@@ -3416,50 +3397,39 @@ class CUser extends CApiService {
 	 *
 	 * @param array $data
 	 */
-	public function confirm(array $data): bool {
-		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
-			'sessionid' => 			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'userid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-			'mfa' =>				['type' => API_OBJECT, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'fields' => [
-				'mfaid' =>				['type' => API_ID, 'flags' => API_REQUIRED | API_NOT_EMPTY],
-				'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
-				'name' =>				['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('mfa', 'name')],
-				'hash_function' =>		['type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
-				'code_length' =>		['type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
-				'api_hostname' => 		['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'api_hostname')],
-				'clientid' =>			['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'clientid')],
-				'client_secret' =>		['type' => API_STRING_UTF8, 'default' => DB::getDefault('mfa', 'client_secret')]
-			]],
-			'redirect_uri' =>		['type' => API_STRING_UTF8],
-			'mfa_response_data' => ['type' => API_OBJECT, 'fields' => [
-				'totp_secret' =>		['type' => API_STRING_UTF8],
-				'verification_code' =>	['type' => API_STRING_UTF8],
-				'state' =>				['type' => API_STRING_UTF8],
-				'username' =>			['type' => API_STRING_UTF8],
+	public static function confirm(array $data): array {
+		$userid = DB::select('sessions', [
+			'output' => ['userid'],
+			'filter' => ['sessionid' => $data['sessionid']]
+		]);
 
-				'duo_code' =>			['type' => API_STRING_UTF8],
-				'duo_state' =>			['type' => API_STRING_UTF8]
-			]]
-		]];
-
-		if (!CApiInputValidator::validate($api_input_rules, $data, '/', $error)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
+		if (!$userid) {
+			self::exception(ZBX_API_ERROR_PARAMETERS, _('You must login to view this page.'));
 		}
 
+		$userid = $userid[0];
+
+		[$mfa] = DB::select('mfa', [
+			'output' => ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
+				'client_secret'
+			],
+			'filter' => ['mfaid' => $data['mfaid']]
+		]);
+
 		[$failed_login_data] = DB::select('users', [
-			'output' => ['userid', 'username', 'attempt_failed'],
-			'userids' => $data['userid'],
+			'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
+			'userids' => $userid,
 			'limit' => 1
 		]);
 		$mfa_response_data = $data['mfa_response_data'];
 
-		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
-			$totp_generator = $this->createTotpGenerator($data);
+		if ($mfa['type'] == MFA_TYPE_TOTP) {
+			$totp_generator = self::createTotpGenerator($mfa);
 
 			if (!array_key_exists('totp_secret', $mfa_response_data) || $mfa_response_data['totp_secret'] == '') {
 				$user_totp_secret = DB::select('mfa_totp_secret', [
 					'output' => ['totp_secret'],
-					'filter' => ['mfaid' => $data['mfa']['mfaid'], 'userid' => $data['userid']]
+					'filter' => ['mfaid' => $mfa['mfaid'], 'userid' => $userid['userid']]
 				]);
 				$user_totp_secret = $user_totp_secret[0]['totp_secret'];
 			}
@@ -3472,8 +3442,8 @@ class CUser extends CApiService {
 			if ($valid_code) {
 				if (array_key_exists('totp_secret', $mfa_response_data) && $mfa_response_data['totp_secret'] != '') {
 					DB::insert('mfa_totp_secret', [[
-						'mfaid' => $data['mfa']['mfaid'],
-						'userid' =>$data['userid'],
+						'mfaid' => $mfa['mfaid'],
+						'userid' => $userid['userid'],
 						'totp_secret' => $mfa_response_data['totp_secret']
 					]]);
 				}
@@ -3481,29 +3451,48 @@ class CUser extends CApiService {
 			else {
 				self::increaseFailedLoginAttempts($failed_login_data);
 
-				throw new Exception(_('The verification code was incorrect, please try again.'));
+				if (($failed_login_data['attempt_failed'] + 1) >= CSettingsHelper::get(
+					CSettingsHelper::LOGIN_ATTEMPTS
+				)) {
+					[$failed_login_data] = DB::select('users', [
+						'output' => ['userid', 'username', 'attempt_failed', 'attempt_clock'],
+						'userids' => $userid,
+						'limit' => 1
+					]);
+				}
+
+				try {
+					self::checkLoginTemporarilyBlocked($failed_login_data);
+				}
+				catch (Exception $e) {
+					DB::delete('sessions', ['sessionid' => $data['sessionid']]);
+
+					throw $e;
+				}
+
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('The verification code was incorrect, please try again.'));
 			}
 		}
 
-		if ($data['mfa']['type'] == MFA_TYPE_DUO) {
+		if ($mfa['type'] == MFA_TYPE_DUO) {
 			if (!array_key_exists('state', $mfa_response_data) || !array_key_exists('username', $mfa_response_data)) {
-				throw new Exception(_('No saved state please login again.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('No saved state please login again.'));
 			}
 
 			if ($mfa_response_data['duo_state'] != $mfa_response_data['state']) {
-				throw new Exception(_('Duo state does not match saved state.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Duo state does not match saved state.'));
 			}
 
 			try {
-				$duo_client = new Client($data['mfa']['clientid'], $data['mfa']['client_secret'],
-					$data['mfa']['api_hostname'], $data['redirect_uri']
+				$duo_client = new Client($mfa['clientid'], $mfa['client_secret'],
+					$mfa['api_hostname'], $data['redirect_uri']
 				);
 
 				$duo_client->exchangeAuthorizationCodeFor2FAResult($mfa_response_data['duo_code'],
 					$mfa_response_data['username']
 				);
 			} catch (DuoException $e) {
-				throw new Exception(_('Error decoding Duo result.'));
+				self::exception(ZBX_API_ERROR_PARAMETERS, _('Error decoding Duo result.'));
 			}
 		}
 
@@ -3516,17 +3505,19 @@ class CUser extends CApiService {
 
 		DBexecute(
 			'DELETE FROM sessions'.
-				' WHERE '.dbConditionId('userid', [$data['userid']]).
+				' WHERE '.dbConditionId('userid', [$userid['userid']]).
 					' AND '.dbConditionInt('status', [ZBX_SESSION_VERIFICATION_REQUIRED]).
 					' AND lastaccess<'.zbx_dbstr($outdated)
 		);
 
 		CWebUser::checkAuthentication($data['sessionid']);
 		self::resetFailedLoginAttempts($failed_login_data);
-
 		self::addAuditLog(CAudit::ACTION_LOGIN_SUCCESS, CAudit::RESOURCE_USER);
 
-		return true;
+		return [
+			'sessionid' => $data['sessionid'],
+			'mfa' => $mfa
+		];
 	}
 
 	/**
@@ -3535,10 +3526,10 @@ class CUser extends CApiService {
 	 * @param $data
 	 * @return Google2FA
 	 */
-	private function createTotpGenerator($data): Google2FA {
+	private static function createTotpGenerator($data): Google2FA {
 		$totp_generator = new Google2FA();
 
-		switch ($data['mfa']['hash_function']) {
+		switch ($data['hash_function']) {
 			case TOTP_HASH_SHA256:
 				$totp_generator->setAlgorithm(Constants::SHA256);
 				break;
@@ -3553,7 +3544,7 @@ class CUser extends CApiService {
 
 		$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
 
-		if ($data['mfa']['code_length'] == TOTP_CODE_LENGTH_8) {
+		if ($data['code_length'] == TOTP_CODE_LENGTH_8) {
 			$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
 		}
 

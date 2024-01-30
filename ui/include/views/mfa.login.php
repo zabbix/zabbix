@@ -37,58 +37,57 @@ if (array_key_exists('error', $data) && $data['error']) {
 
 global $ZBX_SERVER_NAME;
 
-if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
-	if (array_key_exists('qr_code_url', $data)) {
-		switch ($data['mfa']['hash_function']) {
-			case TOTP_HASH_SHA256:
-				$hash_function = 'SHA256';
-				break;
+if (array_key_exists('qr_code_url', $data) && $data['qr_code_url']) {
+	switch ($data['mfa']['hash_function']) {
+		case TOTP_HASH_SHA256:
+			$hash_function = 'SHA256';
+			break;
 
-			case TOTP_HASH_SHA512:
-				$hash_function = 'SHA512';
-				break;
+		case TOTP_HASH_SHA512:
+			$hash_function = 'SHA512';
+			break;
 
-			default:
-				$hash_function = 'SHA1';
-		}
-
-		$form = (new CForm())
-			->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
-			->addVar('totp_secret', $data['totp_secret'])
-			->addVar('qr_code_url', $data['qr_code_url'])
-			->addItem([
-				(new CDiv(_('Scan this QR code')))->setAttribute('style', 'text-align: center; font-size: 20px'),
-				new CDiv(_('Please scan and get your verification code displayed in your authenticator app.')),
-				(new CDiv())->addClass('qr-code'),
-				new CDiv(
-					_s('Unable to scan? You can use %1$s secret key to manually configure your authenticator app:',
-						$hash_function)),
-				new CDiv($data['totp_secret'])
-			])
-			->addItem(
-				(new CList())
-					->addItem([
-						new CLabel(_('Verification code'), 'verification_code'),
-						(new CTextBox('verification_code'))->setAttribute('autofocus', 'autofocus'),
-						$error
-					])
-					->addItem(new CSubmit('enter', _('Sign in')))
-			);
+		default:
+			$hash_function = 'SHA1';
 	}
-	else {
-		$form = (new CForm())
-			->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
-			->addItem(
-				(new CList())
-					->addItem([
-						new CLabel(_('Verification code'), 'verification_code'),
-						(new CTextBox('verification_code'))->setAttribute('autofocus', 'autofocus'),
-						$error
-					])
-					->addItem(new CSubmit('enter', _('Sign in')))
-			);
-	}
+
+	$form = (new CForm())
+		->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
+		->addVar('totp_secret', $data['totp_secret'])
+		->addVar('qr_code_url', $data['qr_code_url'])
+		->addItem([
+			(new CDiv(_('Scan this QR code')))->setAttribute('style', 'text-align: center; font-size: 20px'),
+			new CDiv(_('Please scan and get your verification code displayed in your authenticator app.')),
+			(new CDiv())->addClass('qr-code'),
+			new CDiv(
+				_s('Unable to scan? You can use %1$s secret key to manually configure your authenticator app:',
+					$hash_function)),
+			new CDiv($data['totp_secret'])
+		])
+		->addItem(
+			(new CList())
+				->addItem([
+					new CLabel(_('Verification code'), 'verification_code'),
+					(new CTextBox('verification_code'))->setAttribute('autofocus', 'autofocus'),
+					$error
+				])
+				->addItem(new CSubmit('enter', _('Sign in')))
+		);
 }
+else {
+	$form = (new CForm())
+		->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
+		->addItem(
+			(new CList())
+				->addItem([
+					new CLabel(_('Verification code'), 'verification_code'),
+					(new CTextBox('verification_code'))->setAttribute('autofocus', 'autofocus'),
+					$error
+				])
+				->addItem(new CSubmit('enter', _('Sign in')))
+		);
+}
+
 
 (new CDiv([
 	(new CTag('main', true, [

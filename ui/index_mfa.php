@@ -19,8 +19,8 @@
 **/
 
 
-require_once dirname(__FILE__).'/include/classes/user/CWebUser.php';
-require_once dirname(__FILE__).'/include/config.inc.php';
+require_once __DIR__.'/include/classes/user/CWebUser.php';
+require_once __DIR__.'/include/config.inc.php';
 
 CMessageHelper::clear();
 
@@ -64,38 +64,54 @@ $duo_redirect_uri = ((new CUrl($_SERVER['REQUEST_URI']))
 	->setArgument('request', $request)
 	->toString();
 
-$session_data['redirect_uri'] = implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri]);
-$session_data_required = array_intersect_key($session_data, array_flip(['sessionid', 'mfaid', 'redirect_uri']));
-$confirm_data = API::User()->getConfirmData($session_data_required);
+$full_duo_redirect_url = implode('', [HTTPS ? 'https://' : 'http://', $_SERVER['HTTP_HOST'], $duo_redirect_uri]);
+$session_data_required = array_intersect_key($session_data, array_flip(['sessionid', 'mfaid']));
 
-$error = array_column(get_and_clear_messages(), 'message');
+$error = null;
 
-if ($error) {
-	redirectToGeneralWarningPage($error, $redirect_to);
-	exit;
-}
+if (!CSessionHelper::has('state') && !hasRequest('enter')) {
+	try {
+		$data = CUser::getConfirmData($session_data_required + ['redirect_uri' => $full_duo_redirect_url]);
 
-if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
-	// Check of submitted verification code.
-	if (hasRequest('enter')) {
-		$mfa_response_data = [
-			'mfa_response_data' => [
-				'verification_code' => getRequest('verification_code', '')
-		]];
-
-		if (hasRequest('totp_secret')) {
-			$mfa_response_data['mfa_response_data']['totp_secret'] = getRequest('totp_secret');
+		if ($data['mfa']['type'] == MFA_TYPE_TOTP) {
+			echo (new CView('mfa.login', $data))->getOutput();
+			exit;
 		}
 
-		$data_to_check = array_merge($session_data_required, $confirm_data, $mfa_response_data);
-		unset($data_to_check['mfaid'], $data_to_check['qr_code_url'], $data_to_check['totp_secret']);
+		if ($data['mfa']['type'] == MFA_TYPE_DUO) {
+			CSessionHelper::set('state', $data['state']);
+			CSessionHelper::set('username', $data['username']);
+			CSessionHelper::set('sessionid', $data['sessionid']);
 
-		$confirm = API::User()->confirm($data_to_check);
+			header('Location: '.$data['prompt_uri']);
+		}
+	}
+	catch (Exception $e) {
+		$error['error']['message'] = $e->getMessage();
+
+		redirectToGeneralWarningPage($error, $redirect_to);
+		exit;
+	}
+}
+else {
+	$data = $session_data_required;
+	$data['redirect_uri'] = $full_duo_redirect_url;
+	$data['mfa_response_data'] = [
+		'verification_code' => getRequest('verification_code', ''),
+		'totp_secret' => getRequest('totp_secret'),
+		'duo_code' => getRequest('duo_code'),
+		'duo_state' => getRequest('state'),
+		'state' => array_key_exists('state', $session_data) ? $session_data['state'] : '',
+		'username' => array_key_exists('username', $session_data) ? $session_data['username'] : ''
+	];
+
+	try {
+		$confirm = CUser::confirm($data);
 
 		if ($confirm) {
-			CWebUser::checkAuthentication($session_data['sessionid']);
+			CWebUser::checkAuthentication($confirm['sessionid']);
 			CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-			CSessionHelper::unset(['mfaid']);
+			CSessionHelper::unset(['mfaid', 'state', 'username']);
 
 			API::getWrapper()->auth = [
 				'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
@@ -105,75 +121,30 @@ if ($confirm_data['mfa']['type'] == MFA_TYPE_TOTP) {
 			$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
 			redirect(reset($redirect));
 		}
-		elseif(hasRequest('qr_code_url')) {
-			// Show QR code and TOTP secret again, if initial setup verification code was incorrect.
-			$confirm_data['qr_code_url'] = getRequest('qr_code_url');
-			$confirm_data['totp_secret'] = getRequest('totp_secret');
-		}
 	}
+	catch (Exception $e) {
+		$error['error']['message'] = $e->getMessage();
 
-	$messages = get_and_clear_messages();
-	$confirm_data['error'] = $messages ? array_pop($messages) : null;
+		CMessageHelper::clear();
 
-	echo (new CView('mfa.login', $confirm_data))->getOutput();
-	exit;
-}
+		if ($error['error'] && $error['error']['message'] ==
+			_('The verification code was incorrect, please try again.')
+		) {
+			$data['qr_code_url'] = getRequest('qr_code_url');
+			$data['totp_secret'] = getRequest('totp_secret');
 
-
-if ($confirm_data['mfa']['type'] == MFA_TYPE_DUO) {
-	if (!CSessionHelper::has('state')) {
-		CSessionHelper::set('state', $confirm_data['state']);
-		CSessionHelper::set('username', $confirm_data['username']);
-		CSessionHelper::set('sessionid', $session_data['sessionid']);
-
-		header('Location: '.$confirm_data['prompt_uri']);
-	}
-	else {
-		if (hasRequest('error')) {
-			$error_msg = getRequest('error') . ":" . getRequest('error_description');
-			CMessageHelper::addError(_($error_msg));
+			echo (new CView('mfa.login', $data + $error))->getOutput();
+			exit;
 		}
-		else {
-			$mfa_response_data = [
-				'mfa_response_data' => [
-					'duo_code' => getRequest('duo_code'),
-					'duo_state' => getRequest('state'),
-					'state' => $session_data['state'],
-					'username' => $session_data['username']
-				]
-			];
-
-			$data_to_check = array_merge($mfa_response_data, $confirm_data, $session_data_required);
-			unset($data_to_check['mfaid'], $data_to_check['prompt_uri'], $data_to_check['username'],
-				$data_to_check['state']
-			);
-
-			$confirm = API::User()->confirm($data_to_check);
-
-			if ($confirm) {
-				CWebUser::checkAuthentication($session_data['sessionid']);
-				CSessionHelper::set('sessionid', CWebUser::$data['sessionid']);
-				CSessionHelper::unset(['mfaid', 'state', 'username']);
-
-				API::getWrapper()->auth = [
-					'type' => CJsonRpc::AUTH_TYPE_FRONTEND,
-					'auth' => CWebUser::$data['sessionid']
-				];
-
-				$redirect = array_filter([$request, CWebUser::$data['url'], CMenuHelper::getFirstUrl()]);
-				redirect(reset($redirect));
-			}
-		}
-
-		CSessionHelper::unset(['state', 'username']);
-
-		$error = array_column(get_and_clear_messages(), 'message');
 
 		redirectToGeneralWarningPage($error, $redirect_to);
+		exit;
 	}
 }
 
 function redirectToGeneralWarningPage(array $error, CUrl $redirect_to): void {
+	CMessageHelper::clear();
+
 	echo (new CView('general.warning', [
 		'header' => _('You are not logged in'),
 		'messages' => $error,
