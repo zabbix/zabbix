@@ -82,7 +82,7 @@ func (cp *common) osSkip(path string, d fs.DirEntry) bool {
 		return true
 	}
 
-	cp.files[iData] = struct{}{}
+	cp.files[iData] = true
 
 	return false
 }

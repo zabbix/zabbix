@@ -44,7 +44,7 @@ type common struct {
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
-	files         map[inodeData]interface{}
+	files         map[inodeData]bool
 }
 
 func init() {

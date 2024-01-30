@@ -136,7 +136,7 @@ func (sp *sizeParams) skip(path string, d fs.DirEntry) (bool, error) {
 
 func getSizeParams(params []string) (out sizeParams, err error) {
 	out.maxDepth = -1
-	out.files = make(map[inodeData]interface{})
+	out.files = make(map[inodeData]bool)
 
 	switch len(params) {
 	case sixthParam:
