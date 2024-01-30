@@ -74,22 +74,25 @@ class testDashboardsListPage extends CWebTest {
 
 	public static function getCheckFilterData() {
 		return [
+			// #0.
 			[
 				[
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 20
+					'result_count' => 16
 				]
 			],
+			// #1.
 			[
 				[
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 19
+					'result_count' => 15
 				]
 			],
+			// #2.
 			[
 				[
 					'fields' => [
@@ -99,15 +102,17 @@ class testDashboardsListPage extends CWebTest {
 					'result_count' => 3
 				]
 			],
+			// #3.
 			[
 				[
 					'fields' => [
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 12
+					'result_count' => 9
 				]
 			],
+			// #4.
 			[
 				[
 					'fields' => [
@@ -116,6 +121,7 @@ class testDashboardsListPage extends CWebTest {
 					'result_count' => 0
 				]
 			],
+			// #5.
 			[
 				[
 					'fields' => [
@@ -124,6 +130,7 @@ class testDashboardsListPage extends CWebTest {
 					'result_count' => 1
 				]
 			],
+			// #6.
 			[
 				[
 					'fields' => [
@@ -155,6 +162,7 @@ class testDashboardsListPage extends CWebTest {
 		}
 		$this->assertTableStats($data['result_count']);
 		$form->query('button:Reset')->one()->click();
+		$this->page->waitUntilReady();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 	}
 
