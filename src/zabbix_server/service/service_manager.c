@@ -459,6 +459,7 @@ static void	remove_service_problem_tag_index(zbx_hashset_t *service_problem_tags
 		else
 		{
 			value_eq_local.value = service_problem_tag->value;
+
 			if (NULL != (value_eq = zbx_hashset_search(&tag_services->values, &value_eq_local)))
 			{
 				int	i = zbx_vector_service_problem_tag_ptr_search(&value_eq->service_problem_tags,
@@ -1752,7 +1753,7 @@ out:
 
 typedef struct
 {
-	zbx_service_t	*service; /* not owner, no need to cleanup */
+	zbx_service_t	*service;
 	int		severity;
 }
 zbx_service_severity_t;
@@ -1762,6 +1763,7 @@ ZBX_PTR_VECTOR_IMPL(service_severity_ptr, zbx_service_severity_t *)
 
 static void	zbx_service_severity_free(zbx_service_severity_t *service_severity)
 {
+	/* not owner, no need to cleanup */
 	zbx_free(service_severity);
 }
 
