@@ -263,7 +263,7 @@ static void	process_trap(const char *addr, char *begin, char *end)
  *             log_level - [IN]                                               *
  *                                                                            *
  ******************************************************************************/
-static void	delay_trap_logs(char *error, int log_level)
+static void	delay_trap_logs(const char *error, int log_level)
 {
 	static int		lastlogtime = 0;
 	static zbx_hash_t	last_error_hash = 0;
