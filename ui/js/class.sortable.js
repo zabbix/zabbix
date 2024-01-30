@@ -167,6 +167,13 @@ class CSortable {
 	}
 
 	/**
+	 * Invoke the callback as soon as the instance has processed the updated token data.
+	 */
+	whenReady(callback) {
+		requestAnimationFrame(() => callback());
+	}
+
+	/**
 	 * Enable or disable the instance.
 	 *
 	 * @param {boolean} enable
@@ -177,8 +184,8 @@ class CSortable {
 		}
 
 		if (enable) {
-			this.#updateTokens();
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+			this.#updateTokens();
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
@@ -239,6 +246,10 @@ class CSortable {
 	}
 
 	#updateTokens() {
+		for (const token of this.#tokens) {
+			this.#clearAnimation(token);
+		}
+
 		this.#tokens = [];
 
 		for (const element of this.#target.querySelectorAll(':scope > *')) {
@@ -280,8 +291,18 @@ class CSortable {
 	#sortTokens(tokens = this.#tokens) {
 		this.#unobserveTokens();
 
+		const elements_old = [...this.#target.children];
+		const elements_new = [];
+
 		for (const token of tokens) {
 			for (const element of token.elements) {
+				elements_new.push(element);
+			}
+		}
+
+		if (elements_new.length !== elements_old.length
+				|| elements_new.some((element, index) => element !== elements_old[index])) {
+			for (const element of elements_new) {
 				this.#target.appendChild(element);
 			}
 		}
@@ -607,11 +628,15 @@ class CSortable {
 		if (!this.#is_dragging) {
 			this.#startDrag(client_pos);
 
+			this.#unobserveTokens();
+
 			this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
 
 			for (const element of this.#drag_token.elements) {
 				element.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
 			}
+
+			this.#observeTokens();
 
 			this.#drag_style = document.createElement('style');
 			document.head.appendChild(this.#drag_style);
@@ -625,11 +650,15 @@ class CSortable {
 		if (this.#is_dragging) {
 			this.#endDrag();
 
+			this.#unobserveTokens();
+
 			this.#target.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
 
 			for (const element of this.#drag_token.elements) {
 				element.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
 			}
+
+			this.#observeTokens();
 
 			this.#drag_style.remove();
 
@@ -721,6 +750,7 @@ class CSortable {
 			subtree: true,
 			childList: true,
 			attributes: true,
+			attributeFilter: ['class'],
 			characterData: true
 		});
 	}
