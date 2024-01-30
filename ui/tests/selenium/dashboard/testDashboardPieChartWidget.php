@@ -48,10 +48,19 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * Create the needed initial data in database and set static variables.
 	 */
 	public function prepareData() {
-		// Set Pie chart as the default widget type.
-		DBexecute("DELETE FROM profiles WHERE idx='web.dashboard.last_widget_type' AND userid='1'");
-		DBexecute('INSERT INTO profiles (profileid, userid, idx, value_str, type)'.
-				" VALUES (99999, 1, 'web.dashboard.last_widget_type', 'piechart', 3)");
+		// For faster tests set Pie chart as the default widget type.
+		DB::delete('profiles', ['idx' => 'web.dashboard.last_widget_type', 'userid' => 1]);
+		DB::insert('profiles',
+			[
+				[
+					'profileid' => 99999,
+					'userid' => 1,
+					'idx' => 'web.dashboard.last_widget_type',
+					'value_str' => 'piechart',
+					'type' => 3
+				]
+			]
+		);
 
 		// Create a Dashboard for creating widgets.
 		$dashboards = CDataHelper::call('dashboard.create', [
@@ -125,6 +134,12 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$dialog = COverlayDialogElement::find()->one();
 		$this->assertEquals('Add widget', $dialog->getTitle());
+
+		// Assert that the widget Type field works as expected.
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Clock')]);
+		$this->assertFalse($form->query('id:data_set')->exists());
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Pie chart')]);
+		$this->assertTrue($form->query('id:data_set')->exists());
 
 		// Check Help button.
 		$this->assertTrue($dialog->query('xpath:.//*[@title="Help"]')->one()->isClickable());
@@ -1239,6 +1254,12 @@ class testDashboardPieChartWidget extends CWebTest {
 				}
 				$data_set = $this->remapDataSet($data_set, $i);
 				$form->checkValue($data_set);
+
+				// Check data set label.
+				$label = CTestArrayHelper::get($data_set, 'Data set label', 'Data set #'.$i + 1);
+				$this->assertEquals($label,
+					$form->query('xpath:.//li[@data-set="'.$i.'"]//label[@class="sortable-drag-handle js-dataset-label"]')->one()->getText()
+				);
 
 				// Open the next data set, if it exists.
 				if ($i !== $last) {
