@@ -145,8 +145,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_TSIZE	5
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
-
-	char		*procname, *proccomm, *param, *args, *mem_type = NULL;
+	char		*procname, *proccomm, *param, *args, *mem_type = NULL, *rxp_error = NULL;
 	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
@@ -157,6 +156,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	unsigned long 	mem_pages;
 #endif
 	size_t	sz;
+	zbx_regexp_t	*proccomm_rxp = NULL;
 
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
@@ -206,6 +206,19 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (NULL != proccomm && '\0' != *proccomm)
+	{
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			return SYSINFO_RET_FAIL;
+		}
+	}
+
 	mem_type = get_rparam(request, 4);
 
 	if (NULL == mem_type || '\0' == *mem_type || 0 == strcmp(mem_type, "size"))
@@ -307,7 +320,7 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			if (NULL == (args = get_commandline(&proc[i])))
 				continue;
 
-			if (NULL == zbx_regexp_match(args, proccomm, NULL))
+			if (0 != zbx_regexp_match_precompiled(args, proccomm_rxp))
 				continue;
 		}
 
@@ -391,6 +404,9 @@ out:
 			SET_DBL_RESULT(result, pct_size);
 	}
 
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
+
 	return SYSINFO_RET_OK;
 
 #undef ZBX_SIZE
@@ -404,12 +420,13 @@ out:
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
-	char			*procname, *proccomm, *param, *args;
+	char			*procname, *proccomm, *param, *args, *rxp_error = NULL;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
 	int			count, i, proc_ok, stat_ok, comm_ok, mib[4], mibs;
 	size_t			sz;
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
+	zbx_regexp_t		*proccomm_rxp = NULL;
 
 	if (4 < request->nparam)
 	{
@@ -460,6 +477,18 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 
 	proccomm = get_rparam(request, 3);
+
+	if (NULL != proccomm && '\0' != *proccomm)
+	{
+		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
+		{
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
+			zbx_free(rxp_error);
+			return SYSINFO_RET_FAIL;
+		}
+	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
 		goto out;
@@ -542,7 +571,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		if (NULL != proccomm && '\0' != *proccomm)
 		{
 			if (NULL != (args = get_commandline(&proc[i])))
-				if (NULL != zbx_regexp_match(args, proccomm, NULL))
+				if (0 == zbx_regexp_match_precompiled(args, proccomm_rxp))
 					comm_ok = 1;
 		}
 		else
@@ -554,6 +583,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_free(proc);
 out:
 	SET_UI64_RESULT(result, proccount);
+
+	if (NULL != proccomm_rxp)
+		zbx_regexp_free(proccomm_rxp);
 
 	return SYSINFO_RET_OK;
 }
