@@ -1411,8 +1411,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_unavailable_delay, config_unreachable_period,
 								config_unreachable_delay,
 								config_max_concurrent_checks_per_poller,
-								config_externalscripts, config_java_gateway,
-								config_java_gateway_port};
+								get_config_forks, config_java_gateway,
+								config_java_gateway_port, config_externalscripts};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1426,8 +1426,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_taskmanager_args		taskmanager_args = {&config_comms, get_zbx_program_type, zbx_progname,
 								config_startup_time, zbx_config_enable_remote_commands,
 								zbx_config_log_remote_commands, config_hostname,
-								get_config_forks, config_externalscripts,
-								config_java_gateway, config_java_gateway_port};
+								get_config_forks, config_java_gateway,
+								config_java_gateway_port, config_externalscripts};
 	zbx_thread_httppoller_args		httppoller_args = {zbx_config_source_ip, config_ssl_ca_location,
 								config_ssl_cert_location, config_ssl_key_location};
 	zbx_thread_discoverer_args		discoverer_args = {zbx_config_tls, get_zbx_program_type,
@@ -1437,8 +1437,9 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zbx_thread_trapper_args			trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 								zbx_progname, &events_cbs, &listen_sock,
 								config_startup_time, config_proxydata_frequency,
-								get_config_forks, config_stats_allowed_ip, config_externalscripts,
-								config_java_gateway, config_java_gateway_port};
+								get_config_forks, config_stats_allowed_ip,
+								config_java_gateway, config_java_gateway_port,
+								config_externalscripts};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};

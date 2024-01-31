@@ -78,7 +78,10 @@ typedef struct
 	int		offline_ticks_active;
 
 	/* 0 if auditlog is disabled */
-	int		auditlog;
+	int		auditlog_enabled;
+
+	/* 0 if audit logging for autoregistration, network discovery or LLD is disabled */
+	int		auditlog_mode;
 
 	const char	*name;
 	char		*error;
@@ -400,15 +403,19 @@ static int	ha_db_update_config(zbx_ha_info_t *info)
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
 
-	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled from config")))
+	if (NULL == (result = ha_db_select(info, "select ha_failover_delay,auditlog_enabled,auditlog_mode "
+			"from config")))
+	{
 		return FAIL;
+	}
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
 		if (SUCCEED != zbx_is_time_suffix(row[0], &info->failover_delay, ZBX_LENGTH_UNLIMITED))
 			THIS_SHOULD_NEVER_HAPPEN;
 
-		info->auditlog = atoi(row[1]);
+		info->auditlog_enabled = atoi(row[1]);
+		info->auditlog_mode = atoi(row[2]);
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
@@ -671,11 +678,11 @@ static void	ha_flush_audit(zbx_ha_info_t *info)
 {
 	if (ZBX_DB_OK > info->db_status)
 	{
-		zbx_audit_clean();
+		zbx_audit_clean(ZBX_AUDIT_HA_CONTEXT);
 		return;
 	}
 
-	info->db_status = zbx_audit_flush_once();
+	info->db_status = zbx_audit_flush_once(ZBX_AUDIT_HA_CONTEXT);
 }
 
 /******************************************************************************
@@ -736,7 +743,7 @@ static void	ha_db_create_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 			" values ('%s','%s',%d," ZBX_DB_TIMESTAMP() ")",
 			nodeid.str, name_esc, ZBX_NODE_STATUS_STOPPED))
 	{
-		zbx_audit_init(info->auditlog);
+		zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
 		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_ADD, nodeid.str, info->name);
 		zbx_audit_ha_add_create_fields(nodeid.str, info->name, ZBX_NODE_STATUS_STOPPED);
 		ha_flush_audit(info);
@@ -789,8 +796,8 @@ static int	ha_db_check_unavailable_nodes(zbx_ha_info_t *info, zbx_vector_ha_node
 		{
 			zbx_vector_str_append(&unavailable_nodes, nodes->values[i]->ha_nodeid.str);
 
-			zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, nodes->values[i]->ha_nodeid.str,
-					nodes->values[i]->name);
+			zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE,
+					nodes->values[i]->ha_nodeid.str, nodes->values[i]->name);
 			zbx_audit_ha_update_field_int(nodes->values[i]->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
 					nodes->values[i]->status, ZBX_NODE_STATUS_UNAVAILABLE);
 		}
@@ -877,7 +884,7 @@ static void	ha_db_register_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 	ha_status = SUCCEED == activate ? ZBX_NODE_STATUS_ACTIVE : ZBX_NODE_STATUS_STANDBY;
 	ha_get_external_address(&address, &port, ha_config);
 
-	zbx_audit_init(info->auditlog);
+	zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
 	zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess="
@@ -885,7 +892,8 @@ static void	ha_db_register_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 
 	if (ha_status != node->status)
 	{
-		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, node->status, ha_status);
+		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS,
+				node->status, ha_status);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",status=%d", ha_status);
 	}
 
@@ -894,14 +902,16 @@ static void	ha_db_register_node(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 		char	*address_esc;
 
 		address_esc = zbx_db_dyn_escape_string(address);
-		zbx_audit_ha_update_field_string(node->ha_nodeid.str, ZBX_AUDIT_HA_ADDRESS, node->address, address);
+		zbx_audit_ha_update_field_string(node->ha_nodeid.str, ZBX_AUDIT_HA_ADDRESS,
+				node->address, address);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",address='%s'", address_esc);
 		zbx_free(address_esc);
 	}
 
 	if (port != node->port)
 	{
-		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_PORT, node->port, port);
+		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_PORT, node->port,
+				port);
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset, ",port=%d", port);
 	}
 
@@ -952,12 +962,12 @@ static int	ha_check_standby_nodes(zbx_ha_info_t *info, zbx_vector_ha_node_t *nod
 {
 	int	ret;
 
-	zbx_audit_init(info->auditlog);
+	zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
 
 	if (SUCCEED == (ret = ha_db_check_unavailable_nodes(info, nodes, db_time)))
 		ha_flush_audit(info);
 	else
-		zbx_audit_clean();
+		zbx_audit_clean(ZBX_AUDIT_HA_CONTEXT);
 
 	return ret;
 }
@@ -1093,7 +1103,7 @@ static void	ha_check_nodes(zbx_ha_info_t *info, zbx_ha_config_t *ha_config)
 
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset, "update ha_node set lastaccess=" ZBX_DB_TIMESTAMP());
 
-	zbx_audit_init(info->auditlog);
+	zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
 
 	if (ha_status != node->status)
 	{
@@ -1299,7 +1309,7 @@ static int	ha_remove_node_impl(zbx_ha_info_t *info, const char *node, char **res
 	}
 	else
 	{
-		zbx_audit_init(info->auditlog);
+		zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
 		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_DELETE, nodes.values[i]->ha_nodeid.str,
 				nodes.values[i]->name);
 		ha_flush_audit(info);
@@ -1421,9 +1431,10 @@ static void	ha_set_failover_delay(zbx_ha_info_t *info, zbx_ipc_client_t *client,
 		zabbix_log(LOG_LEVEL_WARNING, "HA failover delay set to %ds", delay);
 
 		ZBX_STR2UINT64(configid, row[0]);
-		zbx_audit_init(info->auditlog);
-		zbx_audit_settings_create_entry(ZBX_AUDIT_ACTION_UPDATE, configid);
-		zbx_audit_settings_update_field_int(configid, "settings.ha_failover_delay", atoi(row[1]), delay);
+		zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
+		zbx_audit_settings_create_entry(ZBX_AUDIT_HA_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, configid);
+		zbx_audit_settings_update_field_int(ZBX_AUDIT_HA_CONTEXT, configid, "settings.ha_failover_delay",
+				atoi(row[1]), delay);
 		ha_flush_audit(info);
 	}
 	else
@@ -1509,7 +1520,7 @@ static void	ha_db_update_exit_status(zbx_ha_info_t *info)
 	if (SUCCEED == ha_db_execute(info, "update ha_node set status=%d where ha_nodeid='%s'",
 			ZBX_NODE_STATUS_STOPPED, info->ha_nodeid.str))
 	{
-		zbx_audit_init(info->auditlog);
+		zbx_audit_init(info->auditlog_enabled, info->auditlog_mode, ZBX_AUDIT_HA_CONTEXT);
 		zbx_audit_ha_create_entry(ZBX_AUDIT_ACTION_UPDATE, info->ha_nodeid.str, info->name);
 		zbx_audit_ha_update_field_int(info->ha_nodeid.str, ZBX_AUDIT_HA_STATUS, info->ha_status,
 				ZBX_NODE_STATUS_STOPPED);
@@ -1852,7 +1863,8 @@ ZBX_THREAD_ENTRY(ha_manager_thread, args)
 	info.offline_ticks_active = 0;
 	info.lastaccess_active = 0;
 	info.failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
-	info.auditlog = 0;
+	info.auditlog_enabled = 0;
+	info.auditlog_mode = 0;
 
 	tick = zbx_time();
 

@@ -25,11 +25,12 @@
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve data from script executed on Zabbix server               *
+ * Purpose: retrieves data from script executed on Zabbix server              *
  *                                                                            *
- * Parameters: item                   - [IN] item we are interested in        *
- *             config_externalscripts - [IN]                                  *
- *             result                 - [OUT]                                 *
+ * Parameters:                                                                *
+ *             item                    - [IN] item we are interested in       *
+ *             config_externalscsripts - [IN]                                 *
+ *             result                  - [OUT]                                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
@@ -40,7 +41,7 @@ int	get_value_external(const zbx_dc_item_t *item, const char *config_externalscr
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		i, ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
@@ -62,7 +63,7 @@ int	get_value_external(const zbx_dc_item_t *item, const char *config_externalscr
 		goto out;
 	}
 
-	for (i = 0; i < get_rparams_num(&request); i++)
+	for (int i = 0; i < get_rparams_num(&request); i++)
 	{
 		const char	*param;
 		char		*param_esc;

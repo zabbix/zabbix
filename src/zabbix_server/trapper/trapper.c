@@ -1112,7 +1112,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
-		const char *config_externalscripts, const char *config_java_gateway, int config_java_gateway_port)
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
 {
 	int	ret = SUCCEED;
 
@@ -1201,7 +1201,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			{
 				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
 						zbx_get_program_type_cb(), progname, get_config_forks,
-						config_externalscripts, config_java_gateway, config_java_gateway_port);
+						config_java_gateway, config_java_gateway_port, config_externalscripts);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1302,7 +1302,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
-		const char *config_externalscripts, const char *config_java_gateway, int config_java_gateway_port)
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
 {
 	ssize_t	bytes_received;
 
@@ -1311,7 +1311,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
-			config_externalscripts, config_java_gateway, config_java_gateway_port);
+			config_java_gateway, config_java_gateway_port, config_externalscripts);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1410,8 +1410,9 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					trapper_args_in->proxydata_frequency,
 					trapper_args_in->get_process_forks_cb_arg,
 					trapper_args_in->config_stats_allowed_ip, trapper_args_in->progname,
-					trapper_args_in->config_externalscripts, trapper_args_in->config_java_gateway,
-					trapper_args_in->config_java_gateway_port);
+					trapper_args_in->config_java_gateway,
+					trapper_args_in->config_java_gateway_port,
+					trapper_args_in->config_externalscripts);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

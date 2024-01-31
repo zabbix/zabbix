@@ -25,7 +25,7 @@
 void	zbx_audit_item_update_json_add_lld_data(zbx_uint64_t itemid, const zbx_lld_item_full_t *item,
 		const zbx_lld_item_prototype_t *item_prototype, zbx_uint64_t hostid)
 {
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_LLD_CONTEXT);
 
 #define IT(s) "item."#s
 #define ADD_JSON_S(x, t, f)	zbx_audit_update_json_append_string(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, \

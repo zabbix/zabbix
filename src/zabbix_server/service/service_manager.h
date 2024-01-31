@@ -25,6 +25,7 @@
 typedef struct
 {
 	int	config_timeout;
+	int	config_service_manager_sync_frequency;
 }
 zbx_thread_service_manager_args;
 
