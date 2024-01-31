@@ -233,7 +233,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->query('id:displaying_options')->one()->waitUntilVisible();
 		$form->invalidate();
 
-		$this->assertNonUniformLabel('Merge sectors smaller than ', $form);
+		$this->assertTrue($form->query('xpath:.//label[text()="Merge sectors smaller than"]')->exists());
 
 		foreach (['History data selection', 'Draw', 'Space between sectors'] as $label) {
 			$this->assertTrue($form->getLabel($label)->isVisible());
@@ -311,9 +311,9 @@ class testDashboardPieChartWidget extends CWebTest {
 		$form->fill(['Time period' => 'Widget']);
 		$form->checkValue(['Widget' => '']);
 		$widget_field = $form->getField('Widget');
-		$this->assertTrue($widget_field->isVisible());
-		$this->assertTrue($widget_field->isEnabled());
-		$this->assertTrue($form->isRequired('Widget'));
+		$this->assertTrue($widget_field->isVisible(), $widget_field->isEnabled(), $form->isRequired('Widget'),
+				'Widget field is not interactable or is not required'
+		);
 		$this->assertFieldAttributes($form, 'Widget', ['placeholder' => 'type here to search'], true);
 		$widget_field->query('button:Select')->waitUntilClickable()->one()->click();
 		$widget_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
@@ -1082,7 +1082,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			}
 
 			// Fail test if no match found.
-			throw new Exception('Expected sector for '.$item_name.' not found.');
+			$this->fail('Expected sector for '.$item_name.' not found.');
 		}
 
 		// Assert expected Total value.
@@ -1162,22 +1162,6 @@ class testDashboardPieChartWidget extends CWebTest {
 		$range = $form->getField($label)->query('xpath:.//input[@type="range"]')->one();
 		foreach ($expected_values as $attribute => $expected_value) {
 			$this->assertEquals($expected_value, $range->getAttribute($attribute));
-		}
-	}
-
-	/**
-	 * Checks that a given label exists in a form.
-	 *
-	 * @param string       $label    label to assert
-	 * @param CFormElement $form     form that this label should exist in.
-	 */
-	protected function assertNonUniformLabel($label, $form) {
-		try {
-			$this->assertTrue($form->query('xpath:.//label[text()='.CXPathHelper::escapeQuotes($label).']')->exists());
-		}
-		catch (PHPUnit\Framework\ExpectationFailedException $e) {
-			// Throw a more detailed error.
-			throw new Exception("Failed to find label: ".$label);
 		}
 	}
 
@@ -1500,7 +1484,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Opens the Pie chart dashboard.
 	 *
-	 * @param  login                skips logging in if set to false
+	 * @param bool login            skips logging in if set to false
 	 *
 	 * @return CDashboardElement    dashboard element of the Pie chart dashboard
 	 */
