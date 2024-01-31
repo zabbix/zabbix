@@ -74,7 +74,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$response = CDataHelper::createHosts([
 			[
 				'host' => self::HOST_NAME_ITEM_LIST,
-				'groups' => [['groupid' => '6']], // Virtual machines.
+				'groups' => [['groupid' => 6]], // Virtual machines.
 				'items' => [
 					[
 						'name' => 'item-1',
@@ -92,7 +92,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			],
 			[
 				'host' => self::HOST_NAME_SCREENSHOTS,
-				'groups' => [['groupid' => '6']], // Virtual machines.
+				'groups' => [['groupid' => 6]], // Virtual machines.
 				'items' => [
 					[
 						'name' => 'item-1',
@@ -1031,7 +1031,11 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$dashboard = $this->openDashboard();
 		$widget = $dashboard->getWidgets()->first();
-		$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
+
+		// Only look sectors up if checking sectors.
+		if (CTestArrayHelper::get($data, 'expected_sectors')) {
+			$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
+		}
 
 		// Assert Pie chart sectors by inspecting 'data-hintbox-contents' attribute.
 		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {

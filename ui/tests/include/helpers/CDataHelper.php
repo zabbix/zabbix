@@ -422,12 +422,13 @@ class CDataHelper extends CAPIHelper {
 	}
 
 	/**
-	 * Remove item data from history table.
+	 * Remove item data from history and trends tables.
 	 *
 	 * @param string $itemid		item id
 	 */
 	public static function removeItemData($itemid) {
 		DBexecute('DELETE FROM history'.self::getItemDataTableSuffix($itemid).' WHERE itemid='.zbx_dbstr($itemid));
+		DBexecute('DELETE FROM trends WHERE itemid='.zbx_dbstr($itemid));
 	}
 
 	/**
