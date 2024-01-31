@@ -41,6 +41,8 @@ function SVGMap(options) {
 		this.options.show_timestamp = true;
 	}
 
+	this.rendered_promise = Promise.resolve();
+
 	// Extra group for font styles.
 	container = this.canvas.add('g', {
 		class: 'map-container',
@@ -152,6 +154,15 @@ function SVGMap(options) {
 	}
 	this.update(this.options);
 }
+
+/**
+ * Get rendered promise.
+ *
+ * @returns {Promise<void>}
+ */
+SVGMap.prototype.promiseRendered = function () {
+	return this.rendered_promise;
+};
 
 // Predefined list of fonts for maps.
 SVGMap.FONTS = [
@@ -469,16 +480,37 @@ SVGMap.prototype.update = function (options, incremental) {
 		}
 	}
 
-	// Images are preloaded before update.
-	this.imageCache.preload(images, function () {
-		// Update is performed after preloading all of the images.
-		this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
-		this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
-		this.updateItems('links', 'SVGMapLink', options.links, incremental);
-		this.updateBackground(options.background, incremental);
+	this.rendered_promise = new Promise(resolve => {
+		// Images are preloaded before update.
+		this.imageCache.preload(images, function () {
+			try {
+				// Update is performed after preloading all the images.
+				this.updateItems('elements', 'SVGMapElement', options.elements, incremental);
+				this.updateOrderedItems('shapes', 'sysmap_shapeid', 'SVGMapShape', options.shapes, incremental);
+				this.updateItems('links', 'SVGMapLink', options.links, incremental);
+				this.updateBackground(options.background);
+			}
+			catch(exception) {
+				resolve();
 
-		this.options = SVGElement.mergeAttributes(this.options, options);
-	}, this);
+				throw exception;
+			}
+
+			this.options = SVGElement.mergeAttributes(this.options, options);
+
+			const readiness = [];
+
+			const container = typeof this.options.container !== 'object'
+				? document.querySelector(this.options.container)
+				: this.options.container;
+
+			container.querySelectorAll('image').forEach(image => {
+				readiness.push(new Promise(resolve => image.addEventListener('load', resolve)));
+			});
+
+			resolve(Promise.all(readiness));
+		}, this);
+	});
 
 	// Timestamp (date on map) is updated.
 	if (options.show_timestamp && typeof options.timestamp !== 'undefined') {

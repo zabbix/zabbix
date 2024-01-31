@@ -1339,7 +1339,11 @@ class testPageProblems extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Show' => 'History'
+						'Show' => 'History',
+						'Show timeline' => false
+					],
+					'time_selector' => [
+						'link' => 'Last 1 day'
 					],
 					'result' => [
 						['Problem' => 'Trigger for Age problem'],
