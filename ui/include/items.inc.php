@@ -2666,3 +2666,22 @@ function getInheritedTimeouts(string $proxyid): array {
 		]
 	];
 }
+
+/**
+ * Gets items count with selected item type for every hostid.
+ *
+ * @param int   $item_type
+ * @param array $hostids
+ *
+ * @return array
+ */
+public function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+	$db_selected_items_count = API::Item()->get([
+		'groupCount' => true,
+		'countOutput' => true,
+		'filter' => ['type' => $item_type],
+		'hostids' => $hostids
+	]);
+
+	return array_column($db_selected_items_count, 'rowscount', 'hostid');
+}
