@@ -43,7 +43,7 @@ It is recommended to fill in the values of the filter macros to avoid getting re
 |{$SHAREPOINT.ROOT}||`/Shared Documents`|
 |{$SHAREPOINT.LLD_INTERVAL}||`3h`|
 |{$SHAREPOINT.GET_INTERVAL}||`1m`|
-|{$SHAREPOINT.MAX_HEALT_SCORE}|<p>Must be in the range from 0 to 10</p><p>in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33</p>|`5`|
+|{$SHAREPOINT.MAX_HEALTH_SCORE}|<p>Must be in the range from 0 to 10</p><p>in details: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-wsshp/c60ddeb6-4113-4a73-9e97-26b5c3907d33</p>|`5`|
 
 ### Items
 
@@ -60,7 +60,7 @@ It is recommended to fill in the values of the filter macros to avoid getting re
 |----|-----------|----------|--------|--------------------------------|
 |Sharepoint: Error getting directory structure.|<p>Error getting directory structure. Check the Zabbix server log for more details.</p>|`last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.status)<>200`|Warning|**Manual close**: Yes|
 |Sharepoint: Server responds slowly to API request||`last(/Microsoft SharePoint by HTTP/sharepoint.get_dir.time)>2000`|Warning|**Manual close**: Yes|
-|Sharepoint: Bad health score||`last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALT_SCORE}"`|Average||
+|Sharepoint: Bad health score||`last(/Microsoft SharePoint by HTTP/sharepoint.health_score)>"{$SHAREPOINT.MAX_HEALTH_SCORE}"`|Average||
 
 ### LLD rule Directory discovery
 

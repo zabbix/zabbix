@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-12-15 11:13+0000\n"
+"PO-Revision-Date: 2024-01-28 21:34+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -193,12 +193,12 @@ msgstr[1] "%1$s elementos de %2$s en estado de problema"
 #: app/views/administration.miscconfig.edit.php:127
 #, c-format
 msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "%1$s o %2$s: permite que la página se muestre solo en un marco en el mismo origen que la página misma"
 
 #: app/views/administration.miscconfig.edit.php:130
 #, c-format
 msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
-msgstr ""
+msgstr "%1$s o %2$s: evita que la página se muestre en un marco, independientemente del sitio que intente hacerlo"
 
 #: jsLoader.php:341
 #, c-format
@@ -448,44 +448,44 @@ msgstr "Métodos de API"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
-msgstr "Testigo de API"
+msgstr "Token de API"
 
 #: include/classes/api/services/CToken.php:287
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr "El testigo de la API \"%1$s\" ya existe para el ID de usuario \"%2$s\"."
+msgstr "El token de la API \"%1$s\" ya existe para el ID de usuario \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:116
 #: app/controllers/CControllerTokenCreate.php:129
 msgid "API token added"
-msgstr "Testigo de API añadido"
+msgstr "Token de API añadido"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] "Testigo de API borrado"
-msgstr[1] "Testigos de API borrados"
+msgstr[0] "Token de API borrado"
+msgstr[1] "Tokens de API borrados"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] "Testigo de API desactivado"
-msgstr[1] "Testigos de API desactivados"
+msgstr[0] "Token de API desactivado"
+msgstr[1] "Tokens de API desactivados"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] "Testigo de API activado"
-msgstr[1] "Testigos de API activados"
+msgstr[0] "Token de API activado"
+msgstr[1] "Tokens de API activados"
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr "Testigo de API caducado."
+msgstr "Token de API caducado."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
 msgid "API token updated"
-msgstr "Testigo de API actualizado"
+msgstr "Token de API actualizado"
 
 #: app/controllers/CControllerPopupTokenEdit.php:116
 #: app/controllers/CControllerPopupTokenView.php:75
@@ -497,7 +497,7 @@ msgstr "Testigo de API actualizado"
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
-msgstr "Testigos de API"
+msgstr "Tokens de API"
 
 #: widgets/gauge/includes/WidgetForm.php:265
 #: widgets/item/includes/WidgetForm.php:209
@@ -748,7 +748,7 @@ msgstr "Activo"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr "Cheques activos"
+msgstr "Comprobación activa"
 
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
@@ -1524,7 +1524,7 @@ msgstr "Tal cual"
 
 #: include/views/monitoring.history.php:97
 msgid "As plain text"
-msgstr "Como texto sencillo"
+msgstr "Como texto sin formato"
 
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
@@ -1683,7 +1683,7 @@ msgstr "Agosto"
 
 #: app/views/popup.token.view.php:45
 msgid "Auth token"
-msgstr "Testigo de autenticación"
+msgstr "Token de autenticación"
 
 #: app/views/administration.authentication.edit.php:372
 msgid "AuthN requests"
@@ -3536,6 +3536,10 @@ msgstr "No se puede actualizar en masa los nombres de los equipos."
 msgid "Cannot mass update visible host name."
 msgstr "No se puede actualizar en masa los nombres visibles de los equipos."
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr "No se puede abrir la URL"
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -4995,6 +4999,10 @@ msgstr "Menú de contenido"
 msgid "Context name"
 msgstr "Nombre de contexto"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr "Continuar"
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr "Continuar remplazos"
@@ -5901,6 +5909,10 @@ msgstr "Autenticación por defecto"
 msgid "Default host inventory mode"
 msgstr "Modo de inventario de host por defecto"
 
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr "Cadena de entrada predeterminada"
+
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
 msgid "Default language"
@@ -6781,7 +6793,7 @@ msgstr "Descartar valor"
 #: include/views/configuration.item.prototype.edit.php:923
 #: include/views/configuration.item.prototype.list.php:74
 msgid "Discover"
-msgstr "Descubrimiento"
+msgstr "Descubrir"
 
 #: app/partials/configuration.filter.items.php:213
 #: app/views/trigger.list.php:142 include/discovery.inc.php:112
@@ -7122,6 +7134,14 @@ msgstr "Dibujar"
 #: include/views/configuration.graph.edit.php:388
 msgid "Draw style"
 msgstr "Estilo del trazado"
+
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr "Desplegable"
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr "Opciones desplegables"
 
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
@@ -7520,6 +7540,10 @@ msgstr "¿Desea activar los escenarios web seleccionados?"
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
 msgstr "Habilitar capturas"
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr "Habilitar la entrada del usuario"
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -10834,6 +10858,18 @@ msgstr "Vista inicial"
 msgid "Initial view is ignored if the default view is set."
 msgstr "La vista inicial se ignora si se establece la vista predeterminada."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr "Solicitud de entrada"
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr "Tipo de entrada"
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr "Regla de validación de entrada"
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "Insertar"
@@ -11006,6 +11042,11 @@ msgstr "Configuración de asignación de tipo de medio de aprovisionamiento SAML
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "Configuración de asignación de grupo de usuarios de aprovisionamiento SAML JIT no válida."
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr "URL no válida: %1$s"
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "Contenido del archivo YAML incorrecto"
@@ -11033,6 +11074,10 @@ msgstr "Dirección de correo electrónico incorrecta \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Dirección de correo electrónico incorrecta para el tipo de medio con ID \"%1$s\"."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr "Entrada inválida"
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -11492,7 +11537,7 @@ msgstr[1] "Métricas activadas"
 
 #: include/actions.inc.php:1074
 msgid "Item in \"not supported\" state"
-msgstr "Métrica en estado \"no soportado\""
+msgstr "Métrica en estado \"no soportada\""
 
 #: widgets/piechart/views/widget.edit.js.php:209
 #: widgets/svggraph/views/widget.edit.js.php:287
@@ -12084,7 +12129,7 @@ msgstr "Plantilla de enlace"
 #: app/views/popup.lldoperation.php:236 app/views/popup.massupdate.host.php:71
 #: app/views/template.massupdate.php:76 include/actions.inc.php:706
 msgid "Link templates"
-msgstr "Plantillas de enlaces"
+msgstr "Vincular plantillas"
 
 #: widgets/navtree/views/navtreeitem.edit.php:65
 msgid "Linked map"
@@ -12224,6 +12269,10 @@ msgstr "Longitud de ubicación"
 msgid "Log"
 msgstr "Registro"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr "Registro de cambios mediante descubrimiento de bajo nivel, descubrimiento de red y registro automático"
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Monitorización de archivos de registro con soporte para rotación. Devuelve el registro"
@@ -12231,6 +12280,10 @@ msgstr "Monitorización de archivos de registro con soporte para rotación. Devu
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Monitorización de archivos de registro. Devuelve el registro"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr "Registro de acciones del sistema"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12469,6 +12522,10 @@ msgstr "Acción de evento manual"
 msgid "Manual host action"
 msgstr "Acción de equipo manual"
 
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr "Entrada manual"
+
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
 msgstr "Supresión manual de problemas. La entrada de fecha y hora acepta formato de hora relativa y absoluta."
@@ -12608,7 +12665,7 @@ msgstr "Marcar como causa"
 
 #: include/views/monitoring.sysmap.edit.php:150
 msgid "Mark elements on trigger status change"
-msgstr "Marcar elementos en el cambio de estado del iniciador"
+msgstr "Marcar elementos al cambiar el estado del iniciador"
 
 #: include/views/monitoring.history.php:171
 msgid "Mark others"
@@ -12689,12 +12746,12 @@ msgstr "Período máximo de visualización del historial"
 
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
-msgstr "Número máximo de columnas y filas en tablas de descripción general"
+msgstr "Número máximo de columnas y filas en tablas de vista general"
 
 #: widgets/piechart/includes/WidgetForm.php:209
 #: widgets/svggraph/includes/WidgetForm.php:359
 msgid "Max number of rows"
-msgstr ""
+msgstr "Número máximo de filas"
 
 #: app/views/administration.gui.edit.php:138
 msgid "Max period for time selector"
@@ -13265,7 +13322,7 @@ msgstr "Silenciar"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
-msgstr "Mi"
+msgstr "Mio"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
@@ -14357,12 +14414,12 @@ msgstr "No hay métricas heredadas"
 #: include/items.inc.php:185
 #: include/views/configuration.host.discovery.list.php:165
 msgid "Not supported"
-msgstr "No soportado"
+msgstr "No soportada"
 
 #: app/views/administration.miscconfig.edit.php:138
 #, c-format
 msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
-msgstr ""
+msgstr "Tenga en cuenta que %1$s o %2$s se considerarán nombres de equipo si se usan sin comillas simples."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -14425,7 +14482,7 @@ msgstr "Número de equipos (habilitados/deshabilitados)"
 
 #: app/partials/administration.system.info.php:65
 msgid "Number of items (enabled/disabled/not supported)"
-msgstr "Número de monitores (habilitados/deshabilitados/no soportados)"
+msgstr "Número de métricas (habilitadas/deshabilitadas/no soportadas)"
 
 #: include/classes/data/CItemData.php:2694
 msgid "Number of items in Zabbix database."
@@ -14735,6 +14792,10 @@ msgstr "Solo los superadministradores pueden definir el propietario del informe.
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Sólo cuentan los iniciadores asignados a equipos habilitados y que dependan de monitores habilitados"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr "Abrir URL"
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "Abrir en una ventana nueva"
@@ -15000,6 +15061,10 @@ msgstr "Anular periodo de histórico de elementos"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Anular periodo de tendencias de elementos"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr "Anular selector de período de tiempo"
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -15537,7 +15602,7 @@ msgstr "Algoritmo de colocación"
 #: app/views/mediatype.edit.php:274 include/classes/setup/CSetupWizard.php:559
 #: widgets/plaintext/Widget.php:29
 msgid "Plain text"
-msgstr "Texto plano"
+msgstr "Texto sin formato"
 
 #: app/views/administration.user.edit.php:761
 #: app/views/administration.user.edit.php:796
@@ -16148,7 +16213,7 @@ msgstr "Detalles de la cola"
 #: app/views/administration.queue.overview.proxy.php:33
 #: include/classes/helpers/CMenuHelper.php:389
 msgid "Queue overview"
-msgstr "Descripción general de la cola"
+msgstr "Vista general de la cola"
 
 #: app/views/administration.queue.details.php:36
 #: app/views/administration.queue.overview.php:36
@@ -16156,7 +16221,7 @@ msgstr "Descripción general de la cola"
 #: app/views/administration.queue.overview.proxy.php:36
 #: include/classes/helpers/CMenuHelper.php:391
 msgid "Queue overview by proxy"
-msgstr "Descripción general por proxy"
+msgstr "Vista general por proxy"
 
 #: include/classes/graph/CSvgGraph.php:1480 include/events.inc.php:304
 msgid "RESOLVED"
@@ -19386,6 +19451,10 @@ msgstr "Cadena de prueba"
 msgid "Test subject"
 msgstr "Asunto de la prueba"
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr "Probar la entrada del usuario"
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -19973,7 +20042,7 @@ msgstr "Tendencias"
 #: include/views/js/monitoring.sysmaps.js.php:813 jsLoader.php:257
 #: jsLoader.php:386 widgets/toptriggers/views/widget.view.php:32
 msgid "Trigger"
-msgstr "Iniciadores"
+msgstr "Iniciador"
 
 #: include/classes/api/services/CTriggerGeneral.php:744
 #, c-format
@@ -20115,7 +20184,7 @@ msgstr "Límite de iniciador"
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
-msgstr "Vistazo general de los iniciadores"
+msgstr "Vista general de iniciador"
 
 #: app/controllers/CControllerAuditLogList.php:258
 #: app/views/popup.lldoperation.php:50 app/views/trigger.massupdate.php:181
@@ -20438,6 +20507,10 @@ msgstr "La URL no está codificada correctamente."
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "El nombre de la URL debe ser único para el mapa \"%1$s\"."
+
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr "Confirmación de apertura de URL"
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -21008,7 +21081,7 @@ msgstr "Utilice %{ref} en el filtro de grupo para hacer referencia al valor de e
 
 #: app/views/administration.miscconfig.edit.php:123
 msgid "Use X-Frame-Options HTTP header"
-msgstr ""
+msgstr "Utilice el encabezado HTTP X-Frame-Options"
 
 #: app/partials/configuration.host.interface.row.php:222
 msgid "Use combined requests"
@@ -21240,6 +21313,10 @@ msgstr "El grupo de usuarios con ID \"%1$s\" no está disponible."
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "Grupos de usuarios"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr "La entrada del usuario se ha probado con éxito."
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22352,9 +22429,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "Con problemas"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr "Con esta configuración solo se mostrarán datos numéricos."
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "Con esta configuración solo se mostrarán métricas numéricas en esta columna."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr "Con esta configuración solo se mostrarán métricas numéricas."
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -22419,7 +22505,7 @@ msgstr "Encabezado HTTP X-Frame-Options"
 
 #: app/views/administration.miscconfig.edit.php:125
 msgid "X-Frame-Options HTTP header supported values:"
-msgstr ""
+msgstr "Valores admitidos del encabezado HTTP X-Frame-Options:"
 
 #: include/views/js/monitoring.sysmaps.js.php:439
 msgid "X1"
@@ -22757,7 +22843,7 @@ msgstr "Versión del servidor Zabbix"
 
 #: include/items.inc.php:92
 msgid "Zabbix trapper"
-msgstr "Trapper ZABBIX"
+msgstr "Captura ZABBIX"
 
 #: include/classes/html/CFilter.php:258 include/classes/html/CTabFilter.php:324
 msgid "Zoom out"
@@ -22874,7 +22960,7 @@ msgstr "un caracter especial"
 #: app/views/administration.miscconfig.edit.php:133
 #, c-format
 msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
-msgstr ""
+msgstr "una cadena de nombres de equipo separados por espacios; agregar %1$s a la lista permite que la página se muestre en un marco en el mismo origen que la misma página"
 
 #: include/classes/validators/CApiInputValidator.php:2989
 msgid "a string, number or null value is expected"
@@ -23034,7 +23120,7 @@ msgstr "se espera un entero sin signo"
 
 #: app/views/administration.authentication.edit.php:112
 msgid "an uppercase and a lowercase Latin letter"
-msgstr "una letra latina mayúscula y minúscula"
+msgstr "una letra latina mayúscula y una minúscula"
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
@@ -23804,6 +23890,12 @@ msgstr "sintaxis incorrecta cerca de \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr "uso incorrecto de la función \"%1$s\""
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr "la entrada no coincide con el patrón proporcionado: %1$s"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert(): inserta caracteres o espacios en una cadena de caracteres, comenzando en una posición especificada en la cadena"
@@ -24350,6 +24442,10 @@ msgstr "no contenido en"
 msgid "not selected"
 msgstr "no seleccionada"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr "no utilizado"
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Número de segundos desde la Época"
@@ -24358,9 +24454,29 @@ msgstr "now() - Número de segundos desde la Época"
 msgid "number"
 msgstr "número"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr "el objeto no existe"
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "el objeto no existe o pertenece a otro objeto"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr "el objeto no existe o no tiene permisos para ello"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -25179,6 +25295,10 @@ msgstr "el valor debe estar dentro del rango de %1$s"
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
 msgstr "valor de etiqueta de evento nuevo"
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr "los valores deben ser únicos"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"

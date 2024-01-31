@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -137,6 +137,13 @@ class CSVGGauge {
 	 * @type {number}
 	 */
 	#pos_current = 0;
+
+	/**
+	 * Rendered promise.
+	 *
+	 * @type {Promise<void>}
+	 */
+	#rendered_promise = Promise.resolve();
 
 	/**
 	 * @param {HTMLElement} container           HTML container to append the root SVG element to.
@@ -311,7 +318,7 @@ class CSVGGauge {
 				}
 			}
 
-			this.#animate(this.#pos_current, pos_new,
+			this.#rendered_promise = this.#animate(this.#pos_current, pos_new,
 				(pos) => {
 					const angle = (pos - 0.5) * this.#config.angle;
 
@@ -346,6 +353,15 @@ class CSVGGauge {
 	 */
 	destroy() {
 		this.#svg.remove();
+	}
+
+	/**
+	 * Get rendered promise.
+	 *
+	 * @returns {Promise<void>}
+	 */
+	promiseRendered() {
+		return this.#rendered_promise;
 	}
 
 	/**
@@ -919,28 +935,33 @@ class CSVGGauge {
 	 * @param {number}   from
 	 * @param {number}   to
 	 * @param {function} callback  Callback function to be called with value transitioning within the interval.
+	 *
+	 * @returns {Promise<void>}
 	 */
 	#animate(from, to, callback) {
-		const start_time = Date.now();
-		const end_time = start_time + CSVGGauge.ANIMATE_DURATION;
+		return new Promise(resolve => {
+			const start_time = Date.now();
+			const end_time = start_time + CSVGGauge.ANIMATE_DURATION;
 
-		const animate = () => {
-			const time = Date.now();
+			const animate = () => {
+				const time = Date.now();
 
-			if (time <= end_time) {
-				const progress = (time - start_time) / (end_time - start_time);
-				const smooth_progress = 0.5 + Math.sin(Math.PI * (progress - 0.5)) / 2;
+				if (time <= end_time) {
+					const progress = (time - start_time) / (end_time - start_time);
+					const smooth_progress = 0.5 + Math.sin(Math.PI * (progress - 0.5)) / 2;
 
-				callback(from + (to - from) * smooth_progress);
+					callback(from + (to - from) * smooth_progress);
 
-				requestAnimationFrame(animate);
-			}
-			else {
-				callback(to);
-			}
-		};
+					requestAnimationFrame(animate);
+				}
+				else {
+					callback(to);
+					resolve();
+				}
+			};
 
-		requestAnimationFrame(animate);
+			requestAnimationFrame(animate);
+		});
 	}
 
 	/**

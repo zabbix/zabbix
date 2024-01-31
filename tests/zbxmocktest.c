@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,11 +102,6 @@ void	set_zbx_config_value_cache_size(zbx_uint64_t cache_size)
 }
 
 zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 0;
-
-char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-
-char	*CONFIG_JAVA_GATEWAY		= NULL;
-int	CONFIG_JAVA_GATEWAY_PORT	= 0;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 

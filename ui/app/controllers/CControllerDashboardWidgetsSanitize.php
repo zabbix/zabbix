@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -103,6 +103,8 @@ class CControllerDashboardWidgetsSanitize extends CController {
 					$form = $widget_data['widget']->getForm($widget_data['fields'],
 						$this->hasInput('templateid') ? $this->getInput('templateid') : null
 					);
+
+					$form->validate();
 
 					$widgets_api[$index] = ['fields' => $form->fieldsToApi()];
 				}

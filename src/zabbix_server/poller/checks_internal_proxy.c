@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,13 +26,13 @@
  *                                                                            *
  * Purpose: processes program type (proxy) specific internal checks           *
  *                                                                            *
- * Parameters: param1  - [IN] the first parameter                             *
- *             request - [IN] the request                                     *
- *             result  - [OUT] the result                                     *
+ * Parameters: param1  - [IN] first parameter                                 *
+ *             request - [IN]                                                 *
+ *             result  - [OUT]                                                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *               NOTSUPPORTED - requested item is not supported               *
- *               FAIL - not a proxy specific internal check                   *
+ *               FAIL - not proxy specific internal check                     *
  *                                                                            *
  * Comments: This function is used to process proxy specific internal checks  *
  *           before generic internal checks are processed.                    *

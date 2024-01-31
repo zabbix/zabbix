@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -278,11 +278,16 @@ Overlay.prototype.unmount = function() {
 		cancelAnimationFrame(this.center_dialog_animation_frame);
 	}
 
-	var $wrapper = jQuery('.wrapper');
+	const $wrapper = jQuery('.wrapper');
 
 	if (!jQuery('[data-dialogueid]').length) {
 		$wrapper.css('overflow', $wrapper.data('overflow'));
 		$wrapper.removeData('overflow');
+
+		$wrapper[0].scrollTo($wrapper[0].dataset.scroll_x, $wrapper[0].dataset.scroll_y);
+
+		delete $wrapper[0].dataset.scroll_x;
+		delete $wrapper[0].dataset.scroll_y;
 	}
 };
 
@@ -290,7 +295,10 @@ Overlay.prototype.unmount = function() {
  * Appends associated nodes to document body.
  */
 Overlay.prototype.mount = function() {
-	var $wrapper = jQuery('.wrapper');
+	const $wrapper = jQuery('.wrapper');
+
+	$wrapper[0].dataset.scroll_x = $wrapper[0].scrollLeft;
+	$wrapper[0].dataset.scroll_y = $wrapper[0].scrollTop;
 
 	if (!jQuery('[data-dialogueid]').length) {
 		$wrapper.data('overflow', $wrapper.css('overflow'));

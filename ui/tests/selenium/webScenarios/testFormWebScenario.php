@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -162,7 +162,6 @@ class testFormWebScenario extends CWebTest {
 		// Check tabs available in the form.
 		$this->assertEquals(['Scenario', 'Steps', 'Tags', 'Authentication'], $form->getTabs());
 
-		// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
 		$scenario_fields = [
 			'Name' => ['autofocus' => 'true', 'maxlength' => 64],
 			'Update interval' => ['value' => '1m', 'maxlength' => 255],
@@ -170,10 +169,10 @@ class testFormWebScenario extends CWebTest {
 			'Agent' => ['value' => 'Zabbix'],
 			'id:agent_other' => ['visible' => false, 'maxlength' => 255],
 			'HTTP proxy' => ['placeholder' => '[protocol://][user[:password]@]proxy.example.com[:port]', 'maxlength' => 255],
-			"xpath:(//table[@id='variables']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(//table[@id='variables']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
-			"xpath:(//table[@id='headers']//textarea)[1]" => ['placeholder' => 'name', 'maxlength' => 255],
-			"xpath:(//table[@id='headers']//textarea)[2]" => ['placeholder' => 'value', 'maxlength' => 2000],
+			'xpath:(//table[@id="variables"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@id="variables"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
+			'xpath:(//table[@id="headers"]//textarea)[1]' => ['placeholder' => 'name', 'maxlength' => 255],
+			'xpath:(//table[@id="headers"]//textarea)[2]' => ['placeholder' => 'value', 'maxlength' => 65535],
 			'Enabled' => ['value' => true]
 		];
 
@@ -217,7 +216,7 @@ class testFormWebScenario extends CWebTest {
 			'headers' => ['', 'Name', '', 'Value', '']
 		];
 
-		foreach (['Variables' => false, 'Headers' => true] as $table_name => $row_dragable) {
+		foreach (['Variables' => false, 'Headers' => true] as $table_name => $row_draggable) {
 			$table = $form->getField($table_name)->asTable();
 			$row = $table->getRow(0);
 			$this->assertSame($table_layout['headers'], $table->getHeadersText());
@@ -231,7 +230,7 @@ class testFormWebScenario extends CWebTest {
 			$this->assertFalse($remove_button->isClickable());
 
 			// Check the presence of the draggable icon.
-			if ($row_dragable) {
+			if ($row_draggable) {
 				$drag_icon = $row->query('xpath:.//div[contains(@class,"drag-icon")]')->one();
 				$this->assertFalse($drag_icon->isEnabled());
 			}
@@ -246,7 +245,7 @@ class testFormWebScenario extends CWebTest {
 			$this->assertTrue($row->query('button:Remove')->one()->isClickable());
 
 			// Check that draggable icon becomes enabled when a new row is added.
-			if ($row_dragable) {
+			if ($row_draggable) {
 				$this->assertFalse($drag_icon->isEnabled());
 				$add_button->click();
 				$this->assertTrue($drag_icon->isEnabled());
@@ -495,7 +494,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable name without brackets'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -513,7 +512,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable name without opening bracket'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -531,7 +530,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable name without closing bracket'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -549,7 +548,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Variable with misplaced brackets'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -567,7 +566,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Duplicate variable names'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -575,6 +574,8 @@ class testFormWebScenario extends CWebTest {
 							'value' => '123'
 						],
 						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'name' => '{abc}',
 							'value' => '987'
 						]
@@ -589,7 +590,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Missing variable name'
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -597,6 +598,8 @@ class testFormWebScenario extends CWebTest {
 							'value' => '123'
 						],
 						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'name' => '{abc}',
 							'value' => '987'
 						]
@@ -611,7 +614,7 @@ class testFormWebScenario extends CWebTest {
 					'scenario_fields' => [
 						'Name' => 'Missing header name'
 					],
-					'headers' => [
+					'Headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
@@ -619,6 +622,8 @@ class testFormWebScenario extends CWebTest {
 							'value' => '123'
 						],
 						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
 							'name' => 'abc',
 							'value' => '987'
 						]
@@ -697,12 +702,12 @@ class testFormWebScenario extends CWebTest {
 					'expected' => TEST_GOOD,
 					'scenario_fields' => self::$all_fields['scenario_fields'],
 					'auth_fields' => self::$all_fields['auth_fields'],
-					'variables' => self::$all_fields['variables'],
-					'headers' => self::$all_fields['headers'],
+					'Variables' => self::$all_fields['variables'],
+					'Headers' => self::$all_fields['headers'],
 					'tags' => self::$all_fields['tags']
 				]
 			],
-			// #24 Maximal possible value length in input elements except for update interval.
+			// #24 Maximal possible value length in input elements except for update interval and variables and header values.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -722,20 +727,26 @@ class testFormWebScenario extends CWebTest {
 						'SSL key file' => STRING_255,
 						'SSL key password' => STRING_64
 					],
-					'variables' => [
+					'Variables' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'name' => '{'.substr(STRING_255, 0, 253).'}',
-							'value' => STRING_2000
+							'value' => STRING_6000
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => '{the 2nd variable}',
+							'value' => '2nd variable value'
 						]
 					],
-					'headers' => [
+					'Headers' => [
 						[
 							'action' => USER_ACTION_UPDATE,
 							'index' => 0,
 							'name' => STRING_255,
-							'value' => STRING_2000
+							'value' => STRING_6000
 						],
 						[
 							'action' => USER_ACTION_UPDATE,
@@ -782,32 +793,35 @@ class testFormWebScenario extends CWebTest {
 							'value' => '   value   '
 						]
 					],
+					'Variables' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '   {!@#$%^&*()_+=-良い一日を}   ',
+							'value' => '   !@#$%^&*()_+=-良い一日を   '
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => '  {abc}  ',
+							'value' => '   '
+						]
+					],
+					'Headers' => [
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 0,
+							'name' => '   OneTwoThree   ',
+							'value' => '   '
+						],
+						[
+							'action' => USER_ACTION_UPDATE,
+							'index' => 1,
+							'name' => '   !@#$%^&*()_+=-良い一日を   ',
+							'value' => '   !@#$%^&*()_+=-良い一日を   '
+						]
+					],
 					'trim' => true
-					// TODO: uncomment these lines when ZBX-22433 will be merged.
-//					'variables' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'name' => '{!@#$%^&*()_+=-良い一日を}',
-//							'value' => '!@#$%^&*()_+=-良い一日を'
-//						],
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'name' => '{abc}'
-//						]
-//					],
-//					'headers' => [
-//						[
-//							'action' => USER_ACTION_UPDATE,
-//							'index' => 0,
-//							'name' => 'OneTwoThree'
-//						],
-//						[
-//							'name' => '!@#$%^&*()_+=-良い一日を',
-//							'value' => '!@#$%^&*()_+=-良い一日を'
-//						]
-//					]
 				]
 			]
 		];
@@ -877,16 +891,8 @@ class testFormWebScenario extends CWebTest {
 		// Get initial field values before cloning. Tags need to be handled separately as their table has no label.
 		$fields = $form->getFields()->asValues();
 
-		foreach (['variables', 'headers'] as $field_name) {
-			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
-//			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
-			$field = $form->getField(ucfirst($field_name));
-
-			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-			$table_fields[$field_name]['name'] = $field->query("xpath:(//table[@id=".
-					CXPathHelper::escapeQuotes($field_name)."]//textarea)[1]")->one()->getValue();
-			$table_fields[$field_name]['value'] = $field->query("xpath:(//table[@id=".
-					CXPathHelper::escapeQuotes($field_name)."]//textarea)[2]")->one()->getValue();
+		foreach (['Variables', 'Headers'] as $field_name) {
+			$table_fields[$field_name] = $form->getField($field_name)->asMultifieldTable()->getValue();
 		}
 
 		$form->query('button:Clone')->one()->click();
@@ -905,18 +911,8 @@ class testFormWebScenario extends CWebTest {
 
 		$form->checkValue($fields);
 
-		foreach (['variables', 'headers'] as $field_name) {
-			// TODO: Replace the below workaround with the below commented line when ZBX-22433 is merged.
-//			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
-			$field = $form->getField(ucfirst($field_name));
-
-			// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-			$this->assertEquals($table_fields[$field_name]['name'], $field->query("xpath:(//table[@id=".
-					CXPathHelper::escapeQuotes($field_name)."]//textarea)[1]")->one()->getValue()
-			);
-			$this->assertEquals($table_fields[$field_name]['value'], $field->query("xpath:(//table[@id=".
-					CXPathHelper::escapeQuotes($field_name)."]//textarea)[2]")->one()->getValue()
-			);
+		foreach (['Variables', 'Headers'] as $field_name) {
+			$this->assertEquals($table_fields[$field_name], $form->getField($field_name)->asMultifieldTable()->getValue());
 		}
 	}
 
@@ -1022,16 +1018,20 @@ class testFormWebScenario extends CWebTest {
 				self::$update_scenario = $data['scenario_fields']['Name'];
 			}
 
-			// TODO: add logic to trim headers an variables after ZBX-22433 is merged.
 			if (array_key_exists('trim', $data)) {
 				$skip_fields = ['Password', 'SSL key password'];
 
-				foreach (['scenario_fields', 'auth_fields', 'tags'] as $tab_fields) {
+				foreach (['scenario_fields', 'Variables', 'Headers', 'auth_fields', 'tags'] as $tab_fields) {
 					$original_fields = $data[$tab_fields];
 
 					if ($tab_fields === 'tags') {
 						foreach ($data[$tab_fields] as &$tag) {
 							$tag = array_map('trim', $tag);
+						}
+					}
+					elseif (in_array($tab_fields, ['Variables', 'Headers'])) {
+						foreach ($data[$tab_fields] as &$pair_field) {
+							$pair_field = array_map('trim', $pair_field);
 						}
 					}
 					else {
@@ -1058,22 +1058,13 @@ class testFormWebScenario extends CWebTest {
 			$form->invalidate();
 			$form->checkValue($data['scenario_fields']);
 
-			foreach (['variables', 'headers'] as $field_name) {
+			foreach (['Variables', 'Headers'] as $field_name) {
 				if (array_key_exists($field_name, $data)) {
-					// TODO: Replace the below workaround with a check via $table->checkValue() when ZBX-22433 is merged.
-					$field = $form->getField(ucfirst($field_name));
-
-					$i = 1;
-					// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-					foreach ($data[$field_name] as $field_pair) {
-						$this->assertEquals($field_pair['name'], $field->query("xpath:(//table[@id=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//textarea)[1]")->one()->getValue()
-						);
-						$this->assertEquals($field_pair['value'], $field->query("xpath:(//table[@id=".
-								CXPathHelper::escapeQuotes($field_name)."]//tr[".$i."]//textarea)[2]")->one()->getValue()
-						);
-						$i++;
+					foreach ($data[$field_name] as &$field_array) {
+						unset($field_array['action'], $field_array['index']);
 					}
+
+					$form->getField($field_name)->asMultifieldTable()->checkValue($data[$field_name]);
 				}
 			}
 
@@ -1101,25 +1092,15 @@ class testFormWebScenario extends CWebTest {
 	protected function fillScenarioForm($data, $form, $action = 'update') {
 		$form->fill($data['scenario_fields']);
 
-		foreach (['variables', 'headers'] as $field_name) {
+		foreach (['Variables', 'Headers'] as $field_name) {
 			if (array_key_exists($field_name, $data)) {
-				// TODO: Replace the below workaround with the commented line when ZBX-22433 is merged.
-//				$form->getField(ucfirst($field_name))->asMultifieldTable()->fill($data[$field_name]);
-				$field = $form->getField(ucfirst($field_name));
+				$pair_field = $form->getField($field_name)->asMultifieldTable();
 
-				if (count($data[$field_name]) > 1) {
-					$field->query('button:Add')->one()->click();
+				if ($pair_field->query('class:form_row')->all()->count() !== count($data[$field_name])) {
+					$pair_field->query('button:Add')->one()->click();
 				}
 
-				$i = 1;
-				// TODO: xpath quotes should be fixed after git-hook improvements in DEV-2396.
-				foreach ($data[$field_name] as $field_pair) {
-					$field->query("xpath:(//table[@id=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
-							$i."]//textarea)[1]")->one()->fill($field_pair['name']);
-					$field->query("xpath:(//table[@id=".CXPathHelper::escapeQuotes($field_name)."]//tr[".
-							$i."]//textarea)[2]")->one()->fill($field_pair['value']);
-					$i++;
-				}
+				$pair_field->fill($data[$field_name]);
 			}
 		}
 

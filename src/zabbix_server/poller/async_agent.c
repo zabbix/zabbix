@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -84,7 +84,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 		{
 			SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 					" failed: Cannot resolve address: %s", dnserr));
-			goto stop;
+			return ZBX_ASYNC_TASK_STOP;
 		}
 
 		switch (agent_context->step)
@@ -94,7 +94,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 						" failed: cannot initialize TCP connection to [[%s]:%hu]:"
 						" timed out", agent_context->item.interface.addr,
 						agent_context->item.interface.port));
-				break;
+				return ZBX_ASYNC_TASK_STOP;
 			case ZABBIX_AGENT_STEP_CONNECT_WAIT:
 				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent"
 						" failed: cannot establish TCP connection to [[%s]:%hu]:"
@@ -143,8 +143,9 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					agent_context->config_timeout))
 			{
 				agent_context->item.ret = NETWORK_ERROR;
-				SET_MSG_RESULT(&agent_context->item.result, zbx_dsprintf(NULL, "Get value from agent failed"
-						" during %s", get_agent_step_string(agent_context->step)));
+				SET_MSG_RESULT(&agent_context->item.result,
+						zbx_dsprintf(NULL, "Get value from agent failed during %s",
+						get_agent_step_string(agent_context->step)));
 				goto out;
 			}
 

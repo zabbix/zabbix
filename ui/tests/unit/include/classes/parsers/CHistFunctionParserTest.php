@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -783,7 +783,7 @@ class CHistFunctionParserTest extends TestCase {
 							]
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 15,
 							'match' => '',
 							'length' => 0
@@ -1053,19 +1053,19 @@ class CHistFunctionParserTest extends TestCase {
 							'length' => 15
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 100,
 							'match' => '',
 							'length' => 0
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 102,
 							'match' => '',
 							'length' => 0
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 103,
 							'match' => '',
 							'length' => 0
@@ -1178,6 +1178,47 @@ class CHistFunctionParserTest extends TestCase {
 				['/host/key', '\\1h\\']
 			],
 			[
+				'nodata(/host/key, "\\\\1h\\ ")', 0, ['escape_backslashes' => false],
+				[
+					'rc' => CParser::PARSE_SUCCESS,
+					'match' => 'nodata(/host/key, "\\\\1h\\ ")',
+					'function' => 'nodata',
+					'parameters' => [
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUERY,
+							'pos' => 7,
+							'match' => '/host/key',
+							'length' => 9,
+							'data' => [
+								'host' => 'host',
+								'item' => 'key',
+								'filter' => [
+									'match' => '',
+									'tokens' => []
+								]
+							]
+						],
+						[
+							'type' => CHistFunctionParser::PARAM_TYPE_QUOTED,
+							'pos' => 18,
+							'match' => '"\\\\1h\\ "',
+							'length' => 8
+						]
+					]
+				],
+				['/host/key', '\\\\1h\\ ']
+			],
+			[
+				'nodata(/host/key, "\\\\1h\\\\")', 0, ['escape_backslashes' => false],
+				[
+					'rc' => CParser::PARSE_FAIL,
+					'match' => '',
+					'function' => '',
+					'parameters' => []
+				],
+				[]
+			],
+			[
 				'nodata(/host/key, "\\"")', 0, [],
 				[
 					'rc' => CParser::PARSE_SUCCESS,
@@ -1230,7 +1271,7 @@ class CHistFunctionParserTest extends TestCase {
 							]
 						],
 						[
-							'type' => CHistFunctionParser::PARAM_TYPE_UNQUOTED,
+							'type' => CHistFunctionParser::PARAM_TYPE_EMPTY,
 							'pos' => 15,
 							'match' => '',
 							'length' => 0

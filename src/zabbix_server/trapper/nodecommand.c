@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -330,7 +330,7 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		const char *clientip, const char *manualinput, int config_timeout, int config_trapper_timeout, const char *config_source_ip,
 		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char **debug)
 {
-	int			ret = FAIL, scope = 0, i, macro_type;
+	int			ret = FAIL, scope = 0, i, n, macro_type;
 	zbx_dc_host_t		host;
 	zbx_script_t		script;
 	zbx_uint64_t		usrgrpid, groupid;
@@ -513,21 +513,19 @@ static int	execute_script(zbx_uint64_t scriptid, zbx_uint64_t hostid, zbx_uint64
 		/* in the case that this is a webhook script, perform the substitution for parameter values as well */
 		if (ZBX_SCRIPT_TYPE_WEBHOOK == script.type && 0 < webhook_params.values_num)
 		{
-			int	i;
-
-			for (i = 0; i < webhook_params.values_num; i++)
+			for (n = 0; n < webhook_params.values_num; n++)
 			{
 				char	*expanded_value = NULL;
 				size_t	expanded_value_size;
 
 				/* avoid unnecessary mem (re)allocation in case the macro isn't present */
-				if (NULL == strstr(webhook_params.values[i].second, "{MANUALINPUT}"))
+				if (NULL == strstr(webhook_params.values[n].second, "{MANUALINPUT}"))
 					continue;
 
-				substitute_macro(webhook_params.values[i].second, "{MANUALINPUT}", manualinput,
+				substitute_macro(webhook_params.values[n].second, "{MANUALINPUT}", manualinput,
 						&expanded_value, &expanded_value_size);
 
-				webhook_params.values[i].second = zbx_strdup(webhook_params.values[i].second, expanded_value);
+				webhook_params.values[n].second = zbx_strdup(webhook_params.values[n].second, expanded_value);
 
 				zbx_free(expanded_value);
 			}

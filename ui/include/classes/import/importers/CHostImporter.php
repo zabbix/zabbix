@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -128,7 +128,7 @@ class CHostImporter extends CImporter {
 				if ($this->options['templateLinkage']['createMissing']
 						&& array_key_exists($host['host'], $template_linkage)) {
 					API::Host()->massAdd([
-						'hosts' => $host,
+						'hosts' => ['hostid' => $host['hostid']],
 						'templates' => $template_linkage[$host['host']]
 					]);
 				}

@@ -540,7 +540,7 @@ zabbix_export:
                   var result = [];
                   
                   JSON.parse(value).repositories.forEach(function (e) {
-                      result.push({ '{#ID}': e.id, '{#SLUG}': e.slug });
+                  	result.push({ '{#ID}': e.id, '{#SLUG}': e.slug });
                   });
                   
                   return JSON.stringify(result)

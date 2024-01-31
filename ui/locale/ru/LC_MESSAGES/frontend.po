@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-11-03 14:01+0000\n"
+"PO-Revision-Date: 2024-01-16 08:05+0000\n"
 "Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
 "Language-Team: Zabbix translation team\n"
 "Language: ru\n"
@@ -2044,7 +2044,7 @@ msgstr "По нижнему краю"
 
 #: widgets/tophosts/includes/WidgetForm.php:146
 msgid "Bottom N"
-msgstr "По нижнему краю"
+msgstr "Последние N"
 
 #: jsLoader.php:266
 msgid "Bring forward"
@@ -2386,7 +2386,7 @@ msgstr "Не удалось изменить тип пользователя с�
 
 #: httpconf.php:190 httpconf.php:406 items.php:687 items.php:723
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Не удалось очистить историю и тренды"
 
 #: include/classes/api/services/CDiscoveryRule.php:3834
 msgid "Cannot clone graph prototypes."
@@ -2636,7 +2636,7 @@ msgstr[2] "Не удалось удалить графики"
 #: graphs.php:273 graphs.php:317
 msgid "Cannot delete graph prototype"
 msgid_plural "Cannot delete graph prototypes"
-msgstr[0] ""
+msgstr[0] "Не удалось удалить прототип графика"
 msgstr[1] "Не удалось удалить прототипы графиков"
 msgstr[2] "Не удалось удалить прототипы графиков"
 
@@ -3625,6 +3625,10 @@ msgstr "Невозможно массово обновить имя узла с�
 #: include/classes/api/services/CHost.php:1020
 msgid "Cannot mass update visible host name."
 msgstr "Невозможно массово обновить видимое имя узла сети."
+
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
 
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
@@ -5099,6 +5103,10 @@ msgstr "Меню содержимого"
 msgid "Context name"
 msgstr "Имя контекста"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr "Продолжить замещения"
@@ -6008,6 +6016,10 @@ msgstr "Аутентификация по умолчанию"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "Режим инвентаризации узлов сети по умолчанию"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7234,6 +7246,14 @@ msgstr "Отрисовка"
 msgid "Draw style"
 msgstr "Стиль отрисовки"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7631,6 +7651,10 @@ msgstr "Активировать выбранные веб-сценарии?"
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
 msgstr "Активировать трапы"
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -10967,6 +10991,18 @@ msgstr "Начальный вид"
 msgid "Initial view is ignored if the default view is set."
 msgstr "Начальный вид игнорируется, если задан вид по умолчанию."
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "Вставить"
@@ -11139,6 +11175,11 @@ msgstr "Ошибочная конфигурация сопоставления �
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "Ошибочная конфигурация сопоставления группы пользователей JIT инициализации SAML."
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "Ошибочное содержимое YAML файла."
@@ -11166,6 +11207,10 @@ msgstr "Ошибочный email адрес \"%1$s\"."
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "Ошибочный email адрес у способа оповещения с ID \"%1$s\"."
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -12373,6 +12418,10 @@ msgstr "Размещение (долгота)"
 msgid "Log"
 msgstr "Журнал (лог)"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Мониторинг файлов журналов с поддержкой ротации. Возвращает лог"
@@ -12380,6 +12429,10 @@ msgstr "Мониторинг файлов журналов с поддержко
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Мониторинг файлов журналов логов. Возвращает лог"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12618,6 +12671,10 @@ msgstr "Действие вручную над событиями"
 #: app/views/administration.script.list.php:159
 msgid "Manual host action"
 msgstr "Действие вручную над узлом сети"
+
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -14897,6 +14954,10 @@ msgstr "Только супер администраторы могут зада
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "Подсчитываются только триггеры у активированных узлов сети и которые зависят от активных элементов данных"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "Открывать в новом окне"
@@ -15162,6 +15223,10 @@ msgstr "Переопределить период хранения истори�
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "Переопределить период хранения динамики изменения элементов данных"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -19563,6 +19628,10 @@ msgstr "Тестовая строка"
 msgid "Test subject"
 msgstr "Тестовая тема"
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -20030,7 +20099,7 @@ msgstr "Топ 100 триггеров"
 
 #: widgets/tophosts/includes/WidgetForm.php:145
 msgid "Top N"
-msgstr "Топ N"
+msgstr "Первые N"
 
 #: widgets/tophosts/Widget.php:34
 msgid "Top hosts"
@@ -20627,6 +20696,10 @@ msgstr "URL закодирован некорректно."
 #, c-format
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "Имя URL должно быть уникальным у карты сети \"%1$s\"."
+
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
 
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
@@ -21433,6 +21506,10 @@ msgstr "Группа пользователей с ID \"%1$s\" недоступ�
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "Группы пользователей"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22551,9 +22628,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "С проблемами"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "С этой настройкой в этой колонке будут отображаться только числовые элементы данных."
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -24003,6 +24089,12 @@ msgstr "некорректный синтаксис около \"%1$s\""
 msgid "incorrect usage of function \"%1$s\""
 msgstr "некорректное использование функции \"%1$s\""
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - Добавление указанных символов или пробелов в строку символов, начиная от указанной позиции в строке"
@@ -24549,6 +24641,10 @@ msgstr "не в"
 msgid "not selected"
 msgstr "не выбрано"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - Количество секунд начиная с Epoch"
@@ -24557,9 +24653,29 @@ msgstr "now() - Количество секунд начиная с Epoch"
 msgid "number"
 msgstr "число"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "объект не существует или принадлежит другому объекту"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"
@@ -25380,6 +25496,10 @@ msgstr "значение должно быть в диапазоне %1$s"
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
 msgstr "значение тега нового события"
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"

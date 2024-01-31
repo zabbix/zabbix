@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-08 12:35+0000\n"
-"Last-Translator: Atsushi Tanaka <kha00760@nifty.com>\n"
+"PO-Revision-Date: 2024-01-26 09:47+0000\n"
+"Last-Translator: JK <kim.jongkwon@zabbix.com>\n"
 "Language-Team: Zabbix\n"
 "Language: ja\n"
 "MIME-Version: 1.0\n"
@@ -201,7 +201,7 @@ msgstr "%1$s件が選択されています、上下矢印キーとエンター�
 #, c-format
 msgid "%1$s problem"
 msgid_plural "%1$s problems"
-msgstr[0] "%1$sで障害発生"
+msgstr[0] ""
 
 #: include/classes/helpers/CMapHelper.php:319
 #, c-format
@@ -3458,6 +3458,10 @@ msgstr "ホスト名を一括更新できません。"
 msgid "Cannot mass update visible host name."
 msgstr "ホストの表示名を一括更新できません。"
 
+#: jsLoader.php:435
+msgid "Cannot open URL"
+msgstr ""
+
 #: include/classes/api/services/CHostBase.php:1561
 #, c-format
 msgid "Cannot pass duplicate template IDs for the linkage: %1$s."
@@ -4907,6 +4911,10 @@ msgstr "コンテンツメニュー"
 msgid "Context name"
 msgstr "コンテキスト名"
 
+#: app/views/script.userinput.edit.php:82
+msgid "Continue"
+msgstr ""
+
 #: app/views/popup.lldoverride.php:54
 msgid "Continue overrides"
 msgstr "上書きを続行"
@@ -5808,6 +5816,10 @@ msgstr "デフォルトの認証"
 #: app/views/administration.miscconfig.edit.php:58
 msgid "Default host inventory mode"
 msgstr "デフォルトのホストインベントリモード"
+
+#: app/views/administration.script.edit.php:358
+msgid "Default input string"
+msgstr ""
 
 #: app/views/administration.gui.edit.php:73
 #: include/classes/setup/CSetupWizard.php:458
@@ -7028,6 +7040,14 @@ msgstr "グラフの形式"
 msgid "Draw style"
 msgstr "グラフの形式"
 
+#: app/views/administration.script.edit.php:353
+msgid "Dropdown"
+msgstr ""
+
+#: app/views/administration.script.edit.php:366
+msgid "Dropdown options"
+msgstr ""
+
 #: include/classes/api/services/CMap.php:614
 #: include/classes/api/services/CMap.php:1076
 #, c-format
@@ -7425,6 +7445,10 @@ msgstr "選択したWebシナリオを有効にしますか？"
 #: include/views/configuration.item.prototype.edit.php:898
 msgid "Enable trapping"
 msgstr "トラッピングの有効化"
+
+#: app/views/administration.script.edit.php:333
+msgid "Enable user input"
+msgstr ""
 
 #: app/partials/administration.system.info.php:238
 #: app/partials/configuration.filter.items.php:193
@@ -10727,6 +10751,18 @@ msgstr "初期表示位置"
 msgid "Initial view is ignored if the default view is set."
 msgstr "デフォルト表示が設定されている場合は、初期表示設定は無視されます。"
 
+#: app/views/administration.script.edit.php:339
+msgid "Input prompt"
+msgstr ""
+
+#: app/views/administration.script.edit.php:349
+msgid "Input type"
+msgstr ""
+
+#: app/views/administration.script.edit.php:376
+msgid "Input validation rule"
+msgstr ""
+
 #: app/views/popup.triggerexpr.php:275
 msgid "Insert"
 msgstr "挿入"
@@ -10899,6 +10935,11 @@ msgstr "SAML JITプロビジョニングメディアタイプのマッピング�
 msgid "Invalid SAML JIT provisioning user group mapping configuration."
 msgstr "SAML JITプロビジョニングユーザーグループのマッピング構成が正しくありません。"
 
+#: jsLoader.php:438
+#, c-format
+msgid "Invalid URL: %1$s"
+msgstr ""
+
 #: include/classes/import/readers/CYamlImportReader.php:55
 msgid "Invalid YAML file contents"
 msgstr "YAMLファイルの内容が正しくありません"
@@ -10926,6 +10967,10 @@ msgstr "メールアドレス\"%1$s\"が正しくありません。"
 #, c-format
 msgid "Invalid email address for media type with ID \"%1$s\"."
 msgstr "ID \"%1$s\"のメディアタイプのメールアドレスが正しくありません。"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:43
+msgid "Invalid input"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOperation.php:176
 #: app/controllers/CControllerPopupLldOperation.php:181
@@ -12107,6 +12152,10 @@ msgstr "経度"
 msgid "Log"
 msgstr "ログ"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "ログローテーションに対応したログファイル監視。ログ値を返す。"
@@ -12114,6 +12163,10 @@ msgstr "ログローテーションに対応したログファイル監視。ロ
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "ログファイル監視。ログ値を返す。"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr ""
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12350,6 +12403,10 @@ msgstr "手動イベント処理"
 #: app/views/administration.script.list.php:159
 msgid "Manual host action"
 msgstr "手動ホスト処理"
+
+#: app/views/script.userinput.edit.php:100
+msgid "Manual input"
+msgstr ""
 
 #: app/views/popup.acknowledge.edit.php:84
 msgid "Manual problem suppression. Date-time input accepts relative and absolute time format."
@@ -14607,6 +14664,10 @@ msgstr "特権管理者のみがレポートのオーナーを設定できます
 msgid "Only triggers assigned to enabled hosts and depending on enabled items are counted"
 msgstr "有効なホストとアイテムのトリガーのみカウント"
 
+#: jsLoader.php:439
+msgid "Open URL"
+msgstr ""
+
 #: app/views/administration.script.edit.php:228
 msgid "Open in a new window"
 msgstr "新しいウィンドウで開く"
@@ -14872,6 +14933,10 @@ msgstr "アイテムのヒストリの保存期間設定を上書き"
 #: app/views/administration.housekeeping.edit.php:155
 msgid "Override item trend period"
 msgstr "アイテムのトレンドの保存期間設定を上書き"
+
+#: app/views/popup.tabfilter.edit.php:40
+msgid "Override time period selector"
+msgstr ""
 
 #: app/controllers/CControllerPopupLldOverride.php:90
 #, c-format
@@ -19247,6 +19312,10 @@ msgstr "テスト文字列"
 msgid "Test subject"
 msgstr "テスト用の件名"
 
+#: app/views/administration.script.edit.php:345
+msgid "Test user input"
+msgstr ""
+
 #: app/partials/configuration.filter.items.php:146
 #: app/views/popup.massupdate.item.php:151
 #: include/classes/html/CMacroValue.php:162 include/items.inc.php:131
@@ -20294,6 +20363,10 @@ msgstr "URLが正しくエンコードされていません。"
 msgid "URL name should be unique for map \"%1$s\"."
 msgstr "マップ\"%1$s\"のURLの名前は重複できません。"
 
+#: jsLoader.php:441
+msgid "URL opening confirmation"
+msgstr ""
+
 #: include/html.inc.php:102
 msgid "URL parameter cannot be array."
 msgstr "URLパラメータに配列は使用できません。"
@@ -21091,6 +21164,10 @@ msgstr "ID \"%1$s\"のユーザーグループは使用できません。"
 #: include/views/monitoring.sysmap.edit.php:328
 msgid "User groups"
 msgstr "ユーザーグループ"
+
+#: app/controllers/CControllerScriptUserInputCheck.php:61
+msgid "User input has been successfully tested."
+msgstr ""
 
 #: include/classes/api/services/CUser.php:1282
 msgid "User is not allowed to delete himself."
@@ -22199,9 +22276,18 @@ msgctxt "compact table header"
 msgid "With problems"
 msgstr "障害あり"
 
+#: widgets/tophosts/views/column.edit.php:130
+msgid "With this setting only numeric data will be displayed."
+msgstr ""
+
 #: widgets/tophosts/views/column.edit.php:135
 msgid "With this setting only numeric items will be displayed in this column."
 msgstr "この設定では、数値アイテムだけがこの列内に表示されます。"
+
+#: widgets/item/views/widget.edit.php:70
+#: widgets/tophosts/views/column.edit.php:225
+msgid "With this setting only numeric items will be displayed."
+msgstr ""
 
 #: include/forms.inc.php:339 include/forms.inc.php:557
 msgid "With triggers"
@@ -23651,6 +23737,12 @@ msgstr "間違った書式が\"%1$s\"付近に見つかりました"
 msgid "incorrect usage of function \"%1$s\""
 msgstr "関数\"%1$s\"の使い方が正しくありません"
 
+#: app/controllers/CControllerScriptUserInputCheck.php:111
+#: include/classes/api/services/CScript.php:517
+#, c-format
+msgid "input does not match the provided pattern: %1$s"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:665
 msgid "insert() - Inserts specified characters or spaces into a character string, beginning at a specified position in the string"
 msgstr "insert() - 文字列内の指定した開始位置から指定した文字列かスペースを挿入する"
@@ -24197,6 +24289,10 @@ msgstr "期間外"
 msgid "not selected"
 msgstr "選択されていません"
 
+#: include/classes/helpers/CItemHelper.php:261
+msgid "not used"
+msgstr ""
+
 #: app/controllers/CControllerPopupTriggerExpr.php:872
 msgid "now() - Number of seconds since the Epoch"
 msgstr "now() - エポックを基準とした経過秒数"
@@ -24205,8 +24301,28 @@ msgstr "now() - エポックを基準とした経過秒数"
 msgid "number"
 msgstr "数値"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
 msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
@@ -25024,6 +25140,10 @@ msgstr "値は%1$sの範囲内にしてください"
 #: include/classes/helpers/CCorrelationHelper.php:141
 msgid "value of new event tag"
 msgstr "新しいイベントタグの値"
+
+#: include/classes/api/services/CScript.php:527
+msgid "values must be unique"
+msgstr ""
 
 #: app/controllers/CControllerPopupTriggerExpr.php:1193
 msgid "varpop() - Population variance"

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -140,7 +140,7 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1": unexpected parameter "flags".'
 			],
-			'add unexisting dependent trigger' => [
+			'add nonexistent dependent trigger' => [
 				'triggers' => [
 					[
 						'triggerid' => self::UPDATE_TRIGGER_1,
@@ -272,20 +272,20 @@ class testTriggerValidation extends CAPITest {
 				],
 				'expected_error' => 'Invalid parameter "/1/priority": value must be one of 0, 1, 2, 3, 4, 5.'
 			],
-			'Trigger with unexpected recovery exporession' => [
+			'Trigger with unexpected recovery expression' => [
 				'triggers' => [
 					[
-						'description' => 'Trigger with unexpected recovery exporession',
+						'description' => 'Trigger with unexpected recovery expression',
 						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_expression' => 'last(/Trigger validation test host/item)=1'
 					]
 				],
 				'expected_error' => 'Incorrect value for field "recovery_expression": should be empty.'
 			],
-			'Trigger with unspecified recovery exporession' => [
+			'Trigger with unspecified recovery expression' => [
 				'triggers' => [
 					[
-						'description' => 'Trigger with unspecified recovery exporession',
+						'description' => 'Trigger with unspecified recovery expression',
 						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1
 					]
@@ -295,7 +295,7 @@ class testTriggerValidation extends CAPITest {
 			'Trigger with invalid recovery expression #1' => [
 				'triggers' => [
 					[
-						'description' => 'Trigger with expected recovery exporession',
+						'description' => 'Trigger with expected recovery expression',
 						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1,
 						'recovery_expression' => ['last(/Trigger validation test host/item)=1']
@@ -306,7 +306,7 @@ class testTriggerValidation extends CAPITest {
 			'Trigger with invalid recovery expression #2' => [
 				'triggers' => [
 					[
-						'description' => 'Trigger with expected recovery exporession',
+						'description' => 'Trigger with expected recovery expression',
 						'expression' => 'last(/Trigger validation test host/item)=0',
 						'recovery_mode' => 1,
 						'recovery_expression' => '1+1'

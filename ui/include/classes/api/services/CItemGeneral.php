@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2489,64 +2489,9 @@ abstract class CItemGeneral extends CApiService {
 	 * @return array    The resulting SQL parts array.
 	 */
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts) {
-		if (!$options['countOutput'] && self::dbDistinct($sql_parts)) {
-			$schema = $this->getTableSchema();
-			$nclob_fields = [];
-
-			foreach ($schema['fields'] as $field_name => $field) {
-				if ($field['type'] == DB::FIELD_TYPE_NCLOB
-						&& $this->outputIsRequested($field_name, $options['output'])) {
-					$nclob_fields[] = $field_name;
-				}
-			}
-
-			if ($nclob_fields) {
-				$output = ($options['output'] === API_OUTPUT_EXTEND)
-					? array_keys($schema['fields'])
-					: $options['output'];
-
-				$options['output'] = array_diff($output, $nclob_fields);
-			}
-		}
+		$this->unsetNclobFieldsFromOutput($options, $sql_parts);
 
 		return parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
-	}
-
-	/**
-	 * Add NCLOB type fields if there was DISTINCT in query.
-	 *
-	 * @param array $options    Array of query options.
-	 * @param array $result     Query results.
-	 *
-	 * @return array    The result array with added NCLOB fields.
-	 */
-	protected function addNclobFieldValues(array $options, array $result): array {
-		$schema = $this->getTableSchema();
-		$nclob_fields = [];
-
-		foreach ($schema['fields'] as $field_name => $field) {
-			if ($field['type'] == DB::FIELD_TYPE_NCLOB && $this->outputIsRequested($field_name, $options['output'])) {
-				$nclob_fields[] = $field_name;
-			}
-		}
-
-		if (!$nclob_fields) {
-			return $result;
-		}
-
-		$pk = $schema['key'];
-		$options = [
-			'output' => $nclob_fields,
-			'filter' => [$pk => array_keys($result)]
-		];
-
-		$db_items = DBselect(DB::makeSql($this->tableName, $options));
-
-		while ($db_item = DBfetch($db_items)) {
-			$result[$db_item[$pk]] += $db_item;
-		}
-
-		return $result;
 	}
 
 	/**

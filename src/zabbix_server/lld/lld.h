@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -319,7 +319,7 @@ void	lld_update_hosts(zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_r
 
 int	lld_end_of_life(int lastcheck, int lifetime);
 
-typedef void	(*delete_ids_f)(zbx_vector_uint64_t *ids);
+typedef void	(*delete_ids_f)(zbx_vector_uint64_t *ids, int audit_context_mode);
 typedef void	(*get_object_info_f)(const void *object, zbx_uint64_t *id, int *discovered, int *lastcheck,
 		int *ts_delete, const char **name);
 void	lld_remove_lost_objects(const char *table, const char *id_name, const zbx_vector_ptr_t *objects,

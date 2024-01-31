@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1068,22 +1068,14 @@ class CSvgGraph extends CSvg {
 				$bar_stack_x1 = $group_x1;
 
 				foreach ($bar_group as $bar_group_index => $bar_stack) {
-					$sum_positive = 0;
-					$sum_negative = 0;
+					$sum = 0;
 
 					$bar_stack_x2 = $group_x1 + ($bar_group_index + 1) * $metric_width;
 
 					foreach ($bar_stack as [$metric_index, $point_value]) {
-						if ($point_value >= 0) {
-							$value_from = $sum_positive;
-							$value_to = $sum_positive + $point_value;
-							$sum_positive += $point_value;
-						}
-						else {
-							$value_from = $point_value + $point_value;
-							$value_to = $point_value;
-							$sum_negative += $point_value;
-						}
+						$value_from = $sum;
+						$value_to = $sum + $point_value;
+						$sum += $point_value;
 
 						if ($max_value - $min_value == INF) {
 							$bar_y1 = $this->canvas_y + CMathHelper::safeMul([$this->canvas_height,

@@ -49,7 +49,7 @@ parse_item_key_LDADD = \
 	$(top_srcdir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	$(top_srcdir)/src/zabbix_server/escalator/libzbxescalator.a \
 	$(top_srcdir)/src/zabbix_server/proxypoller/libzbxproxypoller.a \
-	$(top_srcdir)/src/zabbix_server/vmware/libzbxvmware.a \
+	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
 	$(top_srcdir)/src/libs/zbxsysinfo/libzbxserversysinfo.a \
@@ -214,6 +214,27 @@ zbx_execute_agent_check_WRAP_FUNCS = \
 	-Wl,--wrap=vfs_file_md5sum \
 	-Wl,--wrap=vfs_file_cksum \
 	-Wl,--wrap=vfs_dir_size \
+	-Wl,--wrap=vfs_dev_discovery \
+	-Wl,--wrap=vfs_dev_read \
+	-Wl,--wrap=vfs_dev_write \
+	-Wl,--wrap=vfs_dir_count \
+	-Wl,--wrap=vfs_dir_get \
+	-Wl,--wrap=vfs_dir_size \
+	-Wl,--wrap=vfs_dir_cksum \
+	-Wl,--wrap=vfs_file_contents \
+	-Wl,--wrap=vfs_file_exists \
+	-Wl,--wrap=vfs_file_get \
+	-Wl,--wrap=vfs_file_md5sum \
+	-Wl,--wrap=vfs_file_owner \
+	-Wl,--wrap=vfs_file_permissions \
+	-Wl,--wrap=vfs_file_regexp \
+	-Wl,--wrap=vfs_file_regmatch \
+	-Wl,--wrap=vfs_file_size \
+	-Wl,--wrap=vfs_file_time \
+	-Wl,--wrap=vfs_fs_discovery \
+	-Wl,--wrap=vfs_fs_get \
+	-Wl,--wrap=vfs_fs_inode \
+	-Wl,--wrap=vfs_fs_size \
 	-Wl,--wrap=net_dns \
 	-Wl,--wrap=net_dns_record \
 	-Wl,--wrap=net_dns_perf \
