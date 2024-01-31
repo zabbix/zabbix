@@ -28,6 +28,7 @@ class CSVGHoneycomb {
 	static ZBX_STYLE_CELL_OTHER =			'svg-honeycomb-cell-other';
 	static ZBX_STYLE_CELL_OTHER_ELLIPSIS =	'svg-honeycomb-cell-other-ellipsis';
 	static ZBX_STYLE_CONTENT =				'svg-honeycomb-content';
+	static ZBX_STYLE_BACKDROP =				'svg-honeycomb-backdrop';
 	static ZBX_STYLE_LABEL =				'svg-honeycomb-label';
 	static ZBX_STYLE_LABEL_PRIMARY =		'svg-honeycomb-label-primary';
 	static ZBX_STYLE_LABEL_SECONDARY =		'svg-honeycomb-label-secondary';
@@ -422,6 +423,110 @@ class CSVGHoneycomb {
 	};
 
 	#drawCell(cell) {
+		const enter = (cell, d) => {
+			const margin = {
+				horizontal: (this.#padding.horizontal / 2 + this.#container_params.x) / this.#container_params.scale,
+				vertical: (this.#padding.vertical / 2 + this.#container_params.y) / this.#container_params.scale
+			};
+
+			const scale = Math.min(
+				this.#container_params.width / Math.sqrt(3) * 2 + margin.horizontal * 2,
+				this.#container_params.height + this.#cells_gap + margin.vertical * 2,
+				this.#cell_height * (0.15 / this.#container_params.scale + 0.55)
+			);
+
+			const scaled_size = {
+				width: scale * Math.sqrt(3) / 2,
+				height: scale
+			}
+
+			const scaled_position = {
+				x: Math.max(
+					scaled_size.width / 2 - margin.horizontal,
+					Math.min(
+						this.#container_params.width - scaled_size.width / 2 + margin.horizontal,
+						d.position.x
+					)
+				),
+				y: Math.max(
+					scaled_size.height / 2 - margin.vertical,
+					Math.min(
+						this.#container_params.height + this.#cells_gap - scaled_size.height / 2 + margin.vertical,
+						d.position.y
+					)
+				)
+			};
+
+			d.scaled = true;
+			d.stored_labels = d.labels;
+
+			this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
+			this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
+
+			if (cell.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`).empty()) {
+				cell
+					.append('path')
+					.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
+					.attr('d', this.#generatePath(Math.max(this.#cell_height, scaled_size.height * .65), 0))
+					.attr('transform', `translate(0 0)`)
+					.style('fill', 'transparent');
+			}
+			else {
+				clearTimeout(d.backdrop_timeout);
+			}
+
+			cell
+				.attr('transform', `translate(${scaled_position.x} ${scaled_position.y})`)
+				.style('--honeycomb-stroke-color', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
+				.call(cell => cell
+					.select('path')
+					.attr('d', this.#generatePath(scaled_size.height, 0))
+					.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
+				)
+				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
+				.attr('transform',
+					`translate(${d.position.x - scaled_position.x} ${d.position.y - scaled_position.y})`
+				);
+
+			this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
+				detail: {
+					hostid: d.hostid,
+					itemid: d.itemid
+				}
+			});
+		};
+
+		const leave = (cell, d) => {
+			d.scaled = false;
+			d.labels = d.stored_labels;
+
+			this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
+
+			d.backdrop_timeout = setTimeout(() => {
+				cell
+					.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
+					.remove();
+			}, UI_TRANSITION_DURATION);
+
+			cell
+				.attr('transform', `translate(${d.position.x} ${d.position.y})`)
+				.style('--honeycomb-stroke-color', d => this.#getFillColor(d))
+				.call(cell => cell
+					.select('path')
+					.attr('d', this.#cell_path)
+					.style('filter', null)
+				)
+				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
+				.attr('transform', `translate(0 0)`);
+
+			this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
+				detail: {
+					hostid: d.hostid,
+					itemid: d.itemid
+				}
+			});
+		};
+
 		cell
 			.call(cell => this.#drawLabel(cell))
 			.on('click', (e, d) => {
@@ -433,95 +538,22 @@ class CSVGHoneycomb {
 				});
 			})
 			.on('mouseenter', (e, d) => {
-				const margin = {
-					horizontal: (this.#padding.horizontal / 2 + this.#container_params.x) / this.#container_params.scale,
-					vertical: (this.#padding.vertical / 2 + this.#container_params.y) / this.#container_params.scale
-				};
-
-				const scale = Math.min(
-					this.#container_params.width / Math.sqrt(3) * 2 + margin.horizontal * 2,
-					this.#container_params.height + this.#cells_gap + margin.vertical * 2,
-					this.#cell_height * (0.15 / this.#container_params.scale + 0.55)
-				);
-
-				const scaled_size = {
-					width: scale * Math.sqrt(3) / 2,
-					height: scale
-				}
-
-				const scaled_position = {
-					x: Math.max(
-						scaled_size.width / 2 - margin.horizontal,
-						Math.min(
-							this.#container_params.width - scaled_size.width / 2 + margin.horizontal,
-							d.position.x
-						)
-					),
-					y: Math.max(
-						scaled_size.height / 2 - margin.vertical,
-						Math.min(
-							this.#container_params.height + this.#cells_gap - scaled_size.height / 2 + margin.vertical,
-							d.position.y
-						)
-					)
-				};
-
-				d.stored_labels = d.labels;
-
-				this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
-
-				d3.select(e.target)
-					.raise()
-					.call(cell => {
-						setTimeout(() => {
-							cell
-								.attr('transform', `translate(${scaled_position.x} ${scaled_position.y})`)
-								.call(cell => cell
-									.select('path')
-									.attr('d', this.#generatePath(scaled_size.height, 0))
-									.style('filter',
-										`url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`
-									)
-								)
-								.style('--honeycomb-stroke-color',
-									d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex()
-								)
-								.call(cell => this.#resizeLabels(cell,
-									scaled_size.width, (scaled_size.height + this.#cells_gap) / 2
-								));
-
-							this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
-								detail: {
-									hostid: d.hostid,
-									itemid: d.itemid
-								}
-							});
-						})
+				this.#honeycomb_container
+					.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
+					.each((datum, i, cells) => {
+						if (d === datum) {
+							cell.raise();
+							setTimeout(() => enter(cell, d));
+						}
+						else if (datum.scaled === true) {
+							leave(d3.select(cells[i]), datum);
+						}
 					});
 			})
 			.on('mouseleave', (e, d) => {
-				d.labels = d.stored_labels;
-
-				d3.select(e.target)
-					.attr('transform', `translate(${d.position.x} ${d.position.y})`)
-					.style('--honeycomb-stroke-color', d => this.#getFillColor(d))
-					.call(cell => cell
-						.select('path')
-						.attr('d', this.#cell_path)
-						.style('filter', null)
-					)
-					.call(cell => {
-						setTimeout(() => {
-							this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
-
-							this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
-								detail: {
-									hostid: d.hostid,
-									itemid: d.itemid
-								}
-							});
-						})
-					});
+				if (d.scaled === true) {
+					leave(d3.select(e.target), d);
+				}
 			});
 	}
 

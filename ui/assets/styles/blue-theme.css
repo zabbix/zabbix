@@ -3561,6 +3561,8 @@ section {
       fill: var(--honeycomb-fill-color);
       stroke: var(--honeycomb-stroke-color, var(--honeycomb-fill-color));
       transition: d 0.3s, fill 0.6s, stroke 0.3s; }
+      .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
+        transition: transform 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell foreignObject {
       transition: x 0.3s, y 0.3s, width 0.3s, height 0.3s; }
       .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-content {

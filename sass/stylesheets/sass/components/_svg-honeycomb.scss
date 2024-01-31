@@ -22,6 +22,10 @@
 				transition: d $ui-transition-duration,
 							fill $ui-transition-duration * 2,
 							stroke $ui-transition-duration;
+
+				&.svg-honeycomb-backdrop {
+					transition: transform $ui-transition-duration;
+				}
 			}
 		}
 
