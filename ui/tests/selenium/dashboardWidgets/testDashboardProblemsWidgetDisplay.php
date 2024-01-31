@@ -819,7 +819,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 						// Click on icon and open hint.
 						$icon->click();
 						$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
-								->waitUntilVisible()->one();
+								->waitUntilReady()->one();
 						$hint_table = $hint->query('class:list-table')->asTable()->one();
 
 						// Check rows in hint's table.
@@ -830,10 +830,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							$row->assertValues($hint_rows[$i]);
 						}
 
-						// TODO: remove 'if' statement after fix ZBX-23472
-						if ($class !== 'zi-bullet-right-with-content') {
-							$hint->close();
-						}
+						$hint->close();
 					}
 				}
 			}
