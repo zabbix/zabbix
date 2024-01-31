@@ -2340,7 +2340,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'column_fields' => [
 						[
-							'Name' => 'test column 0',
+							'Name' => 'column 0',
 							'Data' => 'Item value',
 							'Item' => '1_item'
 						],
@@ -3674,13 +3674,13 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
 
-		// Update column.
+		// Create widget with column(s).
 		$this->fillColumnForm($data, 'create');
 		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
 		$this->page->waitUntilReady();
 		$dashboard->save();
-		$this->assertMessage('Dashboard updated');
+		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		foreach ($data['column_fields'] as $fields) {
 			foreach ($fields['Thresholds'] as $threshold) {
@@ -4183,7 +4183,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 			// Non-numeric items with aggregation function 'min'/'max'/'avg'/'sum' and Custom time period.
 			[
 				[
-					'non-numeric' => true,
+					'no_data_found' => true,
 					'column_fields' => [
 						[
 							'Name' => 'log item with  aggregation function min',
@@ -4666,6 +4666,429 @@ class testDashboardTopHostsWidget extends testWidgets {
 						]
 					]
 				]
+			],
+			// Check that widget with bar/indicators return 'No data found' if non-numeric data is selected.
+			[
+				[
+					'no_data_found' => true,
+					'column_fields' => [
+						[
+							'Name' => 'Min',
+							'Item' => 'Item with type of information - Log',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2h',
+							'id:time_period_to' => 'now-1h'
+						],
+						[
+							'Name' => 'Max',
+							'Item' => 'Item with type of information - Character',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1w',
+							'id:time_period_to' => 'now-1d'
+						],
+						[
+							'Name' => 'Avg',
+							'Item' => 'Item with type of information - Text',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '2023-12-12 00:00:00',
+							'id:time_period_to' => '2023-12-12 10:00:00'
+						],
+						[
+							'Name' => 'Sum',
+							'Item' => 'Item with type of information - Log',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1h-30m',
+							'id:time_period_to' => 'now-30m'
+						],
+						[
+							'Name' => 'First',
+							'Item' => 'Item with type of information - Character',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'first',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-30m',
+							'id:time_period_to' => 'now'
+						],
+						[
+							'Name' => 'Last',
+							'Item' => 'Item with type of information - Text',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'last',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2d',
+							'id:time_period_to' => 'now-1d'
+						],
+						[
+							'Name' => 'Not used',
+							'Item' => 'Item with type of information - Log',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character 1',
+							'time' => '-15 minutes'
+						],
+						[
+							'name' => 'Item with type of information - Log',
+							'value' => 'Log 1',
+							'time' => '-45 minutes'
+						],
+						[
+							'name' => 'Item with type of information - Log',
+							'value' => 'Log 2',
+							'time' => '-1 hour -10 minutes'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'Text 1',
+							'time' => '-1 day -1 hour'
+						],
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character 2',
+							'time' => '-3 days'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'Text 2',
+							'time' => '2023-12-12 05:00:00'
+						]
+					]
+				]
+			],
+			// Check that widget displays bar/idnicators when aggregation function 'count' is used for non-numeric item.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Count Log',
+							'Item' => 'Item with type of information - Log',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-2h',
+							'id:time_period_to' => 'now-1h'
+						],
+						[
+							'Name' => 'Count Character',
+							'Item' => 'Item with type of information - Character',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '0'],
+								['color' => 'BFFF00', 'threshold' => '0.5']
+							],
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => 'now-1w',
+							'id:time_period_to' => 'now-1d'
+						],
+						[
+							'Name' => 'Count Text',
+							'Item' => 'Item with type of information - Text',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '0'],
+								['color' => 'D1C4E9', 'threshold' => '1']
+							],
+							'Aggregation function' => 'count',
+							'Time period' => 'Custom',
+							'id:time_period_from' => '2023-12-12 00:00:00',
+							'id:time_period_to' => '2023-12-12 10:00:00'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - Log',
+							'value' => 'Log 1',
+							'time' => '-1 hour -15 minutes'
+						],
+						[
+							'name' => 'Item with type of information - Character',
+							'value' => 'Character',
+							'time' => '-3 days'
+						],
+						[
+							'name' => 'Item with type of information - Text',
+							'value' => 'Text',
+							'time' => '2023-12-12 05:00:00'
+						]
+					],
+					'screen_name' => 'mixed_non_numeric'
+				]
+			],
+			// Non-numeric items without data but with aggregation function count (return 0) that are displayed as bar/indicators.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Count Log',
+							'Item' => 'Item with type of information - Log',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Aggregation function' => 'count'
+						],
+						[
+							'Name' => 'Count Character',
+							'Item' => 'Item with type of information - Character',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '-1',
+							'Max' => '1',
+							'Thresholds' => [
+								['color' => 'BFFF00', 'threshold' => '0'],
+								['color' => '4000FF', 'threshold' => '1']
+							],
+							'Aggregation function' => 'count'
+						],
+						[
+							'Name' => 'Count Text',
+							'Item' => 'Item with type of information - Text',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '0'],
+								['color' => 'D1C4E9', 'threshold' => '1']
+							],
+							'Aggregation function' => 'count'
+						]
+					],
+					'screen_name' => 'mixed_non_numeric_without_item_data'
+				]
+			],
+			// Numeric items without data that are displayed as bar/indicators.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Min',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Aggregation function' => 'min'
+						],
+						[
+							'Name' => 'Max',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '-1',
+							'Max' => '1',
+							'Aggregation function' => 'max'
+						],
+						[
+							'Name' => 'Avg',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Aggregation function' => 'avg'
+						],
+						[
+							'Name' => 'Sum',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Aggregation function' => 'sum'
+						],
+						[
+							'Name' => 'First',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Aggregation function' => 'first'
+						],
+						[
+							'Name' => 'Last',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '1',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '0'],
+								['color' => 'D1C4E9', 'threshold' => '1']
+							],
+							'Aggregation function' => 'last'
+						]
+					],
+					'result' => [
+						[
+							'Min' => '',
+							'Max' => '',
+							'Avg' => '',
+							'Sum' => '',
+							'First' => '',
+							'Last' => ''
+						]
+					]
+				]
+			],
+			// Numeric items with data and aggregation function min/max/avg/count that are displayed as bar/indicators.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Min',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '-1',
+							'Max' => '10',
+							'Thresholds' => [
+								['color' => 'FFF9C4', 'threshold' => '-1']
+							],
+							'Aggregation function' => 'min',
+							'Time period' => 'Custom'
+						],
+						[
+							'Name' => 'Max',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '-1.00',
+							'Max' => '10.00',
+							'Aggregation function' => 'max',
+							'Time period' => 'Custom'
+						],
+						[
+							'Name' => 'Avg',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'avg',
+							'Time period' => 'Custom'
+						],
+						[
+							'Name' => 'Count',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10.00',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '3.33'],
+								['color' => 'D1C4E9', 'threshold' => '6.55']
+							],
+							'Aggregation function' => 'sum',
+							'Time period' => 'Custom'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '1',
+							'time' => '-15 minutes'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '5',
+							'time' => '-30 minutes'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '1.11',
+							'time' => '-20 minutes'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '5.44',
+							'time' => '-40 minutes'
+						]
+					],
+					'screen_name' => 'mixed_numeric'
+				]
+			],
+			// Numeric items with data and aggregation function sum/first/last that are displayed as bar/indicators.
+			[
+				[
+					'column_fields' => [
+						[
+							'Name' => 'Sum',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Aggregation function' => 'sum'
+						],
+						[
+							'Name' => 'First',
+							'Item' => 'Item with type of information - numeric (float)',
+							'Display' => 'Bar', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10.00',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '-1.11'],
+								['color' => 'D1C4E9', 'threshold' => '1.11']
+							],
+							'Aggregation function' => 'first'
+						],
+						[
+							'Name' => 'Last',
+							'Item' => 'Item with type of information - numeric (unsigned)',
+							'Display' => 'Indicators', // With this setting only numeric data will be displayed.
+							'Min' => '0',
+							'Max' => '10',
+							'Thresholds' => [
+								['color' => '4000FF', 'threshold' => '0'],
+								['color' => 'D1C4E9', 'threshold' => '1']
+							],
+							'Aggregation function' => 'last'
+						]
+					],
+					'item_data' => [
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '1',
+							'time' => '-15 minutes'
+						],
+						[
+							'name' => 'Item with type of information - numeric (unsigned)',
+							'value' => '5',
+							'time' => '-30 minutes'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '1.11',
+							'time' => '-20 minutes'
+						],
+						[
+							'name' => 'Item with type of information - numeric (float)',
+							'value' => '5.55',
+							'time' => '-40 minutes'
+						]
+					],
+					'screen_name' => 'mixed_numeric2'
+				]
 			]
 		];
 	}
@@ -4680,12 +5103,14 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$dashboard = CDashboardElement::find()->one();
 		$dashboard->waitUntilReady();
 
-		foreach ($data['item_data'] as $params) {
-			$params['time'] = strtotime($params['time']);
-			CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], $params['time']);
+		if (array_key_exists('item_data', $data)) {
+			foreach ($data['item_data'] as $params) {
+				$params['time'] = strtotime($params['time']);
+				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], $params['time']);
+			}
 		}
 
-		// Update column.
+		// Create widget with column(s).
 		$form = $dashboard->edit()->addWidget()->asForm();
 		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
 		$this->fillColumnForm($data, 'create');
@@ -4693,11 +5118,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$dashboard->save();
 		$dashboard->waitUntilReady();
 
-		if (array_key_exists('non-numeric', $data)) {
-			$this->assertTableData();
+		if (array_key_exists('screen_name', $data)) {
+			$this->assertScreenshot($dashboard->getWidget(self::DEFAULT_WIDGET_NAME), $data['screen_name']);
 		}
 		else {
-			$this->assertTableData($data['result']);
+			$table_data = (array_key_exists('no_data_found', $data)) ? '' : $data['result'];
+			$this->assertTableData($table_data);
 		}
 
 		// Necessary for test stability.
