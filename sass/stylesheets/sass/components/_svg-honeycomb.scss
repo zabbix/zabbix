@@ -1,31 +1,39 @@
 .svg-honeycomb {
-	--honeycomb-text-color: #{$honeycomb-label-color};
-	--honeycomb-fill-color: #{$honeycomb-cell-color};
-	--honeycomb-stroke-color: #{$honeycomb-cell-color};
-	--honeycomb-stroke-hover-color: #{darken($honeycomb-cell-color, 6%)};
-	--honeycomb-no-data-text-color: #{$honeycomb-no-data-label-color};
-	--honeycomb-no-data-fill-color: #{$honeycomb-no-data-cell-color};
-	--honeycomb-no-data-stroke-color: #{$honeycomb-no-data-cell-color};
+	--color: #{$honeycomb-label-color};
+	--fill: #{$honeycomb-cell-color};
+	--stroke: #{$honeycomb-cell-color};
+	--stroke-hover: #{darken($honeycomb-cell-color, 6%)};
+	--no-data-color: #{$honeycomb-no-data-label-color};
+	--no-data-fill: #{$honeycomb-no-data-cell-color};
+	--no-data-stroke: #{$honeycomb-no-data-cell-color};
 
 	.svg-honeycomb-cell {
+		--px: calc(var(--x) + var(--dx, 0px));
+		--py: calc(var(--y) + var(--dy, 0px));
+
 		cursor: pointer;
+		transform: translate(var(--px), var(--py));
 
 		@if $ui-transitions {
 			transition: transform $ui-transition-duration;
 		}
 
 		path {
-			fill: var(--honeycomb-fill-color);
-			stroke: var(--honeycomb-stroke-color, var(--honeycomb-fill-color));
+			fill: var(--fill);
+			stroke: var(--stroke, var(--fill));
+
+			&.svg-honeycomb-backdrop {
+				transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px)));
+
+				@if $ui-transitions {
+					transition: transform $ui-transition-duration;
+				}
+			}
 
 			@if $ui-transitions {
 				transition: d $ui-transition-duration,
 							fill $ui-transition-duration * 2,
 							stroke $ui-transition-duration;
-
-				&.svg-honeycomb-backdrop {
-					transition: transform $ui-transition-duration;
-				}
 			}
 		}
 
@@ -43,7 +51,7 @@
 				height: 100%;
 				text-align: center;
 				line-height: 1.2;
-				color: var(--honeycomb-text-color);
+				color: var(--color);
 			}
 
 			.svg-honeycomb-label {
@@ -59,23 +67,23 @@
 		}
 
 		&:hover {
-			--honeycomb-stroke-color: var(--honeycomb-stroke-hover-color);
+			--stroke: var(--stroke-hover);
 		}
 	}
 
 	.svg-honeycomb-cell-no-data,
 	.svg-honeycomb-cell-other {
-		--honeycomb-text-color: var(--honeycomb-no-data-text-color);
-		--honeycomb-fill-color: var(--honeycomb-no-data-fill-color);
-		--honeycomb-stroke-color: var(--honeycomb-no-data-stroke-color);
-		--honeycomb-stroke-hover-color: var(--honeycomb-no-data-stroke-color);
+		--color: var(--no-data-color);
+		--fill: var(--no-data-fill);
+		--stroke: var(--no-data-stroke);
+		--stroke-hover: var(--no-data-stroke);
 
 		cursor: default;
 	}
 
 	.svg-honeycomb-cell-other-ellipsis {
 		circle {
-			fill: var(--honeycomb-text-color);
+			fill: var(--color);
 		}
 	}
 }

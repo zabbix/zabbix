@@ -347,9 +347,10 @@ class CSVGHoneycomb {
 					.append('g')
 					.attr('class', CSVGHoneycomb.ZBX_STYLE_CELL)
 					.attr('data-index', d => d.index)
-					.attr('transform', d => `translate(${d.position.x} ${d.position.y})`)
-					.style('--honeycomb-fill-color', d => this.#getFillColor(d))
-					.style('--honeycomb-stroke-color', d => this.#getFillColor(d))
+					.style('--x', d => `${d.position.x}px`)
+					.style('--y', d => `${d.position.y}px`)
+					.style('--fill', d => this.#getFillColor(d))
+					.style('--stroke', d => this.#getFillColor(d))
 					.call(cell => cell
 						.append('path')
 						.attr('d', this.#cell_path)
@@ -370,9 +371,10 @@ class CSVGHoneycomb {
 					}),
 				update => update
 					.attr('data-index', d => d.index)
-					.attr('transform', d => `translate(${d.position.x} ${d.position.y})`)
-					.style('--honeycomb-fill-color', d => this.#getFillColor(d))
-					.style('--honeycomb-stroke-color', d => this.#getFillColor(d))
+					.style('--x', d => `${d.position.x}px`)
+					.style('--y', d => `${d.position.y}px`)
+					.style('--fill', d => this.#getFillColor(d))
+					.style('--stroke', d => this.#getFillColor(d))
 					.each((d, i, cells) => {
 						const cell = d3.select(cells[i]);
 
@@ -441,58 +443,55 @@ class CSVGHoneycomb {
 			}
 
 			const scaled_position = {
-				x: Math.max(
+				dx: Math.max(
 					scaled_size.width / 2 - margin.horizontal,
 					Math.min(
 						this.#container_params.width - scaled_size.width / 2 + margin.horizontal,
 						d.position.x
 					)
-				),
-				y: Math.max(
+				) - d.position.x,
+				dy: Math.max(
 					scaled_size.height / 2 - margin.vertical,
 					Math.min(
 						this.#container_params.height + this.#cells_gap - scaled_size.height / 2 + margin.vertical,
 						d.position.y
 					)
-				)
+				) - d.position.y
 			};
 
-			d.scaled = true;
 			d.stored_labels = d.labels;
-
-			this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
-			this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
 
 			if (cell.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`).empty()) {
 				cell
 					.append('path')
 					.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
 					.attr('d', this.#generatePath(Math.max(this.#cell_height, scaled_size.height * .65), 0))
-					.attr('transform', `translate(0 0)`)
 					.style('fill', 'transparent');
 			}
 			else {
 				clearTimeout(d.backdrop_timeout);
 			}
 
-			cell
-				.attr('transform', `translate(${scaled_position.x} ${scaled_position.y})`)
-				.style('--honeycomb-stroke-color', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
-				.call(cell => cell
-					.select('path')
-					.attr('d', this.#generatePath(scaled_size.height, 0))
-					.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
-				)
-				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
-				.attr('transform',
-					`translate(${d.position.x - scaled_position.x} ${d.position.y - scaled_position.y})`
-				);
+			setTimeout(() => {
+				this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
+				this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
 
-			this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
-				detail: {
-					hostid: d.hostid,
-					itemid: d.itemid
-				}
+				cell
+					.style('--dx', `${scaled_position.dx}px`)
+					.style('--dy', `${scaled_position.dy}px`)
+					.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
+					.call(cell => cell
+						.select('path')
+						.attr('d', this.#generatePath(scaled_size.height, 0))
+						.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
+					);
+
+				this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
+					detail: {
+						hostid: d.hostid,
+						itemid: d.itemid
+					}
+				});
 			});
 		};
 
@@ -509,15 +508,14 @@ class CSVGHoneycomb {
 			}, UI_TRANSITION_DURATION);
 
 			cell
-				.attr('transform', `translate(${d.position.x} ${d.position.y})`)
-				.style('--honeycomb-stroke-color', d => this.#getFillColor(d))
+				.style('--dx', null)
+				.style('--dy', null)
+				.style('--stroke', d => this.#getFillColor(d))
 				.call(cell => cell
 					.select('path')
 					.attr('d', this.#cell_path)
 					.style('filter', null)
-				)
-				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
-				.attr('transform', `translate(0 0)`);
+				);
 
 			this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
 				detail: {
@@ -538,22 +536,30 @@ class CSVGHoneycomb {
 				});
 			})
 			.on('mouseenter', (e, d) => {
+				if (d.scaled) {
+					return;
+				}
+
 				this.#honeycomb_container
 					.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
 					.each((datum, i, cells) => {
 						if (d === datum) {
+							d.scaled = true;
+
 							cell.raise();
-							setTimeout(() => enter(cell, d));
+							enter(cell, d);
 						}
-						else if (datum.scaled === true) {
+						else if (datum.scaled) {
 							leave(d3.select(cells[i]), datum);
 						}
 					});
 			})
 			.on('mouseleave', (e, d) => {
-				if (d.scaled === true) {
-					leave(d3.select(e.target), d);
+				if (!d.scaled) {
+					return;
 				}
+
+				leave(d3.select(e.target), d);
 			});
 	}
 

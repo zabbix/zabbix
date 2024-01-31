@@ -3547,21 +3547,25 @@ section {
     margin-right: 10px; }
 
 .svg-honeycomb {
-  --honeycomb-text-color: #1f2c33;
-  --honeycomb-fill-color: #d9e7ed;
-  --honeycomb-stroke-color: #d9e7ed;
-  --honeycomb-stroke-hover-color: #c4dae3;
-  --honeycomb-no-data-text-color: #3c5563;
-  --honeycomb-no-data-fill-color: #ebebeb;
-  --honeycomb-no-data-stroke-color: #ebebeb; }
+  --color: #1f2c33;
+  --fill: #d9e7ed;
+  --stroke: #d9e7ed;
+  --stroke-hover: #c4dae3;
+  --no-data-color: #3c5563;
+  --no-data-fill: #ebebeb;
+  --no-data-stroke: #ebebeb; }
   .svg-honeycomb .svg-honeycomb-cell {
+    --px: calc(var(--x) + var(--dx, 0px));
+    --py: calc(var(--y) + var(--dy, 0px));
     cursor: pointer;
+    transform: translate(var(--px), var(--py));
     transition: transform 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell path {
-      fill: var(--honeycomb-fill-color);
-      stroke: var(--honeycomb-stroke-color, var(--honeycomb-fill-color));
+      fill: var(--fill);
+      stroke: var(--stroke, var(--fill));
       transition: d 0.3s, fill 0.6s, stroke 0.3s; }
       .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
+        transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px)));
         transition: transform 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell foreignObject {
       transition: x 0.3s, y 0.3s, width 0.3s, height 0.3s; }
@@ -3571,23 +3575,23 @@ section {
         height: 100%;
         text-align: center;
         line-height: 1.2;
-        color: var(--honeycomb-text-color); }
+        color: var(--color); }
       .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-label {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
         transition: max-height 0.3s, font-size 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell:hover {
-      --honeycomb-stroke-color: var(--honeycomb-stroke-hover-color); }
+      --stroke: var(--stroke-hover); }
   .svg-honeycomb .svg-honeycomb-cell-no-data,
   .svg-honeycomb .svg-honeycomb-cell-other {
-    --honeycomb-text-color: var(--honeycomb-no-data-text-color);
-    --honeycomb-fill-color: var(--honeycomb-no-data-fill-color);
-    --honeycomb-stroke-color: var(--honeycomb-no-data-stroke-color);
-    --honeycomb-stroke-hover-color: var(--honeycomb-no-data-stroke-color);
+    --color: var(--no-data-color);
+    --fill: var(--no-data-fill);
+    --stroke: var(--no-data-stroke);
+    --stroke-hover: var(--no-data-stroke);
     cursor: default; }
   .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
-    fill: var(--honeycomb-text-color); }
+    fill: var(--color); }
 
 .filter-container.tabfilter-container {
   padding: 0;
