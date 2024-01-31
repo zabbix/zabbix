@@ -18,36 +18,19 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageQueueOverviewByProxy extends CLegacyWebTest {
-	public static function allProxies() {
-		return CDBHelper::getDataProvider("select * from proxy order by proxyid");
-	}
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
-	/**
-	* @dataProvider allProxies
-	*/
-	public function testPageQueueOverviewByProxy_CheckLayout($proxy) {
-		$this->zbxTestLogin('queue.php?config=1');
+class testPageQueueDetails extends CLegacyWebTest {
+	public function testPageQueueDetails_CheckLayout() {
+		$this->zbxTestLogin('queue.php?config=2');
 		$this->zbxTestCheckTitle('Queue [refreshed every 30 sec.]');
 		$this->zbxTestTextNotPresent('Cannot display item queue.');
 		$this->zbxTestCheckHeader('Queue of items to be updated');
-		$this->zbxTestDropdownSelectWait('config', 'Overview by proxy');
+		$this->zbxTestDropdownSelectWait('config', 'Details');
 		$this->zbxTestDropdownHasOptions('config', ['Overview', 'Overview by proxy', 'Details']);
-		$this->zbxTestTextPresent(
-			[
-				'Proxy',
-				'5 seconds',
-				'10 seconds',
-				'30 seconds',
-				'1 minute',
-				'5 minutes',
-				'More than 10 minutes'
-			]
-		);
-		$this->zbxTestTextPresent($proxy['name']);
-		$this->zbxTestTextPresent('Server');
+		$this->zbxTestTextPresent(['Scheduled check', 'Delayed by', 'Host', 'Name']);
+		$this->zbxTestTextPresent('Total:');
 	}
 
 }

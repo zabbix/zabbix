@@ -117,6 +117,7 @@ require_once dirname(__FILE__).'/hosts/testFormHostFromMonitoring.php';
 require_once dirname(__FILE__).'/hosts/testFormHostFromStandalone.php';
 require_once dirname(__FILE__).'/hosts/testFormHostLinkTemplates.php';
 require_once dirname(__FILE__).'/hosts/testFormHostPrototype.php';
+require_once dirname(__FILE__).'/hosts/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/hosts/testPageHostInterfaces.php';
 require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
 require_once dirname(__FILE__).'/hosts/testPageHosts.php';
@@ -204,6 +205,13 @@ require_once dirname(__FILE__).'/problems/testPageProblems.php';
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
 
+// Queue.
+/*
+require_once dirname(__FILE__).'/queue/testPageQueueDetails.php';
+require_once dirname(__FILE__).'/queue/testPageQueueOverview.php';
+require_once dirname(__FILE__).'/queue/testPageQueueOverviewByProxy.php';
+*/
+
 // Regexp.
 require_once dirname(__FILE__).'/regexp/testFormAdministrationGeneralRegexp.php';
 require_once dirname(__FILE__).'/regexp/testPageAdministrationGeneralRegexp.php';
@@ -268,6 +276,8 @@ require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependen
 // Triggers.
 require_once dirname(__FILE__).'/triggers/testFormTrigger.php';
 require_once dirname(__FILE__).'/triggers/testFormTriggerPrototype.php';
+require_once dirname(__FILE__).'/triggers/testInheritanceTrigger.php';
+require_once dirname(__FILE__).'/triggers/testInheritanceTriggerPrototype.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypes.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggers.php';
@@ -299,11 +309,6 @@ require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
-/*
-require_once dirname(__FILE__).'/testPageQueueDetails.php';
-require_once dirname(__FILE__).'/testPageQueueOverview.php';
-require_once dirname(__FILE__).'/testPageQueueOverviewByProxy.php';
-*/
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
@@ -323,9 +328,6 @@ require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
 require_once dirname(__FILE__).'/testPageBrowserWarning.php';
-require_once dirname(__FILE__).'/testInheritanceTrigger.php';
-require_once dirname(__FILE__).'/testInheritanceTriggerPrototype.php';
-require_once dirname(__FILE__).'/testInheritanceHostPrototype.php';
 require_once dirname(__FILE__).'/testLanguage.php';
 require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
@@ -437,6 +439,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHostFromStandalone');
 		$suite->addTestSuite('testFormHostLinkTemplates');
 		$suite->addTestSuite('testFormHostPrototype');
+		$suite->addTestSuite('testInheritanceHostPrototype');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
 		$suite->addTestSuite('testPageHosts');
@@ -518,6 +521,13 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationProxies');
 		$suite->addTestSuite('testPageAdministrationProxies');
 
+		// Queue.
+		/*
+		$suite->addTestSuite('testPageQueueDetails');
+		$suite->addTestSuite('testPageQueueOverview');
+		$suite->addTestSuite('testPageQueueOverviewByProxy');
+		*/
+
 		// Regexp.
 		$suite->addTestSuite('testFormAdministrationGeneralRegexp');
 		$suite->addTestSuite('testPageAdministrationGeneralRegexp');
@@ -582,6 +592,8 @@ class SeleniumTests {
 		// Triggers.
 		$suite->addTestSuite('testFormTrigger');
 		$suite->addTestSuite('testFormTriggerPrototype');
+		$suite->addTestSuite('testInheritanceTrigger');
+		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testPageTriggerDescription');
 		$suite->addTestSuite('testPageTriggerPrototypes');
 		$suite->addTestSuite('testPageTriggers');
@@ -613,11 +625,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
-/*
-		$suite->addTestSuite('testPageQueueDetails');
-		$suite->addTestSuite('testPageQueueOverview');
-		$suite->addTestSuite('testPageQueueOverviewByProxy');
-*/
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
@@ -637,9 +644,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormTabIndicators');
 		$suite->addTestSuite('testPageBrowserWarning');
-		$suite->addTestSuite('testInheritanceTrigger');
-		$suite->addTestSuite('testInheritanceHostPrototype');
-		$suite->addTestSuite('testInheritanceTriggerPrototype');
 		$suite->addTestSuite('testLanguage');
 		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testSidebarMenu');
