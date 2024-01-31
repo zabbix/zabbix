@@ -379,6 +379,8 @@ static	const zbx_events_funcs_t	events_cbs = {
 	.events_update_itservices_cb	= zbx_events_update_itservices
 };
 
+//static zbx_find_psk_in_cache_f	find_psk_in_cache_cb = NULL;
+
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num);
 
 int	get_process_info_by_thread(int local_server_num, unsigned char *local_process_type, int *local_process_num)

@@ -440,6 +440,8 @@ typedef int		(*zbx_get_config_forks_f)(unsigned char process_type);
 typedef const char	*(*zbx_get_config_str_f)(void);
 typedef int		(*zbx_get_config_int_f)(void);
 
+typedef size_t	(*zbx_find_psk_in_cache_f)(const unsigned char *, unsigned char *, unsigned int *);
+
 typedef enum
 {
 	ZBX_TASK_START = 0,
