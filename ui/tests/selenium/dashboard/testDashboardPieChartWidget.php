@@ -916,7 +916,8 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'screenshot_id' => 'four_items'
 				]
-			],
+			]/*,
+			TODO: uncomment after DEV-2666 is merged.
 			// Data set type Item list, Total item, merging enabled, doughnut with total value, custom legend display.
 			[
 				[
@@ -975,7 +976,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'screenshot_id' => 'doughnut'
 				]
-			]
+			]*/
 		];
 	}
 
@@ -1065,16 +1066,21 @@ class testDashboardPieChartWidget extends CWebTest {
 				if (strpos($hintbox_html, $legend_name)) {
 					// Assert hintbox value.
 					$matches = [];
-					preg_match('/<span class="svg-pie-chart-hintbox-value">(.*?)<\/span>/', $hintbox_html, $matches);
-					$this->assertEquals($expected_sector['value'], $matches[1]);
-
-					// Assert hintbox legend color.
-					preg_match('/background-color: (.*?);/', $hintbox_html, $matches);
-					$this->assertEquals($expected_sector['color'], $matches[1]);
 
 					// Assert sector fill color.
 					preg_match('/fill: (.*?);/', $sector->getAttribute('style'), $matches);
 					$this->assertEquals($expected_sector['color'], $matches[1]);
+
+					// Open the hintbox and assert the value and legend color.
+					$sector->click();
+					$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
+					$this->assertEquals($expected_sector['value'],
+							$hintbox->query('class:svg-pie-chart-hintbox-value')->one()->getText()
+					);
+					$this->assertEquals('background-color: '.$expected_sector['color'].';',
+							$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
+					);
+					$hintbox->close();
 
 					// Assertion successful, continue to the next expected sector.
 					continue 2;
@@ -1090,8 +1096,11 @@ class testDashboardPieChartWidget extends CWebTest {
 			$this->assertEquals($data['expected_total'], $widget->query('class:svg-pie-chart-total-value')->one()->getText());
 		}
 
+		// Make sure none of the sectors are hovered.
+		$this->query('id:page-title-general')->one()->hoverMouse();
+
 		// Wait for the sector animation to end before taking a screenshot (animation length 1 second).
-		sleep(2);
+		sleep(1);
 
 		// Screenshot the widget.
 		$this->page->removeFocus();
