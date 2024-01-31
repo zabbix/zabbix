@@ -258,7 +258,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 											break;
 
 										case CHistFunctionParser::PARAM_TYPE_QUOTED:
-											$match = CExpressionParser::unquoteString($parameter['match']);
+											$match = CHistFunctionParser::unquoteParam($parameter['match']);
 											$texts_support_user_macros[] = $match;
 											$texts_support_lld_macros[] = $match;
 											break;
