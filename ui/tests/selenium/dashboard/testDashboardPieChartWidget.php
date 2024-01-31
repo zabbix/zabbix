@@ -1125,8 +1125,8 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertEditFormAfterSave($data, $dashboard);
 
 		// Check total Widget count.
-		$count_added = (int) (CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD);
-		$this->assertEquals($old_widget_count + ($edit_widget_name ? 0 : $count_added), $dashboard->getWidgets()->count());
+		$count_added = !$edit_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD ? 1 : 0;
+		$this->assertEquals($old_widget_count + $count_added, $dashboard->getWidgets()->count());
 	}
 
 	/**
