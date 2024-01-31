@@ -3312,7 +3312,10 @@ class CUser extends CApiService {
 	/**
 	 * Returns data necessary for user.confirm method.
 	 *
-	 * @param array $session_data
+	 * @param array  $session_data
+	 * @param string $session_data['sessionid']     User's sessionid passed in session data.
+	 * @param string $session_data['mfaid']         User's mfaid passed ins session data.
+	 * @param string $session_data['redirect_uri']  Redirect uri that will be used for Duo MFA.
 	 *
 	 * Returns:
 	 *                     data['mfa']
@@ -3395,7 +3398,19 @@ class CUser extends CApiService {
 	/**
 	 * Check MFA method authentication for the user based on provided data.
 	 *
-	 * @param array $data
+	 * @param array  $data
+	 * @param string $data['sessionid']                               User's sessionid passed in session data.
+	 * @param string $data['mfaid']                                   User's mfaid passed ins session data.
+	 * @param string $data['redirect_uri']                            Redirect uri that will be used for Duo MFA.
+	 * @param array  $data['mfa_response_data']                       Array with data for MFA response confirmation.
+	 * @param int    $data['mfa_response_data']['verification_code']  TOTP MFA verification code.
+	 * @param string $data['mfa_response_data']['totp_secret']        TOTP MFA secret at initial registration.
+	 * @param string $data['mfa_response_data']['duo_code']           DUO MFA response code.
+	 * @param string $data['mfa_response_data']['duo_state']          DUO MFA response state.
+	 * @param string $data['mfa_response_data']['state']              DUO MFA state from session.
+	 * @param string $data['mfa_response_data']['username']           DUO MFA username from session.
+	 *
+	 * Returns 'sessionid' and 'mfa' object, in case MFA authentication was successful or throws Exception.
 	 */
 	public static function confirm(array $data): array {
 		$userid = DB::select('sessions', [
