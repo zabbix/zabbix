@@ -2675,7 +2675,7 @@ function getInheritedTimeouts(string $proxyid): array {
  *
  * @return array
  */
-public function getItemTypeCountByHostId(int $item_type, array $hostids): array {
+function getItemTypeCountByHostId(int $item_type, array $hostids): array {
 	$db_selected_items_count = API::Item()->get([
 		'groupCount' => true,
 		'countOutput' => true,
