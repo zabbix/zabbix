@@ -21,9 +21,7 @@ package zbxregexp
 
 import (
 	"bytes"
-	"errors"
 	"regexp"
-	"strings"
 )
 
 func ExecuteRegex(line []byte, rx *regexp.Regexp, output []byte) (result string, match bool) {
@@ -64,14 +62,4 @@ func ExecuteRegex(line []byte, rx *regexp.Regexp, output []byte) (result string,
 	}
 	_, _ = buf.Write(output)
 	return buf.String(), true
-}
-
-func ValidateForUnsupportedAssertions(expr string) error {
-	for _, v := range []string{"(?=", "(?!", "(?<=", "(?<!"} {
-		if strings.Contains(expr, v) {
-			return errors.New("Lookaheads and lookbehinds are not supported in regular expressions.")
-		}
-	}
-
-	return nil
 }
