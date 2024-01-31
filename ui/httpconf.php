@@ -243,12 +243,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		foreach (['variables', 'headers'] as $pair_type) {
 			foreach (getRequest($pair_type, []) as $pair) {
+				$pair['name'] = array_key_exists('name', $pair) ? trim($pair['name']) : '';
+				$pair['value'] = array_key_exists('value', $pair) ? trim($pair['value']) : '';
+
 				if ($pair['name'] === '' && $pair['value'] === '') {
 					continue;
-				}
-
-				if ($pair_type === 'variables') {
-					$pair['name'] = trim($pair['name']);
 				}
 
 				$httpTest[$pair_type][] = $pair;

@@ -2798,7 +2798,8 @@ static void	add_ack_escalation_r_eventids(zbx_vector_db_escalation_ptr_t *escala
 	zbx_vector_uint64_destroy(&r_eventids);
 }
 
-static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids, zbx_vector_service_t *services)
+static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids,
+		zbx_vector_db_service_t *services)
 {
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
@@ -2819,7 +2820,7 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 	zbx_free(data);
 }
 
-static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, zbx_vector_service_t *services,
+static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, zbx_vector_db_service_t *services,
 		zbx_vector_db_event_t *events)
 {
 	zbx_db_result_t		result;
@@ -2894,7 +2895,7 @@ static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, z
 			zbx_vector_tags_append(&service->service_tags, tag);
 		}
 
-		zbx_vector_service_append(services, service);
+		zbx_vector_db_service_append(services, service);
 
 		last_serviceid = (zbx_int64_t)service->serviceid;
 	}
@@ -3031,7 +3032,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 	zbx_vector_uint64_pair_t		event_pairs;
 	zbx_vector_service_alarm_t		service_alarms;
 	zbx_service_alarm_t			*service_alarm, service_alarm_local;
-	zbx_vector_service_t			services;
+	zbx_vector_db_service_t			services;
 	zbx_hashset_t				service_roles;
 	zbx_db_service				service_local;
 	zbx_dc_um_handle_t			*um_handle;
@@ -3043,7 +3044,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 	zbx_vector_db_event_create(&events);
 	zbx_vector_uint64_pair_create(&event_pairs);
 	zbx_vector_service_alarm_create(&service_alarms);
-	zbx_vector_service_create(&services);
+	zbx_vector_db_service_create(&services);
 
 	zbx_hashset_create_ext(&service_roles, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_role_clean,
@@ -3138,7 +3139,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 					state = ZBX_ESCALATION_CANCEL;
 					THIS_SHOULD_NEVER_HAPPEN;
 				}
-				else if (FAIL == (index = zbx_vector_service_bsearch(&services, &service_local,
+				else if (FAIL == (index = zbx_vector_db_service_bsearch(&services, &service_local,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
 					error = zbx_dsprintf(error, "service id:" ZBX_FS_UI64 " deleted.",
@@ -3375,8 +3376,8 @@ out:
 	zbx_vector_uint64_pair_destroy(&event_pairs);
 	zbx_vector_service_alarm_destroy(&service_alarms);
 
-	zbx_vector_service_clear_ext(&services, service_clean);
-	zbx_vector_service_destroy(&services);
+	zbx_vector_db_service_clear_ext(&services, service_clean);
+	zbx_vector_db_service_destroy(&services);
 
 	zbx_hashset_destroy(&service_roles);
 

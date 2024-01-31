@@ -25,10 +25,12 @@
 
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks);
+		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts);
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
-		const char *progname, zbx_get_config_forks_f get_config_forks);
+		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
+		int config_java_gateway_port, const char *config_externalscripts);
 
 int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
 		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, struct zbx_json *json,
