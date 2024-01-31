@@ -55,6 +55,7 @@ if (array_key_exists('qr_code_url', $data) && $data['qr_code_url']) {
 		->addItem(hasRequest('request') ? new CVar('request', getRequest('request')) : null)
 		->addVar('totp_secret', $data['totp_secret'])
 		->addVar('qr_code_url', $data['qr_code_url'])
+		->addVar('hash_function', $data['mfa']['hash_function'])
 		->addItem([
 			(new CDiv(_('Scan this QR code')))->setAttribute('style', 'text-align: center; font-size: 20px'),
 			new CDiv(_('Please scan and get your verification code displayed in your authenticator app.')),

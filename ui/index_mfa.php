@@ -29,6 +29,7 @@ $fields = [
 	'enter' =>				[T_ZBX_STR, O_OPT, P_SYS,	null,	null],
 	'request' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
 	'totp_secret' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
+	'hash_function' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
 	'verification_code' =>	[T_ZBX_INT, O_OPT, null,	null,	null],
 	'qr_code_url' =>		[T_ZBX_STR, O_OPT, null,	null,	null],
 	'duo_code' =>			[T_ZBX_STR, O_OPT, null,	null,	null],
@@ -132,6 +133,7 @@ else {
 		) {
 			$data['qr_code_url'] = getRequest('qr_code_url');
 			$data['totp_secret'] = getRequest('totp_secret');
+			$data['mfa']['hash_function'] = getRequest('hash_function');
 
 			echo (new CView('mfa.login', $data + $error))->getOutput();
 			exit;
