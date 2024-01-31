@@ -39,9 +39,9 @@ class CHostAvailability extends CTag {
 		INTERFACE_AVAILABLE_MIXED => ZBX_STYLE_STATUS_YELLOW
 	];
 
-	protected $type_interfaces = [];
+	protected array $type_interfaces = [];
 
-	protected $has_passive_checks = true;
+	protected bool $has_passive_checks = true;
 
 	public function __construct() {
 		parent::__construct('div', true);
@@ -105,13 +105,13 @@ class CHostAvailability extends CTag {
 	}
 
 	/**
-	 * Sets the value if the host has passive checks
+	 * Sets the value if the host has passive checks.
 	 *
 	 * @param bool $value has items with passive checks.
 	 *
 	 * @return CHostAvailability
 	 */
-	public function setPassiveChecks(bool $value): CHostAvailability {
+	public function enablePassiveChecks(bool $value): CHostAvailability {
 		$this->has_passive_checks = $value;
 
 		return $this;
@@ -119,24 +119,22 @@ class CHostAvailability extends CTag {
 
 	public function toString($destroy = true) {
 		foreach ($this->type_interfaces as $type => $interfaces) {
-			if ($type == INTERFACE_TYPE_AGENT && count($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]) > 0) {
+			if ($type == INTERFACE_TYPE_AGENT) {
 				$interfaces = array_merge($interfaces, $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
-
-				$status = $this->has_passive_checks
-					? getInterfaceAvailabilityStatus($interfaces)
-					: getInterfaceAvailabilityStatus($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]);
-			}
-			else {
-				if (!$interfaces || !array_key_exists($type, static::LABELS)) {
-					continue;
-				}
-
-				$status = getInterfaceAvailabilityStatus($interfaces);
 			}
 
-			$this->addItem((new CSpan(static::LABELS[$type]))
-				->addClass(static::COLORS[$status])
-				->setHint($this->getInterfaceHint($interfaces))
+			if (!$interfaces || !array_key_exists($type, static::LABELS)) {
+				continue;
+			}
+
+			$status = $type == INTERFACE_TYPE_AGENT && !$this->has_passive_checks
+				? getInterfaceAvailabilityStatus($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE])
+				: getInterfaceAvailabilityStatus($interfaces);
+
+			$this->addItem(
+				(new CSpan(static::LABELS[$type]))
+					->addClass(static::COLORS[$status])
+					->setHint($this->getInterfaceHint($interfaces))
 			);
 		}
 

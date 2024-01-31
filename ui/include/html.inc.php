@@ -664,7 +664,7 @@ function getHostAvailabilityTable(array $host_interfaces, bool $passive_checks =
 
 	return (new CHostAvailability())
 		->setInterfaces($interfaces)
-		->setPassiveChecks($passive_checks);
+		->enablePassiveChecks($passive_checks);
 }
 
 /**
