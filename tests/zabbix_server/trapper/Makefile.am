@@ -9,6 +9,20 @@ COMMON_SRC_FILES = \
 TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
+	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
+	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller_server.a \
+	$(top_srcdir)/src/zabbix_server/lld/libzbxlld.a \
+	$(top_srcdir)/src/zabbix_server/ha/libzbxha.a \
+	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
+	$(top_srcdir)/src/libs/zbxasyncpoller/libzbxasyncpoller.a \
+	$(top_srcdir)/src/libs/zbxagentget/libzbxagentget.a \
+	$(top_srcdir)/src/libs/zbxversion/libzbxversion.a \
+	$(top_srcdir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
+	$(top_srcdir)/src/libs/zbxstats/libzbxstats.a \
+	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
+	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
+	$(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a \
+	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
 	$(top_srcdir)/src/libs/zbxexpression/libzbxexpression.a \
@@ -78,8 +92,8 @@ TRAPPER_LIBS = \
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
-	../../../src/zabbix_server/trapper/trapper_preproc.c  \
-	../../../src/zabbix_server/trapper/trapper_auth.c  \
+	../../../src/zabbix_server/trapper/trapper_item_test.c \
+	../../../src/zabbix_server/trapper/trapper_auth.c \
 	../../zbxmockjson.c
 
 zbx_trapper_preproc_test_run_LDADD = $(TRAPPER_LIBS)

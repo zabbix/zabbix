@@ -32,7 +32,7 @@ unsigned char	get_program_type(void)
 	return program_type;
 }
 
-static int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
+int	CONFIG_FORKS[ZBX_PROCESS_TYPE_COUNT] = {
 	5, /* ZBX_PROCESS_TYPE_POLLER */
 	1, /* ZBX_PROCESS_TYPE_UNREACHABLE */
 	0, /* ZBX_PROCESS_TYPE_IPMIPOLLER */

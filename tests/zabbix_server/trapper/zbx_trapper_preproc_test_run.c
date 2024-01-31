@@ -23,7 +23,7 @@
 #include "zbxmockjson.h"
 #include "zbxembed.h"
 #include "libs/zbxpreproc/pp_execute.h"
-#include "zabbix_server/trapper/trapper_preproc.h"
+#include "zabbix_server/trapper/trapper_item_test.h"
 #include "zbx_item_constants.h"
 
 zbx_es_t	es_engine;
@@ -204,13 +204,13 @@ void	zbx_mock_test_entry(void **state)
 {
 	const char		*request, *response = NULL, *value_append = NULL, *expected_truncation = NULL;
 	char			*error = NULL, *value_override = NULL,
-				*request_override = NULL, *response_override = NULL;
-	struct zbx_json_parse	jp;
+				*request_override = NULL, *response_override = NULL, *value = NULL;
+	struct zbx_json_parse	jp, jp_data, jp_item, jp_host, jp_options, jp_steps;
 	struct zbx_json		out;
 	int			returned_ret, expected_ret;
 	zbx_mock_handle_t	handle;
 	zbx_uint64_t		random_gen_length = 0, expected_data_len = 0;
-	size_t			tmp_alloc = 0, tmp_offset = 0;
+	size_t			tmp_alloc = 0, tmp_offset = 0, value_size = 0;;
 
 	ZBX_UNUSED(state);
 
@@ -222,21 +222,24 @@ void	zbx_mock_test_entry(void **state)
 	{
 		#define RANG_GEN_REQUEST "{\
 			\"data\": {\
-				\"steps\": [],\
-				\"value_type\": 1,\
-				\"value\": \"%s\"\
+				\"item\": {\
+					\"steps\": [],\
+					\"value_type\": 1,\
+					\"value\": \"%s\"\
+				}\
 			},\
 			\"request\": \"preprocessing.test\",\
 			\"sid\": \"6ed71f17963a881bd010e63b01c39484\"\
 		}"
-		#define RANG_GEN_RESPONSE "{\
-			\"response\": \"success\",\
-			\"data\": {\
-				\"steps\": [],\
-				\"truncated\": %s,\
-				\"result\": \"%s\",\
-				\"original_size\": %llu\
-			}\
+		#define RANG_GEN_RESPONSE_TRUNCATED "{\
+			\"steps\": [],\
+			\"truncated\": %s,\
+			\"result\": \"%s\",\
+			\"original_size\": %llu\
+		}"
+		#define RANG_GEN_RESPONSE_UNTRUNCATED "{\
+			\"steps\": [],\
+			\"result\": \"%s\"\
 		}"
 
 		size_t append_len, required_length;
@@ -261,12 +264,23 @@ void	zbx_mock_test_entry(void **state)
 		tmp_alloc = 0;
 		tmp_offset = 0;
 		value_override[expected_data_len] = '\0';
-		zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE, expected_truncation,
-				value_override, required_length);
+
+		if (0 == strcmp("true", expected_truncation))
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_TRUNCATED,
+					expected_truncation, value_override, required_length);
+		}
+		else
+		{
+			zbx_snprintf_alloc(&response_override, &tmp_alloc, &tmp_offset, RANG_GEN_RESPONSE_UNTRUNCATED,
+					value_override);
+		}
+
 		response = response_override;
 
 		#undef RANG_GEN_REQUEST
-		#undef RANG_GEN_RESPONSE
+		#undef RANG_GEN_RESPONSE_TRUNCATED
+		#undef RANG_GEN_RESPONSE_UNTRUNCATED
 	}
 	else
 	{
@@ -279,7 +293,31 @@ void	zbx_mock_test_entry(void **state)
 	if (FAIL == zbx_json_open(request, &jp))
 		fail_msg("Invalid request format: %s", zbx_json_strerror());
 
-	returned_ret = trapper_preproc_test_run(&jp, &out, &error);
+	if (SUCCEED != zbx_json_brackets_by_name(&jp, ZBX_PROTO_TAG_DATA, &jp_data))
+		fail_msg("Invalid request format: missing \"data\" JSON object");
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_ITEM, &jp_item))
+		fail_msg("Invalid request format: missing \"item\" JSON object");
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_HOST, &jp_host))
+		zbx_json_open("{}", &jp_host);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_data, ZBX_PROTO_TAG_OPTIONS, &jp_options))
+		zbx_json_open("{}", &jp_options);
+
+	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
+		fail_msg("Invalid request format: missing \"steps\" JSON object");
+
+	printf("KDEBUG :: jp_item {%s}", jp_item.start);
+
+	if (FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size, NULL) &&
+			FAIL == zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_VALUE, &value, &value_size, NULL))
+	{
+		fail_msg("Invalid request format: missing value in preprocess request");
+	}
+
+	returned_ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, &out, &error);
+
 	if (FAIL == returned_ret)
 		printf("trapper_preproc_test_run error: %s\n", error);
 	else
