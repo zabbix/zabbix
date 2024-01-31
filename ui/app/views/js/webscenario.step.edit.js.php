@@ -78,6 +78,7 @@ window.webscenario_step_edit_popup = new class {
 		this.#overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'webscenario.step.check');
 
 		this.#post(curl.getUrl(), fields, (response) => {
@@ -145,8 +146,8 @@ window.webscenario_step_edit_popup = new class {
 	#initSortable($table) {
 		$table
 			.sortable({
-				disabled: $table[0].querySelectorAll('.<?= ZBX_STYLE_SORTABLE ?>').length < 2,
-				items: 'tbody .<?= ZBX_STYLE_SORTABLE ?>',
+				disabled: $table[0].querySelectorAll('.<?= CSortable::ZBX_STYLE_SORTABLE ?>').length < 2,
+				items: 'tbody .<?= CSortable::ZBX_STYLE_SORTABLE ?>',
 				axis: 'y',
 				containment: 'parent',
 				cursor: 'grabbing',
@@ -179,13 +180,27 @@ window.webscenario_step_edit_popup = new class {
 				}
 			})
 			.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
-				const is_disabled = $table[0].querySelectorAll('.<?= ZBX_STYLE_SORTABLE ?>').length < 2;
+				const is_disabled = $table[0].querySelectorAll('.<?= CSortable::ZBX_STYLE_SORTABLE ?>').length < 2;
 
 				for (const drag_icon of $table[0].querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
 					drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
 				}
 
 				$table.sortable({disabled: is_disabled});
+			})
+			.on('sortstop.dynamicRows', () => {
+				const rows = $table[0].querySelectorAll('.<?= CSortable::ZBX_STYLE_SORTABLE ?>');
+
+				rows.forEach((row, index) => {
+					const textareas = row.querySelectorAll('textarea');
+
+					textareas.forEach((textarea) => {
+						const original_name = textarea.getAttribute('name');
+						const new_name = original_name.replace(/\[\d+]/, `[${index}]`);
+
+						textarea.setAttribute('name', new_name);
+					});
+				});
 			})
 			.trigger('afteradd.dynamicRows');
 	}
@@ -208,7 +223,7 @@ window.webscenario_step_edit_popup = new class {
 		if (is_raw) {
 			pairs = this.#parsePostRawToPairs(posts.value.trim());
 
-			for (const row of this.#post_fields.querySelectorAll('tbody .<?= ZBX_STYLE_SORTABLE ?>')) {
+			for (const row of this.#post_fields.querySelectorAll('tbody .<?= CSortable::ZBX_STYLE_SORTABLE ?>')) {
 				row.remove();
 			}
 
@@ -233,7 +248,7 @@ window.webscenario_step_edit_popup = new class {
 			$table.trigger('afteradd.dynamicRows');
 		}
 		else {
-			for (const row of this.#post_fields.querySelectorAll('tbody .<?= ZBX_STYLE_SORTABLE ?>')) {
+			for (const row of this.#post_fields.querySelectorAll('tbody .<?= CSortable::ZBX_STYLE_SORTABLE ?>')) {
 				const name = row.querySelector('[name$="[name]"]').value;
 				const value = row.querySelector('[name$="[value]"]').value;
 
@@ -322,6 +337,7 @@ window.webscenario_step_edit_popup = new class {
 
 	#updateForm() {
 		const post_type = this.#form.querySelector('[name="post_type"]:checked').value;
+
 		for (const field of this.#form.querySelectorAll('.js-field-post-fields')) {
 			field.style.display = post_type == <?= ZBX_POSTTYPE_FORM ?> ? '' : 'none';
 		}
@@ -351,7 +367,7 @@ window.webscenario_step_edit_popup = new class {
 				element.removeAttribute('disabled');
 			}
 
-			if (this.#post_fields.querySelectorAll('.<?= ZBX_STYLE_SORTABLE ?>').length > 1) {
+			if (this.#post_fields.querySelectorAll('.<?= CSortable::ZBX_STYLE_SORTABLE ?>').length > 1) {
 				jQuery(this.#post_fields).sortable('enable');
 
 				for (const element of this.#post_fields.querySelectorAll('.<?= ZBX_STYLE_DRAG_ICON ?>')) {
@@ -382,7 +398,7 @@ window.webscenario_step_edit_popup = new class {
 
 		const $table = jQuery(this.#query_fields);
 
-		for (const row of this.#query_fields.querySelectorAll('tbody .<?= ZBX_STYLE_SORTABLE ?>')) {
+		for (const row of this.#query_fields.querySelectorAll('tbody .<?= CSortable::ZBX_STYLE_SORTABLE ?>')) {
 			const name = row.querySelector('[name$="[name]"]').value;
 			const value = row.querySelector('[name$="[value]"]').value;
 
