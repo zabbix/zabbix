@@ -221,7 +221,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (NULL != (args = proc_argv(pproc->p_pid)))
 			{
-				if (0 == zbx_regexp_match_precompiled(procargs, proccomm_rxp))
+				if (0 == zbx_regexp_match_precompiled(args, proccomm_rxp))
 					comm_ok = 1;
 			}
 		}
@@ -397,7 +397,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			if (NULL != (args = proc_argv(pproc->p_pid)))
 			{
-				if (0 == zbx_regexp_match_precompiled(procargs, proccomm_rxp))
+				if (0 == zbx_regexp_match_precompiled(args, proccomm_rxp))
 					comm_ok = 1;
 			}
 		}
@@ -548,7 +548,7 @@ int	proc_get(AGENT_REQUEST *request, AGENT_RESULT *result)
 
 		args = proc_argv(proc[i].p_pid);
 
-		if (NULL != proccomm && '\0' != *proccomm && 0 != zbx_regexp_match_precompiled(procargs, proccomm_rxp))
+		if (NULL != proccomm && '\0' != *proccomm && 0 != zbx_regexp_match_precompiled(args, proccomm_rxp))
 			continue;
 
 		proc_data = (proc_data_t *)zbx_malloc(NULL, sizeof(proc_data_t));
