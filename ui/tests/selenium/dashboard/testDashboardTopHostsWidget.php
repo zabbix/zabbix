@@ -28,9 +28,9 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 /**
  * @dataSource TopHostsWidget, ItemValueWidget, AllItemValueTypes
  *
- * @backup widget, profiles
+ * @backup dashboard, profiles
  *
- * @onBefore prepareDashboardData
+ * @onBefore prepareData
  */
 class testDashboardTopHostsWidget extends testWidgets {
 
@@ -99,7 +99,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 		])->waitUntilVisible()->one();
 	}
 
-	public static function prepareDashboardData() {
+	public static function prepareData() {
 		self::$dashboard_update = CDataHelper::get('TopHostsWidget.top_host_update');
 		self::$dashboard_create = CDataHelper::get('TopHostsWidget.top_host_create');
 		self::$dashboard_remove = CDataHelper::get('TopHostsWidget.top_host_remove');

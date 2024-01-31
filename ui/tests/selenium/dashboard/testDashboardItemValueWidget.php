@@ -31,7 +31,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
  *
  * @dataSource WebScenarios, AllItemValueTypes, ItemValueWidget
  *
- * @onBefore prepareDashboardData
+ * @onBefore prepareData
  */
 class testDashboardItemValueWidget extends testWidgets {
 
@@ -90,7 +90,7 @@ class testDashboardItemValueWidget extends testWidgets {
 		])->waitUntilVisible()->one();
 	}
 
-	public static function prepareDashboardData() {
+	public static function prepareData() {
 		self::$dashboardid = CDataHelper::get('ItemValueWidget.dashboardid');
 		self::$dashboard_zoom = CDataHelper::get('ItemValueWidget.dashboard_zoom');
 		self::$dashboard_threshold = CDataHelper::get('ItemValueWidget.dashboard_threshold');
@@ -3904,7 +3904,6 @@ class testDashboardItemValueWidget extends testWidgets {
 	 * Test function for assuring that binary items are not available in Item Value widget.
 	 */
 	public function testDashboardItemValueWidget_CheckAvailableItems() {
-		$url = 'zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid;
-		$this->checkAvailableItems($url, 'Item value');
+		$this->checkAvailableItems('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboardid, 'Item value');
 	}
 }
