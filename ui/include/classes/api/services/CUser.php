@@ -3375,6 +3375,8 @@ class CUser extends CApiService {
 			try {
 				$duo_client = new Client($data['mfa']['clientid'], $data['mfa']['client_secret'],
 					$data['mfa']['api_hostname'], $session_data['redirect_uri']);
+
+				$duo_client->healthCheck();
 			}
 			catch (DuoException $e) {
 				self::exception(ZBX_API_ERROR_PARAMETERS,
