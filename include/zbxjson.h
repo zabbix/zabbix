@@ -213,6 +213,7 @@
 #define ZBX_PROTO_TAG_ITEM			"item"
 #define ZBX_PROTO_TAG_PREPROCESSING		"preprocessing"
 #define ZBX_PROTO_TAG_OPTIONS			"options"
+#define ZBX_PROTO_TAG_EOL			"eol"
 
 #define ZBX_PROTO_VALUE_FAILED		"failed"
 #define ZBX_PROTO_VALUE_SUCCESS		"success"

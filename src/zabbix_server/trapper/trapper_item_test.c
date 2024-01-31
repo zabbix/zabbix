@@ -925,6 +925,9 @@ preproc_test:
 				ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info, ZBX_JSON_TYPE_STRING,
 				ZBX_JSON_TEST_DATA_MAX_SIZE);
 
+		zbx_json_addstring(json, ZBX_PROTO_TAG_EOL, NULL != strstr(info, "\r\n") ? "CRLF" : "LF",
+				ZBX_JSON_TYPE_STRING);
+
 		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
 		{
 			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
