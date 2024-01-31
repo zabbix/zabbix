@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:43:51Z'
+  date: '2024-01-22T15:07:23Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -37,10 +37,10 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  value = JSON.parse(value)
+                  value = JSON.parse(value);
                   
-                  var list = []
-                  list.push({'scope': value['scope'].split(':')[3], 'access_token': value['access_token']})
+                  var list = [];
+                  list.push({ 'scope': value['scope'].split(':')[3], 'access_token': value['access_token'] });
                   return JSON.stringify(list);
           timeout: 15s
           url: '{$ACRONIS.CPC.DATACENTER.URL}{$ACRONIS.CPC.PATH.ACCOUNT.MANAGEMENT}/idp/token'
@@ -324,116 +324,106 @@ zabbix_export:
           history: '0'
           trends: '0'
           params: |
-            // Script for activating integration on Acronis, if it is not activated.
             
             const request_path = '/api/integration_management/v2/status';
             const app_id = '5619386d-de56-49ec-8508-f5c399d3b9bd';
             
             function checkParams(params) {
-                ['api_url', 'api_token', 'tenant_uuid'].forEach(function (field) {
-                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                        throw 'Required param is not set: ' + field + '.';
-                    }
-                });
-                return params;
+            	['api_url', 'api_token', 'tenant_uuid'].forEach(function (field) {
+            		if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            			throw 'Required param is not set: ' + field + '.';
+            		}
+            	});
+            	return params;
             }
             
             function getHttpData(url, register, params, api_token, tenant_uuid) {
-                const request = new HttpRequest();
+            	const request = new HttpRequest();
             
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('Authorization: Bearer ' + api_token);
-                request.addHeader('X-Application-Secret: ' + app_id);
+            	request.addHeader('Content-Type: application/json');
+            	request.addHeader('Authorization: Bearer ' + api_token);
+            	request.addHeader('X-Application-Secret: ' + app_id);
             
-                // set proxy if needed
-                if (params['http_proxy']) {
-                    request.setProxy(params['http_proxy'])
-                    Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] Using http proxy: ' + params['http_proxy']);
-                }
+            	if (params['http_proxy']) {
+            		request.setProxy(params['http_proxy']);
+            		Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] Using http proxy: ' + params['http_proxy']);
+            	}
             
-                if (!register){
-                    // Code executed if action != to register. Only queries current activation status
-                    const response = request.get(url + '?tenantID=' + encodeURIComponent(tenant_uuid));
-                    Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-                
-                    // check if response status is OK
-                    if (request.getStatus() !== 200) {
-                        if (typeof (response.error && response.error.message) !== 'undefined') {
-                            throw response.error.message;
-                        } else {
-                            throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                        }
-                    }
+            	if (!register) {
+            		const response = request.get(url + '?tenantID=' + encodeURIComponent(tenant_uuid));
+            		Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    // return response object
-                    return response;
+            		if (request.getStatus() !== 200) {
+            			if (typeof (response.error && response.error.message) !== 'undefined') {
+            				throw response.error.message;
+            			} else {
+            				throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            			}
+            		}
             
-                } else {
-                    // Code executed if action == register. Activated integration with POST request
+            		return response;
             
-                    // Use correct format for registering integration on Acronis services
-                    const request_body = {
-                        "application_id": app_id,
-                        "module": {
-                            "name": "Zabbix integration with Acronis Cyber Protect Cloud",
-                            "version": "1.0.0"
-                        },
-                        "vendor_system": {
-                            "name": "Product integrated with Acronis",
-                            "version": "23.07"
-                        },
-                        "events": [
-                            {
-                                "category": "activation",
-                                "action": "activated integration",
-                                "activation_event": true
-                            }
-                        ]
-                    };
+            	} else {
             
-                    const response = request.post(url + '?tenantID=' + encodeURIComponent(tenant_uuid), JSON.stringify(request_body));
-                    Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-                
-                    // check if response status is OK
-                    if (request.getStatus() !== 204) {
-                        if (typeof (response.error && response.error.message) !== 'undefined') {
-                            throw response.error.message;
-                        } else {
-                            throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
-                        }
-                    }
+            		const request_body = {
+            			"application_id": app_id,
+            			"module": {
+            				"name": "Zabbix integration with Acronis Cyber Protect Cloud",
+            				"version": "1.0.0"
+            			},
+            			"vendor_system": {
+            				"name": "Product integrated with Acronis",
+            				"version": "23.07"
+            			},
+            			"events": [
+            				{
+            					"category": "activation",
+            					"action": "activated integration",
+            					"activation_event": true
+            				}
+            			]
+            		};
             
-                    return 1;
-                }
+            		const response = request.post(url + '?tenantID=' + encodeURIComponent(tenant_uuid), JSON.stringify(request_body));
+            		Zabbix.log(4, '[ ACRONIS CYBER PROTECT CLOUD API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            		if (request.getStatus() !== 204) {
+            			if (typeof (response.error && response.error.message) !== 'undefined') {
+            				throw response.error.message;
+            			} else {
+            				throw 'Failed to receive data: invalid response status code. Check debug log for more information.';
+            			}
+            		}
+            
+            		return 1;
+            	}
             }
             
             function parseGetStatusData(http_response) {
-                // parse the response body and return active status if it exists
-                const data = JSON.parse(http_response);
-                // check if active key exists
-                if (data['items']) {
-                    data['items'].forEach(function (app) {
-                        if (app['application_id'] && app['application_id'] === app_id){
-                            return app['active'];
-                        }
-                    })
-                    return false;
-                } else {
-                    throw 'Unexpected data structure in HTTP response.'
-                }
+            	const data = JSON.parse(http_response);
+            	if (data['items']) {
+            		data['items'].forEach(function (app) {
+            			if (app['application_id'] && app['application_id'] === app_id) {
+            				return app['active'];
+            			}
+            		});
+            		return false;
+            	} else {
+            		throw 'Unexpected data structure in HTTP response.';
+            	}
             }
             
             const params = checkParams(JSON.parse(value)),
-                url = params.api_url,
-                api_token = params.api_token
-                tenant_uuid = params.tenant_uuid
+            	url = params.api_url,
+            	api_token = params.api_token,
+            	tenant_uuid = params.tenant_uuid;
             
             const current_activation_status = parseGetStatusData(getHttpData(url + request_path, false, params, api_token, tenant_uuid));
             
-            if (!current_activation_status){
-                return getHttpData(url + request_path, true, params, api_token, tenant_uuid)
+            if (!current_activation_status) {
+            	return getHttpData(url + request_path, true, params, api_token, tenant_uuid);
             } else {
-                return 0; // Something needs to be returned even if not using value anywhere
+            	return 0;
             }
           description: 'Registers integration on Acronis services.'
           timeout: 30s
@@ -498,12 +488,12 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      const idx = [       // 10 - Unknown (default)
-                          'ok',           // 0
-                          'warning',      // 1
-                          'error',        // 2
-                          'critical',     // 3
-                          'information'   // 4
+                      const idx = [
+                      	'ok',
+                      	'warning',
+                      	'error',
+                      	'critical',
+                      	'information'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
                 - type: DISCARD_UNCHANGED_HEARTBEAT

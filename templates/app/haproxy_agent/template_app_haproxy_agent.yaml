@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:44:44Z'
+  date: '2024-01-22T15:10:52Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -58,11 +58,11 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
-                      return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
+                  	var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
+                  	return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
                   }
                   catch (error) {
-                      throw "HAProxy uptime is not found : " + error;
+                  	throw "HAProxy uptime is not found : " + error;
                   }
           master_item:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
