@@ -19,11 +19,12 @@
 
 #include "postinit.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 
 #include "zbxexpression.h"
 #include "zbxtasks.h"
 #include "zbxcachevalue.h"
+#include "zbxcacheconfig.h"
 #include "zbxdbwrap.h"
 #include "zbxdb.h"
 #include "zbxdbhigh.h"

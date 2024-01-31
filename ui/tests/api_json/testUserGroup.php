@@ -158,14 +158,14 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [[
 					'usrgrpid' => '',
-					'name' => 'API user group udated'
+					'name' => 'API user group updated'
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],
 			[
 				'group' => [[
 					'usrgrpid' => '123456',
-					'name' => 'API user group udated'
+					'name' => 'API user group updated'
 				]],
 				'expected_error' => 'No permissions to referred object or it does not exist!'
 			],
@@ -179,7 +179,7 @@ class testUserGroup extends CAPITest {
 			[
 				'group' => [[
 					'usrgrpid' => '1.1',
-					'name' => 'API user group udated'
+					'name' => 'API user group updated'
 				]],
 				'expected_error' => 'Invalid parameter "/1/usrgrpid": a number is expected.'
 			],

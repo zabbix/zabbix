@@ -3342,7 +3342,7 @@ class CDiscoveryRule extends CItemGeneral {
 			}
 		}
 
-		// Master item should exists for LLD rule with type dependent item.
+		// Master item should exist for LLD rule with type dependent item.
 		if ($srcDiscovery['type'] == ITEM_TYPE_DEPENDENT) {
 			$master_items = DBfetchArray(DBselect(
 				'SELECT i1.itemid'.

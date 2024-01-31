@@ -3025,6 +3025,12 @@ return [
 				'length' => 255,
 				'default' => '3s'
 			],
+			'auditlog_mode' => [
+				'null' => false,
+				'type' => DB::FIELD_TYPE_INT,
+				'length' => 10,
+				'default' => '1'
+			],
 			'mfa_status' => [
 				'null' => false,
 				'type' => DB::FIELD_TYPE_INT,
@@ -5783,18 +5789,19 @@ return [
 		]
 	],
 	'globalvars' => [
-		'key' => 'globalvarid',
+		'key' => 'name',
 		'fields' => [
-			'globalvarid' => [
+			'name' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_ID,
-				'length' => 20
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 64,
+				'default' => ''
 			],
-			'snmp_lastsize' => [
+			'value' => [
 				'null' => false,
-				'type' => DB::FIELD_TYPE_UINT,
-				'length' => 20,
-				'default' => '0'
+				'type' => DB::FIELD_TYPE_CHAR,
+				'length' => 2048,
+				'default' => ''
 			]
 		]
 	],
