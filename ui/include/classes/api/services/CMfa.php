@@ -151,13 +151,19 @@ class CMfa extends CApiService {
 
 		$default_mfaid = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
 		if (array_key_exists($default_mfaid, $result)) {
-			$db_usergroups_default_mfa = API::UserGroup()->get([
+			$db_usergroups_mfa_enabled = API::UserGroup()->get([
 				'output' => $output,
-				'mfaid' => null,
 				'mfa_status' => GROUP_MFA_ENABLED
 			]);
 
-			$result[$default_mfaid]['usrgrps'][] = array_diff_key($db_usergroups_default_mfa, array_flip(['mfaid']));
+			$db_usergroups_default_mfa = array_filter($db_usergroups_mfa_enabled, function ($usrgrp) {
+				return $usrgrp['mfaid'] == 0;
+			});
+
+			foreach ($db_usergroups_default_mfa as $db_usergroup) {
+				$result[$default_mfaid]['usrgrps'][] =
+					array_diff_key($db_usergroup, array_flip(['mfaid']));
+			}
 		}
 
 		$db_usergroups = API::UserGroup()->get([
