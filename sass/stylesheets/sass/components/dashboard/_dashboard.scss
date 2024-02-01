@@ -129,7 +129,7 @@
 		}
 
 		li div:hover,
-		li.sortable-token-dragging div {
+		li.sortable-item-dragging div {
 			background: $action-hover-color;
 			border: 1px solid darken($action-hover-color, 20%);
 		}

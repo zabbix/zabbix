@@ -28,49 +28,49 @@ class CSortable {
 	static ZBX_STYLE_CLASS = 'sortable';
 
 	/**
-	 * Class applied to a sortable container while token is being dragged.
+	 * Class applied to a sortable container while item is being dragged.
 	 *
 	 * @type {string}
 	 */
 	static ZBX_STYLE_DRAGGING = 'sortable-dragging';
 
 	/**
-	 * Class applied to token elements.
+	 * Class applied to item elements.
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_TOKEN = 'sortable-token';
+	static ZBX_STYLE_ITEM = 'sortable-item';
 
 	/**
-	 * Class applied to elements of tokens which cannot be sorted.
+	 * Class applied to elements of items which cannot be sorted.
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_TOKEN_STATIC = 'sortable-token-static';
+	static ZBX_STYLE_ITEM_STATIC = 'sortable-item-static';
 
 	/**
-	 * Class applied to token elements while it is being dragged.
+	 * Class applied to item elements while it is being dragged.
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_TOKEN_DRAGGING = 'sortable-token-dragging';
+	static ZBX_STYLE_ITEM_DRAGGING = 'sortable-item-dragging';
 
 	/**
-	 * Event fired on start of dragging of a token.
+	 * Event fired on start of dragging of an item.
 	 *
 	 * @type {string}
 	 */
 	static EVENT_DRAG_START = 'sortable-drag-start';
 
 	/**
-	 * Event fired on end of dragging of a token.
+	 * Event fired on end of dragging of an item.
 	 *
 	 * @type {string}
 	 */
 	static EVENT_DRAG_END = 'sortable-drag-end';
 
 	/**
-	 * Event fired on end of dragging of a token, if sort order has changed.
+	 * Event fired on end of dragging of an item, if sort order has changed.
 	 *
 	 * @type {string}
 	 */
@@ -84,7 +84,7 @@ class CSortable {
 
 	#target;
 
-	#is_vertical;
+	#is_horizontal;
 
 	#selector_span;
 	#selector_freeze;
@@ -96,8 +96,8 @@ class CSortable {
 	#animation_speed;
 	#animation_time_limit;
 
-	#tokens = [];
-	#tokens_loc = [];
+	#items = [];
+	#items_loc = [];
 
 	#animations = new Map();
 	#animation_frame = null;
@@ -105,12 +105,12 @@ class CSortable {
 	#scroll_pos = 0;
 
 	#is_dragging = false;
-	#drag_token = null;
+	#drag_item = null;
 	#drag_index = -1;
 	#drag_index_original = -1;
 	#drag_delta = 0;
 	#drag_style;
-	#overtake_tokens_loc = [];
+	#overtake_items_loc = [];
 	#overtake_min = -1;
 	#overtake_max = -1;
 
@@ -126,9 +126,9 @@ class CSortable {
 	 * Create CSortable instance.
 	 *
 	 * @param {HTMLElement} target                Sortable container.
-	 * @param {boolean}     is_vertical           Whether sorting is vertically oriented.
-	 * @param {string}      selector_span         Selector for matching first child element of multi-element tokens.
-	 * @param {string}      selector_freeze       Selector for matching frozen tokens (cannot change order).
+	 * @param {boolean}     is_horizontal         Whether sorting is horizontally oriented.
+	 * @param {string}      selector_span         Selector for matching first child element of multi-element items.
+	 * @param {string}      selector_freeze       Selector for matching frozen items (cannot change order).
 	 * @param {string}      selector_handle       Selector for matching a drag handle.
 	 * @param {boolean}     enable                Whether to enable the instance initially.
 	 * @param {boolean}     enable_sorting        Whether to enable sorting initially (or just scrolling).
@@ -138,7 +138,7 @@ class CSortable {
 	 * @returns {CSortable}
 	 */
 	constructor(target, {
-		is_vertical,
+		is_horizontal = false,
 
 		selector_span = '',
 		selector_freeze = '',
@@ -152,9 +152,9 @@ class CSortable {
 	} = {}) {
 		this.#target = target;
 		this.#target.classList.add(CSortable.ZBX_STYLE_CLASS);
-		this.#target[is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
+		this.#target[is_horizontal ? 'scrollLeft' : 'scrollTop'] = 0;
 
-		this.#is_vertical = is_vertical;
+		this.#is_horizontal = is_horizontal;
 
 		this.#selector_span = selector_span;
 		this.#selector_freeze = selector_freeze;
@@ -182,7 +182,7 @@ class CSortable {
 	}
 
 	/**
-	 * Update tokens and reflect changes immediately.
+	 * Update items and reflect changes immediately.
 	 *
 	 * @param {function} callback  Scrollable container will be passed as the first parameter to the callback function.
 	 */
@@ -207,7 +207,7 @@ class CSortable {
 		}
 
 		if (enable) {
-			this.#updateTokens();
+			this.#updateItems();
 			this.#render();
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 			this.#observeMutations();
@@ -242,20 +242,20 @@ class CSortable {
 	}
 
 	/**
-	 * Scroll the target token into view.
+	 * Scroll the target item into view.
 	 *
 	 * @param {HTMLElement} element
 	 * @param {boolean}     immediate  Whether to scroll into view immediately.
 	 */
 	scrollIntoView(element, {immediate = false} = {}) {
-		if (this.#is_dragging || this.#drag_token !== null) {
+		if (this.#is_dragging || this.#drag_item !== null) {
 			return;
 		}
 
-		const token = this.#matchToken(element);
+		const item = this.#matchItem(element);
 
-		if (token !== null) {
-			this.#scrollIntoView(this.#tokens_loc.get(token));
+		if (item !== null) {
+			this.#scrollIntoView(this.#items_loc.get(item));
 
 			if (immediate) {
 				this.#finishAnimations([CSortable.ANIMATION_SCROLL]);
@@ -281,42 +281,42 @@ class CSortable {
 		this.#finishAnimations();
 	}
 
-	#updateTokens() {
-		for (const token of this.#tokens) {
-			this.#clearAnimation(token);
+	#updateItems() {
+		for (const item of this.#items) {
+			this.#clearAnimation(item);
 		}
 
-		this.#tokens = [];
+		this.#items = [];
 
 		for (const element of this.#target.querySelectorAll(':scope > *')) {
 			if (this.#selector_span === '' || element.matches(this.#selector_span)) {
-				this.#tokens.push({
+				this.#items.push({
 					elements: [],
 					freeze: this.#selector_freeze !== '' && element.matches(this.#selector_freeze),
 					rel: 0
 				});
 			}
 
-			this.#tokens.at(-1).elements.push(element);
+			this.#items.at(-1).elements.push(element);
 		}
 
 		const observe_mutations = this.#observeMutations(false);
 
-		for (let index = 0; index < this.#tokens.length; index++) {
-			const is_static = this.#tokens[index].freeze
-				|| ((index === 0 || this.#tokens[index - 1].freeze)
-					&& (index === this.#tokens.length - 1 || this.#tokens[index + 1].freeze)
+		for (let index = 0; index < this.#items.length; index++) {
+			const is_static = this.#items[index].freeze
+				|| ((index === 0 || this.#items[index - 1].freeze)
+					&& (index === this.#items.length - 1 || this.#items[index + 1].freeze)
 				);
 
-			for (const element of this.#getContentsElements(this.#tokens[index].elements)) {
-				element.classList.add(CSortable.ZBX_STYLE_TOKEN);
-				element.classList.toggle(CSortable.ZBX_STYLE_TOKEN_STATIC, is_static);
+			for (const element of this.#getContentsElements(this.#items[index].elements)) {
+				element.classList.add(CSortable.ZBX_STYLE_ITEM);
+				element.classList.toggle(CSortable.ZBX_STYLE_ITEM_STATIC, is_static);
 			}
 		}
 
 		this.#observeMutations(observe_mutations);
 
-		this.#tokens_loc = this.#getTokensLoc(this.#tokens);
+		this.#items_loc = this.#getItemsLoc(this.#items);
 	}
 
 	#getContentsElements(elements) {
@@ -334,33 +334,33 @@ class CSortable {
 		return contents_elements;
 	}
 
-	#getTokensLoc(tokens) {
-		this.#sortTokens(tokens);
+	#getItemsLoc(items) {
+		this.#sortItems(items);
 
 		const target_pos = this.#getTargetLoc().pos - this.#scroll_pos;
 
-		const tokens_loc = new Map();
+		const items_loc = new Map();
 
-		for (const token of tokens) {
-			const client_loc = this.#getLoc(token.elements);
+		for (const item of items) {
+			const client_loc = this.#getLoc(item.elements);
 
-			tokens_loc.set(token, {
-				pos: client_loc.pos - target_pos - token.rel,
+			items_loc.set(item, {
+				pos: client_loc.pos - target_pos - item.rel,
 				dim: client_loc.dim
 			});
 		}
 
-		this.#sortTokens();
+		this.#sortItems();
 
-		return tokens_loc;
+		return items_loc;
 	}
 
-	#sortTokens(tokens = this.#tokens) {
+	#sortItems(items = this.#items) {
 		const elements_old = [...this.#target.children];
 		const elements_new = [];
 
-		for (const token of tokens) {
-			for (const element of token.elements) {
+		for (const item of items) {
+			for (const element of item.elements) {
 				elements_new.push(element);
 			}
 		}
@@ -381,8 +381,8 @@ class CSortable {
 		const client_rect = this.#target.getBoundingClientRect();
 
 		return {
-			pos: this.#is_vertical ? client_rect.y : client_rect.x,
-			dim: this.#is_vertical ? client_rect.height : client_rect.width
+			pos: this.#is_horizontal ? client_rect.x : client_rect.y,
+			dim: this.#is_horizontal ? client_rect.width : client_rect.height
 		};
 	}
 
@@ -394,8 +394,8 @@ class CSortable {
 			const rect = element.getBoundingClientRect();
 
 			const loc = {
-				pos: this.#is_vertical ? rect.y : rect.x,
-				dim: this.#is_vertical ? rect.height : rect.width
+				pos: this.#is_horizontal ? rect.x : rect.y,
+				dim: this.#is_horizontal ? rect.width : rect.height
 			};
 
 			if (pos === 0 && pos_to === 0) {
@@ -509,9 +509,9 @@ class CSortable {
 			this.#scroll_pos = updates.get(CSortable.ANIMATION_SCROLL);
 		}
 
-		for (const token of this.#tokens) {
-			if (updates.has(token)) {
-				token.rel = updates.get(token);
+		for (const item of this.#items) {
+			if (updates.has(item)) {
+				item.rel = updates.get(item);
 			}
 		}
 	}
@@ -520,14 +520,14 @@ class CSortable {
 		if (this.#is_dragging) {
 			let drag_rel = this.#getDragRelConstrained();
 
-			const drag_pos = this.#scroll_pos + this.#tokens_loc.get(this.#drag_token).pos + drag_rel;
+			const drag_pos = this.#scroll_pos + this.#items_loc.get(this.#drag_item).pos + drag_rel;
 
 			let index;
 
 			for (index = this.#overtake_min; index < this.#overtake_max; index++) {
-				const token_loc = [...this.#overtake_tokens_loc[index + 1].values()][index];
+				const item_loc = [...this.#overtake_items_loc[index + 1].values()][index];
 
-				if (token_loc.pos + token_loc.dim / 2 >= drag_pos) {
+				if (item_loc.pos + item_loc.dim / 2 >= drag_pos) {
 					break;
 				}
 			}
@@ -538,21 +538,21 @@ class CSortable {
 				drag_rel = this.#getDragRelConstrained();
 			}
 
-			this.#applyRel(this.#drag_token.elements, drag_rel);
+			this.#applyRel(this.#drag_item.elements, drag_rel);
 		}
 
-		for (const token of this.#tokens) {
-			if (!this.#is_dragging || token !== this.#drag_token) {
-				this.#applyRel(token.elements, token.rel - this.#scroll_pos);
+		for (const item of this.#items) {
+			if (!this.#is_dragging || item !== this.#drag_item) {
+				this.#applyRel(item.elements, item.rel - this.#scroll_pos);
 			}
 		}
 	}
 
-	#matchToken(element) {
-		for (const token of this.#tokens) {
-			for (const token_element of token.elements) {
-				if (token_element.contains(element)) {
-					return token;
+	#matchItem(element) {
+		for (const item of this.#items) {
+			for (const item_element of item.elements) {
+				if (item_element.contains(element)) {
+					return item;
 				}
 			}
 		}
@@ -562,55 +562,58 @@ class CSortable {
 
 	#applyRel(elements, rel) {
 		for (const element of this.#getContentsElements(elements)) {
-			element.style[this.#is_vertical ? 'top' : 'left'] = `${rel}px`;
+			element.style[this.#is_horizontal ? 'left' : 'top'] = `${rel}px`;
 		}
 	}
 
 	#getDragConstraints() {
-		const drag_token_loc = this.#tokens_loc.get(this.#drag_token);
+		const drag_loc = this.#items_loc.get(this.#drag_item);
+
+		const overtake_min_loc = this.#items_loc.get(this.#items[this.#overtake_min]);
+		const overtake_max_loc = this.#items_loc.get(this.#items[this.#overtake_max]);
 
 		return {
-			tokens: {
-				min: this.#tokens_loc.get(this.#tokens[this.#overtake_min]).pos - drag_token_loc.pos - this.#scroll_pos,
-				max: this.#tokens_loc.get(this.#tokens[this.#overtake_max]).pos - drag_token_loc.pos - this.#scroll_pos
+			items: {
+				min: overtake_min_loc.pos - drag_loc.pos - this.#scroll_pos,
+				max: overtake_max_loc.pos + overtake_max_loc.dim - drag_loc.pos - drag_loc.dim - this.#scroll_pos
 			},
 			client: {
-				min: -drag_token_loc.pos,
-				max: this.#getTargetLoc().dim - drag_token_loc.pos - drag_token_loc.dim
+				min: -drag_loc.pos,
+				max: this.#getTargetLoc().dim - drag_loc.pos - drag_loc.dim
 			}
 		};
 	}
 
 	#getDragRelConstrained(constraints = this.#getDragConstraints()) {
-		const min = Math.max(constraints.tokens.min, constraints.client.min);
-		const max = Math.min(constraints.tokens.max, constraints.client.max);
+		const min = Math.max(constraints.items.min, constraints.client.min);
+		const max = Math.min(constraints.items.max, constraints.client.max);
 
-		return Math.max(Math.min(this.#drag_token.rel, max), min);
+		return Math.max(Math.min(this.#drag_item.rel, max), min);
 	}
 
 	#overtake(index) {
-		const drag_token_rel_delta = this.#tokens_loc.get(this.#drag_token).pos
-			- this.#overtake_tokens_loc[index].get(this.#drag_token).pos;
+		const drag_item_rel_delta = this.#items_loc.get(this.#drag_item).pos
+			- this.#overtake_items_loc[index].get(this.#drag_item).pos;
 
-		this.#drag_token.rel += drag_token_rel_delta;
-		this.#drag_delta += drag_token_rel_delta;
+		this.#drag_item.rel += drag_item_rel_delta;
+		this.#drag_delta += drag_item_rel_delta;
 
-		for (const [token, token_loc] of this.#overtake_tokens_loc[index]) {
-			if (token !== this.#drag_token) {
-				token.rel += this.#tokens_loc.get(token).pos - token_loc.pos;
-				this.#scheduleAnimation(token, token.rel, 0);
+		for (const [item, item_loc] of this.#overtake_items_loc[index]) {
+			if (item !== this.#drag_item) {
+				item.rel += this.#items_loc.get(item).pos - item_loc.pos;
+				this.#scheduleAnimation(item, item.rel, 0);
 			}
 		}
 
 		this.#drag_index = index;
-		this.#tokens = [...this.#overtake_tokens_loc[index].keys()];
-		this.#tokens_loc = this.#overtake_tokens_loc[index];
+		this.#items = [...this.#overtake_items_loc[index].keys()];
+		this.#items_loc = this.#overtake_items_loc[index];
 
-		this.#sortTokens();
+		this.#sortItems();
 	}
 
 	#getScrollMax() {
-		return this.#target[this.#is_vertical ? 'scrollHeight' : 'scrollWidth'] - this.#getTargetLoc().dim;
+		return this.#target[this.#is_horizontal ? 'scrollWidth' : 'scrollHeight'] - this.#getTargetLoc().dim;
 	}
 
 	#scrollTo(pos) {
@@ -644,16 +647,16 @@ class CSortable {
 	}
 
 	#startDrag(client_pos) {
-		this.#overtake_tokens_loc = [];
+		this.#overtake_items_loc = [];
 
 		this.#overtake_min = this.#drag_index;
 		this.#overtake_max = this.#drag_index;
 
-		while (this.#overtake_min >= 0 && !this.#tokens[this.#overtake_min].freeze) {
+		while (this.#overtake_min >= 0 && !this.#items[this.#overtake_min].freeze) {
 			this.#overtake_min--;
 		}
 
-		while (this.#overtake_max < this.#tokens.length && !this.#tokens[this.#overtake_max].freeze) {
+		while (this.#overtake_max < this.#items.length && !this.#items[this.#overtake_max].freeze) {
 			this.#overtake_max++;
 		}
 
@@ -661,24 +664,24 @@ class CSortable {
 		this.#overtake_max--;
 
 		for (let index = this.#overtake_min; index <= this.#overtake_max; index++) {
-			const tokens = [...this.#tokens];
+			const items = [...this.#items];
 
-			tokens.splice(index, 0, ...tokens.splice(this.#drag_index, 1));
+			items.splice(index, 0, ...items.splice(this.#drag_index, 1));
 
-			this.#overtake_tokens_loc[index] = this.#getTokensLoc(tokens);
+			this.#overtake_items_loc[index] = this.#getItemsLoc(items);
 		}
 
 		this.#is_dragging = true;
-		this.#drag_token.rel -= this.#scroll_pos;
-		this.#drag_delta = this.#drag_token.rel - client_pos;
+		this.#drag_item.rel -= this.#scroll_pos;
+		this.#drag_delta = this.#drag_item.rel - client_pos;
 
-		this.#clearAnimation(this.#drag_token);
+		this.#clearAnimation(this.#drag_item);
 	}
 
 	#endDrag() {
 		this.#cancelDragScroll();
-		this.#scheduleAnimation(this.#drag_token, this.#scroll_pos + this.#getDragRelConstrained(), 0);
-		this.#scrollIntoView(this.#tokens_loc.get(this.#drag_token));
+		this.#scheduleAnimation(this.#drag_item, this.#scroll_pos + this.#getDragRelConstrained(), 0);
+		this.#scrollIntoView(this.#items_loc.get(this.#drag_item));
 
 		this.#is_dragging = false;
 	}
@@ -691,8 +694,8 @@ class CSortable {
 
 			this.#target.classList.add(CSortable.ZBX_STYLE_DRAGGING);
 
-			for (const element of this.#getContentsElements(this.#drag_token.elements)) {
-				element.classList.add(CSortable.ZBX_STYLE_TOKEN_DRAGGING);
+			for (const element of this.#getContentsElements(this.#drag_item.elements)) {
+				element.classList.add(CSortable.ZBX_STYLE_ITEM_DRAGGING);
 			}
 
 			this.#observeMutations(observe_mutations);
@@ -713,8 +716,8 @@ class CSortable {
 
 			this.#target.classList.remove(CSortable.ZBX_STYLE_DRAGGING);
 
-			for (const element of this.#getContentsElements(this.#drag_token.elements)) {
-				element.classList.remove(CSortable.ZBX_STYLE_TOKEN_DRAGGING);
+			for (const element of this.#getContentsElements(this.#drag_item.elements)) {
+				element.classList.remove(CSortable.ZBX_STYLE_ITEM_DRAGGING);
 			}
 
 			this.#observeMutations(observe_mutations);
@@ -733,7 +736,7 @@ class CSortable {
 			this.#skip_click = true;
 		}
 
-		this.#drag_token = null;
+		this.#drag_item = null;
 	}
 
 	#cancelSort() {
@@ -759,7 +762,7 @@ class CSortable {
 			const index = this.#drag_index + this.#drag_scroll_direction;
 
 			if (index >= this.#overtake_min && index <= this.#overtake_max) {
-				this.#scrollIntoView(this.#tokens_loc.get(this.#tokens[index]));
+				this.#scrollIntoView(this.#items_loc.get(this.#items[index]));
 				this.#requestDragScroll();
 			}
 		}, this.#animation_time_limit * 1000);
@@ -829,15 +832,15 @@ class CSortable {
 
 	#listeners = {
 		mouseDown: (e) => {
-			const pos = this.#scroll_pos - this.#getTargetLoc().pos + (this.#is_vertical ? e.clientY : e.clientX);
+			const pos = this.#scroll_pos - this.#getTargetLoc().pos + (this.#is_horizontal ? e.clientX : e.clientY);
 
-			this.#drag_token = null;
+			this.#drag_item = null;
 
-			for (const [token, token_loc] of this.#tokens_loc) {
-				if (pos >= token_loc.pos + token.rel && pos < token_loc.pos + token_loc.dim + token.rel) {
-					this.#scrollIntoView(token_loc);
+			for (const [item, item_loc] of this.#items_loc) {
+				if (pos >= item_loc.pos + item.rel && pos < item_loc.pos + item_loc.dim + item.rel) {
+					this.#scrollIntoView(item_loc);
 
-					if (!this.#is_enabled_sorting || token.freeze) {
+					if (!this.#is_enabled_sorting || item.freeze) {
 						break;
 					}
 
@@ -849,8 +852,8 @@ class CSortable {
 						}
 					}
 
-					this.#drag_token = token;
-					this.#drag_index = this.#tokens.indexOf(token);
+					this.#drag_item = item;
+					this.#drag_index = this.#items.indexOf(item);
 					this.#drag_index_original = this.#drag_index;
 
 					this.#toggleListeners(CSortable.LISTENERS_SCROLL_SORT);
@@ -861,21 +864,21 @@ class CSortable {
 		},
 
 		mouseMove: (e) => {
-			const client_pos = this.#is_vertical ? e.clientY : e.clientX;
+			const client_pos = this.#is_horizontal ? e.clientX : e.clientY;
 
 			this.#startSort(client_pos);
 
-			const rel_old = this.#drag_token.rel;
+			const rel_old = this.#drag_item.rel;
 
-			this.#drag_token.rel = this.#drag_delta + client_pos;
+			this.#drag_item.rel = this.#drag_delta + client_pos;
 
 			const constraints = this.#getDragConstraints();
 			const rel_new = this.#getDragRelConstrained(constraints);
 
-			if (rel_new === constraints.client.min && rel_new <= rel_old && this.#drag_token.rel < rel_new) {
+			if (rel_new === constraints.client.min && rel_new <= rel_old && this.#drag_item.rel < rel_new) {
 				this.#requestDragScroll(-1);
 			}
-			else if (rel_new === constraints.client.max && rel_new >= rel_old && this.#drag_token.rel > rel_new) {
+			else if (rel_new === constraints.client.max && rel_new >= rel_old && this.#drag_item.rel > rel_new) {
 				this.#requestDragScroll(1);
 			}
 			else if (rel_new !== constraints.client.min && rel_new !== constraints.client.max) {
@@ -899,11 +902,11 @@ class CSortable {
 		},
 
 		wheel: (e) => {
-			if (!this.#is_dragging && this.#drag_token !== null) {
-				const client_pos = this.#is_vertical ? e.clientY : e.clientX;
+			if (!this.#is_dragging && this.#drag_item !== null) {
+				const client_pos = this.#is_horizontal ? e.clientX : e.clientY;
 
 				this.#startSort(client_pos);
-				this.#drag_token.rel = this.#drag_delta + client_pos;
+				this.#drag_item.rel = this.#drag_delta + client_pos;
 			}
 
 			this.#cancelDragScroll();
@@ -934,23 +937,23 @@ class CSortable {
 				return;
 			}
 
-			const token = this.#matchToken(e.target);
+			const item = this.#matchItem(e.target);
 
-			if (token === null || token.freeze) {
+			if (item === null || item.freeze) {
 				return;
 			}
 
 			e.preventDefault();
 
-			const index = this.#tokens.indexOf(token);
+			const index = this.#items.indexOf(item);
 			const index_to = index + direction;
 
-			if (index_to < 0 || index_to > this.#tokens.length - 1 || this.#tokens[index_to].freeze) {
+			if (index_to < 0 || index_to > this.#items.length - 1 || this.#items[index_to].freeze) {
 				return;
 			}
 
-			this.#tokens.splice(index, 0, ...this.#tokens.splice(index_to, 1));
-			this.#tokens_loc = this.#getTokensLoc(this.#tokens);
+			this.#items.splice(index, 0, ...this.#items.splice(index_to, 1));
+			this.#items_loc = this.#getItemsLoc(this.#items);
 
 			e.target.focus();
 
@@ -958,19 +961,19 @@ class CSortable {
 		},
 
 		focusIn: (e) => {
-			this.#target[this.#is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
+			this.#target[this.#is_horizontal ? 'scrollLeft' : 'scrollTop'] = 0;
 
-			const token = this.#matchToken(e.target);
+			const item = this.#matchItem(e.target);
 
-			if (token !== null) {
-				this.#scrollIntoView(this.#tokens_loc.get(token));
+			if (item !== null) {
+				this.#scrollIntoView(this.#items_loc.get(item));
 			}
 		},
 
 		mutation: () => {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 			this.#cancelSort();
-			this.#updateTokens();
+			this.#updateItems();
 			this.#render();
 		}
 	};

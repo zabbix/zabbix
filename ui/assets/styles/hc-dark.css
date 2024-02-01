@@ -699,10 +699,10 @@ svg a {
 .sortable {
   isolation: isolate;
   overflow: hidden; }
-  .sortable .sortable-token {
+  .sortable .sortable-item {
     position: relative;
     box-sizing: border-box; }
-    .sortable .sortable-token.sortable-token-dragging {
+    .sortable .sortable-item.sortable-item-dragging {
       opacity: 0.6;
       z-index: 1; }
   .sortable.sortable-dragging {
@@ -1595,8 +1595,8 @@ button {
         border: 1px solid transparent;
         box-shadow: 0 0 0 2px #ffffff; }
     .dashboard-navigation-tabs .sortable li div:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div:hover,
-    .dashboard-navigation-tabs .sortable li.sortable-token-dragging div,
-    .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li.sortable-token-dragging div {
+    .dashboard-navigation-tabs .sortable li.sortable-item-dragging div,
+    .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li.sortable-item-dragging div {
       background: #454545;
       border: 1px solid #121212; }
     .dashboard-navigation-tabs .sortable li div.selected-tab, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div.selected-tab {
@@ -4513,11 +4513,10 @@ form.dashboard-widget-svggraph .list-item-actions {
 form.dashboard-widget-svggraph .items-list {
   grid-column: 4 / span 3; }
 form.dashboard-widget-svggraph .list-vertical-accordion {
-  position: relative; }
-  form.dashboard-widget-svggraph .list-vertical-accordion.sortable {
-    overflow: visible;
-    margin-top: -5px;
-    margin-bottom: 5px; }
+  position: relative;
+  overflow: visible;
+  margin-top: -5px;
+  margin-bottom: 5px; }
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
   display: grid;

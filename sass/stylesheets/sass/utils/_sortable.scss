@@ -2,11 +2,11 @@
 	isolation: isolate;
 	overflow: hidden;
 
-	.sortable-token {
+	.sortable-item {
 		position: relative;
 		box-sizing: border-box;
 
-		&.sortable-token-dragging {
+		&.sortable-item-dragging {
 			opacity: 0.6;
 			z-index: 1;
 		}
