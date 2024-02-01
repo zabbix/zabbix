@@ -73,6 +73,7 @@ class CControllerDiscoveryUpdate extends CController {
 
 	protected function doAction() {
 		$drule = [];
+
 		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks',
 			'host_source', 'name_source'
 		]);
