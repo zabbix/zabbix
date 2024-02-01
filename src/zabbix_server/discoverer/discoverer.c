@@ -1770,7 +1770,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_get_program_type_cb = discoverer_args_in->zbx_get_program_type_cb_arg;
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);
+	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg,
+			zbx_dc_get_psk_by_identity);
 #endif
 	source_ip = discoverer_args_in->config_source_ip;
 	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
