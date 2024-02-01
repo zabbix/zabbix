@@ -104,6 +104,7 @@ function updateMessageSettings($messages) {
 		' WHERE p.userid='.CWebUser::$data['userid'].
 			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
+
 	while ($profile = DBfetch($dbProfiles)) {
 		if ($profile['type'] == PROFILE_TYPE_ID) {
 			unset($profile['value_str']);

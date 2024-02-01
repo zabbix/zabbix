@@ -21,11 +21,11 @@
 
 class CControllerNotificationsSnooze extends CController {
 
-	public function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'eventid' => 'required|db events.eventid'
 		];
@@ -45,11 +45,11 @@ class CControllerNotificationsSnooze extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (!CWebUser::isGuest() && $this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$msg_settings = getMessageSettings();
 		$msg_settings['snoozed.eventid'] = $this->getInput('eventid');
 

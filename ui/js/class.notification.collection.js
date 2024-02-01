@@ -143,6 +143,7 @@ ZBX_NotificationCollection.prototype.makeNodes = function() {
 		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL]},
 		{class: [ZBX_STYLE_BTN_ICON + ' ' + ZBX_ICON_BELL_OFF]}
 	);
+
 	const li_btn_snooze = document.createElement('li');
 	li_btn_snooze.appendChild(this.btn_snooze);
 
@@ -262,11 +263,11 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * Shows or hides list node, updates and appends notification nodes, then delegates to remove dangling nodes.
  * Updates button tooltip text based on actual data.
  *
- * @param {object}                  Severity_styles.
- * @param {ZBX_NotificationsAlarm}  Alarm_state.
- * @param {username}                Username of logged-in user.
- * @param {muted}                   Indicator whether notifications are muted.
- * @param {snoozed_eventid}         Latest snoozed event ID.
+ * @param {object}                 severity_styles  Severity_styles.
+ * @param {ZBX_NotificationsAlarm} alarm_state      Alarm_state.
+ * @param {string}                 username         Username of logged-in user.
+ * @param {boolean}                muted            Indicator whether notifications are muted.
+ * @param {string}                 snoozed_eventid  Snoozed event ID.
  */
 ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state, username, muted, snoozed_eventid) {
 	this.btn_snooze.setAttribute('title', t('Snooze for %1$s').replace('%1$s', username));
@@ -286,7 +287,7 @@ ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_st
 		this.btn_mute.title = locale['S_CANNOT_SUPPORT_NOTIFICATION_AUDIO'];
 	}
 
-	var list_node = this.list_node,
+	let list_node = this.list_node,
 		prev_notif_node = null;
 
 	if (this.isEmpty()) {
@@ -296,9 +297,9 @@ ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_st
 		}.bind(this));
 	}
 
-	var slide_down = list_node.children.length != 0;
+	const slide_down = list_node.children.length != 0;
 
-	this.map(function(notif, index) {
+	this.map(function(notif) {
 		notif.render(severity_styles);
 
 		if (notif.isNodeConnected()) {

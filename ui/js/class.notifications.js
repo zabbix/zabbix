@@ -456,7 +456,7 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 	}
 
 	for (const item of this._cached_list) {
-		if (parseInt(item.eventid) <= parseInt(this._cached_user_settings.snoozed_eventid)) {
+		if (parseInt(item.eventid) <= this._cached_user_settings.snoozed_eventid) {
 			item.snoozed = true;
 		}
 	}
@@ -465,15 +465,15 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 
 	this
 		.fetch('notifications.snooze', {eventid: latest_event})
-		.then((resp) => {
-			if ('error' in resp) {
-				throw {error: resp.error};
+		.then((response) => {
+			if ('error' in response) {
+				throw {error: response.error};
 			}
 
-			this._cached_user_settings.snoozed_eventid = resp.snoozed_eventid;
+			this._cached_user_settings.snoozed_eventid = response.snoozed_eventid;
 
-			this.collection.map(function(notif) {
-				notif.updateRaw({snoozed: true});
+			this.collection.map(function(notification) {
+				notification.updateRaw({snoozed: true});
 			});
 
 			this.consumeList(this.collection.getRawList());

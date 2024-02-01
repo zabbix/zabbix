@@ -724,7 +724,7 @@ if ($data['action'] === 'user.edit') {
 	$tabs->addTab('permissionsTab', _('Permissions'), $permissions_form_list);
 }
 
-// Messaging tab.
+// Frontend notifications tab.
 if ($data['action'] !== 'user.edit') {
 	$messaging_form_list = (new CFormList())
 		->addRow(_('Frontend notifications'),
@@ -822,7 +822,9 @@ if ($data['action'] !== 'user.edit') {
 				->setUncheckedValue(ZBX_PROBLEM_SUPPRESSED_FALSE)
 		);
 
-	$tabs->addTab('messagingTab', _('Frontend notifications'), $messaging_form_list, TAB_INDICATOR_FRONTEND_MESSAGE);
+	$tabs->addTab('notificationsTab', _('Frontend notifications'), $messaging_form_list,
+		TAB_INDICATOR_FRONTEND_NOTIFICATIONS
+	);
 }
 
 // Append buttons to form.

@@ -217,7 +217,7 @@ class CControllerNotificationsGet extends CController {
 			]);
 
 			foreach ($problems_by_triggerid as $triggerid => $notification_eventids) {
-				$trigger = $triggers[$triggerid] ?? null;
+				$trigger = array_key_exists($triggerid, $triggers) ? $triggers[$triggerid] : null;
 
 				if ($trigger) {
 					$url_problems = (new CUrl('zabbix.php'))
@@ -285,7 +285,7 @@ class CControllerNotificationsGet extends CController {
 				'msg_recovery_timeout' => $this->settings['ok_timeout'],
 				'msg_timeout' => $this->settings['timeout'],
 				'muted' => (bool) $this->settings['sounds.mute'],
-				'snoozed_eventid' => $this->settings['snoozed.eventid'],
+				'snoozed_eventid' => (int) $this->settings['snoozed.eventid'],
 				'severity_styles' => [
 					-1 => ZBX_STYLE_NORMAL_BG,
 					TRIGGER_SEVERITY_AVERAGE => ZBX_STYLE_AVERAGE_BG,
