@@ -27,14 +27,8 @@ class CWidgetFieldColorView extends CWidgetFieldView {
 		$this->field = $field;
 	}
 
-	public function getLabel(): ?CLabel {
-		$label = parent::getLabel();
-
-		if ($label !== null) {
-			$label->setFor('lbl_'.$this->field->getName());
-		}
-
-		return $label;
+	public function getFocusableElementId(): string {
+		return 'lbl_'.$this->field->getName();
 	}
 
 	public function getView(): CColor {

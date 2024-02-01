@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/common/testMassUpdateItems.php';
+require_once dirname(__FILE__).'/../common/testMassUpdateItems.php';
 
 /**
  * Test the mass update of items.
