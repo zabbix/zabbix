@@ -105,13 +105,11 @@ class CHostAvailability extends CTag {
 	}
 
 	/**
-	 * Sets the value if the host has passive checks.
-	 *
-	 * @param bool $value has items with passive checks.
+	 * @param bool $value
 	 *
 	 * @return CHostAvailability
 	 */
-	public function enablePassiveChecks(bool $value): CHostAvailability {
+	public function enablePassiveChecks(bool $value = true): CHostAvailability {
 		$this->has_passive_checks = $value;
 
 		return $this;
