@@ -124,7 +124,7 @@ static void	pb_discovery_write_row(zbx_pb_discovery_data_t *data, zbx_uint64_t d
 		row->status = status;
 		row->value = zbx_strdup(NULL, value);
 		row->clock = clock;
-		row->error = zbx_strdup(NULL, error);
+		row->error = zbx_strdup(NULL, ZBX_NULL2EMPTY_STR(error));
 
 		zbx_list_append(&data->rows, row, NULL);
 		data->rows_num++;
@@ -188,6 +188,9 @@ static int	pb_discovery_add_row_mem(zbx_pb_t *pb, zbx_pb_discovery_t *src)
 	}
 
 	if (NULL == (row->value = pb_strdup(src->value)))
+		goto out;
+
+	if (NULL == (row->error = pb_strdup(src->error)))
 		goto out;
 
 	ret = zbx_list_append(&pb->discovery, row, NULL);
@@ -354,7 +357,10 @@ static int	pb_discovery_get_mem(zbx_pb_t *pb, struct zbx_json *j, zbx_uint64_t *
 			zbx_json_addint64(j, ZBX_PROTO_TAG_PORT, row->port);
 			zbx_json_addstring(j, ZBX_PROTO_TAG_VALUE, row->value, ZBX_JSON_TYPE_STRING);
 			zbx_json_addint64(j, ZBX_PROTO_TAG_STATUS, row->status);
-			zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, row->error, ZBX_JSON_TYPE_STRING);
+
+			if ('\0' != *row->error)
+				zbx_json_addstring(j, ZBX_PROTO_TAG_ERROR, row->error, ZBX_JSON_TYPE_STRING);
+
 			zbx_json_close(j);
 
 			records_num++;
