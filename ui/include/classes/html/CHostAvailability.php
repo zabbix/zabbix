@@ -128,6 +128,7 @@ class CHostAvailability extends CTag {
 			}
 
 			$status = $type == INTERFACE_TYPE_AGENT && !$this->has_passive_checks
+					&& $this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE]
 				? getInterfaceAvailabilityStatus($this->type_interfaces[INTERFACE_TYPE_AGENT_ACTIVE])
 				: getInterfaceAvailabilityStatus($interfaces);
 
