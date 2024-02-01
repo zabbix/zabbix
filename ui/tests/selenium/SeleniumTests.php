@@ -19,9 +19,6 @@
 **/
 
 
-require_once dirname(__FILE__).'/testDocumentationLinks.php';
-require_once dirname(__FILE__).'/testGeneric.php';
-
 // Actions.
 require_once dirname(__FILE__).'/actions/testFormAction.php';
 require_once dirname(__FILE__).'/actions/testPageActions.php';
@@ -317,18 +314,20 @@ require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
+require_once dirname(__FILE__).'/testDocumentationLinks.php';
 require_once dirname(__FILE__).'/testExecuteNow.php';
-require_once dirname(__FILE__).'/testPageInventory.php';
-require_once dirname(__FILE__).'/testPageSearch.php';
-require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
-require_once dirname(__FILE__).'/testPageBrowserWarning.php';
+require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/testLanguage.php';
-require_once dirname(__FILE__).'/testTimezone.php';
+require_once dirname(__FILE__).'/testPageBrowserWarning.php';
+require_once dirname(__FILE__).'/testPageInventory.php';
+require_once dirname(__FILE__).'/testPageSearch.php';
+require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testSidebarMenu.php';
+require_once dirname(__FILE__).'/testTimezone.php';
 require_once dirname(__FILE__).'/testUrlParameters.php';
 require_once dirname(__FILE__).'/testZBX6648.php';
 require_once dirname(__FILE__).'/testZBX6663.php';
@@ -338,9 +337,6 @@ use PHPUnit\Framework\TestSuite;
 class SeleniumTests {
 	public static function suite() {
 		$suite = new TestSuite('selenium');
-
-		$suite->addTestSuite('testDocumentationLinks');
-		$suite->addTestSuite('testGeneric');
 
 		// Actions.
 		$suite->addTestSuite('testFormAction');
@@ -637,18 +633,20 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringWeb');
 		$suite->addTestSuite('testPageMonitoringWebDetails');
 
+		$suite->addTestSuite('testDocumentationLinks');
 		$suite->addTestSuite('testExecuteNow');
-		$suite->addTestSuite('testPageInventory');
-		$suite->addTestSuite('testPageSearch');
-		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormTabIndicators');
-		$suite->addTestSuite('testPageBrowserWarning');
+		$suite->addTestSuite('testGeneric');
 		$suite->addTestSuite('testLanguage');
-		$suite->addTestSuite('testTimezone');
+		$suite->addTestSuite('testPageBrowserWarning');
+		$suite->addTestSuite('testPageInventory');
+		$suite->addTestSuite('testPageSearch');
+		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testSidebarMenu');
+		$suite->addTestSuite('testTimezone');
 		$suite->addTestSuite('testUrlParameters');
 		$suite->addTestSuite('testZBX6648');
 		$suite->addTestSuite('testZBX6663');
