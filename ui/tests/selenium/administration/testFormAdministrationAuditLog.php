@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 /**
  * @backup config
  */
-class testFormAdministrationGeneralAuditLog extends testFormAdministrationGeneral {
+class testFormAdministrationAuditLog extends testFormAdministrationGeneral {
 
 	public $form_selector = 'id:audit-settings';
 	public $config_link = 'zabbix.php?action=audit.settings.edit';
@@ -62,7 +62,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 * The function's main purpose is to check if the layout of the page is not broken and fields are in their place,
 	 * Additional checkups are made and committed within the function.
 	 */
-	public function testFormAdministrationGeneralAuditLog_CheckLayout() {
+	public function testFormAdministrationAuditLog_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=audit.settings.edit')->waitUntilReady();
 		$form = $this->query('id:audit-settings')->waitUntilPresent()->asForm()->one();
 		$form->checkValue($this->default_values);
@@ -112,14 +112,14 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	/**
 	 * Test for checking 'Reset defaults' button.
 	 */
-	public function totestFormAdministrationGeneralAuditLog_ResetButton() {
+	public function totestFormAdministrationAuditLog_ResetButton() {
 		$this->executeResetButtonTest();
 	}
 
 	/**
 	 * Test for checking form update without changing any data.
 	 */
-	public function testFormAdministrationGeneralAuditLog_SimpleUpdate() {
+	public function testFormAdministrationAuditLog_SimpleUpdate() {
 		$this->executeSimpleUpdate();
 	}
 
@@ -678,7 +678,7 @@ class testFormAdministrationGeneralAuditLog extends testFormAdministrationGenera
 	 *
 	 * @dataProvider getUpdateValueData
 	 */
-	public function testFormAdministrationGeneralAuditLog_UpdateParameters($data) {
+	public function testFormAdministrationAuditLog_UpdateParameters($data) {
 		$this->executeCheckForm($data);
 	}
 }

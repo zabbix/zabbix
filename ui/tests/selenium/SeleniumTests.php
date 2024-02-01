@@ -27,18 +27,16 @@ require_once dirname(__FILE__).'/actions/testFormAction.php';
 require_once dirname(__FILE__).'/actions/testPageActions.php';
 
 // Administration.
-require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralAuditLog.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationAuditLog.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralAutoregistration.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralGUI.php';
 //require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralOtherParams.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralTimeouts.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationHousekeeper.php';
-require_once dirname(__FILE__).'/administration/testFormAdministrationUserGroups.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationHousekeeping.php';
 require_once dirname(__FILE__).'/administration/testPageAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/administration/testPageAdministrationGeneralModules.php';
-
 
 // Api tokens.
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGeneral.php';
@@ -157,6 +155,10 @@ require_once dirname(__FILE__).'/items/testPageItems.php';
 require_once dirname(__FILE__).'/items/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/items/testPageMassUpdateItems.php';
 
+// Latest data.
+require_once dirname(__FILE__).'/latestData/testPageItemHistory.php';
+require_once dirname(__FILE__).'/latestData/testPageMonitoringLatestData.php';
+
 // LLD.
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscovery.php';
 require_once dirname(__FILE__).'/lld/testFormLowLevelDiscoveryOverrides.php';
@@ -184,9 +186,6 @@ require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypes.php
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeMessageTemplates.php';
 require_once dirname(__FILE__).'/mediaTypes/testFormAdministrationMediaTypeWebhook.php';
 require_once dirname(__FILE__).'/mediaTypes/testPageAdministrationMediaTypes.php';
-
-// Monitoring.
-require_once dirname(__FILE__).'/monitoring/testPageMonitoringLatestData.php';
 
 // Multiselects.
 require_once dirname(__FILE__).'/multiselects/testMultiselects.php';
@@ -300,9 +299,11 @@ require_once dirname(__FILE__).'/triggers/testTriggerExpressions.php';
 
 // Users.
 require_once dirname(__FILE__).'/users/testFormUser.php';
+require_once dirname(__FILE__).'/users/testFormUserGroups.php';
 require_once dirname(__FILE__).'/users/testFormUserMedia.php';
 require_once dirname(__FILE__).'/users/testFormUserPermissions.php';
 require_once dirname(__FILE__).'/users/testFormUserProfile.php';
+require_once dirname(__FILE__).'/users/testPageUserGroups.php';
 require_once dirname(__FILE__).'/users/testPageUsers.php';
 
 // Value mapping.
@@ -317,16 +318,10 @@ require_once dirname(__FILE__).'/webScenarios/testInheritanceWeb.php';
 require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
-
-require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
-require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
-require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
-require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
-require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
 require_once dirname(__FILE__).'/testFormLogin.php';
 require_once dirname(__FILE__).'/testFormSetup.php';
 require_once dirname(__FILE__).'/testFormTabIndicators.php';
@@ -352,15 +347,14 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageActions');
 
 		// Administration.
-		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
+		$suite->addTestSuite('testFormAdministrationAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
 		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
 		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
-		$suite->addTestSuite('testFormAdministrationHousekeeper');
-		$suite->addTestSuite('testFormAdministrationUserGroups');
+		$suite->addTestSuite('testFormAdministrationHousekeeping');
 		$suite->addTestSuite('testPageAdministrationGeneralImages');
 		$suite->addTestSuite('testPageAdministrationGeneralModules');
 
@@ -481,6 +475,10 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMassUpdateItems');
 
+		// Latest data.
+		$suite->addTestSuite('testPageItemHistory');
+		$suite->addTestSuite('testPageMonitoringLatestData');
+
 		// LLD.
 		$suite->addTestSuite('testFormLowLevelDiscovery');
 		$suite->addTestSuite('testFormLowLevelDiscoveryOverrides');
@@ -508,9 +506,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormAdministrationMediaTypes');
 		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
 		$suite->addTestSuite('testPageAdministrationMediaTypes');
-
-		// Monitoring.
-		$suite->addTestSuite('testPageMonitoringLatestData');
 
 		// Multiselects.
 		$suite->addTestSuite('testMultiselects');
@@ -624,9 +619,11 @@ class SeleniumTests {
 
 		// Users.
 		$suite->addTestSuite('testFormUser');
+		$suite->addTestSuite('testFormUserGroups');
 		$suite->addTestSuite('testFormUserMedia');
 		$suite->addTestSuite('testFormUserPermissions');
 		$suite->addTestSuite('testFormUserProfile');
+		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testPageUsers');
 
 		// Value mapping.
@@ -641,11 +638,9 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testExecuteNow');
-		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
-		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testExpandExpressionMacros');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormSetup');

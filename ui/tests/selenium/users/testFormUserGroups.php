@@ -26,10 +26,10 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
  *
  * @dataSource LoginUsers
  */
-class testFormAdministrationUserGroups extends CLegacyWebTest {
+class testFormUserGroups extends CLegacyWebTest {
 	private $userGroup = 'Selenium user group';
 
-	public function testFormAdministrationUserGroups_CheckLayout() {
+	public function testFormUserGroups_CheckLayout() {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickButtonText('Create user group');
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -106,7 +106,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 	/**
 	 * @dataProvider create
 	 */
-	public function testFormAdministrationUserGroups_Create($data) {
+	public function testFormUserGroups_Create($data) {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.edit');
 		$this->zbxTestCheckTitle('Configuration of user groups');
 		$this->zbxTestCheckHeader('User groups');
@@ -212,7 +212,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 	/**
 	 * @dataProvider update
 	 */
-	public function testFormAdministrationUserGroups_Update($data) {
+	public function testFormUserGroups_Update($data) {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickLinkTextWait($this->userGroup);
 		$this->zbxTestCheckTitle('Configuration of user groups');
@@ -304,7 +304,7 @@ class testFormAdministrationUserGroups extends CLegacyWebTest {
 	/**
 	 * @dataProvider delete
 	 */
-	public function testFormAdministrationUserGroups_Delete($data) {
+	public function testFormUserGroups_Delete($data) {
 		$this->zbxTestLogin('zabbix.php?action=usergroup.list');
 		$this->zbxTestClickLinkTextWait($data['name']);
 		$this->zbxTestCheckTitle('Configuration of user groups');

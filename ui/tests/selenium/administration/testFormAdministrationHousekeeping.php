@@ -24,7 +24,7 @@ require_once dirname(__FILE__).'/../common/testFormAdministrationGeneral.php';
 /**
  * @backup config
  */
-class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
+class testFormAdministrationHousekeeping extends testFormAdministrationGeneral {
 
 	public $config_link = 'zabbix.php?action=housekeeping.edit';
 	public $form_selector = 'id:housekeeping-form';
@@ -96,7 +96,7 @@ class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 	/**
 	 * Test for checking form layout.
 	 */
-	public function testFormAdministrationHousekeeper_CheckLayout() {
+	public function testFormAdministrationHousekeeping_CheckLayout() {
 		$this->page->login()->open($this->config_link);
 		$this->page->assertTitle('Configuration of housekeeping');
 		$this->page->assertHeader('Housekeeping');
@@ -152,14 +152,14 @@ class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 	/**
 	 * Test for checking form update without changing any data.
 	 */
-	public function testFormAdministrationHousekeeper_SimpleUpdate() {
+	public function testFormAdministrationHousekeeping_SimpleUpdate() {
 		$this->executeSimpleUpdate();
 	}
 
 	/**
 	 * Test for checking 'Reset defaults' button.
 	 */
-	public function testFormAdministrationHousekeeper_ResetButton() {
+	public function testFormAdministrationHousekeeping_ResetButton() {
 		$this->executeResetButtonTest();
 	}
 
@@ -1606,7 +1606,7 @@ class testFormAdministrationHousekeeper extends testFormAdministrationGeneral {
 	 *
 	 * @dataProvider getCheckFormData
 	 */
-	public function testFormAdministrationHousekeeper_CheckForm($data) {
+	public function testFormAdministrationHousekeeping_CheckForm($data) {
 		$this->executeCheckForm($data);
 	}
 }

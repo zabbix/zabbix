@@ -18,26 +18,27 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
 
-class testPageHistory extends CLegacyWebTest {
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
+
+class testPageItemHistory extends CLegacyWebTest {
 
 	public static function checkLayoutItems() {
 		return CDBHelper::getDataProvider(
 			'SELECT i.itemid,i.value_type,i.key_,i.name'.
 			' FROM items i,hosts h'.
 			' WHERE i.hostid=h.hostid'.
-				' AND h.host=\'testPageHistory_CheckLayout\''
+				' AND h.host=\'testPageItemHistory_CheckLayout\''
 		);
 	}
 
 	/**
 	* @dataProvider checkLayoutItems
 	*/
-	public function testPageHistory_CheckLayout($item) {
+	public function testPageItemHistory_CheckLayout($item) {
 		$this->zbxTestLogin('history.php?action=showvalues&itemids[]='.$item['itemid']);
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
-		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
+		$this->zbxTestCheckHeader('testPageItemHistory_CheckLayout: '.$item['name']);
 		switch ($item['value_type']) {
 			case ITEM_VALUE_TYPE_LOG:
 				if (substr($item['key_'], 0, 9) === 'eventlog[') {
@@ -56,17 +57,17 @@ class testPageHistory extends CLegacyWebTest {
 		$view_as = $this->query('id:filter-view-as')->asDropdown()->one();
 		$view_as->select('500 latest values');
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
-		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
+		$this->zbxTestCheckHeader('testPageItemHistory_CheckLayout: '.$item['name']);
 
 		$this->zbxTestClickWait('plaintext');
-		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
+		$this->zbxTestTextPresent('testPageItemHistory_CheckLayout: '.$item['name']);
 
 		$this->zbxTestOpen('history.php?action=showvalues&itemids[]='.$item['itemid']);
 		$this->zbxTestCheckTitle('History [refreshed every 30 sec.]');
 		$view_as->select('Values');
-		$this->zbxTestCheckHeader('testPageHistory_CheckLayout: '.$item['name']);
+		$this->zbxTestCheckHeader('testPageItemHistory_CheckLayout: '.$item['name']);
 
 		$this->zbxTestClickWait('plaintext');
-		$this->zbxTestTextPresent('testPageHistory_CheckLayout: '.$item['name']);
+		$this->zbxTestTextPresent('testPageItemHistory_CheckLayout: '.$item['name']);
 	}
 }
