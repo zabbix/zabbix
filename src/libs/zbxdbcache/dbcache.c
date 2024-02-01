@@ -2924,6 +2924,9 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num, zbx_
 
 	for (i = 0; i < history_num; i++)
 	{
+		if (SUCCEED != errcodes[i])
+			continue;
+
 		zbx_item_diff_t	*diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
 		ZBX_DC_HISTORY	*h = &history[i];
 
@@ -2951,9 +2954,6 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num, zbx_
 		}
 
 		zbx_vector_ptr_append(item_diff, diff);
-
-		if (SUCCEED != errcodes[i])
-			continue;
 
 		/* store items with enabled history  */
 		if (0 != items[i].history)
