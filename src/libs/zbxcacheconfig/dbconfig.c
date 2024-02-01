@@ -456,7 +456,7 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 		const char	*value = NULL;
 		char		*out = NULL;
 
-		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_FUNC_MACRO != token.type)
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_USER_FUNC_MACRO != token.type)
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
@@ -465,7 +465,7 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 		{
 			int		ret;
 
-			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l + 1,
 						env, &value);
 
@@ -883,7 +883,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 					"default_timezone", "hk_events_service", "auditlog_enabled",
 					"timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent",
 					"timeout_external_check", "timeout_db_monitor", "timeout_http_agent",
-					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script"};
+					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "auditlog_mode"};
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
@@ -1213,6 +1213,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (NULL == config->config->item_timeouts.script || 0 != strcmp(config->config->item_timeouts.script, row[42]))
 	{
 		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.script, row[42]);
+		config->revision.config_table = revision;
+	}
+
+	if (config->config->auditlog_mode != (value_int = atoi(row[43])))
+	{
+		config->config->auditlog_mode = value_int;
 		config->revision.config_table = revision;
 	}
 
@@ -13452,6 +13458,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED))
 		cfg->auditlog_enabled = config->config->auditlog_enabled;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_MODE))
+		cfg->auditlog_mode = config->config->auditlog_mode;
+
 	UNLOCK_CACHE;
 
 	cfg->flags = flags;
@@ -15682,7 +15691,7 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 
 		switch(token.type)
 		{
-			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
 						token.loc.l + 1, um_handle->macro_env, &value);
 

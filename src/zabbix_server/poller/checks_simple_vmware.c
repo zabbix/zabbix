@@ -67,16 +67,16 @@ static int	vmware_set_powerstate_result(AGENT_RESULT *result)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to Hypervisor data from hashset with uuid          *
+ * Purpose: returns pointer to Hypervisor data from hashset with uuid         *
  *                                                                            *
- * Parameters: hvs  - [IN] the hashset with all Hypervisors                   *
- *             uuid - [IN] the uuid of Hypervisor                             *
+ * Parameters: hvs  - [IN] hashset with all Hypervisors                       *
+ *             uuid - [IN] uuid of Hypervisor                                 *
  *                                                                            *
- * Return value: zbx_vmware_hv_t* - the operation has completed successfully  *
- *               NULL             - the operation has failed                  *
+ * Return value: zbx_vmware_hv_t* - operation has completed successfully      *
+ *               NULL             - operation has failed                      *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
+static zbx_vmware_hv_t	*hv_get(const zbx_hashset_t *hvs, const char *uuid)
 {
 	zbx_vmware_hv_t	*hv, hv_local = {.uuid = (char *)uuid};
 
@@ -91,24 +91,24 @@ static zbx_vmware_hv_t	*hv_get(zbx_hashset_t *hvs, const char *uuid)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to Datastore data from vector with id              *
+ * Purpose: returns pointer to Datastore data from vector with id             *
  *                                                                            *
- * Parameters: dss     - [IN] the vector with all Datastores                  *
- *             ds_uuid - [IN] the id of Datastore                             *
+ * Parameters: dss     - [IN] vector with all Datastores                      *
+ *             ds_uuid - [IN] id of Datastore                                 *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_datastore_t* - the operation has completed successfully  *
- *        NULL                    - the operation has failed                  *
+ *        zbx_vmware_datastore_t* - operation has completed successfully      *
+ *        NULL                    - operation has failed                      *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, const char *ds_uuid)
+static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_ptr_t *dss, const char *ds_uuid)
 {
 	int			i;
 	zbx_vmware_datastore_t	ds_cmp;
 
 	ds_cmp.uuid = (char *)ds_uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_datastore_bsearch(dss, &ds_cmp, vmware_ds_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datastore_ptr_bsearch(dss, &ds_cmp, vmware_ds_uuid_compare)))
 		return NULL;
 
 	return dss->values[i];
@@ -116,24 +116,24 @@ static zbx_vmware_datastore_t	*ds_get(const zbx_vector_vmware_datastore_t *dss, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to DVSwitch data from vector with uuid             *
+ * Purpose: returns pointer to DVSwitch data from vector with uuid            *
  *                                                                            *
- * Parameters: dvss - [IN] the vector with all DVSwitches                     *
- *             uuid - [IN] the id of dvswitch                                 *
+ * Parameters: dvss - [IN] vector with all DVSwitches                         *
+ *             uuid - [IN] id of dvswitch                                     *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_dvswitch_t* - the operation has completed successfully   *
- *        NULL                    - the operation has failed                  *
+ *        zbx_vmware_dvswitch_t* - operation completed successfully           *
+ *        NULL                   - operation failed                           *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, const char *uuid)
+static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_ptr_t *dvss, const char *uuid)
 {
 	zbx_vmware_dvswitch_t	dvs_cmp;
 	int			i;
 
 	dvs_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_dvswitch_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dvswitch_ptr_bsearch(dvss, &dvs_cmp, vmware_dvs_uuid_compare)))
 		return NULL;
 
 	return dvss->values[i];
@@ -141,24 +141,24 @@ static zbx_vmware_dvswitch_t	*dvs_get(const zbx_vector_vmware_dvswitch_t *dvss, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: return pointer to Datacenter data from vector with id             *
+ * Purpose: returns pointer to Datacenter data from vector with id            *
  *                                                                            *
- * Parameters: dcs - [IN] the vector with all Datacenters                     *
- *             id  - [IN] the id of Datacenter                                *
+ * Parameters: dcs - [IN] vector with all Datacenters                         *
+ *             id  - [IN] id of Datacenter                                    *
  *                                                                            *
  * Return value:                                                              *
- *        zbx_vmware_datacenter_t* - the operation has completed successfully *
- *        NULL                     - the operation has failed                 *
+ *        zbx_vmware_datacenter_t* - operation completed successfully         *
+ *        NULL                     - operation failed                         *
  *                                                                            *
  ******************************************************************************/
-static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_t *dcs, const char *id)
+static zbx_vmware_datacenter_t	*dc_get(const zbx_vector_vmware_datacenter_ptr_t *dcs, const char *id)
 {
 	int			i;
 	zbx_vmware_datacenter_t	cmp;
 
 	cmp.id = (char *)id;
 
-	if (FAIL == (i = zbx_vector_vmware_datacenter_bsearch(dcs, &cmp, vmware_dc_id_compare)))
+	if (FAIL == (i = zbx_vector_vmware_datacenter_ptr_bsearch(dcs, &cmp, vmware_dc_id_compare)))
 		return NULL;
 
 	return dcs->values[i];
@@ -199,16 +199,15 @@ static zbx_vmware_vm_t	*service_vm_get(zbx_vmware_service_t *service, const char
 	return vm;
 }
 
-static zbx_vmware_cluster_t	*cluster_get(zbx_vector_ptr_t *clusters, const char *clusterid)
+static zbx_vmware_cluster_t	*cluster_get(zbx_vector_vmware_cluster_ptr_t *clusters, const char *clusterid)
 {
-	int			i;
 	zbx_vmware_cluster_t	*cluster;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() uuid:'%s'", __func__, clusterid);
 
-	for (i = 0; i < clusters->values_num; i++)
+	for (int i = 0; i < clusters->values_num; i++)
 	{
-		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = clusters->values[i];
 
 		if (0 == strcmp(cluster->id, clusterid))
 			goto out;
@@ -221,16 +220,15 @@ out:
 	return cluster;
 }
 
-static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_ptr_t *clusters, const char *name)
+static zbx_vmware_cluster_t	*cluster_get_by_name(zbx_vector_vmware_cluster_ptr_t *clusters, const char *name)
 {
-	int			i;
 	zbx_vmware_cluster_t	*cluster;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() name:'%s'", __func__, name);
 
-	for (i = 0; i < clusters->values_num; i++)
+	for (int i = 0; i < clusters->values_num; i++)
 	{
-		cluster = (zbx_vmware_cluster_t *)clusters->values[i];
+		cluster = clusters->values[i];
 
 		if (0 == strcmp(cluster->name, name))
 			goto out;
@@ -247,16 +245,16 @@ out:
  *                                                                            *
  * Purpose: gets vmware performance counter value by its identifier           *
  *                                                                            *
- * Parameters: service   - [IN] the vmware service                            *
- *             type      - [IN] the performance entity type (HostSystem,      *
+ * Parameters: service   - [IN] vmware service                                *
+ *             type      - [IN] performance entity type (HostSystem,          *
  *                              VirtualMachine, Datastore)                    *
- *             id        - [IN] the performance entity identifier             *
- *             counterid - [IN] the performance counter identifier            *
- *             instance  - [IN] the performance counter instance or "" for    *
+ *             id        - [IN] performance entity identifier                 *
+ *             counterid - [IN] performance counter identifier                *
+ *             instance  - [IN] performance counter instance or "" for        *
  *                              aggregate data                                *
- *             coeff     - [IN] the coefficient to apply to the value         *
- *             unit      - [IN] the counter unit info (kilo, mega, % etc)     *
- *             result    - [OUT] the output result                            *
+ *             coeff     - [IN] coefficient to apply to the value             *
+ *             unit      - [IN] counter unit info (kilo, mega, % etc)         *
+ *             result    - [OUT] output result                                *
  *                                                                            *
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
@@ -270,8 +268,9 @@ out:
  *           ignored by server rather than generating error.                  *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service, const char *type, const char *id,
-		zbx_uint64_t counterid, const char *instance, unsigned int coeff, int unit, AGENT_RESULT *result)
+static int	vmware_service_get_counter_value_by_id(const zbx_vmware_service_t *service, const char *type,
+		const char *id, zbx_uint64_t counterid, const char *instance, unsigned int coeff, int unit,
+		AGENT_RESULT *result)
 {
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*perfcounter;
@@ -280,6 +279,8 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() type:%s id:%s counterid:" ZBX_FS_UI64 " instance:%s", __func__,
 			type, id, counterid, instance);
+
+	zbx_vmware_perf_counter_t	loc = {.counterid = counterid};
 
 	if (NULL == (entity = zbx_vmware_service_get_perf_entity(service, type, id)))
 	{
@@ -295,7 +296,7 @@ static int	vmware_service_get_counter_value_by_id(zbx_vmware_service_t *service,
 		goto out;
 	}
 
-	if (FAIL == (i = zbx_vector_ptr_bsearch(&entity->counters, &counterid, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
+	if (FAIL == (i = zbx_vector_vmware_perf_counter_ptr_bsearch(&entity->counters, &loc, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Performance counter data was not found."));
 		goto out;
@@ -401,16 +402,16 @@ out:
  *                                                                            *
  * Purpose: gets vmware performance counter value by the path                 *
  *                                                                            *
- * Parameters: service  - [IN] the vmware service                             *
- *             type     - [IN] the performance entity type (HostSystem,       *
+ * Parameters: service  - [IN] vmware service                                 *
+ *             type     - [IN] performance entity type (HostSystem,           *
  *                             VirtualMachine, Datastore)                     *
- *             id       - [IN] the performance entity identifier              *
- *             path     - [IN] the performance counter path                   *
+ *             id       - [IN] performance entity identifier                  *
+ *             path     - [IN] performance counter path                       *
  *                             (<group>/<key>[<rollup type>])                 *
- *             instance - [IN] the performance counter instance or "" for     *
+ *             instance - [IN] performance counter instance or "" for         *
  *                             aggregate data                                 *
- *             coeff    - [IN] the coefficient to apply to the value          *
- *             result   - [OUT] the output result                             *
+ *             coeff    - [IN] coefficient to apply to the value              *
+ *             result   - [OUT] output result                                 *
  *                                                                            *
  * Return value: SYSINFO_RET_OK, result has value - performance counter value *
  *                               was successfully retrieved                   *
@@ -424,7 +425,7 @@ out:
  *           ignored by server rather than generating error.                  *
  *                                                                            *
  ******************************************************************************/
-static int	vmware_service_get_counter_value_by_path(zbx_vmware_service_t *service, const char *type,
+static int	vmware_service_get_counter_value_by_path(const zbx_vmware_service_t *service, const char *type,
 		const char *id, const char *path, const char *instance, unsigned int coeff, AGENT_RESULT *result)
 {
 	zbx_uint64_t	counterid;
@@ -465,26 +466,27 @@ out:
  *                                                                            *
  * Purpose: gets vmware service object                                        *
  *                                                                            *
- * Parameters: url       - [IN] the vmware service URL                        *
- *             username  - [IN] the vmware service username                   *
- *             password  - [IN] the vmware service password                   *
- *             ret       - [OUT] the operation result code                    *
+ * Parameters: url       - [IN] vmware service URL                            *
+ *             username  - [IN] vmware service username                       *
+ *             password  - [IN] vmware service password                       *
+ *             result    - [OUT]                                              *
+ *             ret       - [OUT] operation result code                        *
  *                                                                            *
  * Return value: The vmware service object or NULL if the service was not     *
  *               found, did not have data or any error occurred. In the last  *
  *               case the error message will be stored in agent result.       *
  *                                                                            *
  * Comments: There are three possible cases:                                  *
- *             1) the vmware service is not ready. This can happen when       *
+ *             1) The vmware service is not ready. This can happen when       *
  *                service was added, but not yet processed by collector.      *
  *                In this case NULL is returned and result code is set to     *
  *                SYSINFO_RET_OK.                                             *
- *             2) the vmware service update failed. This can happen if there  *
+ *             2) The vmware service update failed. This can happen if there  *
  *                was a network problem, authentication failure or any error  *
  *                that prevented from obtaining and parsing vmware data.      *
  *                In this case NULL is returned and result code is set to     *
  *                SYSINFO_RET_FAIL.                                           *
- *             3) the vmware service has been updated successfully.           *
+ *             3) The vmware service has been updated successfully.           *
  *                In this case the service object is returned and result code *
  *                is not set.                                                 *
  *                                                                            *
@@ -523,16 +525,17 @@ out:
  *                                                                            *
  * Purpose: retrieves data from virtual machine details                       *
  *                                                                            *
- * Parameters: request   - [IN] the original request. The first parameter is  *
+ * Parameters: request   - [IN] The original request. The first parameter is  *
  *                              vmware service URL and the second parameter   *
  *                              is virtual machine uuid.                      *
- *             username  - [IN] the vmware service user name                  *
- *             password  - [IN] the vmware service password                   *
- *             xpath     - [IN] the xpath describing data to retrieve         *
- *             result    - [OUT] the request result                           *
+ *             username  - [IN] vmware service user name                      *
+ *             password  - [IN] vmware service password                       *
+ *             propid    - [IN]                                               *
+ *             xpath     - [IN] xpath describing data to retrieve             *
+ *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_vcenter_vmprop(AGENT_REQUEST *request, const char *username, const char *password,
+static int	get_vcenter_vmprop(const AGENT_REQUEST *request, const char *username, const char *password,
 		int propid, AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
@@ -589,16 +592,16 @@ out:
  *                                                                            *
  * Purpose: retrieves hypervisor property                                     *
  *                                                                            *
- * Parameters: request   - [IN] the original request. The first parameter is  *
+ * Parameters: request   - [IN] The original request. The first parameter is  *
  *                              vmware service URL and the second parameter   *
  *                              is hypervisor uuid.                           *
- *             username  - [IN] the vmware service user name                  *
- *             password  - [IN] the vmware service password                   *
- *             propid    - [IN] the property id                               *
- *             result    - [OUT] the request result                           *
+ *             username  - [IN] vmware service user name                      *
+ *             password  - [IN] vmware service password                       *
+ *             propid    - [IN] property id                                   *
+ *             result    - [OUT] request result                               *
  *                                                                            *
  ******************************************************************************/
-static int	get_vcenter_hvprop(AGENT_REQUEST *request, const char *username, const char *password, int propid,
+static int	get_vcenter_hvprop(const AGENT_REQUEST *request, const char *username, const char *password, int propid,
 		AGENT_RESULT *result)
 {
 	zbx_vmware_service_t	*service;
@@ -679,13 +682,14 @@ static int	custquery_read_result(zbx_vmware_cust_query_t *custom_query, AGENT_RE
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update json document with tags info                               *
+ * Purpose: updates json document with tags info                              *
  *                                                                            *
- * Parameters: entity_tags - [IN] the all tags and linked objects             *
- *             uuid        - [IN] the vmware object uuid                      *
- *             tag_name    - [IN] the name of tags array                      *
- *             json_data   - [OUT] the json document                          *
- *             error       - [OUT] the error of tags receiving (optional)     *
+ * Parameters:                                                                *
+ *             data_tags   - [IN] all tags and linked objects                 *
+ *             uuid        - [IN] vmware object uuid                          *
+ *             tag_name    - [IN] name of tags array                          *
+ *             json_data   - [OUT] json document                              *
+ *             error       - [OUT] error of tags receiving (optional)         *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const char *uuid, const char *tag_name,
@@ -693,7 +697,7 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 {
 	int				i;
 	zbx_vmware_entity_tags_t	entity_cmp;
-	zbx_vector_vmware_tag_t		*tags;
+	zbx_vector_vmware_tag_ptr_t	*tags;
 
 	if (NULL != data_tags->error)
 	{
@@ -705,7 +709,7 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 
 	entity_cmp.uuid = (char *)uuid;
 
-	if (FAIL == (i = zbx_vector_vmware_entity_tags_bsearch(&data_tags->entity_tags, &entity_cmp,
+	if (FAIL == (i = zbx_vector_vmware_entity_tags_ptr_bsearch(&data_tags->entity_tags, &entity_cmp,
 			ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 	{
 		return;
@@ -740,14 +744,15 @@ static void	vmware_tags_uuid_json(const zbx_vmware_data_tags_t *data_tags, const
 
 /******************************************************************************
  *                                                                            *
- * Purpose: update json document with tags info by object id                  *
+ * Purpose: updates json document with tags info by object id                 *
  *                                                                            *
- * Parameters: entity_tags - [IN] the all tags and linked objects             *
- *             type        - [IN] the HostSystem, VirtualMachine etc          *
- *             id          - [IN] the id of hv, vm etc                        *
- *             tag_name    - [IN] the name of tags array                      *
- *             json_data   - [OUT] the json document                          *
- *             error       - [OUT] the error of tags receiving (optional)     *
+ * Parameters:                                                                *
+ *             data_tags   - [IN]                                             *
+ *             type        - [IN] HostSystem, VirtualMachine etc              *
+ *             id          - [IN] id of hv, vm etc                            *
+ *             tag_name    - [IN] name of tags array                          *
+ *             json_data   - [OUT] json document                              *
+ *             error       - [OUT] error of tags receiving (optional)         *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_tags_id_json(const zbx_vmware_data_tags_t *data_tags, const char *type,
@@ -765,7 +770,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 	struct zbx_json		json_data;
 	const char		*url;
 	zbx_vmware_service_t	*service;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -784,9 +789,8 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < service->data->clusters.values_num; i++)
+	for (int i = 0; i < service->data->clusters.values_num; i++)
 	{
-		int			j;
 		zbx_vmware_cluster_t	*cluster = (zbx_vmware_cluster_t *)service->data->clusters.values[i];
 
 		zbx_json_addobject(&json_data, NULL);
@@ -794,7 +798,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 		zbx_json_addstring(&json_data, "{#CLUSTER.NAME}", cluster->name, ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json_data, "resource_pool");
 
-		for (j = 0; j < service->data->resourcepools.values_num; j++)
+		for (int j = 0; j < service->data->resourcepools.values_num; j++)
 		{
 			zbx_vmware_resourcepool_t	*rp = service->data->resourcepools.values[j];
 
@@ -815,7 +819,7 @@ int	check_vcenter_cluster_discovery(AGENT_REQUEST *request, const char *username
 				NULL);
 		zbx_json_addarray(&json_data, "datastore_uuid");
 
-		for (j = 0; j < cluster->dss_uuid.values_num; j++)
+		for (int j = 0; j < cluster->dss_uuid.values_num; j++)
 			zbx_json_addstring(&json_data, NULL, cluster->dss_uuid.values[j], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
@@ -1023,15 +1027,13 @@ out:
 	return ret;
 }
 
-static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t eventlog_last_key,
+static void	vmware_get_events(const zbx_vector_vmware_event_ptr_t *events, zbx_uint64_t eventlog_last_key,
 		const zbx_dc_item_t *item, zbx_vector_ptr_t *add_results)
 {
-	int	i;
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() eventlog_last_key:" ZBX_FS_UI64, __func__, eventlog_last_key);
 
 	/* events were retrieved in reverse chronological order */
-	for (i = events->values_num - 1; i >= 0; i--)
+	for (int i = events->values_num - 1; i >= 0; i--)
 	{
 		const zbx_vmware_event_t	*event = (zbx_vmware_event_t *)events->values[i];
 		AGENT_RESULT			*add_result = NULL;
@@ -1063,8 +1065,8 @@ static void	vmware_get_events(const zbx_vector_ptr_t *events, zbx_uint64_t event
 
 /******************************************************************************
  *                                                                            *
- * Purpose: converts a single value of VMware event log level from string to  *
- *          bitmask                                                           *
+ * Purpose: Converts a single value of VMware event log level from string to  *
+ *          bitmask.                                                          *
  *                                                                            *
  * Parameters: level         - [IN]                                           *
  *             severity_mask - [OUT]                                          *
@@ -1104,11 +1106,9 @@ static int	severity_to_mask(const char *level, unsigned char *severity_mask)
  ******************************************************************************/
 static int	evt_severities_to_mask(const char *severity, unsigned char *mask, char **error)
 {
-	int	i;
-
 	*mask = 0;
 
-	for (i = 1; i <= zbx_num_param(severity); i++)
+	for (int i = 1; i <= zbx_num_param(severity); i++)
 	{
 		unsigned char	level_mask;
 		char		*level;
@@ -1545,7 +1545,6 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_hashset_iter_reset(&service->data->hvs, &iter);
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
-		int			i;
 		const char		*name;
 		zbx_vmware_cluster_t	*cluster = NULL;
 
@@ -1569,7 +1568,7 @@ int	check_vcenter_hv_discovery(AGENT_REQUEST *request, const char *username, con
 				ZBX_NULL2EMPTY_STR(hv->props[ZBX_VMWARE_HVPROP_NET_NAME]), ZBX_JSON_TYPE_STRING);
 		zbx_json_addarray(&json_data, "resource_pool");
 
-		for (i = 0; NULL == cluster && i < service->data->resourcepools.values_num; i++)
+		for (int i = 0; NULL == cluster && i < service->data->resourcepools.values_num; i++)
 		{
 			zbx_vmware_resourcepool_t	*rp = service->data->resourcepools.values[i];
 
@@ -1611,7 +1610,7 @@ int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, 
 	struct zbx_json		json_data;
 	const char		*url, *uuid;
 	zbx_vmware_service_t	*service;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_hv_t		*hv;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -1644,7 +1643,7 @@ int	check_vcenter_hv_diskinfo_get(AGENT_REQUEST *request, const char *username, 
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < hv->diskinfo.values_num; i++)
+	for (int i = 0; i < hv->diskinfo.values_num; i++)
 	{
 		zbx_vmware_diskinfo_t	*di = hv->diskinfo.values[i];
 
@@ -1843,7 +1842,7 @@ int	check_vcenter_hv_hw_vendor(AGENT_REQUEST *request, const char *username, con
 int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_service_t	*service;
 	const char		*uuid, *url;
 	zbx_vmware_hv_t		*hv;
@@ -1877,7 +1876,7 @@ int	check_vcenter_hv_memory_size_ballooned(AGENT_REQUEST *request, const char *u
 		goto unlock;
 	}
 
-	for (i = 0; i < hv->vms.values_num; i++)
+	for (int i = 0; i < hv->vms.values_num; i++)
 	{
 		zbx_uint64_t	mem;
 		const char	*value_str;
@@ -2261,7 +2260,7 @@ int	check_vcenter_hv_network_out(AGENT_REQUEST *request, const char *username, c
 int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	const char		*url, *uuid;
 	struct zbx_json		json_data;
 	zbx_vmware_service_t	*service;
@@ -2292,7 +2291,7 @@ int	check_vcenter_hv_net_if_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < hv->pnics.values_num; i++)
+	for (int i = 0; i < hv->pnics.values_num; i++)
 	{
 		nic = hv->pnics.values[i];
 
@@ -2355,7 +2354,7 @@ int	check_vcenter_hv_network_linkspeed(AGENT_REQUEST *request, const char *usern
 
 	nic_cmp.name = (char *)if_name;
 
-	if (FAIL == (i = zbx_vector_vmware_pnic_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
+	if (FAIL == (i = zbx_vector_vmware_pnic_ptr_bsearch(&hv->pnics, &nic_cmp, vmware_pnic_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown physical network interface name"));
 		goto out;
@@ -2482,7 +2481,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	struct zbx_json		json_data;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -2508,11 +2507,11 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < hv->dsnames.values_num; i++)
+	for (int i = 0; i < hv->dsnames.values_num; i++)
 	{
 		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
 		zbx_vmware_datastore_t	*datastore;
-		int			j, total = 0;
+		int			total = 0;
 
 		if (NULL == (datastore = ds_get(&service->data->datastores, dsname->uuid)))
 		{
@@ -2521,7 +2520,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 			goto unlock;
 		}
 
-		for (j = 0; j < dsname->hvdisks.values_num; j++)
+		for (int j = 0; j < dsname->hvdisks.values_num; j++)
 			total += dsname->hvdisks.values[j].multipath_total;
 
 		zbx_json_addobject(&json_data, NULL);
@@ -2534,7 +2533,7 @@ int	check_vcenter_hv_datastore_discovery(AGENT_REQUEST *request, const char *use
 				(unsigned int)dsname->hvdisks.values_num);
 		zbx_json_addarray(&json_data, "datastore_extent");
 
-		for (j = 0; j < datastore->diskextents.values_num; j++)
+		for (int j = 0; j < datastore->diskextents.values_num; j++)
 		{
 			zbx_vmware_diskextent_t	*ext = datastore->diskextents.values[j];
 
@@ -2621,7 +2620,7 @@ static int	check_vcenter_hv_datastore_metrics(AGENT_REQUEST *request, const char
 
 	dsname_cmp.name = (char *)ds_name;
 
-	if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+	if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.", ds_name));
 		goto unlock;
@@ -2748,7 +2747,7 @@ static int	check_vcenter_datastore_metrics(AGENT_REQUEST *request, const char *u
 	{
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)ds_name};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3003,7 +3002,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 			goto unlock;
 		}
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					name));
@@ -3020,7 +3019,7 @@ static int	check_vcenter_ds_size(const char *url, const char *hv_uuid, const cha
 	{
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)name};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3281,7 +3280,7 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 	char			*ds_list = NULL;
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -3304,7 +3303,7 @@ int	check_vcenter_hv_datastore_list(AGENT_REQUEST *request, const char *username
 		goto unlock;
 	}
 
-	for (i = 0; i < hv->dsnames.values_num; i++)
+	for (int i = 0; i < hv->dsnames.values_num; i++)
 	{
 		zbx_vmware_dsname_t	*dsname = hv->dsnames.values[i];
 
@@ -3334,7 +3333,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 	zbx_vmware_service_t	*service;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_dsname_t	*dsname;
-	int			ret = SYSINFO_RET_FAIL, i, j, multipath_count = 0;
+	int			ret = SYSINFO_RET_FAIL, i, multipath_count = 0;
 	zbx_uint64_t		partitionid = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3385,7 +3384,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 
 		dsname_cmp.name = (char *)ds_name;
 
-		if (FAIL == (i = zbx_vector_vmware_dsname_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
+		if (FAIL == (i = zbx_vector_vmware_dsname_ptr_bsearch(&hv->dsnames, &dsname_cmp, vmware_dsname_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Datastore \"%s\" not found on this hypervisor.",
 					ds_name));
@@ -3410,7 +3409,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		}
 		else
 		{
-			for (j = 0; j < dsname->hvdisks.values_num; j++)
+			for (int j = 0; j < dsname->hvdisks.values_num; j++)
 				multipath_count += dsname->hvdisks.values[j].multipath_active;
 		}
 	}
@@ -3420,7 +3419,7 @@ int	check_vcenter_hv_datastore_multipath(AGENT_REQUEST *request, const char *use
 		{
 			dsname = hv->dsnames.values[i];
 
-			for (j = 0; j < dsname->hvdisks.values_num; j++)
+			for (int j = 0; j < dsname->hvdisks.values_num; j++)
 				multipath_count += dsname->hvdisks.values[j].multipath_active;
 		}
 	}
@@ -3464,7 +3463,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 	{
 		zbx_vmware_datastore_t	ds_cmp =  {.name = (char *)ds_name};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3474,7 +3473,7 @@ int	check_vcenter_datastore_hv_list(AGENT_REQUEST *request, const char *username
 		datastore = service->data->datastores.values[i];
 	}
 
-	for (i=0; i < datastore->hv_uuids_access.values_num; i++)
+	for (i = 0; i < datastore->hv_uuids_access.values_num; i++)
 	{
 		if (NULL == (hv = hv_get(&service->data->hvs, datastore->hv_uuids_access.values[i].name)))
 		{
@@ -3607,7 +3606,7 @@ int	check_vcenter_datastore_property(AGENT_REQUEST *request, const char *usernam
 		int			i;
 		zbx_vmware_datastore_t	ds_cmp = {.name = (char *)uuid};
 
-		if (FAIL == (i = zbx_vector_vmware_datastore_search(&service->data->datastores, &ds_cmp,
+		if (FAIL == (i = zbx_vector_vmware_datastore_ptr_search(&service->data->datastores, &ds_cmp,
 				vmware_ds_name_compare)))
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown datastore name."));
@@ -3803,7 +3802,7 @@ int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *usernam
 		AGENT_RESULT *result)
 {
 	const char		*url;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_service_t	*service;
 	struct zbx_json		json_data;
 
@@ -3824,7 +3823,7 @@ int	check_vcenter_dvswitch_discovery(AGENT_REQUEST *request, const char *usernam
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < service->data->dvswitches.values_num; i++)
+	for (int i = 0; i < service->data->dvswitches.values_num; i++)
 	{
 		zbx_vmware_dvswitch_t	*dvswitch = (zbx_vmware_dvswitch_t *)service->data->dvswitches.values[i];
 
@@ -3851,9 +3850,7 @@ out:
 
 static int	dvs_param_validate(zbx_vector_custquery_param_t *query_params, unsigned int vc_version)
 {
-	int	i;
-
-	for (i = 0; i < query_params->values_num; i++)
+	for (int i = 0; i < query_params->values_num; i++)
 	{
 		zbx_vmware_custquery_param_t	*p = &query_params->values[i];
 
@@ -4073,7 +4070,7 @@ int	check_vcenter_vm_attribute(AGENT_REQUEST *request, const char *username, con
 
 	custom_attr.name = (char *)attr_name;
 
-	if (FAIL == (index = zbx_vector_vmware_custom_attr_bsearch(&vm->custom_attrs, &custom_attr,
+	if (FAIL == (index = zbx_vector_vmware_custom_attr_ptr_bsearch(&vm->custom_attrs, &custom_attr,
 			vmware_custom_attr_compare_name)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Custom attribute is not available."));
@@ -4278,7 +4275,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_t		*vm;
 	zbx_hashset_iter_t	iter;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -4305,9 +4302,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 		if (NULL != hv->clusterid)
 			cluster = cluster_get(&service->data->clusters, hv->clusterid);
 
-		for (i = 0; i < hv->vms.values_num; i++)
+		for (int i = 0; i < hv->vms.values_num; i++)
 		{
-			int			j;
 			zbx_vmware_datastore_t	*datastore = NULL;
 
 			vm = (zbx_vmware_vm_t *)hv->vms.values[i];
@@ -4321,8 +4317,8 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 			if (NULL == (hv_uuid = hv->props[ZBX_VMWARE_HVPROP_HW_UUID]))
 				continue;
 
-			for (j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
-				j < service->data->datastores.values_num; j++)
+			for (int j = 0; NULL != vm->props[ZBX_VMWARE_VMPROP_DATASTOREID] &&
+					j < service->data->datastores.values_num; j++)
 			{
 				if (0 != strcmp(vm->props[ZBX_VMWARE_VMPROP_DATASTOREID],
 						service->data->datastores.values[j]->id))
@@ -4386,7 +4382,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 				rpool_cmp.id = vm->props[ZBX_VMWARE_VMPROP_RESOURCEPOOL];
 
-				if (FAIL != (idx = zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools,
+				if (FAIL != (idx = zbx_vector_vmware_resourcepool_ptr_bsearch(&service->data->resourcepools,
 						&rpool_cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 				{
 					zbx_json_addstring(&json_data, "{#VM.RPOOL.PATH}", ZBX_NULL2EMPTY_STR(
@@ -4401,7 +4397,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 			zbx_json_addarray(&json_data, "vm_customattribute");
 
-			for (j = 0; j < vm->custom_attrs.values_num; j++)
+			for (int j = 0; j < vm->custom_attrs.values_num; j++)
 			{
 				zbx_json_addobject(&json_data, NULL);
 				zbx_json_addstring(&json_data, "name",
@@ -4417,7 +4413,7 @@ int	check_vcenter_vm_discovery(AGENT_REQUEST *request, const char *username, con
 
 			zbx_json_addarray(&json_data, "net_if");
 
-			for (j = 0; j < vm->devs.values_num; j++)
+			for (int j = 0; j < vm->devs.values_num; j++)
 			{
 				zbx_vmware_dev_t	*dev;
 
@@ -4769,7 +4765,8 @@ static void	check_vcenter_vm_discovery_nic_props_cb(struct zbx_json *j, zbx_vmwa
 			ZBX_JSON_TYPE_INT);
 	zbx_json_addstring(j, "{#IFTYPE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFTYPE]),
 			ZBX_JSON_TYPE_STRING);
-	zbx_json_addstring(j, "{#IFBACKINGDEVICE}", ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
+	zbx_json_addstring(j, "{#IFBACKINGDEVICE}",
+			ZBX_NULL2EMPTY_STR(dev->props[ZBX_VMWARE_DEV_PROPS_IFBACKINGDEVICE]),
 			ZBX_JSON_TYPE_STRING);
 	zbx_json_addstring(j, "{#IFDVSWITCH.UUID}", ZBX_NULL2EMPTY_STR(
 			dev->props[ZBX_VMWARE_DEV_PROPS_IFDVSWITCH_UUID]), ZBX_JSON_TYPE_STRING);
@@ -4795,7 +4792,7 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 	zbx_vmware_vm_t		*vm = NULL;
 	zbx_vmware_dev_t	*dev;
 	const char		*url, *uuid;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s(), func_parent:'%s'", __func__, func_parent);
 
@@ -4827,7 +4824,7 @@ static int	check_vcenter_vm_discovery_common(AGENT_REQUEST *request, const char 
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < vm->devs.values_num; i++)
+	for (int i = 0; i < vm->devs.values_num; i++)
 	{
 		dev = (zbx_vmware_dev_t *)vm->devs.values[i];
 
@@ -5152,8 +5149,8 @@ int	check_vcenter_vm_uptime(AGENT_REQUEST *request, const char *username, const 
 int	check_vcenter_vm_vfs_dev_discovery(AGENT_REQUEST *request, const char *username, const char *password,
 		AGENT_RESULT *result)
 {
-	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK, __func__,
-			check_vcenter_vm_discovery_disk_props_cb);
+	return check_vcenter_vm_discovery_common(request, username, password, result, ZBX_VMWARE_DEV_TYPE_DISK,
+			__func__, check_vcenter_vm_discovery_disk_props_cb);
 }
 
 int	check_vcenter_vm_vfs_dev_read(AGENT_REQUEST *request, const char *username, const char *password,
@@ -5177,7 +5174,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm = NULL;
 	const char		*url, *uuid;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5209,7 +5206,7 @@ int	check_vcenter_vm_vfs_fs_discovery(AGENT_REQUEST *request, const char *userna
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < vm->file_systems.values_num; i++)
+	for (int i = 0; i < vm->file_systems.values_num; i++)
 	{
 		zbx_vmware_fs_t	*fs = (zbx_vmware_fs_t *)vm->file_systems.values[i];
 
@@ -5239,7 +5236,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 	zbx_vmware_service_t	*service;
 	zbx_vmware_vm_t		*vm;
 	const char		*url, *uuid, *fsname, *mode;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 	zbx_vmware_fs_t		*fs = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -5272,7 +5269,7 @@ int	check_vcenter_vm_vfs_fs_size(AGENT_REQUEST *request, const char *username, c
 		goto unlock;
 	}
 
-	for (i = 0; i < vm->file_systems.values_num; i++)
+	for (int i = 0; i < vm->file_systems.values_num; i++)
 	{
 		fs = (zbx_vmware_fs_t *)vm->file_systems.values[i];
 
@@ -5378,7 +5375,7 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 	const char		*url;
 	zbx_vmware_service_t	*service;
 	struct zbx_json		json_data;
-	int			i, ret = SYSINFO_RET_FAIL;
+	int			ret = SYSINFO_RET_FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5397,7 +5394,7 @@ int	check_vcenter_dc_discovery(AGENT_REQUEST *request, const char *username, con
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < service->data->datacenters.values_num; i++)
+	for (int i = 0; i < service->data->datacenters.values_num; i++)
 	{
 		zbx_vmware_datacenter_t	*datacenter = service->data->datacenters.values[i];
 
@@ -5428,7 +5425,7 @@ int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, cons
 {
 	zbx_vmware_service_t		*service;
 	zbx_vmware_datacenter_t		*dc = NULL;
-	int				i, ret = SYSINFO_RET_FAIL;
+	int				ret = SYSINFO_RET_FAIL;
 	const char			*url, *id;
 	struct zbx_json			json_data;
 	char				*error = NULL;
@@ -5453,7 +5450,7 @@ int	check_vcenter_dc_tags_get(AGENT_REQUEST *request, const char *username, cons
 	if (NULL == (service = get_vmware_service(url, username, password, result, &ret)))
 		goto unlock;
 
-	for (i = 0; i < service->data->datacenters.values_num; i++)
+	for (int i = 0; i < service->data->datacenters.values_num; i++)
 	{
 		if (0 == strcmp(service->data->datacenters.values[i]->id, id))
 		{
@@ -5944,7 +5941,7 @@ static int	check_vcenter_rp_common(const char *url, const char *username, const 
 
 	rp_cmp.id = (char *)rpid;
 
-	if (FAIL == zbx_vector_vmware_resourcepool_bsearch(&service->data->resourcepools, &rp_cmp,
+	if (FAIL == zbx_vector_vmware_resourcepool_ptr_bsearch(&service->data->resourcepools, &rp_cmp,
 			ZBX_DEFAULT_STR_PTR_COMPARE_FUNC))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Unknown resource pool id."));
@@ -6053,20 +6050,20 @@ out:
 }
 
 
-static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_t *alarms, zbx_vector_str_t *ids,
+static int	check_vcenter_alarm_get_common(zbx_vector_vmware_alarm_ptr_t *alarms, zbx_vector_str_t *ids,
 		AGENT_RESULT *result)
 {
-	int		i, ret = SYSINFO_RET_OK;
+	int		ret = SYSINFO_RET_OK;
 	struct zbx_json	json_data;
 
 	zbx_json_initarray(&json_data, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < ids->values_num; i++)
+	for (int i = 0; i < ids->values_num; i++)
 	{
 		zbx_vmware_alarm_t	*alarm, cmp = {.key = ids->values[i]};
 		int			j;
 
-		if (FAIL == (j = zbx_vector_vmware_alarm_bsearch(alarms, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
+		if (FAIL == (j = zbx_vector_vmware_alarm_ptr_bsearch(alarms, &cmp, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC)))
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Alarm not found:%s", cmp.key));
 			ret = SYSINFO_RET_FAIL;

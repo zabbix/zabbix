@@ -24,11 +24,11 @@
 
 #include "zbxalgo.h"
 
-void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
+void	zbx_audit_settings_create_entry(int audit_context_mode, int audit_action, zbx_uint64_t configid)
 {
 	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	local_audit_entry.id = configid;
 	local_audit_entry.cuid = NULL;
@@ -43,11 +43,12 @@ void	zbx_audit_settings_create_entry(int audit_action, zbx_uint64_t configid)
 	}
 }
 
-void	zbx_audit_settings_update_field_int(zbx_uint64_t configid, const char *key, int old_value, int new_value)
+void	zbx_audit_settings_update_field_int(int audit_context_mode, zbx_uint64_t configid, const char *key,
+		int old_value, int new_value)
 {
 	zbx_audit_entry_t	*entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	entry = zbx_audit_get_entry(configid, NULL, AUDIT_CONFIG_ID);
 	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);

@@ -256,7 +256,6 @@ var jqBlink = {
  */
 var hintBox = {
 
-	preload_hint_timer: null,
 	show_hint_timer: null,
 
 	/**
@@ -283,45 +282,6 @@ var hintBox = {
 				e.clientX = offset.left - w.scrollLeft();
 				e.clientY = offset.top - w.scrollTop() + ($target.height() / 2);
 				e.preventDefault();
-			}
-
-			if ($target[0].dataset.hintboxPreload !== '' && $target[0].dataset.hintboxContents === '') {
-				if (e.type === 'mousemove') {
-					return;
-				}
-
-				clearTimeout(hintBox.preload_hint_timer);
-
-				// Manually trigger preloaderCloseHandler for the previous preloader.
-				if (jQuery('#hintbox-preloader').length) {
-
-					// Prevent loading restart on repetitive click and keydown events.
-					if (e.type === 'click' || e.type === 'keydown') {
-						return false;
-					}
-
-					jQuery(document).trigger('click');
-				}
-
-				if (e.type === 'mouseleave') {
-					hintBox.hideHint($target[0], false);
-					$target.blur();
-
-					return false;
-				}
-
-				var preloadHintHandler = function() {
-					hintBox.preloadHint(e, $target);
-				}
-
-				if (e.type === 'mouseenter') {
-					hintBox.preload_hint_timer = setTimeout(preloadHintHandler, 400);
-				}
-				else {
-					preloadHintHandler();
-				}
-
-				return false;
 			}
 
 			hintBox.displayHint(e, $target, $target.data('hintbox-delay') !== undefined
@@ -391,32 +351,25 @@ var hintBox = {
 		}
 	},
 
-	preloadHint: function(e, $target) {
-		var url = new Curl('zabbix.php'),
-			data = $target.data('hintbox-preload');
+	preloadHint: function(e, target, box) {
+		const url = new Curl('zabbix.php');
+		const data = jQuery(target).data('hintbox-preload');
 
 		url.setArgument('action', hintBox.getHintboxAction(data.type));
 
-		var xhr = jQuery.ajax({
+		const xhr = jQuery.ajax({
 			url: url.getUrl(),
 			method: 'POST',
 			data: data.data,
 			dataType: 'json'
 		});
 
-		var $preloader = hintBox.createPreloader();
-
-		var preloader_timer = setTimeout(function() {
-			$preloader.fadeIn(200);
-			hintBox.positionElement(e, $target[0], $preloader);
-		}, 500);
-
-		addToOverlaysStack($preloader.prop('id'), $target[0], 'preloader', xhr);
+		const $preloader = jQuery('<div>', {
+			'id': 'hintbox-preloader',
+			'class': 'is-loading hintbox-preloader'
+		}).appendTo(box);
 
 		xhr.done(function(resp) {
-			clearTimeout(preloader_timer);
-			overlayPreloaderDestroy($preloader.prop('id'));
-
 			let hintbox_contents = '';
 
 			if ('error' in resp) {
@@ -434,36 +387,25 @@ var hintBox = {
 				}
 			}
 
-			$target[0].dataset.hintboxContents = hintbox_contents;
+			target.dataset.hintboxContents = hintbox_contents;
 
-			hintBox.displayHint(e, $target);
+			$preloader.remove();
+
+			if (target.hintBoxItem !== undefined) {
+				box.append(hintbox_contents);
+
+				// Reset hintbox position.
+				box.css({
+					width: '',
+					height: '',
+					top: '',
+					right: '',
+					left: ''
+				});
+
+				hintBox.positionElement(e, target, target.hintBoxItem);
+			}
 		});
-
-		jQuery(document)
-			.off('click', hintBox.preloaderCloseHandler)
-			.on('click', {id: $preloader.prop('id')}, hintBox.preloaderCloseHandler);
-	},
-
-	/**
-	 * Create preloader elements for the hint box.
-	 */
-	createPreloader: function() {
-		return jQuery('<div>', {
-			'id': 'hintbox-preloader',
-			'class': 'is-loading hintbox-preloader'
-		})
-			.appendTo($('.wrapper'))
-			.on('click', function(e) {
-				e.stopPropagation();
-			})
-			.hide();
-	},
-
-	/**
-	 * Event handler for the preloader elements destroy.
-	 */
-	preloaderCloseHandler: function(event) {
-		overlayPreloaderDestroy(event.data.id);
 	},
 
 	createBox: function(e, target, hintText, className, isStatic, styles, appendTo) {
@@ -510,6 +452,10 @@ var hintBox = {
 					hintBox.hideHint(target, true);
 				});
 			box.prepend(close_link);
+		}
+
+		if (target.dataset?.hintboxPreload !== '' && target.dataset?.hintboxContents === '') {
+			hintBox.preloadHint(e, target, box);
 		}
 
 		jQuery(appendTo).append(box);
