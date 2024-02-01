@@ -21,6 +21,6 @@
 		}
 	},
 	"assets": {
-		"js": ["class.widget.js"]
+		"js": ["class.svggauge.js", "class.widget.js"]
 	}
 }

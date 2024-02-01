@@ -1,16 +1,23 @@
+Changes for 7.0.0beta2
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
 Changes for 7.0.0beta1
 
 New features:
 ..F....... [ZBXNEXT-8925] set minimal supported PHP version to 8.0 (esekace)
-A.F.....S. [ZBXNEXT-8837] made it possible to turn-off audit logging specifically for LLD, network discovery and autoregistration (arimdjonoks, jfreibergs)
+A.F.....S. [ZBXNEXT-8837] made it possible to turn off audit logging specifically for LLD, network discovery and autoregistration (arimdjonoks, jfreibergs)
 A...I...S. [ZBXNEXT-5878,ZBXNEXT-8532] improved performance of permission checks for hosts, templates and API objects related to them; added strict validation for host group and template parameters of host API methods (asestakovs, vmaksimovs)
-.......PS. [ZBXNEXT-8823] implemented detection of SNMP engineId duplicates (dgoloscapov)
+.......PS. [ZBXNEXT-8823] implemented detection of SNMP engineID duplicates (dgoloscapov)
 .......PS. [ZBXNEXT-8891] updated max supported MySQL version to 8.2 (mprihodko)
-.........T [ZBXNEXT-8524] added support HTTP proxy in GCP templates (egordymov)
+.........T [ZBXNEXT-8524] added support of HTTP proxy in GCP templates (egordymov)
 ..F.I..... [ZBXNEXT-8496] added aggregations for Item value widget and time period functionality for Top hosts and Item value widgets (averza, esekace, kkuzmina, MVekslers)
 .......P.. [ZBXNEXT-8724] improved error messages when proxy is starting up (dimir)
 .........T [ZBXNEXT-8759] added dashboards in Azure templates (egordymov)
-.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to depends and made few minor changes in MSSQL by ODBC template (akotsegubov)
+.........T [ZBXNEXT-8580] added new discovery rules, refactored discovery rules to dependent items and made few minor changes in MSSQL by ODBC template (akotsegubov)
 .........T [ZBXNEXT-8730] added Azure Cost Management by HTTP template (egordymov)
 
 Bug fixes:
@@ -19,35 +26,35 @@ Bug fixes:
 ........S. [ZBX-23814] fixed {TRIGGER.VALUE} macro not working anymore (akozlovs, vso)
 ...G...PS. [ZBX-23904] fixed build flags when using custom OpenSSL library (askolmeisters)
 ..F....... [ZBX-23818] fixed clock, graph and graph prototype widget form reloading and field focus when changing values (esekace)
-.......PS. [ZBX-23967] fixed possible invalid free in walk2json (dgoloscapov)
+.......PS. [ZBX-23967] fixed possible invalid free in SNMP walk to JSON preprocessing step (dgoloscapov)
 ........S. [ZBX-22371] fixed process tags option not adding tags for service events (vso)
-...G...... [ZBX-17208] fix Zabbix agent 2 invalid command line flag handling (rzvejs)
-..F....... [ZBX-23517] fixed user unable to clone dashboard with read-only access (jfreibergs)
+...G...... [ZBX-17208] fixed invalid command-line flag handling in Zabbix agent 2 (rzvejs)
+..F....... [ZBX-23517] fixed user not being able to clone dashboard with read-only access (jfreibergs)
 ..F....... [ZBX-22961] fixed modal (popup) form resizing and visual glitch on initial load, and ResizeObserver observation error in Safari browser (ddauksa)
 .........T [ZBX-23937] fixed JavaScript for AWS EC2 instances discovery (egordymov)
 ..F....... [ZBX-22715] fixed map shape dimension changes on resizing in scaled browser mode (ddauksa)
 .......PS. [ZBX-23722] added garbage collection after executing JavaScript code (asitals)
 .......PS. [ZBX-23740] fixed netsnmp persistent state disabling without affecting its configuration (wiper)
-..F....... [ZBX-23874] fixed undefined array key error for map elements wih URL (esekace, Ivo)
+..F....... [ZBX-23874] fixed undefined array key error for map elements with URL (esekace, Ivo)
 ...G...... [ZBX-23890] removed non-existing headers from compiler checks: mtent.h and knlist.h (arimdjonoks)
 .........T [ZBX-23912] removed Jira with CustomFields media type in data.tmpl (egordymov)
 ..F....... [ZBX-23883] fixed PHP runtime error while using "/d", "/m" or "/h" modifiers in the time selector with some time zones (Sasha)
 A......... [ZBX-23262] fixed inability to log in using user.login API method if user has a user group with disabled frontend access (epulke, vmaksimovs)
 ...G...... [ZBX-23257] fixed log items not using MaxLinesPerSecond setting correctly for Zabbix agent 2 (kprutkovs)
-.......PS. [ZBX-23914] fixed use of uninitialized protocol version variable during snmp checks (vso)
+.......PS. [ZBX-23914] fixed use of uninitialized protocol version variable during SNMP checks (vso)
 A.F....... [ZBX-22536] fixed TimescaleDB compression detection for history.clear API method and proper error appearance in frontend (miks)
 .........T [ZBX-23761] fixed JavaScript in Jira media type (egordymov)
-.........T [ZBX-22558] fixed expression of trigger for retrieval of stub page in Nginx templates (drasikhov)
+.........T [ZBX-22558] fixed trigger expression for retrieval of stub page in Nginx templates (drasikhov)
 .......PS. [ZBX-23906] fixed Zabbix server and proxy crash when executing SNMP agent item (arimdjonoks)
 ..F....... [ZBX-23562] fixed time period selector validation for maximum time period (averza, esekace)
-...G...... [ZBX-23540] add error checks for RegisterMetrics calls (rzvejs)
+...G...... [ZBX-23540] added error checks for RegisterMetrics calls (rzvejs)
 .........T [ZBX-23691] fixed LLD filters evaluation type for devices discovery in Cisco SD-WAN by HTTP template (drasikhov)
 .........T [ZBX-23605] removed getting location buckets in AWS by HTTP template; added discovery filters for request metrics in AWS S3 bucket by HTTP template (egordymov)
 ..F....... [ZBX-23497] fixed user edit form fields validation for user without user group (dpetra)
 ..F....... [ZBX-23696] fixed script item parameters and HTTP agent item query fields and headers not being passed to Zabbix server when testing items (agriscenko)
-..F....... [ZBX-23466] fixed errors while data aggregation in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
+..F....... [ZBX-23466] fixed data aggregation errors in Graphs and Top hosts widgets with Elasticsearch backend (Sasha)
 .........T [ZBX-23835] updated Meraki templates (egordymov)
-.........T [ZBX-23723] fixed proxy params in JavaScript AWS templates (egordymov)
+.........T [ZBX-23723] fixed proxy parameters in JavaScript AWS templates (egordymov)
 A.F....... [ZBX-23846] fixed quoting of empty parameters while resolving macros in the trigger expressions (Sasha)
 
 --------------------------------------------------------------------------------
@@ -497,6 +504,18 @@ Bug fixes:
 ...G...... [ZBX-22147] updated default buffer size to 1000 in Zabbix agent 2 (esneiders)
 .......PS. [ZBX-22587] fixed JSON validation not detecting invalid unicode characters and out-of-bounds access with JSONPath on invalid unicode character (vso)
 A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issues with provisioning (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.4.12rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.4.11
+
+6.4.11rc1 was released as 6.4.11 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.4.11rc1
@@ -2099,6 +2118,18 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 ..F.I..... [ZBXNEXT-7397] removed support for MD5 user passwords (asestakovs, mkrisjanis)
 ........S. [ZBXNEXT-7488] removed zabbix[history*] and zabbix[trends*] internal items (akozlovs)
 ..F....... [ZBXNEXT-7138] added modal form for API tokens in User settings->API tokens and Administration->General->API tokens (epulke)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.27rc1
+
+New features:
+
+Bug fixes:
+
+--------------------------------------------------------------------------------
+Changes for 6.0.26
+
+6.0.26rc1 was released as 6.0.26 without any changes
 
 --------------------------------------------------------------------------------
 Changes for 6.0.26rc1
@@ -4994,6 +5025,13 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.41
