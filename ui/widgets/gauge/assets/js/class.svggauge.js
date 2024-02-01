@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+
 class CSVGGauge {
 
 	static ZBX_STYLE_CLASS =					'svg-gauge';
@@ -38,6 +39,7 @@ class CSVGGauge {
 	static ZBX_STYLE_NO_DATA =					'svg-gauge-no-data';
 
 	static SVG_NS = 'http://www.w3.org/2000/svg';
+	static XHTML_NS = 'http://www.w3.org/1999/xhtml';
 
 	static LINE_HEIGHT = 1.14;
 	static TEXT_BASELINE = 0.8;
@@ -368,7 +370,7 @@ class CSVGGauge {
 	 * Create multi-line description.
 	 */
 	#createDescription() {
-		const container = document.createElementNS(CSVGGauge.SVG_NS, 'text');
+		const container = document.createElementNS(CSVGGauge.SVG_NS, 'foreignObject');
 
 		this.#g.appendChild(container);
 
@@ -379,24 +381,20 @@ class CSVGGauge {
 		}
 
 		if (this.#config.description.color !== '') {
-			container.style.fill = `#${this.#config.description.color}`;
+			container.style.color = `#${this.#config.description.color}`;
 		}
 
-		const lines_data = [];
-
 		for (const text of this.#config.description.text.split('\r\n')) {
-			let line = null;
+			if (text.replace(/ /g, '') !== '') {
+				const line = document.createElementNS(CSVGGauge.XHTML_NS, 'div');
 
-			if (text !== '') {
-				line = document.createElementNS(CSVGGauge.SVG_NS, 'tspan');
+				line.innerText = text;
 
 				container.appendChild(line);
 			}
-
-			lines_data.push({line, text});
 		}
 
-		this.#elements.description = {container, lines_data};
+		this.#elements.description = {container};
 	}
 
 	/**
@@ -895,37 +893,20 @@ class CSVGGauge {
 	 * Position description according to the size of widget and truncate the text matching the available width.
 	 */
 	#drawDescription() {
-		const {container, lines_data} = this.#elements.description;
+		const {container} = this.#elements.description;
 
 		const line_height = this.#height * this.#config.description.size / 100;
-		const font_size = line_height / CSVGGauge.LINE_HEIGHT;
+		const font_size = line_height * CSVGGauge.TEXT_BASELINE;
 
+		container.style.lineHeight = `${line_height}px`;
 		container.style.fontSize = `${font_size}px`;
 
-		let offset = 0;
-
-		for (const {line, text} of lines_data) {
-			if (text === '') {
-				offset++;
-
-				continue;
-			}
-
-			line.setAttribute('x', `${this.#width / 2}`);
-			line.setAttribute('dy', `${offset * line_height}`);
-
-			line.textContent = text;
-
-			while (line.getComputedTextLength() > this.#width && line.textContent.length >= 4) {
-				line.textContent = `${line.textContent.slice(0, -4)}...`;
-			}
-
-			offset = 1;
-		}
-
+		container.setAttribute('width', this.#width);
+		container.setAttribute('height', line_height * container.childElementCount);
+		container.setAttribute('x', 0);
 		container.setAttribute('y', this.#config.description.position === CSVGGauge.DESC_V_POSITION_TOP
-			? `${font_size * CSVGGauge.TEXT_BASELINE + (line_height - font_size) / 2}`
-			: `${this.#height + font_size * (CSVGGauge.TEXT_BASELINE - 1/2) + line_height * (1/2 - lines_data.length)}`
+			? 0
+			: this.#height - line_height * container.childElementCount
 		);
 	}
 
