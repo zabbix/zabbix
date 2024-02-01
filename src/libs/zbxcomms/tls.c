@@ -518,7 +518,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 	{
 		/* call the function zbx_dc_get_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
+		if (0 < find_psk_in_cache_cb((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
 			if (0 >= (psk_bin_len = zbx_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
