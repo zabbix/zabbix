@@ -861,7 +861,7 @@ static void	vmware_perf_data_add_error(zbx_vector_ptr_t *perfdata, const char *t
  *             perfdata - [IN/OUT] the performance data                       *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_service_copy_perf_data(zbx_vmware_service_t *service, zbx_vector_ptr_t *perfdata)
+static void	vmware_service_copy_perf_data(const zbx_vmware_service_t *service, zbx_vector_ptr_t *perfdata)
 {
 	int				i, j, index;
 	zbx_vmware_perf_data_t		*data;
@@ -1492,7 +1492,7 @@ out:
  * Return value: SUCCEED if the counter was found, FAIL otherwise             *
  *                                                                            *
  ******************************************************************************/
-int	zbx_vmware_service_get_counterid(zbx_vmware_service_t *service, const char *path,
+int	zbx_vmware_service_get_counterid(const zbx_vmware_service_t *service, const char *path,
 		zbx_uint64_t *counterid, int *unit)
 {
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
@@ -1592,8 +1592,8 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
  * Return value: the performance entity or NULL if not found                  *
  *                                                                            *
  ******************************************************************************/
-zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(zbx_vmware_service_t *service, const char *type,
-		const char *id)
+zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(const zbx_vmware_service_t *service,
+		const char *type, const char *id)
 {
 	zbx_vmware_perf_entity_t	*pentity, entity = {.type = (char *)type, .id = (char *)id};
 

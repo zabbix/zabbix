@@ -25,7 +25,7 @@
  */
 class CFrontendSetup {
 
-	const MIN_PHP_VERSION = '7.4.0';
+	const MIN_PHP_VERSION = '8.0.0';
 	const MIN_PHP_MEMORY_LIMIT = '134217728'; // 128 * ZBX_MEBIBYTE;
 	const MIN_PHP_POST_MAX_SIZE = '16777216'; // 16 * ZBX_MEBIBYTE;
 	const MIN_PHP_UPLOAD_MAX_FILESIZE = '2097152'; // 2 * ZBX_MEBIBYTE;
