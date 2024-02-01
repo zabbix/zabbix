@@ -848,7 +848,8 @@ static zbx_am_alert_t	*am_pop_alert(zbx_am_t *manager)
 	if (NULL == (mediatype = am_pop_mediatype(manager)))
 		return NULL;
 
-	alertpool = am_pop_alertpool(mediatype);
+	if (NULL == (alertpool = am_pop_alertpool(mediatype)))
+		return NULL;
 
 	elem = zbx_binary_heap_find_min(&alertpool->queue);
 	alert = (zbx_am_alert_t *)elem->data;
