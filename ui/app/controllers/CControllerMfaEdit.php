@@ -84,6 +84,11 @@ class CControllerMfaEdit extends CController {
 			$data['mfaid'] = $this->getInput('mfaid');
 		}
 
+		$curl_status = (new CFrontendSetup())->checkPhpCurlModule();
+		$data['curl_error'] = ($curl_status['result'] == CFrontendSetup::CHECK_OK)
+				? ''
+				: _('You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server.');
+
 		$this->setResponse(new CControllerResponseData($data));
 	}
 }

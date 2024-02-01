@@ -37,20 +37,23 @@ if (array_key_exists('mfaid', $data)) {
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
+$curl_warning = !$data['curl_error']
+		? ''
+		: (makeWarningIcon($data['curl_error']));
 
 $form
 	->addItem((new CFormGrid())
 		->addItem([
 			new CLabel(_('Type'), 'type'),
-			new CFormField(
+			new CFormField([
 				(new CSelect('type'))
 					->setFocusableElementId('type')
 					->setValue($data['type'])
-					->addOptions(CSelect::createOptionsFromArray([
-						MFA_TYPE_TOTP => _('TOTP'),
-						MFA_TYPE_DUO => _('DUO Universal Prompt')
-					]))
-			)
+					->addOption(new CSelectOption(MFA_TYPE_TOTP, _('TOTP')))
+					->addOption((new CSelectOption(MFA_TYPE_DUO, _('DUO Universal Prompt')))
+						->setDisabled($data['curl_error'])),
+				$curl_warning
+			])
 		])
 		->addItem([
 			(new CLabel(_('Name'), 'name'))->setAsteriskMark(),
