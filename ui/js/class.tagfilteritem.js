@@ -46,26 +46,25 @@ class CTagFilterItem extends CBaseComponent {
 			 * Event called when operation field changes.
 			 */
 			changeOperation: (ev) => {
-				if (ev.target.value == TAG_OPERATOR_EXISTS || ev.target.value == TAG_OPERATOR_NOT_EXISTS) {
-					this._value.addClass('display-none');
-					this._value._target.closest('td').style.paddingRight = 0;
+				const show_value = ev.target.value != TAG_OPERATOR_EXISTS && ev.target.value != TAG_OPERATOR_NOT_EXISTS;
 
-					if (typeof this._value._target.dataset.text === 'undefined'
-							|| this._value._target.dataset.text === '') {
-						this._value._target.dataset.text = this._value._target.value;
-						this._value._target.value = '';
-					}
+				if (this._value.hasClass('display-none') != show_value) {
+					return;
 				}
-				else {
+
+				if (show_value) {
 					this._value.removeClass('display-none');
 					this._value._target.closest('td').style.paddingRight = null;
 
-					if (typeof this._value._target.dataset.text !== 'undefined'
-							&& this._value._target.dataset.text !== '') {
-						this._value._target.value = this._value._target.dataset.text;
-					}
-
+					this._value._target.value = this._value._target.dataset.text;
 					this._value._target.dataset.text = '';
+				}
+				else {
+					this._value.addClass('display-none');
+					this._value._target.closest('td').style.paddingRight = 0;
+
+					this._value._target.dataset.text = this._value._target.value;
+					this._value._target.value = '';
 				}
 			}
 		}
