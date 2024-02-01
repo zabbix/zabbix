@@ -453,7 +453,7 @@ Overlay.prototype.unsetProperty = function(key) {
 
 		case 'prevent_navigation':
 			const prevent_navigation_overlays = Object.values(overlays_stack.map).filter((overlay) =>
-				overlay.$dialogue[0].dataset.preventNavigation === 'true'
+				overlay.$dialogue !== undefined && overlay.$dialogue[0].dataset.preventNavigation === 'true'
 			);
 
 			const was_closed_overlay_preventing_navigation = prevent_navigation_overlays.find((overlay) =>
