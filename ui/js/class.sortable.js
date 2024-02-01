@@ -42,6 +42,13 @@ class CSortable {
 	static ZBX_STYLE_TOKEN = 'sortable-token';
 
 	/**
+	 * Class applied to elements of tokens which cannot be sorted.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_TOKEN_STATIC = 'sortable-token-static';
+
+	/**
 	 * Class applied to token elements while it is being dragged.
 	 *
 	 * @type {string}
@@ -131,7 +138,7 @@ class CSortable {
 	 * @returns {CSortable}
 	 */
 	constructor(target, {
-		is_vertical = false,
+		is_vertical,
 
 		selector_span = '',
 		selector_freeze = '',
@@ -219,19 +226,19 @@ class CSortable {
 	/**
 	 * Enable or disable sorting.
 	 *
-	 * @param {boolean} enable
+	 * @param {boolean} enable_sorting
 	 *
 	 * @returns {boolean}  Previous state.
 	 */
-	enableSorting(enable = true) {
-		if (this.#is_enabled && this.#is_enabled_sorting && !enable) {
+	enableSorting(enable_sorting = true) {
+		if (this.#is_enabled && this.#is_enabled_sorting && !enable_sorting) {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 			this.#cancelSort();
 		}
 
-		this.#is_enabled_sorting = enable;
+		this.#is_enabled_sorting = enable_sorting;
 
-		return !enable;
+		return !enable_sorting;
 	}
 
 	/**
@@ -290,9 +297,15 @@ class CSortable {
 
 		const observe_mutations = this.#observeMutations(false);
 
-		for (const token of this.#tokens) {
-			for (const element of this.#getContentsElements(token.elements)) {
+		for (let index = 0; index < this.#tokens.length; index++) {
+			const is_static = this.#tokens[index].freeze
+				|| ((index === 0 || this.#tokens[index - 1].freeze)
+					&& (index === this.#tokens.length - 1 || this.#tokens[index + 1].freeze)
+				);
+
+			for (const element of this.#getContentsElements(this.#tokens[index].elements)) {
 				element.classList.add(CSortable.ZBX_STYLE_TOKEN);
+				element.classList.toggle(CSortable.ZBX_STYLE_TOKEN_STATIC, is_static);
 			}
 		}
 
