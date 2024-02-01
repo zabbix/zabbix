@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-26T07:47:17Z'
+  date: '2024-01-22T15:13:39Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -120,7 +120,7 @@ zabbix_export:
                 - |
                   var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/)
                   if (a) {
-                      return a[1]-a[2]
+                  	return a[1]-a[2]
                   }
             - type: CHANGE_PER_SECOND
               parameters:
