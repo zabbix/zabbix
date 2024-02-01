@@ -62,96 +62,85 @@
 		padding: 2px 0;
 		// Hide the invisible tab paddings.
 		margin: 0 -1.5px;
-	}
 
-	.sortable-list {
 		display: flex;
-		padding: 0;
-		margin: 0;
 		align-items: center;
 
-		& > .sortable-item:focus:not(:active) {
+		li {
+			// This container should not be visually styled at this level.
+			box-sizing: border-box;
+			display: block;
+			// Invisible padding for tab separation.
+			padding: 0 1.5px;
+			margin: 0;
+			list-style-type: none;
+			outline: none;
+
+			div {
+				display: flex;
+				align-items: center;
+
+				min-height: 22px;
+				line-height: 22px;
+				padding: 0 10px;
+				flex-shrink: 0;
+
+				font-size: 12px;
+				white-space: nowrap;
+
+				cursor: pointer;
+				user-select: none;
+
+				background-color: $ui-bg-color;
+				border: 1px solid $ui-border-color;
+				border-radius: 2px;
+
+				@if $ui-transitions {
+					transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
+				}
+
+				span {
+					@extend %overflow-ellipsis;
+					max-width: 300px;
+					color: $font-color;
+				}
+
+				button {
+					margin: -1px -9px -1px 4px;
+				}
+
+				&:not(.selected-tab) {
+					button {
+						display: none;
+					}
+				}
+			}
+		}
+
+		li:focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
 			padding: 0 3.5px;
 
-			& > div {
+			div {
 				padding: 0 8px;
 				border: 1px solid transparent;
 				box-shadow: 0 0 0 2px $btn-focus-outline-color;
 			}
 		}
-	}
 
-	.sortable-item {
-		// This container should not be visually styled at this level.
-		box-sizing: border-box;
-		display: block;
-		// Invisible padding for tab separation.
-		padding: 0 1.5px;
-		margin: 0;
-		list-style-type: none;
-		outline: none;
+		li div:hover,
+		li.sortable-token-dragging div {
+			background: $action-hover-color;
+			border: 1px solid darken($action-hover-color, 20%);
+		}
 
-		& > div {
-			display: flex;
-			align-items: center;
-
-			min-height: 22px;
-			line-height: 22px;
-			padding: 0 10px;
-			flex-shrink: 0;
-
-			font-size: 12px;
-			white-space: nowrap;
-
-			cursor: pointer;
-			user-select: none;
-
-			background-color: $ui-bg-color;
-			border: 1px solid $ui-border-color;
-			border-radius: 2px;
-
-			@if $ui-transitions {
-				transition: background-color $ui-transition-duration, border-color $ui-transition-duration;
-			}
+		li div.selected-tab {
+			background-color: $ui-bg-selected-color;
+			border: 1px solid transparent;
 
 			span {
-				@extend %overflow-ellipsis;
-				max-width: 300px;
-				color: $font-color;
+				color: $font-selected-color;
 			}
-
-			button {
-				margin: -1px -9px -1px 4px;
-			}
-
-			&:not(.selected-tab) {
-				button {
-					display: none;
-				}
-			}
-		}
-	}
-
-	.sortable > .sortable-item > div,
-	.sortable-list > .sortable-item > div:hover {
-		background: $action-hover-color;
-		border: 1px solid darken($action-hover-color, 20%);
-	}
-
-	.sortable > .sortable-item > div.selected-tab,
-	.sortable-list > .sortable-item > div.selected-tab {
-		background-color: $ui-bg-selected-color;
-		border: 1px solid transparent;
-
-		span {
-			color: $font-selected-color;
-		}
-	}
-
-	.sortable-item {
-		&.sortable-dragging > div {
-			@extend %cursor-dragging;
 		}
 	}
 

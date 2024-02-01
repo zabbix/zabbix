@@ -25,21 +25,28 @@ class CSortable {
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_SORTABLE = 'sortable';
+	static ZBX_STYLE_CLASS = 'sortable';
 
 	/**
 	 * Class applied to a sortable container while token is being dragged.
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_SORTABLE_DRAGGING = 'sortable-dragging';
+	static ZBX_STYLE_DRAGGING = 'sortable-dragging';
 
 	/**
-	 * Class applied to a token while it is being dragged.
+	 * Class applied to token elements.
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_SORTABLE_DRAGGING_TOKEN = 'sortable-dragging-token';
+	static ZBX_STYLE_TOKEN = 'sortable-token';
+
+	/**
+	 * Class applied to token elements while it is being dragged.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_TOKEN_DRAGGING = 'sortable-token-dragging';
 
 	/**
 	 * Event fired on start of dragging of a token.
@@ -103,7 +110,8 @@ class CSortable {
 	#drag_scroll_timeout = null;
 	#drag_scroll_direction = 0;
 
-	#mutation_observer = null;
+	#mutation_observer;
+	#mutation_observer_connected = false;
 
 	#skip_click = false;
 
@@ -136,7 +144,7 @@ class CSortable {
 		animation_time_limit = .25
 	} = {}) {
 		this.#target = target;
-		this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE);
+		this.#target.classList.add(CSortable.ZBX_STYLE_CLASS);
 		this.#target[is_vertical ? 'scrollTop' : 'scrollLeft'] = 0;
 
 		this.#is_vertical = is_vertical;
@@ -167,39 +175,53 @@ class CSortable {
 	}
 
 	/**
-	 * Invoke the callback as soon as the instance has processed the updated token data.
+	 * Update tokens and reflect changes immediately.
+	 *
+	 * @param {function} callback  Scrollable container will be passed as the first parameter to the callback function.
 	 */
-	whenReady(callback) {
-		requestAnimationFrame(() => callback());
+	update(callback) {
+		const enable = this.enable(false);
+
+		callback(this.#target);
+
+		this.enable(enable);
 	}
 
 	/**
 	 * Enable or disable the instance.
 	 *
 	 * @param {boolean} enable
+	 *
+	 * @returns {boolean}  Previous state.
 	 */
 	enable(enable = true) {
 		if (enable === this.#is_enabled) {
-			return;
+			return enable;
 		}
 
 		if (enable) {
-			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 			this.#updateTokens();
+			this.#render();
+			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
+			this.#observeMutations();
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
-			this.#unobserveTokens();
+			this.#observeMutations(false);
 			this.#cancelSort();
 		}
 
 		this.#is_enabled = enable;
+
+		return !enable;
 	}
 
 	/**
 	 * Enable or disable sorting.
 	 *
 	 * @param {boolean} enable
+	 *
+	 * @returns {boolean}  Previous state.
 	 */
 	enableSorting(enable = true) {
 		if (this.#is_enabled && this.#is_enabled_sorting && !enable) {
@@ -208,6 +230,8 @@ class CSortable {
 		}
 
 		this.#is_enabled_sorting = enable;
+
+		return !enable;
 	}
 
 	/**
@@ -237,9 +261,9 @@ class CSortable {
 	}
 
 	/**
-	 * Destroy the instance.
+	 * Hard reset the instance.
 	 */
-	destroy() {
+	reset() {
 		this.enable(false);
 		this.#scrollTo(0);
 		this.#finishAnimations();
@@ -264,7 +288,32 @@ class CSortable {
 			this.#tokens.at(-1).elements.push(element);
 		}
 
+		const observe_mutations = this.#observeMutations(false);
+
+		for (const token of this.#tokens) {
+			for (const element of this.#getContentsElements(token.elements)) {
+				element.classList.add(CSortable.ZBX_STYLE_TOKEN);
+			}
+		}
+
+		this.#observeMutations(observe_mutations);
+
 		this.#tokens_loc = this.#getTokensLoc(this.#tokens);
+	}
+
+	#getContentsElements(elements) {
+		let contents_elements = [];
+
+		for (const element of elements) {
+			if (getComputedStyle(element).display === 'contents') {
+				contents_elements = [...contents_elements, ...this.#getContentsElements(element.children)];
+			}
+			else {
+				contents_elements.push(element);
+			}
+		}
+
+		return contents_elements;
 	}
 
 	#getTokensLoc(tokens) {
@@ -289,8 +338,6 @@ class CSortable {
 	}
 
 	#sortTokens(tokens = this.#tokens) {
-		this.#unobserveTokens();
-
 		const elements_old = [...this.#target.children];
 		const elements_new = [];
 
@@ -302,12 +349,14 @@ class CSortable {
 
 		if (elements_new.length !== elements_old.length
 				|| elements_new.some((element, index) => element !== elements_old[index])) {
+			const observe_mutations = this.#observeMutations(false);
+
 			for (const element of elements_new) {
 				this.#target.appendChild(element);
 			}
-		}
 
-		this.#observeTokens();
+			this.#observeMutations(observe_mutations);
+		}
 	}
 
 	#getTargetLoc() {
@@ -323,24 +372,13 @@ class CSortable {
 		let pos = 0;
 		let pos_to = 0;
 
-		for (const element of elements) {
-			let loc;
+		for (const element of this.#getContentsElements(elements)) {
+			const rect = element.getBoundingClientRect();
 
-			if (getComputedStyle(element).display === 'contents') {
-				loc = this.#getLoc(element.children);
-
-				if (loc.dim === 0) {
-					continue;
-				}
-			}
-			else {
-				const client_rect = element.getBoundingClientRect();
-
-				loc = {
-					pos: this.#is_vertical ? client_rect.y : client_rect.x,
-					dim: this.#is_vertical ? client_rect.height : client_rect.width
-				};
-			}
+			const loc = {
+				pos: this.#is_vertical ? rect.y : rect.x,
+				dim: this.#is_vertical ? rect.height : rect.width
+			};
 
 			if (pos === 0 && pos_to === 0) {
 				pos = loc.pos;
@@ -497,13 +535,8 @@ class CSortable {
 	}
 
 	#applyRel(elements, rel) {
-		for (const element of elements) {
-			if (getComputedStyle(element).display === 'contents') {
-				this.#applyRel(element.children, rel);
-			}
-			else {
-				element.style[this.#is_vertical ? 'top' : 'left'] = `${rel}px`;
-			}
+		for (const element of this.#getContentsElements(elements)) {
+			element.style[this.#is_vertical ? 'top' : 'left'] = `${rel}px`;
 		}
 	}
 
@@ -628,15 +661,15 @@ class CSortable {
 		if (!this.#is_dragging) {
 			this.#startDrag(client_pos);
 
-			this.#unobserveTokens();
+			const observe_mutations = this.#observeMutations(false);
 
-			this.#target.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
+			this.#target.classList.add(CSortable.ZBX_STYLE_DRAGGING);
 
-			for (const element of this.#drag_token.elements) {
-				element.classList.add(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
+			for (const element of this.#getContentsElements(this.#drag_token.elements)) {
+				element.classList.add(CSortable.ZBX_STYLE_TOKEN_DRAGGING);
 			}
 
-			this.#observeTokens();
+			this.#observeMutations(observe_mutations);
 
 			this.#drag_style = document.createElement('style');
 			document.head.appendChild(this.#drag_style);
@@ -650,15 +683,15 @@ class CSortable {
 		if (this.#is_dragging) {
 			this.#endDrag();
 
-			this.#unobserveTokens();
+			const observe_mutations = this.#observeMutations(false);
 
-			this.#target.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING);
+			this.#target.classList.remove(CSortable.ZBX_STYLE_DRAGGING);
 
-			for (const element of this.#drag_token.elements) {
-				element.classList.remove(CSortable.ZBX_STYLE_SORTABLE_DRAGGING_TOKEN);
+			for (const element of this.#getContentsElements(this.#drag_token.elements)) {
+				element.classList.remove(CSortable.ZBX_STYLE_TOKEN_DRAGGING);
 			}
 
-			this.#observeTokens();
+			this.#observeMutations(observe_mutations);
 
 			this.#drag_style.remove();
 
@@ -745,18 +778,27 @@ class CSortable {
 		}
 	}
 
-	#observeTokens() {
-		this.#mutation_observer.observe(this.#target, {
-			subtree: true,
-			childList: true,
-			attributes: true,
-			attributeFilter: ['class'],
-			characterData: true
-		});
-	}
+	#observeMutations(observe_mutations = true) {
+		if (observe_mutations === this.#mutation_observer_connected) {
+			return observe_mutations;
+		}
 
-	#unobserveTokens() {
-		this.#mutation_observer.disconnect();
+		if (observe_mutations) {
+			this.#mutation_observer.observe(this.#target, {
+				subtree: true,
+				childList: true,
+				attributes: true,
+				attributeFilter: ['class'],
+				characterData: true
+			});
+		}
+		else {
+			this.#mutation_observer.disconnect();
+		}
+
+		this.#mutation_observer_connected = observe_mutations;
+
+		return !observe_mutations;
 	}
 
 	#listeners = {
@@ -903,6 +945,7 @@ class CSortable {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 			this.#cancelSort();
 			this.#updateTokens();
+			this.#render();
 		}
 	};
 

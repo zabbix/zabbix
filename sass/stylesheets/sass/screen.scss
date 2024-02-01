@@ -3076,6 +3076,27 @@ svg {
 	line-height: 24px;
 }
 
+.drag-icon {
+	@extend .zi-drag-handle;
+	@extend %icon-position;
+	@extend %cursor-drag;
+
+	width: 12px;
+	height: $body-line-height;
+	color: $btn-icon-color;
+
+	&::before {
+		@extend %icons-font;
+
+		font-size: 22px;
+	}
+
+	&.disabled {
+		color: $btn-icon-disabled-color;
+		opacity: 1;
+	}
+}
+
 .preprocessing-list {
 	$drag-icon: 10px;
 	$name-width: 285px;

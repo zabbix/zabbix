@@ -1,5 +1,5 @@
 @charset "UTF-8";
-.sidebar .server-name, .dashboard-navigation-tabs .sortable-item > div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item > div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
+.sidebar .server-name, .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span, .dashboard-grid-widget-header h4, .dashboard-grid-iterator-header h4, .list-table .action-container .link-action, div.dashboard-widget-map .btn-back-map-container a:focus .btn-back-map .btn-back-map-content, div.dashboard-widget-map .btn-back-map-container a:hover .btn-back-map .btn-back-map-content, form.dashboard-widget-tophosts #list_columns .text, .menu-popup .menu-popup-item, .menu-popup h3, .notif-body h4, .overlay-descr-url, .tag, .btn-tag, .overflow-ellipsis, .overflow-ellipsis td:not(.wordbreak, .wordwrap), .overflow-ellipsis th, .overflow-ellipsis th a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap; }
@@ -42,9 +42,9 @@ svg *:focus {
 @font-face {
   font-family: "zabbix-icons";
   src: url("../fonts/zabbix-icons.woff2?t=1693379524479") format("woff2"), url("../fonts/zabbix-icons.woff?t=1693379524479") format("woff"), url("../fonts/zabbix-icons.ttf?t=1693379524479") format("truetype"), url("../fonts/zabbix-icons.svg?t=1693379524479#zabbix-icons") format("svg"); }
-[class^="zi-"]::before, [class*=" zi-"]::before, .drag-icon::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
+[class^="zi-"]::before, [class*=" zi-"]::before, .btn-overlay-close::before, .color-picker .use-transparent::after,
 .color-picker-dialogue .use-transparent::after, .dashboard-widget-placeholder .dashboard-widget-placeholder-label::before, .menu-main .has-submenu > a::after, .menu-user .has-submenu > a::after, output::before, .z-select .focusable::after,
-z-select .focusable::after, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
+z-select .focusable::after, .drag-icon::before, .btn-dropdown-container .btn-dropdown-toggle::after, .na-bg::before, .normal-bg::before, .info-bg::before, .average-bg::before, .warning-bg::before, .high-bg::before, .disaster-bg::before, .log-na-bg::before, .log-info-bg::before, .log-warning-bg::before, .log-high-bg::before, .log-disaster-bg::before, .inactive-bg::before, .problem-icon-link .problem-icon-list-item::before,
 .problem-icon-list .problem-icon-list-item::before {
   font-family: 'zabbix-icons';
   font-size: 18px;
@@ -52,14 +52,14 @@ z-select .focusable::after, .btn-dropdown-container .btn-dropdown-toggle::after,
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
-.drag-icon, button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon, .color-picker .use-transparent::after,
-.color-picker-dialogue .use-transparent::after {
+button[class^="zi-"], [class^="zi-"].btn, [class^="zi-"].btn-alt, [class^="zi-"].btn-grey, [class^="zi-"].btn-icon, [class^="zi-"].btn-link, [class^="zi-"].btn-overlay-close, [class^="zi-"].btn-debug, button[class*=" zi-"], [class*=" zi-"].btn, [class*=" zi-"].btn-alt, [class*=" zi-"].btn-grey, [class*=" zi-"].btn-icon, [class*=" zi-"].btn-link, [class*=" zi-"].btn-overlay-close, [class*=" zi-"].btn-debug, .btn-overlay-close, .icon, .color-picker .use-transparent::after,
+.color-picker-dialogue .use-transparent::after, .drag-icon {
   position: relative;
   display: inline-flex;
   align-items: center;
   vertical-align: top; }
-  .drag-icon:empty, button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty, .color-picker .use-transparent:empty::after,
-  .color-picker-dialogue .use-transparent:empty::after {
+  button[class^="zi-"]:empty, [class^="zi-"].btn:empty, [class^="zi-"].btn-alt:empty, [class^="zi-"].btn-grey:empty, [class^="zi-"].btn-icon:empty, [class^="zi-"].btn-link:empty, [class^="zi-"].btn-debug:empty, button[class*=" zi-"]:empty, [class*=" zi-"].btn:empty, [class*=" zi-"].btn-alt:empty, [class*=" zi-"].btn-grey:empty, [class*=" zi-"].btn-icon:empty, [class*=" zi-"].btn-link:empty, [class*=" zi-"].btn-debug:empty, .btn-overlay-close:empty, .icon:empty, .color-picker .use-transparent:empty::after,
+  .color-picker-dialogue .use-transparent:empty::after, .drag-icon:empty {
     justify-content: center; }
 
 .zi-alert-check:before {
@@ -697,28 +697,16 @@ svg a {
       opacity: 1; }
 
 .sortable {
-  position: relative;
+  isolation: isolate;
   overflow: hidden; }
-  .sortable .sortable-list {
+  .sortable .sortable-token {
     position: relative;
-    top: 0;
-    left: 0; }
-  .sortable .sortable-item {
     box-sizing: border-box; }
-  .sortable.sortable-dragging .sortable-item {
-    position: absolute; }
-    .sortable.sortable-dragging .sortable-item.sortable-dragging {
-      opacity: 0.6; }
-
-.drag-icon {
-  width: 12px;
-  height: 1.4em;
-  color: #555555; }
-  .drag-icon::before {
-    font-size: 22px; }
-  .drag-icon.disabled {
-    color: #cccccc;
-    opacity: 1; }
+    .sortable .sortable-token.sortable-token-dragging {
+      opacity: 0.6;
+      z-index: 1; }
+  .sortable.sortable-dragging {
+    user-select: none; }
 
 html,
 body {
@@ -1569,60 +1557,53 @@ button {
   overflow: hidden; }
   .dashboard-navigation-tabs .sortable, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable {
     padding: 2px 0;
-    margin: 0 -1.5px; }
-  .dashboard-navigation-tabs .sortable-list, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list {
+    margin: 0 -1.5px;
     display: flex;
-    padding: 0;
-    margin: 0;
     align-items: center; }
-    .dashboard-navigation-tabs .sortable-list > .sortable-item:focus:not(:active), .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item:focus:not(:active) {
+    .dashboard-navigation-tabs .sortable li, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li {
+      box-sizing: border-box;
+      display: block;
+      padding: 0 1.5px;
+      margin: 0;
+      list-style-type: none;
+      outline: none; }
+      .dashboard-navigation-tabs .sortable li div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div {
+        display: flex;
+        align-items: center;
+        min-height: 22px;
+        line-height: 22px;
+        padding: 0 10px;
+        flex-shrink: 0;
+        font-size: 12px;
+        white-space: nowrap;
+        cursor: pointer;
+        user-select: none;
+        background-color: #ffffff;
+        border: 1px solid #9f9f9f;
+        border-radius: 2px; }
+        .dashboard-navigation-tabs .sortable li div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div span {
+          max-width: 300px;
+          color: #000000; }
+        .dashboard-navigation-tabs .sortable li div button, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div button {
+          margin: -1px -9px -1px 4px; }
+        .dashboard-navigation-tabs .sortable li div:not(.selected-tab) button, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div:not(.selected-tab) button {
+          display: none; }
+    .dashboard-navigation-tabs .sortable li:focus:not(:active), .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li:focus:not(:active) {
       padding: 0 3.5px; }
-      .dashboard-navigation-tabs .sortable-list > .sortable-item:focus:not(:active) > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item:focus:not(:active) > div {
+      .dashboard-navigation-tabs .sortable li:focus:not(:active) div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li:focus:not(:active) div {
         padding: 0 8px;
         border: 1px solid transparent;
         box-shadow: 0 0 0 2px #111111; }
-  .dashboard-navigation-tabs .sortable-item, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item {
-    box-sizing: border-box;
-    display: block;
-    padding: 0 1.5px;
-    margin: 0;
-    list-style-type: none;
-    outline: none; }
-    .dashboard-navigation-tabs .sortable-item > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item > div {
-      display: flex;
-      align-items: center;
-      min-height: 22px;
-      line-height: 22px;
-      padding: 0 10px;
-      flex-shrink: 0;
-      font-size: 12px;
-      white-space: nowrap;
-      cursor: pointer;
-      user-select: none;
-      background-color: #ffffff;
-      border: 1px solid #9f9f9f;
-      border-radius: 2px; }
-      .dashboard-navigation-tabs .sortable-item > div span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item > div span {
-        max-width: 300px;
-        color: #000000; }
-      .dashboard-navigation-tabs .sortable-item > div button, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item > div button {
-        margin: -1px -9px -1px 4px; }
-      .dashboard-navigation-tabs .sortable-item > div:not(.selected-tab) button, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item > div:not(.selected-tab) button {
-        display: none; }
-  .dashboard-navigation-tabs .sortable > .sortable-item > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable > .sortable-item > div,
-  .dashboard-navigation-tabs .sortable-list > .sortable-item > div:hover,
-  .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item > div:hover {
-    background: #f4f4f4;
-    border: 1px solid #c1c1c1; }
-  .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab,
-  .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab,
-  .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab {
-    background-color: #333333;
-    border: 1px solid transparent; }
-    .dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable > .sortable-item > div.selected-tab span,
-    .dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span,
-    .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-list > .sortable-item > div.selected-tab span {
-      color: #ffffff; }
+    .dashboard-navigation-tabs .sortable li div:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div:hover,
+    .dashboard-navigation-tabs .sortable li.sortable-token-dragging div,
+    .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li.sortable-token-dragging div {
+      background: #f4f4f4;
+      border: 1px solid #c1c1c1; }
+    .dashboard-navigation-tabs .sortable li div.selected-tab, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div.selected-tab {
+      background-color: #333333;
+      border: 1px solid transparent; }
+      .dashboard-navigation-tabs .sortable li div.selected-tab span, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div.selected-tab span {
+        color: #ffffff; }
   .dashboard-navigation-tabs .btn-dashboard-page-properties:hover, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .btn-dashboard-page-properties:hover, .dashboard-navigation-tabs .btn-dashboard-page-properties:focus, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .btn-dashboard-page-properties:focus, .dashboard-navigation-tabs .btn-dashboard-page-properties:active, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .btn-dashboard-page-properties:active {
     color: #ffffff; }
 
@@ -6450,14 +6431,14 @@ z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, tex
     background-color: #f9f9f9;
     border: 1px solid #adadad; }
 
-.drag-icon, .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head {
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head, .drag-icon {
   cursor: move;
   cursor: grab; }
 
-.dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable.ui-draggable-dragging .dashboard-widget-head, .cursor-dragging {
@@ -6595,6 +6576,16 @@ svg {
 
 .visibility-box-caption {
   line-height: 24px; }
+
+.drag-icon {
+  width: 12px;
+  height: 1.4em;
+  color: #555555; }
+  .drag-icon::before {
+    font-size: 22px; }
+  .drag-icon.disabled {
+    color: #cccccc;
+    opacity: 1; }
 
 .preprocessing-list {
   display: block;
