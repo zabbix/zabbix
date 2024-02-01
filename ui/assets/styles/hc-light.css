@@ -3508,6 +3508,8 @@ section {
   --no-data-color: #1f2c33;
   --no-data-fill: #f3f3f3;
   --no-data-stroke: #f3f3f3; }
+  .svg-honeycomb feDropShadow {
+    flood-opacity: var(--shadow-opacity, 0); }
   .svg-honeycomb .svg-honeycomb-cell {
     --px: calc(var(--x) + var(--dx, 0px));
     --py: calc(var(--y) + var(--dy, 0px));

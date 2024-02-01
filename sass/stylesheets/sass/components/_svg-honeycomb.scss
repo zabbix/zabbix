@@ -7,6 +7,14 @@
 	--no-data-fill: #{$honeycomb-no-data-cell-color};
 	--no-data-stroke: #{$honeycomb-no-data-cell-color};
 
+	feDropShadow {
+		flood-opacity: var(--shadow-opacity, 0);
+
+		@if $ui-transitions {
+			transition: flood-opacity $ui-transition-duration;
+		}
+	}
+
 	.svg-honeycomb-cell {
 		--px: calc(var(--x) + var(--dx, 0px));
 		--py: calc(var(--y) + var(--dy, 0px));

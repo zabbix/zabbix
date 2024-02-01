@@ -194,9 +194,9 @@ class CSVGHoneycomb {
 				.append('feDropShadow')
 				.attr('dx', 0)
 				.attr('dy', 0)
-				.attr('flood-color', 'rgba(0, 0, 0, .2)')
-				.attr('flood-opacity', 1)
-			);
+				.attr('flood-color', 'rgba(0, 0, 0, .25)')
+			)
+			.on('mouseleave', () => this.#containerLeave());
 
 		this.#container = this.#svg
 			.append('g')
@@ -338,6 +338,8 @@ class CSVGHoneycomb {
 					y: this.#cell_height * row * .75 + this.#cell_height * .5
 				};
 
+				d.scaled = false;
+
 				d.index = i;
 
 				return d.itemid;
@@ -425,105 +427,6 @@ class CSVGHoneycomb {
 	};
 
 	#drawCell(cell) {
-		const enter = (cell, d) => {
-			const margin = {
-				horizontal: (this.#padding.horizontal / 2 + this.#container_params.x) / this.#container_params.scale,
-				vertical: (this.#padding.vertical / 2 + this.#container_params.y) / this.#container_params.scale
-			};
-
-			const scale = Math.min(
-				this.#container_params.width / Math.sqrt(3) * 2 + margin.horizontal * 2,
-				this.#container_params.height + this.#cells_gap + margin.vertical * 2,
-				this.#cell_height * (0.15 / this.#container_params.scale + 0.55)
-			);
-
-			const scaled_size = {
-				width: scale * Math.sqrt(3) / 2,
-				height: scale
-			}
-
-			const scaled_position = {
-				dx: Math.max(
-					scaled_size.width / 2 - margin.horizontal,
-					Math.min(
-						this.#container_params.width - scaled_size.width / 2 + margin.horizontal,
-						d.position.x
-					)
-				) - d.position.x,
-				dy: Math.max(
-					scaled_size.height / 2 - margin.vertical,
-					Math.min(
-						this.#container_params.height + this.#cells_gap - scaled_size.height / 2 + margin.vertical,
-						d.position.y
-					)
-				) - d.position.y
-			};
-
-			d.stored_labels = d.labels;
-
-			if (cell.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`).empty()) {
-				cell
-					.append('path')
-					.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
-					.attr('d', this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0));
-			}
-			else {
-				clearTimeout(d.backdrop_timeout);
-			}
-
-			setTimeout(() => {
-				this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
-				this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
-
-				cell
-					.style('--dx', `${scaled_position.dx}px`)
-					.style('--dy', `${scaled_position.dy}px`)
-					.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
-					.call(cell => cell
-						.select('path')
-						.attr('d', this.#generatePath(scaled_size.height, 0))
-						.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
-					);
-
-				this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
-					detail: {
-						hostid: d.hostid,
-						itemid: d.itemid
-					}
-				});
-			});
-		};
-
-		const leave = (cell, d) => {
-			d.scaled = false;
-			d.labels = d.stored_labels;
-
-			this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
-
-			d.backdrop_timeout = setTimeout(() => {
-				cell
-					.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
-					.remove();
-			}, UI_TRANSITION_DURATION);
-
-			cell
-				.style('--dx', null)
-				.style('--dy', null)
-				.style('--stroke', d => this.#getFillColor(d))
-				.call(cell => cell
-					.select('path')
-					.attr('d', this.#cell_path)
-					.style('filter', null)
-				);
-
-			this.#svg.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
-				detail: {
-					hostid: d.hostid,
-					itemid: d.itemid
-				}
-			});
-		};
-
 		cell
 			.call(cell => this.#drawLabel(cell))
 			.on('click', (e, d) => {
@@ -534,22 +437,23 @@ class CSVGHoneycomb {
 					}
 				});
 			})
-			.on('mouseenter', (e, d) => {
-				if (d.scaled) {
-					return;
-				}
-
+			.on('mouseenter', (e, target_d) => {
 				this.#honeycomb_container
 					.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
-					.each((datum, i, cells) => {
-						if (d === datum) {
-							d.scaled = true;
+					.each((d, i, cells) => {
+						const cell = d3.select(cells[i]);
 
-							cell.raise();
-							enter(cell, d);
+						if (d === target_d) {
+							if (!d.scaled) {
+								cell.raise();
+
+								setTimeout(() => {
+									this.#cellEnter(cell, d);
+								});
+							}
 						}
-						else if (datum.scaled) {
-							leave(d3.select(cells[i]), datum);
+						else if (d.scaled) {
+							this.#cellLeave(cell, d);
 						}
 					});
 			})
@@ -558,7 +462,120 @@ class CSVGHoneycomb {
 					return;
 				}
 
-				leave(d3.select(e.target), d);
+				this.#cellLeave(d3.select(e.target), d);
+			});
+	}
+
+	#cellEnter(cell, d) {
+		d.scaled = true;
+
+		const margin = {
+			horizontal: (this.#padding.horizontal / 2 + this.#container_params.x) / this.#container_params.scale,
+			vertical: (this.#padding.vertical / 2 + this.#container_params.y) / this.#container_params.scale
+		};
+
+		const scale = Math.min(
+			this.#container_params.width / Math.sqrt(3) * 2 + margin.horizontal * 2,
+			this.#container_params.height + this.#cells_gap + margin.vertical * 2,
+			this.#cell_height * (0.15 / this.#container_params.scale + 0.55)
+		);
+
+		const scaled_size = {
+			width: scale * Math.sqrt(3) / 2,
+			height: scale
+		}
+
+		const scaled_position = {
+			dx: Math.max(
+				scaled_size.width / 2 - margin.horizontal,
+				Math.min(
+					this.#container_params.width - scaled_size.width / 2 + margin.horizontal,
+					d.position.x
+				)
+			) - d.position.x,
+			dy: Math.max(
+				scaled_size.height / 2 - margin.vertical,
+				Math.min(
+					this.#container_params.height + this.#cells_gap - scaled_size.height / 2 + margin.vertical,
+					d.position.y
+				)
+			) - d.position.y
+		};
+
+		if (cell.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`).empty()) {
+			cell
+				.append('path')
+				.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
+				.attr('d', this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0));
+		}
+		else {
+			clearTimeout(d.backdrop_timeout);
+		}
+
+		d.stored_labels = d.labels;
+
+		this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
+		this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
+
+		cell
+			.style('--dx', `${scaled_position.dx}px`)
+			.style('--dy', `${scaled_position.dy}px`)
+			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
+			.call(cell => cell
+				.select('path')
+				.attr('d', this.#generatePath(scaled_size.height, 0))
+				.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
+			);
+
+		this.#svg
+			.style('--shadow-opacity', 1)
+			.dispatch(CSVGHoneycomb.EVENT_CELL_ENTER, {
+				detail: {
+					hostid: d.hostid,
+					itemid: d.itemid
+				}
+			});
+	}
+
+	#containerLeave() {
+		this.#honeycomb_container
+			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
+			.each((d, i, cells) => {
+				if (d.scaled) {
+					this.#cellLeave(d3.select(cells[i]), d);
+				}
+			});
+	}
+
+	#cellLeave(cell, d) {
+		d.scaled = false;
+		d.labels = d.stored_labels;
+
+		this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
+
+		d.backdrop_timeout = setTimeout(() => {
+			cell
+				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
+				.remove();
+		}, UI_TRANSITION_DURATION);
+
+		cell
+			.style('--dx', null)
+			.style('--dy', null)
+			.style('--stroke', d => this.#getFillColor(d))
+			.call(cell => cell
+				.select('path')
+				.attr('d', this.#cell_path)
+				.style('filter', null)
+			);
+
+		this.#svg
+			.style('--shadow-opacity', null)
+			.dispatch(CSVGHoneycomb.EVENT_CELL_LEAVE, {
+				detail: {
+					hostid: d.hostid,
+					itemid: d.itemid
+				}
 			});
 	}
 
