@@ -2390,6 +2390,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Display' => 'Bar',
 							'Min' => '0',
 							'Max' => '2000',
+							'Decimal places' => '0',
 							'Thresholds' => [
 								[
 									'threshold' => ''
