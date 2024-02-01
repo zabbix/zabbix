@@ -36,4 +36,51 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 #endif
 
+
+typedef struct
+{
+	zbx_config_comms_args_t	*config_comms;
+	zbx_get_program_type_f	zbx_get_program_type_cb_arg;
+	zbx_get_progname_f	zbx_get_progname_cb_arg;
+	unsigned char		poller_type;
+	int			config_startup_time;
+	int			config_unavailable_delay;
+	int			config_unreachable_period;
+	int			config_unreachable_delay;
+	int			config_max_concurrent_checks_per_poller;
+	zbx_get_config_forks_f	get_config_forks;
+	const char		*config_java_gateway;
+	int			config_java_gateway_port;
+	const char		*config_externalscripts;
+}
+zbx_thread_poller_args;
+
+ZBX_THREAD_ENTRY(poller_thread, args);
+
+ZBX_THREAD_ENTRY(async_poller_thread, args);
+
+zbx_get_program_type_f  poller_get_program_type(void);
+zbx_get_progname_f	poller_get_progname(void);
+
+void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
+		unsigned char expand_macros);
+void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
+		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
+		int config_startup_time, unsigned char program_type, const char *progname,
+		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
+		const char *config_externalscripts);
+void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
+void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
+
+
+int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
+
+int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
+		const char *config_source_ip, const char *progname);
+void	zbx_init_library_mt_snmp(const char *progname);
+
+void	zbx_shutdown_library_mt_snmp(const char *progname);
+
+void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname);
+
 #endif

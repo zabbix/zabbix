@@ -56,11 +56,11 @@ zabbix_server_LDADD = \
 	events/libzbxevents.a \
 	actions/libzbxactions.a \
 	pinger/libzbxpinger.a \
-	poller/libzbxpoller.a \
 	housekeeper/libzbxhousekeeper.a \
 	timer/libzbxtimer.a \
 	trapper/libzbxtrapper.a \
 	trapper/libzbxtrapper_server.a \
+	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/libs/zbxautoreg/libzbxautoreg_server.a \
 	reporter/libzbxreporter.a \
 	$(top_builddir)/src/libs/zbxsnmptrapper/libzbxsnmptrapper.a \

@@ -21,8 +21,9 @@
 
 #include "zbxscripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
-#include "../../zabbix_server/poller/checks_snmp.h"
+//#include "../../zabbix_server/poller/checks_snmp.h"
 
+#include "zbxpoller.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"

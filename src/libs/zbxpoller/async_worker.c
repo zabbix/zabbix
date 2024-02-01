@@ -17,14 +17,15 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "async_manager.h"
 #include "async_worker.h"
+
+#include "async_manager.h"
+
 #include "zbxalgo.h"
 #include "zbxtime.h"
 #include "zbxthreads.h"
 #include "zbxcacheconfig.h"
 #include "zbxexpression.h"
-#include "poller.h"
 #include "zbx_availability_constants.h"
 #include "zbxpoller.h"
 

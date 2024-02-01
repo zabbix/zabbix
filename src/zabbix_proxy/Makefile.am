@@ -23,7 +23,7 @@ zabbix_proxy_LDADD = \
 	$(top_builddir)/src/zabbix_server/httppoller/libzbxhttppoller.a \
 	proxyconfig/libzbxproxyconfig.a \
 	$(top_builddir)/src/zabbix_server/pinger/libzbxpinger.a \
-	$(top_builddir)/src/zabbix_server/poller/libzbxpoller.a \
+	$(top_builddir)/src/libs/zbxpoller/libzbxpoller.a \
 	$(top_builddir)/src/zabbix_server/poller/libzbxpoller_proxy.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper.a \
 	$(top_builddir)/src/zabbix_server/trapper/libzbxtrapper_proxy.a \

@@ -21,7 +21,7 @@
 #define ZABBIX_ASYNC_MANAGER_H
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
-#include "poller.h"
+#include "zbxpoller.h"
 
 typedef struct zbx_async_manager	zbx_async_manager_t;
 typedef void (*zbx_async_notify_cb_t)(void *data);

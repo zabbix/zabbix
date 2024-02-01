@@ -34,14 +34,14 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-
+#include "zbxpoller.h"
 #include "zbxvmware.h"
 #include "zbxdbsyncer.h"
+
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
-#include "../zabbix_server/poller/poller.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "../zabbix_server/trapper/trapper_request.h"
 #include "proxyconfig/proxyconfig.h"

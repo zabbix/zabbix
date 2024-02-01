@@ -16,11 +16,14 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
+#include "zbxpoller.h"
+
 #include "async_manager.h"
-#include "poller.h"
 #include "async_httpagent.h"
 #include "async_agent.h"
 #include "checks_snmp.h"
+
 #include "zbxasynchttppoller.h"
 #include "zbxlog.h"
 #include "zbxalgo.h"

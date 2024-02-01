@@ -19,7 +19,7 @@
 
 #include "checks_internal.h"
 
-#include "poller.h"
+#include "zbxpoller.h"
 
 #include "zbxstats.h"
 #include "checks_java.h"

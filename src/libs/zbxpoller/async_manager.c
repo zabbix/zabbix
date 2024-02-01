@@ -19,10 +19,11 @@
 
 #include "async_manager.h"
 #include "async_worker.h"
+
 #include "zbxtimekeeper.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
-#include "poller.h"
+#include "zbxpoller.h"
 
 ZBX_PTR_VECTOR_IMPL(interface_status, zbx_interface_status_t *)
 ZBX_PTR_VECTOR_IMPL(poller_item, zbx_poller_item_t *)

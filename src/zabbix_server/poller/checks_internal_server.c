@@ -25,8 +25,9 @@
 #include "zbxconnector.h"
 #include "../ha/ha.h"
 #include "zbxproxybuffer.h"
+#include "zbxpoller.h"
 
-#include "checks_internal.h"
+//#include "checks_internal.h"
 #include "../lld/lld_protocol.h"
 
 /******************************************************************************

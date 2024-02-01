@@ -37,6 +37,7 @@
 #include "zbxnix.h"
 #include "zbxcomms.h"
 
+#include "zbxpoller.h"
 #include "zbxvmware.h"
 #include "zbxalerter.h"
 #include "zbxdbsyncer.h"
@@ -45,7 +46,7 @@
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
-#include "poller/poller.h"
+//#include "poller/poller.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"

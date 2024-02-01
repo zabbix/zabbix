@@ -27,6 +27,4 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
 		zbx_get_config_forks_f get_config_forks);
 
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
-
 #endif
