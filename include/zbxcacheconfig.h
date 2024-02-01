@@ -1448,5 +1448,6 @@ int	zbx_dc_get_proxy_group_hostmap_revision(zbx_uint64_t proxy_groupid, zbx_uint
 void	zbx_dc_set_proxy_failover_delay(const char *failover_delay);
 void	zbx_dc_set_proxy_lastonline(int lastonline);
 zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid);
+zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid);
 
 #endif

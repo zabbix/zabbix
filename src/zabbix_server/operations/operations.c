@@ -206,7 +206,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 {
 	zbx_db_result_t		result, result2;
 	zbx_db_row_t		row, row2;
-	zbx_uint64_t		hostid = 0, proxyid;
+	zbx_uint64_t		hostid = 0, proxyid, proxy_groupid;
 	char			*host_visible, *hostname = NULL;
 	unsigned short		port;
 	zbx_vector_uint64_t	groupids;
@@ -260,12 +260,16 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 		while (NULL != (row = zbx_db_fetch(result)))
 		{
-			zbx_uint64_t	interfaceid, dhostid, druleid;
+			zbx_uint64_t	interfaceid, dhostid, druleid, db_proxyid = 0;
 			unsigned char	svc_type, interface_type;
 
 			ZBX_STR2UINT64(dhostid, row[0]);
 			ZBX_STR2UINT64(druleid, row[8]);
 			ZBX_DBROW2UINT64(proxyid, row[1]);
+
+			if (0 == (proxy_groupid = zbx_dc_get_proxy_groupid(proxyid)))
+				db_proxyid = proxyid;
+
 			svc_type = (unsigned char)atoi(row[5]);
 
 			switch (svc_type)
@@ -430,9 +434,9 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				hostid = zbx_db_get_maxid("hosts");
 
-				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host", "name",
-						(char *)NULL);
-				zbx_db_insert_add_values(&db_insert, hostid, proxyid, host_unique,
+				zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "proxy_groupid", "host",
+						"name", (char *)NULL);
+				zbx_db_insert_add_values(&db_insert, hostid, db_proxyid, proxy_groupid, host_unique,
 						hostname);
 				zbx_db_insert_execute(&db_insert);
 				zbx_db_insert_clean(&db_insert);
@@ -499,12 +503,16 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 		if (NULL != (row = zbx_db_fetch(result)))
 		{
 			char			*host_esc, *sql = NULL;
-			zbx_uint64_t		host_proxyid;
+			zbx_uint64_t		host_proxyid, db_proxyid;
 			zbx_conn_flags_t	flags;
 			int			flags_int, tls_accepted;
 			unsigned char		useip = 1;
 
 			ZBX_DBROW2UINT64(proxyid, row[0]);
+
+			if (0 == (proxy_groupid = zbx_dc_get_proxy_groupid(proxyid)))
+				db_proxyid = proxyid;
+
 			host_esc = zbx_db_dyn_escape_field("hosts", "host", row[1]);
 			port = (unsigned short)atoi(row[4]);
 			flags_int = atoi(row[5]);
@@ -570,11 +578,11 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 					zbx_dc_get_autoregistration_psk(psk_identity, sizeof(psk_identity),
 							(unsigned char *)psk, sizeof(psk));
 
-					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid",
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "proxy_groupid",
 							"host", "name", "tls_connect", "tls_accept",
 							"tls_psk_identity", "tls_psk", (char *)NULL);
-					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname, hostname,
-						tls_accepted, tls_accepted, psk_identity, psk);
+					zbx_db_insert_add_values(&db_insert, hostid, db_proxyid, proxy_groupid,
+							hostname, hostname, tls_accepted, tls_accepted, psk_identity, psk);
 
 					zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
 					zbx_audit_host_update_json_add_tls_and_psk(hostid, tls_accepted, tls_accepted,
@@ -582,11 +590,11 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 				}
 				else
 				{
-					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "host",
-							"name", (char *)NULL);
+					zbx_db_insert_prepare(&db_insert, "hosts", "hostid", "proxyid", "proxy_groupid",
+							"host", "name", (char *)NULL);
 
 					zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_ADD, hostid, hostname);
-					zbx_db_insert_add_values(&db_insert, hostid, proxyid, hostname,
+					zbx_db_insert_add_values(&db_insert, hostid, proxyid, proxy_groupid, hostname,
 							hostname);
 				}
 
@@ -620,7 +628,7 @@ static zbx_uint64_t	add_discovered_host(const zbx_db_event *event, int *status, 
 
 				zbx_audit_host_create_entry(ZBX_AUDIT_ACTION_UPDATE, hostid, hostname);
 
-				if (host_proxyid != proxyid)
+				if (host_proxyid != db_proxyid)
 				{
 					zbx_db_execute("update hosts"
 							" set proxyid=%s"

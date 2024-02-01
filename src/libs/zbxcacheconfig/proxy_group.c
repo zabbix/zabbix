@@ -550,3 +550,27 @@ zbx_uint64_t	zbx_dc_get_proxy_group_revision(zbx_uint64_t proxy_groupid)
 
 	return revision;
 }
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: get proxy group by proxy id                                       *
+ *                                                                            *
+ ******************************************************************************/
+zbx_uint64_t	zbx_dc_get_proxy_groupid(zbx_uint64_t proxyid)
+{
+	zbx_uint64_t	proxy_groupid = 0;
+	ZBX_DC_PROXY	*proxy;
+
+	if (0 != proxyid)
+	{
+		RDLOCK_CACHE;
+
+		if (NULL != (proxy = (ZBX_DC_PROXY *)zbx_hashset_search(&config->proxies, &proxyid)))
+			proxy_groupid = proxy->proxy_groupid;
+
+		UNLOCK_CACHE;
+	}
+
+	return proxy_groupid;
+}
+

@@ -306,6 +306,7 @@ void	zbx_audit_host_update_json_update_##resource(zbx_uint64_t hostid, type1 old
 PREPARE_AUDIT_HOST_UPDATE(host, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(name, const char*, string)
 PREPARE_AUDIT_HOST_UPDATE(proxyid, zbx_uint64_t, uint64)
+PREPARE_AUDIT_HOST_UPDATE(proxy_groupid, zbx_uint64_t, uint64)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_authtype, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_privilege, int, int)
 PREPARE_AUDIT_HOST_UPDATE(ipmi_username, const char*, string)
