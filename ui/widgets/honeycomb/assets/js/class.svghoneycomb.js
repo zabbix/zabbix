@@ -355,7 +355,7 @@ class CSVGHoneycomb {
 					.style('--stroke', d => this.#getFillColor(d))
 					.call(cell => cell
 						.append('path')
-						.attr('d', this.#cell_path)
+						.style('--path', `path('${this.#cell_path}')`)
 						.style('stroke-width', 2 / this.#container_params.scale)
 					)
 					.each((d, i, cells) => {
@@ -506,7 +506,7 @@ class CSVGHoneycomb {
 			cell
 				.append('path')
 				.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
-				.attr('d', this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0));
+				.style('--path', `path('${this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0)}')`);
 		}
 		else {
 			clearTimeout(d.backdrop_timeout);
@@ -523,7 +523,7 @@ class CSVGHoneycomb {
 			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
 			.call(cell => cell
 				.select('path')
-				.attr('d', this.#generatePath(scaled_size.height, 0))
+				.style('--path', `path('${this.#generatePath(scaled_size.height, 0)}')`)
 				.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
 			);
 
@@ -565,7 +565,7 @@ class CSVGHoneycomb {
 			.style('--stroke', d => this.#getFillColor(d))
 			.call(cell => cell
 				.select('path')
-				.attr('d', this.#cell_path)
+				.style('--path', `path('${this.#cell_path}')`)
 				.style('filter', null)
 			);
 

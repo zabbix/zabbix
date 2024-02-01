@@ -27,6 +27,7 @@
 		}
 
 		path {
+			d: var(--path);
 			fill: var(--fill);
 			stroke: var(--stroke, var(--fill));
 
