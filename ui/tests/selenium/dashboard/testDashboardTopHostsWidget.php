@@ -3670,18 +3670,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 */
 	public function testDashboardTopHostsWidget_ThresholdColor($data) {
 		$time = strtotime('now');
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_threshold);
+		$this->createTopHostsWidget($data, self::$dashboard_threshold);
 		$dashboard = CDashboardElement::find()->one();
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
-
-		// Create widget with column(s).
-		$this->fillColumnForm($data, 'create');
-		$form->submit();
-		COverlayDialogElement::ensureNotPresent();
-		$this->page->waitUntilReady();
-		$dashboard->save();
-		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		foreach ($data['column_fields'] as $fields) {
 			foreach ($fields['Thresholds'] as $threshold) {
@@ -5100,10 +5090,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 	 * @dataProvider getAggregationFunctionData
 	 */
 	public function testDashboardTopHostsWidget_AggregationFunctionData($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_aggregation)->waitUntilReady();
-		$dashboard = CDashboardElement::find()->one();
-		$dashboard->waitUntilReady();
-
 		if (array_key_exists('item_data', $data)) {
 			foreach ($data['item_data'] as $params) {
 				$params['time'] = strtotime($params['time']);
@@ -5111,13 +5097,8 @@ class testDashboardTopHostsWidget extends testWidgets {
 			}
 		}
 
-		// Create widget with column(s).
-		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
-		$this->fillColumnForm($data, 'create');
-		$form->submit();
-		$dashboard->save();
-		$dashboard->waitUntilReady();
+		$this->createTopHostsWidget($data, self::$dashboard_aggregation);
+		$dashboard = CDashboardElement::find()->one();
 
 		if (array_key_exists('screen_name', $data)) {
 			$this->assertScreenshot($dashboard->getWidget(self::DEFAULT_WIDGET_NAME), $data['screen_name']);
@@ -5141,15 +5122,24 @@ class testDashboardTopHostsWidget extends testWidgets {
 		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.$name);
 		$dashboard = CDashboardElement::find()->one();
 		$form = $dashboard->edit()->addWidget()->asForm();
-		$form->fill(['Type' => 'Top hosts']);
-		COverlayDialogElement::find()->waitUntilReady()->one();
+		$form->fill(['Type' => CFormElement::RELOADABLE_FILL('Top hosts')]);
 
-		// Add new column and save widget.
+		// Add new column(s) and save widget.
 		$this->fillColumnForm($data, 'create');
-		$form->fill($data['main_fields'])->submit();
+
+		if (array_key_exists('main_fields', $data)) {
+			$form->fill($data['main_fields']);
+		}
+
+		$form->submit();
 		COverlayDialogElement::ensureNotPresent();
-		$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
+
+		if (array_key_exists('main_fields', $data)) {
+			$dashboard->getWidget($data['main_fields']['Name'])->waitUntilReady();
+		}
+
 		$dashboard->save();
+		$dashboard->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 	}
 
