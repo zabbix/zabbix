@@ -87,10 +87,10 @@
  *                                                                            *
  * This is zbx_snmp_walk() callback function prototype.                       *
  *                                                                            *
- * Parameters: arg   - [IN] user argument passed to zbx_snmp_walk() function  *
- *             snmp_oid - [IN] the OID the walk function is looking for       *
- *             index    - [IN] the index of found OID                         *
- *             value    - [IN] the OID value                                  *
+ * Parameters: arg      - [IN] user argument passed to zbx_snmp_walk()        *
+ *             snmp_oid - [IN] OID walk function is looking for               *
+ *             index    - [IN] index of found OID                             *
+ *             value    - [IN] OID value                                      *
  *                                                                            *
  ******************************************************************************/
 typedef void (zbx_snmp_walk_cb_func)(void *arg, const char *snmp_oid, const char *index, const char *value);
@@ -500,21 +500,21 @@ static char	*get_item_security_name(const zbx_dc_item_t *item)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve index that matches value from the relevant index cache   *
+ * Purpose: retrieves index that matches value from relevant index cache      *
  *                                                                            *
- * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ * Parameters: item      - [IN] Configuration of Zabbix item, contains        *
  *                              IP address, port, community string, context,  *
- *                              security name                                 *
- *             snmp_oid  - [IN] OID of the table which contains the indexes   *
- *             value     - [IN] value for which to look up the index          *
- *             idx       - [IN/OUT] destination pointer for the               *
+ *                              security name.                                *
+ *             snmp_oid  - [IN] OID of table which contains indexes           *
+ *             value     - [IN] value for which to look up index              *
+ *             idx       - [IN/OUT] destination pointer for                   *
  *                                  heap-(re)allocated index                  *
- *             idx_alloc - [IN/OUT] size of the (re)allocated index           *
+ *             idx_alloc - [IN/OUT] size of (re)allocated index               *
  *                                                                            *
  * Return value: FAIL    - dynamic index cache is empty or cache does not     *
- *                         contain index matching the value                   *
- *               SUCCEED - idx contains the found index,                      *
- *                         idx_alloc contains the current size of the         *
+ *                         contain index matching value                       *
+ *               SUCCEED - idx contains found index,                          *
+ *                         idx_alloc contains current size of                 *
  *                         heap-(re)allocated idx                             *
  *                                                                            *
  ******************************************************************************/
@@ -555,17 +555,18 @@ end:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: store the index-value pair in the relevant index cache            *
+ * Purpose: stores index-value pair in relevant index cache                   *
  *                                                                            *
- * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ * Parameters: item      - [IN] Configuration of Zabbix item, contains        *
  *                              IP address, port, community string, context,  *
- *                              security name                                 *
- *             snmp_oid  - [IN] OID of the table which contains the indexes   *
- *             index     - [IN] index part of the index-value pair            *
- *             value     - [IN] value part of the index-value pair            *
+ *                              security name.                                *
+ *             snmp_oid  - [IN] OID of table which contains indexes           *
+ *             index     - [IN] index part of index-value pair                *
+ *             value     - [IN] value part of index-value pair                *
  *                                                                            *
  ******************************************************************************/
-static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid, const char *index, const char *value)
+static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid, const char *index,
+		const char *value)
 {
 	zbx_snmpidx_main_key_t	*main_key, main_key_local;
 	zbx_snmpidx_mapping_t	*mapping, mapping_local;
@@ -621,15 +622,15 @@ static void	cache_put_snmp_index(const zbx_dc_item_t *item, const char *snmp_oid
 
 /******************************************************************************
  *                                                                            *
- * Purpose: delete index-value mappings from the specified index cache        *
+ * Purpose: deletes index-value mappings from specified index cache           *
  *                                                                            *
- * Parameters: item      - [IN] configuration of Zabbix item, contains        *
+ * Parameters: item      - [IN] Configuration of Zabbix item, contains        *
  *                              IP address, port, community string, context,  *
- *                              security name                                 *
- *             snmp_oid  - [IN] OID of the table which contains the indexes   *
+ *                              security name.                                *
+ *             snmp_oid  - [IN] OID of table which contains indexes           *
  *                                                                            *
- * Comments: does nothing if the index cache is empty or if it does not       *
- *           contain the cache for the specified OID                          *
+ * Comments: Does nothing if the index cache is empty or if it does not       *
+ *           contain the cache for the specified OID.                         *
  *                                                                            *
  ******************************************************************************/
 static void	cache_del_snmp_index_subtree(const zbx_dc_item_t *item, const char *snmp_oid)
@@ -1362,12 +1363,12 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
 
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve information by walking an OID tree                       *
+ * Purpose: retrieves information by walking OID tree                         *
  *                                                                            *
  * Parameters: ssp           - [IN] SNMP session handle                       *
  *             item          - [IN] configuration of Zabbix item              *
- *             OID           - [IN] OID of table with values of interest      *
- *             error         - [OUT] a buffer to store error message          *
+ *             snmp_oid      - [IN] OID of table with values of interest      *
+ *             error         - [OUT] buffer to store error message            *
  *             max_error_len - [IN] maximum error message length              *
  *             max_succeed   - [OUT] value of "max_repetitions" that succeeded*
  *             min_fail      - [OUT] value of "max_repetitions" that failed   *
@@ -1375,7 +1376,7 @@ static int	zbx_oid_is_new(zbx_hashset_t *hs, size_t root_len, const oid *p_oid, 
  *             bulk          - [IN] whether GetBulkRequest-PDU should be used *
  *             walk_cb_func  - [IN] callback function to process discovered   *
  *                                  OIDs and their values                     *
- *             walk_cb_arg   - [IN] argument to pass to the callback function *
+ *             walk_cb_arg   - [IN] argument to pass to callback function     *
  *                                                                            *
  * Return value: NOTSUPPORTED - OID does not exist, any other critical error  *
  *               NETWORK_ERROR - recoverable network error                    *
@@ -1501,7 +1502,8 @@ reduce_max_vars:
 			if (1 >= level && 1 < max_vars)
 				goto reduce_max_vars;
 
-			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response, error, max_error_len);
+			ret = zbx_get_snmp_response_error(ssp, &item->interface, status, response, error,
+					max_error_len);
 			running = 0;
 			goto next;
 		}
@@ -1647,13 +1649,11 @@ static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 		unsigned char *query_and_ignore_type, int num, int level, char *error, size_t max_error_len,
 		int *max_succeed, int *min_fail, unsigned char poller_type)
 {
-	int			i, j, status, ret = SUCCEED;
-	int			mapping[ZBX_MAX_SNMP_ITEMS], mapping_num = 0;
+	int			status, ret = SUCCEED, mapping_num = 0;
+	int			mapping[ZBX_MAX_SNMP_ITEMS];
 	oid			parsed_oids[ZBX_MAX_SNMP_ITEMS][MAX_OID_LEN];
 	size_t			parsed_oid_lens[ZBX_MAX_SNMP_ITEMS];
 	struct snmp_pdu		*pdu, *response;
-	struct variable_list	*var;
-	unsigned char		val_type;
 	struct snmp_session	*ss;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() num:%d level:%d", __func__, num, level);
@@ -1665,7 +1665,7 @@ static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 		goto out;
 	}
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		if (SUCCEED != errcodes[i])
 			continue;
@@ -1704,12 +1704,15 @@ static int	zbx_snmp_get_values(zbx_snmp_sess_t ssp, const zbx_dc_item_t *items,
 retry:
 	status = snmp_sess_synch_response(ssp, pdu, &response);
 
-	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_sess_synch_response() status:%d s_snmp_errno:%d errstat:%ld mapping_num:%d",
-			__func__, status, ss->s_snmp_errno, NULL == response ? (long)-1 : response->errstat,
-			mapping_num);
+	zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_sess_synch_response() status:%d s_snmp_errno:%d errstat:%ld "
+			"mapping_num:%d", __func__, status, ss->s_snmp_errno, NULL == response ? (long)-1 :
+			response->errstat, mapping_num);
 
 	if (STAT_SUCCESS == status && SNMP_ERR_NOERROR == response->errstat)
 	{
+		struct variable_list	*var;
+		int			i;
+
 		for (i = 0, var = response->variables;; i++, var = var->next_variable)
 		{
 			/* check that response variable binding matches the request variable binding */
@@ -1747,7 +1750,7 @@ retry:
 				break;
 			}
 
-			j = mapping[i];
+			int	j = mapping[i];
 
 			if (parsed_oid_lens[j] != var->name_length ||
 					0 != memcmp(parsed_oids[j], var->name, parsed_oid_lens[j] * sizeof(oid)))
@@ -1776,6 +1779,7 @@ retry:
 			}
 
 			/* process received data */
+			unsigned char	val_type;
 
 			if (NULL != query_and_ignore_type && 1 == query_and_ignore_type[j])
 				(void)zbx_snmp_set_result(var, &results[j], &val_type);
@@ -1802,7 +1806,7 @@ retry:
 		/* SNMPv2 allows SNMPv1 behavior, too. So regardless of the SNMP version used, if we get this error, */
 		/* then we fix the PDU by removing the bad variable and retry the request. */
 
-		i = response->errindex - 1;
+		int	i = response->errindex - 1;
 
 		if (0 > i || i >= mapping_num)
 		{
@@ -1815,7 +1819,7 @@ retry:
 			goto exit;
 		}
 
-		j = mapping[i];
+		int	j = mapping[i];
 
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmp_sess_synch_response() errindex:%ld OID:'%s'", __func__,
 				response->errindex, oids[j]);
@@ -1871,15 +1875,13 @@ halve:
 		{
 			/* halve the number of items */
 
-			int	base;
-
 			ret = zbx_snmp_get_values(ssp, items, oids, results, errcodes, query_and_ignore_type, num / 2,
 					level + 1, error, max_error_len, max_succeed, min_fail, poller_type);
 
 			if (SUCCEED != ret)
 				goto exit;
 
-			base = num / 2;
+			int	base = num / 2;
 
 			ret = zbx_snmp_get_values(ssp, items + base, oids + base, results + base, errcodes + base,
 					NULL == query_and_ignore_type ? NULL : query_and_ignore_type + base, num - base,
@@ -1889,7 +1891,7 @@ halve:
 		{
 			/* resort to querying items one by one */
 
-			for (i = 0; i < num; i++)
+			for (int i = 0; i < num; i++)
 			{
 				if (SUCCEED != errcodes[i])
 					continue;
@@ -1921,7 +1923,7 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: translate well-known object identifiers into numeric form         *
+ * Purpose: translates well-known object identifiers into numeric form        *
  *                                                                            *
  ******************************************************************************/
 static void	zbx_snmp_translate(char *oid_translated, const char *snmp_oid, size_t max_oid_len)
@@ -1962,11 +1964,11 @@ static void	zbx_snmp_translate(char *oid_translated, const char *snmp_oid, size_
 	};
 #undef LEN_STR
 
-	int	found = 0, i;
+	int	found = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() OID:'%s'", __func__, snmp_oid);
 
-	for (i = 0; 0 != mibs[i].sz; i++)
+	for (int i = 0; 0 != mibs[i].sz; i++)
 	{
 		if (0 == strncmp(mibs[i].mib, snmp_oid, mibs[i].sz))
 		{
@@ -2032,7 +2034,7 @@ static int	zbx_snmp_dobject_compare(const void *d1, const void *d2)
  *                                                                            *
  * Parameters: data          - [IN] snmp discovery data object                *
  *             key           - [IN] discovery OID key                         *
- *             error         - [OUT] a buffer to store error message          *
+ *             error         - [OUT] buffer to store error message            *
  *             max_error_len - [IN] maximum error message length              *
  *                                                                            *
  * Return value: CONFIG_ERROR - OID key configuration error                   *
@@ -2041,7 +2043,7 @@ static int	zbx_snmp_dobject_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *error, size_t max_error_len)
 {
-	int	i, j, ret = CONFIG_ERROR;
+	int	ret = CONFIG_ERROR;
 
 	zbx_init_agent_request(&data->request);
 
@@ -2057,7 +2059,7 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 		goto out;
 	}
 
-	for (i = 0; i < data->request.nparam; i += 2)
+	for (int i = 0; i < data->request.nparam; i += 2)
 	{
 		if (SUCCEED != zbx_is_discovery_macro(data->request.params[i]))
 		{
@@ -2073,9 +2075,9 @@ static int	zbx_snmp_ddata_init(zbx_snmp_ddata_t *data, const char *key, char *er
 		}
 	}
 
-	for (i = 2; i < data->request.nparam; i += 2)
+	for (int i = 2; i < data->request.nparam; i += 2)
 	{
-		for (j = 0; j < i; j += 2)
+		for (int j = 0; j < i; j += 2)
 		{
 			if (0 == strcmp(data->request.params[i], data->request.params[j]))
 			{
@@ -2105,7 +2107,6 @@ out:
  ******************************************************************************/
 static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 {
-	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_snmp_dobject_t	*obj;
 
@@ -2114,7 +2115,7 @@ static void	zbx_snmp_ddata_clean(zbx_snmp_ddata_t *data)
 	zbx_hashset_iter_reset(&data->objects, &iter);
 	while (NULL != (obj = (zbx_snmp_dobject_t *)zbx_hashset_iter_next(&iter)))
 	{
-		for (i = 0; i < data->request.nparam / 2; i++)
+		for (int i = 0; i < data->request.nparam / 2; i++)
 			zbx_free(obj->values[i]);
 
 		zbx_free(obj->index);
@@ -2152,7 +2153,7 @@ static int	zbx_snmp_process_discovery(zbx_snmp_sess_t ssp, const zbx_dc_item_t *
 		int *errcode, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int max_vars,
 		int bulk)
 {
-	int			i, j, ret;
+	int			ret;
 	char			oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
 	struct zbx_json		js;
 	zbx_snmp_ddata_t	data;
@@ -2176,14 +2177,14 @@ static int	zbx_snmp_process_discovery(zbx_snmp_sess_t ssp, const zbx_dc_item_t *
 
 	zbx_json_initarray(&js, ZBX_JSON_STAT_BUF_LEN);
 
-	for (i = 0; i < data.index.values_num; i++)
+	for (int i = 0; i < data.index.values_num; i++)
 	{
 		obj = (zbx_snmp_dobject_t *)data.index.values[i];
 
 		zbx_json_addobject(&js, NULL);
 		zbx_json_addstring(&js, "{#SNMPINDEX}", obj->index, ZBX_JSON_TYPE_STRING);
 
-		for (j = 0; j < data.request.nparam / 2; j++)
+		for (int j = 0; j < data.request.nparam / 2; j++)
 		{
 			if (NULL == obj->values[j])
 				continue;
@@ -2244,11 +2245,9 @@ static void	snmp_bulkwalk_set_options(zbx_snmp_format_opts_t *opts)
 
 static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 {
-	int	i;
-
 	zbx_vector_snmp_oid_sort(oids, (zbx_compare_func_t)zbx_snmp_oid_compare);
 
-	for (i = 1; i < oids->values_num; i++)
+	for (int i = 1; i < oids->values_num; i++)
 	{
 		size_t len = strlen(oids->values[i - 1]->str_oid);
 
@@ -2269,12 +2268,9 @@ static void	snmp_bulkwalk_remove_matching_oids(zbx_vector_snmp_oid_t *oids)
 static int	snmp_bulkwalk_parse_params(AGENT_REQUEST *request, zbx_vector_snmp_oid_t *oids_out,
 		char *error, size_t max_error_len)
 {
-	int	i;
-
-	for (i = 0; i < request->nparam; i++)
+	for (int i = 0; i < request->nparam; i++)
 	{
-		char		oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX];
-		char		buffer[MAX_OID_LEN];
+		char		oid_translated[ZBX_ITEM_SNMP_OID_LEN_MAX], buffer[MAX_OID_LEN];
 		zbx_snmp_oid_t	*root_oid;
 
 		zbx_snmp_translate(oid_translated, request->params[i], sizeof(oid_translated));
@@ -2344,8 +2340,7 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 static int	snmp_bulkwalk_handle_response(int status, struct snmp_pdu *response,
 		zbx_bulkwalk_context_t *bulkwalk_context, char **results, size_t *results_alloc,
 		size_t *results_offset, const zbx_snmp_sess_t ssp, const zbx_dc_interface_t *interface,
-		unsigned char snmp_oid_type, char *error,
-		size_t max_error_len)
+		unsigned char snmp_oid_type, char *error, size_t max_error_len)
 {
 	struct variable_list	*var;
 	int			ret = SUCCEED;
@@ -2445,8 +2440,7 @@ static int	asynch_response(int operation, struct snmp_session *sp, int reqid, st
 {
 	zbx_bulkwalk_context_t	*bulkwalk_context;
 	zbx_snmp_context_t	*snmp_context;
-	int			ret = FAIL;
-	int			stat;
+	int			stat, ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()",__func__);
 
@@ -2561,10 +2555,9 @@ static void	snmp_bulkwalk_context_free(zbx_bulkwalk_context_t *bulkwalk_context)
 static int	snmp_bulkwalk_add(zbx_snmp_context_t *snmp_context, int *fd, char *error, size_t max_error_len)
 {
 	struct snmp_pdu			*pdu;
-	int				ret;
 	zbx_bulkwalk_context_t		*bulkwalk_context = snmp_context->bulkwalk_contexts.values[snmp_context->i];
 	struct netsnmp_transport_s	*transport;
-	int				numfds = 0, block = 0;
+	int				ret, numfds = 0, block = 0;
 	struct timeval			timeout = {.tv_sec = snmp_context->config_timeout};
 	fd_set				fdset;
 
@@ -2847,7 +2840,8 @@ static int	snmp_task_process(short event, void *data, int *fd, const char *addr,
 				snmp_context->config_timeout, snmp_context->config_source_ip)))
 		{
 			snmp_context->item.ret = NOTSUPPORTED;
-			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL, "zbx_snmp_open_session() failed"));
+			SET_MSG_RESULT(&snmp_context->item.result, zbx_dsprintf(NULL,
+					"zbx_snmp_open_session() failed"));
 			goto stop;
 		}
 	}
@@ -2902,7 +2896,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		void *arg, void *arg_action, struct event_base *base, struct evdns_base *dnsbase,
 		const char *config_source_ip)
 {
-	int			i, ret = SUCCEED, pdu_type;
+	int			ret = SUCCEED, pdu_type;
 	AGENT_REQUEST		request;
 	zbx_snmp_context_t	*snmp_context;
 	char			error[MAX_STRING_LEN];
@@ -3002,7 +2996,7 @@ int	zbx_async_check_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_async_ta
 		goto out;
 	}
 
-	for (i = 0; i < snmp_context->param_oids.values_num; i++)
+	for (int i = 0; i < snmp_context->param_oids.values_num; i++)
 	{
 		zbx_bulkwalk_context_t	*bulkwalk_context;
 
@@ -3031,15 +3025,14 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail, int bulk,
 		unsigned char poller_type)
 {
-	int		i, j, k, ret;
-	int		to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0;
-	int		to_verify[ZBX_MAX_SNMP_ITEMS], to_verify_num = 0;
-	char		to_verify_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	int		ret, to_walk[ZBX_MAX_SNMP_ITEMS], to_walk_num = 0, to_verify[ZBX_MAX_SNMP_ITEMS],
+			to_verify_num = 0;
 	unsigned char	query_and_ignore_type[ZBX_MAX_SNMP_ITEMS];
-	char		index_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
-	char		index_values[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
-	char		oids_translated[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
-	char		*idx = NULL, *pl;
+	char		to_verify_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX],
+			index_oids[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX],
+			index_values[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX],
+			oids_translated[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
+	char		*idx = NULL;
 	size_t		idx_alloc = 32;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3048,7 +3041,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 
 	/* perform initial item validation */
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		char	method[8];
 
@@ -3101,9 +3094,9 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 		if (SUCCEED != ret && NOTSUPPORTED != ret)
 			goto exit;
 
-		for (i = 0; i < to_verify_num; i++)
+		for (int i = 0; i < to_verify_num; i++)
 		{
-			j = to_verify[i];
+			int	j = to_verify[i];
 
 			if (SUCCEED != errcodes[j])
 				continue;
@@ -3115,12 +3108,9 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 			else
 			{
 				/* ready to construct the final OID with index */
+				size_t	len = strlen(oids_translated[j]);
 
-				size_t	len;
-
-				len = strlen(oids_translated[j]);
-
-				pl = strchr(items[j].snmp_oid, '[');
+				char	*pl = strchr(items[j].snmp_oid, '[');
 
 				*pl = '\0';
 				zbx_snmp_translate(oids_translated[j], items[j].snmp_oid, sizeof(oids_translated[j]));
@@ -3137,11 +3127,9 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 
 	if (0 != to_walk_num)
 	{
-		for (i = 0; i < to_walk_num; i++)
+		for (int i = 0; i < to_walk_num; i++)
 		{
-			int	errcode;
-
-			j = to_walk[i];
+			int	k, j = to_walk[i];
 
 			/* see whether this OID tree was already walked for another item */
 
@@ -3158,8 +3146,8 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 
 			cache_del_snmp_index_subtree(&items[j], oids_translated[j]);
 
-			errcode = zbx_snmp_walk(ssp, &items[j], oids_translated[j], error, max_error_len, max_succeed,
-					min_fail, num, bulk, zbx_snmp_walk_cache_cb, (void *)&items[j]);
+			int	errcode = zbx_snmp_walk(ssp, &items[j], oids_translated[j], error, max_error_len,
+					max_succeed, min_fail, num, bulk, zbx_snmp_walk_cache_cb, (void *)&items[j]);
 
 			if (NETWORK_ERROR == errcode)
 			{
@@ -3186,9 +3174,9 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 			}
 		}
 
-		for (i = 0; i < to_walk_num; i++)
+		for (int i = 0; i < to_walk_num; i++)
 		{
-			j = to_walk[i];
+			int	j = to_walk[i];
 
 			if (SUCCEED != errcodes[j])
 				continue;
@@ -3198,7 +3186,7 @@ static int	zbx_snmp_process_dynamic(zbx_snmp_sess_t ssp, const zbx_dc_item_t *it
 			{
 				/* ready to construct the final OID with index */
 
-				pl = strchr(items[j].snmp_oid, '[');
+				char	*pl = strchr(items[j].snmp_oid, '[');
 
 				*pl = '\0';
 				zbx_snmp_translate(oids_translated[j], items[j].snmp_oid, sizeof(oids_translated[j]));
@@ -3233,12 +3221,12 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 		int *errcodes, int num, char *error, size_t max_error_len, int *max_succeed, int *min_fail,
 		unsigned char poller_type)
 {
-	int	i, ret;
+	int	ret;
 	char	oids_translated[ZBX_MAX_SNMP_ITEMS][ZBX_ITEM_SNMP_OID_LEN_MAX];
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	for (i = 0; i < num; i++)
+	for (int i = 0; i < num; i++)
 	{
 		if (SUCCEED != errcodes[i])
 			continue;
@@ -3441,7 +3429,7 @@ void	get_values_snmp(zbx_dc_item_t *items, AGENT_RESULT *results, int *errcodes,
 	}
 	else if (0 != (ZBX_FLAG_DISCOVERY_RULE & items[j].flags) || 0 == strncmp(items[j].snmp_oid, "discovery[", 10))
 	{
-		int	max_vars;
+		int		max_vars;
 		zbx_dc_item_t	*item = &items[j];
 		char		ip_addr[ZBX_INTERFACE_IP_LEN_MAX];
 
@@ -3538,9 +3526,9 @@ out:
  *                                                                            *
  * Purpose: clears snmpv3 user authentication cache                           *
  *                                                                            *
- * Parameters: process_type - [IN] type of process                            *
+ * Parameters: process_type - [IN]                                            *
  *             process_num  - [IN] unique id of process                       *
- *                 progname - [IN]                                            *
+ *             progname     - [IN]                                            *
  *                                                                            *
  ******************************************************************************/
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname)
