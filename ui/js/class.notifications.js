@@ -455,6 +455,12 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 		return;
 	}
 
+	for (const item of this._cached_list) {
+		if (parseInt(item.eventid) <= parseInt(this._cached_user_settings.snoozed_eventid)) {
+			item.snoozed = true;
+		}
+	}
+
 	const latest_event = Math.max(...this.collection.getRawList().map(event => parseInt(event.eventid, 10)));
 
 	this
@@ -465,12 +471,14 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 			}
 
 			this._cached_user_settings.snoozed_eventid = resp.snoozed_eventid;
-			this.pushUpdates();
-			this.render();
 
 			this.collection.map(function(notif) {
-				notif.updateRaw({snoozed_eventid: resp.snoozed_eventid});
+				notif.updateRaw({snoozed: true});
 			});
+
+			this.consumeList(this.collection.getRawList());
+			this.pushUpdates();
+			this.render();
 		})
 		.catch((exception) => {
 			clearMessages();
@@ -489,8 +497,6 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 
 			addMessage(message_box);
 		});
-
-	this.consumeList(this.collection.getRawList());
 };
 
 /**
@@ -541,6 +547,10 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 
 		return;
 	}
+
+	this.collection.map(function(notif) {
+		notif.updateRaw({snoozed: notif._raw.eventid <= resp.settings.snoozed_eventid});
+	});
 
 	this.consumeUserSettings(resp.settings);
 	this.consumeList(resp.notifications);
@@ -852,19 +862,17 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
 };
 
 /**
- * @param {array}  list        List of raw notifications.
- * @param {string} snoozed_id  Last snoozed event ID.
+ * @param {array}  list             List of raw notifications.
+ * @param {string} snoozed_eventid  Last snoozed event ID.
  *
  * @return {boolean}
  */
-ZBX_NotificationsAlarm.prototype.isSnoozed = function(list, snoozed_id) {
-	for (const item of list) {
-		if (parseInt(item.eventid) <= parseInt(snoozed_id)) {
-			item.snoozed = true;
-		}
+ZBX_NotificationsAlarm.prototype.isSnoozed = function(list, snoozed_eventid) {
+	if (list.length === 0) {
+		return false;
 	}
 
-	return list.length > 0 ? !list.some(item => !item.snoozed) : false;
+	return list.every(item => item.eventid <= snoozed_eventid);
 };
 
 /**
