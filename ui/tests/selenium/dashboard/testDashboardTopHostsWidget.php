@@ -2340,13 +2340,12 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'column_fields' => [
 						[
-							'Name' => 'test column 0',
+							'Name' => 'column 0',
 							'Data' => 'Item value',
-							'Item' => '1_item',
-							'Decimal places' => '0'
+							'Item' => '1_item'
 						],
 						[
-							'Name' => 'test column 1',
+							'Name' => 'column 1',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Indicators',
@@ -2359,7 +2358,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						],
 						[
-							'Name' => 'test column 2',
+							'Name' => 'column 2',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Indicators',
@@ -2372,7 +2371,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						],
 						[
-							'Name' => 'test column 3',
+							'Name' => 'column 3',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Bar',
@@ -2385,7 +2384,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							]
 						],
 						[
-							'Name' => 'test column 4',
+							'Name' => 'column 4',
 							'Data' => 'Item value',
 							'Item' => '1_item',
 							'Display' => 'Bar',
