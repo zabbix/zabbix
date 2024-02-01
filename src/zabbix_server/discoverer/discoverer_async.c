@@ -127,9 +127,12 @@ static void	process_snmp_result(void *data)
 
 		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
 		{
-			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
-					NULL == zbx_async_check_snmp_get_reverse_dns(data) ? "" :
-					zbx_async_check_snmp_get_reverse_dns(data));
+			const char	*rdns = ZBX_NULL2EMPTY_STR(zbx_async_check_snmp_get_reverse_dns(data));
+
+			if ('\0' != *rdns && SUCCEED != zbx_validate_hostname(rdns))
+				rdns = "";
+
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, rdns);
 		}
 	}
 
@@ -249,8 +252,12 @@ static void	process_agent_result(void *data)
 
 		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
 		{
-			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
-					NULL == agent_context->reverse_dns ? "" : agent_context->reverse_dns);
+			const char	*rdns = ZBX_NULL2EMPTY_STR(agent_context->reverse_dns);
+
+			if ('\0' != *rdns && SUCCEED != zbx_validate_hostname(rdns))
+				rdns = "";
+
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, rdns);
 		}
 	}
 
@@ -334,8 +341,12 @@ static void	process_tcpsvc_result(void *data)
 
 		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
 		{
-			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname,
-					NULL == tcpsvc_context->reverse_dns ? "" : tcpsvc_context->reverse_dns);
+			const char	*rdns = ZBX_NULL2EMPTY_STR(tcpsvc_context->reverse_dns);
+
+			if ('\0' != *rdns && SUCCEED != zbx_validate_hostname(rdns))
+				rdns = "";
+
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, rdns);
 		}
 	}
 
