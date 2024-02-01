@@ -465,8 +465,7 @@ class CSVGHoneycomb {
 				cell
 					.append('path')
 					.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
-					.attr('d', this.#generatePath(Math.max(this.#cell_height, scaled_size.height * .65), 0))
-					.style('fill', 'transparent');
+					.attr('d', this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0));
 			}
 			else {
 				clearTimeout(d.backdrop_timeout);

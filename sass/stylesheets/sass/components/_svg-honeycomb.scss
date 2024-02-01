@@ -23,6 +23,9 @@
 			stroke: var(--stroke, var(--fill));
 
 			&.svg-honeycomb-backdrop {
+				--fill: transparent;
+				--stroke: transparent;
+
 				transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px)));
 
 				@if $ui-transitions {
