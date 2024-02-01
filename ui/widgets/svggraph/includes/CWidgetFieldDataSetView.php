@@ -278,7 +278,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 				->addItem([
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Draw')),
+							new CLabel(_('Draw'), $field_name.'['.$row_num.'][type]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][type]', (int) $value['type']))
 									->addClass('js-type')
@@ -300,7 +300,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							])
 						])
 						->addItem([
-							new CLabel(_('Width')),
+							new CLabel(_('Width'), $field_name.'['.$row_num.'][width]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][width]', (int) $value['width']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
@@ -311,7 +311,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Point size')),
+							new CLabel(_('Point size'), $field_name.'['.$row_num.'][pointsize]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][pointsize]', (int) $value['pointsize']))
 									->setEnabled($value['type'] == SVG_GRAPH_TYPE_POINTS)
@@ -322,7 +322,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Transparency')),
+							new CLabel(_('Transparency'), $field_name.'['.$row_num.'][transparency]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][transparency]',
 									(int) $value['transparency'])
@@ -334,7 +334,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Fill')),
+							new CLabel(_('Fill'), $field_name.'['.$row_num.'][fill]'),
 							new CFormField(
 								(new CRangeControl($field_name.'['.$row_num.'][fill]', (int) $value['fill']))
 									->setEnabled(!in_array($value['type'], [SVG_GRAPH_TYPE_POINTS, SVG_GRAPH_TYPE_BAR]))
@@ -345,7 +345,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Missing data')),
+							new CLabel(_('Missing data'), $field_name.'['.$row_num.'][missingdatafunc]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][missingdatafunc]',
 									(int) $value['missingdatafunc'])
@@ -366,7 +366,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 						]),
 					(new CFormGrid())
 						->addItem([
-							new CLabel(_('Y-axis')),
+							new CLabel(_('Y-axis'), $field_name.'['.$row_num.'][axisy]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][axisy]', (int) $value['axisy']))
 									->addValue(_('Left'), GRAPH_YAXIS_SIDE_LEFT)
@@ -416,7 +416,7 @@ class CWidgetFieldDataSetView extends CWidgetFieldView {
 							)
 						])
 						->addItem([
-							new CLabel(_('Aggregate')),
+							new CLabel(_('Aggregate'), $field_name.'['.$row_num.'][aggregate_grouping]'),
 							new CFormField(
 								(new CRadioButtonList($field_name.'['.$row_num.'][aggregate_grouping]',
 									(int) $value['aggregate_grouping'])
