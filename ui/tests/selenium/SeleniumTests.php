@@ -26,6 +26,20 @@ require_once dirname(__FILE__).'/testGeneric.php';
 require_once dirname(__FILE__).'/actions/testFormAction.php';
 require_once dirname(__FILE__).'/actions/testPageActions.php';
 
+// Administration.
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralAuditLog.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralAutoregistration.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralGUI.php';
+//require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralImages.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralOtherParams.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralTimeouts.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralTrigDisplOptions.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationHousekeeper.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationUserGroups.php';
+require_once dirname(__FILE__).'/administration/testPageAdministrationGeneralImages.php';
+require_once dirname(__FILE__).'/administration/testPageAdministrationGeneralModules.php';
+
+
 // Api tokens.
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensAdministrationGeneral.php';
 require_once dirname(__FILE__).'/apiTokens/testPageApiTokensUserSettings.php';
@@ -304,23 +318,12 @@ require_once dirname(__FILE__).'/webScenarios/testPageMonitoringWebDetails.php';
 
 require_once dirname(__FILE__).'/testExecuteNow.php';
 
-require_once dirname(__FILE__).'/testFormAdministrationGeneralAutoregistration.php';
-require_once dirname(__FILE__).'/testPageAdministrationGeneralImages.php';
-require_once dirname(__FILE__).'/testPageAdministrationGeneralModules.php';
 require_once dirname(__FILE__).'/testPageHistory.php';
 require_once dirname(__FILE__).'/testPageInventory.php';
 require_once dirname(__FILE__).'/testPageSearch.php';
 require_once dirname(__FILE__).'/testPageStatusOfZabbix.php';
 require_once dirname(__FILE__).'/testPageUserGroups.php';
 require_once dirname(__FILE__).'/testExpandExpressionMacros.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralAuditLog.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralGUI.php';
-//require_once dirname(__FILE__).'/testFormAdministrationGeneralImages.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralOtherParams.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralTimeouts.php';
-require_once dirname(__FILE__).'/testFormAdministrationGeneralTrigDisplOptions.php';
-require_once dirname(__FILE__).'/testFormAdministrationHousekeeper.php';
-require_once dirname(__FILE__).'/testFormAdministrationUserGroups.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
@@ -347,6 +350,19 @@ class SeleniumTests {
 		// Actions.
 		$suite->addTestSuite('testFormAction');
 		$suite->addTestSuite('testPageActions');
+
+		// Administration.
+		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
+		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
+		$suite->addTestSuite('testFormAdministrationGeneralGUI');
+//		$suite->addTestSuite('testFormAdministrationGeneralImages');
+		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
+		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
+		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
+		$suite->addTestSuite('testFormAdministrationHousekeeper');
+		$suite->addTestSuite('testFormAdministrationUserGroups');
+		$suite->addTestSuite('testPageAdministrationGeneralImages');
+		$suite->addTestSuite('testPageAdministrationGeneralModules');
 
 		// Api tokens.
 		$suite->addTestSuite('testFormApiTokensAdministrationGeneral');
@@ -487,6 +503,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormSysmap');
 		$suite->addTestSuite('testPageMaps');
 
+		// Media types.
+		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
+		$suite->addTestSuite('testFormAdministrationMediaTypes');
+		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
+		$suite->addTestSuite('testPageAdministrationMediaTypes');
+
 		// Monitoring.
 		$suite->addTestSuite('testPageMonitoringLatestData');
 
@@ -619,27 +641,12 @@ class SeleniumTests {
 		$suite->addTestSuite('testPageMonitoringWebDetails');
 
 		$suite->addTestSuite('testExecuteNow');
-		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
-		$suite->addTestSuite('testPageAdministrationGeneralImages');
-		$suite->addTestSuite('testPageAdministrationGeneralModules');
-		$suite->addTestSuite('testPageAdministrationMediaTypes');
 		$suite->addTestSuite('testPageHistory');
 		$suite->addTestSuite('testPageInventory');
 		$suite->addTestSuite('testPageSearch');
 		$suite->addTestSuite('testPageStatusOfZabbix');
 		$suite->addTestSuite('testPageUserGroups');
 		$suite->addTestSuite('testExpandExpressionMacros');
-		$suite->addTestSuite('testFormAdministrationGeneralAuditLog');
-		$suite->addTestSuite('testFormAdministrationGeneralGUI');
-//		$suite->addTestSuite('testFormAdministrationGeneralImages');
-		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
-		$suite->addTestSuite('testFormAdministrationGeneralTimeouts');
-		$suite->addTestSuite('testFormAdministrationGeneralTrigDisplOptions');
-		$suite->addTestSuite('testFormAdministrationHousekeeper');
-		$suite->addTestSuite('testFormAdministrationMediaTypes');
-		$suite->addTestSuite('testFormAdministrationMediaTypeMessageTemplates');
-		$suite->addTestSuite('testFormAdministrationMediaTypeWebhook');
-		$suite->addTestSuite('testFormAdministrationUserGroups');
 		$suite->addTestSuite('testFormLogin');
 		$suite->addTestSuite('testFormSetup');
 		$suite->addTestSuite('testFormTabIndicators');

@@ -18,7 +18,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-require_once dirname(__FILE__).'/../include/CLegacyWebTest.php';
+
+require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 class testFormAdministrationGeneralImages extends CLegacyWebTest {
 	public $icon_image_name = '1image1';
