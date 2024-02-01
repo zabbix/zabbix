@@ -73,10 +73,21 @@ class CControllerDiscoveryUpdate extends CController {
 
 	protected function doAction() {
 		$drule = [];
-		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks']);
+		$this->getInputs($drule, ['druleid', 'name', 'proxy_hostid', 'iprange', 'delay', 'status', 'dchecks',
+			'host_source', 'name_source'
+		]);
+
 		$uniq = $this->getInput('uniqueness_criteria', 0);
 
 		foreach ($drule['dchecks'] as $dcnum => $check) {
+			if (substr($drule['host_source'], 1) === $check['dcheckid']) {
+				$drule['dchecks'][$dcnum]['host_source'] = ZBX_DISCOVERY_VALUE;
+			}
+
+			if (substr($drule['name_source'], 1) === $check['dcheckid']) {
+				$drule['dchecks'][$dcnum]['name_source'] = ZBX_DISCOVERY_VALUE;
+			}
+
 			if (substr($check['dcheckid'], 0, 3) === 'new') {
 				unset($drule['dchecks'][$dcnum]['dcheckid']);
 			}
