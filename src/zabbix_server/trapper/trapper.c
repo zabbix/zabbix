@@ -27,7 +27,7 @@
 #include "proxydata.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
-//#include "../poller/checks_snmp.h"
+#include "zbxpoller.h"
 #include "trapper_auth.h"
 #include "trapper_preproc.h"
 #include "trapper_expressions_evaluate.h"
