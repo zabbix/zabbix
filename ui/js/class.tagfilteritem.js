@@ -49,18 +49,23 @@ class CTagFilterItem extends CBaseComponent {
 				if (ev.target.value == TAG_OPERATOR_EXISTS || ev.target.value == TAG_OPERATOR_NOT_EXISTS) {
 					this._value.addClass('display-none');
 					this._value._target.closest('td').style.paddingRight = 0;
-					this._value._target.setAttribute('data-text', this._value._target.value);
-					this._value._target.value = '';
+
+					if (typeof this._value._target.dataset.text === 'undefined'
+							|| this._value._target.dataset.text === '') {
+						this._value._target.dataset.text = this._value._target.value;
+						this._value._target.value = '';
+					}
 				}
 				else {
 					this._value.removeClass('display-none');
 					this._value._target.closest('td').style.paddingRight = null;
-					const value = this._value._target.getAttribute('data-text');
-					this._value._target.removeAttribute('data-text');
 
-					if (value !== null) {
-						this._value._target.value = value;
+					if (typeof this._value._target.dataset.text !== 'undefined'
+							&& this._value._target.dataset.text !== '') {
+						this._value._target.value = this._value._target.dataset.text;
 					}
+
+					this._value._target.dataset.text = '';
 				}
 			}
 		}
