@@ -198,8 +198,6 @@ static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
 /* Pointer to zbx_dc_get_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where zbx_dc_get_psk_by_identity() resides */
 /* but other components (e.g. agent) do not link dbconfig.o. */
-//size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *) = NULL;
-
 static zbx_find_psk_in_cache_f	find_psk_in_cache_cb = NULL;
 
 /* variable for passing information from callback functions if PSK was found among host PSKs or autoregistration PSK */
