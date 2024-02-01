@@ -3685,6 +3685,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 					$time++;
 				}
+
 				$this->page->refresh()->waitUntilReady();
 
 				$rgb = (array_key_exists('expected_color', $data))
@@ -3705,7 +3706,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 
 	public static function getAggregationFunctionData() {
 		return [
-			// Widget with several columns with common item that used value mapping, different aggregation functions and time periods.
+			// Widget with several columns, common item (value mapping), different aggregation functions and time periods.
 			[
 				[
 					'column_fields' => [
@@ -3843,7 +3844,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 				[
 					'column_fields' => [
 						[
-							// Not used is default value for aggregation function field.
+							// 'not used' is default value for aggregation function field.
 							'Name' => 'Value mapping with aggregation function not used',
 							'Item' => 'Value mapping'
 						]
@@ -4177,7 +4178,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					'no_data_found' => true,
 					'column_fields' => [
 						[
-							'Name' => 'log item with  aggregation function min',
+							'Name' => 'log item with aggregation function min',
 							'Item' => 'Item with type of information - Log',
 							'Aggregation function' => 'min', // only numeric items will be displayed.
 							'Time period' => 'Custom',
@@ -4185,7 +4186,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'id:time_period_to' => 'now-1y'
 						],
 						[
-							'Name' => 'Character item with  aggregation function max',
+							'Name' => 'Character item with aggregation function max',
 							'Item' => 'Item with type of information - Character',
 							'Aggregation function' => 'max', // only numeric items will be displayed.
 							'Time period' => 'Custom',
@@ -4201,7 +4202,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'id:time_period_to' => 'now'
 						],
 						[
-							'Name' => 'Log item with  aggregation function sum',
+							'Name' => 'Log item with aggregation function sum',
 							'Item' => 'Item with type of information - Log',
 							'Aggregation function' => 'sum', // only numeric items will be displayed.
 							'Time period' => 'Custom',
@@ -4658,7 +4659,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 					]
 				]
 			],
-			// Check that widget with bar/indicators return 'No data found' if non-numeric data is selected.
+			// Check that widget with bar/indicators returns 'No data found' if non-numeric data is selected.
 			[
 				[
 					'no_data_found' => true,
@@ -4987,10 +4988,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 							'Min' => '0',
 							'Max' => '10.00',
 							'Thresholds' => [
-								['color' => '4000FF', 'threshold' => '3.33'],
-								['color' => 'D1C4E9', 'threshold' => '6.55']
+								['color' => '4000FF', 'threshold' => '1.00'],
+								['color' => 'D1C4E9', 'threshold' => '5.00']
 							],
-							'Aggregation function' => 'sum',
+							'Aggregation function' => 'count',
 							'Time period' => 'Custom'
 						]
 					],
