@@ -120,8 +120,8 @@ ZBX_NotificationCollection.prototype.consumeList = function(list) {
  * Creates detached DOM nodes.
  */
 ZBX_NotificationCollection.prototype.makeNodes = function() {
-	var header = document.createElement('div'),
-		controls = document.createElement('ul');
+	const header = document.createElement('div');
+	const controls = document.createElement('ul');
 
 	this.node = document.createElement('div');
 	this.node.style.display = 'none';
@@ -267,7 +267,7 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * @param {ZBX_NotificationsAlarm} alarm_state      Alarm_state.
  * @param {string}                 username         Username of logged-in user.
  * @param {boolean}                muted            Indicator whether notifications are muted.
- * @param {string}                 snoozed_eventid  Snoozed event ID.
+ * @param {int}                    snoozed_eventid  Snoozed event ID.
  */
 ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state, username, muted, snoozed_eventid) {
 	this.btn_snooze.setAttribute('title', t('Snooze for %1$s').replace('%1$s', username));

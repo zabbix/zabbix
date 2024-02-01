@@ -456,7 +456,7 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 	}
 
 	for (const item of this._cached_list) {
-		if (parseInt(item.eventid) <= this._cached_user_settings.snoozed_eventid) {
+		if (parseInt(item.eventid, 10) <= this._cached_user_settings.snoozed_eventid) {
 			item.snoozed = true;
 		}
 	}
@@ -863,7 +863,7 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
 
 /**
  * @param {array}  list             List of raw notifications.
- * @param {string} snoozed_eventid  Last snoozed event ID.
+ * @param {int}    snoozed_eventid  Last snoozed event ID.
  *
  * @return {boolean}
  */
