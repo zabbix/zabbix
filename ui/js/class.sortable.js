@@ -245,8 +245,9 @@ class CSortable {
 	 * Scroll the target token into view.
 	 *
 	 * @param {HTMLElement} element
+	 * @param {boolean}     immediate  Whether to scroll into view immediately.
 	 */
-	scrollIntoView(element) {
+	scrollIntoView(element, {immediate = false} = {}) {
 		if (this.#is_dragging || this.#drag_token !== null) {
 			return;
 		}
@@ -255,6 +256,10 @@ class CSortable {
 
 		if (token !== null) {
 			this.#scrollIntoView(this.#tokens_loc.get(token));
+
+			if (immediate) {
+				this.#finishAnimations([CSortable.ANIMATION_SCROLL]);
+			}
 		}
 	}
 
@@ -462,21 +467,29 @@ class CSortable {
 			: null;
 	}
 
-	#finishAnimations() {
+	#finishAnimations(keys = null) {
 		const updates = new Map();
 
-		for (const [key, animation] of this.#animations) {
-			updates.set(key, animation.to);
+		if (keys === null) {
+			keys = this.#animations.keys();
 		}
 
-		this.#update(updates);
-		this.#render();
+		for (const key of keys) {
+			if (this.#animations.has(key)) {
+				updates.set(key, this.#animations.get(key).to);
 
-		this.#animations.clear();
+				this.#animations.delete(key);
+			}
+		}
 
-		if (this.#animation_frame !== null) {
-			cancelAnimationFrame(this.#animation_frame);
-			this.#animation_frame = null;
+		if (updates) {
+			this.#update(updates);
+			this.#render();
+
+			if (this.#animations.size === 0 && this.#animation_frame !== null) {
+				cancelAnimationFrame(this.#animation_frame);
+				this.#animation_frame = null;
+			}
 		}
 	}
 
