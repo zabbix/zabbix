@@ -244,7 +244,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 		}
 	}
 
-	values[*values_num] = value;
+	values[*values_num] = zbx_strdup(NULL, value);
 	size = value_size;
 
 	ts[(*values_num)++] = ts_now;
@@ -948,6 +948,7 @@ preproc_test:
 	ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, json, error);
 	zbx_json_close(json);
 out:
+	zbx_free(value);
 	zbx_free(info);
 	zbx_user_free(&user);
 
