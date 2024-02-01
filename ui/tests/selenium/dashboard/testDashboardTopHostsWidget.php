@@ -2340,9 +2340,10 @@ class testDashboardTopHostsWidget extends testWidgets {
 					],
 					'column_fields' => [
 						[
-							'Name' => 'column 0',
+							'Name' => 'test column 0',
 							'Data' => 'Item value',
-							'Item' => '1_item'
+							'Item' => '1_item',
+							'Decimal places' => '0'
 						],
 						[
 							'Name' => 'test column 1',
