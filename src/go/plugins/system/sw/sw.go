@@ -3,7 +3,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,10 +30,13 @@ import (
 	"strings"
 	"time"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 	"zabbix.com/pkg/zbxcmd"
 )
+
+var impl Plugin
 
 // Plugin -
 type Plugin struct {
@@ -54,7 +57,15 @@ type manager struct {
 	parser  func(in []string, regex string) ([]string, error)
 }
 
-var impl Plugin
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "Sw",
+		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 // Configure -
 func (p *Plugin) Configure(global *plugin.GlobalOptions, options interface{}) {
@@ -213,10 +224,4 @@ func parseDpkg(in []string, regex string) (out []string, err error) {
 	}
 
 	return
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "Sw",
-		"system.sw.packages", "Lists installed packages whose name matches the given package regular expression.",
-	)
 }

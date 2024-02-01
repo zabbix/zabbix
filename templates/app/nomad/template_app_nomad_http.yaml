@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:45:51Z'
+  date: '2024-01-22T15:14:35Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -33,14 +33,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var response = Object.keys(JSON.parse(value).header).filter(function (f) {
-                          return f.match(/HTTP\/[\d.]+\s+\d{3}/);
-                      });
+                  	var response = Object.keys(JSON.parse(value).header).filter(function (f) {
+                  		return f.match(/HTTP\/[\d.]+\s+\d{3}/);
+                  	});
                   
-                      return response.pop();
+                  	return response.pop();
                   }
                   catch (error) {
-                      return "HTTP/1.1 408 Request timeout";
+                  	return "HTTP/1.1 408 Request timeout";
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -82,7 +82,7 @@ zabbix_export:
           url: '{$NOMAD.ENDPOINT.API.URL}/v1/nodes'
           query_fields:
             - name: os
-              value: '1'
+              value: 'true'
           status_codes: ''
           http_proxy: '{$NOMAD.HTTP.PROXY}'
           headers:
@@ -167,107 +167,106 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Nomad = {
-                setParams: function (params) {
-                    ['api_endpoint'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_endpoint'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            		});
             
-                    Nomad.params = params;
-                    if (typeof Nomad.params.api_endpoint === 'string' && !Nomad.params.api_endpoint.endsWith('/')) {
-                        Nomad.params.api_endpoint += '/';
-                    }
-                },
+            		Nomad.params = params;
+            		if (typeof Nomad.params.api_endpoint === 'string' && !Nomad.params.api_endpoint.endsWith('/')) {
+            			Nomad.params.api_endpoint += '/';
+            		}
+            	},
             
-                request: function (query) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Nomad.params.api_endpoint + query;
+            	request: function (query) {
+            		var response,
+            			request = new HttpRequest(),
+            			url = Nomad.params.api_endpoint + query;
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('X-Nomad-Token: ' + Nomad.params.token);
-                // set proxy if needed
-                    if (Nomad.params.http_proxy) {
-                        request.setProxy(Nomad.params.http_proxy)
-                        Zabbix.log(4, '[ Nomad ] Using http proxy: ' + Nomad.params.http_proxy);
-                    }
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('X-Nomad-Token: ' + Nomad.params.token);
+            		if (Nomad.params.http_proxy) {
+            			request.setProxy(Nomad.params.http_proxy)
+            			Zabbix.log(4, '[ Nomad ] Using http proxy: ' + Nomad.params.http_proxy);
+            		}
             
-                    Zabbix.log(4, '[ Nomad ] Sending request: ' + url);
-                    response = request.get(url);
+            		Zabbix.log(4, '[ Nomad ] Sending request: ' + url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ Nomad ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Nomad ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Nomad agent API.';
-                        }
-                    }
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Nomad agent API.';
+            			}
+            		}
             
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
-                },
+            		return {
+            			status: request.getStatus(),
+            			response: response
+            		};
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                getIds: function () {
-                    var result = this.request('v1/operator/raft/configuration');
+            	getIds: function () {
+            		var result = this.request('v1/operator/raft/configuration');
             
-                    if (typeof result.response !== 'object' || result.status != 200) {
-                        throw 'Cannot get servers list from Nomad agent API.';
-                    }
+            		if (typeof result.response !== 'object' || result.status != 200) {
+            			throw 'Cannot get servers list from Nomad agent API.';
+            		}
             
-                    return this.getField(result, 'response.Servers')
-                        .map(function (srv) {
-                            return srv['ID'];
-                        });
-                },
+            		return this.getField(result, 'response.Servers')
+            			.map(function (srv) {
+            				return srv['ID'];
+            			});
+            	},
             
-                getServers: function () {
-                    var ids = this.getIds();
-                    result = Nomad.request('v1/agent/members');
+            	getServers: function () {
+            		var ids = this.getIds();
+            		result = Nomad.request('v1/agent/members');
             
-                    if (typeof result.response !== 'object' || result.status != 200) {
-                        throw 'Cannot get servers list from Nomad agent API.';
-                    }
+            		if (typeof result.response !== 'object' || result.status != 200) {
+            			throw 'Cannot get servers list from Nomad agent API.';
+            		}
             
-                    return this.getField(result,'response.Members').filter(function (s) {
-                        return ids.indexOf(s.Tags.id) >= 0;
-                    });
+            		return this.getField(result,'response.Members').filter(function (s) {
+            			return ids.indexOf(s.Tags.id) >= 0;
+            		});
             
-                },
+            	},
             };
             
             try {
-                Nomad.setParams(JSON.parse(value));
+            	Nomad.setParams(JSON.parse(value));
             
-                var servers = Nomad.getServers();
+            	var servers = Nomad.getServers();
             
-                return JSON.stringify(servers);
+            	return JSON.stringify(servers);
             
             }
             catch (error) {
-                error += ((String(error).endsWith('.')) ? '' : '.');
-                Zabbix.log(3, '[ Nomad ] ERROR: ' + error);
+            	error += ((String(error).endsWith('.')) ? '' : '.');
+            	Zabbix.log(3, '[ Nomad ] ERROR: ' + error);
             
-                return JSON.stringify({ error: error + ' Check debug log for more information.' });
+            	return JSON.stringify({ error: error + ' Check debug log for more information.' });
             }
           description: 'Nomad servers data in raw format.'
           timeout: '{$NOMAD.DATA.TIMEOUT}'
@@ -1074,14 +1073,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var response = Object.keys(JSON.parse(value).header).filter(function (f) {
-                          return f.match(/HTTP\/[\d.]+\s+\d{3}/);
-                      });
+                  	var response = Object.keys(JSON.parse(value).header).filter(function (f) {
+                  		return f.match(/HTTP\/[\d.]+\s+\d{3}/);
+                  	});
                   
-                      return response.pop();
+                  	return response.pop();
                   }
                   catch (error) {
-                      return "HTTP/1.1 408 Request timeout";
+                  	return "HTTP/1.1 408 Request timeout";
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1147,14 +1146,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var response = Object.keys(JSON.parse(value).header).filter(function (f) {
-                          return f.match(/HTTP\/[\d.]+\s+\d{3}/);
-                      });
+                  	var response = Object.keys(JSON.parse(value).header).filter(function (f) {
+                  		return f.match(/HTTP\/[\d.]+\s+\d{3}/);
+                  	});
                   
-                      return response.pop();
+                  	return response.pop();
                   }
                   catch (error) {
-                      return "HTTP/1.1 408 Request timeout";
+                  	return "HTTP/1.1 408 Request timeout";
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -1199,8 +1198,9 @@ zabbix_export:
           url: '{$NOMAD.CLIENT.API.SCHEME}://{HOST.IP}:{$NOMAD.CLIENT.API.PORT}/v1/allocations'
           query_fields:
             - name: reverse
-              value: '1'
+              value: 'true'
             - name: task_states
+              value: 'false'
             - name: filter
               value: 'NodeID == "{HOST.HOST}" and DesiredStatus == "run" and ClientStatus == "running"'
           status_codes: ''
@@ -1331,14 +1331,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var response = Object.keys(JSON.parse(value).header).filter(function (f) {
-                          return f.match(/HTTP\/[\d.]+\s+\d{3}/);
-                      });
+                  	var response = Object.keys(JSON.parse(value).header).filter(function (f) {
+                  		return f.match(/HTTP\/[\d.]+\s+\d{3}/);
+                  	});
                   
-                      return response.pop();
+                  	return response.pop();
                   }
                   catch (error) {
-                      return "HTTP/1.1 408 Request timeout";
+                  	return "HTTP/1.1 408 Request timeout";
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -3520,14 +3520,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var response = Object.keys(JSON.parse(value).header).filter(function (f) {
-                          return f.match(/HTTP\/[\d.]+\s+\d{3}/);
-                      });
+                  	var response = Object.keys(JSON.parse(value).header).filter(function (f) {
+                  		return f.match(/HTTP\/[\d.]+\s+\d{3}/);
+                  	});
                   
-                      return response.pop();
+                  	return response.pop();
                   }
                   catch (error) {
-                      return "HTTP/1.1 408 Request timeout";
+                  	return "HTTP/1.1 408 Request timeout";
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
@@ -4843,9 +4843,9 @@ zabbix_export:
               parameters:
                 - |
                   const idx = [
-                      'Leader',
-                      'Follower',
-                      'Candidate',
+                  	'Leader',
+                  	'Follower',
+                  	'Candidate',
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -5561,14 +5561,14 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var response = Object.keys(JSON.parse(value).header).filter(function (f) {
-                          return f.match(/HTTP\/[\d.]+\s+\d{3}/);
-                      });
+                  	var response = Object.keys(JSON.parse(value).header).filter(function (f) {
+                  		return f.match(/HTTP\/[\d.]+\s+\d{3}/);
+                  	});
                   
-                      return response.pop();
+                  	return response.pop();
                   }
                   catch (error) {
-                      return "HTTP/1.1 408 Request timeout";
+                  	return "HTTP/1.1 408 Request timeout";
                   }
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:

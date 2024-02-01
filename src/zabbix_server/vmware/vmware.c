@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -7054,7 +7054,11 @@ int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats)
  *             err       - [IN] the libxml2 error message                     *
  *                                                                            *
  ******************************************************************************/
+#if 21200 > LIBXML_VERSION /* version 2.12.0 */
 static void	libxml_handle_error(void *user_data, xmlErrorPtr err)
+#else
+static void	libxml_handle_error(void *user_data, const xmlError *err)
+#endif
 {
 	ZBX_UNUSED(user_data);
 	ZBX_UNUSED(err);

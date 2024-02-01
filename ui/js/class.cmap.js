@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2058,8 +2058,8 @@ ZABBIX.apps.map = (function($) {
 					shiftY = Math.round(dims.height / 2),
 					newX = x,
 					newY = y,
-					newWidth = dims.width,
-					newHeight = dims.height,
+					newWidth = Math.round(dims.width),
+					newHeight = Math.round(dims.height),
 					gridSize = parseInt(this.sysmap.data.grid_size, 10);
 
 				// Lines should not be aligned

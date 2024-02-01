@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -258,6 +258,18 @@ class CIntegrationTest extends CAPITest {
 
 		foreach ($components as $component) {
 			self::stopComponent($component);
+		}
+
+		if ($this->hasFailed()) {
+			$case_name = strtr($this->getName(true), [' ' => '-']);
+			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
+
+			foreach ($components as $component) {
+				$log_file = self::getLogPath($component);
+				if (file_exists($log_file)) {
+					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
+				}
+			}
 		}
 
 		self::setHostStatus($this->case_hosts, HOST_STATUS_NOT_MONITORED);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:45:35Z'
+  date: '2024-01-22T15:13:39Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -120,7 +120,7 @@ zabbix_export:
                 - |
                   var a = value.match(/server accepts handled requests\s+([0-9]+) ([0-9]+) ([0-9]+)/)
                   if (a) {
-                      return a[1]-a[2]
+                  	return a[1]-a[2]
                   }
             - type: CHANGE_PER_SECOND
               parameters:
@@ -244,8 +244,8 @@ zabbix_export:
           triggers:
             - uuid: 78e0a6322a1941469a0e108a9367c420
               expression: |
-                find(/Nginx by HTTP/nginx.get_stub_status,,"like","HTTP/1.1 200")=0 or
-                 nodata(/Nginx by HTTP/nginx.get_stub_status,30m)=1
+                find(/Nginx by HTTP/nginx.get_stub_status,,"regexp","HTTP\/[\d.]+\s+200")=0 or
+                nodata(/Nginx by HTTP/nginx.get_stub_status,30m)=1
               name: 'Nginx: Failed to fetch stub status page'
               event_name: 'Nginx: Failed to fetch stub status page (or no data for 30m)'
               priority: WARNING

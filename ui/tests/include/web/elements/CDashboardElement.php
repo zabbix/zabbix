@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -305,8 +305,22 @@ class CDashboardElement extends CElement {
 	 */
 	public function selectPage($name, $index = 1) {
 		$selection = '//ul[@class="sortable-list"]//span[@title='.CXPathHelper::escapeQuotes($name).']';
-		$this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one()->click();
-		$this->query('xpath:'.$selection.'/../../div[@class="selected-tab"]')->one()->waitUntilPresent();
+		$tab = $this->query('xpath:('.$selection.')['.$index.']')->waitUntilClickable()->one();
+		$parent = $tab->parents()->one();
+
+		// Nothing needs to be done if page is already selected.
+		if ($parent->hasClass('selected-tab')) {
+			return;
+		}
+
+		// Get widgets that belong to the initially opened page, in order to make sure that they are not visible later.
+		$widgets = $this->getWidgets();
+
+		// Open tab and wait for the class to be present, for old widgets not to be visible and for new widgets to load.
+		$tab->click();
+		$parent->waitUntilClassesPresent('selected-tab');
+		$widgets->waitUntilNotVisible();
+		$this->waitUntilReady();
 	}
 
 	/**
@@ -318,5 +332,14 @@ class CDashboardElement extends CElement {
 		return function () use ($target) {
 			return ($target->getWidgets()->filter(CElementFilter::NOT_READY)->count() === 0);
 		};
+	}
+
+	/**
+	 * Return the name of the selected dashboard page.
+	 *
+	 * @return string
+	 */
+	public function getSelectedPageName() {
+		return $this->query('xpath://div[@class="selected-tab"]/span')->one()->getText();
 	}
 }

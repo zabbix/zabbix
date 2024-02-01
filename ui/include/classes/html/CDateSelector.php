@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -78,11 +78,11 @@ class CDateSelector extends CTag {
 	private $enabled = true;
 
 	/**
-	 * Maxlength attribute of the input field. Aligned with the date format by default.
+	 * Maxlength attribute of the input field.
 	 *
 	 * @var int
 	 */
-	private $maxlength;
+	private $maxlength = 255;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -166,19 +166,6 @@ class CDateSelector extends CTag {
 	}
 
 	/**
-	 * Set non-default maxlength attribute to the input field.
-	 *
-	 * @param int $maxlength
-	 *
-	 * @return CDateSelector
-	 */
-	public function setMaxLength(int $maxlength) {
-		$this->maxlength = $maxlength;
-
-		return $this;
-	}
-
-	/**
 	 * Gets string representation of date textbox and calendar button.
 	 *
 	 * @param bool $destroy
@@ -191,7 +178,7 @@ class CDateSelector extends CTag {
 				(new CTextBox($this->name, $this->value))
 					->setId($this->name)
 					->setAttribute('placeholder', $this->placeholder)
-					->setAttribute('maxlength', $this->maxlength ?? strlen(date($this->date_format)))
+					->setAttribute('maxlength', $this->maxlength)
 					->setAriaRequired($this->is_required)
 					->setEnabled($this->enabled)
 					->setReadonly($this->readonly)

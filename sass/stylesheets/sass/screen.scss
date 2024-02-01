@@ -1072,11 +1072,11 @@ form {
 }
 
 .filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px;
-	padding: 10px 0;
-	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -4147,6 +4147,10 @@ a.link-action {
 			border-top-right-radius: 2px;
 			border-bottom-right-radius: 2px;
 		}
+
+		&[data-hintbox='1'] {
+			cursor: pointer;
+		}
 	}
 
 	.status-na-bg,
@@ -4516,25 +4520,21 @@ span {
 	}
 }
 
-.menu-popup-preloader,
-.hintbox-preloader {
+.menu-popup-preloader {
 	background: $preloader-bg-color;
 	border: 1px solid $overlay-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-	height: 128px;
-	width: 128px;
+	height: 50px;
+	width: 50px;
 	position: fixed;
 	right: auto;
 	bottom: auto;
 	z-index: 1010;
-
-	&::before {
-		background: $preloader-bg-color;
-	}
 }
 
 .hintbox-preloader {
-	position: absolute;
+	height: 50px;
+	width: 50px;
 }
 
 $browser-logos: (

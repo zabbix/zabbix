@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,8 @@
 				->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('sortable')
+			->addClass('form_row')
+			->addClass(CSortable::ZBX_STYLE_SORTABLE)
 			->toString()
 	?>
 </script>
@@ -82,7 +83,8 @@
 					->addClass('element-table-remove')
 			))->addClass(ZBX_STYLE_NOWRAP)
 		]))
-			->addClass('sortable')
+			->addClass('form_row')
+			->addClass(CSortable::ZBX_STYLE_SORTABLE)
 			->toString()
 	?>
 </script>
@@ -582,7 +584,6 @@
 		};
 
 		jQuery('.httpconf-dynamic-row', $tab).each(function(index, table) {
-
 			var $table = jQuery(table),
 				type = $table.data('type');
 
@@ -592,14 +593,15 @@
 			dynamicRowsBindRemoveDisable($table);
 			dynamicRowsBindNewRow($table);
 
-			$table.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
-
+			$table.on('dynamic_rows.beforeadd', function(e) {
 				if (type === 'variables') {
+					e.new_node.classList.remove('<?= CSortable::ZBX_STYLE_SORTABLE ?>');
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 				}
 
 				if (type === 'variables' || type === 'headers') {
-					e.new_node.querySelector('[data-type="value"]').setAttribute('maxlength', 2000);
+					e.new_node.querySelector('[data-type="value"]')
+						.setAttribute('maxlength', <?= DB::getFieldLength('httptest_field', 'value') ?>);
 				}
 			});
 
@@ -904,14 +906,16 @@
 				data = this.step.data.pairs[type];
 
 			if (type === 'variables') {
-				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
+				$node.on('dynamic_rows.beforeadd', function(e) {
+					e.new_node.classList.remove('<?= CSortable::ZBX_STYLE_SORTABLE ?>');
 					e.new_node.querySelector('.' + httpconf.ZBX_STYLE_DRAG_ICON).remove();
 				});
 			}
 
 			if (type === 'variables' || type === 'headers' || type === 'post_fields') {
-				$node.on('dynamic_rows.beforeadd', function(e, dynamic_rows) {
-					e.new_node.querySelector('[data-type="value"]').setAttribute('maxlength', 2000);
+				$node.on('dynamic_rows.beforeadd', function(e) {
+					e.new_node.querySelector('[data-type="value"]')
+						.setAttribute('maxlength', <?= DB::getFieldLength('httptest_field', 'value') ?>);
 				});
 			}
 

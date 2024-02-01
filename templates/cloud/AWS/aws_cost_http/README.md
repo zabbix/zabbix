@@ -90,7 +90,7 @@ Additional information about metrics and used API methods:
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
 |{$AWS.BILLING.REGION}|<p>Amazon Billing region code.</p>|`us-east-1`|
-|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`role_base`|
+|{$AWS.AUTH_TYPE}|<p>Authorization method. Possible values: role_base, access_key.</p>|`access_key`|
 |{$AWS.BILLING.MONTH}|<p>Months to get historical data from AWS Cost Explore API, no more than 12 months.</p>|`11`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.MATCHES}|<p>Filter of discoverable discovered billing service by name.</p>|`.*`|
 |{$AWS.BILLING.LLD.FILTER.SERVICE.NOT_MATCHES}|<p>Filter to exclude discovered billing service by name.</p>|`CHANGE_IF_NEEDED`|

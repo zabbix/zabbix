@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,6 +25,7 @@
 int	zbx_http_punycode_encode_url(char **url);
 void	zbx_http_url_encode(const char *source, char **result);
 int	zbx_http_url_decode(const char *source, char **result);
+char	*zbx_determine_charset(const char *content_type, char *body, size_t size);
 
 #ifdef HAVE_LIBCURL
 
@@ -48,7 +49,7 @@ int	zbx_http_prepare_ssl(CURL *easyhandle, const char *ssl_cert_file, const char
 int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *username, const char *password,
 		char **error);
 char	*zbx_http_parse_header(char **headers);
-
+void	zbx_http_convert_to_utf8(CURL *easyhandle, char **data, size_t *size, size_t *allocated);
 int	zbx_http_get(const char *url, const char *header, long timeout, char **out, long *response_code, char **error);
 #endif
 

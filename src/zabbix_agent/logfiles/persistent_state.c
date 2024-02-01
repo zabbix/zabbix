@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -170,15 +170,16 @@ static int	check_persistent_directory_exists(const char *pathname, char **error)
 {
 	zbx_stat_t	status;
 
-	if (0 != lstat(pathname, &status))
+	if (0 != zbx_stat(pathname, &status))
 	{
-		*error = zbx_dsprintf(*error, "cannot obtain directory information: %s", zbx_strerror(errno));
+		*error = zbx_dsprintf(*error, "cannot obtain persistent directory information: %s",
+				zbx_strerror(errno));
 		return FAIL;
 	}
 
 	if (0 == S_ISDIR(status.st_mode))
 	{
-		*error = zbx_dsprintf(*error, "file exists but is not a directory");
+		*error = zbx_dsprintf(*error, "cannot obtain persistent directory: file exists but is not a directory");
 		return FAIL;
 	}
 

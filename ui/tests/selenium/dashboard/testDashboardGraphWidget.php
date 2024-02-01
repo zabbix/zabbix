@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -2129,7 +2129,7 @@ class testDashboardGraphWidget extends CWebTest {
 					],
 					'Data set' => [
 						'host' => 'Zabbix*, new widget',
-						'item' => 'Agetn*, new widget'
+						'item' => 'Agent*, new widget'
 					]
 				]
 			],
@@ -2336,9 +2336,7 @@ class testDashboardGraphWidget extends CWebTest {
 		return [
 			[
 				[
-					'fields' => [
-						'Number of rows' => 1
-					],
+					'new_value' => 1,
 					'expected' => [
 						'Number of rows' => 1
 					],
@@ -2349,9 +2347,7 @@ class testDashboardGraphWidget extends CWebTest {
 			],
 			[
 				[
-					'fields' => [
-						'Number of rows' => 9
-					],
+					'new_value' => 9,
 					'expected' => [
 						'Number of rows' => 5
 					],
@@ -2362,9 +2358,7 @@ class testDashboardGraphWidget extends CWebTest {
 			],
 			[
 				[
-					'fields' => [
-						'Number of rows' => 0
-					],
+					'new_value' => 0,
 					'expected' => [
 						'Number of rows' => 1
 					],
@@ -2375,14 +2369,12 @@ class testDashboardGraphWidget extends CWebTest {
 			],
 			[
 				[
-					'fields' => [
-						'Number of rows' => 'a'
-					],
+					'new_value' => 'a',
 					'expected' => [
-						'Number of rows' => 3
+						'Number of rows' => 1
 					],
 					'range_percentage' => [
-						'Number of rows' => 50
+						'Number of rows' => 0
 					]
 				]
 			]
@@ -2394,23 +2386,27 @@ class testDashboardGraphWidget extends CWebTest {
 	 *
 	 * @dataProvider getSlidebarData
 	 */
-	// TODO: Uncomment the below scenario when DEV-2709 will be fixed.
-//	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
-//		$this->page->login()->open(self::DASHBOARD_URL);
-//		$form = $this->openGraphWidgetConfiguration();
-//		$form->selectTab('Legend');
-//		$form->fill($data['fields']);
-//
-//		// Check the resulting value in input element and check positioning of the range control thumb element.
-//		foreach ($data['expected'] as $field_name => $value) {
-//			$field = $form->getField($field_name);
-//			$this->assertEquals($value, $field->query('xpath:.//input[@type="text"]')->one()->getValue());
-//
-//			$this->assertEquals('left: '.$data['range_percentage'][$field_name].'%;', $field->query('class:range-control-thumb')
-//					->one()->getAttribute('style')
-//			);
-//		}
-//	}
+	public function testDashboardGraphWidget_LegendRangeControlsValidation($data) {
+		$this->page->login()->open(self::DASHBOARD_URL);
+		$form = $this->openGraphWidgetConfiguration();
+		$form->selectTab('Legend');
+
+		$field = $form->getField('id:legend_lines');
+		$field->fill($data['new_value']);
+
+		// JS should trigger a change action for the input, so that these changes would apply to the range control.
+		CElementQuery::getDriver()->executeScript('return jQuery(arguments[0]).trigger("change");', [$field]);
+
+		// Check the resulting value in input element and check positioning of the range control thumb element.
+		foreach ($data['expected'] as $field_name => $value) {
+			$field = $form->getField($field_name);
+			$this->assertEquals($value, $field->query('xpath:.//input[@type="text"]')->one()->getValue());
+
+			$this->assertEquals('left: '.$data['range_percentage'][$field_name].'%;', $field->query('class:range-control-thumb')
+					->one()->getAttribute('style')
+			);
+		}
+	}
 
 	public function testDashboardGraphWidget_ProblemsDisabledFields() {
 		$this->page->login()->open(self::DASHBOARD_URL);

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:47:30Z'
+  date: '2024-01-22T15:20:37Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -131,217 +131,221 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AWS = {
-                params: {},
+            	params: {},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                setParams: function (params) {
-                    switch (AWS.getField(params, 'auth_type')) {
-                        case 'role_base':
-                            AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            	setParams: function (params) {
+            		AWS.params['proxy'] = params.proxy;
+            		switch (AWS.getField(params, 'auth_type')) {
+            			case 'role_base':
+            				AWS.params['auth_type'] = 'role_base';
+            				var request = new HttpRequest();
+            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            					request.setProxy(AWS.params.proxy);
+            				}
+            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
-                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-                                throw 'Error getting security credentials from instance metadata. Role not found.';
-                            }
+            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            					throw 'Error getting security credentials from instance metadata. Role not found.';
+            				}
             
-                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
-                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-                                throw 'Error getting security credentials from instance metadata.';
-                            }
+            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            					throw 'Error getting security credentials from instance metadata.';
+            				}
             
-                            try {
-                                credentials = JSON.parse(credentials);
-                            }
-                            catch (error) {
-                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-                            }
+            				try {
+            					credentials = JSON.parse(credentials);
+            				}
+            				catch (error) {
+            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            				}
             
-                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                                    throw 'Required credentials is not set: "' + field + '".';
-                                };
-                                AWS.params[field] = credentials[field];
-                            });
-                            break;
-                        case 'access_key':
-                        default:
-                            AWS.params['auth_type'] = 'access_key';
-                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
-                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                                    throw 'Required param is not set: "' + field + '".';
-                                }
-                                AWS.params[field] = params[field];
-                            });
-                    }
-                    ['region', 'cluster_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                        AWS.params[field] = params[field];
-                    });
-                },
+            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
+            			case 'access_key':
+            			default:
+            				AWS.params['auth_type'] = 'access_key';
+            				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            		}
+            		['region', 'cluster_name'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
+            	},
             
-                sign: function (key, message) {
-                    var hex = hmac('sha256', key, message);
+            	sign: function (key, message) {
+            		var hex = hmac('sha256', key, message);
             
-                    if ((hex.length % 2) === 1) {
-                        throw 'Invalid length of a hex string!';
-                    }
+            		if ((hex.length % 2) === 1) {
+            			throw 'Invalid length of a hex string!';
+            		}
             
-                    var result = new Int8Array(hex.length / 2);
-                    for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
-                        result[b] = parseInt(hex.substring(i, i + 2), 16);
-                    }
+            		var result = new Int8Array(hex.length / 2);
+            		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+            			result[b] = parseInt(hex.substring(i, i + 2), 16);
+            		}
             
-                    return result;
-                },
+            		return result;
+            	},
             
-                prepareParams: function (params) {
-                    var result = [];
+            	prepareParams: function (params) {
+            		var result = [];
             
-                    Object.keys(params).sort().forEach(function (key) {
-                        if (typeof params[key] !== 'object') {
-                            result.push(key + '=' + encodeURIComponent(params[key]));
-                        }
-                        else {
-                            result.push(prepareObject(key, params[key]));
-                        }
-                    });
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
             
-                    return result.join('&');
-                },
+            		return result.join('&');
+            	},
             
-                request: function (method, region, service, params, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (method, region, service, params, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
-                        date = amzdate.replace(/T\d+Z/, ''),
-                        host = service + '.' + region + '.amazonaws.com',
-                        canonical_uri = '/',
-                        canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-                        signed_headers = 'content-encoding;host;x-amz-date',
-                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                        credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
-                        request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
+            		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+            			date = amzdate.replace(/T\d+Z/, ''),
+            			host = service + '.' + region + '.amazonaws.com',
+            			canonical_uri = '/',
+            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+            			signed_headers = 'content-encoding;host;x-amz-date',
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+            			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
             
-                    key = AWS.sign(key, region);
-                    key = AWS.sign(key, service);
-                    key = AWS.sign(key, 'aws4_request');
+            		key = AWS.sign(key, region);
+            		key = AWS.sign(key, service);
+            		key = AWS.sign(key, 'aws4_request');
             
-                    var request = new HttpRequest(),
-                        url = 'https://' + host + canonical_uri + '?' + params;
+            		var request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
-                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-                        request.setProxy(AWS.params.proxy);
-                    }
-                    request.addHeader('x-amz-date: ' + amzdate);
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Content-Encoding: amz-1.0');
-                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                    if (AWS.params.auth_type === 'role_base')
-                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('x-amz-date: ' + amzdate);
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Content-Encoding: amz-1.0');
+            		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            		if (AWS.params.auth_type === 'role_base')
+            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-                    Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
+            		Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
             
-                    response = request.get(url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (response[0] === '<') {
-                        try {
-                            response = XML.toJson(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                        }
-                    }
+            		if (response[0] === '<') {
+            			try {
+            				response = XML.toJson(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            			}
+            		}
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                        }
-                    }
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            			}
+            		}
             
-                    return response;
-                },
+            		return response;
+            	},
             
-                getAlarms: function () {
-                    var payload = {
-                        'Action': 'DescribeAlarms',
-                        'Version': '2010-08-01',
-                        'MaxRecords': 100
-                    },
-                        result = [];
+            	getAlarms: function () {
+            		var payload = {
+            			'Action': 'DescribeAlarms',
+            			'Version': '2010-08-01',
+            			'MaxRecords': 100
+            		},
+            			result = [];
             
-                    while (payload.nextToken !== '') {
-                        var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
-                        payload.nextToken = alarms.nextToken || '';
-                        alarms_list = AWS.getField(alarms, 'MetricAlarms');
+            		while (payload.nextToken !== '') {
+            			var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
+            			payload.nextToken = alarms.nextToken || '';
+            			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             
-                        if (!Array.isArray(alarms_list))
-                            alarms_list = [alarms_list]
-                        alarms_list.forEach(function (alarm) {
-                            var dimensions = alarm.Dimensions;
+            			if (!Array.isArray(alarms_list))
+            				alarms_list = [alarms_list]
+            			alarms_list.forEach(function (alarm) {
+            				var dimensions = alarm.Dimensions;
             
-                            Zabbix.log(4, '[ AWS ECS ] dimensions: ' + JSON.stringify(dimensions));
-                            if (Array.isArray(alarm.Metrics)) {
-                                alarm.Metrics.forEach(function (metric) {
-                                    if (typeof metric.MetricStat === 'object' && metric.MetricStat !== null
-                                        && typeof metric.MetricStat.Metric === 'object' && metric.MetricStat.Metric !== null
-                                        && Array.isArray(metric.MetricStat.Metric.Dimensions)) {
-                                        dimensions = dimensions.concat(metric.MetricStat.Metric.Dimensions);
-                                    }
-                                });
-                            }
-                            for (var i in dimensions) {
-                                if (dimensions[i].Name === 'ClusterName' && dimensions[i].Value === AWS.params.cluster_name) {
-                                    result.push(alarm);
-                                    break;
-                                }
-                            }
-                        });
-                    }
+            				Zabbix.log(4, '[ AWS ECS ] dimensions: ' + JSON.stringify(dimensions));
+            				if (Array.isArray(alarm.Metrics)) {
+            					alarm.Metrics.forEach(function (metric) {
+            						if (typeof metric.MetricStat === 'object' && metric.MetricStat !== null
+            							&& typeof metric.MetricStat.Metric === 'object' && metric.MetricStat.Metric !== null
+            							&& Array.isArray(metric.MetricStat.Metric.Dimensions)) {
+            							dimensions = dimensions.concat(metric.MetricStat.Metric.Dimensions);
+            						}
+            					});
+            				}
+            				for (var i in dimensions) {
+            					if (dimensions[i].Name === 'ClusterName' && dimensions[i].Value === AWS.params.cluster_name) {
+            						result.push(alarm);
+            						break;
+            					}
+            				}
+            			});
+            		}
             
-                    return result;
-                }
+            		return result;
+            	}
             }
             
             try {
-                AWS.setParams(JSON.parse(value));
+            	AWS.setParams(JSON.parse(value));
             
-                return JSON.stringify(AWS.getAlarms());
+            	return JSON.stringify(AWS.getAlarms());
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
             
-                return JSON.stringify({ 'error': error });
+            	return JSON.stringify({ 'error': error });
             }
           description: |
             Get alarms data.
@@ -377,233 +381,236 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AWS = {
-                params: {},
+            	params: {},
             
-                setParams: function (params) {
-                    switch (AWS.getField(params, 'auth_type')) {
-                        case 'role_base':
-                            AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            	setParams: function (params) {
+            		AWS.params['proxy'] = params.proxy;
+            		switch (AWS.getField(params, 'auth_type')) {
+            			case 'role_base':
+            				AWS.params['auth_type'] = 'role_base';
+            				var request = new HttpRequest();
+            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            					request.setProxy(AWS.params.proxy);
+            				}
+            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
-                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-                                throw 'Error getting security credentials from instance metadata. Role not found.';
-                            }
+            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            					throw 'Error getting security credentials from instance metadata. Role not found.';
+            				}
             
-                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
-                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-                                throw 'Error getting security credentials from instance metadata.';
-                            }
+            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            					throw 'Error getting security credentials from instance metadata.';
+            				}
             
-                            try {
-                                credentials = JSON.parse(credentials);
-                            }
-                            catch (error) {
-                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-                            }
+            				try {
+            					credentials = JSON.parse(credentials);
+            				}
+            				catch (error) {
+            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            				}
             
-                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                                    throw 'Required credentials is not set: "' + field + '".';
-                                };
-                                AWS.params[field] = credentials[field];
-                            });
-                            break;
-                        case 'access_key':
-                        default:
-                            AWS.params['auth_type'] = 'access_key';
-                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
-                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                                    throw 'Required param is not set: "' + field + '".';
-                                }
-                                AWS.params[field] = params[field];
-                            });
-                    }
-                    ['region', 'cluster_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                        AWS.params[field] = params[field];
-                    });
-                },
+            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
+            			case 'access_key':
+            			default:
+            				AWS.params['auth_type'] = 'access_key';
+            				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            		}
+            		['region', 'cluster_name'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                sign: function (key, message) {
-                    var hex = hmac('sha256', key, message);
+            	sign: function (key, message) {
+            		var hex = hmac('sha256', key, message);
             
-                    if ((hex.length % 2) === 1) {
-                        throw 'Invalid length of a hex string!';
-                    }
+            		if ((hex.length % 2) === 1) {
+            			throw 'Invalid length of a hex string!';
+            		}
             
-                    var result = new Int8Array(hex.length / 2);
-                    for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
-                        result[b] = parseInt(hex.substring(i, i + 2), 16);
-                    }
+            		var result = new Int8Array(hex.length / 2);
+            		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+            			result[b] = parseInt(hex.substring(i, i + 2), 16);
+            		}
             
-                    return result;
-                },
+            		return result;
+            	},
             
-                prepareParams: function (params) {
-                    var result = [];
+            	prepareParams: function (params) {
+            		var result = [];
             
-                    Object.keys(params).sort().forEach(function (key) {
-                        if (typeof params[key] !== 'object') {
-                            result.push(key + '=' + encodeURIComponent(params[key]));
-                        }
-                        else {
-                            result.push(prepareObject(key, params[key]));
-                        }
-                    });
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
             
-                    return result.join('&');
-                },
+            		return result.join('&');
+            	},
             
-                request: function (method, region, service, host, params, data, uri) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (method, region, service, host, params, data, uri) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
-                        date = amzdate.replace(/T\d+Z/, ''),
+            		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+            			date = amzdate.replace(/T\d+Z/, ''),
             
-                        canonical_uri = '/' + uri,
-                        canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-                        signed_headers = 'content-encoding;host;x-amz-date',
-                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                        credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
-                        request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
+            			canonical_uri = '/' + uri,
+            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+            			signed_headers = 'content-encoding;host;x-amz-date',
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+            			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
             
-                    key = AWS.sign(key, region);
-                    key = AWS.sign(key, service);
-                    key = AWS.sign(key, 'aws4_request');
+            		key = AWS.sign(key, region);
+            		key = AWS.sign(key, service);
+            		key = AWS.sign(key, 'aws4_request');
             
-                    var request = new HttpRequest(),
-                        url = 'https://' + host + canonical_uri + '?' + params;
+            		var request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
-                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-                        request.setProxy(AWS.params.proxy);
-                    }
-                    request.addHeader('x-amz-date: ' + amzdate);
-                    request.addHeader('x-amz-content-sha256:' + sha256(data));
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Content-Type: application/x-www-form-urlencoded');
-                    request.addHeader('Content-Encoding: amz-1.0');
-                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                    if (AWS.params.auth_type === 'role_base')
-                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
-                    Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('x-amz-date: ' + amzdate);
+            		request.addHeader('x-amz-content-sha256:' + sha256(data));
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/x-www-form-urlencoded');
+            		request.addHeader('Content-Encoding: amz-1.0');
+            		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            		if (AWS.params.auth_type === 'role_base')
+            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-                    response = request.post(url, data);
+            		Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
             
-                    Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		response = request.post(url, data);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from AWS API. Check debug log for more information.';
-                    }
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    return response;
-                },
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from AWS API. Check debug log for more information.';
+            		}
             
-                listServices: function () {
-                    var payload = {},
-                        result,
-                        ECSClusters_Services,
-                        services = [];
+            		return response;
+            	},
             
-                    payload['Action'] = 'ListServices';
-                    payload['Version'] = '2014-11-13';
-                    payload['cluster'] = AWS.params.cluster_name;
+            	listServices: function () {
+            		var payload = {},
+            			result,
+            			ECSClusters_Services,
+            			services = [];
             
-                    result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
-                    ECSClusters_Services = AWS.getField(result, 'ListServicesResponse.ListServicesResult.serviceArns')
+            		payload['Action'] = 'ListServices';
+            		payload['Version'] = '2014-11-13';
+            		payload['cluster'] = AWS.params.cluster_name;
             
-                    for (k in ECSClusters_Services) {
-                        id = ECSClusters_Services[k];
+            		result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		ECSClusters_Services = AWS.getField(result, 'ListServicesResponse.ListServicesResult.serviceArns')
             
-                        json = {};
-                        input = id.split(AWS.params.cluster_name + '/');
-                        for (var i = 1; i < input.length; i += 2) {
-                            json[input[i]] = input[i + 1];
-                        }
-                        services.push({
-                            'service_name': input[1],
-                        });
-                    }
+            		for (k in ECSClusters_Services) {
+            			id = ECSClusters_Services[k];
             
-                    if (Array.isArray(services))
-                        return services;
-                    else
-                        return [services];
+            			json = {};
+            			input = id.split(AWS.params.cluster_name + '/');
+            			for (var i = 1; i < input.length; i += 2) {
+            				json[input[i]] = input[i + 1];
+            			}
+            			services.push({
+            				'service_name': input[1],
+            			});
+            		}
             
-                },
+            		if (Array.isArray(services))
+            			return services;
+            		else
+            			return [services];
+            
+            	},
             
             
-                ListTasks: function () {
-                    var payload = {},
-                        result,
-                        ECSClusters_Services_Tasks,
-                        tasks = [];
+            	ListTasks: function () {
+            		var payload = {},
+            			result,
+            			ECSClusters_Services_Tasks,
+            			tasks = [];
             
-                    payload['Action'] = 'ListTasks';
-                    payload['Version'] = '2014-11-13';
-                    payload['cluster'] = AWS.params.cluster_name;
-                    payload['status'] = AWS.params.status;
+            		payload['Action'] = 'ListTasks';
+            		payload['Version'] = '2014-11-13';
+            		payload['cluster'] = AWS.params.cluster_name;
+            		payload['status'] = AWS.params.status;
             
-                    result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
-                    ECSClusters_Services_Tasks = AWS.getField(result, 'ListTasksResponse.ListTasksResult.taskArns')
-                    for (k in ECSClusters_Services_Tasks) {
-                        id = ECSClusters_Services_Tasks[k];
-                        json = {};
-                        input = id.split(AWS.params.cluster_name + '/');
-                        for (var i = 1; i < input.length; i += 2) {
-                            json[input[i]] = input[i + 1];
-                        }
-                        tasks.push({
-                            'task_id': input[1],
-                        });
-                    }
+            		result = AWS.request('POST', AWS.params.region, 'ecs', 'ecs.' + AWS.params.region + '.amazonaws.com', AWS.prepareParams(payload), '', '');
+            		ECSClusters_Services_Tasks = AWS.getField(result, 'ListTasksResponse.ListTasksResult.taskArns')
+            		for (k in ECSClusters_Services_Tasks) {
+            			id = ECSClusters_Services_Tasks[k];
+            			json = {};
+            			input = id.split(AWS.params.cluster_name + '/');
+            			for (var i = 1; i < input.length; i += 2) {
+            				json[input[i]] = input[i + 1];
+            			}
+            			tasks.push({
+            				'task_id': input[1],
+            			});
+            		}
             
-                    if (Array.isArray(tasks))
-                        return tasks;
-                    else
-                        return [tasks];
-                }
+            		if (Array.isArray(tasks))
+            			return tasks;
+            		else
+            			return [tasks];
+            	}
             };
             
             try {
-                AWS.setParams(JSON.parse(value));
-                var 
-                services = AWS.listServices(),
-                    tasks = AWS.ListTasks();
-                return JSON.stringify(({ services, tasks }));
+            	AWS.setParams(JSON.parse(value));
+            	var services = AWS.listServices(),
+            		tasks = AWS.ListTasks();
+            	return JSON.stringify(({ services, tasks }));
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
-                return JSON.stringify({ 'error': error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
             }
           description: |
             Get cluster services.
@@ -639,272 +646,276 @@ zabbix_export:
           value_type: TEXT
           params: |
             var AWS = {
-                params: {},
-                request_period: 600,
+            	params: {},
+            	request_period: 600,
             
-                setParams: function (params) {
-                    switch (AWS.getField(params, 'auth_type')) {
-                        case 'role_base':
-                            AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            	setParams: function (params) {
+            		AWS.params['proxy'] = params.proxy;
+            		switch (AWS.getField(params, 'auth_type')) {
+            			case 'role_base':
+            				AWS.params['auth_type'] = 'role_base';
+            				var request = new HttpRequest();
+            				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            					request.setProxy(AWS.params.proxy);
+            				}
+            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
-                            if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-                                throw 'Error getting security credentials from instance metadata. Role not found.';
-                            }
+            				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+            					throw 'Error getting security credentials from instance metadata. Role not found.';
+            				}
             
-                            credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
             
-                            if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-                                throw 'Error getting security credentials from instance metadata.';
-                            }
+            				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+            					throw 'Error getting security credentials from instance metadata.';
+            				}
             
-                            try {
-                                credentials = JSON.parse(credentials);
-                            }
-                            catch (error) {
-                                throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-                            }
+            				try {
+            					credentials = JSON.parse(credentials);
+            				}
+            				catch (error) {
+            					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+            				}
             
-                            ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-                                if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                                    throw 'Required credentials is not set: "' + field + '".';
-                                };
-                                AWS.params[field] = credentials[field];
-                            });
-                            break;
-                        case 'access_key':
-                        default:
-                            AWS.params['auth_type'] = 'access_key';
-                            ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
-                                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                                    throw 'Required param is not set: "' + field + '".';
-                                }
-                                AWS.params[field] = params[field];
-                            });
-                    }
-                    ['region', 'cluster_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                        AWS.params[field] = params[field];
-                    });
-                },
+            				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+            					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+            						throw 'Required credentials is not set: "' + field + '".';
+            					};
+            					AWS.params[field] = credentials[field];
+            				});
+            				break;
+            			case 'access_key':
+            			default:
+            				AWS.params['auth_type'] = 'access_key';
+            				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+            					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            						throw 'Required param is not set: "' + field + '".';
+            					}
+            					AWS.params[field] = params[field];
+            				});
+            		}
+            		['region', 'cluster_name'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            			AWS.params[field] = params[field];
+            		});
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                sign: function (key, message) {
-                    var hex = hmac('sha256', key, message);
+            	sign: function (key, message) {
+            		var hex = hmac('sha256', key, message);
             
-                    if ((hex.length % 2) === 1) {
-                        throw 'Invalid length of a hex string!';
-                    }
+            		if ((hex.length % 2) === 1) {
+            			throw 'Invalid length of a hex string!';
+            		}
             
-                    var result = new Int8Array(hex.length / 2);
-                    for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
-                        result[b] = parseInt(hex.substring(i, i + 2), 16);
-                    }
+            		var result = new Int8Array(hex.length / 2);
+            		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+            			result[b] = parseInt(hex.substring(i, i + 2), 16);
+            		}
             
-                    return result;
-                },
+            		return result;
+            	},
             
-                prepareRecursive: function (prefix, param) {
-                    var result = {};
+            	prepareRecursive: function (prefix, param) {
+            		var result = {};
             
-                    if (typeof param === 'object') {
-                        if (Array.isArray(param)) {
-                            param.forEach(function (value, index) {
-                                var nested = AWS.prepareRecursive(prefix + '.member.' + (index + 1), value);
-                                Object.keys(nested).forEach(function (key) {
-                                    result[key] = nested[key];
-                                });
-                            });
-                        }
-                        else {
-                            Object.keys(param).forEach(function (k) {
-                                var nested = AWS.prepareRecursive(prefix + '.' + k, param[k]);
-                                Object.keys(nested).forEach(function (key) {
-                                    result[key] = nested[key];
-                                });
-                            });
-                        }
-                    }
-                    else {
-                        result[prefix] = param;
-                    }
+            		if (typeof param === 'object') {
+            			if (Array.isArray(param)) {
+            				param.forEach(function (value, index) {
+            					var nested = AWS.prepareRecursive(prefix + '.member.' + (index + 1), value);
+            					Object.keys(nested).forEach(function (key) {
+            						result[key] = nested[key];
+            					});
+            				});
+            			}
+            			else {
+            				Object.keys(param).forEach(function (k) {
+            					var nested = AWS.prepareRecursive(prefix + '.' + k, param[k]);
+            					Object.keys(nested).forEach(function (key) {
+            						result[key] = nested[key];
+            					});
+            				});
+            			}
+            		}
+            		else {
+            			result[prefix] = param;
+            		}
             
-                    return result;
-                },
+            		return result;
+            	},
             
-                renderPayload: function (period, cluster_name) {
-                    var metrics_list = [
-                        'ContainerInstanceCount:Count',
-                        'ServiceCount:Count',
-                        'CpuReserved:None',
-                        'CpuUtilized:None',
-                        'MemoryReserved:Megabytes',
-                        'MemoryUtilized:Megabytes',
-                        'NetworkRxBytes:Bytes/Second',
-                        'NetworkTxBytes:Bytes/Second',
-                        'StorageReadBytes:Bytes',
-                        'StorageWriteBytes:Bytes',
-                        'TaskCount:Count'
-                    ];
+            	renderPayload: function (period, cluster_name) {
+            		var metrics_list = [
+            			'ContainerInstanceCount:Count',
+            			'ServiceCount:Count',
+            			'CpuReserved:None',
+            			'CpuUtilized:None',
+            			'MemoryReserved:Megabytes',
+            			'MemoryUtilized:Megabytes',
+            			'NetworkRxBytes:Bytes/Second',
+            			'NetworkTxBytes:Bytes/Second',
+            			'StorageReadBytes:Bytes',
+            			'StorageWriteBytes:Bytes',
+            			'TaskCount:Count'
+            		];
             
-                    var metric_payload = [];
-                    metrics_list.forEach(function (metric) {
-                        var parts = metric.split(':', 2);
-                        var name = parts[0].replace(/[^a-zA-Z0-9]/g, '');
-                        metric_payload.push({
-                            'Id': name.charAt(0).toLowerCase() + name.slice(1),
-                            'MetricStat': {
-                                'Metric': {
-                                    'MetricName': parts[0],
-                                    'Namespace': 'ECS/ContainerInsights',
-                                    'Dimensions': [
-                                        {
-                                            'Name': 'ClusterName',
-                                            'Value': cluster_name
-                                        }
-                                    ]
-                                },
-                                'Period': period,
-                                'Stat': 'Average',
-                                'Unit': parts[1]
-                            }
-                        });
-                    });
+            		var metric_payload = [];
+            		metrics_list.forEach(function (metric) {
+            			var parts = metric.split(':', 2);
+            			var name = parts[0].replace(/[^a-zA-Z0-9]/g, '');
+            			metric_payload.push({
+            				'Id': name.charAt(0).toLowerCase() + name.slice(1),
+            				'MetricStat': {
+            					'Metric': {
+            						'MetricName': parts[0],
+            						'Namespace': 'ECS/ContainerInsights',
+            						'Dimensions': [
+            							{
+            								'Name': 'ClusterName',
+            								'Value': cluster_name
+            							}
+            						]
+            					},
+            					'Period': period,
+            					'Stat': 'Average',
+            					'Unit': parts[1]
+            				}
+            			});
+            		});
             
-                    return metric_payload;
-                },
+            		return metric_payload;
+            	},
             
-                prepareParams: function (params) {
-                    var result = [];
+            	prepareParams: function (params) {
+            		var result = [];
             
-                    Object.keys(params).sort().forEach(function (key) {
-                        if (typeof params[key] !== 'object') {
-                            result.push(key + '=' + encodeURIComponent(params[key]));
-                        }
-                        else {
-                            result.push(prepareObject(key, params[key]));
-                        }
-                    });
+            		Object.keys(params).sort().forEach(function (key) {
+            			if (typeof params[key] !== 'object') {
+            				result.push(key + '=' + encodeURIComponent(params[key]));
+            			}
+            			else {
+            				result.push(prepareObject(key, params[key]));
+            			}
+            		});
             
-                    return result.join('&');
-                },
+            		return result.join('&');
+            	},
             
-                request: function (method, region, service, params, data) {
-                    if (typeof data === 'undefined' || data === null) {
-                        data = '';
-                    }
+            	request: function (method, region, service, params, data) {
+            		if (typeof data === 'undefined' || data === null) {
+            			data = '';
+            		}
             
-                    var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
-                        date = amzdate.replace(/T\d+Z/, ''),
-                        host = service + '.' + region + '.amazonaws.com',
-                        canonical_uri = '/',
-                        canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-                        signed_headers = 'content-encoding;host;x-amz-date',
-                        canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                        credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
-                        request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                        key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
+            		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+            			date = amzdate.replace(/T\d+Z/, ''),
+            			host = service + '.' + region + '.amazonaws.com',
+            			canonical_uri = '/',
+            			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+            			signed_headers = 'content-encoding;host;x-amz-date',
+            			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+            			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+            			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+            			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
             
-                    key = AWS.sign(key, region);
-                    key = AWS.sign(key, service);
-                    key = AWS.sign(key, 'aws4_request');
+            		key = AWS.sign(key, region);
+            		key = AWS.sign(key, service);
+            		key = AWS.sign(key, 'aws4_request');
             
-                    var request = new HttpRequest(),
-                        url = 'https://' + host + canonical_uri + '?' + params;
+            		var request = new HttpRequest(),
+            			url = 'https://' + host + canonical_uri + '?' + params;
             
-                    if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-                        request.setProxy(AWS.params.proxy);
-                    }
-                    request.addHeader('x-amz-date: ' + amzdate);
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Content-Encoding: amz-1.0');
-                    request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                    if (AWS.params.auth_type === 'role_base')
-                        request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
-                    Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
+            		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+            			request.setProxy(AWS.params.proxy);
+            		}
+            		request.addHeader('x-amz-date: ' + amzdate);
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Content-Encoding: amz-1.0');
+            		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+            		if (AWS.params.auth_type === 'role_base')
+            			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-                    response = request.get(url);
+            		Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
             
-                    Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		response = request.get(url);
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                        }
-                    }
+            		if (request.getStatus() !== 200) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    return response;
-                },
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+            			}
+            		}
             
-                getMetricsData: function () {
-                    var timestamp = new Date().getTime(),
-                        MetricData = [],
-                        CPUUtilization,
-                        MemoryUtilization,
-                        DiskUtilization,
-                        obj = {},
-                        metrics = ['CpuReserved', 'CpuUtilized', 'MemoryReserved', 'MemoryUtilized'],
-                        end_time = new Date(timestamp).toISOString().replace(/\.\d+Z/, 'Z'),
-                        start_time = new Date(timestamp - AWS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
-                        payload = AWS.prepareRecursive('MetricDataQueries', AWS.renderPayload(AWS.request_period, AWS.params.cluster_name));
+            		return response;
+            	},
             
-                    payload['Action'] = 'GetMetricData';
-                    payload['Version'] = '2010-08-01';
-                    payload['StartTime'] = start_time;
-                    payload['EndTime'] = end_time;
-                    payload['ScanBy'] = 'TimestampDescending';
+            	getMetricsData: function () {
+            		var timestamp = new Date().getTime(),
+            			MetricData = [],
+            			CPUUtilization,
+            			MemoryUtilization,
+            			DiskUtilization,
+            			obj = {},
+            			metrics = ['CpuReserved', 'CpuUtilized', 'MemoryReserved', 'MemoryUtilized'],
+            			end_time = new Date(timestamp).toISOString().replace(/\.\d+Z/, 'Z'),
+            			start_time = new Date(timestamp - AWS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
+            			payload = AWS.prepareRecursive('MetricDataQueries', AWS.renderPayload(AWS.request_period, AWS.params.cluster_name));
             
-                    result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
-                    MetricData = AWS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
+            		payload['Action'] = 'GetMetricData';
+            		payload['Version'] = '2010-08-01';
+            		payload['StartTime'] = start_time;
+            		payload['EndTime'] = end_time;
+            		payload['ScanBy'] = 'TimestampDescending';
             
-                    MetricData.forEach(function (id) {
-                        for (i in metrics) {
-                            if (AWS.getField(id, 'Label') === metrics[i]) {
-                                obj[metrics[i]] = AWS.getField(id, 'Values');
-                            }
-                        }
-                    });
-                    CPUUtilization = Math.abs(obj.CpuUtilized * 100 / obj.CpuReserved);
-                    MemoryUtilization = Math.abs(obj.MemoryUtilized * 100 / obj.MemoryReserved);
-                    return ({ MetricData, MemoryUtilization, CPUUtilization, DiskUtilization });
-                }
+            		result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
+            		MetricData = AWS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
+            
+            		MetricData.forEach(function (id) {
+            			for (i in metrics) {
+            				if (AWS.getField(id, 'Label') === metrics[i]) {
+            					obj[metrics[i]] = AWS.getField(id, 'Values');
+            				}
+            			}
+            		});
+            		CPUUtilization = Math.abs(obj.CpuUtilized * 100 / obj.CpuReserved);
+            		MemoryUtilization = Math.abs(obj.MemoryUtilized * 100 / obj.MemoryReserved);
+            		return ({ MetricData, MemoryUtilization, CPUUtilization, DiskUtilization });
+            	}
             };
             
             try {
-                AWS.setParams(JSON.parse(value));
+            	AWS.setParams(JSON.parse(value));
             
-                return JSON.stringify(AWS.getMetricsData());
+            	return JSON.stringify(AWS.getMetricsData());
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
             
-                return JSON.stringify({ 'error': error });
+            	return JSON.stringify({ 'error': error });
             }
           description: |
             Get cluster metrics.
@@ -1330,268 +1341,272 @@ zabbix_export:
               value_type: TEXT
               params: |
                 var AWS = {
-                    params: {},
-                    request_period: 600,
+                	params: {},
+                	request_period: 600,
                 
-                    setParams: function (params) {
-                        switch (AWS.getField(params, 'auth_type')) {
-                            case 'role_base':
-                                AWS.params['auth_type'] = 'role_base';
-                                var request = new HttpRequest(),
-                                    IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                	setParams: function (params) {
+                		AWS.params['proxy'] = params.proxy;
+                		switch (AWS.getField(params, 'auth_type')) {
+                			case 'role_base':
+                				AWS.params['auth_type'] = 'role_base';
+                				var request = new HttpRequest();
+                				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                					request.setProxy(AWS.params.proxy);
+                				}
+                				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
                 
-                                if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
-                                    throw 'Error getting security credentials from instance metadata. Role not found.';
-                                }
+                				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
+                					throw 'Error getting security credentials from instance metadata. Role not found.';
+                				}
                 
-                                credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+                				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
                 
-                                if (request.getStatus() !== 200 || credentials === null || credentials === '') {
-                                    throw 'Error getting security credentials from instance metadata.';
-                                }
+                				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
+                					throw 'Error getting security credentials from instance metadata.';
+                				}
                 
-                                try {
-                                    credentials = JSON.parse(credentials);
-                                }
-                                catch (error) {
-                                    throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
-                                }
+                				try {
+                					credentials = JSON.parse(credentials);
+                				}
+                				catch (error) {
+                					throw 'Failed to parse response received from instance metadata. Check debug log for more information.';
+                				}
                 
-                                ['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
-                                    if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
-                                        throw 'Required credentials is not set: "' + field + '".';
-                                    };
-                                    AWS.params[field] = credentials[field];
-                                });
-                                break;
-                            case 'access_key':
-                            default:
-                                AWS.params['auth_type'] = 'access_key';
-                                ['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
-                                    if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                                        throw 'Required param is not set: "' + field + '".';
-                                    }
-                                    AWS.params[field] = params[field];
-                                });
-                        }
-                        ['region', 'cluster_name', 'service_name'].forEach(function (field) {
-                            if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                                throw 'Required param is not set: "' + field + '".';
-                            }
-                            AWS.params[field] = params[field];
-                        });
-                    },
+                				['AccessKeyId', 'SecretAccessKey', 'Token'].forEach(function (field) {
+                					if (typeof credentials !== 'object' || typeof credentials[field] === 'undefined' || credentials[field] === '') {
+                						throw 'Required credentials is not set: "' + field + '".';
+                					};
+                					AWS.params[field] = credentials[field];
+                				});
+                				break;
+                			case 'access_key':
+                			default:
+                				AWS.params['auth_type'] = 'access_key';
+                				['AccessKeyId', 'SecretAccessKey'].forEach(function (field) {
+                					if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                						throw 'Required param is not set: "' + field + '".';
+                					}
+                					AWS.params[field] = params[field];
+                				});
+                		}
+                		['region', 'cluster_name', 'service_name'].forEach(function (field) {
+                			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+                				throw 'Required param is not set: "' + field + '".';
+                			}
+                			AWS.params[field] = params[field];
+                		});
+                	},
                 
-                    getField: function (data, path) {
-                        var steps = path.split('.');
-                        for (var i = 0; i < steps.length; i++) {
-                            var step = steps[i];
-                            if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                                throw 'Required field was not found: ' + path;
-                            }
+                	getField: function (data, path) {
+                		var steps = path.split('.');
+                		for (var i = 0; i < steps.length; i++) {
+                			var step = steps[i];
+                			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+                				throw 'Required field was not found: ' + path;
+                			}
                 
-                            data = data[step];
-                        }
+                			data = data[step];
+                		}
                 
-                        return data;
-                    },
-                    
-                    sign: function (key, message) {
-                        var hex = hmac('sha256', key, message);
+                		return data;
+                	},
                 
-                        if ((hex.length % 2) === 1) {
-                            throw 'Invalid length of a hex string!';
-                        }
+                	sign: function (key, message) {
+                		var hex = hmac('sha256', key, message);
                 
-                        var result = new Int8Array(hex.length / 2);
-                        for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
-                            result[b] = parseInt(hex.substring(i, i + 2), 16);
-                        }
+                		if ((hex.length % 2) === 1) {
+                			throw 'Invalid length of a hex string!';
+                		}
                 
-                        return result;
-                    },
+                		var result = new Int8Array(hex.length / 2);
+                		for (var i = 0, b = 0; i < hex.length; i += 2, b++) {
+                			result[b] = parseInt(hex.substring(i, i + 2), 16);
+                		}
                 
-                    prepareRecursive: function (prefix, param) {
-                        var result = {};
+                		return result;
+                	},
                 
-                        if (typeof param === 'object') {
-                            if (Array.isArray(param)) {
-                                param.forEach(function (value, index) {
-                                    var nested = AWS.prepareRecursive(prefix + '.member.' + (index + 1), value);
-                                    Object.keys(nested).forEach(function (key) {
-                                        result[key] = nested[key];
-                                    });
-                                });
-                            }
-                            else {
-                                Object.keys(param).forEach(function (k) {
-                                    var nested = AWS.prepareRecursive(prefix + '.' + k, param[k]);
-                                    Object.keys(nested).forEach(function (key) {
-                                        result[key] = nested[key];
-                                    });
-                                });
-                            }
-                        }
-                        else {
-                            result[prefix] = param;
-                        }
+                	prepareRecursive: function (prefix, param) {
+                		var result = {};
                 
-                        return result;
-                    },
+                		if (typeof param === 'object') {
+                			if (Array.isArray(param)) {
+                				param.forEach(function (value, index) {
+                					var nested = AWS.prepareRecursive(prefix + '.member.' + (index + 1), value);
+                					Object.keys(nested).forEach(function (key) {
+                						result[key] = nested[key];
+                					});
+                				});
+                			}
+                			else {
+                				Object.keys(param).forEach(function (k) {
+                					var nested = AWS.prepareRecursive(prefix + '.' + k, param[k]);
+                					Object.keys(nested).forEach(function (key) {
+                						result[key] = nested[key];
+                					});
+                				});
+                			}
+                		}
+                		else {
+                			result[prefix] = param;
+                		}
                 
-                    renderPayload: function (period, cluster_name, service_name) {
-                        var metrics_list = [
-                            'CpuReserved:None:ECS/ContainerInsights',
-                            'CpuUtilized:None:ECS/ContainerInsights',
-                            'CPUUtilization:Percent:AWS/ECS',
-                            'MemoryUtilization:Percent:AWS/ECS',
-                            'MemoryReserved:Megabytes:ECS/ContainerInsights',
-                            'MemoryUtilized:Megabytes:ECS/ContainerInsights',
-                            'NetworkRxBytes:Bytes/Second:ECS/ContainerInsights',
-                            'NetworkTxBytes:Bytes/Second:ECS/ContainerInsights',
-                            'StorageReadBytes:Bytes:ECS/ContainerInsights',
-                            'StorageWriteBytes:Bytes:ECS/ContainerInsights',
-                            'DeploymentCount:Count:ECS/ContainerInsights',
-                            'TaskSetCount:Count:ECS/ContainerInsights',
-                            'DesiredTaskCount:Count:ECS/ContainerInsights',
-                            'PendingTaskCount:Count:ECS/ContainerInsights',
-                            'RunningTaskCount:Count:ECS/ContainerInsights',
-                            'EphemeralStorageReserved:Gigabytes:ECS/ContainerInsights',
-                            'EphemeralStorageUtilized:Gigabytes:ECS/ContainerInsights'
-                        ];
+                		return result;
+                	},
                 
-                        var metric_payload = [];
-                        metrics_list.forEach(function (metric) {
-                            var parts = metric.split(':', 3);
-                            var name = parts[0].replace(/[^a-zA-Z0-9]/g, '');
-                            metric_payload.push({
-                                'Id': name.charAt(0).toLowerCase() + name.slice(1),
-                                'MetricStat': {
-                                    'Metric': {
-                                        'MetricName': parts[0],
-                                        'Namespace': parts[2],
-                                        'Dimensions': [
-                                            {
-                                                'Name': 'ClusterName',
-                                                'Value': cluster_name
-                                            }
-                                            ,
-                                            {
-                                                'Name': 'ServiceName',
-                                                'Value': service_name
-                                            }
-                                        ]
-                                    },
-                                    'Period': period,
-                                    'Stat': 'Average',
-                                    'Unit': parts[1]
-                                }
-                            });
-                        });
+                	renderPayload: function (period, cluster_name, service_name) {
+                		var metrics_list = [
+                			'CpuReserved:None:ECS/ContainerInsights',
+                			'CpuUtilized:None:ECS/ContainerInsights',
+                			'CPUUtilization:Percent:AWS/ECS',
+                			'MemoryUtilization:Percent:AWS/ECS',
+                			'MemoryReserved:Megabytes:ECS/ContainerInsights',
+                			'MemoryUtilized:Megabytes:ECS/ContainerInsights',
+                			'NetworkRxBytes:Bytes/Second:ECS/ContainerInsights',
+                			'NetworkTxBytes:Bytes/Second:ECS/ContainerInsights',
+                			'StorageReadBytes:Bytes:ECS/ContainerInsights',
+                			'StorageWriteBytes:Bytes:ECS/ContainerInsights',
+                			'DeploymentCount:Count:ECS/ContainerInsights',
+                			'TaskSetCount:Count:ECS/ContainerInsights',
+                			'DesiredTaskCount:Count:ECS/ContainerInsights',
+                			'PendingTaskCount:Count:ECS/ContainerInsights',
+                			'RunningTaskCount:Count:ECS/ContainerInsights',
+                			'EphemeralStorageReserved:Gigabytes:ECS/ContainerInsights',
+                			'EphemeralStorageUtilized:Gigabytes:ECS/ContainerInsights'
+                		];
                 
-                        return metric_payload;
-                    },
+                		var metric_payload = [];
+                		metrics_list.forEach(function (metric) {
+                			var parts = metric.split(':', 3);
+                			var name = parts[0].replace(/[^a-zA-Z0-9]/g, '');
+                			metric_payload.push({
+                				'Id': name.charAt(0).toLowerCase() + name.slice(1),
+                				'MetricStat': {
+                					'Metric': {
+                						'MetricName': parts[0],
+                						'Namespace': parts[2],
+                						'Dimensions': [
+                							{
+                								'Name': 'ClusterName',
+                								'Value': cluster_name
+                							}
+                							,
+                							{
+                								'Name': 'ServiceName',
+                								'Value': service_name
+                							}
+                						]
+                					},
+                					'Period': period,
+                					'Stat': 'Average',
+                					'Unit': parts[1]
+                				}
+                			});
+                		});
                 
-                    prepareParams: function (params) {
-                        var result = [];
+                		return metric_payload;
+                	},
                 
-                        Object.keys(params).sort().forEach(function (key) {
-                            if (typeof params[key] !== 'object') {
-                                result.push(key + '=' + encodeURIComponent(params[key]));
-                            }
-                            else {
-                                result.push(prepareObject(key, params[key]));
-                            }
-                        });
+                	prepareParams: function (params) {
+                		var result = [];
                 
-                        return result.join('&');
-                    },
+                		Object.keys(params).sort().forEach(function (key) {
+                			if (typeof params[key] !== 'object') {
+                				result.push(key + '=' + encodeURIComponent(params[key]));
+                			}
+                			else {
+                				result.push(prepareObject(key, params[key]));
+                			}
+                		});
                 
-                    request: function (method, region, service, params, data) {
-                        if (typeof data === 'undefined' || data === null) {
-                            data = '';
-                        }
+                		return result.join('&');
+                	},
                 
-                        var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
-                            date = amzdate.replace(/T\d+Z/, ''),
-                            host = service + '.' + region + '.amazonaws.com',
-                            canonical_uri = '/',
-                            canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
-                            signed_headers = 'content-encoding;host;x-amz-date',
-                            canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                            credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
-                            request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
-                            key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
+                	request: function (method, region, service, params, data) {
+                		if (typeof data === 'undefined' || data === null) {
+                			data = '';
+                		}
                 
-                        key = AWS.sign(key, region);
-                        key = AWS.sign(key, service);
-                        key = AWS.sign(key, 'aws4_request');
+                		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
+                			date = amzdate.replace(/T\d+Z/, ''),
+                			host = service + '.' + region + '.amazonaws.com',
+                			canonical_uri = '/',
+                			canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
+                			signed_headers = 'content-encoding;host;x-amz-date',
+                			canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
+                			credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
+                			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
+                			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
                 
-                        var request = new HttpRequest(),
-                            url = 'https://' + host + canonical_uri + '?' + params;
+                		key = AWS.sign(key, region);
+                		key = AWS.sign(key, service);
+                		key = AWS.sign(key, 'aws4_request');
                 
-                        if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
-                            request.setProxy(AWS.params.proxy);
-                        }
-                        request.addHeader('x-amz-date: ' + amzdate);
-                        request.addHeader('Accept: application/json');
-                        request.addHeader('Content-Type: application/json');
-                        request.addHeader('Content-Encoding: amz-1.0');
-                        request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
-                        if (AWS.params.auth_type === 'role_base')
-                            request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                        
-                        Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
+                		var request = new HttpRequest(),
+                			url = 'https://' + host + canonical_uri + '?' + params;
                 
-                        response = request.get(url);
+                		if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                			request.setProxy(AWS.params.proxy);
+                		}
+                		request.addHeader('x-amz-date: ' + amzdate);
+                		request.addHeader('Accept: application/json');
+                		request.addHeader('Content-Type: application/json');
+                		request.addHeader('Content-Encoding: amz-1.0');
+                		request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
+                		if (AWS.params.auth_type === 'role_base')
+                			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
                 
-                        Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
+                		Zabbix.log(4, '[ AWS ECS  ] Sending request: ' + url);
                 
-                        if (request.getStatus() !== 200) {
-                            throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                        }
+                		response = request.get(url);
                 
-                        if (response !== null) {
-                            try {
-                                response = JSON.parse(response);
-                            }
-                            catch (error) {
-                                throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
-                            }
-                        }
+                		Zabbix.log(4, '[ AWS ECS ] Received response with status code ' + request.getStatus() + ': ' + response);
                 
-                        return response;
-                    },
+                		if (request.getStatus() !== 200) {
+                			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+                		}
                 
-                    getMetricsData: function () {
-                        var timestamp = new Date().getTime(),
-                            end_time = new Date(timestamp).toISOString().replace(/\.\d+Z/, 'Z'),
-                            start_time = new Date(timestamp - AWS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
-                            payload = AWS.prepareRecursive('MetricDataQueries', AWS.renderPayload(AWS.request_period, AWS.params.cluster_name, AWS.params.service_name));
+                		if (response !== null) {
+                			try {
+                				response = JSON.parse(response);
+                			}
+                			catch (error) {
+                				throw 'Failed to parse response received from AWS CloudWatch API. Check debug log for more information.';
+                			}
+                		}
                 
-                        payload['Action'] = 'GetMetricData';
-                        payload['Version'] = '2010-08-01';
-                        payload['StartTime'] = start_time;
-                        payload['EndTime'] = end_time;
-                        payload['ScanBy'] = 'TimestampDescending';
+                		return response;
+                	},
                 
-                        result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
-                        MetricData = AWS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
+                	getMetricsData: function () {
+                		var timestamp = new Date().getTime(),
+                			end_time = new Date(timestamp).toISOString().replace(/\.\d+Z/, 'Z'),
+                			start_time = new Date(timestamp - AWS.request_period * 1000).toISOString().replace(/\.\d+Z/, 'Z'),
+                			payload = AWS.prepareRecursive('MetricDataQueries', AWS.renderPayload(AWS.request_period, AWS.params.cluster_name, AWS.params.service_name));
                 
-                        return MetricData;
-                    }
+                		payload['Action'] = 'GetMetricData';
+                		payload['Version'] = '2010-08-01';
+                		payload['StartTime'] = start_time;
+                		payload['EndTime'] = end_time;
+                		payload['ScanBy'] = 'TimestampDescending';
+                
+                		result = AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload));
+                		MetricData = AWS.getField(result, 'GetMetricDataResponse.GetMetricDataResult.MetricDataResults')
+                
+                		return MetricData;
+                	}
                 };
                 
                 try {
-                    AWS.setParams(JSON.parse(value));
+                	AWS.setParams(JSON.parse(value));
                 
-                    return JSON.stringify(AWS.getMetricsData());
+                	return JSON.stringify(AWS.getMetricsData());
                 }
                 catch (error) {
-                    error += (String(error).endsWith('.')) ? '' : '.';
-                    Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
+                	error += (String(error).endsWith('.')) ? '' : '.';
+                	Zabbix.log(3, '[ AWS ECS ] ERROR: ' + error);
                 
-                    return JSON.stringify({ 'error': error });
+                	return JSON.stringify({ 'error': error });
                 }
               description: |
                 Get metrics of ESC services.
@@ -1890,7 +1905,7 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.AUTH_TYPE}'
-          value: role_base
+          value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
         - macro: '{$AWS.ECS.CLUSTER.CPU.UTIL.WARN}'
           value: '70'

@@ -2,7 +2,7 @@
 
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -278,7 +278,7 @@ class testDashboardItemValueWidget extends CWebTest {
 				}
 
 				// Check fields' lengths.
-				$field_lenghts = [
+				$field_lengths = [
 					'Name' =>  255,
 					'id:description' => 255,
 					'id:desc_size' => 3,
@@ -289,7 +289,7 @@ class testDashboardItemValueWidget extends CWebTest {
 					'id:units_size' => 3
 				];
 
-				foreach ($field_lenghts as $field => $length) {
+				foreach ($field_lengths as $field => $length) {
 					$this->assertEquals($length, $form->getField($field)->getAttribute('maxlength'));
 				}
 

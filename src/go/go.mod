@@ -3,7 +3,7 @@ module zabbix.com
 go 1.19
 
 require (
-	git.zabbix.com/ap/plugin-support v1.2.2-0.20231017084106-a7a9dc3e4609
+	git.zabbix.com/ap/plugin-support v1.2.2-0.20240118125059-c17bf0453a50
 	github.com/BurntSushi/locker v0.0.0-20171006230638-a6e239ea1c69
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/Microsoft/go-winio v0.6.1
@@ -18,14 +18,16 @@ require (
 	github.com/goburrow/modbus v0.1.0
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.20.1
-	github.com/google/go-cmp v0.4.0
+	github.com/google/go-cmp v0.6.0
 	github.com/mattn/go-sqlite3 v1.14.8
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/memcachier/mc/v3 v3.0.1
 	github.com/miekg/dns v1.1.43
 	github.com/omeid/go-yarn v0.0.1
 	github.com/sokurenko/go-netstat v1.0.0
-	golang.org/x/sys v0.11.0
+	golang.org/x/net v0.17.0
+	golang.org/x/sys v0.13.0
+	golang.org/x/text v0.13.0
 )
 
 require (
@@ -39,7 +41,6 @@ require (
 	github.com/josharian/intern v1.0.0 // indirect
 	github.com/mailru/easyjson v0.7.7 // indirect
 	golang.org/x/mod v0.12.0 // indirect
-	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sync v0.3.0 // indirect
 	golang.org/x/tools v0.11.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
