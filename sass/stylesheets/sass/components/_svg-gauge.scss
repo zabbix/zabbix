@@ -4,7 +4,14 @@
 	fill: $font-color;
 
 	.svg-gauge-description {
-		text-anchor: middle;
+		text-align: center;
+		white-space: nowrap;
+		color: $font-color;
+
+		div {
+			overflow: hidden;
+			text-overflow: ellipsis;
+		}
 	}
 
 	.svg-gauge-thresholds-arc-sector,

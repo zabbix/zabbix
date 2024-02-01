@@ -76,8 +76,8 @@ void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value)
 	zbx_str_free(value.value);
 }
 
-ZBX_PTR_VECTOR_IMPL(vmware_entity_tags, zbx_vmware_entity_tags_t *)
-ZBX_PTR_VECTOR_IMPL(vmware_tag, zbx_vmware_tag_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_entity_tags_ptr, zbx_vmware_entity_tags_t *)
+ZBX_PTR_VECTOR_IMPL(vmware_tag_ptr, zbx_vmware_tag_t *)
 
 /******************************************************************************
  *                                                                            *
@@ -113,9 +113,8 @@ static void	vmware_tag_free(zbx_vmware_tag_t *value)
  ******************************************************************************/
 static void	vmware_entity_tags_free(zbx_vmware_entity_tags_t *value)
 {
-
-	zbx_vector_vmware_tag_clear_ext(&value->tags, vmware_tag_free);
-	zbx_vector_vmware_tag_destroy(&value->tags);
+	zbx_vector_vmware_tag_ptr_clear_ext(&value->tags, vmware_tag_free);
+	zbx_vector_vmware_tag_ptr_destroy(&value->tags);
 	zbx_str_free(value->uuid);
 	zbx_str_free(value->error);
 	zbx_str_free(value->obj_id->id);
@@ -126,11 +125,11 @@ static void	vmware_entity_tags_free(zbx_vmware_entity_tags_t *value)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create entity tag object                                          *
+ * Purpose: creates entity tag object                                         *
  *                                                                            *
  * Parameters: type - [IN] VirtualMachine, HostSystem etc                     *
- *             id   - [IN] the id of vm, hv or ds                             *
- *             uuid - [IN] the uuid of vm, hv or ds                           *
+ *             id   - [IN] id of vm, hv or ds                                 *
+ *             uuid - [IN] uuid of vm, hv or ds                               *
  *                                                                            *
  * Return value: pointer to tag object                                        *
  *                                                                            *
@@ -141,7 +140,7 @@ static zbx_vmware_entity_tags_t	*vmware_entity_tag_create(const char *type, cons
 
 	entry_tag = (zbx_vmware_entity_tags_t *)zbx_malloc(NULL, sizeof(zbx_vmware_entity_tags_t));
 	entry_tag->obj_id = (zbx_vmware_obj_id_t *)zbx_malloc(NULL, sizeof(zbx_vmware_obj_id_t));
-	zbx_vector_vmware_tag_create(&entry_tag->tags);
+	zbx_vector_vmware_tag_ptr_create(&entry_tag->tags);
 	entry_tag->obj_id->type = zbx_strdup(NULL, type);
 	entry_tag->obj_id->id = zbx_strdup(NULL, id);
 	entry_tag->uuid = zbx_strdup(NULL, uuid);
@@ -154,13 +153,12 @@ static zbx_vmware_entity_tags_t	*vmware_entity_tag_create(const char *type, cons
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware service data     *
  *                                                                            *
- * Parameters: data        - [IN] the vmware service data                     *
+ * Parameters: data        - [IN] vmware service data                         *
  *             entity_tags - [OUT] set of query tags objects                  *
  *                                                                            *
  ******************************************************************************/
-static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_entity_tags_t *entity_tags)
+static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_entity_tags_ptr_t *entity_tags)
 {
-	int			i;
 	zbx_hashset_iter_t	iter;
 	zbx_vmware_hv_t		*hv;
 	zbx_vmware_vm_index_t	*vmi;
@@ -171,7 +169,7 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 
 	while (NULL != (hv = (zbx_vmware_hv_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_HV, hv->id, hv->uuid));
 	}
 
@@ -179,49 +177,49 @@ static void	vmware_entry_tags_init(zbx_vmware_data_t *data, zbx_vector_vmware_en
 
 	while (NULL != (vmi = (zbx_vmware_vm_index_t *)zbx_hashset_iter_next(&iter)))
 	{
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_VM, vmi->vm->id, vmi->vm->uuid));
 	}
 
-	for (i = 0; i < data->datastores.values_num; i++)
+	for (int i = 0; i < data->datastores.values_num; i++)
 	{
 		zbx_vmware_datastore_t	*ds = data->datastores.values[i];
 
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DS, ds->id, ds->uuid));
 	}
 
-	for (i = 0; i < data->datacenters.values_num; i++)
+	for (int i = 0; i < data->datacenters.values_num; i++)
 	{
 		zbx_vmware_datacenter_t	*dc = data->datacenters.values[i];
 		char			uuid[VMWARE_SHORT_STR_LEN];
 
 		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_DC, dc->id);
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_DC, dc->id, uuid));
 	}
 
-	for (i = 0; i < data->clusters.values_num; i++)
+	for (int i = 0; i < data->clusters.values_num; i++)
 	{
 		zbx_vmware_cluster_t	*cl = (zbx_vmware_cluster_t *)data->clusters.values[i];
 		char			uuid[VMWARE_SHORT_STR_LEN];
 
 		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_CLUSTER, cl->id);
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_CLUSTER, cl->id, uuid));
 	}
 
-	for (i = 0; i < data->resourcepools.values_num; i++)
+	for (int i = 0; i < data->resourcepools.values_num; i++)
 	{
 		zbx_vmware_resourcepool_t	*rp = data->resourcepools.values[i];
 		char				uuid[VMWARE_SHORT_STR_LEN];
 
 		zbx_snprintf(uuid, sizeof(uuid),"%s:%s", ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id);
-		zbx_vector_vmware_entity_tags_append(entity_tags,
+		zbx_vector_vmware_entity_tags_ptr_append(entity_tags,
 				vmware_entity_tag_create(ZBX_VMWARE_SOAP_RESOURCEPOOL, rp->id, uuid));
 	}
 
-	zbx_vector_vmware_entity_tags_sort(entity_tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_entity_tags_ptr_sort(entity_tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() entity tags:%d", __func__, entity_tags->values_num);
 }
@@ -703,20 +701,20 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get tag details and save to cache vectors                         *
+ * Purpose: gets tag details and saves it to cache vectors                    *
  *                                                                            *
- * Parameters: tag_id     - [IN] the tag id                                   *
- *             easyhandle - [IN] the CURL handle                              *
+ * Parameters: tag_id     - [IN]                                              *
+ *             easyhandle - [IN] CURL handle                                  *
  *             is_new_api - [IN] flag to use new api version syntax           *
- *             tags       - [OUT] the vector with tags info                   *
- *             categories - [OUT] the vector with categories info             *
- *             error      - [OUT] the error message in the case of failure    *
+ *             tags       - [OUT] vector with tags info                       *
+ *             categories - [OUT] vector with categories info                 *
+ *             error      - [OUT] error message in the case of failure        *
  *                                                                            *
- * Return value: SUCCEED if the receive tag details, FAIL otherwise           *
+ * Return value: SUCCEED if received tag details, FAIL otherwise              *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, unsigned char is_new_api,
-		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, char **error)
+		zbx_vector_vmware_tag_ptr_t *tags, zbx_vector_vmware_key_value_t *categories, char **error)
 {
 	struct zbx_json_parse	jp, jp_data;
 	int			i;
@@ -795,10 +793,10 @@ static int	vmware_vectors_update(const char *tag_id, CURL *easyhandle, unsigned 
 	tag->name = zbx_strdup(NULL, name);
 	tag->description = zbx_strdup(NULL, desc);
 	tag->category  = zbx_strdup(NULL, categories->values[i].value);
-	zbx_vector_vmware_tag_append(tags, tag);
-	zbx_vector_vmware_tag_sort(tags, zbx_vmware_tag_id_compare);
+	zbx_vector_vmware_tag_ptr_append(tags, tag);
+	zbx_vector_vmware_tag_ptr_sort(tags, zbx_vmware_tag_id_compare);
 
-	if (FAIL == (i = zbx_vector_vmware_tag_bsearch(tags, tag, zbx_vmware_tag_id_compare)))
+	if (FAIL == (i = zbx_vector_vmware_tag_ptr_bsearch(tags, tag, zbx_vmware_tag_id_compare)))
 	{
 		*error = zbx_strdup(NULL, "Cannot append tag info");
 		return FAIL;
@@ -815,21 +813,21 @@ json_err:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: create vector with tags details                                   *
+ * Purpose: creates vector with tags details                                  *
  *                                                                            *
  * Parameters: is_new_api  - [IN] flag to use new api version syntax          *
- *             entity_tags - [IN/OUT] the tag entity                          *
- *             tags        - [IN/OUT] the vector with tags info               *
- *             categories  - [IN/OUT] the vector with categories info         *
- *             easyhandle  - [IN/OUT] the CURL handle                         *
+ *             entity_tags - [IN/OUT] tag entity                              *
+ *             tags        - [IN/OUT] vector with tags info                   *
+ *             categories  - [IN/OUT] vector with categories info             *
+ *             easyhandle  - [IN/OUT] CURL handle                             *
  *                                                                            *
  * Return value: SUCCEED if the create tags vector, FAIL otherwise            *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *entity_tags,
-		zbx_vector_vmware_tag_t *tags, zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
+		zbx_vector_vmware_tag_ptr_t *tags, zbx_vector_vmware_key_value_t *categories, CURL *easyhandle)
 {
-	int			i, found_tags = 0;
+	int			found_tags = 0;
 	zbx_vector_str_t	tag_ids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() obj_id:%s", __func__, entity_tags->obj_id->id);
@@ -839,12 +837,12 @@ static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *e
 	if (FAIL == vmware_tags_linked_id(entity_tags->obj_id, easyhandle, is_new_api, &tag_ids, &entity_tags->error))
 		goto out;
 
-	for (i = 0; i < tag_ids.values_num; i++)
+	for (int i = 0; i < tag_ids.values_num; i++)
 	{
 		int			j;
 		zbx_vmware_tag_t	*tag, cmp = {.id = tag_ids.values[i]};
 
-		if (FAIL == (j = zbx_vector_vmware_tag_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
+		if (FAIL == (j = zbx_vector_vmware_tag_ptr_bsearch(tags, &cmp, zbx_vmware_tag_id_compare)) &&
 				FAIL == (j = vmware_vectors_update(tag_ids.values[i], easyhandle, is_new_api, tags,
 				categories, &entity_tags->error)))
 		{
@@ -858,11 +856,11 @@ static int	vmware_tags_get(unsigned char is_new_api, zbx_vmware_entity_tags_t *e
 		tag->description = zbx_strdup(NULL, tags->values[j]->description);
 		tag->category = zbx_strdup(NULL, tags->values[j]->category);
 		tag->id = NULL;
-		zbx_vector_vmware_tag_append(&entity_tags->tags, tag);
+		zbx_vector_vmware_tag_ptr_append(&entity_tags->tags, tag);
 		found_tags++;
 	}
 
-	zbx_vector_vmware_tag_sort(&entity_tags->tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
+	zbx_vector_vmware_tag_ptr_sort(&entity_tags->tags, ZBX_DEFAULT_STR_PTR_COMPARE_FUNC);
 out:
 	zbx_vector_str_clear_ext(&tag_ids, zbx_str_free);
 	zbx_vector_str_destroy(&tag_ids);
@@ -883,19 +881,19 @@ out:
 int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout)
 {
-	int				i, version, found_tags = 0, ret = FAIL;
-	char				*error = NULL;
-	unsigned char			is_new_api;
-	zbx_vector_vmware_entity_tags_t	entity_tags;
-	zbx_vector_vmware_tag_t		tags;
-	zbx_vector_vmware_key_value_t	categories;
-	CURL				*easyhandle = NULL;
-	struct curl_slist		*headers = NULL;
+	int					version, found_tags = 0, ret = FAIL;
+	char					*error = NULL;
+	unsigned char				is_new_api;
+	zbx_vector_vmware_entity_tags_ptr_t	entity_tags;
+	zbx_vector_vmware_tag_ptr_t		tags;
+	zbx_vector_vmware_key_value_t		categories;
+	CURL					*easyhandle = NULL;
+	struct curl_slist			*headers = NULL;
 	ZBX_HTTPPAGE_REST			page = {.data = NULL, .url = NULL};
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	zbx_vector_vmware_entity_tags_create(&entity_tags);
+	zbx_vector_vmware_entity_tags_ptr_create(&entity_tags);
 
 	zbx_vmware_lock();
 	version = service->major_version * 100 + service->minor_version * 10 + service->update_version;
@@ -912,7 +910,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() vc version:%d", __func__, version);
 
-	zbx_vector_vmware_tag_create(&tags);
+	zbx_vector_vmware_tag_ptr_create(&tags);
 	zbx_vector_vmware_key_value_create(&categories);
 	is_new_api = (702 <= version) ? 1 : 0;
 
@@ -925,7 +923,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 		goto clean;
 	}
 
-	for (i = 0; i < entity_tags.values_num; i++)
+	for (int i = 0; i < entity_tags.values_num; i++)
 		found_tags += vmware_tags_get(is_new_api, entity_tags.values[i], &tags, &categories, easyhandle);
 
 	if (NULL != headers)
@@ -935,17 +933,17 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 
 	ret = SUCCEED;
 clean:
-	zbx_vector_vmware_tag_clear_ext(&tags, vmware_tag_free);
+	zbx_vector_vmware_tag_ptr_clear_ext(&tags, vmware_tag_free);
 	zbx_vector_vmware_key_value_clear_ext(&categories, zbx_vmware_key_value_free);
-	zbx_vector_vmware_tag_destroy(&tags);
+	zbx_vector_vmware_tag_ptr_destroy(&tags);
 	zbx_vector_vmware_key_value_destroy(&categories);
 	curl_slist_free_all(headers);
 	curl_easy_cleanup(easyhandle);
 	zbx_free(page.data);
 	zbx_free(page.url);
 out:
-	zbx_vector_vmware_entity_tags_clear_ext(&entity_tags, vmware_entity_tags_free);
-	zbx_vector_vmware_entity_tags_destroy(&entity_tags);
+	zbx_vector_vmware_entity_tags_ptr_clear_ext(&entity_tags, vmware_entity_tags_free);
+	zbx_vector_vmware_entity_tags_ptr_destroy(&entity_tags);
 
 	if (FAIL == ret)
 	{
