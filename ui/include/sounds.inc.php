@@ -66,14 +66,14 @@ function getMessageSettings() {
 	];
 
 	$dbProfiles = DBselect(
-		'SELECT p.idx,p.source,p.value_id, p.value_str'.
+		'SELECT p.idx,p.source,p.value_id,p.value_str,type'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
 			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
 
 	while ($profile = DBfetch($dbProfiles)) {
-		$messages[$profile['source']] = $profile['source'] === 'snoozed.eventid'
+		$messages[$profile['source']] = $profile['type'] == PROFILE_TYPE_ID
 			? $profile['value_id']
 			: $profile['value_str'];
 	}
@@ -99,20 +99,20 @@ function updateMessageSettings($messages) {
 	}
 
 	$dbProfiles = DBselect(
-		'SELECT p.profileid,p.idx,p.source,p.value_id, p.value_str'.
+		'SELECT p.profileid,p.idx,p.source,p.value_id,p.value_str,type'.
 		' FROM profiles p'.
 		' WHERE p.userid='.CWebUser::$data['userid'].
 			' AND '.dbConditionString('p.idx', ['web.messages'])
 	);
 	while ($profile = DBfetch($dbProfiles)) {
-		if ($profile['source'] === 'snoozed.eventid') {
+		if ($profile['type'] == PROFILE_TYPE_ID) {
 			unset($profile['value_str']);
 		}
 		else {
 			unset($profile['value_id']);
 		}
 
-		$profile['value'] = ($profile['source'] === 'snoozed.eventid') ? $profile['value_id'] : $profile['value_str'];
+		$profile['value'] = $profile['type'] == PROFILE_TYPE_ID ? $profile['value_id'] : $profile['value_str'];
 		$dbMessages[$profile['source']] = $profile;
 	}
 
@@ -130,10 +130,10 @@ function updateMessageSettings($messages) {
 			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
 			'source' => $key,
-			'type' => $key === 'snoozed.eventid' ? PROFILE_TYPE_ID : PROFILE_TYPE_STR
+			'type' => (int) $dbMessages[$key]['type']
 		];
 
-		if ($key === 'snoozed.eventid') {
+		if ($values['type'] === PROFILE_TYPE_ID) {
 			$values['value_id'] = $value;
 		}
 		else {
