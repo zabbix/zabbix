@@ -52,6 +52,11 @@ type perfCounterIndex struct {
 	lang int
 }
 
+type perfCounterAddInfo struct {
+	index    perfCounterIndex
+	interval int64
+}
+
 type perfCounter struct {
 	lastAccess time.Time
 	interval   int
@@ -65,7 +70,9 @@ type perfCounter struct {
 type Plugin struct {
 	plugin.Base
 	mutex        sync.Mutex
+	historyMutex sync.Mutex
 	counters     map[perfCounterIndex]*perfCounter
+	addCounters  []perfCounterAddInfo
 	query        win32.PDH_HQUERY
 	collectError error
 }
@@ -125,27 +132,14 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 		return nil, zbxerr.New("invalid performance counter path")
 	}
 
-	p.mutex.Lock()
-	defer p.mutex.Unlock()
-
-	if p.query == 0 {
-		p.query, err = win32.PdhOpenQuery(nil, 0)
-		if err != nil {
-			return nil, zbxerr.New("cannot open query").Wrap(err)
-		}
-	}
-
 	index := perfCounterIndex{path, lang}
+	p.historyMutex.Lock()
+	defer p.historyMutex.Unlock()
 	counter, ok := p.counters[index]
 	if !ok {
-		err = p.addCounter(index, interval)
-		if err != nil {
-			p.collectError = zbxerr.New(
-				fmt.Sprintf("failed to get counter for path %q and lang %d", path, lang),
-			).Wrap(err)
-		}
+		p.addCounters = append(p.addCounters, perfCounterAddInfo{index, interval})
 
-		return nil, p.collectError
+		return nil, nil
 	}
 
 	if p.collectError != nil {
@@ -159,23 +153,64 @@ func (p *Plugin) Collect() error {
 	p.mutex.Lock()
 	defer p.mutex.Unlock()
 
-	if len(p.counters) == 0 {
+	if len(p.counters) == 0 && len(p.addCounters) == 0 {
 		return nil
 	}
 
-	p.setCounterData()
-
-	if p.collectError != nil {
-		p.Debugf("reset counter query: '%s'", p.collectError)
-
-		err := win32.PdhCloseQuery(p.query)
+	var err error
+	if p.query == 0 {
+		p.query, err = win32.PdhOpenQuery(nil, 0)
 		if err != nil {
-			p.Warningf("error while closing query '%s'", err)
+			return zbxerr.New("cannot open query").Wrap(err)
+		}
+	}
+
+	p.historyMutex.Lock()
+	addCountersLocal := p.addCounters
+	p.addCounters = nil
+	p.collectError = nil
+	p.historyMutex.Unlock()
+
+	for i := len(addCountersLocal) - 1; i >= 0; i-- {
+		addInfo := addCountersLocal[i]
+		err = p.addCounter(addInfo.index, addInfo.interval)
+		if err != nil {
+			p.historyMutex.Lock()
+			p.collectError = zbxerr.New(
+				fmt.Sprintf("failed to get counter for path %q and lang %d", addInfo.index.path, addInfo.index.lang),
+			).Wrap(err)
+			err = p.collectError
+			p.historyMutex.Unlock()
+			addCountersLocal = addCountersLocal[:i]
+
+			break
+		}
+	}
+
+	if err != nil {
+		p.historyMutex.Lock()
+		defer p.historyMutex.Unlock()
+		p.addCounters = append(p.addCounters, addCountersLocal...)
+
+		return err
+	}
+
+	err = p.setCounterData()
+	if err != nil {
+		p.Debugf("reset counter query: '%s'", err)
+
+		p.historyMutex.Lock()
+		p.collectError = err
+		p.historyMutex.Unlock()
+
+		err2 := win32.PdhCloseQuery(p.query)
+		if err2 != nil {
+			p.Warningf("error while closing query '%s'", err2)
 		}
 
 		p.query = 0
 
-		return p.collectError
+		return err
 	}
 
 	return nil
@@ -191,31 +226,32 @@ func (p *Plugin) Start() {
 func (p *Plugin) Stop() {
 }
 
-func (p *Plugin) setCounterData() {
-	p.collectError = nil
-
-	err := win32.PdhCollectQueryData(p.query)
-	if err != nil {
-		p.collectError = fmt.Errorf("cannot collect value %s", err)
+func (p *Plugin) setCounterData() error {
+	errCollect := win32.PdhCollectQueryData(p.query)
+	if errCollect != nil {
+		errCollect = fmt.Errorf("cannot collect value %s", errCollect)
 	}
 
 	expireTime := time.Now().Add(-maxInactivityPeriod)
 
 	for index, c := range p.counters {
-		if c.lastAccess.Before(expireTime) || p.collectError != nil {
-			err = win32.PdhRemoveCounter(c.handle)
-			if err != nil {
-				p.Warningf("error while removing counter '%s': %s", index.path, err)
+		if c.lastAccess.Before(expireTime) || errCollect != nil {
+			err2 := win32.PdhRemoveCounter(c.handle)
+			if err2 != nil {
+				p.Warningf("error while removing counter '%s': %s", index.path, err2)
 			}
 
+			p.historyMutex.Lock()
 			delete(p.counters, index)
+			p.historyMutex.Unlock()
 
 			continue
 		}
 
 		c.err = nil
 
-		c.history[c.tail], err = win32.PdhGetFormattedCounterValueDouble(c.handle, 1)
+		histValue, err := win32.PdhGetFormattedCounterValueDouble(c.handle, 1)
+		p.historyMutex.Lock()
 		if err != nil {
 			zbxErr := zbxerr.New(
 				fmt.Sprintf("failed to retrieve pdh counter value double for index %s", index.path),
@@ -225,12 +261,17 @@ func (p *Plugin) setCounterData() {
 			}
 
 			p.Debugf("%s", zbxErr)
+		} else {
+			c.history[c.tail] = histValue
 		}
 
 		if c.tail = c.tail.inc(c.interval); c.tail == c.head {
 			c.head = c.head.inc(c.interval)
 		}
+		p.historyMutex.Unlock()
 	}
+
+	return errCollect
 }
 
 // addCounter adds new performance counter to query. The plugin mutex must be locked.
@@ -318,6 +359,7 @@ func (c *perfCounter) getHistory(interval int) (value interface{}, err error) {
 	if num != 0 {
 		return total / num, nil
 	}
+
 	return nil, nil
 }
 
