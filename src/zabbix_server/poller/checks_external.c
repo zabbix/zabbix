@@ -23,25 +23,25 @@
 #include "zbxsysinfo.h"
 #include "zbxtime.h"
 
-extern char	*CONFIG_EXTERNALSCRIPTS;
-
 /******************************************************************************
  *                                                                            *
- * Purpose: retrieve data from script executed on Zabbix server               *
+ * Purpose: retrieves data from script executed on Zabbix server              *
  *                                                                            *
- * Parameters: item           - [IN] item we are interested in                *
- *             result         - [OUT]                                         *
+ * Parameters:                                                                *
+ *             item                    - [IN] item we are interested in       *
+ *             config_externalscsripts - [IN]                                 *
+ *             result                  - [OUT]                                *
  *                                                                            *
  * Return value: SUCCEED - data successfully retrieved and stored in result   *
  *                         and result_str (as string)                         *
  *               NOTSUPPORTED - requested item is not supported               *
  *                                                                            *
  ******************************************************************************/
-int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
+int	get_value_external(const zbx_dc_item_t *item, const char *config_externalscripts, AGENT_RESULT *result)
 {
 	char		error[ZBX_ITEM_ERROR_LEN_MAX], *cmd = NULL, *buf = NULL;
 	size_t		cmd_alloc = ZBX_KIBIBYTE, cmd_offset = 0;
-	int		i, ret = NOTSUPPORTED;
+	int		ret = NOTSUPPORTED;
 	AGENT_REQUEST	request;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() key:'%s'", __func__, item->key);
@@ -55,7 +55,7 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 	}
 
 	cmd = (char *)zbx_malloc(cmd, cmd_alloc);
-	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", CONFIG_EXTERNALSCRIPTS, get_rkey(&request));
+	zbx_snprintf_alloc(&cmd, &cmd_alloc, &cmd_offset, "%s/%s", config_externalscripts, get_rkey(&request));
 
 	if (-1 == access(cmd, X_OK))
 	{
@@ -63,7 +63,7 @@ int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result)
 		goto out;
 	}
 
-	for (i = 0; i < get_rparams_num(&request); i++)
+	for (int i = 0; i < get_rparams_num(&request); i++)
 	{
 		const char	*param;
 		char		*param_esc;
