@@ -152,7 +152,7 @@ class CDashboard {
 			this._containers.navigation_tabs.appendChild(sortable);
 
 			this._tabs = new CSortable(sortable, {
-				is_vertical: false,
+				is_horizontal: true,
 				enable_sorting: this._is_edit_mode
 			});
 
