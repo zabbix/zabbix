@@ -376,7 +376,6 @@
 				if (typeof dcheck.ports !== 'undefined' && dcheck.ports != getDCheckDefaultPort(dcheck.type)) {
 					dcheck.name += ' (' + dcheck.ports + ')';
 				}
-
 				if (dcheck.key_) {
 					dcheck.name += ' "' + dcheck.key_ + '"';
 				}
