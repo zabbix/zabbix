@@ -27,7 +27,6 @@
 #include "zbxproxybuffer.h"
 #include "zbxpoller.h"
 
-//#include "checks_internal.h"
 #include "../lld/lld_protocol.h"
 
 /******************************************************************************

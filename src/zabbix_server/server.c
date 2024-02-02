@@ -46,7 +46,6 @@
 #include "httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "pinger/pinger.h"
-//#include "poller/poller.h"
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"

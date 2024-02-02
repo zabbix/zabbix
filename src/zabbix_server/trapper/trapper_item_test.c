@@ -20,7 +20,6 @@
 #include "trapper_item_test.h"
 #include "zbxexpression.h"
 
-//#include "../poller/poller.h"
 #include "zbxpoller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
