@@ -174,7 +174,8 @@ class testDashboardPieChartWidget extends CWebTest {
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['Data set #1', 'Aggregation function', 'Data set aggregation', 'Data set label'];
-		$this->assertAllVisibleLabels($form->query('id:data_set')->one(), $expected_labels);
+		$data_set_tab = $form->query('id:data_set')->one();
+		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
 
 		$buttons = [
@@ -212,7 +213,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['Data set #1', 'Data set #2', 'Aggregation function', 'Data set aggregation', 'Data set label'];
-		$this->assertAllVisibleLabels($form->query('id:data_set')->one(), $expected_labels);
+		$this->assertAllVisibleLabels($data_set_tab, $expected_labels);
 		$this->validateDataSetHintboxes($form);
 
 		$buttons = [
@@ -232,7 +233,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Displaying options tab.
 		$form->selectTab('Displaying options');
-		$this->query('id:displaying_options')->one()->waitUntilVisible();
+		$displaying_options_tab = $this->query('id:displaying_options')->one()->waitUntilVisible();
 		$form->invalidate();
 		$expected_values = [
 			'History data selection' => 'Auto',
@@ -244,7 +245,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		];
 		$form->checkValue($expected_values);
 		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];
-		$this->assertAllVisibleLabels($form->query('id:displaying_options')->one(), $expected_labels);
+		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 
 		$radios = ['History data selection' => ['Auto', 'History', 'Trends'], 'Draw' => ['Pie', 'Doughnut']];
 		foreach ($radios as $radio => $labels) {
@@ -255,7 +256,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$this->assertRangeSliderParameters($form, 'Space between sectors', ['min' => '0', 'max' => '10', 'step' => '1']);
 
-		foreach (['merge' => true, 'merge_percent' => false, 'merge_color' => false] as $id => $enabled) {
+		foreach (['merge_percent' => false, 'merge_color' => false] as $id => $enabled) {
 			$this->assertTrue($form->query('id', $id)->one()->isEnabled($enabled));
 		}
 
@@ -279,7 +280,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			'Colour' => false
 		];
 		$expected_labels = array_merge($expected_labels, array_keys($inputs_enabled));
-		$this->assertAllVisibleLabels($form->query('id:displaying_options')->one(), $expected_labels);
+		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$form->checkValue(['Space between sectors' => 1, 'Width' => 50]);
 
@@ -320,12 +321,10 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Time period tab.
 		$form->selectTab('Time period');
-		$this->query('id:time_period')->one()->waitUntilVisible();
+		$time_period_tab = $this->query('id:time_period')->one()->waitUntilVisible();
 		$form->invalidate();
-
-		$expected_labels = ['History data selection', 'Draw', 'Space between sectors', 'Merge sectors smaller than'];
-		$this->assertAllVisibleLabels($form->query('id:displaying_options')->one(), $expected_labels);
-
+		$this->assertAllVisibleLabels($time_period_tab, ['Time period']);
+		$form->checkValue(['Time period' => 'Dashboard']);
 		$time_period = $form->getField('Time period');
 		$this->assertTrue($time_period->isEnabled());
 		$this->assertEquals(['Dashboard', 'Widget', 'Custom'], $time_period->getLabels()->asText());
@@ -336,6 +335,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertTrue($widget_field->isVisible(), $widget_field->isEnabled(), $form->isRequired('Widget'),
 				'Widget field is not interactable or is not required'
 		);
+		$this->assertAllVisibleLabels($time_period_tab, ['Time period', 'Widget']);
 		$this->assertFieldAttributes($form, 'Widget', ['placeholder' => 'type here to search'], true);
 		$widget_field->query('button:Select')->waitUntilClickable()->one()->click();
 		$widget_dialog = COverlayDialogElement::find()->waitUntilReady()->all()->last();
@@ -343,6 +343,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$widget_dialog->close();
 
 		$form->fill(['Time period' => 'Custom']);
+		$this->assertAllVisibleLabels($time_period_tab, ['Time period', 'From', 'To']);
 		$form->checkValue(['From' => 'now-1h', 'To' => 'now']);
 
 		foreach (['From', 'To'] as $label) {
@@ -356,11 +357,16 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Legend tab.
 		$form->selectTab('Legend');
-		$this->query('id:legend_tab')->one()->waitUntilVisible();
+		$legend_tab = $this->query('id:legend_tab')->one()->waitUntilVisible();
 		$form->invalidate();
-
-		$form->checkValue(['Show legend' => true, 'Show aggregation function' => false, 'Number of rows' => 1, 'Number of columns' => 4]);
-
+		$expected_values = [
+			'Show legend' => true,
+			'Show aggregation function' => false,
+			'Number of rows' => 1,
+			'Number of columns' => 4
+		];
+		$form->checkValue($expected_values);
+		$this->assertAllVisibleLabels($legend_tab, array_keys($expected_values));
 		$this->assertRangeSliderParameters($form, 'Number of rows', ['min' => '1', 'max' => '10', 'step' => '1']);
 		$this->assertRangeSliderParameters($form, 'Number of columns', ['min' => '1', 'max' => '4', 'step' => '1']);
 
@@ -374,7 +380,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Footer buttons.
 		$this->assertEquals(['Add', 'Cancel'],
-			$dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
+				$dialog->getFooter()->query('button')->all()->filter(CElementFilter::CLICKABLE)->asText()
 		);
 	}
 
@@ -1529,20 +1535,19 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Checks all visible labels inside an element. Fails if a label is missing or if there are unexpected labels.
+	 * Checks visible labels inside an element. Fails if a label is missing or if there are unexpected labels.
 	 *
-	 * @param CElement $element    form element to check
-	 * @param array    $labels     list of all currently visible labels
+	 * @param CElement $element    element to check
+	 * @param array    $labels     list of all expected visible labels
 	 */
 	protected function assertAllVisibleLabels($element, $labels) {
 		// There are weird labels in this form but at the same time we don't need to match all of them, for example radio buttons.
 		$label_selector = 'xpath:.//div[@class="form-grid"]/label'. // standart case
 				' | .//div[@class="form-field"]/label'. // when the label is a child of the actual field
 				' | .//label[@class="sortable-drag-handle js-dataset-label"]'; // this matches data set labels
-
 		$actual_labels = $element->query($label_selector)->all()->filter(CElementFilter::VISIBLE)->asText();
 
-		// Remove empty labels (these come from checkboxes) from the list.
+		// Remove empty labels (for checkboxes) from the list.
 		$actual_labels = array_filter($actual_labels);
 
 		$this->assertEqualsCanonicalizing($labels, $actual_labels,
