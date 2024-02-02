@@ -21,7 +21,6 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxstats/libzbxstats.a \
 	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
-	$(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
 	$(top_srcdir)/src/libs/zbxpreproc/libzbxpreproc.a \
 	$(top_srcdir)/src/libs/zbxcachehistory/libzbxcachehistory.a \
@@ -89,6 +88,10 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxcommon/libzbxcommon.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
 	$(CMOCKA_LIBS) $(YAML_LIBS) $(TLS_LIBS)
+
+if HAVE_IPMI
+TRAPPER_LIBS += $(top_srcdir)/src/libs/zbxipmi/libzbxipmi.a
+endif
 
 zbx_trapper_preproc_test_run_SOURCES = \
 	zbx_trapper_preproc_test_run.c \
