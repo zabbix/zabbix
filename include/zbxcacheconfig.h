@@ -1099,11 +1099,19 @@ zbx_event_suppress_query_t;
 
 ZBX_PTR_VECTOR_DECL(event_suppress_query_ptr, zbx_event_suppress_query_t*)
 
-#define ZBX_MAINTENANCE_UPDATE_TRUE	1
-#define ZBX_MAINTENANCE_UPDATE_FALSE	0
+#define ZBX_FLAG_MAINTENANCE_UPDATE_NONE	0x00
+#define ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE	0x01
+#define ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD	0x02
+
+typedef enum
+{
+	MAINTENANCE_TIMER_INITIALIZED = 0,
+	MAINTENANCE_TIMER_PENDING
+}
+zbx_maintenance_timer_t;
 
 void	zbx_event_suppress_query_free(zbx_event_suppress_query_t *query);
-int	zbx_dc_update_maintenances(void);
+int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer);
 void	zbx_dc_get_host_maintenance_updates(const zbx_vector_uint64_t *maintenanceids,
 		zbx_vector_host_maintenance_diff_ptr_t *updates);
 void	zbx_dc_flush_host_maintenance_updates(const zbx_vector_host_maintenance_diff_ptr_t *updates);
@@ -1115,6 +1123,7 @@ void	zbx_dc_maintenance_set_update_flags(void);
 void	zbx_dc_maintenance_reset_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flag(int timer);
 int	zbx_dc_maintenance_check_update_flags(void);
+int	zbx_dc_maintenance_check_immediate_update(void);
 
 int	zbx_dc_maintenance_has_tags(void);
 
