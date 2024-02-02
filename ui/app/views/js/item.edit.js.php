@@ -790,7 +790,8 @@ window.item_edit_form = new class {
 
 		const overlay = PopUp(parameters.action, parameters, {
 			dialogueid: this.overlay.dialogueid,
-			dialogue_class: 'modal-popup-large'
+			dialogue_class: 'modal-popup-large',
+			prevent_navigation: true
 		});
 
 		this.#proxyDialogueSubmitEvent(overlay);
