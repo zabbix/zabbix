@@ -16,3 +16,14 @@
 		user-select: none;
 	}
 }
+
+.sortable {
+
+	.sortable-item-static {
+
+		.drag-icon {
+			cursor: unset;
+			color: $btn-icon-disabled-color;
+		}
+	}
+}

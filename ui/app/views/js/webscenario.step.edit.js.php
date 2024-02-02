@@ -37,6 +37,12 @@ window.webscenario_step_edit_popup = new class {
 	/** @type {HTMLTableElement} */
 	#post_fields;
 
+	/** @type {HTMLTableElement} */
+	#headers;
+
+	/** @type {CSortable} */
+	#sortable_post_fields;
+
 	init({query_fields, post_fields, variables, headers}) {
 		this.#overlay = overlays_stack.getById('webscenario-step-edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
@@ -44,6 +50,7 @@ window.webscenario_step_edit_popup = new class {
 
 		this.#query_fields = document.getElementById('step-query-fields');
 		this.#post_fields = document.getElementById('step-post-fields');
+		this.#headers = document.getElementById('step-headers');
 
 		this.#initQueryFields(query_fields);
 		this.#initPostFields(post_fields);
@@ -96,7 +103,11 @@ window.webscenario_step_edit_popup = new class {
 		});
 
 		this.#initTextareaFlexible($query_fields);
-		this.#initSortable($query_fields);
+
+		new CSortable(this.#query_fields.querySelector('tbody'), {
+			selector_freeze: 'tr:last-child',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+		});
 	}
 
 	#initPostFields(post_fields) {
@@ -108,7 +119,11 @@ window.webscenario_step_edit_popup = new class {
 		});
 
 		this.#initTextareaFlexible($post_fields);
-		this.#initSortable($post_fields);
+
+		this.#sortable_post_fields = new CSortable(this.#post_fields.querySelector('tbody'), {
+			selector_freeze: 'tr:last-child',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+		});
 	}
 
 	#initVariables(variables) {
@@ -123,7 +138,7 @@ window.webscenario_step_edit_popup = new class {
 	}
 
 	#initHeaders(headers) {
-		const $headers = jQuery('#step-headers');
+		const $headers = jQuery(this.#headers);
 
 		$headers.dynamicRows({
 			template: '#step-header-row-tmpl',
@@ -131,7 +146,11 @@ window.webscenario_step_edit_popup = new class {
 		});
 
 		this.#initTextareaFlexible($headers);
-		this.#initSortable($headers);
+
+		new CSortable(this.#headers.querySelector('tbody'), {
+			selector_freeze: 'tr:last-child',
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+		});
 	}
 
 	#initTextareaFlexible($table) {
@@ -140,54 +159,6 @@ window.webscenario_step_edit_popup = new class {
 				jQuery('.form_row:last .<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', $table).textareaFlexible();
 			})
 			.find('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>').textareaFlexible();
-	}
-
-	#initSortable($table) {
-		$table
-			.sortable({
-				disabled: $table[0].querySelectorAll('.<?= ZBX_STYLE_SORTABLE ?>').length < 2,
-				items: 'tbody .<?= ZBX_STYLE_SORTABLE ?>',
-				axis: 'y',
-				containment: 'parent',
-				cursor: 'grabbing',
-				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				helper: (e, ui) => {
-					for (const td of ui.find('>td')) {
-						const $td = jQuery(td);
-						$td.css('width', $td.width());
-					}
-
-					// When dragging element on Safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('left', '5px');
-					}
-
-					return ui;
-				},
-				start: (e, ui) => {
-					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-				},
-				stop: (e, ui) => {
-					for (const td of ui.item.find('>td')) {
-						jQuery(td).removeAttr('style');
-					}
-
-					ui.item.removeAttr('style');
-				}
-			})
-			.on('afteradd.dynamicRows afterremove.dynamicRows', () => {
-				const is_disabled = $table[0].querySelectorAll('.<?= ZBX_STYLE_SORTABLE ?>').length < 2;
-
-				for (const drag_icon of $table[0].querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-					drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
-				}
-
-				$table.sortable({disabled: is_disabled});
-			})
-			.trigger('afteradd.dynamicRows');
 	}
 
 	#togglePostType(e) {
@@ -208,7 +179,7 @@ window.webscenario_step_edit_popup = new class {
 		if (is_raw) {
 			pairs = this.#parsePostRawToPairs(posts.value.trim());
 
-			for (const row of this.#post_fields.querySelectorAll('tbody .<?= ZBX_STYLE_SORTABLE ?>')) {
+			for (const row of this.#post_fields.querySelectorAll('tbody .form_row')) {
 				row.remove();
 			}
 
@@ -233,7 +204,7 @@ window.webscenario_step_edit_popup = new class {
 			$table.trigger('afteradd.dynamicRows');
 		}
 		else {
-			for (const row of this.#post_fields.querySelectorAll('tbody .<?= ZBX_STYLE_SORTABLE ?>')) {
+			for (const row of this.#post_fields.querySelectorAll('tbody .form_row')) {
 				const name = row.querySelector('[name$="[name]"]').value;
 				const value = row.querySelector('[name$="[value]"]').value;
 
@@ -340,23 +311,11 @@ window.webscenario_step_edit_popup = new class {
 				element.setAttribute('disabled', 'disabled');
 			}
 
-			jQuery(this.#post_fields).sortable('disable');
-
-			for (const element of this.#post_fields.querySelectorAll('.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-				element.classList.add('<?= ZBX_STYLE_DISABLED ?>');
-			}
+			this.#sortable_post_fields.enable(false);
 		}
 		else {
 			for (const element of posts_elements) {
 				element.removeAttribute('disabled');
-			}
-
-			if (this.#post_fields.querySelectorAll('.<?= ZBX_STYLE_SORTABLE ?>').length > 1) {
-				jQuery(this.#post_fields).sortable('enable');
-
-				for (const element of this.#post_fields.querySelectorAll('.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-					element.classList.remove('<?= ZBX_STYLE_DISABLED ?>');
-				}
 			}
 
 			jQuery('.<?= ZBX_STYLE_TEXTAREA_FLEXIBLE ?>', jQuery(this.#post_fields)).textareaFlexible();
@@ -382,7 +341,7 @@ window.webscenario_step_edit_popup = new class {
 
 		const $table = jQuery(this.#query_fields);
 
-		for (const row of this.#query_fields.querySelectorAll('tbody .<?= ZBX_STYLE_SORTABLE ?>')) {
+		for (const row of this.#query_fields.querySelectorAll('tbody .form_row')) {
 			const name = row.querySelector('[name$="[name]"]').value;
 			const value = row.querySelector('[name$="[value]"]').value;
 

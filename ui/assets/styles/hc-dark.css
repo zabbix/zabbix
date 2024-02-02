@@ -708,6 +708,10 @@ svg a {
   .sortable.sortable-dragging {
     user-select: none; }
 
+.sortable .sortable-item-static .drag-icon {
+  cursor: unset;
+  color: #555555; }
+
 html,
 body {
   height: 100vh; }
@@ -4513,10 +4517,11 @@ form.dashboard-widget-svggraph .list-item-actions {
 form.dashboard-widget-svggraph .items-list {
   grid-column: 4 / span 3; }
 form.dashboard-widget-svggraph .list-vertical-accordion {
-  position: relative;
-  overflow: visible;
-  margin-top: -5px;
-  margin-bottom: 5px; }
+  position: relative; }
+  form.dashboard-widget-svggraph .list-vertical-accordion.sortable {
+    overflow: visible;
+    margin-top: -5px;
+    margin-bottom: 5px; }
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
   display: grid;

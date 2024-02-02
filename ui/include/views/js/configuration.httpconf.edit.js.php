@@ -33,8 +33,8 @@
 		/** @type {boolean} */
 		#is_templated = false;
 
-		/** @type {HTMLTableElement} */
-		#step_list;
+		/** @type {string} */
+		#context;
 
 		/** @type {Object} */
 		#templates = {};
@@ -42,11 +42,20 @@
 		/** @type {Object} */
 		#events = {};
 
+		/** @type {HTMLTableElement} */
+		#variables;
+
+		/** @type {HTMLTableElement} */
+		#headers;
+
 		/** @type {boolean} */
 		#variables_headers_initialized = false;
 
-		/** @type {string} */
-		#context;
+		/** @type {HTMLTableElement} */
+		#steps;
+
+		/** @type {boolean} */
+		#steps_initialized = false;
 
 		constructor() {
 			this.#registerEvents();
@@ -55,8 +64,10 @@
 		init({is_templated, variables, headers, steps, context}) {
 			this.#form = document.getElementById('webscenario-form');
 			this.#is_templated = is_templated;
-			this.#step_list = document.getElementById('steps');
 			this.#context = context;
+			this.#variables = document.getElementById('variables');
+			this.#headers = document.getElementById('headers');
+			this.#steps = document.getElementById('steps');
 
 			this.#initTemplates();
 
@@ -72,15 +83,22 @@
 			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
 
-				if (panel.attr('id') === 'scenario-tab' && !this.#variables_headers_initialized) {
-					this.#initVariables(variables);
-					this.#initHeaders(headers);
+				if (panel.attr('id') === 'scenario-tab') {
+					if (!this.#variables_headers_initialized) {
+						this.#initVariables(variables);
+						this.#initHeaders(headers);
 
-					this.#variables_headers_initialized = true;
+						this.#variables_headers_initialized = true;
+					}
+				}
+				else if (panel.attr('id') === 'steps-tab') {
+					if (!this.#steps_initialized) {
+						this.#initSteps(steps);
+
+						this.#steps_initialized = true;
+					}
 				}
 			});
-
-			this.#initSteps(steps);
 
 			for (const id of ['agent', 'authentication']) {
 				document.getElementById(id).addEventListener('change', () => this.#updateForm());
@@ -96,9 +114,9 @@
 		}
 
 		#initVariables(variables) {
-			const $variables = jQuery('#variables');
+			const $variables = jQuery(this.#variables);
 
-			jQuery('#variables').dynamicRows({
+			$variables.dynamicRows({
 				template: '#variable-row-tmpl',
 				rows: variables
 			});
@@ -107,42 +125,19 @@
 		}
 
 		#initHeaders(headers) {
-			const $headers = jQuery('#headers');
+			const $headers = jQuery(this.#headers);
 
-			$headers
-				.dynamicRows({
-					template: '#header-row-tmpl',
-					rows: headers
-				})
-				.on('tableupdate.dynamicRows', (e) => {
-					this.#toggleDragIcon(e.target);
-					jQuery(e.target).sortable({disabled: e.target.querySelectorAll('.sortable').length < 2});
-				});
-
-			this.#initTextareaFlexible($headers);
-			this.#initSortable($headers);
-		}
-
-		#initSteps(steps) {
-			for (const [row_index, step] of Object.entries(steps)) {
-				step.row_index = row_index;
-				this.#step_list.querySelector('tbody').appendChild(this.#prepareStepRow(step));
-			}
-
-			this.#step_list.addEventListener('click', (e) => {
-				if (e.target.classList.contains('js-add-step')) {
-					this.#editStep();
-				}
-				else if (e.target.classList.contains('js-edit-step')) {
-					this.#editStep(e.target.closest('tr'));
-				}
-				else if (e.target.classList.contains('js-remove-step')) {
-					e.target.closest('tr').remove();
-					this.#toggleDragIcon(this.#step_list);
-				}
+			$headers.dynamicRows({
+				template: '#header-row-tmpl',
+				rows: headers
 			});
 
-			this.#initSortable(jQuery('#steps'));
+			this.#initTextareaFlexible($headers);
+
+			new CSortable(this.#headers.querySelector('tbody'), {
+				selector_freeze: 'tr:last-child',
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+			});
 		}
 
 		#initTextareaFlexible($element) {
@@ -154,55 +149,28 @@
 				.textareaFlexible();
 		}
 
-		#initSortable($element) {
-			this.#toggleDragIcon($element[0]);
+		#initSteps(steps) {
+			for (const [row_index, step] of Object.entries(steps)) {
+				step.row_index = row_index;
+				this.#steps.querySelector('tbody').appendChild(this.#prepareStepRow(step));
+			}
 
-			$element.sortable({
-				disabled: $element[0].querySelectorAll('.sortable').length < 2,
-				items: 'tbody tr.sortable',
-				axis: 'y',
-				containment: 'parent',
-				cursor: 'grabbing',
-				handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-				tolerance: 'pointer',
-				opacity: 0.6,
-				helper: (e, ui) => {
-					for (const td of ui.find('>td')) {
-						const $td = jQuery(td);
-						const width = Math.floor($td.width());
-
-						$td.css({
-							'width': width,
-							'max-width': width
-						});
-					}
-
-					// When dragging element on Safari, it jumps out of the table.
-					if (SF) {
-						// Move back draggable element to proper position.
-						ui.css('top', 0);
-					}
-
-					return ui;
-				},
-				start: (e, ui) => {
-					jQuery(ui.placeholder).height(jQuery(ui.helper).height());
-				},
-				stop: (e, ui) => {
-					for (const td of ui.item.find('>td')) {
-						jQuery(td).removeAttr('style');
-					}
-
-					ui.item.removeAttr('style');
+			this.#steps.addEventListener('click', (e) => {
+				if (e.target.classList.contains('js-add-step')) {
+					this.#editStep();
+				}
+				else if (e.target.classList.contains('js-edit-step')) {
+					this.#editStep(e.target.closest('tr'));
+				}
+				else if (e.target.classList.contains('js-remove-step')) {
+					e.target.closest('tr').remove();
 				}
 			});
-		}
 
-		#toggleDragIcon(container) {
-			const is_disabled = container.querySelectorAll('.sortable').length < 2;
-
-			for (const drag_icon of container.querySelectorAll('div.<?= ZBX_STYLE_DRAG_ICON ?>')) {
-				drag_icon.classList.toggle('<?= ZBX_STYLE_DISABLED ?>', is_disabled);
+			if (!this.#is_templated) {
+				new CSortable(this.#steps.querySelector('tbody'), {
+					selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+				});
 			}
 		}
 
@@ -235,7 +203,7 @@
 			const names = [];
 			const row_indexes = [];
 
-			for (const row of this.#step_list.querySelectorAll('tbody tr[data-row_index]')) {
+			for (const row of this.#steps.querySelectorAll('tbody tr[data-row_index]')) {
 				names.push(row.querySelector('[name="steps[' + row.dataset.row_index + '][name]"]').value);
 				row_indexes.push(row.dataset.row_index);
 			}
@@ -267,10 +235,8 @@
 					row.replaceWith(new_row);
 				}
 				else {
-					this.#step_list.querySelector('tbody').appendChild(new_row);
+					this.#steps.querySelector('tbody').appendChild(new_row);
 				}
-
-				this.#initSortable(jQuery('#steps'));
 			});
 		}
 
@@ -354,7 +320,7 @@
 						}
 					}
 
-					if (curl == null) {
+					if (curl === null) {
 						view.refresh();
 					}
 					else {

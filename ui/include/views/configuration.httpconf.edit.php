@@ -194,9 +194,7 @@ $scenario_tab
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('element-table-remove')
 						))->addClass(ZBX_STYLE_NOWRAP)
-					]))
-						->addClass('form_row')
-						->addClass('sortable')
+					]))->addClass('form_row')
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -291,9 +289,7 @@ $steps_tab = (new CFormGrid())->addItem([
 						(new CCol(
 							(new CButtonLink(_('Remove')))->addClass('js-remove-step')
 						))->addClass(ZBX_STYLE_NOWRAP)
-					]))
-						->setAttribute('data-row_index', '#{row_index}')
-						->addClass('sortable')
+					]))->setAttribute('data-row_index', '#{row_index}')
 				)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
