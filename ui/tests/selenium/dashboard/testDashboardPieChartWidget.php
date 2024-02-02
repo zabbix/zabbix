@@ -1396,10 +1396,15 @@ class testDashboardPieChartWidget extends CWebTest {
 				unset($data_set['host']);
 
 				// Select Items.
-				$table = $dialog->query('class:list-table')->asTable()->waitUntilVisible()->one();
+				$table = $dialog->query('class:list-table')->waitUntilVisible()->asTable()->one();
+
 				foreach ($data_set['items'] as $item) {
-					$table->findRow('Name', $item['name'])->select();
+					// Get the correct checkbox in table by knowing only link text;
+					$checkbox_xpath = 'xpath:.//a[text()='.CXPathHelper::escapeQuotes($item['name']).
+							']/../preceding-sibling::td/input[@type="checkbox"]';
+					$table->query($checkbox_xpath)->waitUntilPresent()->asCheckbox()->one()->check();
 				}
+
 				$dialog->getFooter()->query('button:Select')->one()->click();
 				$dialog->waitUntilNotVisible();
 			}
