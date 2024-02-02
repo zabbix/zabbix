@@ -76,7 +76,7 @@ $form
 				'form_id' => $form->getId()
 			]).');
 		'))->setOnDocumentReady()
-	);;
+	);
 
 return [
 	'form' => $form,

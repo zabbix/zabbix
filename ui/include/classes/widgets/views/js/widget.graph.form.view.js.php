@@ -53,12 +53,11 @@ window.widget_graph_form = new class {
 		const ms_itemid_input = this.#form.querySelector('[name="itemid"]');
 		const ms_graphid_input = this.#form.querySelector('[name="graphid"]');
 
-		if (ms_itemid_input !== null && is_graph) {
-			ms_itemid_input.disabled = true;
+		if (ms_itemid_input !== null) {
+			ms_itemid_input.disabled = is_graph;
 		}
-
-		if (ms_graphid_input !== null && !is_graph) {
-			ms_graphid_input.disabled = true;
+		if (ms_graphid_input !== null) {
+			ms_graphid_input.disabled = !is_graph;
 		}
 	}
 };
