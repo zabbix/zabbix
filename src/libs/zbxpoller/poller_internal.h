@@ -21,6 +21,7 @@
 
 #include "zbxcommon.h"
 
-zbx_get_program_type_f  poller_get_program_type(void);
+zbx_get_program_type_f	poller_get_program_type(void);
+zbx_get_progname_f	poller_get_progname(void);
 
 #endif /* ZABBIX_POLLER_INTERNAL_H */

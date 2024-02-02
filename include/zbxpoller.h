@@ -36,7 +36,6 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 #endif
 
-
 typedef struct
 {
 	zbx_config_comms_args_t	*config_comms;
@@ -58,8 +57,6 @@ zbx_thread_poller_args;
 ZBX_THREAD_ENTRY(poller_thread, args);
 
 ZBX_THREAD_ENTRY(async_poller_thread, args);
-
-zbx_get_progname_f	poller_get_progname(void);
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
 		unsigned char expand_macros);
