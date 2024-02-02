@@ -131,7 +131,7 @@ function updateMessageSettings($messages) {
 			'userid' => CWebUser::$data['userid'],
 			'idx' => 'web.messages',
 			'source' => $key,
-			'type' => (int) $dbMessages[$key]['type']
+			'type' => $key === 'snoozed.eventid' ? PROFILE_TYPE_ID : PROFILE_TYPE_STR
 		];
 
 		if ($values['type'] == PROFILE_TYPE_ID) {
