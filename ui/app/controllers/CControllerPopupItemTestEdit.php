@@ -374,7 +374,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		$show_warning = false;
 
 		if (array_key_exists('interface', $inputs['item'])) {
-			if (array_key_exists('address', $inputs['interface'])
+			if (array_key_exists('address', $inputs['item']['interface'])
 					&& strpos($inputs['item']['interface']['address'], ZBX_SECRET_MASK) !== false) {
 				$inputs['item']['interface']['address'] = '';
 				$show_warning = true;

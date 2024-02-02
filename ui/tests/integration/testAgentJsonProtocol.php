@@ -246,9 +246,12 @@ class testAgentJsonProtocol extends CIntegrationTest {
 
 		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'), 8, 10, ZBX_SOCKET_BYTES_LIMIT);
 		$result = $server->testItem($item_test_data, self::$sid);
+
 		$this->assertFalse($result === false);
-		$this->assertArrayHasKey('result', $result);
-		$this->assertEquals($result['result'], 'ok');
+		$this->assertArrayHasKey('item', $result);
+		$this->assertArrayNotHasKey('error', $result['item']);
+		$this->assertArrayHasKey('result', $result['item']);
+		$this->assertEquals($result['item']['result'], 'ok');
 	}
 
 	/**
