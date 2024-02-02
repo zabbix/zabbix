@@ -334,7 +334,6 @@ static void	process_tcpsvc_result(void *data)
 	{
 		zbx_discoverer_dservice_t	*service;
 
-
 		service = result_dservice_create(item->interface.port, async_result->dcheckid);
 		service->status = DOBJECT_STATUS_UP;
 		zbx_vector_discoverer_services_ptr_append(&async_result->dresult->services, service);

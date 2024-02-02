@@ -558,7 +558,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 				char				*err = NULL;
 				zbx_discoverer_drule_error_t	derror = {.druleid = result->druleid};
 
-
 				if (FAIL != (j = zbx_vector_discoverer_drule_error_search(drule_errors, derror,
 						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
 				{
@@ -585,9 +584,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 					result->dnsname, result->now, result->unique_dcheckid, &result->services,
 					events_cbs->add_event_cb);
 
-			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip,
-					NULL != result->dnsname ? result->dnsname : "", host_status, result->now,
-					events_cbs->add_event_cb);
+			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
+					host_status, result->now, events_cbs->add_event_cb);
 
 			if (NULL != events_cbs->process_events_cb)
 				events_cbs->process_events_cb(NULL, NULL);
@@ -1014,6 +1012,9 @@ static void	discover_results_move_value(zbx_discoverer_results_t *src, zbx_hashs
 {
 	zbx_discoverer_results_t *dst;
 
+	if (NULL == src->dnsname)
+		src->dnsname = zbx_strdup(NULL, "");
+
 	if (NULL == (dst = zbx_hashset_search(hr_dst, src)))
 	{
 		dst = zbx_hashset_insert(hr_dst, src, sizeof(zbx_discoverer_results_t));
@@ -1022,14 +1023,12 @@ static void	discover_results_move_value(zbx_discoverer_results_t *src, zbx_hashs
 		src->dnsname = NULL;
 		src->ip = NULL;
 	}
-	else if (NULL == dst->dnsname && NULL != src->dnsname)
+	else if ('\0' == *dst->dnsname && '\0' != *src->dnsname)
 	{
+		zbx_free(dst->dnsname);
 		dst->dnsname = src->dnsname;
 		src->dnsname = NULL;
 	}
-
-	if (NULL == dst->dnsname)
-		dst->dnsname = zbx_strdup(NULL, "");
 
 	zbx_vector_discoverer_services_ptr_append_array(&dst->services, src->services.values,
 			src->services.values_num);
