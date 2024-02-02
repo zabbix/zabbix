@@ -715,11 +715,13 @@ typedef struct
 	int			value;
 	int			severity;
 
-	zbx_vector_ptr_t	tags;
+	zbx_vector_tags_t	tags;
 	int			suppressed;
 	int			mtime;
 }
 zbx_event_t;
+
+ZBX_PTR_VECTOR_DECL(events_ptr, zbx_event_t *)
 
 int	zbx_db_get_user_by_active_session(const char *sessionid, zbx_user_t *user);
 int	zbx_db_get_user_by_auth_token(const char *formatted_auth_token_hash, zbx_user_t *user);

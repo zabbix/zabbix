@@ -85,6 +85,7 @@ window.webscenario_step_edit_popup = new class {
 		this.#overlay.setLoading();
 
 		const curl = new Curl('zabbix.php');
+
 		curl.setArgument('action', 'webscenario.step.check');
 
 		this.#post(curl.getUrl(), fields, (response) => {
@@ -293,6 +294,7 @@ window.webscenario_step_edit_popup = new class {
 
 	#updateForm() {
 		const post_type = this.#form.querySelector('[name="post_type"]:checked').value;
+
 		for (const field of this.#form.querySelectorAll('.js-field-post-fields')) {
 			field.style.display = post_type == <?= ZBX_POSTTYPE_FORM ?> ? '' : 'none';
 		}

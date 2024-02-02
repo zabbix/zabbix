@@ -132,7 +132,7 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('post_fields[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-							->setMaxlength(2000)
+							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
 							->setAttribute('placeholder', _('value'))
 							->disableSpellcheck(),
 						(new CCol(
@@ -178,7 +178,7 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-							->setMaxlength(2000)
+							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
 							->setAttribute('placeholder', _('value'))
 							->disableSpellcheck(),
 						(new CCol(
@@ -217,7 +217,7 @@ $form_grid = (new CFormGrid())
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-							->setMaxlength(2000)
+							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
 							->setAttribute('placeholder', _('value'))
 							->disableSpellcheck(),
 						(new CCol(

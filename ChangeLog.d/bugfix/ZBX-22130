@@ -1,0 +1,1 @@
+.......PS. [ZBX-22130] changed jsonpath expression evaluator to treat null values as empty variants (wiper)
