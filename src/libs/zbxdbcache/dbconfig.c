@@ -5972,7 +5972,7 @@ static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items
 		int				i;
 
 		zbx_vector_uint64_pair_create(&vc_items);
-		zbx_vector_uint64_pair_reserve(&vc_items, items->values_num);
+		zbx_vector_uint64_pair_reserve(&vc_items, (size_t)items->values_num);
 
 		for (i = 0; i < items->values_num; i++)
 		{
