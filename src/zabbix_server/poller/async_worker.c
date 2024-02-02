@@ -125,7 +125,7 @@ static void	poller_update_interfaces(zbx_vector_interface_status_t *interfaces,
 
 /******************************************************************************
  *                                                                            *
- * Purpose: work with configuration cache without blocking main thread        *
+ * Purpose: works with configuration cache without blocking main thread       *
  *                                                                            *
  ******************************************************************************/
 static void	*async_worker_entry(void *args)
@@ -311,12 +311,12 @@ void	async_worker_destroy(zbx_async_worker_t *worker)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: set callback to call after task is processed                      *
+ * Purpose: sets callback to call after task is processed                     *
  *                                                                            *
- * Parameters: worker         - [IN] the worker                               *
- *             finished_cb   - [IN] a callback to call after finishing        *
- *                                     task                                   *
- *             finished_data - [IN] the callback data                         *
+ * Parameters: worker        - [IN]                                           *
+ *             finished_cb   - [IN] callback to call after finishing          *
+ *                                  task                                      *
+ *             finished_data - [IN] callback data                             *
  *                                                                            *
  ******************************************************************************/
 void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb, void *finished_data)

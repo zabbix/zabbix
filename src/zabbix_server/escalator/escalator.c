@@ -19,15 +19,14 @@
 
 #include "escalator.h"
 
-#include "zbxexpression.h"
-#include "../server.h"
+#include "../server_constants.h"
+#include "../db_lengths_constants.h"
 
-#include "../db_lengths.h"
+#include "zbxexpression.h"
 #include "zbxnix.h"
 #include "zbxself.h"
-#include "../actions.h"
+#include "../actions/actions.h"
 #include "zbxscripts.h"
-#include "zbxcrypto.h"
 #include "zbxevent.h"
 #include "zbxservice.h"
 #include "zbxnum.h"
@@ -219,34 +218,66 @@ static int	check_tag_based_permission(zbx_uint64_t userid, zbx_vector_uint64_t *
 
 /******************************************************************************
  *                                                                            *
- * Purpose: returns user permissions for access to trigger                    *
+ * Purpose: checks user permissions for access to trigger                     *
  *                                                                            *
- * Return value: PERM_DENY - if host or user not found,                       *
- *               permission otherwise                                         *
+ * Return value: SUCCEED - user has access                                    *
+ *               FAIL    - user does not have access                          *
  *                                                                            *
  ******************************************************************************/
-static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char **user_timezone)
+static int	check_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char **user_timezone)
 {
-	int			perm = PERM_DENY;
+	int			ret = FAIL;
+	char			*sql = NULL;
+	size_t			sql_alloc = 0, sql_offset = 0;
+	zbx_uint64_t		roleid;
+	zbx_vector_uint64_t	hostgroupids, hgsetids;
 	zbx_db_result_t		result;
 	zbx_db_row_t		row;
-	zbx_vector_uint64_t	hostgroupids;
-	zbx_uint64_t		roleid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zbx_vector_uint64_create(&hgsetids);
+
 	if (USER_TYPE_SUPER_ADMIN == zbx_get_user_info(userid, &roleid, user_timezone))
 	{
-		perm = PERM_READ_WRITE;
+		ret = SUCCEED;
 		goto out;
 	}
 
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select distinct hh.hgsetid from host_hgset hh"
+			" join items i on hh.hostid=i.hostid"
+			" join functions f on i.itemid=f.itemid"
+			" where f.triggerid=" ZBX_FS_UI64,
+			event->objectid);
+	zbx_db_select_uint64(sql, &hgsetids);
+
+	if (0 == hgsetids.values_num)
+		goto out;
+
+	zbx_vector_uint64_sort(&hgsetids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
+	sql_offset = 0;
+	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
+			"select count(*) from permission p"
+			" join user_ugset u on p.ugsetid=u.ugsetid"
+			" where u.userid=" ZBX_FS_UI64 " and", userid);
+	zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, "p.hgsetid", hgsetids.values, hgsetids.values_num);
+	result = zbx_db_select("%s", sql);
+
+	if (NULL == (row = zbx_db_fetch(result)) || atoi(row[0]) != hgsetids.values_num)
+	{
+		zbx_db_free_result(result);
+		goto out;
+	}
+
+	zbx_db_free_result(result);
 	zbx_vector_uint64_create(&hostgroupids);
 
 	result = zbx_db_select(
 			"select distinct hg.groupid from items i"
 			" join functions f on i.itemid=f.itemid"
-			" join hosts_groups hg on hg.hostid = i.hostid"
+			" join hosts_groups hg on hg.hostid=i.hostid"
 				" and f.triggerid=" ZBX_FS_UI64,
 			event->objectid);
 
@@ -261,17 +292,16 @@ static int	get_trigger_permission(zbx_uint64_t userid, zbx_db_event *event, char
 
 	zbx_vector_uint64_sort(&hostgroupids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 
-	if (PERM_DENY < (perm = zbx_get_hostgroups_permission(userid, &hostgroupids)) &&
-			FAIL == check_tag_based_permission(userid, &hostgroupids, event))
-	{
-		perm = PERM_DENY;
-	}
+	ret = check_tag_based_permission(userid, &hostgroupids, event);
 
 	zbx_vector_uint64_destroy(&hostgroupids);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_permission_string(perm));
+	zbx_vector_uint64_destroy(&hgsetids);
+	zbx_free(sql);
 
-	return perm;
+	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
+
+	return ret;
 }
 
 static int	check_parent_service_intersection(zbx_vector_uint64_t *parent_ids, zbx_vector_uint64_t *role_ids)
@@ -743,7 +773,7 @@ static void	add_object_msg(zbx_uint64_t actionid, zbx_uint64_t operationid, zbx_
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+				if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -846,7 +876,7 @@ static void	add_sentusers_msg(zbx_user_msg_t **user_msg, zbx_uint64_t actionid, 
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+				if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -942,7 +972,7 @@ static void	add_sentusers_msg_esc_cancel(zbx_user_msg_t **user_msg, zbx_uint64_t
 		switch (event->object)
 		{
 			case EVENT_OBJECT_TRIGGER:
-				if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+				if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 					goto clean;
 				break;
 			case EVENT_OBJECT_ITEM:
@@ -1021,7 +1051,7 @@ static void	add_sentusers_ack_msg(zbx_user_msg_t **user_msg, zbx_uint64_t action
 		if (SUCCEED != zbx_db_check_user_perm2system(userid))
 			continue;
 
-		if (PERM_READ > get_trigger_permission(userid, event, &user_timezone))
+		if (SUCCEED != check_trigger_permission(userid, event, &user_timezone))
 			goto clean;
 
 		add_user_msgs(userid, operationid, 0, user_msg, actionid, event, r_event, ack, NULL, NULL,
@@ -2768,7 +2798,8 @@ static void	add_ack_escalation_r_eventids(zbx_vector_db_escalation_ptr_t *escala
 	zbx_vector_uint64_destroy(&r_eventids);
 }
 
-static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids, zbx_vector_service_t *services)
+static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceids,
+		zbx_vector_db_service_t *services)
 {
 	unsigned char		*data = NULL;
 	size_t			data_alloc = 0, data_offset = 0;
@@ -2789,7 +2820,7 @@ static void	get_services_rootcause_eventids(const zbx_vector_uint64_t *serviceid
 	zbx_free(data);
 }
 
-static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, zbx_vector_service_t *services,
+static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, zbx_vector_db_service_t *services,
 		zbx_vector_db_event_t *events)
 {
 	zbx_db_result_t		result;
@@ -2864,7 +2895,7 @@ static void	db_get_services(const zbx_vector_db_escalation_ptr_t *escalations, z
 			zbx_vector_tags_append(&service->service_tags, tag);
 		}
 
-		zbx_vector_service_append(services, service);
+		zbx_vector_db_service_append(services, service);
 
 		last_serviceid = (zbx_int64_t)service->serviceid;
 	}
@@ -3001,7 +3032,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 	zbx_vector_uint64_pair_t		event_pairs;
 	zbx_vector_service_alarm_t		service_alarms;
 	zbx_service_alarm_t			*service_alarm, service_alarm_local;
-	zbx_vector_service_t			services;
+	zbx_vector_db_service_t			services;
 	zbx_hashset_t				service_roles;
 	zbx_db_service				service_local;
 	zbx_dc_um_handle_t			*um_handle;
@@ -3013,7 +3044,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 	zbx_vector_db_event_create(&events);
 	zbx_vector_uint64_pair_create(&event_pairs);
 	zbx_vector_service_alarm_create(&service_alarms);
-	zbx_vector_service_create(&services);
+	zbx_vector_db_service_create(&services);
 
 	zbx_hashset_create_ext(&service_roles, 100, ZBX_DEFAULT_UINT64_HASH_FUNC,
 			ZBX_DEFAULT_UINT64_COMPARE_FUNC, (zbx_clean_func_t)service_role_clean,
@@ -3108,7 +3139,7 @@ static int	process_db_escalations(int now, int *nextcheck, zbx_vector_db_escalat
 					state = ZBX_ESCALATION_CANCEL;
 					THIS_SHOULD_NEVER_HAPPEN;
 				}
-				else if (FAIL == (index = zbx_vector_service_bsearch(&services, &service_local,
+				else if (FAIL == (index = zbx_vector_db_service_bsearch(&services, &service_local,
 						ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC)))
 				{
 					error = zbx_dsprintf(error, "service id:" ZBX_FS_UI64 " deleted.",
@@ -3345,8 +3376,8 @@ out:
 	zbx_vector_uint64_pair_destroy(&event_pairs);
 	zbx_vector_service_alarm_destroy(&service_alarms);
 
-	zbx_vector_service_clear_ext(&services, service_clean);
-	zbx_vector_service_destroy(&services);
+	zbx_vector_db_service_clear_ext(&services, service_clean);
+	zbx_vector_db_service_destroy(&services);
 
 	zbx_hashset_destroy(&service_roles);
 

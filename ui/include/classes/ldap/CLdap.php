@@ -100,7 +100,7 @@ class CLdap {
 	protected $placeholders = [];
 
 	/**
-	 * Estabilished LDAP connection resource, for PHP8.1.0+ LDAP\Connection class instance.
+	 * Established LDAP connection resource, for PHP8.1.0+ LDAP\Connection class instance.
 	 *
 	 * @var bool|resource|LDAP\Connection
 	 */

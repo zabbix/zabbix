@@ -80,6 +80,17 @@ class testDocumentationLinks extends CWebTest {
 				]
 			]
 		]);
+
+		CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for documentation links test',
+				'maintenance_type' => MAINTENANCE_TYPE_NODATA,
+				'active_since' => 1534885200,
+				'active_till' => 1534971600,
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'timeperiods' => [[]]
+			]
+		]);
 	}
 
 	/**
@@ -189,7 +200,7 @@ class testDocumentationLinks extends CWebTest {
 			// #8 Event details view.
 			[
 				[
-					'url' => 'tr_events.php?triggerid=100028&eventid=95',
+					'url' => 'tr_events.php?triggerid=100032&eventid=9000',
 					'doc_link' => '/en/manual/web_interface/frontend_sections/monitoring/problems#viewing-details'
 				]
 			],
@@ -1449,7 +1460,7 @@ class testDocumentationLinks extends CWebTest {
 					'actions' => [
 						[
 							'callback' => 'openFormWithLink',
-							'element' => 'xpath://a[text()="Maintenance for update (data collection)"]'
+							'element' => 'xpath://a[text()="Maintenance for documentation links test"]'
 						]
 					],
 					'doc_link' => '/en/manual/maintenance#configuration'
