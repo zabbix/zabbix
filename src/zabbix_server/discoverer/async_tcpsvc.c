@@ -151,7 +151,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			tcpsvc_context->step = ZABBIX_TCPSVC_STEP_CONNECT_WAIT;
 			*fd = tcpsvc_context->s.socket;
 
-			return ZBX_ASYNC_TASK_READ;
+			return ZBX_ASYNC_TASK_WRITE;
 		case ZABBIX_TCPSVC_STEP_CONNECT_WAIT:
 			if (0 == getsockopt(tcpsvc_context->s.socket, SOL_SOCKET, SO_ERROR, &errnum, &optlen) &&
 					0 != errnum)
