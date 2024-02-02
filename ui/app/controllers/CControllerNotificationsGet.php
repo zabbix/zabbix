@@ -49,7 +49,7 @@ class CControllerNotificationsGet extends CController {
 	 */
 	private $known_eventids = [];
 
-	protected function init() {
+	protected function init(): void {
 		parent::init();
 
 		$this->disableCsrfValidation();
@@ -69,7 +69,7 @@ class CControllerNotificationsGet extends CController {
 		$this->time_from = max([$this->settings['last.clock'], $this->timeout_time]);
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'known_eventids' => 'array_db events.eventid'
 		];
@@ -89,11 +89,11 @@ class CControllerNotificationsGet extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (!CWebUser::isGuest() && $this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		if (!$this->settings['enabled']) {
 			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
 			return;
@@ -106,7 +106,7 @@ class CControllerNotificationsGet extends CController {
 		$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
 	}
 
-	protected function loadNotifications() {
+	protected function loadNotifications(): void {
 		// Select problem events.
 		$options = [
 			'output' => ['eventid', 'r_eventid', 'objectid', 'severity', 'clock', 'r_clock', 'name'],
@@ -258,7 +258,7 @@ class CControllerNotificationsGet extends CController {
 		$this->notifications = array_values($this->notifications);
 	}
 
-	protected function makeResponseData() {
+	protected function makeResponseData(): string {
 		CArrayHelper::sort($this->notifications, [
 			['field' => 'clock', 'order' => ZBX_SORT_DOWN],
 			['field' => 'severity', 'order' => ZBX_SORT_DOWN],

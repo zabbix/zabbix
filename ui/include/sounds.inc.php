@@ -134,7 +134,7 @@ function updateMessageSettings($messages) {
 			'type' => (int) $dbMessages[$key]['type']
 		];
 
-		if ($values['type'] === PROFILE_TYPE_ID) {
+		if ($values['type'] == PROFILE_TYPE_ID) {
 			$values['value_id'] = $value;
 		}
 		else {

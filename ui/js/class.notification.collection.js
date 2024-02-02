@@ -263,8 +263,8 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * Shows or hides list node, updates and appends notification nodes, then delegates to remove dangling nodes.
  * Updates button tooltip text based on actual data.
  *
- * @param {object}                 severity_styles  Severity_styles.
- * @param {ZBX_NotificationsAlarm} alarm_state      Alarm_state.
+ * @param {object}                 severity_styles  Severity styles.
+ * @param {ZBX_NotificationsAlarm} alarm_state      Alarm state.
  * @param {string}                 username         Username of logged-in user.
  * @param {boolean}                muted            Indicator whether notifications are muted.
  * @param {int}                    snoozed_eventid  Snoozed event ID.
@@ -287,8 +287,8 @@ ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_st
 		this.btn_mute.title = locale['S_CANNOT_SUPPORT_NOTIFICATION_AUDIO'];
 	}
 
-	let list_node = this.list_node,
-		prev_notif_node = null;
+	const list_node = this.list_node;
+	let prev_notif_node = null;
 
 	if (this.isEmpty()) {
 		return this.hide().then(function() {
