@@ -2822,13 +2822,15 @@ zabbix_export:
               key: 'mssql.job.lastrundatetime["{#JOBNAME}"]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
+              units: unixtime
               description: 'The last date-time of the job run.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.last_run_date_time
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return value == ''null'' ? 0 : Math.floor(new Date(value) / 1000);'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
                     - 1d
@@ -2868,16 +2870,18 @@ zabbix_export:
               key: 'mssql.job.nextrundatetime["{#JOBNAME}"]'
               delay: '0'
               history: 7d
-              trends: '0'
-              value_type: TEXT
+              units: unixtime
               description: 'The next date-time of the job run.'
               preprocessing:
                 - type: JSONPATH
                   parameters:
                     - $.next_run_date_time
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return value == ''null'' ? 0 : Math.floor(new Date(value) / 1000);'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 15m
+                    - 1d
               master_item:
                 key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
