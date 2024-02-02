@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:19:54Z'
+  date: '2024-02-02T10:40:43Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -2548,10 +2548,10 @@ zabbix_export:
           description: 'EC2 instance ID.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}'
           value: '.*'
-          description: 'Filter of discoverable alarms by namespace.'
+          description: 'Filter of discoverable alarms by name.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered alarms by namespace.'
+          description: 'Filter to exclude discovered alarms by name.'
         - macro: '{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable alarms by namespace.'

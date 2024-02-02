@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T15:20:37Z'
+  date: '2024-02-02T10:42:52Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -1687,7 +1687,7 @@ zabbix_export:
               value_type: FLOAT
               units: B
               description: |
-                'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using. 
+                'The memory that is reserved by tasks in the resource that is specified by the dimension set that you're using.
                 This metric is only collected for tasks that have a defined memory reservation in their task definition.'
               preprocessing:
                 - type: JSONPATH
@@ -1927,6 +1927,12 @@ zabbix_export:
         - macro: '{$AWS.ECS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered alarms by name.'
+        - macro: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}'
+          value: '.*'
+          description: 'Filter of discoverable alarms by namespace.'
+        - macro: '{$AWS.ECS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter to exclude discovered alarms by namespace.'
         - macro: '{$AWS.ECS.LLD.FILTER.SERVICE.MATCHES}'
           value: '.*'
           description: 'Filter of discoverable services by name.'

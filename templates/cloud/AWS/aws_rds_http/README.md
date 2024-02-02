@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.  
+The template to monitor AWS RDS instance by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
@@ -33,9 +33,9 @@ This template has been tested on:
 
 The template get AWS RDS instance metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.  
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect Amazon RDS metrics.  
+Add the following required permissions to your Zabbix IAM policy in order to collect Amazon RDS metrics.
 ```json
 {
     "Version":"2012-10-17",
@@ -105,8 +105,8 @@ Additional information about metrics and used API methods:
 |{$AWS.RDS.INSTANCE.ID}|<p>RDS DB Instance identifier.</p>||
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.RDS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
-|{$AWS.RDS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.RDS.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
+|{$AWS.RDS.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.RDS.LLD.FILTER.EVENT_CATEGORY.MATCHES}|<p>Filter of discoverable events by category.</p>|`.*`|
 |{$AWS.RDS.LLD.FILTER.EVENT_CATEGORY.NOT_MATCHES}|<p>Filter to exclude discovered events by category.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.RDS.LLD.FILTER.EVENT_SOURCE_TYPE.MATCHES}|<p>Filter of discoverable events by source type.</p>|`.*`|

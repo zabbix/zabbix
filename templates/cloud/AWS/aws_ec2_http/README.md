@@ -3,7 +3,7 @@
 
 ## Overview
 
-The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.  
+The template to monitor AWS EC2 and attached AWS EBS volumes by HTTP via Zabbix that works without any external scripts.
 Most of the metrics are collected in one go, thanks to Zabbix bulk data collection.
 *NOTE*
 This template uses the GetMetricData CloudWatch API calls to list and retrieve metrics.
@@ -33,9 +33,9 @@ This template has been tested on:
 
 The template get AWS EC2 and attached AWS EBS volumes metrics and uses the script item to make HTTP requests to the CloudWatch API.
 
-Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.  
+Before using the template, you need to create an IAM policy with the necessary permissions for the Zabbix role in your AWS account.
 
-Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.  
+Add the following required permissions to your Zabbix IAM policy in order to collect Amazon EC2 metrics.
 ```json
 {
     "Version":"2012-10-17",
@@ -110,8 +110,8 @@ Additional information about metrics and used API methods:
 |{$AWS.EC2.LLD.FILTER.VOLUME_TYPE.NOT_MATCHES}|<p>Filter to exclude discovered volumes by type.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
 |{$AWS.EC2.LLD.FILTER.ALARM_SERVICE_NAMESPACE.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
-|{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by namespace.</p>|`.*`|
-|{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by namespace.</p>|`CHANGE_IF_NEEDED`|
+|{$AWS.EC2.LLD.FILTER.ALARM_NAME.MATCHES}|<p>Filter of discoverable alarms by name.</p>|`.*`|
+|{$AWS.EC2.LLD.FILTER.ALARM_NAME.NOT_MATCHES}|<p>Filter to exclude discovered alarms by name.</p>|`CHANGE_IF_NEEDED`|
 |{$AWS.EC2.CPU.UTIL.WARN.MAX}|<p>The warning threshold of the CPU utilization expressed in %.</p>|`85`|
 |{$AWS.EC2.CPU.CREDIT.BALANCE.MIN.WARN}|<p>Minimum number of free earned CPU credits for trigger expression.</p>|`50`|
 |{$AWS.EC2.CPU.CREDIT.SURPLUS.BALANCE.MAX.WARN}|<p>Maximum number of spent CPU Surplus credits for trigger expression.</p>|`100`|
