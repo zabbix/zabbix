@@ -3564,7 +3564,6 @@ section {
     transform: translate(var(--px), var(--py));
     transition: transform 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell path {
-      d: var(--path);
       fill: var(--fill);
       stroke: var(--stroke, var(--fill));
       transition: d 0.3s, fill 0.6s, stroke 0.3s; }

@@ -355,7 +355,7 @@ class CSVGHoneycomb {
 					.style('--stroke', d => this.#getFillColor(d))
 					.call(cell => cell
 						.append('path')
-						.style('--path', `path('${this.#cell_path}')`)
+						.attr('d', this.#cell_path)
 						.style('stroke-width', 2 / this.#container_params.scale)
 					)
 					.each((d, i, cells) => {
@@ -485,6 +485,8 @@ class CSVGHoneycomb {
 			height: scale
 		}
 
+		d.scaled_path = this.#generatePath(scaled_size.height, 0);
+
 		const scaled_position = {
 			dx: Math.max(
 				scaled_size.width / 2 - margin.horizontal,
@@ -506,7 +508,7 @@ class CSVGHoneycomb {
 			cell
 				.append('path')
 				.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
-				.style('--path', `path('${this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0)}')`);
+				.attr('d', this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0));
 		}
 		else {
 			clearTimeout(d.backdrop_timeout);
@@ -523,8 +525,13 @@ class CSVGHoneycomb {
 			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
 			.call(cell => cell
 				.select('path')
-				.style('--path', `path('${this.#generatePath(scaled_size.height, 0)}')`)
 				.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
+				.append('animate')
+				.attr('attributeName', 'd')
+				.attr('from', this.#cell_path)
+				.attr('to', d.scaled_path)
+				.attr('dur', `${UI_TRANSITION_DURATION}ms`)
+				.attr('fill', 'freeze')
 			);
 
 		this.#svg
@@ -553,20 +560,19 @@ class CSVGHoneycomb {
 
 		this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
 
-		d.backdrop_timeout = setTimeout(() => {
-			cell
-				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
-				.remove();
-		}, UI_TRANSITION_DURATION);
-
 		cell
 			.style('--dx', null)
 			.style('--dy', null)
 			.style('--stroke', d => this.#getFillColor(d))
 			.call(cell => cell
 				.select('path')
-				.style('--path', `path('${this.#cell_path}')`)
 				.style('filter', null)
+				.append('animate')
+				.attr('attributeName', 'd')
+				.attr('from', d.scaled_path)
+				.attr('to', this.#cell_path)
+				.attr('dur', `${UI_TRANSITION_DURATION}ms`)
+				.attr('fill', 'freeze')
 			);
 
 		this.#svg
@@ -577,6 +583,16 @@ class CSVGHoneycomb {
 					itemid: d.itemid
 				}
 			});
+
+		d.backdrop_timeout = setTimeout(() => {
+			cell
+				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
+				.remove();
+
+			cell
+				.select('animate')
+				.remove();
+		}, UI_TRANSITION_DURATION);
 	}
 
 	#drawLabel(cell) {
