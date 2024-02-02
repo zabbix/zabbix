@@ -82,6 +82,7 @@ AC_DEFUN([CONF_TESTS],
 			tests/zabbix_server/pinger/Makefile
 			tests/zabbix_server/service/Makefile
 			tests/zabbix_server/trapper/Makefile
+			tests/zabbix_server/lld/Makefile
 			tests/mocks/Makefile
 			tests/mocks/configcache/Makefile
 			tests/mocks/valuecache/Makefile

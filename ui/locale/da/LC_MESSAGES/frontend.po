@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.4\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2023-10-04 10:31+0000\n"
-"Last-Translator: Jurijs <jurijs.klopovskis@zabbix.com>\n"
+"PO-Revision-Date: 2024-01-15 21:40+0000\n"
+"Last-Translator: Kim Anthonisen <kim@anthonisen.dk>\n"
 "Language-Team: none\n"
 "Language: da\n"
 "MIME-Version: 1.0\n"
@@ -667,11 +667,10 @@ msgid "Action class %1$s must extend %2$s class."
 msgstr "Handlingsklassen %1$s skal udvide %2$s-klassen."
 
 #: app/controllers/CControllerActionDelete.php:79
-#, fuzzy
 msgid "Action deleted"
 msgid_plural "Actions deleted"
 msgstr[0] "Handlingen er slettet"
-msgstr[1] "Handlingen er slettet"
+msgstr[1] "Handlinger er slettet"
 
 #: app/controllers/CControllerActionDisable.php:84
 msgid "Action disabled"
@@ -683,7 +682,7 @@ msgstr[1] "Handling deaktiveret"
 msgid "Action enabled"
 msgid_plural "Actions enabled"
 msgstr[0] "Handling aktiveret"
-msgstr[1] "Handling aktiveret"
+msgstr[1] "Handlinger aktiveret"
 
 #: app/controllers/CControllerActionLogList.php:198
 #: app/views/reports.actionlog.list.php:180
@@ -705,7 +704,7 @@ msgstr "Handling opdateret"
 #: include/classes/api/services/CDashboardGeneral.php:672
 #, c-format
 msgid "Action with ID \"%1$s\" is not available."
-msgstr "Handliing med ID \"%1$s\" er ikke tilgænglig."
+msgstr "Handlingen med ID \"%1$s\" er ikke tilgænglig."
 
 #: app/controllers/CControllerPopupGeneric.php:496
 #: app/controllers/CControllerPopupGeneric.php:504
@@ -950,7 +949,7 @@ msgstr "Tilføj underordnet tjeneste"
 
 #: app/views/js/popup.service.edit.js.php:375
 msgid "Add child services"
-msgstr "Tilføj underordnet tjenester"
+msgstr ""
 
 #: app/partials/configuration.valuemap.php:57
 msgid "Add from host"
@@ -1164,7 +1163,7 @@ msgstr "Samlet sum"
 
 #: app/views/popup.triggerexpr.php:126
 msgid "Aggregate functions"
-msgstr "aggregerings-funktioner"
+msgstr "Aggregerings-funktioner"
 
 #: widgets/piechart/includes/CWidgetFieldDataSetView.php:283
 msgid "Aggregates each item in the data set."
@@ -12272,12 +12271,20 @@ msgstr ""
 msgid "Log"
 msgstr ""
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr ""
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr ""
 
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
+msgstr ""
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
 msgstr ""
 
 #: app/views/popup.massupdate.item.php:365
@@ -24446,8 +24453,28 @@ msgstr ""
 msgid "number"
 msgstr ""
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr ""
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
+msgstr ""
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
 msgstr ""
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136

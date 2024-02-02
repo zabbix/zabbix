@@ -91,7 +91,8 @@ class CAlert extends CApiService {
 			$options['output'] = self::OUTPUT_FIELDS;
 		}
 
-		$res = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
+		$sql_parts = $this->createSelectQueryParts($this->tableName, $this->tableAlias(), $options);
+		$res = DBselect(self::createSelectQueryFromParts($sql_parts), $options['limit']);
 
 		$db_alerts = [];
 
@@ -114,6 +115,10 @@ class CAlert extends CApiService {
 		}
 
 		if ($db_alerts) {
+			if (self::dbDistinct($sql_parts)) {
+				$db_alerts = $this->addNclobFieldValues($options, $db_alerts);
+			}
+
 			$db_alerts = $this->addRelatedObjects($options, $db_alerts);
 			$db_alerts = $this->unsetExtraFields($db_alerts, ['alertid', 'userid', 'mediatypeid'], $options['output']);
 
@@ -125,113 +130,146 @@ class CAlert extends CApiService {
 		return $db_alerts;
 	}
 
+	protected function createSelectQueryParts($tableName, $tableAlias, array $options) {
+		$sql_parts = [
+			'select' => ['a.alertid'],
+			'from' => [],
+			'where' => [],
+			'group' => [],
+			'order' => [],
+			'limit' => null
+		];
+
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			$sql_parts['from']['e'] = 'events e';
+			$sql_parts['from'][] = 'alerts a';
+			$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+			$sql_parts['where'][] = dbConditionInt('e.source', [$options['eventsource']]);
+			$sql_parts['where'][] = dbConditionInt('e.object', [$options['eventobject']]);
+		}
+		else {
+			if ($options['eventsource'] == EVENT_SOURCE_TRIGGERS
+					|| $options['eventsource'] == EVENT_SOURCE_AUTOREGISTRATION) {
+				$sql_parts['from'][] = 'alerts a';
+				$sql_parts['where'][] = 'EXISTS ('.
+					'SELECT NULL'.
+					' FROM actions aa'.
+					' WHERE a.actionid=aa.actionid'.
+						' AND '.dbConditionInt('aa.eventsource', [$options['eventsource']]).
+				')';
+			}
+			else {
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from'][] = 'alerts a';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where'][] = dbConditionInt('e.source', [$options['eventsource']]);
+				$sql_parts['where'][] = dbConditionInt('e.object', [$options['eventobject']]);
+			}
+		}
+
+		// add filter options
+		$sql_parts = $this->applyQueryFilterOptions($tableName, $tableAlias, $options, $sql_parts);
+
+		// add output options
+		$sql_parts = $this->applyQueryOutputOptions($tableName, $tableAlias, $options, $sql_parts);
+
+		// add sort options
+		$sql_parts = $this->applyQuerySortOptions($tableName, $tableAlias, $options, $sql_parts);
+
+		return $sql_parts;
+	}
+
 	protected function applyQueryFilterOptions($table_name, $table_alias, array $options, array $sql_parts): array {
 		$sql_parts = parent::applyQueryFilterOptions($table_name, $table_alias, $options, $sql_parts);
 
 		// editable + PERMISSION CHECK
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
-			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+				if (self::$userData['ugsetid'] == 0) {
+					return $options['countOutput'] ? '0' : [];
+				}
 
-				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-				$sql_parts['where'][] = 'EXISTS ('.
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
+
+				$sql_parts['where'][] = 'NOT EXISTS ('.
 					'SELECT NULL'.
-					' FROM events e,functions f,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
-					' WHERE a.eventid=e.eventid'.
-						' AND e.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY f.triggerid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.zbx_dbstr($permission).
+					' FROM functions f1'.
+					' JOIN items i1 ON f1.itemid=i1.itemid'.
+					' JOIN host_hgset hh1 ON i1.hostid=hh1.hostid'.
+					' LEFT JOIN permission p1 ON hh1.hgsetid=p1.hgsetid'.
+						' AND p1.ugsetid=p.ugsetid'.
+					' WHERE e.objectid=f1.triggerid'.
+						' AND p1.permission IS NULL'.
 				')';
 			}
-			// items and LLD rules
-			elseif ($options['eventobject'] == EVENT_OBJECT_ITEM || $options['eventobject'] == EVENT_OBJECT_LLDRULE) {
-				$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+			elseif (in_array($options['eventobject'], [EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE])) {
+				if (self::$userData['ugsetid'] == 0) {
+					return $options['countOutput'] ? '0' : [];
+				}
 
-				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-				$sql_parts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM events e,items i,hosts_groups hgg'.
-					' JOIN rights r'.
-						' ON r.id=hgg.groupid'.
-							' AND '.dbConditionInt('r.groupid', getUserGroupsByUserId(self::$userData['userid'])).
-					' WHERE a.eventid=e.eventid'.
-						' AND e.objectid=i.itemid'.
-						' AND i.hostid=hgg.hostid'.
-					' GROUP BY hgg.hostid'.
-					' HAVING MIN(r.permission)>'.PERM_DENY.
-					' AND MAX(r.permission)>='.zbx_dbstr($permission).
-				')';
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'host_hgset hh';
+				$sql_parts['from'][] = 'permission p';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hh.hostid';
+				$sql_parts['where'][] = 'hh.hgsetid=p.hgsetid';
+				$sql_parts['where'][] = 'p.ugsetid='.self::$userData['ugsetid'];
+
+				if ($options['editable']) {
+					$sql_parts['where'][] = 'p.permission='.PERM_READ_WRITE;
+				}
 			}
-		}
-
-		// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-		if ($options['eventsource'] == EVENT_SOURCE_TRIGGERS
-				|| $options['eventsource'] == EVENT_SOURCE_AUTOREGISTRATION) {
-			/*
-			 * Performance optimization: events with such sources does not have multiple objects therefore we can ignore
-			 * event object in SQL requests.
-			 */
-			$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM actions aa'.
-				' WHERE a.actionid=aa.actionid'.
-					' AND aa.eventsource='.zbx_dbstr($options['eventsource']).
-			')';
-		}
-		else {
-			$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM events e'.
-				' WHERE a.eventid=e.eventid'.
-					' AND e.source='.zbx_dbstr($options['eventsource']).
-					' AND e.object='.zbx_dbstr($options['eventobject']).
-			')';
 		}
 
 		// Allow user to get alerts sent only by users with same user group.
 		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN) {
-			// Filter by userid only if userid IS NOT NULL.
-			$sql_parts['where'][] = '(a.userid IS NULL OR EXISTS ('.
-				'SELECT NULL'.
-				' FROM users_groups ug'.
-				' WHERE ug.userid=a.userid'.
-					' AND '.dbConditionInt('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
-			'))';
+			$sql_parts['from'][] = 'users_groups ug';
+			$sql_parts['where'][] = '(a.userid IS NULL'.
+				' OR (a.userid=ug.userid'.
+					' AND '.dbConditionId('ug.usrgrpid', getUserGroupsByUserId(self::$userData['userid'])).
+				')'.
+			')';
 		}
 
 		// groupids
 		if ($options['groupids'] !== null) {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-				$sql_parts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM events e,functions f,items i,hosts_groups hg'.
-					' WHERE a.eventid=e.eventid'.
-						' AND e.objectid=f.triggerid'.
-						' AND f.itemid=i.itemid'.
-						' AND i.hostid=hg.hostid'.
-						' AND '.dbConditionInt('hg.groupid', $options['groupids']).
-				')';
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'hosts_groups hg';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hg.hostid';
+				$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-				$sql_parts['where'][] = 'EXISTS ('.
-					'SELECT NULL'.
-					' FROM events e,items i,hosts_groups hg'.
-					' WHERE a.eventid=e.eventid'.
-						' AND e.objectid=i.itemid'.
-						' AND i.hostid=hg.hostid'.
-						' AND '.dbConditionInt('hg.groupid', $options['groupids']).
-				')';
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['from'][] = 'hosts_groups hg';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where'][] = 'i.hostid=hg.hostid';
+				$sql_parts['where'][] = dbConditionId('hg.groupid', $options['groupids']);
 			}
 		}
 
@@ -239,49 +277,40 @@ class CAlert extends CApiService {
 		if ($options['hostids'] !== null) {
 			// triggers
 			if ($options['eventobject'] == EVENT_OBJECT_TRIGGER) {
-				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-				$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM events e,functions f,items i'.
-				' WHERE a.eventid=e.eventid'.
-					' AND e.objectid=f.triggerid'.
-					' AND f.itemid=i.itemid'.
-					' AND '.dbConditionInt('i.hostid', $options['hostids']).
-				')';
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from']['f'] = 'functions f';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where']['e-f'] = 'e.objectid=f.triggerid';
+				$sql_parts['where']['f-i'] = 'f.itemid=i.itemid';
+				$sql_parts['where'][] = dbConditionId('i.hostid', $options['hostids']);
 			}
 			// lld rules and items
 			elseif ($options['eventobject'] == EVENT_OBJECT_LLDRULE || $options['eventobject'] == EVENT_OBJECT_ITEM) {
-				// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-				$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM events e,items i'.
-				' WHERE a.eventid=e.eventid'.
-					' AND e.objectid=i.itemid'.
-					' AND '.dbConditionInt('i.hostid', $options['hostids']).
-				')';
+				$sql_parts['from']['e'] = 'events e';
+				$sql_parts['from']['i'] = 'items i';
+				$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+				$sql_parts['where']['e-i'] = 'e.objectid=i.itemid';
+				$sql_parts['where'][] = dbConditionId('i.hostid', $options['hostids']);
 			}
 		}
 
 		// alertids
 		if ($options['alertids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('a.alertid', $options['alertids']);
+			$sql_parts['where'][] = dbConditionId('a.alertid', $options['alertids']);
 		}
 
 		// objectids
 		if ($options['objectids'] !== null && in_array($options['eventobject'],
 				[EVENT_OBJECT_TRIGGER, EVENT_OBJECT_ITEM, EVENT_OBJECT_LLDRULE, EVENT_OBJECT_SERVICE])) {
-			// Oracle does not support using distinct with nclob fields, so we must use exists instead of joins
-			$sql_parts['where'][] = 'EXISTS ('.
-				'SELECT NULL'.
-				' FROM events e'.
-				' WHERE a.eventid=e.eventid'.
-					' AND '.dbConditionInt('e.objectid', $options['objectids']).
-			')';
+			$sql_parts['from']['e'] = 'events e';
+			$sql_parts['where']['e-a'] = 'e.eventid=a.eventid';
+			$sql_parts['where'][] = dbConditionId('e.objectid', $options['objectids']);
 		}
 
 		// eventids
 		if ($options['eventids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('a.eventid', $options['eventids']);
+			$sql_parts['where'][] = dbConditionId('a.eventid', $options['eventids']);
 
 			if ($options['groupCount']) {
 				$sql_parts['group']['a'] = 'a.eventid';
@@ -290,7 +319,7 @@ class CAlert extends CApiService {
 
 		// actionids
 		if ($options['actionids'] !== null) {
-			$sql_parts['where'][] = dbConditionInt('a.actionid', $options['actionids']);
+			$sql_parts['where'][] = dbConditionId('a.actionid', $options['actionids']);
 		}
 
 		// userids
@@ -322,6 +351,8 @@ class CAlert extends CApiService {
 	}
 
 	protected function applyQueryOutputOptions($table_name, $table_alias, array $options, array $sql_parts): array {
+		self::unsetNclobFieldsFromOutput($options, $sql_parts);
+
 		$sql_parts = parent::applyQueryOutputOptions($table_name, $table_alias, $options, $sql_parts);
 
 		if (!$options['countOutput']) {

@@ -4333,7 +4333,7 @@ class testScripts extends CAPITest {
 			],
 
 			// Check "manualinput_validator_type" in search.
-			'Test script.get unexcpected parameter "manualinput_validator_type" in search' => [
+			'Test script.get unexpected parameter "manualinput_validator_type" in search' => [
 				'request' => [
 					'search' => [
 						'manualinput_validator_type' => false
@@ -8188,7 +8188,7 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	 * Data provider for script.getScriptsByHosts. Array contains valid data. Checks if result contains cetrain scripts
+	 * Data provider for script.getScriptsByHosts. Array contains valid data. Checks if result contains certain scripts
 	 * and those scripts contain fields with resolved macros. Some macros cannot be resolved. They either resolve to
 	 * *UNKNOWN* or do not resolve at all. Each host and request can have different macros.
 	 *
@@ -10165,7 +10165,7 @@ class testScripts extends CAPITest {
 	}
 
 	/**
-	 * Data provider for script.getScriptsByEvents. Array contains valid data. Checks if result contains cetrain scripts
+	 * Data provider for script.getScriptsByEvents. Array contains valid data. Checks if result contains certain scripts
 	 * and those scripts contain fields with resolved macros. Some macros cannot be resolved. They either resolve to
 	 * *UNKNOWN* or do not resolve at all. Each event and request can have different macros.
 	 *

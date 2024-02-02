@@ -64,7 +64,17 @@ class CWidgetFieldsGroupView extends CDiv {
 	}
 
 	public function getLabel(): CLabel {
-		return (new CLabel([$this->label, $this->field_hint]))
+		$focusable_element_id = null;
+
+		if ($this->fields && $this->fields[0] instanceof CWidgetFieldView) {
+			$label = $this->fields[0]->getLabel();
+
+			if ($label === null) {
+				$focusable_element_id = $this->fields[0]->getFocusableElementId();
+			}
+		}
+
+		return (new CLabel([$this->label, $this->field_hint], $focusable_element_id))
 			->addClass(CFormGrid::ZBX_STYLE_FIELDS_GROUP_LABEL)
 			->addClass($this->label_class_list ? implode(' ', $this->label_class_list) : null);
 	}

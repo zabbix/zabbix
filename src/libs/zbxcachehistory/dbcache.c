@@ -2698,6 +2698,9 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
+
+		if (0 != item->has_trigger)
+			h->flags |= ZBX_DC_FLAG_HASTRIGGER;
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);

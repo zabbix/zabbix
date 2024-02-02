@@ -78,11 +78,11 @@ class CDateSelector extends CTag {
 	private $enabled = true;
 
 	/**
-	 * Maxlength attribute of the input field. Aligned with the date format by default.
+	 * Maxlength attribute of the input field.
 	 *
 	 * @var int
 	 */
-	private $maxlength;
+	private $maxlength = 255;
 
 	/**
 	 * Create array with all inputs required for date selection and calendar.
@@ -191,7 +191,7 @@ class CDateSelector extends CTag {
 				(new CTextBox($this->name, $this->value))
 					->setId(zbx_formatDomId($this->name))
 					->setAttribute('placeholder', $this->placeholder)
-					->setAttribute('maxlength', $this->maxlength ?? strlen(date($this->date_format)))
+					->setAttribute('maxlength', $this->maxlength)
 					->setAriaRequired($this->is_required)
 					->setEnabled($this->enabled)
 					->setReadonly($this->readonly)
