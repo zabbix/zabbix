@@ -36,7 +36,6 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 #endif
 
-//int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
 typedef int (*zbx_get_value_internal_ext_f)(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
 
 typedef struct
@@ -57,7 +56,6 @@ typedef struct
 	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
 }
 zbx_thread_poller_args;
-
 
 ZBX_THREAD_ENTRY(poller_thread, args);
 
