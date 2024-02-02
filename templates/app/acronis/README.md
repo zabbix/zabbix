@@ -82,6 +82,21 @@ This template is not meant to be used independently. A host with the `Acronis Cy
 
 If needed, you can specify an HTTP proxy for the template to use by changing the value of `{$ACRONIS.CPC.HTTP.PROXY}` user macro.
 
+Device discovery trigger prototypes that check services which have failed to run, have trigger time offset user macros:
+
+* `{$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE}`
+
+* `{$ACRONIS.CPC.OFFSET.SCHEDULED.BACKUP}`
+
+* `{$ACRONIS.CPC.OFFSET.SCHEDULED.VULNERABILITY}`
+
+* `{$ACRONIS.CPC.OFFSET.SCHEDULED.PATCH}`
+
+Using these macros, their respective triggers can be offset in both directions. For example, if you wish to make
+sure that the trigger fires only when the current time is at least 3 minutes over the next scheduled antimalware
+scan, then set the value of `{$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE}` user macro to `-180`.
+This is the default behaviour.
+
 
 ### Macros used
 
@@ -91,6 +106,10 @@ If needed, you can specify an HTTP proxy for the template to use by changing the
 |{$ACRONIS.CPC.HTTP.PROXY}|<p>Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.</p>||
 |{$ACRONIS.CPC.CYBERFIT.WARN}|<p>CyberFit score threshold for "warning" severity trigger.</p>|`669`|
 |{$ACRONIS.CPC.CYBERFIT.HIGH}|<p>CyberFit score threshold for "high" severity trigger.</p>|`579`|
+|{$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE}|<p>Offset time in seconds for scheduled antimalware scan trigger check.</p>|`-180`|
+|{$ACRONIS.CPC.OFFSET.SCHEDULED.BACKUP}|<p>Offset time in seconds for scheduled backup run trigger check.</p>|`-180`|
+|{$ACRONIS.CPC.OFFSET.SCHEDULED.VULNERABILITY}|<p>Offset time in seconds for scheduled vulnerability assessment run trigger check.</p>|`-180`|
+|{$ACRONIS.CPC.OFFSET.SCHEDULED.PATCH}|<p>Offset time in seconds for scheduled patch management run trigger check.</p>|`-180`|
 |{$ACRONIS.CPC.DEVICE.RESOURCE.TYPE}|<p>Comma separated list of resource types for devices retrieval.</p>|`resource.machine`|
 |{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.MATCHES}|<p>Sets the alert category regex filter to use in alert discovery for including.</p>|`.*`|
 |{$ACRONIS.CPC.ALERT.DISCOVERY.CATEGORY.NOT_MATCHES}|<p>Sets the alert category regex filter to use in alert discovery for excluding.</p>|`CHANGE_IF_NEEDED`|
@@ -196,13 +215,13 @@ If needed, you can specify an HTTP proxy for the template to use by changing the
 |Device [{#NAME}]:[{#ID}]: Protection status "error"|<p>Device has "error" protection status.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.status[{#NAME}])="error"`|Average|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Protection status "warning"|<p>Device has "warning" protection status.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.status[{#NAME}])="warning"`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>Device [{#NAME}]:[{#ID}]: Protection status "error"</li></ul>|
 |Device [{#NAME}]:[{#ID}]: Previous protection scan not successful|<p>Device has "error" protection status.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.prev.ok[{#NAME}])<>last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.prev[{#NAME}])`|Average|**Manual close**: Yes|
-|Device [{#NAME}]:[{#ID}]: Scheduled antimalware scan failed to run|<p>Scheduled antimalware scan failed to run for at least 3 minutes.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.next[{#NAME}],3m) < now()`|Warning|**Manual close**: Yes|
+|Device [{#NAME}]:[{#ID}]: Scheduled antimalware scan failed to run|<p>Scheduled antimalware scan failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE})`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous machine backup run not successful|<p>Previous machine backup did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
-|Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run|<p>Scheduled machine backup failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
+|Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run|<p>Scheduled machine backup failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.BACKUP})`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous vulnerability assessment not successful|<p>Previous vulnerability assessment did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
-|Device [{#NAME}]:[{#ID}]: Scheduled vulnerability assessment failed to run|<p>Scheduled vulnerability assessment failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
+|Device [{#NAME}]:[{#ID}]: Scheduled vulnerability assessment failed to run|<p>Scheduled vulnerability assessment failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.VULNERABILITY})`|Warning|**Manual close**: Yes|
 |Device [{#NAME}]:[{#ID}]: Previous patch management run not successful|<p>Previous patch management run did not run successfully.</p>|`max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev.ok[{#NAME}],1m)<>max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.prev[{#NAME}],1m)`|Average|**Manual close**: Yes|
-|Device [{#NAME}]:[{#ID}]: Scheduled patch management failed to run|<p>Scheduled patch management failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.next[{#NAME}]) < now()`|Warning|**Manual close**: Yes|
+|Device [{#NAME}]:[{#ID}]: Scheduled patch management failed to run|<p>Scheduled patch management failed to run.</p>|`last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.PATCH})`|Warning|**Manual close**: Yes|
 
 ## Feedback
 
