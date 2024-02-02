@@ -189,8 +189,8 @@ class CMediatype extends CApiService {
 		}
 		unset($mediatype);
 
-		self::updateParameters($mediatypes, __FUNCTION__);
-		self::updateMessageTemplates($mediatypes, __FUNCTION__);
+		self::updateParameters($mediatypes);
+		self::updateMessageTemplates($mediatypes);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes);
 
@@ -271,8 +271,12 @@ class CMediatype extends CApiService {
 		self::validateUpdate($mediatypes, $db_mediatypes);
 
 		$upd_mediatypes = [];
+		$upd_mediatypeids = [];
 
-		foreach ($mediatypes as $mediatype) {
+		$internal_fields = array_flip(['mediatypeid']);
+		$nested_object_fields = array_flip(['parameters', 'message_templates']);
+
+		foreach ($mediatypes as $i => &$mediatype) {
 			$upd_mediatype = DB::getUpdatedValues('media_type', $mediatype, $db_mediatypes[$mediatype['mediatypeid']]);
 
 			if ($upd_mediatype) {
@@ -280,15 +284,25 @@ class CMediatype extends CApiService {
 					'values' => $upd_mediatype,
 					'where' => ['mediatypeid' => $mediatype['mediatypeid']]
 				];
+
+				$mediatype = array_intersect_key($mediatype, $internal_fields + $upd_mediatype + $nested_object_fields);
+				$upd_mediatypeids[$i] = $mediatype['mediatypeid'];
+			}
+			else {
+				$mediatype = array_intersect_key($mediatype, $internal_fields + $nested_object_fields);
 			}
 		}
+		unset($mediatype);
 
 		if ($upd_mediatypes) {
 			DB::update('media_type', $upd_mediatypes);
 		}
 
-		self::updateParameters($mediatypes, __FUNCTION__, $db_mediatypes);
-		self::updateMessageTemplates($mediatypes, __FUNCTION__, $db_mediatypes);
+		self::updateParameters($mediatypes, $db_mediatypes, $upd_mediatypeids);
+		self::updateMessageTemplates($mediatypes, $db_mediatypes, $upd_mediatypeids);
+
+		$mediatypes = array_intersect_key($mediatypes, $upd_mediatypeids);
+		$db_mediatypes = array_intersect_key($db_mediatypes, array_flip($upd_mediatypeids));
 
 		self::addAuditLog(CAudit::ACTION_UPDATE, CAudit::RESOURCE_MEDIA_TYPE, $mediatypes, $db_mediatypes);
 
@@ -640,22 +654,24 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param array      $mediatypes
-	 * @param string     $method
 	 * @param array|null $db_mediatypes
+	 * @param array|null $upd_mediatypeids
 	 */
-	private static function updateParameters(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateParameters(array &$mediatypes, array $db_mediatypes = null,
+			array &$upd_mediatypeids = null): void {
 		$ins_params = [];
 		$upd_params = [];
 		$del_paramids = [];
 
-		foreach ($mediatypes as &$mediatype) {
+		foreach ($mediatypes as $i => &$mediatype) {
 			if (!array_key_exists('parameters', $mediatype)) {
 				continue;
 			}
 
-			$db_params = ($method === 'update')
+			$db_params = $db_mediatypes !== null
 				? array_column($db_mediatypes[$mediatype['mediatypeid']]['parameters'], null, 'name')
 				: [];
+			$changed = false;
 
 			foreach ($mediatype['parameters'] as &$param) {
 				if (array_key_exists($param['name'], $db_params)) {
@@ -670,15 +686,29 @@ class CMediatype extends CApiService {
 							'values' => $upd_param,
 							'where' => ['mediatype_paramid' => $param['mediatype_paramid']]
 						];
+						$changed = true;
 					}
 				}
 				else {
 					$ins_params[] = ['mediatypeid' => $mediatype['mediatypeid']] + $param;
+					$changed = true;
 				}
 			}
 			unset($param);
 
-			$del_paramids = array_merge($del_paramids, array_column($db_params, 'mediatype_paramid'));
+			if ($db_params) {
+				$del_paramids = array_merge($del_paramids, array_column($db_params, 'mediatype_paramid'));
+				$changed = true;
+			}
+
+			if ($db_mediatypes !== null) {
+				if ($changed) {
+					$upd_mediatypeids[$i] = $mediatype['mediatypeid'];
+				}
+				else {
+					unset($mediatype['parameters']);
+				}
+			}
 		}
 		unset($mediatype);
 
@@ -715,20 +745,24 @@ class CMediatype extends CApiService {
 	 * @static
 	 *
 	 * @param array      $mediatypes
-	 * @param string     $method
 	 * @param array|null $db_mediatypes
+	 * @param array|null $upd_mediatypeids
 	 */
-	private static function updateMessageTemplates(array &$mediatypes, string $method, array $db_mediatypes = null): void {
+	private static function updateMessageTemplates(array &$mediatypes, array $db_mediatypes = null,
+			array &$upd_mediatypeids = null): void {
 		$ins_messages = [];
 		$upd_messages = [];
 		$del_messageids = [];
 
-		foreach ($mediatypes as &$mediatype) {
+		foreach ($mediatypes as $i => &$mediatype) {
 			if (!array_key_exists('message_templates', $mediatype)) {
 				continue;
 			}
 
-			$db_messages = ($method === 'update') ? $db_mediatypes[$mediatype['mediatypeid']]['message_templates'] : [];
+			$db_messages = $db_mediatypes !== null
+				? $db_mediatypes[$mediatype['mediatypeid']]['message_templates']
+				: [];
+			$changed = false;
 
 			foreach ($mediatype['message_templates'] as &$message) {
 				$db_message = current(
@@ -749,15 +783,29 @@ class CMediatype extends CApiService {
 							'values' => $upd_message,
 							'where' => ['mediatype_messageid' => $db_message['mediatype_messageid']]
 						];
+						$changed = true;
 					}
 				}
 				else {
 					$ins_messages[] = ['mediatypeid' => $mediatype['mediatypeid']] + $message;
+					$changed = true;
 				}
 			}
 			unset($message);
 
-			$del_messageids = array_merge($del_messageids, array_keys($db_messages));
+			if ($db_messages) {
+				$del_messageids = array_merge($del_messageids, array_keys($db_messages));
+				$changed = true;
+			}
+
+			if ($db_mediatypes !== null) {
+				if ($changed) {
+					$upd_mediatypeids[$i] = $mediatype['mediatypeid'];
+				}
+				else {
+					unset($mediatype['message_templates']);
+				}
+			}
 		}
 		unset($mediatype);
 

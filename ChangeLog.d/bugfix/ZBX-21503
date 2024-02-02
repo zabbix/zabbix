@@ -1,0 +1,1 @@
+A......... [ZBX-21503] prevented creation of audit logs for Media type objects on updates without actual changes (jfreibergs)
