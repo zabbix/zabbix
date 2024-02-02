@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
+#include "checks_internal_proxy.h"
+
 #include "zbxcachehistory.h"
 #include "zbxpoller.h"
 #include "zbxproxybuffer.h"
@@ -38,7 +39,7 @@
  *           before generic internal checks are processed.                    *
  *                                                                            *
  ******************************************************************************/
-int	zbx_get_value_internal_ext(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
+int	zbx_get_value_internal_ext_proxy(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	if (0 == strcmp(param1, "proxy_history"))
 	{

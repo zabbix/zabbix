@@ -1,3 +1,4 @@
+
 /*
 ** Zabbix
 ** Copyright (C) 2001-2024 Zabbix SIA
@@ -17,18 +18,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_CHECKS_INTERNAL_H
-#define ZABBIX_CHECKS_INTERNAL_H
+#ifndef ZABBIX_POLLER_PROXY_H
+#define ZABBIX_POLLER_PROXY_H
 
-#include "zbxcachehistory.h"
-#include "zbxcomms.h"
+#include "module.h"
 
-#include "poller_internal.h"
-
-#include "zbxpoller.h"
-
-int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
-		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
-		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f zbx_get_value_internal_ext_cb);
+int	zbx_get_value_internal_ext_proxy(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
 
 #endif

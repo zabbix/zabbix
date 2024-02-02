@@ -253,7 +253,7 @@ out:
  *********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
-		zbx_get_config_forks_f get_config_forks)
+		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	AGENT_REQUEST	request;
 	int		ret = NOTSUPPORTED, nparams;
@@ -280,7 +280,7 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		goto out;
 	}
 
-	if (FAIL != (ret = zbx_get_value_internal_ext(tmp, &request, result)))
+	if (FAIL != (ret = get_value_internal_ext_cb(tmp, &request, result)))
 		goto out;
 
 	ret = NOTSUPPORTED;

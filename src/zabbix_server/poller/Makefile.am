@@ -3,9 +3,11 @@
 noinst_LIBRARIES = libzbxpoller_server.a libzbxpoller_proxy.a
 
 libzbxpoller_server_a_SOURCES = \
+	checks_internal_server.h \
 	checks_internal_server.c
 
 libzbxpoller_proxy_a_SOURCES = \
+	checks_internal_proxy.h \
 	checks_internal_proxy.c
 
 libzbxpoller_a_CFLAGS = \

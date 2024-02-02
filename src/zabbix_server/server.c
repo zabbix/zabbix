@@ -49,6 +49,7 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"
+#include "poller/checks_internal_server.h"
 #include "proxypoller/proxypoller.h"
 #include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"
@@ -1444,12 +1445,14 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
 							config_max_concurrent_checks_per_poller, get_config_forks,
-							config_java_gateway, config_java_gateway_port, config_externalscripts};
+							config_java_gateway, config_java_gateway_port, config_externalscripts,
+							zbx_get_value_internal_ext_server};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
-							config_java_gateway_port, config_externalscripts};
+							config_java_gateway_port, config_externalscripts,
+							zbx_get_value_internal_ext_server};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							get_config_forks};

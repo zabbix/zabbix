@@ -72,7 +72,7 @@ void	zbx_free_agent_result_ptr(AGENT_RESULT *result)
 static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts)
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	int	res = FAIL, version = item->interface.version;
 
@@ -89,7 +89,7 @@ static int	get_value(zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t
 			break;
 		case ITEM_TYPE_INTERNAL:
 			res = get_value_internal(item, result, config_comms, config_startup_time, config_java_gateway,
-					config_java_gateway_port, get_config_forks);
+					config_java_gateway_port, get_config_forks, get_value_internal_ext_cb);
 			break;
 		case ITEM_TYPE_DB_MONITOR:
 #ifdef HAVE_UNIXODBC
@@ -545,7 +545,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		zbx_vector_ptr_t *add_results, unsigned char poller_type, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts)
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	if (ITEM_TYPE_SNMP == items[0].type)
 	{
@@ -578,7 +578,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 		{
 			errcodes[0] = get_value(&items[0], &results[0], add_results, config_comms,
 					config_startup_time, program_type, get_config_forks, config_java_gateway,
-					config_java_gateway_port, config_externalscripts);
+					config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb);
 		}
 	}
 	else
@@ -666,7 +666,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 		int config_startup_time, int config_unavailable_delay, int config_unreachable_period,
 		int config_unreachable_delay, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts)
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	zbx_dc_item_t		item, *items;
 	AGENT_RESULT		results[ZBX_MAX_POLLER_ITEMS];
@@ -693,7 +693,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 	zbx_prepare_items(items, errcodes, num, results, ZBX_MACRO_EXPAND_YES);
 	zbx_check_items(items, errcodes, num, results, &add_results, poller_type, config_comms, config_startup_time,
 			program_type, progname, get_config_forks, config_java_gateway, config_java_gateway_port,
-			config_externalscripts);
+			config_externalscripts, get_value_internal_ext_cb);
 
 	zbx_timespec(&timespec);
 
@@ -714,7 +714,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				}
 				break;
 			case NETWORK_ERROR:
-			case GATEWAY_ERROR:
+		case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
 				if (ZBX_INTERFACE_AVAILABLE_FALSE != last_available)
 				{
@@ -879,7 +879,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					poller_args_in->config_unreachable_delay, info->program_type,
 					poller_args_in->zbx_get_progname_cb_arg(), poller_args_in->get_config_forks,
 					poller_args_in->config_java_gateway, poller_args_in->config_java_gateway_port,
-					poller_args_in->config_externalscripts);
+					poller_args_in->config_externalscripts, poller_args_in->zbx_get_value_internal_ext_cb);
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}
