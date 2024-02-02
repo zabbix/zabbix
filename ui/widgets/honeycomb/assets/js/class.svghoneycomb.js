@@ -485,8 +485,6 @@ class CSVGHoneycomb {
 			height: scale
 		}
 
-		d.scaled_path = this.#generatePath(scaled_size.height, 0);
-
 		const scaled_position = {
 			dx: Math.max(
 				scaled_size.width / 2 - margin.horizontal,
@@ -523,16 +521,12 @@ class CSVGHoneycomb {
 			.style('--dx', `${scaled_position.dx}px`)
 			.style('--dy', `${scaled_position.dy}px`)
 			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
-			.call(cell => cell
-				.select('path')
-				.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
-				.append('animate')
-				.attr('attributeName', 'd')
-				.attr('from', this.#cell_path)
-				.attr('to', d.scaled_path)
-				.attr('dur', `${UI_TRANSITION_DURATION}ms`)
-				.attr('fill', 'freeze')
-			);
+			.select('path')
+			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
+			.transition()
+			.duration(UI_TRANSITION_DURATION)
+			.ease(d3.easeLinear)
+			.attr('d', this.#generatePath(scaled_size.height, 0));
 
 		this.#svg
 			.style('--shadow-opacity', 1)
@@ -564,16 +558,12 @@ class CSVGHoneycomb {
 			.style('--dx', null)
 			.style('--dy', null)
 			.style('--stroke', d => this.#getFillColor(d))
-			.call(cell => cell
-				.select('path')
-				.style('filter', null)
-				.append('animate')
-				.attr('attributeName', 'd')
-				.attr('from', d.scaled_path)
-				.attr('to', this.#cell_path)
-				.attr('dur', `${UI_TRANSITION_DURATION}ms`)
-				.attr('fill', 'freeze')
-			);
+			.select('path')
+			.style('filter', null)
+			.transition()
+			.duration(UI_TRANSITION_DURATION)
+			.ease(d3.easeLinear)
+			.attr('d', this.#cell_path);
 
 		this.#svg
 			.style('--shadow-opacity', null)
