@@ -509,8 +509,18 @@ A.F....... [ZBX-21976] added support of OneLogin and Azure SCIM, fixed some issu
 Changes for 6.4.12rc1
 
 New features:
+.........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
+........S. [ZBX-23688] improved new item value retrieval performance by adding such items to value cache after configuration sync (wiper)
+.......PS. [ZBX-22130] changed jsonpath expression evaluator to treat null values as empty variants (wiper)
+.......... [ZBX-23986] added a license to the Go module (jxl)
+..F....... [ZBX-23587] fixed widget input field selecting when clicking on label (dpetra)
+.......PS. [ZBX-23232] fixed syncing web scenarios to proxy (asitals)
+..F....... [ZBX-23640] fixed preload hints opening (apoga)
+A.F....... [ZBX-22433] fixed Web scenario and Web scenario step configuration field trimming and field sorting (ddauksa, Ivo, Sasha)
+.........T [ZBX-23684] fixed transactions query file for PostgreSQL by Zabbix agent template (drasikhov)
+..F....... [ZBX-23659] fixed incorrect calculation of bar graph polygon in SVG graph widget for negative values (solonkins)
 
 --------------------------------------------------------------------------------
 Changes for 6.4.11
