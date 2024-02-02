@@ -3519,6 +3519,7 @@ section {
     cursor: pointer;
     transform: translate(var(--px), var(--py)); }
     .svg-honeycomb .svg-honeycomb-cell path {
+      transform: scale(var(--scale, 1));
       fill: var(--fill);
       stroke: var(--stroke, var(--fill)); }
       .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {

@@ -521,12 +521,9 @@ class CSVGHoneycomb {
 			.style('--dx', `${scaled_position.dx}px`)
 			.style('--dy', `${scaled_position.dy}px`)
 			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
+			.style('--scale', scale / (this.#cell_height - this.#cells_gap))
 			.select('path')
-			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`)
-			.transition()
-			.duration(UI_TRANSITION_DURATION)
-			.ease(d3.easeLinear)
-			.attr('d', this.#generatePath(scaled_size.height, 0));
+			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`);
 
 		this.#svg
 			.style('--shadow-opacity', 1)
@@ -558,12 +555,9 @@ class CSVGHoneycomb {
 			.style('--dx', null)
 			.style('--dy', null)
 			.style('--stroke', d => this.#getFillColor(d))
+			.style('--scale', null)
 			.select('path')
-			.style('filter', null)
-			.transition()
-			.duration(UI_TRANSITION_DURATION)
-			.ease(d3.easeLinear)
-			.attr('d', this.#cell_path);
+			.style('filter', null);
 
 		this.#svg
 			.style('--shadow-opacity', null)
@@ -577,10 +571,6 @@ class CSVGHoneycomb {
 		d.backdrop_timeout = setTimeout(() => {
 			cell
 				.select(`.${CSVGHoneycomb.ZBX_STYLE_BACKDROP}`)
-				.remove();
-
-			cell
-				.select('animate')
 				.remove();
 		}, UI_TRANSITION_DURATION);
 	}

@@ -3570,18 +3570,18 @@ section {
     --py: calc(var(--y) + var(--dy, 0px));
     cursor: pointer;
     transform: translate(var(--px), var(--py));
-    transition: transform 0.3s linear; }
+    transition: transform 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell path {
+      transform: scale(var(--scale, 1));
       fill: var(--fill);
       stroke: var(--stroke, var(--fill));
-      transition: fill 0.6s, stroke 0.3s; }
+      transition: transform 0.3s, fill 0.6s, stroke 0.3s; }
       .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
         --fill: transparent;
         --stroke: transparent;
-        transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px)));
-        transition: transform 0.3s linear; }
+        transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px))); }
     .svg-honeycomb .svg-honeycomb-cell foreignObject {
-      transition: x 0.3s linear, y 0.3s linear, width 0.3s linear, height 0.3s linear; }
+      transition: x 0.3s, y 0.3s, width 0.3s, height 0.3s; }
       .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-content {
         display: grid;
         align-content: space-evenly;
@@ -3593,7 +3593,7 @@ section {
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
-        transition: max-height 0.3s linear, font-size 0.3s linear; }
+        transition: max-height 0.3s, font-size 0.3s; }
     .svg-honeycomb .svg-honeycomb-cell:hover {
       --stroke: var(--stroke-hover); }
   .svg-honeycomb .svg-honeycomb-cell-no-data,

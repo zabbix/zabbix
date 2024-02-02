@@ -23,10 +23,11 @@
 		transform: translate(var(--px), var(--py));
 
 		@if $ui-transitions {
-			transition: transform $ui-transition-duration linear;
+			transition: transform $ui-transition-duration;
 		}
 
 		path {
+			transform: scale(var(--scale, 1));
 			fill: var(--fill);
 			stroke: var(--stroke, var(--fill));
 
@@ -35,24 +36,21 @@
 				--stroke: transparent;
 
 				transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px)));
-
-				@if $ui-transitions {
-					transition: transform $ui-transition-duration linear;
-				}
 			}
 
 			@if $ui-transitions {
-				transition: fill $ui-transition-duration * 2,
+				transition: transform $ui-transition-duration,
+							fill $ui-transition-duration * 2,
 							stroke $ui-transition-duration;
 			}
 		}
 
 		foreignObject {
 			@if $ui-transitions {
-				transition: x $ui-transition-duration linear,
-							y $ui-transition-duration linear,
-							width $ui-transition-duration linear,
-							height $ui-transition-duration linear;
+				transition: x $ui-transition-duration,
+							y $ui-transition-duration,
+							width $ui-transition-duration,
+							height $ui-transition-duration;
 			}
 
 			.svg-honeycomb-content {
@@ -70,8 +68,8 @@
 				white-space: nowrap;
 
 				@if $ui-transitions {
-					transition: max-height $ui-transition-duration linear,
-								font-size $ui-transition-duration linear;
+					transition: max-height $ui-transition-duration,
+								font-size $ui-transition-duration;
 				}
 			}
 		}
