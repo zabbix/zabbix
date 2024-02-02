@@ -21,6 +21,7 @@
 
 #include "zbxexpression.h"
 
+#include "poller_internal.h"
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"

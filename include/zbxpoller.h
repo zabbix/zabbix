@@ -59,7 +59,6 @@ ZBX_THREAD_ENTRY(poller_thread, args);
 
 ZBX_THREAD_ENTRY(async_poller_thread, args);
 
-zbx_get_program_type_f  poller_get_program_type(void);
 zbx_get_progname_f	poller_get_progname(void);
 
 void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT *results,
