@@ -228,16 +228,20 @@ class testAgentJsonProtocol extends CIntegrationTest {
 
 	private function checkItemTest($agent_component, $sleep_sec) {
 		$item_test_data = [
-			'type' => '0',
-			'proxyid' => '0',
-			'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
-			'timeout' => '6s',
-			'interface' => [
-				'address' => '127.0.0.1',
-				'port' => $this->getConfigurationValue($agent_component, 'ListenPort'),
-				'type' => 0
+			'item' => [
+				'type' => '0',
+				'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
+				'timeout' => '6s'
 			],
-			'host' => ['tls_connect' => '1']
+			'host' => [
+				'proxyid' => '0',
+				'tls_connect' => '1',
+				'interface' => [
+					'address' => '127.0.0.1',
+					'port' => $this->getConfigurationValue($agent_component, 'ListenPort'),
+					'type' => 0
+				]
+			]
 		];
 
 		$server = new CZabbixServer('localhost', $this->getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort'), 8, 10, ZBX_SOCKET_BYTES_LIMIT);
