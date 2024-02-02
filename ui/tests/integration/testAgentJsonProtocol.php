@@ -229,18 +229,18 @@ class testAgentJsonProtocol extends CIntegrationTest {
 	private function checkItemTest($agent_component, $sleep_sec) {
 		$item_test_data = [
 			'item' => [
-				'type' => '0',
+				'type' => ITEM_TYPE_ZABBIX,
 				'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
-				'timeout' => '6s'
-			],
-			'host' => [
-				'proxyid' => '0',
-				'tls_connect' => '1',
+				'timeout' => '6s',
 				'interface' => [
 					'address' => '127.0.0.1',
-					'port' => $this->getConfigurationValue($agent_component, 'ListenPort'),
-					'type' => 0
+					'port' => (int) $this->getConfigurationValue($agent_component, 'ListenPort'),
+					'type' => INTERFACE_TYPE_UNKNOWN
 				]
+			],
+			'host' => [
+				'tls_connect' => HOST_ENCRYPTION_NONE,
+				'proxyid' => '0'
 			]
 		];
 
