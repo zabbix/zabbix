@@ -237,7 +237,7 @@ window.token_edit_popup = {
 					{once: true}
 				);
 
-				this.overlay.setProperties(response);
+				this.overlay.setProperties({...response, prevent_navigation: false});
 			})
 			.catch(this.ajaxExceptionHandler)
 			.finally(() => {
