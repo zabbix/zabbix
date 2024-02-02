@@ -179,7 +179,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
 	const char		*ptr;
 	int			ret = FAIL;
-	struct zbx_json_parse	jp_data, jp_history, jp_step;
+	struct zbx_json_parse	jp_history, jp_step;
 	size_t			size;
 	zbx_timespec_t		ts_now;
 
@@ -538,13 +538,12 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
 		int config_java_gateway_port, const char *config_externalscripts)
 {
-	char				tmp[MAX_STRING_LEN + 1], **pvalue, *value = NULL;
+	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
 	static const zbx_db_table_t	*table_items, *table_interface, *table_interface_snmp, *table_hosts;
 	struct zbx_json_parse		jp_item, jp_host, jp_steps, jp_interface, jp_details, jp_script_params;
 	AGENT_RESULT			result;
 	int				errcode, ret = FAIL;
-	size_t				value_size = 0;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
