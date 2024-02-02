@@ -82,6 +82,7 @@ If you are using role-based authorization, add the appropriate permissions:
                 "ec2:AssociateIamInstanceProfile",
                 "ec2:ReplaceIamInstanceProfileAssociation",
                 "elasticloadbalancing:DescribeLoadBalancers",
+                "elasticloadbalancing:DescribeTargetGroups",
                 "ec2:DescribeSecurityGroups"
             ],
             "Resource": "*"
