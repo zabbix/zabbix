@@ -395,7 +395,7 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
 	psinfo_t		psinfo;	/* In the correct procfs.h, the structure name is psinfo_t */
-	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0;
+	int			do_task, proccount = 0, invalid_user = 0, proc_props = 0, ret = SYSINFO_RET_OK;
 	zbx_uint64_t		mem_size = 0, byte_value = 0;
 	double			pct_size = 0.0, pct_value = 0.0;
 	size_t			*p_value;
@@ -404,7 +404,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
@@ -425,7 +426,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -447,7 +449,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
@@ -460,7 +463,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 	else
@@ -483,7 +487,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
@@ -492,7 +497,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -561,11 +567,11 @@ out:
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
@@ -574,7 +580,7 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	DIR			*dir;
 	struct dirent		*entries;
 	struct passwd		*usrinfo;
-	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat;
+	int			proccount = 0, invalid_user = 0, proc_props = 0, zbx_proc_stat, ret = SYSINFO_RET_OK;
 #ifdef HAVE_ZONE_H
 	zoneid_t		zoneid;
 	int			zoneflag;
@@ -584,7 +590,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (NULL != (procname = get_rparam(request, 0)) && '\0' != *procname)
@@ -605,7 +612,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -627,7 +635,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (NULL != (proccomm = get_rparam(request, 3)) && '\0' != *proccomm)
@@ -640,7 +649,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 	else
@@ -675,7 +685,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 #ifdef HAVE_ZONE_H
 	zoneid = getzoneid();
@@ -687,7 +698,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -724,11 +736,11 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zabbix_log(LOG_LEVEL_WARNING, "%s(): cannot close /proc: %s", __func__, zbx_strerror(errno));
 out:
 	SET_UI64_RESULT(result, proccount);
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 /******************************************************************************

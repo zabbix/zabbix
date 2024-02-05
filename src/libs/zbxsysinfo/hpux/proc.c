@@ -165,6 +165,10 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (-1 == count)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
+
+		if (NULL != proccomm_rxp)
+			zbx_regexp_free(proccomm_rxp);
+
 		return SYSINFO_RET_FAIL;
 	}
 out:

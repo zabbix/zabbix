@@ -527,14 +527,15 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_uint64_t	mem_size = 0, byte_value = 0, total_memory;
 	double		pct_size = 0.0, pct_value = 0.0;
 	int		do_task, res, mem_type_code, mem_type_tried = 0, proccount = 0, invalid_user = 0,
-			invalid_read = 0;
+			invalid_read = 0, ret = SYSINFO_RET_OK;
 	char		*mem_type = NULL, *rxp_error = NULL;
 	const char	*mem_type_search = NULL;
 
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	procname = get_rparam(request, 0);
@@ -550,7 +551,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 							zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -572,7 +574,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proccomm = get_rparam(request, 3);
@@ -581,9 +584,12 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		if (SUCCEED != zbx_regexp_compile(proccomm, &proccomm_rxp, &rxp_error))
 		{
-			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: %s", rxp_error));
+			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Invalid regular expression in fourth parameter: "
+					"%s", rxp_error));
+
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -665,7 +671,8 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
@@ -677,20 +684,23 @@ int	proc_mem(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain amount of total memory: %s",
 					zbx_strerror(errno)));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 
 		if (0 == total_memory)	/* this should never happen but anyway - avoid crash due to dividing by 0 */
 		{
 			SET_MSG_RESULT(result, zbx_strdup(NULL, "Total memory reported is 0."));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -856,7 +866,8 @@ clean:
 		zbx_rtrim(s, ":\t");
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot get amount of \"%s\" memory.", s));
 		zbx_free(s);
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 out:
 	if (ZBX_PMEM != mem_type_code)
@@ -873,11 +884,11 @@ out:
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 #undef ZBX_SIZE
 #undef ZBX_RSS
 #undef ZBX_VSIZE
@@ -902,12 +913,13 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	struct passwd	*usrinfo;
 	zbx_regexp_t	*proccomm_rxp = NULL;
 	FILE		*f_cmd = NULL, *f_stat = NULL;
-	int		proccount = 0, invalid_user = 0, zbx_proc_stat;
+	int		proccount = 0, invalid_user = 0, zbx_proc_stat, ret = SYSINFO_RET_OK;
 
 	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	procname = get_rparam(request, 0);
@@ -923,7 +935,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 							zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -949,7 +962,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proccomm = get_rparam(request, 3);
@@ -962,7 +976,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -972,7 +987,8 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (dir = opendir("/proc")))
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot open /proc: %s", zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	while (NULL != (entries = readdir(dir)))
@@ -1011,12 +1027,12 @@ int	proc_num(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_fclose(f_stat);
 	closedir(dir);
 out:
+	SET_UI64_RESULT(result, proccount);
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	SET_UI64_RESULT(result, proccount);
-
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 /******************************************************************************
