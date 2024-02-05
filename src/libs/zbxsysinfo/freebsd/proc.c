@@ -146,7 +146,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 #define ZBX_DSIZE	6
 #define ZBX_SSIZE	7
 	char		*procname, *proccomm, *param, *args, *mem_type = NULL, *rxp_error = NULL;
-	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4];
+	int		do_task, pagesize, count, i, proccount = 0, invalid_user = 0, mem_type_code, mib[4],
+			ret = SYSINFO_RET_OK;
 	unsigned int	mibs;
 	zbx_uint64_t	mem_size = 0, byte_value = 0;
 	double		pct_size = 0.0, pct_value = 0.0;
@@ -164,7 +165,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (5 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	procname = get_rparam(request, 0);
@@ -180,7 +182,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -202,7 +205,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proccomm = get_rparam(request, 3);
@@ -215,7 +219,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -252,7 +257,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid fifth parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (1 == invalid_user)	/* handle 0 for non-existent user after all parameters have been parsed and validated */
@@ -287,7 +293,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		{
 			SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain number of physical pages: %s",
 					zbx_strerror(errno)));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -296,7 +303,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
 				zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proc = (struct kinfo_proc *)zbx_malloc(proc, sz);
@@ -305,7 +313,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_free(proc);
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain process information: %s",
 				zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	count = sz / sizeof(struct kinfo_proc);
@@ -403,11 +412,11 @@ out:
 		else
 			SET_DBL_RESULT(result, pct_size);
 	}
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 
 #undef ZBX_SIZE
 #undef ZBX_RSS
@@ -422,7 +431,7 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args, *rxp_error = NULL;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
-	int			count, i, proc_ok, stat_ok, comm_ok, mib[4], mibs;
+	int			count, i, proc_ok, stat_ok, comm_ok, mib[4], mibs, ret = SYSINFO_RET_OK;
 	size_t			sz;
 	struct kinfo_proc	*proc = NULL;
 	struct passwd		*usrinfo;
@@ -431,7 +440,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	procname = get_rparam(request, 0);
@@ -447,7 +457,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -473,7 +484,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proccomm = get_rparam(request, 3);
@@ -486,7 +498,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -517,7 +530,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	{
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain necessary buffer size from system: %s",
 				zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proc = (struct kinfo_proc *)zbx_malloc(proc, sz);
@@ -526,7 +540,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 		zbx_free(proc);
 		SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain process information: %s",
 				zbx_strerror(errno)));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	count = sz / sizeof(struct kinfo_proc);
@@ -583,9 +598,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	zbx_free(proc);
 out:
 	SET_UI64_RESULT(result, proccount);
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }

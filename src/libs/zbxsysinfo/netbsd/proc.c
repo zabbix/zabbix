@@ -65,7 +65,8 @@ static char	*proc_argv(pid_t pid)
 int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args, *rxp_error = NULL;
-	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok, op, arg;
+	int			do_task, pagesize, count, i, proccount = 0, invalid_user = 0, proc_ok, comm_ok, op,
+				arg, ret = SYSINFO_RET_OK;
 	double			value = 0.0, memsize = 0;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
@@ -74,7 +75,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	procname = get_rparam(request, 0);
@@ -90,7 +92,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -112,7 +115,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proccomm = get_rparam(request, 3);
@@ -125,7 +129,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -137,7 +142,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == kd && NULL == (kd = kvm_open(NULL, NULL, NULL, KVM_NO_FILES, NULL)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a descriptor to access kernel virtual memory."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (NULL != usrinfo)
@@ -154,7 +160,8 @@ int     PROC_MEM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (proc = kvm_getproc2(kd, op, arg, sizeof(struct kinfo_proc2), &count)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	for (pproc = proc, i = 0; i < count; pproc++, i++)
@@ -199,18 +206,18 @@ out:
 		SET_DBL_RESULT(result, 0 == proccount ? 0 : memsize / proccount);
 	else
 		SET_UI64_RESULT(result, memsize);
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
 
 int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 {
 	char			*procname, *proccomm, *param, *args, *rxp_error = NULL;
 	int			proccount = 0, invalid_user = 0, zbx_proc_stat;
-	int			count, i, proc_ok, stat_ok, comm_ok, op, arg;
+	int			count, i, proc_ok, stat_ok, comm_ok, op, arg, ret = SYSINFO_RET_OK;
 	struct kinfo_proc2	*proc, *pproc;
 	struct passwd		*usrinfo;
 	zbx_regexp_t		*proccomm_rxp = NULL;
@@ -218,7 +225,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (4 < request->nparam)
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Too many parameters."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	procname = get_rparam(request, 0);
@@ -234,7 +242,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 			{
 				SET_MSG_RESULT(result, zbx_dsprintf(NULL, "Cannot obtain user information: %s",
 						zbx_strerror(errno)));
-				return SYSINFO_RET_FAIL;
+				ret = SYSINFO_RET_FAIL;
+				goto out2;
 			}
 
 			invalid_user = 1;
@@ -260,7 +269,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	else
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	proccomm = get_rparam(request, 3);
@@ -273,7 +283,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					"%s", rxp_error));
 
 			zbx_free(rxp_error);
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto out2;
 		}
 	}
 
@@ -283,7 +294,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == kd && NULL == (kd = kvm_open(NULL, NULL, NULL, KVM_NO_FILES, NULL)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain a descriptor to access kernel virtual memory."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	if (NULL != usrinfo)
@@ -300,7 +312,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	if (NULL == (proc = kvm_getproc2(kd, op, arg, sizeof(struct kinfo_proc2), &count)))
 	{
 		SET_MSG_RESULT(result, zbx_strdup(NULL, "Cannot obtain process information."));
-		return SYSINFO_RET_FAIL;
+		ret = SYSINFO_RET_FAIL;
+		goto out2;
 	}
 
 	for (pproc = proc, i = 0; i < count; pproc++, i++)
@@ -357,9 +370,9 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 	}
 out:
 	SET_UI64_RESULT(result, proccount);
-
+out2:
 	if (NULL != proccomm_rxp)
 		zbx_regexp_free(proccomm_rxp);
 
-	return SYSINFO_RET_OK;
+	return ret;
 }
