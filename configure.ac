@@ -1631,6 +1631,9 @@ if test "x$want_openssl" = "xyes"; then
 fi
 AC_SUBST(TLS_CFLAGS)
 
+AM_CONDITIONAL(HAVE_OPENSSL, [test "x$have_tls" = "xOpenSSL" || test "x$have_tls" = "xOpenSSL (PSK not supported)"])
+AM_CONDITIONAL(HAVE_GNUTLS, [test "x$have_tls" = "xGnuTLS"])
+
 SERVER_LDFLAGS="$SERVER_LDFLAGS $TLS_LDFLAGS"
 SERVER_LIBS="$SERVER_LIBS $TLS_LIBS"
 
