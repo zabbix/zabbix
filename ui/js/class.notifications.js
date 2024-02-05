@@ -548,8 +548,8 @@ ZBX_Notifications.prototype.handleMainLoopResp = function(resp) {
 		return;
 	}
 
-	this.collection.map(function(notif) {
-		notif.updateRaw({snoozed: notif._raw.eventid <= resp.settings.snoozed_eventid});
+	this.collection.map(function(notification) {
+		notification.updateRaw({snoozed: notification._raw.eventid <= resp.settings.snoozed_eventid});
 	});
 
 	this.consumeUserSettings(resp.settings);
