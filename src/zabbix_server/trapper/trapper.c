@@ -20,13 +20,13 @@
 #include "trapper.h"
 #include "zbxdbwrap.h"
 
-#include "../poller/checks_internal_server.h"
+//#include "../poller/checks_internal_server.h"
 
 #include "zbxlog.h"
 #include "zbxself.h"
 #include "active.h"
 #include "nodecommand.h"
-#include "proxydata.h"
+//#include "proxydata.h"
 #include "zbxnix.h"
 #include "zbxcommshigh.h"
 #include "zbxpoller.h"

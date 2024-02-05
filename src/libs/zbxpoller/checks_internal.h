@@ -20,10 +20,9 @@
 #ifndef ZABBIX_CHECKS_INTERNAL_H
 #define ZABBIX_CHECKS_INTERNAL_H
 
-#include "poller.h"
 #include "zbxpoller.h"
 
-#include "zbxcachehistory.h"
+#include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,

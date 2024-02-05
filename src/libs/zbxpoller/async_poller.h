@@ -22,6 +22,7 @@
 
 #include "async_manager.h"
 
+#include "zbxalgo.h"
 #include "zbxthreads.h"
 
 typedef struct

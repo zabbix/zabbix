@@ -20,6 +20,9 @@
 #ifndef ZABBIX_ASYNC_AGENT_H
 #define ZABBIX_ASYNC_AGENT_H
 
+
+#include "zbxcomms.h"
+#include "zbxjson.h"
 #include "zbxcacheconfig.h"
 #include "zbxasyncpoller.h"
 

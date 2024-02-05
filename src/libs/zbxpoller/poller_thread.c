@@ -41,7 +41,7 @@
 #include "zbxipcservice.h"
 #include "zbxstr.h"
 #include "zbxthreads.h"
-#include "zbxtimekeeper.h"
+//#include "zbxtimekeeper.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxrtc.h"

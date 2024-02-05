@@ -31,8 +31,6 @@
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"
 
-#include "../poller/checks_internal_server.h"
-
 static void	dump_item(const zbx_dc_item_t *item)
 {
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
