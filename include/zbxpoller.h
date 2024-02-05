@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#ifndef ZABBIX_POLLER_H
-#define ZABBIX_POLLER_H
+#ifndef ZABBIX_ZBX_POLLER_H
+#define ZABBIX_ZBX_POLLER_H
 
 #include "zbxcacheconfig.h"
 #include "module.h"
@@ -36,7 +36,7 @@ int	zbx_agent_get_value(const zbx_dc_item_t *item, const char *config_source_ip,
 int	zbx_ssh_get_value(zbx_dc_item_t *item, const char *config_source_ip, AGENT_RESULT *result);
 #endif
 
-typedef int (*zbx_get_value_internal_ext_f)(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
+typedef int	(*zbx_get_value_internal_ext_f)(const char *param1, const AGENT_REQUEST *request, AGENT_RESULT *result);
 
 typedef struct
 {
@@ -71,7 +71,7 @@ void	zbx_check_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESULT 
 void	zbx_clean_items(zbx_dc_item_t *items, int num, AGENT_RESULT *results);
 void	zbx_free_agent_result_ptr(AGENT_RESULT *result);
 
-int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
+int	zbx_get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
 		const char *config_source_ip, const char *progname);
 void	zbx_init_library_mt_snmp(const char *progname);
 
@@ -79,4 +79,4 @@ void	zbx_shutdown_library_mt_snmp(const char *progname);
 
 void	zbx_clear_cache_snmp(unsigned char process_type, int process_num, const char *progname);
 
-#endif
+#endif /* ZABBIX_ZBX_POLLER_H*/

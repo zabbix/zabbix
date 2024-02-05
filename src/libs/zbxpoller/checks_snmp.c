@@ -3250,7 +3250,7 @@ static int	zbx_snmp_process_standard(struct snmp_session *ss, const zbx_dc_item_
 	return ret;
 }
 
-int	get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
+int	zbx_get_value_snmp(zbx_dc_item_t *item, AGENT_RESULT *result, unsigned char poller_type,
 		const char *config_source_ip, const char *progname)
 {
 	int	errcode = SUCCEED;

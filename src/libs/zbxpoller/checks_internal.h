@@ -23,7 +23,7 @@
 #include "zbxcachehistory.h"
 #include "zbxcomms.h"
 
-#include "poller_internal.h"
+#include "poller.h"
 
 #include "zbxpoller.h"
 

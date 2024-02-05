@@ -7,8 +7,8 @@ libzbxpoller_a_SOURCES = \
 	checks_ssh.c \
 	checks_telnet.c \
 	poller.c \
+	poller.h \
 	poller_thread.c \
-	poller_internal.h \
 	ssh_run.h \
 	telnet_run.c \
 	telnet_run.h \

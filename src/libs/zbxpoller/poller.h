@@ -16,12 +16,12 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
-#ifndef ZABBIX_POLLER_INTERNAL_H
-#define ZABBIX_POLLER_INTERNAL_H
+#ifndef ZABBIX_POLLER_H
+#define ZABBIX_POLLER_H
 
 #include "zbxcommon.h"
 
 zbx_get_program_type_f	poller_get_program_type(void);
 zbx_get_progname_f	poller_get_progname(void);
 
-#endif /* ZABBIX_POLLER_INTERNAL_H */
+#endif /* ZABBIX_POLLER_H */

@@ -20,7 +20,6 @@
 #include "checks_simple.h"
 
 #include "checks_simple_vmware.h"
-//#include "simple.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 
