@@ -451,7 +451,7 @@ ZBX_Notifications.prototype.handleCloseClicked = function(e) {
  * Handles snooze button click event.
  */
 ZBX_Notifications.prototype.handleSnoozeClicked = function() {
-	if (this.alarm.isSnoozed(this._cached_list, this._cached_user_settings.snoozed_eventid)) {
+	if (this.alarm.isSnoozed(this._cached_list)) {
 		return;
 	}
 
@@ -567,7 +567,7 @@ ZBX_Notifications.prototype.handleAlarmStateChanged = function(alarm_state) {
  */
 ZBX_Notifications.prototype.renderCollection = function() {
 	this.collection.render(this._cached_user_settings.severity_styles, this.alarm, this._cached_user_settings.username,
-		this._cached_user_settings.muted, this._cached_user_settings.snoozed_eventid
+		this._cached_user_settings.muted
 	);
 };
 
@@ -857,16 +857,17 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
 
 /**
  * @param {array}  list             List of raw notifications.
- * @param {int}    snoozed_eventid  Last snoozed event ID.
  *
  * @return {boolean}
  */
-ZBX_NotificationsAlarm.prototype.isSnoozed = function(list, snoozed_eventid) {
-	if (list.length === 0) {
-		return false;
+ZBX_NotificationsAlarm.prototype.isSnoozed = function(list) {
+	for (let i = 0; i < list.length; i++) {
+		if (!list[i].snoozed) {
+			return false;
+		}
 	}
 
-	return list.every(item => item.eventid <= snoozed_eventid);
+	return (list.length == 0) ? false : true;
 };
 
 /**
@@ -915,7 +916,7 @@ ZBX_NotificationsAlarm.prototype.unmute = function() {
 ZBX_NotificationsAlarm.prototype.render = function(user_settings, list) {
 	user_settings.muted ? this.mute() : this.unmute();
 
-	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list, user_settings.snoozed_eventid)) {
+	if (this.isStopped() || this.isPlayed() || this.isSnoozed(list)) {
 		return this.player.stop();
 	}
 

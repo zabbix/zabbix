@@ -267,16 +267,15 @@ ZBX_NotificationCollection.prototype.removeDanglingNodes = function() {
  * @param {ZBX_NotificationsAlarm} alarm_state      Alarm state.
  * @param {string}                 username         Username of logged-in user.
  * @param {boolean}                muted            Indicator whether notifications are muted.
- * @param {int}                    snoozed_eventid  Snoozed event ID.
  */
-ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state, username, muted, snoozed_eventid) {
+ZBX_NotificationCollection.prototype.render = function(severity_styles, alarm_state, username, muted) {
 	this.btn_snooze.setAttribute('title', t('Snooze for %1$s').replace('%1$s', username));
 	this.btn_mute.setAttribute('title', muted
 		? t('Unmute for %1$s').replace('%1$s', username)
 		: t('Mute for %1$s').replace('%1$s', username)
 	);
 
-	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList(), snoozed_eventid));
+	this.btn_snooze.renderState(alarm_state.isSnoozed(this.getRawList()));
 
 	if (alarm_state.supported) {
 		this.btn_mute.renderState(alarm_state.muted);
