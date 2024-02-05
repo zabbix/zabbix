@@ -11,16 +11,10 @@
 			z-index: 1;
 		}
 	}
-
-	&.sortable-dragging {
-		user-select: none;
-	}
 }
 
 .sortable {
-
-	.sortable-item-static {
-
+	.sortable-item-disabled {
 		.drag-icon {
 			cursor: unset;
 			color: $btn-icon-disabled-color;

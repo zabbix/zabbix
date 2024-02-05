@@ -42,11 +42,11 @@ class CSortable {
 	static ZBX_STYLE_ITEM = 'sortable-item';
 
 	/**
-	 * Class applied to elements of items which cannot be sorted.
+	 * Class applied to elements of non-frozen items which still cannot be sorted.
 	 *
 	 * @type {string}
 	 */
-	static ZBX_STYLE_ITEM_STATIC = 'sortable-item-static';
+	static ZBX_STYLE_ITEM_DISABLED = 'sortable-item-disabled';
 
 	/**
 	 * Class applied to item elements while it is being dragged.
@@ -98,6 +98,8 @@ class CSortable {
 
 	#items = [];
 	#items_loc = [];
+	#items_dim = new Map();
+	#items_gap = new Map();
 
 	#animations = new Map();
 	#animation_frame = null;
@@ -215,7 +217,7 @@ class CSortable {
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
 			this.#observeMutations(false);
-			this.#cancelSort();
+			this.#cancelSorting();
 		}
 
 		this.#is_enabled = enable;
@@ -233,7 +235,7 @@ class CSortable {
 	enableSorting(enable_sorting = true) {
 		if (this.#is_enabled && this.#is_enabled_sorting && !enable_sorting) {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
-			this.#cancelSort();
+			this.#cancelSorting();
 		}
 
 		this.#is_enabled_sorting = enable_sorting;
@@ -287,12 +289,15 @@ class CSortable {
 		}
 
 		this.#items = [];
+		this.#items_dim.clear();
+		this.#items_gap.clear();
 
 		for (const element of this.#target.querySelectorAll(':scope > *')) {
 			if (this.#selector_span === '' || element.matches(this.#selector_span)) {
 				this.#items.push({
 					elements: [],
 					freeze: this.#selector_freeze !== '' && element.matches(this.#selector_freeze),
+					static: false,
 					rel: 0
 				});
 			}
@@ -300,23 +305,28 @@ class CSortable {
 			this.#items.at(-1).elements.push(element);
 		}
 
-		const observe_mutations = this.#observeMutations(false);
+		this.#mutate(() => {
+			for (let index = 0; index < this.#items.length; index++) {
+				this.#items[index].static = this.#items[index].freeze
+					|| ((index === 0 || this.#items[index - 1].freeze)
+						&& (index === this.#items.length - 1 || this.#items[index + 1].freeze)
+					);
 
-		for (let index = 0; index < this.#items.length; index++) {
-			const is_static = this.#items[index].freeze
-				|| ((index === 0 || this.#items[index - 1].freeze)
-					&& (index === this.#items.length - 1 || this.#items[index + 1].freeze)
-				);
-
-			for (const element of this.#getContentsElements(this.#items[index].elements)) {
-				element.classList.add(CSortable.ZBX_STYLE_ITEM);
-				element.classList.toggle(CSortable.ZBX_STYLE_ITEM_STATIC, is_static);
+				for (const element of this.#getContentsElements(this.#items[index].elements)) {
+					element.classList.add(CSortable.ZBX_STYLE_ITEM);
+					element.classList.toggle(CSortable.ZBX_STYLE_ITEM_DISABLED,
+						!this.#items[index].freeze && this.#items[index].static
+					);
+				}
 			}
-		}
 
-		this.#observeMutations(observe_mutations);
+			for (const item of this.#items) {
+				this.#items_dim.set(item, this.#getLoc(item.elements).dim);
+			}
 
-		this.#items_loc = this.#getItemsLoc(this.#items);
+			this.#items_loc = this.#getItemsLoc(this.#items);
+			this.#fixItemsOrder();
+		});
 	}
 
 	#getContentsElements(elements) {
@@ -335,54 +345,65 @@ class CSortable {
 	}
 
 	#getItemsLoc(items) {
-		this.#sortItems(items);
-
-		const target_pos = this.#getTargetLoc().pos - this.#scroll_pos;
-
 		const items_loc = new Map();
 
-		for (const item of items) {
-			const client_loc = this.#getLoc(item.elements);
+		let pos = 0;
 
-			items_loc.set(item, {
-				pos: client_loc.pos - target_pos - item.rel,
-				dim: client_loc.dim
+		for (let index = 0; index < items.length; index++) {
+			const desc = this.#getItemGapDescriptor(items[index]);
+			const desc_prev = index > 0 ? this.#getItemGapDescriptor(items[index - 1]) : null;
+
+			if (!this.#items_gap.has(desc_prev)) {
+				this.#items_gap.set(desc_prev, new Map());
+			}
+
+			if (!this.#items_gap.get(desc_prev).has(desc)) {
+				this.#target.innerHTML = '';
+
+				if (index > 0) {
+					this.#target.append(...items[index - 1].elements);
+				}
+
+				this.#target.append(...items[index].elements);
+
+				const loc = this.#getLoc(items[index].elements);
+				const loc_prev = index > 0 ? this.#getLoc(items[index - 1].elements) : {pos: loc.pos, dim: 0};
+
+				this.#items_gap.get(desc_prev).set(desc, loc.pos - loc_prev.pos - loc_prev.dim);
+			}
+
+			const gap = this.#items_gap.get(desc_prev).get(desc);
+			const dim = this.#items_dim.get(items[index]);
+
+			items_loc.set(items[index], {
+				pos: pos + gap - items[index].rel,
+				dim
 			});
-		}
 
-		this.#sortItems();
+			pos += gap + dim;
+		}
 
 		return items_loc;
 	}
 
-	#sortItems(items = this.#items) {
-		const elements_old = [...this.#target.children];
-		const elements_new = [];
+	#fixItemsOrder() {
+		this.#target.innerHTML = '';
 
-		for (const item of items) {
-			for (const element of item.elements) {
-				elements_new.push(element);
-			}
-		}
-
-		if (elements_new.length !== elements_old.length
-				|| elements_new.some((element, index) => element !== elements_old[index])) {
-			const observe_mutations = this.#observeMutations(false);
-
-			for (const element of elements_new) {
-				this.#target.appendChild(element);
-			}
-
-			this.#observeMutations(observe_mutations);
+		for (const item of this.#items) {
+			this.#target.append(...item.elements);
 		}
 	}
 
+	#getItemGapDescriptor(item) {
+		return JSON.stringify(item.elements.map(element => [...element.classList].sort()));
+	}
+
 	#getTargetLoc() {
-		const client_rect = this.#target.getBoundingClientRect();
+		const rect = this.#target.getBoundingClientRect();
 
 		return {
-			pos: this.#is_horizontal ? client_rect.x : client_rect.y,
-			dim: this.#is_horizontal ? client_rect.width : client_rect.height
+			pos: this.#is_horizontal ? rect.x : rect.y,
+			dim: this.#is_horizontal ? rect.width : rect.height
 		};
 	}
 
@@ -605,11 +626,21 @@ class CSortable {
 			}
 		}
 
+		this.#mutate(() => {
+			const item = this.#items[this.#drag_index];
+			const item_to = this.#items[index];
+
+			if (index > this.#drag_index) {
+				item_to.elements.at(-1).after(...item.elements);
+			}
+			else {
+				item_to.elements[0].before(...item.elements);
+			}
+		});
+
 		this.#drag_index = index;
 		this.#items = [...this.#overtake_items_loc[index].keys()];
 		this.#items_loc = this.#overtake_items_loc[index];
-
-		this.#sortItems();
 	}
 
 	#getScrollMax() {
@@ -646,30 +677,34 @@ class CSortable {
 		return this.#scrollTo(Math.min(pos, Math.max(this.#scroll_pos, pos + dim - this.#getTargetLoc().dim)));
 	}
 
-	#startDrag(client_pos) {
+	#startDragging(client_pos) {
 		this.#overtake_items_loc = [];
 
 		this.#overtake_min = this.#drag_index;
 		this.#overtake_max = this.#drag_index;
 
-		while (this.#overtake_min >= 0 && !this.#items[this.#overtake_min].freeze) {
+		while (this.#overtake_min >= 0 && !this.#items[this.#overtake_min].static) {
 			this.#overtake_min--;
 		}
 
-		while (this.#overtake_max < this.#items.length && !this.#items[this.#overtake_max].freeze) {
+		while (this.#overtake_max < this.#items.length && !this.#items[this.#overtake_max].static) {
 			this.#overtake_max++;
 		}
 
 		this.#overtake_min++;
 		this.#overtake_max--;
 
-		for (let index = this.#overtake_min; index <= this.#overtake_max; index++) {
-			const items = [...this.#items];
+		this.#mutate(() => {
+			for (let index = this.#overtake_min; index <= this.#overtake_max; index++) {
+				const items = [...this.#items];
 
-			items.splice(index, 0, ...items.splice(this.#drag_index, 1));
+				items.splice(index, 0, ...items.splice(this.#drag_index, 1));
 
-			this.#overtake_items_loc[index] = this.#getItemsLoc(items);
-		}
+				this.#overtake_items_loc[index] = this.#getItemsLoc(items);
+			}
+
+			this.#fixItemsOrder();
+		});
 
 		this.#is_dragging = true;
 		this.#drag_item.rel -= this.#scroll_pos;
@@ -678,49 +713,47 @@ class CSortable {
 		this.#clearAnimation(this.#drag_item);
 	}
 
-	#endDrag() {
-		this.#cancelDragScroll();
+	#endDragging() {
+		this.#cancelDragScrolling();
 		this.#scheduleAnimation(this.#drag_item, this.#scroll_pos + this.#getDragRelConstrained(), 0);
 		this.#scrollIntoView(this.#items_loc.get(this.#drag_item));
 
 		this.#is_dragging = false;
 	}
 
-	#startSort(client_pos) {
+	#startSorting(client_pos) {
 		if (!this.#is_dragging) {
-			this.#startDrag(client_pos);
+			this.#startDragging(client_pos);
 
-			const observe_mutations = this.#observeMutations(false);
+			this.#mutate(() => {
+				this.#target.classList.add(CSortable.ZBX_STYLE_DRAGGING);
 
-			this.#target.classList.add(CSortable.ZBX_STYLE_DRAGGING);
-
-			for (const element of this.#getContentsElements(this.#drag_item.elements)) {
-				element.classList.add(CSortable.ZBX_STYLE_ITEM_DRAGGING);
-			}
-
-			this.#observeMutations(observe_mutations);
+				for (const element of this.#getContentsElements(this.#drag_item.elements)) {
+					element.classList.add(CSortable.ZBX_STYLE_ITEM_DRAGGING);
+				}
+			});
 
 			this.#drag_style = document.createElement('style');
 			document.head.appendChild(this.#drag_style);
-			this.#drag_style.sheet.insertRule('* { pointer-events: none; cursor: grabbing !important; }');
+			this.#drag_style.sheet.insertRule(
+				'* { pointer-events: none; user-select: none; cursor: grabbing !important; }'
+			);
 
 			this.#fire(CSortable.EVENT_DRAG_START, {index: this.#drag_index_original});
 		}
 	}
 
-	#endSort() {
+	#endSorting() {
 		if (this.#is_dragging) {
-			this.#endDrag();
+			this.#endDragging();
 
-			const observe_mutations = this.#observeMutations(false);
+			this.#mutate(() => {
+				this.#target.classList.remove(CSortable.ZBX_STYLE_DRAGGING);
 
-			this.#target.classList.remove(CSortable.ZBX_STYLE_DRAGGING);
-
-			for (const element of this.#getContentsElements(this.#drag_item.elements)) {
-				element.classList.remove(CSortable.ZBX_STYLE_ITEM_DRAGGING);
-			}
-
-			this.#observeMutations(observe_mutations);
+				for (const element of this.#getContentsElements(this.#drag_item.elements)) {
+					element.classList.remove(CSortable.ZBX_STYLE_ITEM_DRAGGING);
+				}
+			});
 
 			this.#drag_style.remove();
 
@@ -739,17 +772,17 @@ class CSortable {
 		this.#drag_item = null;
 	}
 
-	#cancelSort() {
+	#cancelSorting() {
 		if (this.#is_dragging) {
 			if (this.#drag_index !== this.#drag_index_original) {
 				this.#overtake(this.#drag_index_original);
 			}
 		}
 
-		this.#endSort();
+		this.#endSorting();
 	}
 
-	#requestDragScroll(direction = this.#drag_scroll_direction) {
+	#requestDragScrolling(direction = this.#drag_scroll_direction) {
 		if (this.#drag_scroll_timeout !== null) {
 			clearTimeout(this.#drag_scroll_timeout);
 		}
@@ -763,12 +796,12 @@ class CSortable {
 
 			if (index >= this.#overtake_min && index <= this.#overtake_max) {
 				this.#scrollIntoView(this.#items_loc.get(this.#items[index]));
-				this.#requestDragScroll();
+				this.#requestDragScrolling();
 			}
 		}, this.#animation_time_limit * 1000);
 	}
 
-	#cancelDragScroll() {
+	#cancelDragScrolling() {
 		if (this.#drag_scroll_timeout !== null) {
 			clearTimeout(this.#drag_scroll_timeout);
 			this.#drag_scroll_timeout = null;
@@ -830,6 +863,22 @@ class CSortable {
 		return !observe_mutations;
 	}
 
+	#mutate(callback) {
+		const rect = this.#target.getBoundingClientRect();
+
+		this.#target.style.width = `${rect.width}px`;
+		this.#target.style.height = `${rect.height}px`;
+
+		const observe_mutations = this.#observeMutations(false);
+
+		callback();
+
+		this.#observeMutations(observe_mutations);
+
+		this.#target.style.width = '';
+		this.#target.style.height = '';
+	}
+
 	#listeners = {
 		mouseDown: (e) => {
 			const pos = this.#scroll_pos - this.#getTargetLoc().pos + (this.#is_horizontal ? e.clientX : e.clientY);
@@ -840,7 +889,7 @@ class CSortable {
 				if (pos >= item_loc.pos + item.rel && pos < item_loc.pos + item_loc.dim + item.rel) {
 					this.#scrollIntoView(item_loc);
 
-					if (!this.#is_enabled_sorting || item.freeze) {
+					if (!this.#is_enabled_sorting || item.static) {
 						break;
 					}
 
@@ -866,7 +915,7 @@ class CSortable {
 		mouseMove: (e) => {
 			const client_pos = this.#is_horizontal ? e.clientX : e.clientY;
 
-			this.#startSort(client_pos);
+			this.#startSorting(client_pos);
 
 			const rel_old = this.#drag_item.rel;
 
@@ -876,13 +925,13 @@ class CSortable {
 			const rel_new = this.#getDragRelConstrained(constraints);
 
 			if (rel_new === constraints.client.min && rel_new <= rel_old && this.#drag_item.rel < rel_new) {
-				this.#requestDragScroll(-1);
+				this.#requestDragScrolling(-1);
 			}
 			else if (rel_new === constraints.client.max && rel_new >= rel_old && this.#drag_item.rel > rel_new) {
-				this.#requestDragScroll(1);
+				this.#requestDragScrolling(1);
 			}
 			else if (rel_new !== constraints.client.min && rel_new !== constraints.client.max) {
-				this.#cancelDragScroll();
+				this.#cancelDragScrolling();
 			}
 
 			this.#render();
@@ -890,7 +939,7 @@ class CSortable {
 
 		mouseUp: () => {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
-			this.#endSort();
+			this.#endSorting();
 		},
 
 		click: (e) => {
@@ -905,11 +954,11 @@ class CSortable {
 			if (!this.#is_dragging && this.#drag_item !== null) {
 				const client_pos = this.#is_horizontal ? e.clientX : e.clientY;
 
-				this.#startSort(client_pos);
+				this.#startSorting(client_pos);
 				this.#drag_item.rel = this.#drag_delta + client_pos;
 			}
 
-			this.#cancelDragScroll();
+			this.#cancelDragScrolling();
 
 			if (this.#scrollRel(e.deltaY !== 0 ? e.deltaY : e.deltaX) !== 0 || this.#is_dragging) {
 				e.preventDefault();
@@ -939,7 +988,7 @@ class CSortable {
 
 			const item = this.#matchItem(e.target);
 
-			if (item === null || item.freeze) {
+			if (item === null || item.static) {
 				return;
 			}
 
@@ -948,12 +997,15 @@ class CSortable {
 			const index = this.#items.indexOf(item);
 			const index_to = index + direction;
 
-			if (index_to < 0 || index_to > this.#items.length - 1 || this.#items[index_to].freeze) {
+			if (index_to < 0 || index_to > this.#items.length - 1 || this.#items[index_to].static) {
 				return;
 			}
 
-			this.#items.splice(index, 0, ...this.#items.splice(index_to, 1));
-			this.#items_loc = this.#getItemsLoc(this.#items);
+			this.#mutate(() => {
+				this.#items.splice(index, 0, ...this.#items.splice(index_to, 1));
+				this.#items_loc = this.#getItemsLoc(this.#items);
+				this.#fixItemsOrder();
+			});
 
 			e.target.focus();
 
@@ -972,7 +1024,7 @@ class CSortable {
 
 		mutation: () => {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
-			this.#cancelSort();
+			this.#cancelSorting();
 			this.#updateItems();
 			this.#render();
 		}
