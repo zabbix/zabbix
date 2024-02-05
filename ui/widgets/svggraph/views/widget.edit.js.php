@@ -440,7 +440,9 @@ window.widget_svggraph_form = new class {
 
 	_initDataSetSortable() {
 		if (this._sortable_data_set === undefined) {
-			this._sortable_data_set = new CSortable(document.querySelector('#data_sets'));
+			this._sortable_data_set = new CSortable(document.querySelector('#data_sets'), {
+				selector_handle: '.js-main-drag-icon, .js-dataset-label'
+			});
 
 			this._sortable_data_set.on(CSortable.EVENT_SORT, () => {
 				this.updateVariableOrder(this._dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
