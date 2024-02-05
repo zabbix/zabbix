@@ -21,6 +21,8 @@
 
 class TopHostsWidget {
 
+	const ZABBIX_SERVER_HOSTID = 10084; // ЗАББИКС Сервер.
+
 	/**
 	 * Create data for testDashboardTopHostsWidget test.
 	 *
@@ -33,21 +35,21 @@ class TopHostsWidget {
 			[
 				'name' => 'top_hosts_trap_text',
 				'key_' => 'top_hosts_text',
-				'hostid' => 10084, // ЗАББИКС Сервер.
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT
 			],
 			[
 				'name' => 'top_hosts_trap_log',
 				'key_' => 'top_hosts_log',
-				'hostid' => 10084,
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_LOG
 			],
 			[
 				'name' => 'top_hosts_trap_char',
 				'key_' => 'top_hosts_char',
-				'hostid' => 10084,
+				'hostid' => self::ZABBIX_SERVER_HOSTID,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_STR
 			]
@@ -55,7 +57,7 @@ class TopHostsWidget {
 		$itemids = CDataHelper::getIds('name');
 
 		// Create dashboards for Top host widget testing.
-		$response = CDataHelper::call('dashboard.create', [
+		CDataHelper::call('dashboard.create', [
 			[
 				'name' => 'top_host_update',
 				'display_period' => 30,
@@ -419,20 +421,15 @@ class TopHostsWidget {
 				'pages' => [[]]
 			]
 		]);
-		$dashboard_update = $response['dashboardids'][0];
-		$dashboard_create = $response['dashboardids'][1];
-		$dashboard_delete = $response['dashboardids'][2];
-		$dashboard_remove = $response['dashboardids'][3];
-		$dashboard_screenshots = $response['dashboardids'][4];
-		$dashboard_text_items = $response['dashboardids'][5];
+		$dashboardids  = CDataHelper::getIds('name');
 
 		return [
-			'top_host_update' => $dashboard_update,
-			'top_host_create' => $dashboard_create,
-			'top_host_delete' => $dashboard_delete,
-			'top_host_remove' => $dashboard_remove,
-			'top_host_screenshots' => $dashboard_screenshots,
-			'top_host_text_items' => $dashboard_text_items,
+			'top_host_update' => $dashboardids['top_host_update'],
+			'top_host_create' => $dashboardids['top_host_create'],
+			'top_host_delete' => $dashboardids['top_host_delete'],
+			'top_host_remove' => $dashboardids['top_host_remove'],
+			'top_host_screenshots' => $dashboardids['top_host_screenshots'],
+			'top_host_text_items' => $dashboardids['top_host_text_items'],
 			'itemids' => $itemids
 		];
 	}

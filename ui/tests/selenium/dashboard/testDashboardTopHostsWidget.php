@@ -48,9 +48,6 @@ class testDashboardTopHostsWidget extends testWidgets {
 		];
 	}
 
-	/**
-	 * Widget name for update.
-	 */
 	protected static $updated_name = 'Top hosts update';
 	protected static $aggregation_itemids;
 	protected static $top_hosts_itemids;
@@ -5093,8 +5090,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 	public function testDashboardTopHostsWidget_AggregationFunctionData($data) {
 		if (array_key_exists('item_data', $data)) {
 			foreach ($data['item_data'] as $params) {
-				$params['time'] = strtotime($params['time']);
-				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], $params['time']);
+				CDataHelper::addItemData(self::$aggregation_itemids[$params['name']], $params['value'], strtotime($params['time']));
 			}
 		}
 
@@ -5114,7 +5110,7 @@ class testDashboardTopHostsWidget extends testWidgets {
 	}
 
 	/**
-	 * Function used to create Top Hosts widget with special columns for CheckTextItems and WidgetAppearance scenarios.
+	 * Function used to create Top Hosts widget with special columns.
 	 *
 	 * @param array     $data    data provider values
 	 * @param string    $name    name of the dashboard where to create Top Hosts widget
@@ -5156,28 +5152,29 @@ class testDashboardTopHostsWidget extends testWidgets {
 			$this->assertTrue($field->isVisible(CTestArrayHelper::get($attributes, 'visible', true)));
 			$this->assertTrue($field->isEnabled(CTestArrayHelper::get($attributes, 'enabled', true)));
 
-			if (array_key_exists('value', $attributes)) {
-				$this->assertEquals($attributes['value'], $field->getValue());
-			}
+			foreach ($attributes as $attribute => $value) {
+				switch ($attribute) {
+					case 'value':
+						$this->assertEquals($value, $field->getValue());
+						break;
 
-			if (array_key_exists('maxlength', $attributes)) {
-				$this->assertEquals($attributes['maxlength'], $field->getAttribute('maxlength'));
-			}
+					case 'maxlength':
+					case 'placeholder':
+						$this->assertEquals($value, $field->getAttribute($attribute));
+						break;
 
-			if (array_key_exists('placeholder', $attributes)) {
-				$this->assertEquals($attributes['placeholder'], $field->getAttribute('placeholder'));
-			}
+					case 'labels':
+						$this->assertEquals($value, $field->asSegmentedRadio()->getLabels()->asText());
+						break;
 
-			if (array_key_exists('labels', $attributes)) {
-				$this->assertEquals($attributes['labels'], $field->asSegmentedRadio()->getLabels()->asText());
-			}
+					case 'options':
+						$this->assertEquals($value, $field->asDropdown()->getOptions()->asText());
+						break;
 
-			if (array_key_exists('options', $attributes)) {
-				$this->assertEquals($attributes['options'], $field->asDropdown()->getOptions()->asText());
-			}
-
-			if (array_key_exists('color', $attributes)) {
-				$this->assertEquals($attributes['color'], $form->query($label)->asColorPicker()->one()->getValue());
+					case 'color':
+						$this->assertEquals($value,  $form->query($label)->asColorPicker()->one()->getValue());
+						break;
+				}
 			}
 		}
 	}
