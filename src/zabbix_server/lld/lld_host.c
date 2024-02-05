@@ -1348,7 +1348,8 @@ static void	lld_hgsets_make(zbx_vector_ptr_t *hosts, zbx_vector_lld_hgset_ptr_t 
 
 		if (0 == host->groupids.values_num)
 		{
-			THIS_SHOULD_NEVER_HAPPEN;
+			zabbix_log(LOG_LEVEL_WARNING, "%s() detected host without groups [hostid=" ZBX_FS_UI64 "],"
+					" permissions will not be granted", __func__, host->hostid);
 			continue;
 		}
 
