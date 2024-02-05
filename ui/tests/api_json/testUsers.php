@@ -36,6 +36,15 @@ class testUsers extends CAPITest {
 			'Provision media mapping email' => null,
 			'Provision media mapping sms' => null
 		],
+		'userids' => [
+			'user_with_not_authorized_session' => null,
+			'user_with_expired_session' => null,
+			'user_with_passive_session' => null,
+			'user_with_disabled_usergroup' => null,
+			'user_for_token_tests' => null,
+			'user_with_valid_session' => null,
+			'user_for_extend_parameter_tests' => null
+		],
 		'userid' => [
 			'Provisioned user' => null
 		],
