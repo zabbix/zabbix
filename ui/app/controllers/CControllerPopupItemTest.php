@@ -376,8 +376,8 @@ abstract class CControllerPopupItemTest extends CController {
 
 		switch ($this->item_type) {
 			case ITEM_TYPE_ZABBIX:
-				$data_item += CArrayHelper::getByKeys($input, ['key', 'timeout'])
-					+ $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
+				$data_item += CArrayHelper::getByKeys($input, ['key', 'timeout']);
+				$data_host += $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
 					$data_host +=
@@ -423,8 +423,8 @@ abstract class CControllerPopupItemTest extends CController {
 					}
 				}
 
-				$data_item += ['flags' => $item_flag] + CArrayHelper::getByKeys($input, ['snmp_oid', 'timeout'])
-					+ $this->getInterface($input, ['ip', 'dns']);
+				$data_item += ['flags' => $item_flag] + CArrayHelper::getByKeys($input, ['snmp_oid', 'timeout']);
+				$data_host += $this->getInterface($input, ['ip', 'dns']);
 				$data_host['host'] = $this->host['host'];
 				break;
 
@@ -468,8 +468,8 @@ abstract class CControllerPopupItemTest extends CController {
 				break;
 
 			case ITEM_TYPE_IPMI:
-				$data_item += CArrayHelper::getByKeys($input, ['key', 'ipmi_sensor'])
-					+ $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
+				$data_item += CArrayHelper::getByKeys($input, ['key', 'ipmi_sensor']);
+				$data_host += $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
 				$data_host['hostid'] = $this->host['hostid'];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
@@ -482,10 +482,11 @@ abstract class CControllerPopupItemTest extends CController {
 			case ITEM_TYPE_SSH:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'authtype', 'params_es', 'username', 'password',
 					'timeout'
-				]) + $this->getInterface($input) + [
+				]) + [
 					'authtype' => ITEM_AUTHTYPE_PASSWORD,
 					'params_es' => ITEM_AUTHTYPE_PASSWORD,
 				];
+				$data_host += $this->getInterface($input);
 
 				if ($data_item['authtype'] == ITEM_AUTHTYPE_PUBLICKEY) {
 					$data_item += CArrayHelper::getByKeys($input, ['publickey', 'privatekey']);
@@ -493,8 +494,8 @@ abstract class CControllerPopupItemTest extends CController {
 				break;
 
 			case ITEM_TYPE_TELNET:
-				$data_item += CArrayHelper::getByKeys($input, ['key', 'params_es', 'username', 'password', 'timeout'])
-					+ $this->getInterface($input);
+				$data_item += CArrayHelper::getByKeys($input, ['key', 'params_es', 'username', 'password', 'timeout']);
+				$data_host += $this->getInterface($input);
 				break;
 
 			case ITEM_TYPE_JMX:
@@ -507,8 +508,8 @@ abstract class CControllerPopupItemTest extends CController {
 				break;
 
 			case ITEM_TYPE_SIMPLE:
-				$data_item += CArrayHelper::getByKeys($input, ['key', 'username', 'password', 'timeout'])
-					+ $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns', 'port']);
+				$data_item += CArrayHelper::getByKeys($input, ['key', 'username', 'password', 'timeout']);
+				$data_host += $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns', 'port']);
 				break;
 
 			case ITEM_TYPE_SCRIPT:
@@ -1254,13 +1255,17 @@ abstract class CControllerPopupItemTest extends CController {
 					'table' => 'items',
 					'fields' => [
 						'steps' => ['table' => 'item_preproc']
-					],
-					'interface' => [
-						'table' => 'interface',
-						'fields' => ['details' => 'interface_snmp']
 					]
 				],
-				'host' => ['table' => 'hosts']
+				'host' => [
+					'table' => 'hosts',
+					'fields' => [
+						'interface' => [
+							'table' => 'interface',
+							'fields' => ['details' => 'interface_snmp']
+						]
+					]
+				]
 			];
 		}
 
