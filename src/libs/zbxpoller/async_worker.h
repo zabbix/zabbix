@@ -19,6 +19,7 @@
 
 #ifndef ZABBIX_ASYNC_WORKER_H
 #define ZABBIX_ASYNC_WORKER_H
+
 #include "async_manager.h"
 #include "async_queue.h"
 

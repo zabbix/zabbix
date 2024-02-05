@@ -18,6 +18,7 @@
 **/
 
 #include "checks_http.h"
+
 #include "zbxhttp.h"
 #include "zbxcacheconfig.h"
 

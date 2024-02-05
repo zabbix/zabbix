@@ -20,7 +20,6 @@
 #ifndef ZABBIX_CHECKS_SCRIPT_H
 #define ZABBIX_CHECKS_SCRIPT_H
 
-#include "module.h"
 #include "zbxcacheconfig.h"
 
 void	scriptitem_es_engine_init(void);

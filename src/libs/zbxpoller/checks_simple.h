@@ -21,7 +21,6 @@
 #define ZABBIX_CHECKS_SIMPLE_H
 
 #include "zbxcacheconfig.h"
-#include "module.h"
 #include "zbxalgo.h"
 
 int	get_value_simple(const zbx_dc_item_t *item, AGENT_RESULT *result, zbx_vector_ptr_t *add_results,

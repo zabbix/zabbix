@@ -17,12 +17,12 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "async_poller.h"
 #include "zbxpoller.h"
 
 #include "async_manager.h"
 #include "async_httpagent.h"
 #include "async_agent.h"
-#include "async_poller.h"
 #include "checks_snmp.h"
 
 #include "zbxasynchttppoller.h"

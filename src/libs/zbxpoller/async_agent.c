@@ -16,12 +16,15 @@
 ** along with this program; if not, write to the Free Software
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
+
 #include "async_agent.h"
+
+#include "async_poller.h"
+
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"
-#include "async_poller.h"
 #include "zbxagentget.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)

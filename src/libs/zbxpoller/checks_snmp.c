@@ -24,17 +24,10 @@
 #ifdef HAVE_NETSNMP
 
 #define SNMP_NO_DEBUGGING
+
 #include "zbxasyncpoller.h"
 #include "async_poller.h"
-#include "zbxcommon.h"
-#include "zbxtypes.h"
-#include <event2/event.h>
-#include <event2/util.h>
-#include <event2/dns.h>
-#include <net-snmp/net-snmp-config.h>
-#include <net-snmp/net-snmp-includes.h>
-#include <net-snmp/library/large_fd_set.h>
-#include "zbxself.h"
+#include "zbxpoller.h"
 
 #include "zbxcomms.h"
 #include "zbxalgo.h"
@@ -43,8 +36,15 @@
 #include "zbxsysinfo.h"
 #include "zbxdbhigh.h"
 #include "zbxexpr.h"
-#include "zbxpoller.h"
 #include "zbxstr.h"
+
+#include <event2/event.h>
+#include <event2/util.h>
+#include <event2/dns.h>
+#include <net-snmp/net-snmp-config.h>
+#include <net-snmp/net-snmp-includes.h>
+#include <net-snmp/library/large_fd_set.h>
+#include "zbxself.h"
 
 /*
  * SNMP Dynamic Index Cache

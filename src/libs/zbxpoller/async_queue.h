@@ -19,9 +19,12 @@
 
 #ifndef ZABBIX_ASYNC_QUEUE_H
 #define ZABBIX_ASYNC_QUEUE_H
-#include "zbxalgo.h"
-#include "zbxpoller.h"
+
 #include "async_manager.h"
+#include "zbxpoller.h"
+
+#include "zbxalgo.h"
+
 #include "pthread.h"
 
 typedef struct

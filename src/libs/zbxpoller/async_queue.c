@@ -17,11 +17,11 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "async_manager.h"
 #include "async_queue.h"
 
+#include "async_manager.h"
+
 #include "zbxalgo.h"
-#include "zbxcommon.h"
 
 #define ASYNC_TASK_QUEUE_INIT_NONE	0x00
 #define ASYNC_TASK_QUEUE_INIT_LOCK	0x01

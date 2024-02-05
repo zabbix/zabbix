@@ -21,7 +21,6 @@
 #define ZABBIX_CHECKS_EXTERNAL_H
 
 #include "zbxcacheconfig.h"
-#include "module.h"
 
 int	get_value_external(const zbx_dc_item_t *item, const char *config_externalscripts, AGENT_RESULT *result);
 

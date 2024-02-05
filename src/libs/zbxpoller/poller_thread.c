@@ -18,10 +18,8 @@
 **/
 
 #include "zbxpoller.h"
-
-#include "zbxexpression.h"
-
 #include "poller.h"
+
 #include "checks_external.h"
 #include "checks_internal.h"
 #include "checks_script.h"
@@ -31,6 +29,7 @@
 #include "checks_calculated.h"
 #include "checks_http.h"
 
+#include "zbxexpression.h"
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 #include "zbxdbhigh.h"

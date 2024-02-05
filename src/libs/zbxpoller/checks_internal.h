@@ -20,12 +20,11 @@
 #ifndef ZABBIX_CHECKS_INTERNAL_H
 #define ZABBIX_CHECKS_INTERNAL_H
 
+#include "poller.h"
+#include "zbxpoller.h"
+
 #include "zbxcachehistory.h"
 #include "zbxcomms.h"
-
-#include "poller.h"
-
-#include "zbxpoller.h"
 
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,

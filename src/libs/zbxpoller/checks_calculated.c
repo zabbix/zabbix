@@ -18,6 +18,7 @@
 **/
 
 #include "checks_calculated.h"
+
 #include "zbxexpression.h"
 #include "zbxeval.h"
 #include "zbxtime.h"
