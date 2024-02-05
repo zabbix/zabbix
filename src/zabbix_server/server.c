@@ -32,7 +32,7 @@
 #include "timer/timer.h"
 #include "trapper/trapper.h"
 #include "escalator/escalator.h"
-#include "poller/checks_internal_server.h"
+#include "poller/poller_server.h"
 #include "proxypoller/proxypoller.h"
 #include "taskmanager/taskmanager_server.h"
 #include "connector/connector_manager.h"

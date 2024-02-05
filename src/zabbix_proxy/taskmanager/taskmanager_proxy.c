@@ -20,7 +20,7 @@
 #include "taskmanager_proxy.h"
 
 #include "../../zabbix_server/trapper/trapper_item_test.h"
-#include "../../zabbix_server/poller/checks_internal_proxy.h"
+#include "../poller/poller_proxy.h"
 
 #include "zbxscripts.h"
 #include "zbxpoller.h"

@@ -38,7 +38,7 @@
 #include "zbxvmware.h"
 #include "zbxdbsyncer.h"
 
-#include "../zabbix_server/poller/checks_internal_proxy.h"
+#include "poller/poller_proxy.h"
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"

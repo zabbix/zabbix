@@ -17,7 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "checks_internal_server.h"
+#include "poller_server.h"
+#include "zbxpoller.h"
 
 #include "../ha/ha.h"
 #include "../lld/lld_protocol.h"
@@ -28,7 +29,6 @@
 #include "zbxtime.h"
 #include "zbxconnector.h"
 #include "zbxproxybuffer.h"
-#include "zbxpoller.h"
 
 /******************************************************************************
  *                                                                            *
