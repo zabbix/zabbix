@@ -452,23 +452,38 @@ Overlay.prototype.unsetProperty = function(key) {
 			break;
 
 		case 'prevent_navigation':
-			const prevent_navigation_overlays = Object.values(overlays_stack.map).filter((overlay) =>
-				overlay.$dialogue !== undefined && overlay.$dialogue[0].dataset.preventNavigation === 'true'
-			);
+			const dialogues = Object.values(overlays_stack.map).filter((overlay) => overlay.$dialogue !== undefined);
+			let prevent_navigation = false;
 
-			const was_closed_overlay_preventing_navigation = prevent_navigation_overlays.find((overlay) =>
-				overlay.dialogueid === this.$dialogue[0].dataset.dialogueid
-			) instanceof Overlay;
+			if (this.$dialogue !== undefined) {
+				if (dialogues.length === 0) {
+					if (this.$dialogue[0].dataset.preventNavigation === 'true' && !isVisible(this.$dialogue[0])) {
+						prevent_navigation = true;
+					}
+				}
+				else {
+					// Dialogue was closed.
+					if (dialogues[dialogues.length - 1].dialogueid === this.dialogueid
+							&& isVisible(this.$dialogue[0])) {
+						// Ignore last dialogue in stack, because it is same as "this" (which was closed).
+						dialogues.pop();
 
-			const allow_navigation_first_overlay = prevent_navigation_overlays?.length === 0
-				&& this.$dialogue[0].dataset.preventNavigation !== 'true';
+						if (dialogues.some((dialogue) => dialogue.$dialogue[0].dataset.preventNavigation === 'true')) {
+							prevent_navigation = true;
+						}
+					}
+					// Dialogue was opened.
+					else {
+						if (dialogues.some((dialogue) => dialogue.$dialogue[0].dataset.preventNavigation === 'true')
+								|| this.$dialogue[0].dataset.preventNavigation === 'true') {
+							prevent_navigation = true;
+						}
+					}
+				}
+			}
 
-			const allow_navigation_inner_overlays = prevent_navigation_overlays?.length !== 0
-				&& was_closed_overlay_preventing_navigation
-				&& isVisible(this.$dialogue[0]);
-
-			if (allow_navigation_first_overlay || allow_navigation_inner_overlays) {
-				window.removeEventListener('beforeunload', this.preventNavigation);
+			if (!prevent_navigation) {
+				removeEventListener('beforeunload', this.preventNavigation);
 			}
 
 			break;
