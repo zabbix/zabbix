@@ -856,7 +856,7 @@ ZBX_NotificationsAlarm.prototype.isPlayed = function() {
 };
 
 /**
- * @param {array}  list             List of raw notifications.
+ * @param {array} list  List of raw notifications.
  *
  * @return {boolean}
  */
