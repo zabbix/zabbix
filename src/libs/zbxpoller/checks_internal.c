@@ -27,7 +27,7 @@
 #include "zbxcachehistory.h"
 #include "zbxjson.h"
 #include "zbxtime.h"
-//#include "zbxtimekeeper.h"
+#include "zbxtimekeeper.h"
 #include "zbxstats.h"
 #include "zbxself.h"
 #include "zbxdiscovery.h"
