@@ -328,21 +328,22 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 				throw new ErrorException($result['error'], 70);
 			}
 
-			if (!array_key_exists('item', $result)) {
-				throw new ErrorException('', 70);
-			}
-
 			if ($steps_data && !array_key_exists('preprocessing', $result)) {
 				throw new ErrorException('', 70);
 			}
 
-			$result_item = $result['item'];
 			$result_preproc = (array_key_exists('preprocessing', $result) ? $result['preprocessing'] : [])
 				+ ['steps' => []];
 
 			if ($this->get_value_from_host) {
+				if (!array_key_exists('item', $result)) {
+					throw new ErrorException('', 70);
+				}
+
+				$result_item = $result['item'];
+
 				if (array_key_exists('error', $result_item) && $result_item['error'] !== '') {
-					if ($steps_data	&& $steps_data['steps'][0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+					if ($steps_data	&& $steps_data[0]['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
 						$output['runtime_error'] = $result_item['error'];
 						$output['not_supported'] = self::NOT_SUPPORTED_STATE;
 					}
