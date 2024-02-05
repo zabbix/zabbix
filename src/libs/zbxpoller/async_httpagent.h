@@ -21,8 +21,6 @@
 #define ZABBIX_ASYNC_HTTPAGENT_H
 
 #include "zbxcacheconfig.h"
-#include "module.h"
-#include "async_poller.h"
 #include "zbxhttp.h"
 
 #ifdef HAVE_LIBCURL

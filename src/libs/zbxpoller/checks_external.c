@@ -21,7 +21,8 @@
 
 #include "zbxexec.h"
 #include "zbxsysinfo.h"
-#include "zbxtime.h"
+#include "zbxdbhigh.h"
+#include "zbxstr.h"
 
 /******************************************************************************
  *                                                                            *

@@ -20,7 +20,6 @@
 #include "checks_simple.h"
 
 #include "checks_simple_vmware.h"
-#include "zbxself.h"
 #include "zbxsysinfo.h"
 
 typedef int	(*vmfunc_t)(AGENT_REQUEST *, const char *, const char *, AGENT_RESULT *);

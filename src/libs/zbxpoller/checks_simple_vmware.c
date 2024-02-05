@@ -27,6 +27,9 @@
 #include "zbxxml.h"
 #include "zbxsysinfo.h"
 #include "zbxparam.h"
+#include "zbxjson.h"
+#include "zbxnum.h"
+#include "zbxstr.h"
 
 #define ZBX_VMWARE_DATASTORE_SIZE_TOTAL		0
 #define ZBX_VMWARE_DATASTORE_SIZE_FREE		1

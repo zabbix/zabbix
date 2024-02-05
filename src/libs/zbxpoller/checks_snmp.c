@@ -41,6 +41,10 @@
 #include "zbxjson.h"
 #include "zbxparam.h"
 #include "zbxsysinfo.h"
+#include "zbxdbhigh.h"
+#include "zbxexpr.h"
+#include "zbxpoller.h"
+#include "zbxstr.h"
 
 /*
  * SNMP Dynamic Index Cache

@@ -28,6 +28,7 @@
 #include "zbxexpression.h"
 #include "zbx_availability_constants.h"
 #include "zbxpoller.h"
+#include "zbxavailability.h"
 
 #define ASYNC_WORKER_INIT_NONE		0x00
 #define ASYNC_WORKER_INIT_THREAD	0x01

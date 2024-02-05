@@ -18,7 +18,6 @@
 **/
 #include "async_agent.h"
 #include "zbxcacheconfig.h"
-#include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxip.h"
 #include "zbxself.h"

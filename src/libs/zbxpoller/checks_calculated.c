@@ -19,6 +19,9 @@
 
 #include "checks_calculated.h"
 #include "zbxexpression.h"
+#include "zbxeval.h"
+#include "zbxtime.h"
+#include "zbxvariant.h"
 
 int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result)
 {

@@ -19,8 +19,8 @@
 
 #include "async_manager.h"
 #include "async_worker.h"
+#include "async_queue.h"
 
-#include "zbxtimekeeper.h"
 #include "zbxstr.h"
 #include "zbxalgo.h"
 #include "zbxpoller.h"

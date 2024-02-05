@@ -18,11 +18,17 @@
 **/
 
 #include "checks_internal.h"
+#include "checks_java.h"
+#include "poller.h"
 
 #include "zbxpoller.h"
 
+#include "zbxalgo.h"
+#include "zbxcachehistory.h"
+#include "zbxjson.h"
+#include "zbxtime.h"
+#include "zbxtimekeeper.h"
 #include "zbxstats.h"
-#include "checks_java.h"
 #include "zbxself.h"
 #include "zbxdiscovery.h"
 #include "zbxtrends.h"

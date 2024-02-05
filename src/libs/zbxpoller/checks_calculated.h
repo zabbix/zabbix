@@ -20,8 +20,7 @@
 #ifndef ZABBIX_CHECKS_CALCULATED_H
 #define ZABBIX_CHECKS_CALCULATED_H
 
-#include "zbxcachehistory.h"
-#include "module.h"
+#include "zbxcacheconfig.h"
 
 int	get_value_calculated(zbx_dc_item_t *dc_item, AGENT_RESULT *result);
 

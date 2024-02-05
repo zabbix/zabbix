@@ -21,6 +21,8 @@
 
 #include "zbxjson.h"
 #include "zbxsysinfo.h"
+#include "zbxcomms.h"
+#include "zbxstr.h"
 
 static int	parse_response(AGENT_RESULT *results, int *errcodes, int num, char *response,
 		char *error, int max_error_len)

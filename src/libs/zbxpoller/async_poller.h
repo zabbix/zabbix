@@ -20,9 +20,7 @@
 #ifndef ZABBIX_ASYNC_POLLER_H
 #define ZABBIX_ASYNC_POLLER_H
 
-#include "zbxalgo.h"
 #include "zbxthreads.h"
-#include "zbxcacheconfig.h"
 #include "async_manager.h"
 
 typedef struct

@@ -19,10 +19,8 @@
 
 #ifndef ZABBIX_ASYNC_WORKER_H
 #define ZABBIX_ASYNC_WORKER_H
-#include "zbxalgo.h"
 #include "async_manager.h"
 #include "async_queue.h"
-#include "zbxtimekeeper.h"
 
 typedef struct
 {
