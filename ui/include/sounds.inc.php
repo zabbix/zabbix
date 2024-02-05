@@ -106,13 +106,6 @@ function updateMessageSettings($messages) {
 	);
 
 	while ($profile = DBfetch($dbProfiles)) {
-		if ($profile['type'] == PROFILE_TYPE_ID) {
-			unset($profile['value_str']);
-		}
-		else {
-			unset($profile['value_id']);
-		}
-
 		$profile['value'] = $profile['type'] == PROFILE_TYPE_ID ? $profile['value_id'] : $profile['value_str'];
 		$dbMessages[$profile['source']] = $profile;
 	}

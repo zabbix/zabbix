@@ -219,38 +219,40 @@ class CControllerNotificationsGet extends CController {
 			foreach ($problems_by_triggerid as $triggerid => $notification_eventids) {
 				$trigger = array_key_exists($triggerid, $triggers) ? $triggers[$triggerid] : null;
 
-				if ($trigger) {
-					$url_problems = (new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->setArgument('filter_set', '1')
-						->setArgument('hostids[]', $trigger['hosts'][0]['hostid'])
+				if ($trigger === null) {
+					continue;
+				}
+
+				$url_problems = (new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('filter_set', '1')
+					->setArgument('hostids[]', $trigger['hosts'][0]['hostid'])
+					->getUrl();
+
+				$url_events = (new CUrl('zabbix.php'))
+					->setArgument('action', 'problem.view')
+					->setArgument('filter_set', '1')
+					->setArgument('triggerids[]', $triggerid)
+					->getUrl();
+
+				$url_trigger_events_pt = (new CUrl('tr_events.php'))->setArgument('triggerid', $triggerid);
+
+				foreach ($notification_eventids as $eventid) {
+					$notification = &$this->notifications[$eventid];
+
+					$url_trigger_events = $url_trigger_events_pt
+						->setArgument('eventid', $notification['eventid'])
 						->getUrl();
 
-					$url_events = (new CUrl('zabbix.php'))
-						->setArgument('action', 'problem.view')
-						->setArgument('filter_set', '1')
-						->setArgument('triggerids[]', $triggerid)
-						->getUrl();
-
-					$url_trigger_events_pt = (new CUrl('tr_events.php'))->setArgument('triggerid', $triggerid);
-
-					foreach ($notification_eventids as $eventid) {
-						$notification = &$this->notifications[$eventid];
-
-						$url_trigger_events = $url_trigger_events_pt
-							->setArgument('eventid', $notification['eventid'])
-							->getUrl();
-
-						$notification += [
-							'title' => (new CLink($trigger['hosts'][0]['name'], $url_problems))->toString(),
-							'body' => [
-								(new CLink($notification['name'], $url_events))->toString(),
-								(new CLink(
-									zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']), $url_trigger_events)
-								)->toString()
-							]
-						];
-					}
+					$notification += [
+						'title' => (new CLink($trigger['hosts'][0]['name'], $url_problems))->toString(),
+						'body' => [
+							(new CLink($notification['name'], $url_events))->toString(),
+							(new CLink(
+								zbx_date2str(DATE_TIME_FORMAT_SECONDS, $notification['clock']), $url_trigger_events)
+							)->toString()
+						]
+					];
 				}
 			}
 		}
