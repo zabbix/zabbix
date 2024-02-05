@@ -455,12 +455,6 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 		return;
 	}
 
-	for (const item of this._cached_list) {
-		if (parseInt(item.eventid, 10) <= this._cached_user_settings.snoozed_eventid) {
-			item.snoozed = true;
-		}
-	}
-
 	const latest_event = Math.max(...this.collection.getRawList().map(event => parseInt(event.eventid, 10)));
 
 	this
@@ -473,7 +467,7 @@ ZBX_Notifications.prototype.handleSnoozeClicked = function() {
 			this._cached_user_settings.snoozed_eventid = response.snoozed_eventid;
 
 			this.collection.map(function(notification) {
-				notification.updateRaw({snoozed: true});
+				notification.updateRaw({snoozed: notification._raw.eventid <= latest_event});
 			});
 
 			this.consumeList(this.collection.getRawList());
