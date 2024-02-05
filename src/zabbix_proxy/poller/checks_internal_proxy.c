@@ -18,9 +18,9 @@
 **/
 
 #include "checks_internal_proxy.h"
+#include "zbxpoller.h"
 
 #include "zbxcachehistory.h"
-#include "zbxpoller.h"
 #include "zbxproxybuffer.h"
 
 /******************************************************************************

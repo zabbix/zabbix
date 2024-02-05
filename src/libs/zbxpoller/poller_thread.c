@@ -17,8 +17,8 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxpoller.h"
 #include "poller.h"
+#include "zbxpoller.h"
 
 #include "checks_external.h"
 #include "checks_internal.h"
@@ -888,7 +888,8 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 					poller_args_in->config_unreachable_delay, info->program_type,
 					poller_args_in->zbx_get_progname_cb_arg(), poller_args_in->get_config_forks,
 					poller_args_in->config_java_gateway, poller_args_in->config_java_gateway_port,
-					poller_args_in->config_externalscripts, poller_args_in->zbx_get_value_internal_ext_cb);
+					poller_args_in->config_externalscripts,
+					poller_args_in->zbx_get_value_internal_ext_cb);
 
 			sleeptime = zbx_calculate_sleeptime(nextcheck, POLLER_DELAY);
 		}
