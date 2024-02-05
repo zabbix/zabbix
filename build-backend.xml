@@ -25,8 +25,8 @@
 		<property name="conf2" value="--enable-server ${with.db}"/>
 		<property name="conf3" value="--enable-proxy ${with.db}"/>
 		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db}"/>
-		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
+		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl"/>
+		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap --with-libcurl"/>
 	</target>
 
 	<!-- Additional Zabbix configuration parameters -->
@@ -84,10 +84,14 @@
 							<arg line="-o"/>
 							<arg line="./clang-scan-build-reports"/>
 							<arg line="make"/>
+							<arg line="-s"/>
+							<arg line="-j5"/>
 						</exec>
 					</try>
 					<finally>
 						<exec executable="make" failonerror="on">
+							<arg line="-s"/>
+							<arg line="-j5"/>
 							<arg line="clean"/>
 						</exec>
 					</finally>
@@ -142,6 +146,8 @@
 				</try>
 				<finally>
 					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
 						<arg line="clean"/>
 					</exec>
 				</finally>
@@ -194,9 +200,13 @@
 				</try>
 				<finally>
 					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
 						<arg line="clean"/>
 					</exec>
 					<exec executable="make" failonerror="on">
+						<arg line="-s"/>
+						<arg line="-j5"/>
 						<arg line="-C"/>
 						<arg line="tests"/>
 						<arg line="clean"/>
@@ -310,9 +320,13 @@
 			<arg line="--quiet"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
 			<arg line="dbschema"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
 			<arg line="dist"/>
 		</exec>
 		<apply executable="tar">
@@ -333,6 +347,8 @@
 			<arg line="--enable-agent2"/>
 		</exec>
 		<exec executable="make" failonerror="on">
+			<arg line="-s"/>
+			<arg line="-j5"/>
 			<arg line="check"/>
 		</exec>
 	</target>
