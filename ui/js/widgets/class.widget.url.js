@@ -28,14 +28,22 @@ class CWidgetUrl extends CWidget {
 
 			mousedown: () => {
 				if (this._is_edit_mode) {
-					this._content_body.querySelector('iframe').style.pointerEvents = 'none';
+					const iframe = this._content_body.querySelector('iframe');
 
-					addEventListener('mouseup', this._events.mouseup, {once: true});
+					if (iframe !== null) {
+						iframe.style.pointerEvents = 'none';
+
+						addEventListener('mouseup', this._events.mouseup, {once: true});
+					}
 				}
 			},
 
 			mouseup: () => {
-				this._content_body.querySelector('iframe').style.pointerEvents = '';
+				const iframe = this._content_body.querySelector('iframe');
+
+				if (iframe !== null) {
+					iframe.style.pointerEvents = '';
+				}
 			}
 		}
 	}
