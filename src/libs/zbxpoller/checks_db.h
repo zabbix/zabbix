@@ -23,6 +23,9 @@
 #include "zbxcommon.h"
 
 #ifdef HAVE_UNIXODBC
+
+#include "zbxcacheconfig.h"
+
 int	get_value_db(const zbx_dc_item_t *item, AGENT_RESULT *result);
 #endif
 

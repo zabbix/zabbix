@@ -25,6 +25,11 @@
 #include "checks_script.h"
 #include "checks_simple.h"
 #include "checks_snmp.h"
+
+#ifdef HAVE_UNIXODBC
+#	include "checks_db.h"
+#endif
+
 #include "checks_java.h"
 #include "checks_calculated.h"
 #include "checks_http.h"
