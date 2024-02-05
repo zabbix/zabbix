@@ -33,7 +33,7 @@ $form = (new CForm())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
 	->setId('authentication-form')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->disablePasswordAutofill();
 
 // Authentication general fields.
