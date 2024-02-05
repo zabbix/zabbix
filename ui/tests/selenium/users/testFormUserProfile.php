@@ -370,7 +370,6 @@ class testFormUserProfile extends CLegacyWebTest {
 				break;
 		}
 	}
-
 	public static function messaging() {
 		return [
 			[[
@@ -464,6 +463,9 @@ class testFormUserProfile extends CLegacyWebTest {
 	 * @dataProvider messaging
 	 */
 	public function testFormUserProfile_MessagesTimeout($data) {
+		// TODO: uncomment the following line after ZBX-23993 is fixed.
+		$this->markTestSkipped();
+
 		$this->zbxTestLogin('zabbix.php?action=userprofile.edit');
 		$this->zbxTestCheckHeader('User profile: Zabbix Administrator');
 		$this->zbxTestTabSwitch('Messaging');

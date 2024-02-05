@@ -76,7 +76,7 @@ void	DCsync_maintenances(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -171,7 +171,7 @@ void	DCsync_maintenance_tags(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -276,7 +276,7 @@ void	DCsync_maintenance_periods(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE|ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -357,7 +357,7 @@ void	DCsync_maintenance_groups(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -431,7 +431,7 @@ void	DCsync_maintenance_hosts(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -799,6 +799,26 @@ out:
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: checks if there are change to maintenance that require immediate  *
+ *          update                                                            *
+ *                                                                            *
+ * Return value: SUCCEED - a maintenance immediate update flag is set         *
+ *               FAIL    - otherwise                                          *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dc_maintenance_check_immediate_update(void)
+{
+	int	ret;
+
+	RDLOCK_CACHE;
+	ret = 0 != (ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD & config->maintenance_update) ? SUCCEED : FAIL;
+	UNLOCK_CACHE;
+
+	return ret;
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: update maintenance state depending on maintenance periods         *
  *                                                                            *
  * Return value: SUCCEED - maintenance status was changed, host/event update  *
@@ -810,7 +830,7 @@ out:
  *           and period start/end time.                                       *
  *                                                                            *
  ******************************************************************************/
-int	zbx_dc_update_maintenances(void)
+int	zbx_dc_update_maintenances(zbx_maintenance_timer_t maintenance_timer)
 {
 	zbx_dc_maintenance_t		*maintenance;
 	zbx_dc_maintenance_period_t	*period;
@@ -825,10 +845,11 @@ int	zbx_dc_update_maintenances(void)
 
 	WRLOCK_CACHE;
 
-	if (ZBX_MAINTENANCE_UPDATE_TRUE == config->maintenance_update)
+	/* force recalculation on configuration changes only periodically when timer expires */
+	if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
 	{
-		ret = SUCCEED;
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_FALSE;
+		if (0 != (ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE & config->maintenance_update))
+			ret = SUCCEED;
 	}
 
 	zbx_hashset_iter_reset(&config->maintenances, &iter);
@@ -901,6 +922,11 @@ int	zbx_dc_update_maintenances(void)
 			}
 		}
 	}
+
+	if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_NONE;
+	else
+		config->maintenance_update &= ~ZBX_FLAG_MAINTENANCE_UPDATE_PERIOD;
 
 	UNLOCK_CACHE;
 

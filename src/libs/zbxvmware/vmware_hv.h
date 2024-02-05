@@ -34,8 +34,8 @@ void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv);
 void	vmware_hv_clean(zbx_vmware_hv_t *hv);
 
 int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, const char *id,
-		zbx_vector_vmware_datastore_t *dss, zbx_vector_vmware_resourcepool_t *rpools,
-		zbx_vector_cq_value_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
+		zbx_vector_vmware_datastore_ptr_t *dss, zbx_vector_vmware_resourcepool_ptr_t *rpools,
+		zbx_vector_cq_value_ptr_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
 		char **error);
 
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

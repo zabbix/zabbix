@@ -2389,7 +2389,11 @@ ZBX_THREAD_ENTRY(zbx_alert_manager_thread, args)
 			if (NULL == (alerter = (zbx_am_alerter_t *)zbx_queue_ptr_pop(&manager.free_alerters)))
 				break;
 
-			if (FAIL == am_process_alert(&manager, alerter, am_pop_alert(&manager), scripts_path))
+			zbx_am_alert_t	*alert;
+			if (NULL == (alert = am_pop_alert(&manager)))
+				break;
+
+			if (FAIL == am_process_alert(&manager, alerter, alert, scripts_path))
 				zbx_queue_ptr_push(&manager.free_alerters, alerter);
 		}
 

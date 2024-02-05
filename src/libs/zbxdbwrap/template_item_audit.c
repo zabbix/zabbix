@@ -22,12 +22,12 @@
 #include "audit/zbxaudit.h"
 #include "audit/zbxaudit_item.h"
 
-void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template_item_t *item,
-		zbx_uint64_t hostid)
+void	zbx_audit_item_update_json_add_data(int audit_context_mode, zbx_uint64_t itemid,
+		const zbx_template_item_t *item, zbx_uint64_t hostid)
 {
 	int	resource_type;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(audit_context_mode);
 
 	resource_type = zbx_audit_item_flag_to_resource_type(item->flags);
 
@@ -36,11 +36,11 @@ void	zbx_audit_item_update_json_add_data(zbx_uint64_t itemid, const zbx_template
 #define ADD_JSON_UI(x, t, f)	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,\
 		ZBX_AUDIT_IT_OR_ITP_OR_DR(x), item->x, t, f)
 #define AUDIT_TABLE_NAME	"items"
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ZBX_AUDIT_IT_OR_ITP_OR_DR(itemid),
-			itemid, AUDIT_TABLE_NAME, "itemid");
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+		ZBX_AUDIT_IT_OR_ITP_OR_DR(itemid), itemid, AUDIT_TABLE_NAME, "itemid");
 	ADD_JSON_S(delay, AUDIT_TABLE_NAME, "delay");
-	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD, ZBX_AUDIT_IT_OR_ITP_OR_DR(hostid),
-			hostid, AUDIT_TABLE_NAME, "hostid");
+	zbx_audit_update_json_append_uint64(itemid, AUDIT_ITEM_ID, AUDIT_DETAILS_ACTION_ADD,
+			ZBX_AUDIT_IT_OR_ITP_OR_DR(hostid), hostid, AUDIT_TABLE_NAME, "hostid");
 	ADD_JSON_UI(interfaceid, AUDIT_TABLE_NAME, "interfaceid");
 	ADD_JSON_S(key, AUDIT_TABLE_NAME, "key_");
 	ADD_JSON_S(name, AUDIT_TABLE_NAME, "name");
