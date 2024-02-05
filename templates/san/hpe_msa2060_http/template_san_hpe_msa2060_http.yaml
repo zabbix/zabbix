@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:59:56Z'
+  date: '2024-01-22T16:06:17Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -90,34 +90,34 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                fields = ['username', 'password', 'base_url'],
-                methods = [
-                    'system',
-                    'controllers',
-                    'controller-statistics',
-                    'frus',
-                    'disk-groups',
-                    'disk-group-statistics',
-                    'disks',
-                    'enclosures',
-                    'fans',
-                    'pools',
-                    'ports',
-                    'power-supplies',
-                    'volumes',
-                    'volume-statistics'
-                ],
-                result = {},
-                data = {};
+            	fields = ['username', 'password', 'base_url'],
+            	methods = [
+            		'system',
+            		'controllers',
+            		'controller-statistics',
+            		'frus',
+            		'disk-groups',
+            		'disk-group-statistics',
+            		'disks',
+            		'enclosures',
+            		'fans',
+            		'pools',
+            		'ports',
+            		'power-supplies',
+            		'volumes',
+            		'volume-statistics'
+            	],
+            	result = {},
+            	data = {};
             
             fields.forEach(function (field) {
-                if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '' ) {
-                    throw 'Required param is not set: "' + field + '".';
-                }
+            	if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            		throw 'Required param is not set: "' + field + '".';
+            	}
             });
             
             if (!params.base_url.endsWith('/')) {
-                params.base_url += '/';
+            	params.base_url += '/';
             }
             
             var response, request = new HttpRequest();
@@ -128,16 +128,16 @@ zabbix_export:
             response = request.get(params.base_url + 'api/login/' + auth_string);
             
             if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                throw 'Authentication request has failed with status code ' + request.getStatus() + ': ' + response;
+            	throw 'Authentication request has failed with status code ' + request.getStatus() + ': ' + response;
             }
             
             if (response !== null) {
-                try {
-                    auth_data = JSON.parse(response);
-                }
-                catch (error) {
-                   throw 'Failed to parse authentication response received from device API.';
-                }
+            	try {
+            		auth_data = JSON.parse(response);
+            	}
+            	catch (error) {
+            		throw 'Failed to parse authentication response received from device API.';
+            	}
             }
             
             session_key = auth_data['status'][0]['response'];
@@ -147,57 +147,57 @@ zabbix_export:
             data.errors = [];
             
             methods.forEach(function (method) {
-                response = request.get(params.base_url + 'api/show/' + method);
-                method_error = '';
-                
-                if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                    method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
-                    data.errors.push(method_error);
-                    return;
-                }
+            	response = request.get(params.base_url + 'api/show/' + method);
+            	method_error = '';
             
-                if (response !== null) {
-                    try {
-                        result = JSON.parse(response);
-                        switch (method) {
-                            case 'controller-statistics':
-                                var stats_array = result['controller-statistics'] || [];
-                                for (var i = 0; i < stats_array.length; i++) {
-                                    result['controller-statistics'][i]['durable-id'] = result['controller-statistics'][i]['durable-id'].toLowerCase();
-                                }
-                                data[method] = result[method];
-                                break;
-                            case 'frus':
-                                data[method] = result['enclosure-fru'];
-                                break;
-                            case 'disks':
-                                data[method] = result['drives'];
-                                break;
-                            case 'fans':
-                                data[method] = result['fan'];
-                                break;
-                            case 'ports':
-                                data[method] = result['port'];
-                                break;
-                            default:
-                                data[method] = result[method];
-                        }
-                    }
-                    catch (error) {
-                        method_error = 'Method: ' + method + '. Failed to parse response received from device API.';
-                    }
-                }
-                else {
-                    method_error = 'Method: ' + method + '. No data received by request.';
-                }
+            	if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            		method_error = 'Method: ' + method + '. Request has failed with status code ' + request.getStatus() + ': ' + response;
+            		data.errors.push(method_error);
+            		return;
+            	}
             
-                if (method_error.length > 0) {
-                    data.errors.push(method_error);
-                }
+            	if (response !== null) {
+            		try {
+            			result = JSON.parse(response);
+            			switch (method) {
+            				case 'controller-statistics':
+            					var stats_array = result['controller-statistics'] || [];
+            					for (var i = 0; i < stats_array.length; i++) {
+            						result['controller-statistics'][i]['durable-id'] = result['controller-statistics'][i]['durable-id'].toLowerCase();
+            					}
+            					data[method] = result[method];
+            					break;
+            				case 'frus':
+            					data[method] = result['enclosure-fru'];
+            					break;
+            				case 'disks':
+            					data[method] = result['drives'];
+            					break;
+            				case 'fans':
+            					data[method] = result['fan'];
+            					break;
+            				case 'ports':
+            					data[method] = result['port'];
+            					break;
+            				default:
+            					data[method] = result[method];
+            			}
+            		}
+            		catch (error) {
+            			method_error = 'Method: ' + method + '. Failed to parse response received from device API.';
+            		}
+            	}
+            	else {
+            		method_error = 'Method: ' + method + '. No data received by request.';
+            	}
+            
+            	if (method_error.length > 0) {
+            		data.errors.push(method_error);
+            	}
             });
             
             if (data.errors.length == 0) {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);

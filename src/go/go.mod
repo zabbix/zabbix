@@ -19,7 +19,7 @@ require (
 	github.com/godbus/dbus/v5 v5.1.0
 	github.com/godror/godror v0.20.1
 	github.com/google/go-cmp v0.6.0
-	github.com/mattn/go-sqlite3 v1.14.8
+	github.com/mattn/go-sqlite3 v1.14.19
 	github.com/mediocregopher/radix/v3 v3.5.0
 	github.com/memcachier/mc/v3 v3.0.1
 	github.com/miekg/dns v1.1.43

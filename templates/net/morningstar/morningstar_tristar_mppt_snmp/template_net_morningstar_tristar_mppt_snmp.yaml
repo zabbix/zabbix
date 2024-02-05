@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-01T20:57:04Z'
+  date: '2024-01-22T15:55:55Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -329,35 +329,35 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'rtsOpen',
-                    'rtsShorted',
-                    'rtsDisconnected',
-                    'heatsinkTempSensorOpen',
-                    'heatsinkTempSensorShorted',
-                    'highTemperatureCurrentLimit',
-                    'currentLimit',
-                    'currentOffset',
-                    'batterySense',
-                    'batterySenseDisconnected',
-                    'uncalibrated',
-                    'rtsMiswire',
-                    'highVoltageDisconnect',
-                    'undefined',
-                    'systemMiswire',
-                    'mosfetSOpen',
-                    'p12VoltageReferenceOff',
-                    'highArrayVCurrentLimit',
-                    'maxAdcValueReached',
-                    'controllerWasReset',
+                  	'rtsOpen',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
+                  	'heatsinkTempSensorOpen',
+                  	'heatsinkTempSensorShorted',
+                  	'highTemperatureCurrentLimit',
+                  	'currentLimit',
+                  	'currentOffset',
+                  	'batterySense',
+                  	'batterySenseDisconnected',
+                  	'uncalibrated',
+                  	'rtsMiswire',
+                  	'highVoltageDisconnect',
+                  	'undefined',
+                  	'systemMiswire',
+                  	'mosfetSOpen',
+                  	'p12VoltageReferenceOff',
+                  	'highArrayVCurrentLimit',
+                  	'maxAdcValueReached',
+                  	'controllerWasReset',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
@@ -529,27 +529,27 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'overcurrent',
-                    'fetShort',
-                    'softwareFault',
-                    'batteryHvd',
-                    'arrayHvd',
-                    'dipSwitchChange',
-                    'customSettingsEdit',
-                    'rtsShorted',
-                    'rtsDisconnected',
-                    'eepromRetryLimit',
-                    'fault11Undefined',
-                    'slaveControlTimeout',
+                  	'overcurrent',
+                  	'fetShort',
+                  	'softwareFault',
+                  	'batteryHvd',
+                  	'arrayHvd',
+                  	'dipSwitchChange',
+                  	'customSettingsEdit',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
+                  	'eepromRetryLimit',
+                  	'fault11Undefined',
+                  	'slaveControlTimeout',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
@@ -889,11 +889,11 @@ zabbix_export:
               parameters:
                 - |
                   var v_range = [
-                        [[0, 18], [12, 15, 11.5, 15.5]],
-                        [[18, 36], [24, 30, 23, 31]],
-                        [[36, 99], [48, 60, 46, 62]],
-                    ],
-                    result = [];
+                      [[0, 18], [12, 15, 11.5, 15.5]],
+                      [[18, 36], [24, 30, 23, 31]],
+                      [[36, 99], [48, 60, 46, 62]],
+                  ],
+                      result = [];
                   
                   for (var idx in v_range) {
                       if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {
