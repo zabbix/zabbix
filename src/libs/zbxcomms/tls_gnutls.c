@@ -25,6 +25,7 @@
 #include "zbxsysinc.h"
 #include "zbxlog.h"
 #include "zbxstr.h"
+#include "zbxcrypto.h"
 
 static zbx_get_program_type_f		zbx_get_program_type_cb = NULL;
 
@@ -2164,3 +2165,8 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
 	ciphersuites_psk = args->ciphersuites_psk;
 }
 #endif
+
+unsigned int	zbx_tls_get_psk_usage(void)
+{
+	return	psk_usage;
+}

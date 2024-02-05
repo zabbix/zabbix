@@ -27,9 +27,6 @@
 static ZBX_THREAD_LOCAL char		*my_psk			= NULL;
 static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
 
-/* variable for passing information from callback functions if PSK was found among host PSKs or autoregistration PSK */
-static unsigned int	psk_usage;
-
 void	zbx_psk_warn_misconfig(const char *psk_identity)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "same PSK identity \"%s\" but different PSK values used in proxy configuration"
@@ -193,9 +190,4 @@ void	zbx_tls_free_on_signal(void)
 {
 	if (NULL != my_psk)
 		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
-}
-
-unsigned int	zbx_tls_get_psk_usage(void)
-{
-	return	psk_usage;
 }

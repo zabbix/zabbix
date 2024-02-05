@@ -362,6 +362,7 @@ static void	zbx_tls_error_msg(char **error, size_t *error_alloc, size_t *error_o
 	}
 }
 
+#if defined(HAVE_OPENSSL_WITH_PSK)
 /******************************************************************************
  *                                                                            *
  * Purpose:                                                                   *
@@ -529,6 +530,7 @@ fail:
 	incoming_connection_psk_id[0] = '\0';
 	return 0;	/* PSK not found */
 }
+#endif
 
 /******************************************************************************
  *                                                                            *
@@ -2462,3 +2464,8 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
 #endif
 }
 #endif
+
+unsigned int	zbx_tls_get_psk_usage(void)
+{
+	return	psk_usage;
+}
