@@ -79,7 +79,8 @@
 		_edit(parameters = {}) {
 			const overlay = PopUp('popup.sla.edit', parameters, {
 				dialogueid: 'sla_edit',
-				dialogue_class: 'modal-popup-static'
+				dialogue_class: 'modal-popup-static',
+				prevent_navigation: true
 			});
 
 			const dialogue = overlay.$dialogue[0];

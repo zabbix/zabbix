@@ -120,7 +120,8 @@
 
 			const overlay = PopUp('popup.service.edit', parameters, {
 				dialogueid: 'service_edit',
-				dialogue_class: 'modal-popup-medium'
+				dialogue_class: 'modal-popup-medium',
+				prevent_navigation: true
 			});
 
 			const dialogue = overlay.$dialogue[0];
