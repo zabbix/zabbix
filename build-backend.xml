@@ -25,8 +25,8 @@
 		<property name="conf2" value="--enable-server ${with.db}"/>
 		<property name="conf3" value="--enable-proxy ${with.db}"/>
 		<property name="conf4" value="--enable-server --enable-agent --enable-proxy ${with.db}"/>
-		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap  --with-libcurl"/>
-		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap  --with-libcurl"/>
+		<property name="conf6" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl"/>
+		<property name="conf7" value="--enable-server --enable-agent --enable-proxy ${with.db} --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-gnutls --with-ldap --with-libcurl"/>
 	</target>
 
 	<!-- Additional Zabbix configuration parameters -->
@@ -133,8 +133,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
 						<arg line="@{target}"/>
 					</exec>
 					<if>
@@ -193,8 +191,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
 						<arg line="tests_build"/>
 					</exec>
 					<mkdir dir="tests_results/@{conf-name}"/>
