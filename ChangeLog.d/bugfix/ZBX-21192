@@ -1,1 +1,1 @@
-.......PS. [ZBX-21192] improved SNMP traps to resume processing from last record and timestamp when HA node is switched (vso)
+....I..... [ZBX-21192] updated date and time format in zabbix trap receiver script (vso)
