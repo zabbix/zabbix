@@ -841,7 +841,7 @@ class testUserDirectory extends CAPITest {
 
 	/**
 	 * Default userdirectory can be deleted only when there are no userdirectories and ldap_auth_enabled=0.
-	 * This test requires to one userdirectory exists therefor it removes all avaiable userdirectories and should be ran last.
+	 * This test requires to one userdirectory exists therefor it removes all available userdirectories and should be ran last.
 	 */
 	public function testDeleteDefault() {
 		// Delete user group to allow to delete userdirectory linked to user group.

@@ -29,14 +29,29 @@ require_once dirname(__FILE__).'/../include/CAPITest.php';
 class testUsers extends CAPITest {
 
 	private static $data = [
-		'userids' => [
-			'user_with_not_authorized_session' => null,
-			'user_with_expired_session' => null,
-			'user_with_passive_session' => null,
-			'user_with_disabled_usergroup' => null,
-			'user_for_token_tests' => null,
-			'user_with_valid_session' => null,
-			'user_for_extend_parameter_tests' => null
+		'userdirectoryid' => [
+			'Provision userdirectory' => null
+		],
+		'userdirectory_mediaid' => [
+			'Provision media mapping email' => null,
+			'Provision media mapping sms' => null
+		],
+		'userid' => [
+			'Provisioned user' => null
+		],
+		'mediaid' => [
+			'Provision media mapping email' => null,
+			'Provision media mapping sms' => null
+		],
+		'mediatypeid' => [
+			'Email media type' => 1,
+			'SMS media type' => 3
+		],
+		'roleid' => [
+			'Provision user role' => null
+		],
+		'usrgrpid' => [
+			'Provision user group' => null
 		],
 		'sessionids' => [
 			'not_authorized_session' => null,
@@ -54,6 +69,27 @@ class testUsers extends CAPITest {
 			'valid_for_user_with_disabled_usergroup' => null
 		]
 	];
+
+	/**
+	 * Replace name by value for property names in self::$data.
+	 *
+	 * @param array $rows
+	 */
+	public static function resolveIds(array $rows): array {
+		$result = [];
+
+		foreach ($rows as $row) {
+			foreach (array_intersect_key(self::$data, $row) as $key => $ids) {
+				if (array_key_exists($row[$key], $ids)) {
+					$row[$key] = $ids[$row[$key]];
+				}
+			}
+
+			$result[] = $row;
+		}
+
+		return $result;
+	}
 
 	/**
 	 * Prepare data for user.checkAuthentication tests.
@@ -266,6 +302,270 @@ class testUsers extends CAPITest {
 		self::$data['tokens']['disabled'] = $tokens[1]['token'];
 		self::$data['tokens']['valid'] = $tokens[2]['token'];
 		self::$data['tokens']['valid_for_user_with_disabled_usergroup'] = $tokens[3]['token'];
+
+		self::prepareProvisionUsers();
+	}
+
+	public static function prepareProvisionUsers() {
+		// Role 'Provision user role'.
+		self::$data['roleid']['Provision user role'] = CDataHelper::call('role.create', [
+			'type' => USER_TYPE_ZABBIX_ADMIN, 'name' => 'Provision user role'
+		])['roleids'][0];
+
+		// Group 'Provision user group'.
+		self::$data['usrgrpid']['Provision user group'] = CDataHelper::call('usergroup.create', [
+			'name' => 'Provision user group'
+		])['usrgrpids'][0];
+
+		// Userdirectories 'Provision userdirectory'.
+		$data = [
+			[
+				'idp_type' => IDP_TYPE_LDAP,
+				'name' => 'Provision userdirectory',
+				'host' => 'ldap://local.ldap',
+				'port' => '389',
+				'base_dn' => 'test',
+				'search_attribute' => 'test',
+				'provision_status' => JIT_PROVISIONING_ENABLED,
+				'provision_media' => self::resolveIds([
+					['name' => 'Provision media mapping email', 'mediatypeid' => 'Email media type', 'attribute' => 'attr1'],
+					['name' => 'Provision media mapping sms', 'mediatypeid' => 'SMS media type', 'attribute' => 'attr2']
+				]),
+				'provision_groups' => self::resolveIds([
+					[
+						'name' => '#1',
+						'roleid' => 'Provision user role',
+						'user_groups' => self::resolveIds([['usrgrpid' => 'Provision user group']])
+					]
+				])
+			]
+		];
+		$result = CDataHelper::call('userdirectory.create', $data);
+		self::$data['userdirectoryid'] = array_merge(
+			self::$data['userdirectoryid'],
+			array_combine(array_column($data, 'name'), $result['userdirectoryids'])
+		);
+		$userdirectories = CDataHelper::call('userdirectory.get', [
+			'output' => [],
+			'selectProvisionMedia' => ['userdirectory_mediaid', 'name'],
+			'userdirectoryids' => [self::$data['userdirectoryid']['Provision userdirectory']]
+		]);
+
+		foreach ($userdirectories as $userdirectory) {
+			self::$data['userdirectory_mediaid'] = array_merge(
+				self::$data['userdirectory_mediaid'],
+				array_column($userdirectory['provision_media'], 'userdirectory_mediaid', 'name')
+			);
+		}
+
+		// Create provisioned user.
+		$provisioned_user = self::resolveIds([[
+			'username' => 'Provisioned user',
+			'passwd' => 'Z@bbIxPa$$',
+			'roleid' => 'Provision user role',
+			'usrgrps' => self::resolveIds([['usrgrpid' => 'Provision user group']]),
+			'medias' => self::resolveIds([
+				['mediatypeid' => 'Email media type', 'sendto' => 'provision@user.local'],
+				['mediatypeid' => 'SMS media type', 'sendto' => 'provision-user']
+			])
+		]])[0];
+		$email_userdirectory_mediaid = self::$data['userdirectory_mediaid']['Provision media mapping email'];
+		$sms_userdirectory_mediaid = self::$data['userdirectory_mediaid']['Provision media mapping sms'];
+		$result = CDataHelper::call('user.create', $provisioned_user);
+		self::$data['userid'][$provisioned_user['username']] = $result['userids'][0];
+		DB::update('users', [
+			'values' => [
+				'userdirectoryid' => self::$data['userdirectoryid']['Provision userdirectory']
+			],
+			'where' => ['userid' => self::$data['userid'][$provisioned_user['username']]]
+		]);
+		DB::update('media', [
+			'values' => ['userdirectory_mediaid' => $email_userdirectory_mediaid],
+			'where' => [
+				'userid' => self::$data['userid'][$provisioned_user['username']],
+				'mediatypeid' => self::$data['mediatypeid']['Email media type']
+			]
+		]);
+		DB::update('media', [
+			'values' => ['userdirectory_mediaid' => $sms_userdirectory_mediaid],
+			'where' => [
+				'userid' => self::$data['userid'][$provisioned_user['username']],
+				'mediatypeid' => self::$data['mediatypeid']['SMS media type']
+			]
+		]);
+		$db_user = CDataHelper::call('user.get', [
+			'output' => [],
+			'selectMedias' => ['mediaid', 'userdirectory_mediaid'],
+			'userids' => [self::$data['userid'][$provisioned_user['username']]]
+		])[0];
+		$user_medias = array_column($db_user['medias'], null, 'userdirectory_mediaid');
+		self::$data['mediaid']['Provision media mapping email'] = $user_medias[$email_userdirectory_mediaid]['mediaid'];
+		self::$data['mediaid']['Provision media mapping sms'] = $user_medias[$sms_userdirectory_mediaid]['mediaid'];
+	}
+
+	public static function dataProviderUserMediaUpdate() {
+		return [
+			// #0 Provisioned media cannot be deleted.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => []
+				]],
+				'expected_error' => 'Incorrect value for field "/1/medias": cannot delete provisioned media.'
+			],
+			// #1 Provisioned media cannot be replaced.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						['mediatypeid' => 'SMS media type', 'sendto' => 'newmedia']
+					]
+				]],
+				'expected_error' => 'Incorrect value for field "/1/medias": cannot delete provisioned media.'
+			],
+			// #2 Property userdirectory_mediaid is not supported in medias for user.update.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'userdirectory_mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local']
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'userdirectory_mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/1/medias/1": unexpected parameter "userdirectory_mediaid".'
+			],
+			// #3 Duplicate value of mediaid is not allowed.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local']
+						],
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						]
+					]
+				]],
+				'expected_error' => 'Invalid parameter "/1/medias/2": value (mediaid)=(%d) already exists.'
+			],
+			// #4 Property mediatypeid cannot be changed for existing provisioned medias.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user2'
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user2'
+						]
+					]
+				]],
+				'expected_error' => 'Not allowed to update field "mediatypeid" for provisioned user.'
+			],
+			// #5 Update provisioned media successful.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local'],
+							'active' => MEDIA_STATUS_DISABLED
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						]
+					]
+				]],
+				'expected_error' => null
+			],
+			// #6 Add custom media to provisioned media list successful.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'medias' => [
+						[
+							'mediaid' => 'Provision media mapping email',
+							'mediatypeid' => 'Email media type',
+							'sendto' => ['provision@user.local'],
+							'active' => MEDIA_STATUS_DISABLED
+						],
+						[
+							'mediaid' => 'Provision media mapping sms',
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'provision-user'
+						],
+						[
+							'mediatypeid' => 'SMS media type',
+							'sendto' => 'custom-sendto',
+							'active' => MEDIA_STATUS_ACTIVE,
+							'severity' => 1,
+							'period' => '1-5,9:00-20:00'
+						]
+					]
+				]],
+				'expected_error' => null
+			]
+		];
+	}
+
+	/**
+	 * Test provisioned media for user update action.
+	 *
+	 * @dataProvider dataProviderUserMediaUpdate
+	 */
+	public function testUserMediaUpdate(array $users, ?string $expected_error) {
+		$users = self::resolveIds($users);
+
+		foreach($users as &$user) {
+			if (array_key_exists('medias', $user)) {
+				$user['medias'] = self::resolveIds($user['medias']);
+			}
+		}
+		unset($user);
+
+		if ($expected_error === null || strpos($expected_error, '%') === false) {
+			$this->call('user.update', $users, $expected_error);
+		}
+		else {
+			if (CAPIHelper::getSessionId() === null) {
+				$this->authorize(PHPUNIT_LOGIN_NAME, PHPUNIT_LOGIN_PWD);
+			}
+
+			$response = CAPIHelper::call('user.update', $users);
+			$this->assertArrayNotHasKey('result', $response);
+			$this->assertArrayHasKey('error', $response);
+			$replaceable = sscanf($response['error']['data'], $expected_error);
+
+			if ($replaceable) {
+				$expected_error = vsprintf($expected_error, $replaceable);
+			}
+
+			$this->assertSame($expected_error, $response['error']['data']);
+		}
 	}
 
 	public static function user_create() {
@@ -492,11 +792,11 @@ class testUsers extends CAPITest {
 			[
 				'user' => [
 					[
-						'username' => 'API user with non-existing userdirectory',
+						'username' => 'API user create provisioned user',
 						'userdirectoryid' => 1234
 					]
 				],
-				'expected_error' => 'User directory with ID "1234" is not available.'
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
 			]
 		];
 	}
@@ -841,6 +1141,40 @@ class testUsers extends CAPITest {
 					]
 				],
 				'expected_error' => null
+			],
+			// #27 Cannot update provisioned user readonly field username.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'username' => 'other-username-value'
+				]],
+				'expected_error' => 'Not allowed to update field "username" for provisioned user.'
+			],
+			// #28 Cannot update provisioned user readonly field password.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'passwd' => 'Z@BB1X@dmln'
+				]],
+				'expected_error' => 'Not allowed to update field "passwd" for provisioned user.'
+			],
+			// #29 Cannot update user userdirectoryid to make provisioned user not provisioned.
+			[
+				'users' => [[
+					'userid' => 'Provisioned user',
+					'userdirectoryid' => 0
+				]],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
+			],
+			// #30 Cannot update user userdirectoryid to make user provisioned.
+			[
+				'user' => [
+					[
+						'userid' => 'API test user with disabled group',
+						'userdirectoryid' => 'Provision userdirectory'
+					]
+				],
+				'expected_error' => 'Invalid parameter "/1": unexpected parameter "userdirectoryid".'
 			]
 		];
 	}
@@ -849,6 +1183,8 @@ class testUsers extends CAPITest {
 	 * @dataProvider user_update
 	 */
 	public function testUsers_Update($users, $expected_error) {
+		$users = self::resolveIds($users);
+
 		foreach ($users as $user) {
 			if (array_key_exists('userid', $user) && filter_var($user['userid'], FILTER_VALIDATE_INT)
 					&& $expected_error !== null) {
@@ -878,9 +1214,12 @@ class testUsers extends CAPITest {
 					$this->assertEquals(1, password_verify('GreatNewP', $dbRowUser['passwd']));
 				}
 
-				$this->assertEquals(1, CDBHelper::getCount('select * from users_groups where userid='.zbx_dbstr($id).
-						' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
-				);
+				if (array_key_exists('usrgrps', $users[$key])) {
+					$this->assertEquals(1, CDBHelper::getCount(
+						'select * from users_groups where userid='.zbx_dbstr($id).
+							' and usrgrpid='.zbx_dbstr($users[$key]['usrgrps'][0]['usrgrpid']))
+					);
+				}
 
 				if (array_key_exists('medias', $users[$key])) {
 					$dbResultMedia = DBSelect('select * from media where userid='.zbx_dbstr($id));
@@ -904,7 +1243,7 @@ class testUsers extends CAPITest {
 		}
 	}
 
-		public static function user_password() {
+	public static function user_password() {
 		return [
 			[
 				'method' => 'user.update',

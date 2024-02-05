@@ -322,8 +322,7 @@ class CUser extends CApiService {
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
-			]],
-			'userdirectoryid' =>	['type' => API_ID, 'default' => 0]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -334,12 +333,6 @@ class CUser extends CApiService {
 			$user = $this->checkLoginOptions($user);
 
 			if (array_key_exists('passwd', $user)) {
-				if ($user['userdirectoryid'] != 0) {
-					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Not allowed to update field "%1$s" for provisioned user.', 'passwd')
-					);
-				}
-
 				$this->checkPassword($user, '/'.($i + 1).'/passwd');
 			}
 
@@ -408,14 +401,14 @@ class CUser extends CApiService {
 			'usrgrps' =>		['type' => API_OBJECTS, 'uniq' => [['usrgrpid']], 'fields' => [
 				'usrgrpid' =>		['type' => API_ID, 'flags' => API_REQUIRED]
 			]],
-			'medias' =>	['type' => API_OBJECTS, 'fields' => [
+			'medias' =>	['type' => API_OBJECTS, 'uniq' => [['mediaid']], 'fields' => [
+				'mediaid' =>		['type' => API_ID],
 				'mediatypeid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
 				'sendto' =>			['type' => API_STRINGS_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY | API_NORMALIZE],
 				'active' =>			['type' => API_INT32, 'in' => implode(',', [MEDIA_STATUS_ACTIVE, MEDIA_STATUS_DISABLED])],
 				'severity' =>		['type' => API_INT32, 'in' => '0:63'],
 				'period' =>			['type' => API_TIME_PERIOD, 'flags' => API_ALLOW_USER_MACRO, 'length' => DB::getFieldLength('media', 'period')]
-			]],
-			'userdirectoryid' =>	['type' => API_ID]
+			]]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $users, '/', $error)) {
@@ -457,12 +450,15 @@ class CUser extends CApiService {
 		foreach ($users as $i => &$user) {
 			$db_user = $db_users[$user['userid']];
 
-			if (array_key_exists('userdirectoryid', $user) && $user['userdirectoryid'] != 0) {
-				$provisioned_field = array_key_first(array_intersect_key($readonly_fields, $user));
+			if ($db_user['userdirectoryid'] != 0) {
+				$fields_changed = array_diff_assoc(
+					array_intersect_key($user, $readonly_fields),
+					array_intersect_key($db_user, $readonly_fields)
+				);
 
-				if ($provisioned_field !== null) {
+				if ($fields_changed) {
 					self::exception(ZBX_API_ERROR_PARAMETERS,
-						_s('Not allowed to update field "%1$s" for provisioned user.', $provisioned_field)
+						_s('Not allowed to update field "%1$s" for provisioned user.', array_key_first($fields_changed))
 					);
 				}
 			}
@@ -558,6 +554,7 @@ class CUser extends CApiService {
 		$this->checkUserGroups($users, $db_users);
 		$db_mediatypes = $this->checkMediaTypes($users);
 		$this->validateMediaRecipients($users, $db_mediatypes);
+		$this->checkUserProvisionedMediaUpdate($users, $db_users);
 		$this->checkHimself($users);
 	}
 
@@ -668,7 +665,9 @@ class CUser extends CApiService {
 		}
 
 		$options = [
-			'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period'],
+			'output' => ['mediaid', 'userid', 'mediatypeid', 'sendto', 'active', 'severity', 'period',
+				'userdirectory_mediaid'
+			],
 			'filter' => ['userid' => $userids]
 		];
 		$db_medias = DBselect(DB::makeSql('media', $options));
@@ -697,6 +696,72 @@ class CUser extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
 				_s('User with username "%1$s" already exists.', $db_users[0]['username'])
 			);
+		}
+	}
+
+	/**
+	 * Validate mediaid, userdirectory_mediaid, mediatypeid values.
+	 *
+	 * @param array  $users[]
+	 * @param string $users[]['userdirectoryid']
+	 * @param string $users[]['medias']								(optional)
+	 * @param string $users[]['medias'][]['userdirectory_mediaid']	(optional)
+	 * @param array  $db_users[]
+	 * @param string $db_users[]['userdirectoryid']					(required) update operation validation
+	 * @param array  $db_users[]['medias']							(required) update operation validation
+	 *
+	 * @throws APIException
+	 */
+	private function checkUserProvisionedMediaUpdate(array $users, array $db_users) {
+		foreach ($users as $i => $user) {
+			if (!array_key_exists('medias', $user)) {
+				continue;
+			}
+
+			$path = '/'.($i+1).'/medias';
+			$db_usermedias = $db_users ? array_column($db_users[$user['userid']]['medias'], null, 'mediaid') : [];
+			$db_provisioned_media = array_column($db_usermedias, 'mediaid', 'userdirectory_mediaid');
+			unset($db_provisioned_media[0]);
+			$readonly_fields = array_flip(['sendto', 'mediatypeid']);
+
+			foreach ($user['medias'] as $j => $user_media) {
+				if (!array_key_exists('mediaid', $user_media)) {
+					continue;
+				}
+
+				if (!array_key_exists($user_media['mediaid'], $db_usermedias)) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Incorrect value for field "%1$s": %2$s.', $path.'/'.++$j.'/mediaid',
+						_s('value "%1$s" not found', $user_media['mediaid'])
+					));
+				}
+
+				$db_media = $db_usermedias[$user_media['mediaid']];
+
+				if ($db_media['userdirectory_mediaid'] == 0) {
+					continue;
+				}
+
+				$user_media['sendto'] = implode("\n", $user_media['sendto']);
+				$fields_changed = array_diff_assoc(
+					array_intersect_key($user_media, $readonly_fields),
+					array_intersect_key($db_media, $readonly_fields)
+				);
+
+				if ($fields_changed) {
+					self::exception(ZBX_API_ERROR_PARAMETERS,
+						_s('Not allowed to update field "%1$s" for provisioned user.', array_key_first($fields_changed))
+					);
+				}
+
+				unset($db_provisioned_media[$db_media['userdirectory_mediaid']]);
+			}
+
+			if ($db_provisioned_media) {
+				self::exception(ZBX_API_ERROR_PARAMETERS,
+					_s('Incorrect value for field "%1$s": %2$s.', $path, _('cannot delete provisioned media')
+				));
+			}
 		}
 	}
 
@@ -1554,25 +1619,6 @@ class CUser extends CApiService {
 	}
 
 	/**
-	 * Auxiliary function for updateMedias().
-	 *
-	 * @param array  $medias
-	 * @param string $mediatypeid
-	 * @param string $sendto
-	 *
-	 * @return int
-	 */
-	private static function findMediaIndex(array $medias, $mediatypeid, $sendto) {
-		foreach ($medias as $index => $media) {
-			if (bccomp($media['mediatypeid'], $mediatypeid) == 0 && $media['sendto'] === $sendto) {
-				return $index;
-			}
-		}
-
-		return -1;
-	}
-
-	/**
 	 * @param array      $users
 	 * @param null|array $db_users
 	 */
@@ -1591,10 +1637,8 @@ class CUser extends CApiService {
 			foreach ($user['medias'] as &$media) {
 				$media['sendto'] = implode("\n", $media['sendto']);
 
-				$index = self::findMediaIndex($db_medias, $media['mediatypeid'], $media['sendto']);
-
-				if ($index != -1) {
-					$db_media = $db_medias[$index];
+				if (array_key_exists('mediaid', $media) && array_key_exists($media['mediaid'], $db_medias)) {
+					$db_media = $db_medias[$media['mediaid']];
 					$upd_media = DB::getUpdatedValues('media', $media, $db_media);
 
 					if ($upd_media) {
@@ -1605,7 +1649,7 @@ class CUser extends CApiService {
 					}
 
 					$media['mediaid'] = $db_media['mediaid'];
-					unset($db_medias[$index]);
+					unset($db_medias[$media['mediaid']]);
 				}
 				else {
 					$ins_medias[] = ['userid' => $user['userid']] + $media;
@@ -2831,7 +2875,7 @@ class CUser extends CApiService {
 		if (array_key_exists('medias', $user)) {
 			$users[$userid]['medias'] = $this->sanitizeUserMedia($user['medias']);
 			$db_users[$userid]['medias'] = DB::select('media', [
-				'output' => ['mediatypeid', 'mediaid', 'sendto'],
+				'output' => ['mediatypeid', 'mediaid', 'sendto', 'userdirectory_mediaid'],
 				'filter' => ['userid' => $userid]
 			]);
 		}
