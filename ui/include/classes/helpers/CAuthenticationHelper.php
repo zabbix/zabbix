@@ -66,7 +66,7 @@ class CAuthenticationHelper {
 					'http_case_sensitive', 'ldap_auth_enabled', 'ldap_case_sensitive', 'ldap_userdirectoryid',
 					'saml_auth_enabled', 'saml_case_sensitive', 'passwd_min_length', 'passwd_check_rules',
 					'jit_provision_interval', 'saml_jit_status', 'ldap_jit_status', 'disabled_usrgrpid'
-				],
+				]
 			]);
 
 			if (self::$params === false) {
