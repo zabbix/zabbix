@@ -3017,6 +3017,9 @@ static int	dbupgrade_groupsets_insert(const char *tbl_name, zbx_hashset_t *group
 	zbx_hashset_iter_t	iter;
 	zbx_dbu_group_set_t	*gset_ptr;
 
+	if (0 == group_sets->num_data)
+		return SUCCEED;
+
 	gsetid = zbx_db_get_maxid_num(tbl_name, group_sets->num_data);
 
 	zbx_hashset_iter_reset(group_sets, &iter);
