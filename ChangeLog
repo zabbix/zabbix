@@ -1,3 +1,23 @@
+Changes for 6.0.27rc1
+
+New features:
+.........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
+
+Bug fixes:
+........S. [ZBX-23688] improved new item value retrieval performance by adding such items to value cache after configuration sync (wiper)
+.......PS. [ZBX-22130] changed jsonpath expression evaluator to treat null values as empty variants (wiper)
+.......... [ZBX-23986] added a license to the Go module (jxl)
+..F....... [ZBX-23587] fixed widget input field selecting when clicking on label (dpetra)
+..F....... [ZBX-23640] fixed preload hints opening (apoga)
+..F....... [ZBX-22433] fixed Web scenario and Web scenario step configuration field trimming and field sorting (ddauksa, Ivo)
+.........T [ZBX-23684] fixed transactions query file for PostgreSQL by Zabbix agent template (drasikhov)
+
+--------------------------------------------------------------------------------
+Changes for 6.0.26
+
+6.0.26rc1 was released as 6.0.26 without any changes
+
+--------------------------------------------------------------------------------
 Changes for 6.0.26rc1
 
 New features:
@@ -2891,6 +2911,13 @@ Bug fixes:
 ..F....... [ZBXNEXT-6054] moved Configuration -> Applications to MVC (talbergs)
 A......... [ZBX-17955] fixed "medias" parameter named inconsistency in user.create and user.update API methods (talbergs)
 .......PS. [ZBX-17548] don't store text items with history 0 in proxy history (wiper)
+
+--------------------------------------------------------------------------------
+Changes for 5.0.42rc1
+
+New features:
+
+Bug fixes:
 
 --------------------------------------------------------------------------------
 Changes for 5.0.41
