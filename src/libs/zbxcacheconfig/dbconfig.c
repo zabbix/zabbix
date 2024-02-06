@@ -2418,10 +2418,6 @@ static void	DCsync_interfaces(zbx_dbsync_t *sync, zbx_uint64_t revision)
 		update->interface = interface;
 		update->host = host;
 
-				/* remove old address->interfaceid index */
-		if (0 != found && INTERFACE_TYPE_SNMP == interface->type)
-			dc_interface_snmpaddrs_remove(interface);
-
 		/* see whether we should and can update interfaces_ht index at this point */
 
 		update_index = 0;
