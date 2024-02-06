@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbxjson.h"
 #include "zbxalgo.h"
+#include "zbxcurl.h"
 
 typedef struct
 {
@@ -302,7 +303,7 @@ static int	vmware_curl_init(const char *url, unsigned char is_new_api, const cha
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_TIMEOUT,
 			(long)config_vmware_timeout)) ||
 			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_SSL_VERIFYHOST, 0L)) ||
-			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+			CURLE_OK != (err = curl_easy_setopt(*easyhandle, opt = CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(*error, "Cannot set cURL option %d: %s.", (int)opt, curl_easy_strerror(err));
 	}

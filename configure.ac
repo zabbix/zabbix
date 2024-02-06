@@ -1712,9 +1712,11 @@ AGENT_LIBS="$AGENT_LIBS $LDAP_LIBS"
 
 AC_SUBST(LDAP_CPPFLAGS)
 
+dnl Currently required cURL library version is 7.19.1 . When it is
+dnl increased all the functionality in zbxcurl.h must be revised.
 found_curl="no"
 dnl Checking for libCurl [by default - skip]
-LIBCURL_CHECK_CONFIG(, [7.13.1], [],[])
+LIBCURL_CHECK_CONFIG(, [7.19.1], [],[])
 if test "x$want_curl" = "xyes"; then
 	if test "x$found_curl" != "xyes"; then
 		AC_MSG_ERROR([Curl library not found])
@@ -2004,6 +2006,7 @@ AC_CONFIG_FILES([
 	src/libs/zbxcompress/Makefile
 	src/libs/zbxconf/Makefile
 	src/libs/zbxcrypto/Makefile
+	src/libs/zbxcurl/Makefile
 	src/libs/zbxdb/Makefile
 	src/libs/zbxdbsyncer/Makefile
 	src/libs/zbxcacheconfig/Makefile

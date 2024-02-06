@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -211,24 +212,17 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 			curlauth = CURLAUTH_NTLM;
 			break;
 		case HTTPTEST_AUTH_NEGOTIATE:
-#if LIBCURL_VERSION_NUM >= 0x072600
 			curlauth = CURLAUTH_NEGOTIATE;
-#else
-			curlauth = CURLAUTH_GSSNEGOTIATE;
-#endif
 			break;
 		case HTTPTEST_AUTH_DIGEST:
 			curlauth = CURLAUTH_DIGEST;
 			break;
 		case HTTPTEST_AUTH_BEARER:
-#if defined(CURLAUTH_BEARER)
+			if (SUCCEED != zbx_curl_has_bearer(error))
+				return FAIL;
+
 			curlauth = CURLAUTH_BEARER;
-#else
-			ZBX_UNUSED(token);
-			*error = zbx_strdup(*error, "cannot set bearer token: cURL library support >= 7.61.0 is"
-					" required");
-			return FAIL;
-#endif
+
 			break;
 		default:
 			THIS_SHOULD_NEVER_HAPPEN;
@@ -244,7 +238,6 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 
 	switch (authtype)
 	{
-#if defined(CURLAUTH_BEARER)
 		case HTTPTEST_AUTH_BEARER:
 			if (NULL == token || '\0' == *token)
 			{
@@ -258,7 +251,6 @@ int	zbx_http_prepare_auth(CURL *easyhandle, unsigned char authtype, const char *
 				return FAIL;
 			}
 			break;
-#endif
 		default:
 			zbx_snprintf(auth, sizeof(auth), "%s:%s", username, password);
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_USERPWD, auth)))
@@ -367,19 +359,8 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(easyhandle, error))
 		goto clean;
-	}
-#endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_URL, url)))
 	{
@@ -387,7 +368,7 @@ int	zbx_http_get(const char *url, const char *header, long timeout, const char *
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+	if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
 		goto clean;
@@ -906,20 +887,8 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		goto clean;
 	}
 
-#if LIBCURL_VERSION_NUM >= 0x071304
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
-	/* CURLOPT_PROTOCOLS was deprecated in favor of CURLOPT_PROTOCOLS_STR starting with version 7.85.0 (0x075500) */
-#	if LIBCURL_VERSION_NUM >= 0x075500
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
-#	else
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_PROTOCOLS,
-			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
-#	endif
-	{
-		*error = zbx_dsprintf(NULL, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+	if (SUCCEED != zbx_curl_setopt_https(context->easyhandle, error))
 		goto clean;
-	}
-#endif
 
 	zbx_snprintf(url_buffer, sizeof(url_buffer),"%s%s", url, query_fields);
 	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_URL, url_buffer)))
@@ -928,7 +897,7 @@ int	zbx_http_request_prepare(zbx_http_context_t *context, unsigned char request_
 		goto clean;
 	}
 
-	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, ZBX_CURLOPT_ACCEPT_ENCODING, "")))
+	if (CURLE_OK != (err = curl_easy_setopt(context->easyhandle, CURLOPT_ACCEPT_ENCODING, "")))
 	{
 		*error = zbx_dsprintf(NULL, "Cannot set cURL encoding option: %s", curl_easy_strerror(err));
 		goto clean;

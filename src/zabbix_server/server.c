@@ -97,6 +97,7 @@
 #include "zbxicmpping.h"
 #include "zbxipcservice.h"
 #include "zbxdiag.h"
+#include "zbxcurl.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -2032,11 +2033,6 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define VMWARE_FEATURE_STATUS	" NO"
 #endif
-#ifdef HAVE_SMTP_AUTHENTICATION
-#	define SMTP_AUTH_FEATURE_STATUS	"YES"
-#else
-#	define SMTP_AUTH_FEATURE_STATUS	" NO"
-#endif
 #ifdef HAVE_UNIXODBC
 #	define ODBC_FEATURE_STATUS	"YES"
 #else
@@ -2066,7 +2062,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Web monitoring:            " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       " SMTP_AUTH_FEATURE_STATUS);
+	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       %s",
+			(SUCCEED == zbx_curl_has_smtp_auth(NULL) ? "YES" : " NO"));
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
