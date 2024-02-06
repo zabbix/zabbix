@@ -51,8 +51,8 @@ window.widget_clock_form = new class {
 
 		const ms_itemid_input = this.#form.querySelector('[name="itemid"]');
 
-		if (ms_itemid_input !== null && this.#time_type.value != <?= TIME_TYPE_HOST ?>) {
-			ms_itemid_input.disabled = true;
+		if (ms_itemid_input !== null) {
+			ms_itemid_input.disabled = this.#time_type.value != <?= TIME_TYPE_HOST ?>;
 		}
 	}
 };
