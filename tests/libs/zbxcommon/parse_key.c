@@ -88,7 +88,7 @@ void	zbx_mock_test_entry(void **state)
 	if (key > key_moving_pointer)
 	{
 		fail_msg("zbx_parse_key() corrupted the pointer - it was moved backward from %p to %p",
-				&key, &key_moving_pointer);
+				(void *)key, (void *)key_moving_pointer);
 	}
 
 	if (key_moving_pointer == key)

@@ -1076,6 +1076,8 @@ int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 #ifndef HAVE_SQLITE3
 	const char		*ha_node_table_name = "ha_node";
 	int			total = 0, current = 0, completed, last_completed = -1, mandatory_num = 0;
+#else
+	ZBX_UNUSED(ha_mode);
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
