@@ -1487,7 +1487,7 @@ class testFormAlertsScripts extends CWebTest {
 			$id = CDBHelper::getValue('SELECT scriptid FROM scripts WHERE name='.zbx_dbstr($data['fields']['Name']));
 			$this->openScriptForm($id, false);
 
-			if(array_key_exists('Advanced configuration', $data['fields'])) {
+			if (array_key_exists('Advanced configuration', $data['fields'])) {
 				$form->fill(['Advanced configuration' => true]);
 			}
 
@@ -2164,6 +2164,610 @@ class testFormAlertsScripts extends CWebTest {
 		$this->assertEquals(0, CPopupMenuElement::find()->waitUntilVisible()->one()->getItems()
 				->filter(CElementFilter::TEXT_PRESENT, $data['fields']['Name'])->count()
 		);
+	}
+
+	public function getManualInputData() {
+		return [
+			// #0 Host url with {MANUALINPUT} macro, confirmation message and input type - string.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host url with {MANUALINPUT} macro, confirmation message and input type - string',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Host id {MANUALINPUT} is selected. Proceed?'
+					],
+					'manualinput' => '0',
+					'prompt' => 'Enter host id',
+					'host' => 'ЗАББИКС Сервер',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #1 Event url with {MANUALINPUT} macro, confirmation message and input type - string.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event url with {MANUALINPUT} macro, confirmation message and input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Host id {MANUALINPUT} is selected. Proceed?'
+					],
+					'manualinput' => '0',
+					'prompt' => 'Enter host id',
+					'event' => 'Inheritance trigger with tags',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #2 Event url without confirmation message (input type - string).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event url with without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '999999',
+					'prompt' => 'Enter host id',
+					'event' => 'Inheritance trigger with tags',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #3 Host url without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host url with {MANUALINPUT} macro and without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '0',
+					'prompt' => 'Enter host id',
+					'host' => 'ЗАББИКС Сервер',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #4 Host script with {MANUALINPUT} macro, confirmation message and input type - string.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host script with {MANUALINPUT} macro and confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.HOST};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter 🚩{HOST.HOST}🚩 ping count',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Ping count: {MANUALINPUT}'
+					],
+					'manualinput' => '0',
+					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'host' => 'Host for triggers filtering',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #5 Event script with {MANUALINPUT} macro, confirmation message and input type - string.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event script with {MANUALINPUT} macro and confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.HOST};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter 🚩{HOST.HOST}🚩 ping count',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Ping count: {MANUALINPUT}'
+					],
+					'manualinput' => '0',
+					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'event' => 'Inheritance trigger with tags',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #6 Event script without confirmation message (input type - string).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event script without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.HOST};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter 🚩{HOST.HOST}🚩 ping count',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b',
+						'Enable confirmation' => false
+					],
+					'manualinput' => '10',
+					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'event' => 'Inheritance trigger with tags',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #7 Host script without confirmation message (input type - string).
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host script without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.HOST};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter 🚩{HOST.HOST}🚩 ping count',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b',
+						'Enable confirmation' => false
+					],
+					'manualinput' => '',
+					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'host' => 'Host for triggers filtering',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #8 Host url without confirmation message.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Host url with without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Open in a new window' => false,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '10084',
+					'prompt' => 'Enter host id',
+					'host' => 'ЗАББИКС Сервер',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #9 Event url without confirmation message.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event url without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Open in a new window' => false,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '10084',
+					'prompt' => 'Enter host id',
+					'event' => 'Test trigger with tag',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #10 Event url without confirmation message and with dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event url without confirmation message and with dropdown',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Open in a new window' => false,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter host id',
+						'Input prompt' => 'Choose host id',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '10080,10084,10081,',
+						'Enable confirmation' => false
+					],
+					'manualinput' => '10084',
+					'prompt' => 'Choose host id',
+					'event' => 'Test trigger with tag',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #11 Host url with confirmation message and with dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Host url with confirmation message and with dropdown',
+						'Scope' => 'Manual host action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Open in a new window' => false,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose host id',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '10080,10084,10081,',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Confirm selected host id {MANUALINPUT}?'
+					],
+					'manualinput' => '10084',
+					'prompt' => 'Choose host id',
+					'confirmation' => 'Confirm selected host id 10084?',
+					'host' => 'ЗАББИКС Сервер',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #12 Event url with confirmation message and with input type - string.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Event url with confirmation message and with input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'URL',
+						'URL' => 'zabbix.php?action=host.edit&hostid={MANUALINPUT}',
+						'Open in a new window' => false,
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose host id',
+						'Default input string' => '1',
+						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Confirm selected host id {MANUALINPUT}?'
+					],
+					'manualinput' => '10084',
+					'prompt' => 'Choose host id',
+					'confirmation' => 'Confirm selected host id 10084?',
+					'event' => 'Test trigger with tag',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #13 Host script with {MANUALINPUT} macro, confirmation message and input type - dropdown.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Host script with dropdown and confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Commands' => 'echo test {MANUALINPUT};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Choose supported version',
+						'Input type' => 'Dropdown',
+						'Dropdown options' => '6.0,6.4,7.0',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Confirm {MANUALINPUT} as supported version?'
+					],
+					'manualinput' => '6.4',
+					'prompt' => 'Choose supported version',
+					'confirmation' => 'Confirm 6.4 as supported version?',
+					'host' => 'ЗАББИКС Сервер',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #14 Manual host script with {MANUALINPUT} macro, confirmation message and input type - string.
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Manual host script with macro and confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.HOST};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter 🚩{HOST.HOST}🚩 ping count',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Ping count: {MANUALINPUT}'
+					],
+					'manualinput' => '2',
+					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'confirmation' => 'Ping count: 2',
+					'host' => 'Host for triggers filtering',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #15 Manual host script with {MANUALINPUT} macro and without confirmation message (input type - string).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Manual host script with macro and without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Script',
+						'Commands' => 'ping -c {MANUALINPUT} {HOST.HOST};',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter 🚩{HOST.HOST}🚩 ping count',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b',
+						'Enable confirmation' => false
+					],
+					'manualinput' => '2',
+					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'host' => 'Host for triggers filtering',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// TODO: uncomment when ZBX-24042 will be fixed.
+			// Manual event script without confirmation message (input type - dropdown).
+//			[
+//				[
+//					'expected' => TEST_GOOD,
+//					'fields' => [
+//						'Name' => 'Manual event script with dropdown and without confirmation message',
+//						'Scope' => 'Manual event action',
+//						'Type' => 'Script',
+//						'Commands' => 'echo test;',
+//						'Advanced configuration' => true,
+//						'Enable user input' => true,
+//						'Input prompt' => 'Choose supported version',
+//						'Input type' => 'Dropdown',
+//						'Dropdown options' => '6.0,6.4,7.0',
+//						'Enable confirmation' => false
+//					],
+//					'manualinput' => '7.0',
+//					'prompt' => 'Choose supported version',
+//					'event' => 'Inheritance trigger with tags',
+//					'urls' => [
+//						'Problems' => 'zabbix.php?action=problem.view',
+//						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+//					]
+//				]
+//			],
+			// #16 Manual event script with confirmation message (input type - string).
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Manual event script with confirmation message and input type - string',
+						'Scope' => 'Manual event action',
+						'Type' => 'Script',
+						'Commands' => 'echo test;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Test version?',
+						'Default input string' => 'Zabbix 7.0.0',
+						'Input validation rule' => 'Zabbix [0-9]+\.[0-9]\.[0-9]+',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Selected version is {MANUALINPUT}, proceed?'
+					],
+					'manualinput' => 'Zabbix 6.4.11',
+					'prompt' => 'Test version?',
+					'confirmation' => 'Selected version is Zabbix 6.4.11, proceed?',
+					'event' => 'Inheritance trigger with tags',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * @dataProvider getManualInputData
+	 */
+	public function testFormAlertsScripts_ManualUserInput($data) {
+		$modal = $this->openScriptForm();
+		$form = $modal->asForm();
+		$form->fill($data['fields'])->submit();
+		$this->assertMessage(TEST_GOOD, 'Script added');
+
+		foreach ($data['urls'] as $content => $url) {
+			$this->page->open($url)->waitUntilReady();
+			$this->page->assertHeader($content);
+
+			if ($content === 'Latest data') {
+				$table = $this->query('xpath://table[@class="list-table fixed"]')->asTable()->one();
+			}
+			elseif ($content === 'Global view') {
+				$table = CDashboardElement::find()->one()->getWidget('Current problems');
+			}
+			else {
+				$table = $this->query('class:list-table')->asTable()->one();
+			}
+
+			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
+			$table->query('link', $data[$scope])->one()->click();
+
+			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
+			$popup->fill($data['fields']['Name']);
+			$manualinput_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$this->assertEquals('Manual input', $manualinput_dialog->getTitle());
+			$this->assertEquals($data['prompt'], $manualinput_dialog->query('class:wordbreak')->one()->getText());
+
+			$input_type = (array_key_exists('Input type', $data['fields']))
+				? $manualinput_dialog->query('name:manualinput')->asDropdown()->one()->select($data['manualinput'])
+				: $manualinput_dialog->query('id:manualinput')->one()->fill($data['manualinput']);
+
+			$action = ($data['fields']['Enable confirmation'] === true) ? 'Continue' : 'Execute';
+
+			// Check if buttons present and clickable.
+			$this->assertEquals(['Cancel', $action], $manualinput_dialog->getFooter()->query('button')->all()
+					->filter(CElementFilter::CLICKABLE)->asText()
+			);
+			$manualinput_dialog->getFooter()->query('button', $action)->one()->click();
+
+			if ($data['expected'] === TEST_BAD) {
+				$this->assertMessage(TEST_BAD, 'Invalid input', $data['error_message']);
+				$manualinput_dialog->close();
+			}
+			else {
+				if (array_key_exists('confirmation', $data)) {
+					$confirmation_message = $this->query('class:confirmation-msg')->waitUntilVisible()->one();
+					$confirmation_dialog = COverlayDialogElement::find()->all()->last()->waitUntilReady();
+					$title = ($data['fields']['Type'] === 'URL') ? 'URL opening confirmation' : 'Execution confirmation';
+					$this->assertEquals($title, $confirmation_dialog->getTitle());
+					$this->assertEquals($data['confirmation'], $confirmation_message->getText());
+					$action = ($data['fields']['Type'] === 'URL') ? 'Open URL' : 'Execute';
+
+					// Check that confirmation popup buttons present and clickable.
+					$this->assertEquals(['Cancel', $action], $confirmation_dialog->getFooter()->query('button')->all()
+							->filter(CElementFilter::CLICKABLE)->asText()
+					);
+					$confirmation_dialog->getFooter()->query('button', $action)->one()->click();
+				}
+
+				if ($data['fields']['Type'] === 'URL') {
+					COverlayDialogElement::ensureNotPresent();
+					$scope = (array_key_exists('host', $data)) ? $data['host'] : 'ЗАББИКС Сервер';
+					$this->assertEquals($scope, $this->query('id:visiblename')->one()->getValue());
+				}
+				else {
+					$this->query('button:Ok')->waitUntilVisible()->one();
+					$output_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+					$this->assertEquals($data['fields']['Name'], $output_dialog->getTitle());
+
+					// Check that Zabbix server is down and return error message.
+					$error = "Connection to Zabbix server \"localhost:10051\" refused. Possible reasons:\n".
+						"1. Incorrect \"NodeAddress\" or \"ListenPort\" in the \"zabbix_server.conf\" or server IP/DNS override in the \"zabbix.conf.php\";\n".
+						"2. Security environment (for example, SELinux) is blocking the connection;\n".
+						"3. Zabbix server daemon not running;\n".
+						"4. Firewall is blocking TCP connection.\n".
+						"Connection refused";
+					$this->assertMessage(TEST_BAD, 'Cannot execute script.', $error);
+					$this->assertEquals(['Ok'], $output_dialog->getFooter()->query('button')->all()
+						->filter(CElementFilter::CLICKABLE)->asText()
+					);
+					$output_dialog->close();
+				}
+			}
+		}
 	}
 
 	/**
