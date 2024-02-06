@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
+require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
@@ -32,6 +32,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	public $entity_count = 6;
 	public $tag = '4 Trigger prototype monitored not discovered_{#KEY}';
 
+	protected $link = 'zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&';
 	protected static $prototype_triggerids;
 	protected static $host_druleids;
 
@@ -59,7 +60,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 		$template_id = $response['templateids'];
 		self::$host_druleids = $response['discoveryruleids'];
 
-		$item_prototype  = CDataHelper::call('itemprototype.create', [
+		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for trigger',
 				'key_' => '1_key[{#KEY}]',
@@ -77,14 +78,14 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 				'description' => '1 Trigger prototype monitored discovered_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '12345',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => '2 Trigger prototype not monitored discovered_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'status' => TRIGGER_STATUS_DISABLED,
 				'opdata' => '{#PROT_MAC}',
-				'priority' => 1
+				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => '3 Trigger prototype not monitored not discovered_{#KEY}',
@@ -92,7 +93,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 				'status' => TRIGGER_STATUS_DISABLED,
 				'discover' => TRIGGER_NO_DISCOVER,
 				'opdata' => 'test',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => '4 Trigger prototype monitored not discovered_{#KEY}',
@@ -109,19 +110,19 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 					]
 				],
 				'opdata' => '!@#$%^&*',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => '5 Trigger prototype for high severity_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '{$TEST}',
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => '6 Trigger prototype for disaster severity_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '🙂🙃',
-				'priority' => 5
+				'priority' => TRIGGER_SEVERITY_DISASTER
 
 			]
 		]);
@@ -129,8 +130,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	}
 
 	public function testPagePrototypeTriggersTemplate_Layout() {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
 	}
 
@@ -151,8 +152,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 * @dataProvider getTriggersButtonLinkData
 	 */
 	public function testPagePrototypeTriggersTemplate_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -162,8 +163,8 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 * @dataProvider getTriggersDeleteData
 	 */
 	public function testPagePrototypeTriggersTemplate_Delete($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

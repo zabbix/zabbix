@@ -32,6 +32,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	public $entity_count = 5;
 	public $tag = '5 Item prototype trapper with text type';
 
+	protected $link = 'zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_itemids;
 	protected static $host_druleids;
 
@@ -76,7 +77,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 		$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
 
-		$item_prototype  = CDataHelper::call('itemprototype.create', [
+		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype monitored discovered',
 				'key_' => '1_key[{#KEY}]',
@@ -153,8 +154,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	}
 
 	public function testPageItemPrototypes_Layout() {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout();
 	}
 
@@ -175,8 +175,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * @dataProvider getItemsButtonLinkData
 	 */
 	public function testPageItemPrototypes_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -186,8 +185,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * @dataProvider getItemsDeleteData
 	 */
 	public function testPageItemPrototypes_Delete($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
@@ -204,8 +202,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * @dataProvider getItemsNotDisplayedValuesData
 	 */
 	public function testPageItemPrototypes_NotDisplayedValues($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkNotDisplayedValues($data);
 	}
 }

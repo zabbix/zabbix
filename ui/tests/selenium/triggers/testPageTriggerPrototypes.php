@@ -32,6 +32,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	public $entity_count = 6;
 	public $tag = '4 Trigger prototype monitored not discovered_{#KEY}';
 
+	protected $link = 'zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&';
 	protected static $prototype_triggerids;
 	protected static $host_druleids;
 
@@ -67,7 +68,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 		$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
 
-		$item_prototype  = CDataHelper::call('itemprototype.create', [
+		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for trigger',
 				'key_' => '1_key[{#KEY}]',
@@ -85,14 +86,14 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				'description' => '1 Trigger prototype monitored discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '12345',
-				'priority' => 0
+				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
 				'description' => '2 Trigger prototype not monitored discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'status' => TRIGGER_STATUS_DISABLED,
 				'opdata' => '{#PROT_MAC}',
-				'priority' => 1
+				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
 				'description' => '3 Trigger prototype not monitored not discovered_{#KEY}',
@@ -100,7 +101,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				'status' => TRIGGER_STATUS_DISABLED,
 				'discover' => TRIGGER_NO_DISCOVER,
 				'opdata' => 'test',
-				'priority' => 2
+				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
 				'description' => '4 Trigger prototype monitored not discovered_{#KEY}',
@@ -117,27 +118,27 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 					]
 				],
 				'opdata' => '!@#$%^&*',
-				'priority' => 3
+				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
 				'description' => '5 Trigger prototype for high severity_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '{$TEST}',
-				'priority' => 4
+				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
 				'description' => '6 Trigger prototype for disaster severity_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '🙂🙃',
-				'priority' => 5
+				'priority' => TRIGGER_SEVERITY_DISASTER
 			]
 		]);
 		self::$prototype_triggerids = CDataHelper::getIds('description');
 	}
 
 	public function testPageTriggerPrototypes_Layout() {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout();
 	}
 
@@ -158,8 +159,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 * @dataProvider getTriggersButtonLinkData
 	 */
 	public function testPageTriggerPrototypes_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -169,8 +170,8 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 * @dataProvider getTriggersDeleteData
 	 */
 	public function testPageTriggerPrototypes_Delete($data) {
-		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

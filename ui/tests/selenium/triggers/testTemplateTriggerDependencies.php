@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testTriggerDependencies.php';
+require_once dirname(__FILE__) . '/../common/testTriggerDependencies.php';
 
 /**
  * @backup hosts

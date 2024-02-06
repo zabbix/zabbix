@@ -31,6 +31,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	public $page_name = 'graph';
 	public $entity_count = 4;
 
+	protected $link = 'graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
 	protected static $host_druleids;
 
@@ -66,7 +67,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 		$hostids = $host_result['hostids'];
 		self::$host_druleids = $host_result['discoveryruleids'];
 
-		$item_prototype  = CDataHelper::call('itemprototype.create', [
+		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for graphs',
 				'key_' => '1_key[{#KEY}]',
@@ -136,8 +137,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	}
 
 	public function testPageGraphPrototypes_Layout() {
-		$this->page->login()->open('graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout();
 	}
 
@@ -158,8 +158,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 * @dataProvider getGraphsButtonLinkData
 	 */
 	public function testPageGraphPrototypes_ButtonLink($data) {
-		$this->page->login()->open('graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -169,8 +168,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	 * @dataProvider getGraphsDeleteData
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
-		$this->page->login()->open('graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

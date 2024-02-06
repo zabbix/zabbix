@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
+require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
@@ -32,6 +32,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	public $entity_count = 5;
 	public $tag = '5 Item prototype trapper with text type';
 
+	protected $link = 'zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&';
 	protected static $prototype_itemids;
 	protected static $host_druleids;
 
@@ -139,8 +140,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	}
 
 	public function testPagePrototypeItemsTemplate_Layout() {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
 	}
 
@@ -161,8 +162,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 * @dataProvider getItemsButtonLinkData
 	 */
 	public function testPagePrototypeItemsTemplate_ButtonLink($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -172,8 +173,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 * @dataProvider getItemsDeleteData
 	 */
 	public function testPagePrototypeItemsTemplate_Delete($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
@@ -190,8 +191,8 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 * @dataProvider getItemsNotDisplayedValuesData
 	 */
 	public function testPagePrototypeItemsTemplate_NotDisplayedValues($data) {
-		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.
+				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkNotDisplayedValues($data);
 	}
 }

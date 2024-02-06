@@ -199,10 +199,10 @@ require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
 
 // Prototype pages.
-require_once dirname(__FILE__).'/prototype/testPagePrototypeGraphsTemplate.php';
-require_once dirname(__FILE__).'/prototype/testPagePrototypeHostsTemplate.php';
-require_once dirname(__FILE__).'/prototype/testPagePrototypeItemsTemplate.php';
-require_once dirname(__FILE__).'/prototype/testPagePrototypeTriggersTemplate.php';
+require_once dirname(__FILE__) . '/graphs/testPagePrototypeGraphsTemplate.php';
+require_once dirname(__FILE__) . '/hosts/testPagePrototypeHostsTemplate.php';
+require_once dirname(__FILE__) . '/items/testPagePrototypeItemsTemplate.php';
+require_once dirname(__FILE__) . '/triggers/testPagePrototypeTriggersTemplate.php';
 
 // Proxies.
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
@@ -266,8 +266,8 @@ require_once dirname(__FILE__) . '/timeouts/testTimeoutsLinkedTemplates.php';
 require_once dirname(__FILE__) . '/timeouts/testTimeoutsTemplates.php';
 
 // Trigger dependencies.
-require_once dirname(__FILE__).'/triggerDependencies/testHostTriggerDependencies.php';
-require_once dirname(__FILE__).'/triggerDependencies/testTemplateTriggerDependencies.php';
+require_once dirname(__FILE__) . '/triggers/testHostTriggerDependencies.php';
+require_once dirname(__FILE__) . '/triggers/testTemplateTriggerDependencies.php';
 
 // Triggers.
 require_once dirname(__FILE__).'/triggers/testFormTrigger.php';

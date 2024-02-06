@@ -19,7 +19,7 @@
 **/
 
 
-require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
+require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 
 /**
  * @backup hosts
@@ -31,6 +31,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	public $page_name = 'graph';
 	public $entity_count = 4;
 
+	protected $link = 'graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
 	protected static $host_druleids;
 
@@ -127,8 +128,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	}
 
 	public function testPagePrototypeGraphsTemplate_Layout() {
-		$this->page->login()->open('graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=' .
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
 	}
 
@@ -149,8 +149,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	 * @dataProvider getGraphsButtonLinkData
 	 */
 	public function testPagePrototypeGraphsTemplate_ButtonLink($data) {
-		$this->page->login()->open('graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -160,8 +159,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	 * @dataProvider getGraphsDeleteData
 	 */
 	public function testPagePrototypeGraphsTemplate_Delete($data) {
-		$this->page->login()->open('graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
