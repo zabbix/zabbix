@@ -36,6 +36,7 @@ void	zbx_mock_test_entry(void **state)
 	if (ZBX_MOCK_SUCCESS != (error = zbx_mock_in_parameter("key", &mh)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(mh, &key)))
 	{
+		key = NULL;
 		fail_msg("Cannot get 'key' from test case data: %s", zbx_mock_error_string(error));
 	}
 
@@ -87,7 +88,7 @@ void	zbx_mock_test_entry(void **state)
 	if (key > key_moving_pointer)
 	{
 		fail_msg("zbx_parse_key() corrupted the pointer - it was moved backward from %p to %p",
-				key, key_moving_pointer);
+				&key, &key_moving_pointer);
 	}
 
 	if (key_moving_pointer == key)
