@@ -37,7 +37,7 @@ static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
 /* Pointer to zbx_dc_get_psk_by_identity() initialized at runtime. This is a workaround for linking. */
 /* Server and proxy link with src/libs/zbxdbcache/dbconfig.o where zbx_dc_get_psk_by_identity() resides */
 /* but other components (e.g. agent) do not link dbconfig.o. */
-size_t	(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *) = NULL;
+static zbx_find_psk_in_cache_f	find_psk_in_cache_cb = NULL;
 
 /* variable for passing information from callback functions if PSK was found among host PSKs or autoregistration PSK */
 static unsigned int	psk_usage;
@@ -172,7 +172,7 @@ static int	zbx_psk_cb(gnutls_session_t session, const char *psk_identity, gnutls
 	if (0 != (zbx_get_program_type_cb() & (ZBX_PROGRAM_TYPE_PROXY | ZBX_PROGRAM_TYPE_SERVER)))
 	{
 		/* call the function zbx_dc_get_psk_by_identity() by pointer */
-		if (0 < find_psk_in_cache((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
+		if (0 < find_psk_in_cache_cb((const unsigned char *)psk_identity, tls_psk_hex, &psk_usage))
 		{
 			/* The PSK is in configuration cache. Convert PSK to binary form. */
 			if (0 >= (psk_bin_len = zbx_hex2bin(tls_psk_hex, psk_buf, sizeof(psk_buf))))
@@ -883,7 +883,8 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
-void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg)
+void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg,
+		zbx_find_psk_in_cache_f zbx_find_psk_in_cache_cb_arg)
 {
 	int			res;
 #ifndef _WINDOWS
@@ -892,7 +893,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_get_program_type_cb = zbx_get_program_type_cb_arg;
-
+	find_psk_in_cache_cb = zbx_find_psk_in_cache_cb_arg;
 #ifndef _WINDOWS
 	/* Invalid TLS parameters will cause exit. Once one process exits the parent process will send SIGHUP to */
 	/* child processes which may be on their way to exit on their own - do not interrupt them, block signal */
