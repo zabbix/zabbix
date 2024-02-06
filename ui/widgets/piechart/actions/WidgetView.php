@@ -26,11 +26,7 @@ use API,
 	CArrayHelper,
 	CControllerDashboardWidgetView,
 	CControllerResponseData,
-	CHousekeepingHelper,
 	CItemHelper,
-	CMacrosResolverHelper,
-	CParser,
-	CSimpleIntervalParser,
 	Manager;
 
 use Widgets\PieChart\Includes\{
@@ -41,6 +37,7 @@ use Widgets\PieChart\Includes\{
 class WidgetView extends CControllerDashboardWidgetView {
 
 	private const LEGEND_AGGREGATION_ON = 1;
+	private const LEGEND_VALUE_ON = 1;
 	private const MERGE_SECTORS_ON = 1;
 	private const SHOW_TOTAL_ON = 1;
 	private const SHOW_UNITS_ON = 1;
@@ -620,6 +617,9 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$legend['data'][] = [
 				'id' => $sector['id'],
 				'name' => $sector['name'],
+				'value' => $sector['formatted_value']['units']
+					? $sector['formatted_value']['value'].' '.$sector['formatted_value']['units']
+					: $sector['formatted_value']['value'],
 				'color' => $sector['color'],
 				'is_total' => $sector['is_total']
 			];
@@ -627,8 +627,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 
 		if ($this->fields_values['legend'] == WidgetForm::LEGEND_ON) {
 			$legend['show'] = true;
+			$legend['value_show'] = $this->fields_values['legend_value'] === self::LEGEND_VALUE_ON;
 			$legend['lines'] = $this->fields_values['legend_lines'];
-			$legend['columns'] = $this->fields_values['legend_columns'];
+			if (!$legend['value_show']) {
+				$legend['columns'] = $this->fields_values['legend_columns'];
+			}
 		}
 		else {
 			$legend['show'] = false;

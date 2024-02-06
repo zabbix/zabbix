@@ -3497,6 +3497,20 @@ section {
       height: 4px;
       margin-right: 4px;
       background: var(--color); }
+  .svg-pie-chart-legend.svg-pie-chart-legend-show-value {
+    grid-template-columns: auto max-content;
+    justify-content: stretch; }
+    .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-header {
+      grid-column: 2;
+      color: #333333; }
+    .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-item {
+      grid-column: 1; }
+    .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-value,
+    .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-value-no-data {
+      grid-column: 2;
+      white-space: nowrap; }
+  .svg-pie-chart-legend .svg-pie-chart-legend-value-no-data {
+    color: #333333; }
 
 .svg-pie-chart-hintbox {
   display: flex;

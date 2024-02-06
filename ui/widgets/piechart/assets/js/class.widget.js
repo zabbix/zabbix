@@ -132,12 +132,24 @@ class CWidgetPieChart extends CWidget {
 				this._body.append(container);
 			}
 
-			container.style.setProperty('--lines', legend.lines);
-			container.style.setProperty('--columns', legend.columns);
+			container.classList.toggle('svg-pie-chart-legend-show-value', legend.value_show);
+			container.style.setProperty('--lines', legend.value_show ? legend.lines + 1 : legend.lines);
+
+			if (!legend.value_show) {
+				container.style.setProperty('--columns', legend.columns);
+			}
 
 			if (total_item !== null) {
 				legend.data.pop();
 				legend.data.unshift(total_item);
+			}
+
+			if (legend.value_show) {
+				const header = document.createElement('div');
+				header.textContent = t('Value');
+				header.classList.add('svg-pie-chart-legend-header');
+
+				container.appendChild(header);
 			}
 
 			for (let i = 0; i < legend.data.length; i++) {
@@ -146,11 +158,20 @@ class CWidgetPieChart extends CWidget {
 				item.style.setProperty('--color', legend.data[i].color);
 
 				const name = document.createElement('span');
-				name.append(legend.data[i].name);
-
+				name.textContent = legend.data[i].name;
 				item.append(name);
 
 				container.append(item);
+
+				if (legend.value_show) {
+					const value = document.createElement('div');
+					value.textContent = legend.data[i].value || '['+t('no data')+']';
+					value.className = legend.data[i].value
+						? 'svg-pie-chart-legend-value'
+						: 'svg-pie-chart-legend-value-no-data';
+
+					container.append(value);
+				}
 			}
 
 			container.style.display = '';
