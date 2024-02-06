@@ -649,7 +649,4 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&lld_service);
-	lld_manager_destroy(&manager);
 }
