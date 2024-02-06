@@ -373,23 +373,23 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 
 		$show_warning = false;
 
-		if (array_key_exists('interface', $inputs['item'])) {
-			if (array_key_exists('address', $inputs['item']['interface'])
-					&& strpos($inputs['item']['interface']['address'], ZBX_SECRET_MASK) !== false) {
-				$inputs['item']['interface']['address'] = '';
+		if (array_key_exists('interface', $inputs['host'])) {
+			if (array_key_exists('address', $inputs['host']['interface'])
+					&& strpos($inputs['host']['interface']['address'], ZBX_SECRET_MASK) !== false) {
+				$inputs['host']['interface']['address'] = '';
 				$show_warning = true;
 			}
 
-			if (array_key_exists('port', $inputs['item']['interface'])
-					&& $inputs['item']['interface']['port'] === ZBX_SECRET_MASK) {
-				$inputs['item']['interface']['port'] = '';
+			if (array_key_exists('port', $inputs['host']['interface'])
+					&& $inputs['host']['interface']['port'] === ZBX_SECRET_MASK) {
+				$inputs['host']['interface']['port'] = '';
 				$show_warning = true;
 			}
 
-			if (array_key_exists('details', $inputs['item']['interface'])) {
-				foreach ($inputs['item']['interface']['details'] as $field => $value) {
+			if (array_key_exists('details', $inputs['host']['interface'])) {
+				foreach ($inputs['host']['interface']['details'] as $field => $value) {
 					if (strpos($value, ZBX_SECRET_MASK) !== false) {
-						$inputs['item']['interface']['details'][$field] = '';
+						$inputs['host']['interface']['details'][$field] = '';
 						$show_warning = true;
 					}
 				}
