@@ -347,6 +347,24 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 	return (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
 }
 
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids)
+{
+	int	i, hour, now = time(NULL);
+
+	hour = now - now % SEC_PER_HOUR;
+
+	LOCK_TRENDS;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		ZBX_DC_TREND	trend = {.itemid = itemids->values[i], .disable_from = hour};
+
+		(void)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
+	}
+
+	UNLOCK_TRENDS;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: apply disable_from changes to cache                               *
@@ -876,7 +894,7 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 				continue;
 
 			/* discard trend items that are older than compression age */
-			if (0 != compression_age && trend->clock < compression_age)
+			if (0 != compression_age && trend->clock < compression_age && 0 != trend->clock)
 			{
 				if (SEC_PER_HOUR < (ts.sec - last_trend_discard)) /* log once per hour */
 				{
@@ -886,13 +904,21 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 				}
 
 				zbx_hashset_iter_remove(&iter);
+
+				trend->clock = 0;
+				trend->num = 0;
+				memset(&trend->value_min, 0, sizeof(history_value_t));
+				memset(&trend->value_avg, 0, sizeof(value_avg_t));
+				memset(&trend->value_max, 0, sizeof(history_value_t));
 			}
 			else
 			{
 				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
-				zbx_vector_uint64_append(&del_itemids, trend->itemid);
+				/* last trend added more than 24 hours ago, check if it should be cleared from cache */
+				if (0 != trend->disable_from && trend->disable_from <= hour - SEC_PER_DAY)
+					zbx_vector_uint64_append(&del_itemids, trend->itemid);
 			}
 		}
 
