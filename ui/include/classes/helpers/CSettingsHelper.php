@@ -81,6 +81,7 @@ class CSettingsHelper extends CConfigGeneralHelper {
 	public const DBVERSION_STATUS = 'dbversion_status';
 	public const SERVER_STATUS = 'server_status';
 	public const AUDITLOG_ENABLED = 'auditlog_enabled';
+	public const AUDITLOG_MODE = 'auditlog_mode';
 	public const GEOMAPS_TILE_PROVIDER = 'geomaps_tile_provider';
 	public const GEOMAPS_TILE_URL = 'geomaps_tile_url';
 	public const GEOMAPS_MAX_ZOOM = 'geomaps_max_zoom';

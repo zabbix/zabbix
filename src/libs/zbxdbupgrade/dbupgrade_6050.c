@@ -2000,14 +2000,16 @@ static int	DBpatch_6050162(void)
 
 static int	DBpatch_6050163(void)
 {
-	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_validator_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL,
+			0};
 
 	return DBadd_field("scripts", &field);
 }
 
 static int	DBpatch_6050164(void)
 {
-	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+	const zbx_db_field_t	field = {"manualinput_default_value", "", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL,
+			0};
 
 	return DBadd_field("scripts", &field);
 }
@@ -2998,7 +3000,7 @@ static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_na
 		zbx_vector_uint64_clear(&groupids);
 	}
 
-	zbx_vector_uint64_create(&groupids);
+	zbx_vector_uint64_destroy(&groupids);
 
 	return ret;
 }
@@ -3159,6 +3161,62 @@ static int	DBpatch_6050203(void)
 	zbx_db_insert_clean(&db_insert);
 
 	return ret;
+}
+
+static int	DBpatch_6050204(void)
+{
+	return DBrename_table("globalvars", "globalvars_tmp");
+}
+
+static int	DBpatch_6050205(void)
+{
+	const zbx_db_table_t	table =
+			{"globalvars", "name", 0,
+				{
+					{"name", "", NULL, NULL, 64, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{"value", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0},
+					{0}
+				},
+				NULL
+			};
+
+	return DBcreate_table(&table);
+}
+
+static int	DBpatch_6050206(void)
+{
+	if (ZBX_DB_OK > zbx_db_execute("insert into globalvars (name,value)"
+			" select 'snmp_lastsize',snmp_lastsize from globalvars_tmp"))
+	{
+		return FAIL;
+	}
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050207(void)
+{
+	return DBdrop_table("globalvars_tmp");
+}
+
+static int	DBpatch_6050208(void)
+{
+#ifdef HAVE_POSTGRESQL
+	if (FAIL == zbx_db_index_exists("globalvars", "globalvars_pkey1"))
+		return SUCCEED;
+
+	return DBrename_index("globalvars", "globalvars_pkey1", "globalvars_pkey",
+			"name", 1);
+#else
+	return SUCCEED;
+#endif
+}
+
+static int	DBpatch_6050209(void)
+{
+	const zbx_db_field_t	field = {"auditlog_mode", "1", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("config", &field);
 }
 #endif
 
@@ -3368,5 +3426,11 @@ DBPATCH_ADD(6050200, 0, 1)
 DBPATCH_ADD(6050201, 0, 1)
 DBPATCH_ADD(6050202, 0, 1)
 DBPATCH_ADD(6050203, 0, 1)
+DBPATCH_ADD(6050204, 0, 1)
+DBPATCH_ADD(6050205, 0, 1)
+DBPATCH_ADD(6050206, 0, 1)
+DBPATCH_ADD(6050207, 0, 1)
+DBPATCH_ADD(6050208, 0, 1)
+DBPATCH_ADD(6050209, 0, 1)
 
 DBPATCH_END()

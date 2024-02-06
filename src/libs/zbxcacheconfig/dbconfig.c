@@ -19,6 +19,7 @@
 
 #include "dbconfig.h"
 
+#include "zbxcacheconfig.h"
 #include "zbxtasks.h"
 #include "zbxshmem.h"
 #include "zbxregexp.h"
@@ -51,6 +52,7 @@
 #include "zbxipcservice.h"
 #include "zbxjson.h"
 #include "zbxkvs.h"
+#include "zbxcachevalue.h"
 #include "zbxcomms.h"
 #include "zbxdb.h"
 
@@ -456,7 +458,7 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 		const char	*value = NULL;
 		char		*out = NULL;
 
-		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_FUNC_MACRO != token.type)
+		if (ZBX_TOKEN_USER_MACRO != token.type && ZBX_TOKEN_USER_FUNC_MACRO != token.type)
 			continue;
 
 		zbx_strncpy_alloc(&str, &str_alloc, &str_offset, text + last_pos, token.loc.l - (size_t)last_pos);
@@ -465,7 +467,7 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 		{
 			int		ret;
 
-			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l + 1,
 						env, &value);
 
@@ -883,7 +885,7 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 					"default_timezone", "hk_events_service", "auditlog_enabled",
 					"timeout_zabbix_agent", "timeout_simple_check", "timeout_snmp_agent",
 					"timeout_external_check", "timeout_db_monitor", "timeout_http_agent",
-					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script"};
+					"timeout_ssh_agent", "timeout_telnet_agent", "timeout_script", "auditlog_mode"};
 
 	const char	*row[ARRSIZE(selected_fields)];
 	size_t		i;
@@ -1213,6 +1215,12 @@ static int	DCsync_config(zbx_dbsync_t *sync, zbx_uint64_t revision, int *flags)
 	if (NULL == config->config->item_timeouts.script || 0 != strcmp(config->config->item_timeouts.script, row[42]))
 	{
 		dc_strpool_replace(found, (const char **)&config->config->item_timeouts.script, row[42]);
+		config->revision.config_table = revision;
+	}
+
+	if (config->config->auditlog_mode != (value_int = atoi(row[43])))
+	{
+		config->config->auditlog_mode = value_int;
 		config->revision.config_table = revision;
 	}
 
@@ -2837,7 +2845,7 @@ do													\
 while(0)
 
 static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, zbx_synced_new_config_t synced,
-		zbx_vector_uint64_t *deleted_itemids)
+		zbx_vector_uint64_t *deleted_itemids, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2977,6 +2985,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, zbx_uint64_t revision, int flags, z
 
 			item->preproc_item = NULL;
 			item->master_item = NULL;
+
+			if (NULL != new_items)
+				zbx_vector_dc_item_ptr_append(new_items, item);
 		}
 		else
 		{
@@ -5952,7 +5963,7 @@ static void	DCsync_hostgroup_hosts(zbx_dbsync_t *sync)
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_TRUE;
+		config->maintenance_update |= ZBX_FLAG_MAINTENANCE_UPDATE_MAINTENANCE;
 
 		/* removed rows will be always added at the end */
 		if (ZBX_DBSYNC_ROW_REMOVE == tag)
@@ -7324,6 +7335,41 @@ void	zbx_dc_config_get_hostids_by_revision(zbx_uint64_t new_revision, zbx_vector
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add new items with triggers to value cache                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items)
+{
+	if (0 != items->values_num)
+	{
+		zbx_vector_uint64_pair_t	vc_items;
+		int				i;
+
+		zbx_vector_uint64_pair_create(&vc_items);
+		zbx_vector_uint64_pair_reserve(&vc_items, (size_t)items->values_num);
+
+		for (i = 0; i < items->values_num; i++)
+		{
+			if (0 != items->values[i]->update_triggers)
+			{
+				zbx_uint64_pair_t	pair = {
+						.first = items->values[i]->itemid,
+						.second = (zbx_uint64_t)items->values[i]->value_type
+				};
+
+				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
+			}
+		}
+
+		if (0 != items->values_num)
+			zbx_vc_add_new_items(&vc_items);
+
+		zbx_vector_uint64_pair_destroy(&vc_items);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
@@ -7357,12 +7403,13 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	zbx_uint64_t	update_flags = 0;
 	unsigned char	changelog_sync_mode = mode;	/* sync mode for objects using incremental sync */
 
-	zbx_hashset_t		trend_queue;
-	zbx_vector_uint64_t	active_avail_diff;
-	zbx_hashset_t		activated_hosts;
-	zbx_uint64_t		new_revision = config->revision.config + 1;
-	int			connectors_num = 0;
-	zbx_hashset_t		psk_owners;
+	zbx_hashset_t			trend_queue;
+	zbx_vector_uint64_t		active_avail_diff;
+	zbx_hashset_t			activated_hosts;
+	zbx_uint64_t			new_revision = config->revision.config + 1;
+	int				connectors_num = 0;
+	zbx_hashset_t			psk_owners;
+	zbx_vector_dc_item_ptr_t	new_items, *pnew_items = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -7378,7 +7425,14 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		dc_load_trigger_queue(&trend_queue);
 	}
 	else if (ZBX_DBSYNC_STATUS_INITIALIZED != sync_status)
+	{
 		changelog_sync_mode = ZBX_DBSYNC_INIT;
+	}
+	else if (0 != (get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_vector_dc_item_ptr_create(&new_items);
+		pnew_items = &new_items;
+	}
 
 	/* global configuration must be synchronized directly with database */
 	zbx_dbsync_init(&config_sync, ZBX_DBSYNC_INIT);
@@ -7673,6 +7727,11 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 		goto out;
 	itemscrp_sec = zbx_time() - sec;
 
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_functions(&func_sync))
+		goto out;
+	fsec = zbx_time() - sec;
+
 	START_SYNC;
 
 	/* resolves macros for interface_snmpaddrs, must be after DCsync_hmacros() */
@@ -7683,7 +7742,7 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids);
+	DCsync_items(&items_sync, new_revision, flags, synced, deleted_itemids, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -7708,28 +7767,16 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	DCsync_itemscript_param(&itemscrp_sync, new_revision);
 	itemscrp_sec2 = zbx_time() - sec;
 
-	FINISH_SYNC;
-
-	zbx_dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
-
-	/* sync function data to support function lookups when resolving macros during configuration sync */
-
-	/* relies on items, must be after DCsync_items() */
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_item_tags(&item_tag_sync))
-		goto out;
-	item_tag_sec = zbx_time() - sec;
-
-	sec = zbx_time();
-	if (FAIL == zbx_dbsync_compare_functions(&func_sync))
-		goto out;
-	fsec = zbx_time() - sec;
-
-	START_SYNC;
 	sec = zbx_time();
 	DCsync_functions(&func_sync, new_revision);
 	fsec2 = zbx_time() - sec;
+
 	FINISH_SYNC;
+
+	if (NULL != pnew_items)
+		dc_add_new_items_to_valuecache(pnew_items);
+
+	zbx_dc_flush_history();	/* misconfigured items generate pseudo-historic values to become notsupported */
 
 	/* sync rest of the data */
 	sec = zbx_time();
@@ -7766,6 +7813,12 @@ zbx_uint64_t	zbx_dc_sync_configuration(unsigned char mode, zbx_synced_new_config
 	if (FAIL == zbx_dbsync_compare_trigger_tags(&trigger_tag_sync))
 		goto out;
 	trigger_tag_sec = zbx_time() - sec;
+
+	/* relies on items, must be after DCsync_items() */
+	sec = zbx_time();
+	if (FAIL == zbx_dbsync_compare_item_tags(&item_tag_sync))
+		goto out;
+	item_tag_sec = zbx_time() - sec;
 
 	sec = zbx_time();
 	if (FAIL == zbx_dbsync_compare_correlations(&correlation_sync))
@@ -8318,6 +8371,9 @@ clean:
 
 	if (ZBX_DBSYNC_INIT == mode)
 		zbx_hashset_destroy(&trend_queue);
+
+	if (NULL != pnew_items)
+		zbx_vector_dc_item_ptr_destroy(pnew_items);
 
 	zbx_dbsync_env_clear();
 
@@ -8873,7 +8929,7 @@ int	zbx_init_configuration_cache(zbx_get_program_type_f get_program_type, zbx_ge
 	/* maintenance data are used only when timers are defined (server) */
 	if (0 != get_config_forks_cb(ZBX_PROCESS_TYPE_TIMER))
 	{
-		config->maintenance_update = ZBX_MAINTENANCE_UPDATE_FALSE;
+		config->maintenance_update = ZBX_FLAG_MAINTENANCE_UPDATE_NONE;
 		config->maintenance_update_flags = (zbx_uint64_t *)__config_shmem_malloc_func(NULL,
 				sizeof(zbx_uint64_t) * zbx_maintenance_update_flags_num());
 		memset(config->maintenance_update_flags, 0, sizeof(zbx_uint64_t) * zbx_maintenance_update_flags_num());
@@ -13452,6 +13508,9 @@ void	zbx_config_get(zbx_config_t *cfg, zbx_uint64_t flags)
 	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED))
 		cfg->auditlog_enabled = config->config->auditlog_enabled;
 
+	if (0 != (flags & ZBX_CONFIG_FLAGS_AUDITLOG_MODE))
+		cfg->auditlog_mode = config->config->auditlog_mode;
+
 	UNLOCK_CACHE;
 
 	cfg->flags = flags;
@@ -15682,7 +15741,7 @@ int	zbx_dc_expand_user_and_func_macros(const zbx_dc_um_handle_t *um_handle, char
 
 		switch(token.type)
 		{
-			case ZBX_TOKEN_FUNC_MACRO:
+			case ZBX_TOKEN_USER_FUNC_MACRO:
 				um_cache_resolve_const(dc_um_get_cache(um_handle), hostids, hostids_num, *text +
 						token.loc.l + 1, um_handle->macro_env, &value);
 

@@ -1008,9 +1008,9 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 	}
 
-	zbx_audit_prepare();
-	zbx_audit_proxy_config_reload(proxyid, hostname);
-	zbx_audit_flush();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
+	zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxyid, hostname);
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 }
 
 #define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
@@ -1470,7 +1470,7 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on all proxies");
 
-	zbx_audit_prepare();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	for (int i = 0; i < proxies.values_num; i++)
 	{
@@ -1493,10 +1493,10 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 				notify_proxypollers = 1;
 		}
 
-		zbx_audit_proxy_config_reload(proxy->proxyid, proxy->name);
+		zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxy->proxyid, proxy->name);
 	}
 
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	if (0 != notify_proxypollers)
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
@@ -1547,7 +1547,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 	zbx_vector_tm_task_create(&tasks_active);
 
-	zbx_audit_prepare();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	for (const char *ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
@@ -1582,11 +1582,11 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 					zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
 
-			zbx_audit_proxy_config_reload(proxyid, name);
+			zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxyid, name);
 		}
 	}
 
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	if (1 == proxynames_log.values_num)
 	{
