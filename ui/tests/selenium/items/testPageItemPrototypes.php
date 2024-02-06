@@ -28,18 +28,9 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPageItemPrototypes extends testPagePrototypes {
 
-	public $headers = ['', '', 'Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover', 'Tags'];
 	public $page_name = 'item';
-	public $amount = 5;
-	public $buttons = [
-		'Create enabled' => false,
-		'Create disabled' => false,
-		'Mass update' => false,
-		'Delete' => false,
-		'Create item prototype' => true
-	];
+	public $entity_count = 5;
 	public $tag = '5 Item prototype trapper with text type';
-	public $clickable_headers = ['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover'];
 
 	protected static $prototype_itemids;
 	protected static $host_druleids;
@@ -68,7 +59,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 						'key_' => 'master_item',
 						'type' => ITEM_TYPE_TRAPPER,
 						'value_type' => ITEM_VALUE_TYPE_FLOAT,
-						'delay' => '0'
+						'delay' => 0
 					]
 				],
 				'groups' => [['groupid' => 4]], // Zabbix server
@@ -144,7 +135,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '',
-				'history' => '0',
+				'history' => 0,
 				'tags' => [
 					[
 						'tag' => 'name_1',
@@ -164,7 +155,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	public function testPageItemPrototypes_Layout() {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-		$this->layout();
+		$this->checkLayout();
 	}
 
 	/**
@@ -186,7 +177,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 	public function testPageItemPrototypes_ButtonLink($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-		$this->executeDiscoverEnable($data);
+		$this->checkTableAction($data);
 	}
 
 	/**
@@ -195,25 +186,20 @@ class testPageItemPrototypes extends testPagePrototypes {
 	 * @dataProvider getItemsDeleteData
 	 */
 	public function testPageItemPrototypes_Delete($data) {
-		$sql = 'SELECT null FROM items WHERE itemid=';
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
+		$ids = [];
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_itemids[$name]));
+			$ids[] = self::$prototype_itemids[$name];
 		}
 
-		$this->executeDelete($data);
-
-		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
-
-		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_itemids[$name]));
-		}
+		$this->checkDelete($data, $ids);
 	}
 
 	/**
-	 * Check that empty values displayed in Trends and Interval columns for some item types and types of information.
+	 * Check that empty values displayed in Trends and Interval columns. SNMP, Zabbix trappers has empty values in trends column.
+	 * Dependent items has empty update interval column.
 	 *
 	 * @dataProvider getItemsNotDisplayedValuesData
 	 */

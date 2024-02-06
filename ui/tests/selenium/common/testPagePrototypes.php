@@ -37,21 +37,79 @@ class testPagePrototypes extends CWebTest {
 		];
 	}
 
-	public $headers;
+	/**
+	 * What page should be checked - item/trigger/graph/host prototype.
+	 */
 	public $page_name;
-	public $amount;
-	public $buttons;
-	public $tag;
-	public $clickable_headers;
 
-	public function layout($template = false) {
+	/**
+	 * How much item/trigger/graph/host displayed in table result opening page.
+	 */
+	public $entity_count;
+
+	/**
+	 * Name of item/trigger/graph/host that has tags.
+	 */
+	public $tag;
+
+	/**
+	 * Layouts of prototype page and SQL used in delete scenarios.
+	 */
+	protected $layout_data = [
+		'graph' => [
+			'headers' => ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'],
+			'clickable_headers' => ['Name', 'Graph type', 'Discover'],
+			'buttons' => [
+				'Delete' => false,
+				'Create graph prototype' => true
+			],
+			'sql' => 'SELECT null FROM graphs WHERE graphid='
+		],
+		'host' => [
+			'headers' => ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'],
+			'clickable_headers' => ['Name', 'Create enabled', 'Discover'],
+			'buttons' => [
+				'Create enabled' => false,
+				'Create disabled' => false,
+				'Delete' => false,
+				'Create host prototype' => true
+			],
+			'sql' => 'SELECT null FROM hosts WHERE hostid='
+		],
+		'item' => [
+			'headers' => ['', '', 'Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover', 'Tags'],
+			'clickable_headers' => ['Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover'],
+			'buttons' => [
+				'Create enabled' => false,
+				'Create disabled' => false,
+				'Mass update' => false,
+				'Delete' => false,
+				'Create item prototype' => true
+			],
+			'sql' => 'SELECT null FROM items WHERE itemid='
+		],
+		'trigger' => [
+			'headers' => ['', 'Severity', 'Name', 'Operational data', 'Expression', 'Create enabled', 'Discover', 'Tags'],
+			'clickable_headers' => ['Severity', 'Name', 'Create enabled', 'Discover'],
+			'buttons' => [
+				'Create enabled' => false,
+				'Create disabled' => false,
+				'Mass update' => false,
+				'Delete' => false,
+				'Create trigger prototype' => true
+			],
+			'sql' => 'SELECT null FROM triggers WHERE triggerid='
+		]
+	];
+
+	public function checkLayout($template = false) {
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Configuration of '.$this->page_name.' prototypes');
-		$capital_name = ucfirst($this->page_name);
-		$this->page->assertHeader($capital_name.' prototypes');
-		$this->assertSame($this->headers, ($this->query('class:list-table')->asTable()->one())->getHeadersText());
-		$this->assertTableStats($this->amount);
+		$page_header  = ucfirst($this->page_name).' prototypes';
+		$this->page->assertHeader($page_header);
 		$table = $this->query('class:list-table')->asTable()->one();
+		$this->assertSame($this->layout_data[$this->page_name]['headers'], $table->getHeadersText());
+		$this->assertTableStats($this->entity_count);
 
 		// Check that Breadcrumbs exists.
 		$links = ($template) ? ['All templates', 'Template for prototype check'] : ['All hosts', 'Host for prototype check'];
@@ -67,14 +125,78 @@ class testPagePrototypes extends CWebTest {
 				$this->query('xpath://div[@class="header-navigation"]//a')->all()->asText()
 		);
 
-		// Check number amount near breadcrumbs.
-		$this->assertEquals($this->amount, $this->query('xpath://div[@class="header-navigation"]//a[text()='.
-				CXPathHelper::escapeQuotes($capital_name.' prototypes').']/following-sibling::sup')->one()->getText()
+		// Check counter value next to entity breadcrumb.
+		$this->assertEquals($this->entity_count, $this->query('xpath://div[@class="header-navigation"]//a[text()='.
+				CXPathHelper::escapeQuotes($page_header).']/following-sibling::sup')->one()->getText()
 		);
 
 		// Check displayed buttons and their default status after opening prototype page.
-		foreach ($this->buttons as $button => $status) {
+		foreach ($this->layout_data[$this->page_name]['buttons'] as $button => $status) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
+		}
+
+		switch ($this->page_name) {
+			case 'graph':
+				// Check Width and Height columns for graph prototype page.
+				foreach (['Width', 'Height'] as $column) {
+					$this->assertTableDataColumn([100, 200, 300, 400], $column);
+				}
+
+				break;
+
+			case 'item':
+				// Check additional popup configuration for item prototype page.
+				$table->getRow(0)->query('xpath:.//button')->one()->click();
+				$popup_menu = CPopupMenuElement::find()->waitUntilPresent()->one();
+				$this->assertEquals(['CONFIGURATION'], $popup_menu->getTitles()->asText());
+				$this->assertEquals(['Item prototype', 'Trigger prototypes', 'Create trigger prototype', 'Create dependent item'],
+					$popup_menu->getItems()->asText()
+				);
+
+				$menu_item_statuses = [
+					'Item prototype' => true,
+					'Trigger prototypes' => false,
+					'Create trigger prototype' => true,
+					'Create dependent item' => true
+				];
+
+				foreach ($menu_item_statuses as $item => $enabled) {
+					$this->assertTrue($popup_menu->getItem($item)->isEnabled($enabled));
+				}
+
+				$popup_menu->close();
+
+				break;
+
+			case 'host':
+				// Check Template column for host prototype page.
+				$template_row = $table->findRow('Name', '4 Host prototype monitored not discovered {#H}');
+				$template_row->assertValues(['Templates' => 'Template for host prototype']);
+				$this->assertTrue($template_row->getColumn('Templates')->isClickable());
+
+				break;
+
+			case 'trigger':
+				// Check Operational data and expression column - values should be displayed, on trigger prototype page.
+				$opdata = [
+					'12345',
+					'{#PROT_MAC}',
+					'test',
+					'!@#$%^&*',
+					'{$TEST}',
+					'🙂🙃'
+				];
+				$this->assertTableDataColumn($opdata, 'Operational data');
+				$trigger_row = $table->getRow(0);
+
+				$expression = ($template) ? 'Template' : 'Host';
+
+				$this->assertEquals('last(/'.$expression.' for prototype check/1_key[{#KEY}])=0',
+					$trigger_row->getColumn('Expression')->getText()
+				);
+				$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
+
+				break;
 		}
 
 		// Check tags (Graph prototypes doesn't have any tags).
@@ -91,65 +213,8 @@ class testPagePrototypes extends CWebTest {
 		}
 
 		// Check clickable headers.
-		foreach ($this->clickable_headers as $header) {
+		foreach ($this->layout_data[$this->page_name]['clickable_headers'] as $header) {
 			$this->assertTrue($table->query('link', $header)->one()->isClickable());
-		}
-
-		// Check additional popup configuration for item prototype page.
-		if ($this->page_name === 'item') {
-			$table->getRow(0)->query('xpath:.//button')->one()->click();
-			$this->page->waitUntilReady();
-			$popup_menu = CPopupMenuElement::find()->one()->waitUntilPresent();
-			$this->assertEquals(['CONFIGURATION'], $popup_menu->getTitles()->asText());
-			$this->assertEquals(['Item prototype', 'Trigger prototypes', 'Create trigger prototype', 'Create dependent item'],
-					$popup_menu->getItems()->asText()
-			);
-
-			$items = [
-				'Item prototype' => true,
-				'Trigger prototypes' => false,
-				'Create trigger prototype' => true,
-				'Create dependent item' => true
-			];
-
-			foreach ($items as $item => $enabled) {
-				$this->assertTrue($popup_menu->getItem($item)->isEnabled($enabled));
-			}
-		}
-
-		// Check Template column for host prototype page.
-		if ($this->page_name === 'host') {
-			$template_row = $table->findRow('Name', '4 Host prototype monitored not discovered {#H}');
-			$template_row->assertValues(['Templates' => 'Template for host prototype']);
-			$this->assertTrue($template_row->getColumn('Templates')->isClickable());
-		}
-
-		// Check Operational data and expression column - values should be displayed, on trigger prototype page.
-		if ($this->page_name === 'trigger') {
-			$opdata = [
-				'12345',
-				'{#PROT_MAC}',
-				'test',
-				'!@#$%^&*',
-				'{$TEST}',
-				'🙂🙃'
-			];
-			$this->assertTableDataColumn($opdata, 'Operational data');
-			$trigger_row = $table->getRow(0);
-
-			$expression = ($template) ? 'Template' : 'Host';
-
-			$this->assertEquals('last(/'.$expression.' for prototype check/1_key[{#KEY}])=0',
-					$trigger_row->getColumn('Expression')->getText()
-			);
-			$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
-		}
-
-		// Check Width and Height columns for graph prototype page.
-		if ($this->page_name === 'graph') {
-			foreach (['Width', 'Height'] as $column) {
-				$this->assertTableDataColumn([100, 200, 300, 400], $column);
-			}
 		}
 	}
 
@@ -720,10 +785,10 @@ class testPagePrototypes extends CWebTest {
 	 *
 	 * @param $data		data from data provider
 	 */
-	public function executeDiscoverEnable($data) {
+	public function checkTableAction($data) {
 		$table = $this->query('class:list-table')->asTable()->one();
 
-		// Find host prototype in table by name and check column data before update.
+		// Find prototype in table by name and check column data before update.
 		if (array_key_exists('name', $data)) {
 			$row = $table->findRow('Name', $data['name']);
 			$this->assertEquals($data['before'], $row->getColumn($data['column_check'])->getText());
@@ -731,7 +796,7 @@ class testPagePrototypes extends CWebTest {
 
 		// Click on button or on link in column (Create enabled or Discover).
 		if (array_key_exists('button', $data)) {
-			// If no Host prototype name in data provider, then select all existing in table host prototypes.
+			// If there is no prototype name in data provider, then select all existing in table host prototypes.
 			$selected = (array_key_exists('name', $data)) ? $data['name'] : null;
 			$this->selectTableRows($selected);
 			$this->query('button', $data['button'])->one()->click();
@@ -744,7 +809,7 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 
-		// Check column value for one prototype or for them all.
+		// Check column value for one or for all prototypes.
 		if (array_key_exists('name', $data)) {
 			$this->assertMessage(TEST_GOOD, ucfirst($this->page_name).' prototype updated');
 			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
@@ -887,22 +952,29 @@ class testPagePrototypes extends CWebTest {
 	 * Check Delete scenarios.
 	 *
 	 * @param $data		data from data provider
+	 * @param $ids		ID's of deleted data
 	 */
-	public function executeDelete($data) {
+	public function checkDelete($data, $ids) {
+		// Check that prototype exists in DB.
+		foreach ($ids as $id) {
+			$this->assertEquals(1, CDBHelper::getCount($this->layout_data[$this->page_name]['sql'].$id));
+		}
+
 		// Check that prototype exists and displayed in prototype table.
+		$prototype_names = $this->getTableColumnData('Name');
 		foreach ($data['name'] as $name) {
-			$this->assertTrue(in_array($name, $this->getTableColumnData('Name')));
+			$this->assertTrue(in_array($name, $prototype_names));
 		}
 
 		// Select prototype and click on Delete button.
 		$this->selectTableRows($data['name']);
 		$this->query('button:Delete')->one()->click();
 
-		// Check that after canceling Delete, prototype still exists in DB nad displayed in table.
+		// Check that after canceling Delete, prototype still exists in DB and displayed in table.
 		if (array_key_exists('cancel', $data)) {
 			$this->page->dismissAlert();
 			foreach ($data['name'] as $name) {
-				$this->assertTrue(in_array($name, $this->getTableColumnData('Name')));
+				$this->assertTrue(in_array($name, $prototype_names));
 			}
 		}
 		else {
@@ -914,6 +986,13 @@ class testPagePrototypes extends CWebTest {
 			foreach ($data['name'] as $name) {
 				$this->assertFalse(in_array($name, $this->getTableColumnData('Name')));
 			}
+		}
+
+		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
+
+		// Check prototype in DB.
+		foreach ($ids as $id) {
+			$this->assertEquals($count, CDBHelper::getCount($this->layout_data[$this->page_name]['sql'].$id));
 		}
 	}
 
@@ -1008,7 +1087,8 @@ class testPagePrototypes extends CWebTest {
 	}
 
 	/**
-	 * Check that empty values displayed in Trends and Interval columns for some item types and types of information.
+	 * Check that empty values displayed in Trends and Interval columns. SNMP, Zabbix trappers has empty values in trends column.
+	 * Dependent items has empty update interval column.
 	 * Only for Item prototype.
 	 */
 	public function checkNotDisplayedValues($data) {

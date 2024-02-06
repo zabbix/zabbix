@@ -28,17 +28,9 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPageHostPrototypes extends testPagePrototypes {
 
-	public $headers = ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'];
 	public $page_name = 'host';
-	public $amount = 4;
-	public $buttons = [
-		'Create enabled' => false,
-		'Create disabled' => false,
-		'Delete' => false,
-		'Create host prototype' => true
-	];
+	public $entity_count = 4;
 	public $tag = '1 Host prototype monitored discovered {#H}';
-	public $clickable_headers = ['Name', 'Create enabled', 'Discover'];
 
 	protected static $prototype_hostids;
 	protected static $host_druleids;
@@ -131,7 +123,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	public function testPageHostPrototypes_Layout() {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-		$this->layout();
+		$this->checkLayout();
 	}
 
 	/**
@@ -153,7 +145,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	public function testPageHostPrototypes_ButtonLink($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-		$this->executeDiscoverEnable($data);
+		$this->checkTableAction($data);
 	}
 
 	/**
@@ -162,20 +154,14 @@ class testPageHostPrototypes extends testPagePrototypes {
 	 * @dataProvider getHostsDeleteData
 	 */
 	public function testPageHostPrototypes_Delete($data) {
-		$sql = 'SELECT null FROM hosts WHERE hostid=';
 		$this->page->login()->open('host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
+		$ids = [];
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
+			$ids[] = self::$prototype_hostids[$name];
 		}
 
-		$this->executeDelete($data);
-
-		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
-
-		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_hostids[$name]));
-		}
+		$this->checkDelete($data, $ids);
 	}
 }

@@ -28,14 +28,8 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 
-	public $headers = ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'];
 	public $page_name = 'graph';
-	public $amount = 4;
-	public $buttons = [
-		'Delete' => false,
-		'Create graph prototype' => true
-	];
-	public $clickable_headers = ['Name', 'Graph type', 'Discover'];
+	public $entity_count = 4;
 
 	protected static $prototype_graphids;
 	protected static $host_druleids;
@@ -75,7 +69,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 				'delay' => 0
 			]
 		]);
-		$prototype_itemids = CDataHelper::getIds('name');
+		$prototype_itemid = CDataHelper::getIds('name')['1 Item prototype for graphs'];
 
 		CDataHelper::call('graphprototype.create', [
 			[
@@ -85,7 +79,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 				'graphtype' => 0,
 				'gitems' => [
 					[
-						'itemid' => $prototype_itemids['1 Item prototype for graphs'],
+						'itemid' => $prototype_itemid,
 						'color' => '00AA00'
 					]
 				]
@@ -98,7 +92,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 				'discover' => GRAPH_NO_DISCOVER,
 				'gitems' => [
 					[
-						'itemid' => $prototype_itemids['1 Item prototype for graphs'],
+						'itemid' => $prototype_itemid,
 						'color' => '00AA00'
 					]
 				]
@@ -110,7 +104,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 				'graphtype' => 2,
 				'gitems' => [
 					[
-						'itemid' => $prototype_itemids['1 Item prototype for graphs'],
+						'itemid' => $prototype_itemid,
 						'color' => '00AA00'
 					]
 				]
@@ -123,7 +117,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 				'discover' => GRAPH_NO_DISCOVER,
 				'gitems' => [
 					[
-						'itemid' => $prototype_itemids['1 Item prototype for graphs'],
+						'itemid' => $prototype_itemid,
 						'color' => '00AA00'
 					]
 				]
@@ -135,7 +129,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	public function testPagePrototypeGraphsTemplate_Layout() {
 		$this->page->login()->open('graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=' .
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
-		$this->layout(true);
+		$this->checkLayout(true);
 	}
 
 	/**
@@ -157,7 +151,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	public function testPagePrototypeGraphsTemplate_ButtonLink($data) {
 		$this->page->login()->open('graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
-		$this->executeDiscoverEnable($data);
+		$this->checkTableAction($data);
 	}
 
 	/**
@@ -166,20 +160,14 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	 * @dataProvider getGraphsDeleteData
 	 */
 	public function testPagePrototypeGraphsTemplate_Delete($data) {
-		$sql = 'SELECT null FROM graphs WHERE graphid=';
 		$this->page->login()->open('graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
+		$ids = [];
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_graphids[$name]));
+			$ids[] = self::$prototype_graphids[$name];
 		}
 
-		$this->executeDelete($data);
-
-		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
-
-		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_graphids[$name]));
-		}
+		$this->checkDelete($data, $ids);
 	}
 }

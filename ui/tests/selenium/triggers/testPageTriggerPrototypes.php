@@ -28,18 +28,9 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPageTriggerPrototypes extends testPagePrototypes {
 
-	public $headers = ['', 'Severity', 'Name', 'Operational data', 'Expression', 'Create enabled', 'Discover', 'Tags'];
 	public $page_name = 'trigger';
-	public $amount = 6;
-	public $buttons = [
-		'Create enabled' => false,
-		'Create disabled' => false,
-		'Mass update' => false,
-		'Delete' => false,
-		'Create trigger prototype' => true
-	];
+	public $entity_count = 6;
 	public $tag = '4 Trigger prototype monitored not discovered_{#KEY}';
-	public $clickable_headers = ['Severity', 'Name', 'Create enabled', 'Discover'];
 
 	protected static $prototype_triggerids;
 	protected static $host_druleids;
@@ -147,7 +138,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	public function testPageTriggerPrototypes_Layout() {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
 				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-		$this->layout();
+		$this->checkLayout();
 	}
 
 	/**
@@ -169,7 +160,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	public function testPageTriggerPrototypes_ButtonLink($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
 				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
-		$this->executeDiscoverEnable($data);
+		$this->checkTableAction($data);
 	}
 
 	/**
@@ -178,20 +169,14 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	 * @dataProvider getTriggersDeleteData
 	 */
 	public function testPageTriggerPrototypes_Delete($data) {
-		$sql = 'SELECT null FROM triggers WHERE triggerid=';
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&'.
 				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
 
+		$ids = [];
 		foreach ($data['name'] as $name) {
-			$this->assertEquals(1, CDBHelper::getCount($sql.self::$prototype_triggerids[$name]));
+			$ids[] = self::$prototype_triggerids[$name];
 		}
 
-		$this->executeDelete($data);
-
-		$count = (array_key_exists('cancel', $data)) ? 1 : 0;
-
-		foreach ($data['name'] as $name) {
-			$this->assertEquals($count, CDBHelper::getCount($sql.self::$prototype_triggerids[$name]));
-		}
+		$this->checkDelete($data, $ids);
 	}
 }
