@@ -39,7 +39,7 @@ const char	*zbx_mock_get_parameter_string(const char *path)
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
 
-		return "";
+		return NULL;
 	}
 
 	return parameter;
@@ -56,7 +56,7 @@ const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const ch
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
 
-		return "";
+		return NULL;
 	}
 
 	return member;
