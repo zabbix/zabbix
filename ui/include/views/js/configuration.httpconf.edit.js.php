@@ -258,7 +258,10 @@
 				popup_params = {names};
 			}
 
-			const overlay = PopUp('webscenario.step.edit', popup_params, {dialogueid: 'webscenario-step-edit'});
+			const overlay = PopUp('webscenario.step.edit', popup_params, {
+				dialogueid: 'webscenario-step-edit',
+				prevent_navigation: true
+			});
 
 			overlay.$dialogue[0].addEventListener('dialogue.submit', (e) => {
 				const new_row = this.#prepareStepRow({row_index, ...e.detail});
