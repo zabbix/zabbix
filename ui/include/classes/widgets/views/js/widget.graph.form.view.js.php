@@ -56,6 +56,7 @@ window.widget_graph_form = new class {
 		if (ms_itemid_input !== null) {
 			ms_itemid_input.disabled = is_graph;
 		}
+
 		if (ms_graphid_input !== null) {
 			ms_graphid_input.disabled = !is_graph;
 		}
