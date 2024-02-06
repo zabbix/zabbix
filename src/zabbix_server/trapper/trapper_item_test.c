@@ -30,7 +30,6 @@
 #include "zbxnum.h"
 #include "zbxsysinfo.h"
 #include "trapper_auth.h"
-
 #include "zbxpreproc.h"
 #include "zbxpreprocbase.h"
 #include "zbxdbhigh.h"
@@ -174,7 +173,7 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
 static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 		const struct zbx_json_parse *jp_options, const struct zbx_json_parse *jp_steps, char *value,
 		size_t value_size, char **values, zbx_timespec_t *ts, int *values_num, unsigned char *value_type,
-		zbx_vector_pp_step_ptr_t *steps, int *single, int *state, int *bypass_first, char **error)
+		zbx_vector_pp_step_ptr_t *steps, int *single, int state, int *bypass_first, char **error)
 {
 	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
 	const char		*ptr;
@@ -195,11 +194,6 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 		*single = 0;
 	else
 		*single = (0 == strcmp(buffer, "true") ? 1 : 0);
-
-	*state = 0;
-
-	if (SUCCEED == zbx_json_value_by_name(jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
-		*state = atoi(buffer);
 
 	zbx_timespec(&ts_now);
 
@@ -294,7 +288,7 @@ static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 			goto out;
 		}
 
-		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type || ZBX_STATE_NOT_SUPPORTED == *state)
+		if (ZBX_PREPROC_VALIDATE_NOT_SUPPORTED != step_type || ZBX_STATE_NOT_SUPPORTED == state)
 		{
 			step = (zbx_pp_step_t *)zbx_malloc(NULL, sizeof(zbx_pp_step_t));
 			step->type = step_type;
@@ -351,11 +345,11 @@ out:
  *                                                                            *
  ******************************************************************************/
 int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
-		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, struct zbx_json *json,
+		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, int state, struct zbx_json *json,
 		char **error)
 {
 	char				*values[2] = {NULL, NULL}, *preproc_error = NULL;
-	int				i, single, state, bypass_first, ret = FAIL, values_num = 0, first_step_type;
+	int				i, single, bypass_first, ret = FAIL, values_num = 0, first_step_type;
 	unsigned char			value_type;
 	zbx_vector_pp_step_ptr_t	steps;
 	zbx_timespec_t			ts[2];
@@ -369,7 +363,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 	zbx_pp_history_init(&history);
 
 	if (FAIL == trapper_parse_preproc_test(jp_item, jp_options, jp_steps, value, value_size, values, ts,
-			&values_num, &value_type, &steps, &single, &state, &bypass_first, error))
+			&values_num, &value_type, &steps, &single, state, &bypass_first, error))
 	{
 		goto out;
 	}
@@ -853,6 +847,17 @@ out:
 	return ret;
 }
 
+static int	try_find_preproc_value(const struct zbx_json_parse *jp_first, const char *name_first,
+		const struct zbx_json_parse *jp_second, char *name_second, char **value, size_t *value_size)
+{
+	int ret = zbx_json_value_by_name_dyn(jp_first, name_first, value, value_size, NULL);
+
+	if (FAIL == ret)
+		ret = zbx_json_value_by_name_dyn(jp_second, name_second, value, value_size, NULL);
+
+	return ret;
+}
+
 static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
@@ -860,9 +865,9 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
-	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL;
+	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN];
 	zbx_uint64_t		proxyid;
-	int			ret = FAIL;
+	int			ret = FAIL, state = 0;
 	size_t			original_size, value_size = 0;
 
 	zbx_user_init(&user);
@@ -894,11 +899,26 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	if (FAIL == zbx_json_brackets_by_name(&jp_item, ZBX_PROTO_TAG_STEPS, &jp_steps))
 		jp_steps.end = jp_steps.start = NULL;
 
-	if (NULL != jp_steps.start && (FAIL != zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_RUNTIME_ERROR, &value,
-			&value_size, NULL) || FAIL != zbx_json_value_by_name_dyn(&jp_item, ZBX_PROTO_TAG_VALUE, &value,
-			&value_size, NULL)))
+	if (NULL != jp_steps.start)
 	{
-		goto preproc_test;
+		int	value_found;
+
+		if (SUCCEED == zbx_json_value_by_name(&jp_options, ZBX_PROTO_TAG_STATE, buffer, sizeof(buffer), NULL))
+			state = atoi(buffer);
+
+		if (ZBX_STATE_NOT_SUPPORTED == state)
+		{
+			value_found = try_find_preproc_value(&jp_options, ZBX_PROTO_TAG_RUNTIME_ERROR, &jp_item,
+					ZBX_PROTO_TAG_VALUE, &value, &value_size);
+		}
+		else
+		{
+			value_found = try_find_preproc_value(&jp_item, ZBX_PROTO_TAG_VALUE, &jp_options,
+					ZBX_PROTO_TAG_RUNTIME_ERROR, &value, &value_size);
+		}
+
+		if (FAIL != value_found)
+			goto preproc_test;
 	}
 
 	if (SUCCEED == zbx_json_value_by_name(&jp_data, ZBX_PROTO_TAG_PROXYID, tmp, sizeof(tmp), NULL))
@@ -909,6 +929,9 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
 			config_externalscripts);
+
+	if (FAIL == ret)
+		state = ZBX_STATE_NOT_SUPPORTED;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() json.buffer:'%s'", __func__, json->buffer);
 
@@ -944,7 +967,7 @@ preproc_test:
 		goto out;
 
 	zbx_json_addobject(json, ZBX_PROTO_TAG_PREPROCESSING);
-	ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, json, error);
+	ret = trapper_preproc_test_run(&jp_item, &jp_options, &jp_steps, value, value_size, state, json, error);
 	zbx_json_close(json);
 out:
 	zbx_free(value);

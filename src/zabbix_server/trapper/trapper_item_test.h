@@ -33,7 +33,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 		int config_java_gateway_port, const char *config_externalscripts);
 
 int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct zbx_json_parse *jp_options,
-		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, struct zbx_json *json,
+		const struct zbx_json_parse *jp_steps, char *value, size_t value_size, int state, struct zbx_json *json,
 		char **error);
 
 #endif
