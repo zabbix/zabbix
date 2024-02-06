@@ -241,7 +241,7 @@ static void test_queue_ptr_remove_head_tail(void)
 	/* try removing value that is not in queue */
 
 	zbx_queue_ptr_create(&queue);
-	zbx_queue_ptr_reserve(&queue, int(values.values_num * 1.5));
+	zbx_queue_ptr_reserve(&queue, (int)(values.values_num * 1.5));
 	queue.tail_pos = values.values_num;
 	queue.head_pos = queue.tail_pos;
 

@@ -1068,12 +1068,13 @@ static int	DBcheck_nodes(void)
 int	zbx_db_check_version_and_upgrade(zbx_ha_mode_t ha_mode)
 {
 #define ZBX_DB_WAIT_UPGRADE	10
-	const char		*dbversion_table_name = "dbversion", *ha_node_table_name = "ha_node";
+	const char		*dbversion_table_name = "dbversion";
 	int			db_mandatory, db_optional, required, ret = FAIL, i;
 	zbx_dbpatch_t		**dbversion;
 	zbx_dbpatch_t		*patches;
 
 #ifndef HAVE_SQLITE3
+	const char		*ha_node_table_name = "ha_node";
 	int			total = 0, current = 0, completed, last_completed = -1, mandatory_num = 0;
 #endif
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
