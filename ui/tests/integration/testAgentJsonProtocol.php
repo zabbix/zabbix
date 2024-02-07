@@ -231,16 +231,16 @@ class testAgentJsonProtocol extends CIntegrationTest {
 			'item' => [
 				'type' => ITEM_TYPE_ZABBIX,
 				'key' => 'system.run[sleep ' . $sleep_sec . ' && echo ok]',
-				'timeout' => '6s',
+				'timeout' => '6s'
+			],
+			'host' => [
+				'tls_connect' => HOST_ENCRYPTION_NONE,
+				'proxyid' => '0',
 				'interface' => [
 					'address' => '127.0.0.1',
 					'port' => (int) $this->getConfigurationValue($agent_component, 'ListenPort'),
 					'type' => INTERFACE_TYPE_UNKNOWN
 				]
-			],
-			'host' => [
-				'tls_connect' => HOST_ENCRYPTION_NONE,
-				'proxyid' => '0'
 			]
 		];
 
