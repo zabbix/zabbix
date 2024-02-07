@@ -48,14 +48,14 @@ class testPagePrototypes extends CWebTest {
 	public static $entity_count;
 
 	/**
-	 * Name of item/trigger/graph/host that has tags.
+	 * Name of item/trigger/host prototype that has tags.
 	 */
 	public $tag;
 
 	/**
 	 * Layouts of prototype page and SQL used in delete scenarios.
 	 */
-	protected $layout_data = [
+	protected $layout_sql_data = [
 		'graph' => [
 			'headers' => ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'],
 			'clickable_headers' => ['Name', 'Graph type', 'Discover'],
@@ -102,13 +102,18 @@ class testPagePrototypes extends CWebTest {
 		]
 	];
 
+	/**
+	 * Check layout on prototype page.
+	 *
+	 * @param boolean $template    if true - prototype page in template should be checked
+	 */
 	public function checkLayout($template = false) {
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Configuration of '.$this->page_name.' prototypes');
 		$page_header  = ucfirst($this->page_name).' prototypes';
 		$this->page->assertHeader($page_header);
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertSame($this->layout_data[$this->page_name]['headers'], $table->getHeadersText());
+		$this->assertSame($this->layout_sql_data[$this->page_name]['headers'], $table->getHeadersText());
 		$this->assertTableStats(self::$entity_count);
 
 		// Check that Breadcrumbs exists.
@@ -131,7 +136,7 @@ class testPagePrototypes extends CWebTest {
 		);
 
 		// Check displayed buttons and their default status after opening prototype page.
-		foreach ($this->layout_data[$this->page_name]['buttons'] as $button => $status) {
+		foreach ($this->layout_sql_data[$this->page_name]['buttons'] as $button => $status) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
 		}
 
@@ -150,7 +155,7 @@ class testPagePrototypes extends CWebTest {
 				$popup_menu = CPopupMenuElement::find()->waitUntilPresent()->one();
 				$this->assertEquals(['CONFIGURATION'], $popup_menu->getTitles()->asText());
 				$this->assertEquals(['Item prototype', 'Trigger prototypes', 'Create trigger prototype', 'Create dependent item'],
-					$popup_menu->getItems()->asText()
+						$popup_menu->getItems()->asText()
 				);
 
 				$menu_item_statuses = [
@@ -213,7 +218,7 @@ class testPagePrototypes extends CWebTest {
 		}
 
 		// Check clickable headers.
-		foreach ($this->layout_data[$this->page_name]['clickable_headers'] as $header) {
+		foreach ($this->layout_sql_data[$this->page_name]['clickable_headers'] as $header) {
 			$this->assertTrue($table->query('link', $header)->one()->isClickable());
 		}
 	}
@@ -503,7 +508,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Check available sorting on prototype page.
 	 *
-	 * @param $data		data from data provider
+	 * @param array $data		data from data provider
 	 */
 	public function executeSorting($data) {
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -783,7 +788,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @param $data		data from data provider
+	 * @param array $data		data from data provider
 	 */
 	public function checkTableAction($data) {
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -951,13 +956,13 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Check Delete scenarios.
 	 *
-	 * @param $data		data from data provider
-	 * @param $ids		ID's of deleted data
+	 * @param array $data    data provider
+	 * @param array $ids     ID's of deleted entity
 	 */
 	public function checkDelete($data, $ids) {
 		// Check that prototype exists in DB.
 		foreach ($ids as $id) {
-			$this->assertEquals(1, CDBHelper::getCount($this->layout_data[$this->page_name]['sql'].$id));
+			$this->assertEquals(1, CDBHelper::getCount($this->layout_sql_data[$this->page_name]['sql'].$id));
 		}
 
 		// Check that prototype exists and displayed in prototype table.
@@ -992,7 +997,7 @@ class testPagePrototypes extends CWebTest {
 
 		// Check prototype in DB.
 		foreach ($ids as $id) {
-			$this->assertEquals($count, CDBHelper::getCount($this->layout_data[$this->page_name]['sql'].$id));
+			$this->assertEquals($count, CDBHelper::getCount($this->layout_sql_data[$this->page_name]['sql'].$id));
 		}
 	}
 
