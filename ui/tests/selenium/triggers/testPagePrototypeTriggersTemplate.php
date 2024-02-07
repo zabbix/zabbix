@@ -29,7 +29,6 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 
 	public $page_name = 'trigger';
-	public $entity_count = 6;
 	public $tag = '4 Trigger prototype monitored not discovered_{#KEY}';
 
 	protected $link = 'zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&';
@@ -127,6 +126,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 			]
 		]);
 		self::$prototype_triggerids = CDataHelper::getIds('description');
+		self::$entity_count = count(self::$prototype_triggerids);
 	}
 
 	public function testPagePrototypeTriggersTemplate_Layout() {

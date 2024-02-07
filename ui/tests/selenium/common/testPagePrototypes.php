@@ -45,7 +45,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * How much item/trigger/graph/host displayed in table result opening page.
 	 */
-	public $entity_count;
+	public static $entity_count;
 
 	/**
 	 * Name of item/trigger/graph/host that has tags.
@@ -109,7 +109,7 @@ class testPagePrototypes extends CWebTest {
 		$this->page->assertHeader($page_header);
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertSame($this->layout_data[$this->page_name]['headers'], $table->getHeadersText());
-		$this->assertTableStats($this->entity_count);
+		$this->assertTableStats(self::$entity_count);
 
 		// Check that Breadcrumbs exists.
 		$links = ($template) ? ['All templates', 'Template for prototype check'] : ['All hosts', 'Host for prototype check'];
@@ -126,7 +126,7 @@ class testPagePrototypes extends CWebTest {
 		);
 
 		// Check counter value next to entity breadcrumb.
-		$this->assertEquals($this->entity_count, $this->query('xpath://div[@class="header-navigation"]//a[text()='.
+		$this->assertEquals(self::$entity_count, $this->query('xpath://div[@class="header-navigation"]//a[text()='.
 				CXPathHelper::escapeQuotes($page_header).']/following-sibling::sup')->one()->getText()
 		);
 

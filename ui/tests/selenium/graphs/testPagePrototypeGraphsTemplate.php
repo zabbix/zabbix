@@ -29,7 +29,6 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 
 	public $page_name = 'graph';
-	public $entity_count = 4;
 
 	protected $link = 'graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
@@ -125,6 +124,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 			]
 		]);
 		self::$prototype_graphids = CDataHelper::getIds('name');
+		self::$entity_count = count(self::$prototype_graphids);
 	}
 
 	public function testPagePrototypeGraphsTemplate_Layout() {

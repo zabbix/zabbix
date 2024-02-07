@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 class testPageHostPrototypes extends testPagePrototypes {
 
 	public $page_name = 'host';
-	public $entity_count = 4;
 	public $tag = '1 Host prototype monitored discovered {#H}';
 
 	protected $link = 'host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
@@ -119,6 +118,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 			]
 		]);
 		self::$prototype_hostids = CDataHelper::getIds('host');
+		self::$entity_count = count(self::$prototype_hostids);
 	}
 
 	public function testPageHostPrototypes_Layout() {

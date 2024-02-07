@@ -29,7 +29,6 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 class testPageItemPrototypes extends testPagePrototypes {
 
 	public $page_name = 'item';
-	public $entity_count = 5;
 	public $tag = '5 Item prototype trapper with text type';
 
 	protected $link = 'zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid=';
@@ -151,6 +150,7 @@ class testPageItemPrototypes extends testPagePrototypes {
 		]);
 		$this->assertArrayHasKey('itemids', $item_prototype );
 		self::$prototype_itemids = CDataHelper::getIds('name');
+		self::$entity_count = count(self::$prototype_itemids);
 	}
 
 	public function testPageItemPrototypes_Layout() {
