@@ -6017,7 +6017,12 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 
 			if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				zbx_vector_uint64_append(&itemids, items->values[i]->itemid);
+				ZBX_DC_NUMITEM	*numitem;
+
+				numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &item->itemid);
+
+				if (NULL != numitem && 0 != numitem->trends)
+					zbx_vector_uint64_append(&itemids, items->values[i]->itemid);
 			}
 
 		}
