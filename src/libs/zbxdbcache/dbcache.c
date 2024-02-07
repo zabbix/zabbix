@@ -903,8 +903,6 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 					last_trend_discard = ts.sec;
 				}
 
-				zbx_hashset_iter_remove(&iter);
-
 				trend->clock = 0;
 				trend->num = 0;
 				memset(&trend->value_min, 0, sizeof(history_value_t));
