@@ -302,10 +302,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 
 	if ($is_template) {
 		$template = new CSpan(
-			(new CLink($db_host['name'], (new CUrl('zabbix.php'))
-				->setArgument('action', 'template.edit')
-				->setArgument('templateid', $db_host['templateid'])
-			))
+			(new CLink($db_host['name']))
 				->setAttribute('data-templateid', $db_host['templateid'])
 				->onClick('view.editTemplate(event, this.dataset.templateid);')
 		);
