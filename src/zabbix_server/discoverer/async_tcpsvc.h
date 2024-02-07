@@ -46,7 +46,7 @@ typedef struct zbx_tcpsvc_context
 	const char			*config_source_ip;
 	int				config_timeout;
 	unsigned char			svc_type;
-	int				(*validate_func)(const unsigned char, const char *, struct zbx_tcpsvc_context *);
+	int				(*validate_func)(struct zbx_tcpsvc_context *, const char *);
 	zbx_async_resolve_reverse_dns_t	resolve_reverse_dns;
 	zbx_async_rdns_step_t		rdns_step;
 	char				*reverse_dns;

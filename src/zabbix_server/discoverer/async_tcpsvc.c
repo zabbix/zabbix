@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 #include "async_tcpsvc.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
@@ -89,7 +88,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 
 #	define	SET_RESULT_FAIL(info)								\
 		SET_UI64_RESULT(&tcpsvc_context->item.result, 0);				\
-		tcpsvc_context->item.ret = SUCCEED;						\
+		tcpsvc_context->item.ret = FAIL;						\
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() FAIL:%s step '%s' event:%d key:%s", __func__,	\
 			info, get_tcpsvc_step_string(tcpsvc_context->step), event,		\
 			tcpsvc_context->item.key);
@@ -203,7 +202,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			{
 				int	val;
 
-				val = tcpsvc_context->validate_func(tcpsvc_context->svc_type, buf, tcpsvc_context);
+				val = tcpsvc_context->validate_func(tcpsvc_context, buf);
 
 				if (SUCCEED == val)
 				{
@@ -291,13 +290,12 @@ static int	async_check_ssh_validate(const char *data, zbx_tcpsvc_context_t *cont
 	return ret;
 }
 
-static int	async_check_service_validate(const unsigned char svc_type, const char *data,
-		zbx_tcpsvc_context_t *context)
+static int	async_check_service_validate(zbx_tcpsvc_context_t *context, const char *data)
 {
-	if (SVC_SSH == svc_type)
+	if (SVC_SSH == context->svc_type)
 		return NULL == data ? FAIL : async_check_ssh_validate(data, context);
 
-	return zbx_check_service_validate(svc_type, data);
+	return zbx_check_service_validate(context->svc_type, data);
 }
 
 int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RESULT *result,
@@ -338,7 +336,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 	tcpsvc_context->rdns_step = ZABBIX_ASYNC_STEP_DEFAULT;
 	tcpsvc_context->reverse_dns = NULL;
 
-	if (NOTSUPPORTED != async_check_service_validate(svc_type, NULL, NULL))
+	if (NOTSUPPORTED != async_check_service_validate(tcpsvc_context, NULL))
 		tcpsvc_context->validate_func = async_check_service_validate;
 
 	tcpsvc_context->config_source_ip = config_source_ip;

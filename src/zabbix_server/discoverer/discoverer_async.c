@@ -22,6 +22,7 @@
 #include "../poller/checks_snmp.h"
 #include "../poller/async_agent.h"
 #include "async_tcpsvc.h"
+#include "async_telnet.h"
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
 #include <event2/dns.h>
