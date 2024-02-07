@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-30T14:03:21Z'
+  date: '2024-02-07T12:29:54Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -82,7 +82,7 @@ zabbix_export:
             FROM sys.databases
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
-          description: 'Getting databases - database name and recovery model'
+          description: 'Getting databases - database name and recovery model.'
           tags:
             - tag: component
               value: raw
@@ -107,7 +107,7 @@ zabbix_export:
               m.mirroring_state_desc IS NOT NULL
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
-          description: 'Getting DB mirroring'
+          description: 'Getting DB mirroring.'
           tags:
             - tag: component
               value: raw
@@ -283,7 +283,7 @@ zabbix_export:
             FROM sys.dm_hadr_cluster_members
           username: '{$MSSQL.USER}'
           password: '{$MSSQL.PASSWORD}'
-          description: 'Getting quorum members - member name, type, state and number of quorum votes'
+          description: 'Getting quorum members - member name, type, state and number of quorum votes.'
           tags:
             - tag: component
               value: raw
@@ -430,6 +430,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -671,6 +674,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Cache Objects in use'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.cache_info.raw
           tags:
@@ -687,6 +693,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Cache Object Counts'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.cache_info.raw
           tags:
@@ -743,6 +752,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Database pages'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.buffer_manager.raw
           tags:
@@ -763,6 +775,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: mssql.db_info.raw
           tags:
@@ -824,6 +839,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -934,6 +952,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -996,6 +1017,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.sql_errors.raw
           tags:
@@ -1268,6 +1292,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: mssql.db_info.raw
           tags:
@@ -1288,6 +1315,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.db_info.raw
           tags:
@@ -1308,6 +1338,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1324,6 +1357,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Memory Grants Outstanding'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1340,6 +1376,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Memory Grants Pending'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1412,6 +1451,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.sql_errors.raw
           tags:
@@ -1615,6 +1657,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Processes blocked'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: mssql.general_statistics.raw
           tags:
@@ -1657,6 +1702,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -1776,6 +1824,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.access_methods.raw
           tags:
@@ -1794,6 +1845,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Target pages'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: mssql.buffer_manager.raw
           tags:
@@ -1814,6 +1868,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1855,6 +1912,9 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1913,6 +1973,9 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -1970,6 +2033,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''User Connections'')].cntr_value.first()'
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 10m
           master_item:
             key: mssql.general_statistics.raw
           tags:
@@ -2113,7 +2179,7 @@ zabbix_export:
               name: 'MSSQL: Percentage of work tables available from the work table cache is low'
               event_name: 'MSSQL: Percentage of work tables available from the work table cache is low (below {$MSSQL.WORKTABLES_FROM_CACHE_RATIO.MIN.CRIT}% for 5m)'
               priority: HIGH
-              description: 'A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system'
+              description: 'A value less than 90% may indicate insufficient memory, since execution plans are being dropped, or on 32-bit systems, may indicate the need for an upgrade to a 64-bit system.'
               tags:
                 - tag: scope
                   value: performance
@@ -2337,6 +2403,9 @@ zabbix_export:
                     - '$[?(@.type==''I'')].duration.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
               master_item:
                 key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
@@ -2409,6 +2478,9 @@ zabbix_export:
                     - '$[?(@.type==''D'')].duration.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
               master_item:
                 key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
@@ -2479,6 +2551,9 @@ zabbix_export:
                     - '$[?(@.type==''L'')].duration.first()'
                   error_handler: CUSTOM_VALUE
                   error_handler_params: '0'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
               master_item:
                 key: 'mssql.backup.raw["{#DBNAME}"]'
               tags:
@@ -2568,6 +2643,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Active Transactions'')].cntr_value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2590,6 +2668,9 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2635,6 +2716,9 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2657,6 +2741,9 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2679,6 +2766,9 @@ zabbix_export:
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2766,6 +2856,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Log Growths'')].cntr_value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2784,6 +2877,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Log Shrinks'')].cntr_value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2802,6 +2898,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Log Truncations'')].cntr_value.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -3431,6 +3530,9 @@ zabbix_export:
                 - type: SIMPLE_CHANGE
                   parameters:
                     - ''
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'db.odbc.get[get_db_mirroring","{$MSSQL.DSN}"]'
               tags:
@@ -3783,6 +3885,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.member_name==''{#MEMBER_NAME}'')].member_state.first()'
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'db.odbc.get[get_quorum_member,{$MSSQL.DSN}]'
               tags:
@@ -4804,7 +4909,7 @@ zabbix_export:
           color: F63100
           item:
             host: 'MSSQL by ODBC'
-            key: mssql.sql_compilations_sec.rate
+            key: mssql.sql_recompilations_sec.rate
     - uuid: 91af398cfb86472ba4a69e3df0816be7
       name: 'MSSQL: Database pages'
       graph_items:
