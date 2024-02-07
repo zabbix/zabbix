@@ -173,15 +173,8 @@ void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *item
 
 	for (i = 0; i < itemids->values_num; i++)
 	{
-		const ZBX_DC_NUMITEM	*numitem;
-
-		if (NULL == (numitem = zbx_hashset_search(&config->numitems, &itemids->values[i])))
-			continue;
-
-		if (0 == numitem->trends)
-			continue;
-
-		zbx_vector_uint64_remove_noorder(itemids, i--);
+		if (NULL != zbx_hashset_search(&config->items, &itemids->values[i]))
+			zbx_vector_uint64_remove_noorder(itemids, i--);
 	}
 
 	UNLOCK_CACHE_CONFIG_HISTORY;
