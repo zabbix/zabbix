@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,6 +32,8 @@ use Facebook\WebDriver\WebDriverBy;
  * - Clone maintenance.
  * - Delete maintenance.
  *
+ * @onBefore prepareMaintenanceData
+ *
  * @backup maintenances
  */
 class testFormMaintenance extends CLegacyWebTest {
@@ -50,6 +52,31 @@ class testFormMaintenance extends CLegacyWebTest {
 
 	public $name = 'Test maintenance';
 	public $periods_table = 'id:timeperiods';
+
+	public function prepareMaintenanceData() {
+		CDataHelper::call('maintenance.create', [
+			[
+				'name' => 'Maintenance for update (data collection)',
+				'maintenance_type' => MAINTENANCE_TYPE_NORMAL,
+				'active_since' => 1534885200,
+				'active_till' => 1534971600,
+				'description' => 'Test description update',
+				'groups' => [['groupid' => 4]], // Zabbix servers.
+				'tags_evaltype' => 2,
+				'tags' => [
+					['tag' => 'Tag1', 'operator' => MAINTENANCE_TAG_OPERATOR_LIKE, 'value' => 'A'],
+					['tag' => 'Tag2', 'operator' => MAINTENANCE_TAG_OPERATOR_EQUAL, 'value' => 'B']
+				],
+				'timeperiods' => [
+					[
+						'period' => 90000,
+						'timeperiod_type' => TIMEPERIOD_TYPE_ONETIME,
+						'start_date' => 1534950000
+					]
+				]
+			]
+		]);
+	}
 
 	/**
 	 * Create maintenance with periods and host group.

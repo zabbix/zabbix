@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -445,8 +445,8 @@ void	zbx_history_value2variant(const zbx_history_value_t *value, unsigned char v
  *          functions                                                         *
  *                                                                            *
  ******************************************************************************/
-void	zbx_history_check_version(struct zbx_json *json, int *result)
+void	zbx_history_check_version(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions)
 {
 	if (NULL != CONFIG_HISTORY_STORAGE_URL)
-		zbx_elastic_version_extract(json, result);
+		zbx_elastic_version_extract(json, result, config_allow_unsupported_db_versions);
 }

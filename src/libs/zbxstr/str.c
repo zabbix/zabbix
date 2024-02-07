@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -595,7 +595,7 @@ void	zbx_str_memcpy_alloc(char **str, size_t *alloc_len, size_t *offset, const c
 	(*str)[*offset] = '\0';
 }
 
-void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str)
+void	zbx_strquote_alloc_opt(char **str, size_t *str_alloc, size_t *str_offset, const char *value_str, int option)
 {
 	size_t		size;
 	const char	*src;
@@ -606,6 +606,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+					break;
+				ZBX_FALLTHROUGH;
 			case '"':
 				size++;
 		}
@@ -634,6 +637,9 @@ void	zbx_strquote_alloc(char **str, size_t *str_alloc, size_t *str_offset, const
 		switch (*src)
 		{
 			case '\\':
+				if (ZBX_STRQUOTE_SKIP_BACKSLASH == option)
+					break;
+				ZBX_FALLTHROUGH;
 			case '"':
 				*dst++ = '\\';
 				break;
@@ -1025,22 +1031,22 @@ static int	get_codepage(const char *encoding, unsigned int *codepage)
 			{1047, "IBM01047"}, {1140, "IBM01140"}, {1141, "IBM01141"}, {1142, "IBM01142"},
 			{1143, "IBM01143"}, {1144, "IBM01144"}, {1145, "IBM01145"}, {1146, "IBM01146"},
 			{1147, "IBM01147"}, {1148, "IBM01148"}, {1149, "IBM01149"}, {1200, "UTF-16"},
-			{1201, "UNICODEFFFE"}, {1250, "WINDOWS-1250"}, {1251, "WINDOWS-1251"}, {1252, "WINDOWS-1252"},
-			{1253, "WINDOWS-1253"}, {1254, "WINDOWS-1254"}, {1255, "WINDOWS-1255"}, {1256, "WINDOWS-1256"},
-			{1257, "WINDOWS-1257"}, {1258, "WINDOWS-1258"}, {1361, "JOHAB"}, {10000, "MACINTOSH"},
-			{10001, "X-MAC-JAPANESE"}, {10002, "X-MAC-CHINESETRAD"}, {10003, "X-MAC-KOREAN"},
-			{10004, "X-MAC-ARABIC"}, {10005, "X-MAC-HEBREW"}, {10006, "X-MAC-GREEK"},
-			{10007, "X-MAC-CYRILLIC"}, {10008, "X-MAC-CHINESESIMP"}, {10010, "X-MAC-ROMANIAN"},
-			{10017, "X-MAC-UKRAINIAN"}, {10021, "X-MAC-THAI"}, {10029, "X-MAC-CE"},
-			{10079, "X-MAC-ICELANDIC"}, {10081, "X-MAC-TURKISH"}, {10082, "X-MAC-CROATIAN"},
-			{12000, "UTF-32"}, {12001, "UTF-32BE"}, {20000, "X-CHINESE_CNS"}, {20001, "X-CP20001"},
-			{20002, "X_CHINESE-ETEN"}, {20003, "X-CP20003"}, {20004, "X-CP20004"}, {20005, "X-CP20005"},
-			{20105, "X-IA5"}, {20106, "X-IA5-GERMAN"}, {20107, "X-IA5-SWEDISH"}, {20108, "X-IA5-NORWEGIAN"},
-			{20127, "US-ASCII"}, {20261, "X-CP20261"}, {20269, "X-CP20269"}, {20273, "IBM273"},
-			{20277, "IBM277"}, {20278, "IBM278"}, {20280, "IBM280"}, {20284, "IBM284"}, {20285, "IBM285"},
-			{20290, "IBM290"}, {20297, "IBM297"}, {20420, "IBM420"}, {20423, "IBM423"}, {20424, "IBM424"},
-			{20833, "X-EBCDIC-KOREANEXTENDED"}, {20838, "IBM-THAI"}, {20866, "KOI8-R"}, {20871, "IBM871"},
-			{20880, "IBM880"}, {20905, "IBM905"}, {20924, "IBM00924"}, {20932, "EUC-JP"},
+			{1200, "UTF-16LE"}, {1201, "UNICODEFFFE"}, {1201, "UTF-16BE"}, {1250, "WINDOWS-1250"},
+			{1251, "WINDOWS-1251"}, {1252, "WINDOWS-1252"}, {1253, "WINDOWS-1253"}, {1254, "WINDOWS-1254"},
+			{1255, "WINDOWS-1255"}, {1256, "WINDOWS-1256"}, {1257, "WINDOWS-1257"}, {1258, "WINDOWS-1258"},
+			{1361, "JOHAB"}, {10000, "MACINTOSH"}, {10001, "X-MAC-JAPANESE"}, {10002, "X-MAC-CHINESETRAD"},
+			{10003, "X-MAC-KOREAN"}, {10004, "X-MAC-ARABIC"}, {10005, "X-MAC-HEBREW"},
+			{10006, "X-MAC-GREEK"}, {10007, "X-MAC-CYRILLIC"}, {10008, "X-MAC-CHINESESIMP"},
+			{10010, "X-MAC-ROMANIAN"}, {10017, "X-MAC-UKRAINIAN"}, {10021, "X-MAC-THAI"},
+			{10029, "X-MAC-CE"}, {10079, "X-MAC-ICELANDIC"}, {10081, "X-MAC-TURKISH"},
+			{10082, "X-MAC-CROATIAN"}, {12000, "UTF-32"}, {12001, "UTF-32BE"}, {20000, "X-CHINESE_CNS"},
+			{20001, "X-CP20001"}, {20002, "X_CHINESE-ETEN"}, {20003, "X-CP20003"}, {20004, "X-CP20004"},
+			{20005, "X-CP20005"}, {20105, "X-IA5"}, {20106, "X-IA5-GERMAN"}, {20107, "X-IA5-SWEDISH"},
+			{20108, "X-IA5-NORWEGIAN"}, {20127, "US-ASCII"}, {20261, "X-CP20261"}, {20269, "X-CP20269"},
+			{20273, "IBM273"}, {20277, "IBM277"}, {20278, "IBM278"}, {20280, "IBM280"}, {20284, "IBM284"},
+			{20285, "IBM285"}, {20290, "IBM290"}, {20297, "IBM297"}, {20420, "IBM420"}, {20423, "IBM423"},
+			{20424, "IBM424"}, {20833, "X-EBCDIC-KOREANEXTENDED"}, {20838, "IBM-THAI"}, {20866, "KOI8-R"},
+			{20871, "IBM871"}, {20880, "IBM880"}, {20905, "IBM905"}, {20924, "IBM00924"}, {20932, "EUC-JP"},
 			{20936, "X-CP20936"}, {20949, "X-CP20949"}, {21025, "CP1025"}, {21027, NULL}, {21866, "KOI8-U"},
 			{28591, "ISO-8859-1"}, {28592, "ISO-8859-2"}, {28593, "ISO-8859-3"}, {28594, "ISO-8859-4"},
 			{28595, "ISO-8859-5"}, {28596, "ISO-8859-6"}, {28597, "ISO-8859-7"}, {28598, "ISO-8859-8"},

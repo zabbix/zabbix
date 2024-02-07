@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,8 +32,8 @@ $form
 	->addField(
 		new CWidgetFieldSelectView($data['fields']['time_type'])
 	)
-	->addField(array_key_exists('itemid', $data['fields'])
-		? (new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
+	->addField(
+		(new CWidgetFieldMultiSelectItemView($data['fields']['itemid']))
 			->setPopupParameter('value_types', [
 				ITEM_VALUE_TYPE_FLOAT,
 				ITEM_VALUE_TYPE_STR,
@@ -41,7 +41,7 @@ $form
 				ITEM_VALUE_TYPE_UINT64,
 				ITEM_VALUE_TYPE_TEXT
 			])
-		: null
+			->addRowClass('js-row-itemid')
 	)
 	->addField(
 		new CWidgetFieldRadioButtonListView($data['fields']['clock_type'])

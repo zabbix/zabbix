@@ -946,13 +946,13 @@ zabbix_export:
                   var result = [];
                   
                   JSON.parse(value).forEach(function (netif) {
-                      if (typeof netif["{#IFNAME}"] === 'undefined') {
-                          netif["{#IFNAME}"] = netif["{#IFDESCR}"];
-                      }
-                      if (typeof netif["{#IFALIAS}"] === 'undefined') {
-                          netif["{#IFALIAS}"] = "";
-                      }
-                      result.push(netif);
+                  	if (typeof netif["{#IFNAME}"] === 'undefined') {
+                  		netif["{#IFNAME}"] = netif["{#IFDESCR}"];
+                  	}
+                  	if (typeof netif["{#IFALIAS}"] === 'undefined') {
+                  		netif["{#IFALIAS}"] = "";
+                  	}
+                  	result.push(netif);
                   });
                   
                   return JSON.stringify(result);

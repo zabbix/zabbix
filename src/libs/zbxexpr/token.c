@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -452,7 +452,8 @@ static int	token_parse_function(const char *expression, const char *func,
  *             macro      - [IN] beginning of the token                       *
  *             func       - [IN] beginning of the macro function in token     *
  *             token      - [OUT]                                             *
- *             token_type - [IN] type flag ZBX_TOKEN_FUNC_MACRO or            *
+ *             token_type - [IN] type flag ZBX_TOKEN_FUNC_MACRO,              *
+ *                               ZBX_TOKEN_USER_FUNC_MACRO or                 *
  *                               ZBX_TOKEN_LLD_FUNC_MACRO                     *
  *                                                                            *
  * Return value: SUCCEED - function macro was parsed successfully             *
@@ -497,7 +498,8 @@ static int	token_parse_func_macro(const char *expression, const char *macro, con
 	token->loc.r = ptr - expression;
 
 	/* initialize token data */
-	data = ZBX_TOKEN_FUNC_MACRO == token_type ? &token->data.func_macro : &token->data.lld_func_macro;
+	data = (ZBX_TOKEN_FUNC_MACRO == token_type || ZBX_TOKEN_USER_FUNC_MACRO == token_type) ?
+			&token->data.func_macro : &token->data.lld_func_macro;
 	data->macro.l = offset + 1;
 	data->macro.r = func_loc.l - 2;
 
@@ -892,8 +894,14 @@ int	zbx_token_parse_nested_macro(const char *expression, const char *macro, zbx_
 	/*               simple macros                        {{MACRO}:key.function()} */
 	if ('.' == ptr[1])
 	{
-		return token_parse_func_macro(expression, macro, ptr + 2, token, '#' == macro[2] ?
-				ZBX_TOKEN_LLD_FUNC_MACRO : ZBX_TOKEN_FUNC_MACRO);
+		int	token_type = ZBX_TOKEN_FUNC_MACRO;
+
+		if ('#' == macro[2])
+			token_type = ZBX_TOKEN_LLD_FUNC_MACRO;
+		else if ('$' == macro[2])
+			token_type = ZBX_TOKEN_USER_FUNC_MACRO;
+
+		return token_parse_func_macro(expression, macro, ptr + 2, token, token_type);
 	}
 	else if (0 != (token_search & ZBX_TOKEN_SEARCH_SIMPLE_MACRO) && '#' != macro[2] && ':' == ptr[1])
 		return token_parse_simple_macro_key(expression, macro, ptr + 2, token);

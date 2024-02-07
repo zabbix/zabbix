@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -32,11 +32,15 @@ typedef struct
 	char		*password;
 	char		*publickey;
 	char		*privatekey;
+	char		*name;
 	char		*command;
 	char		*command_orig;
 	zbx_uint64_t	scriptid;
 	unsigned char	host_access;
 	int		timeout;
+	unsigned char	manualinput;
+	char		*manualinput_validator;
+	unsigned char	manualinput_validator_type;
 }
 zbx_script_t;
 

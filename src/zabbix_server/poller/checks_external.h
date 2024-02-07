@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,6 @@
 #include "zbxcacheconfig.h"
 #include "module.h"
 
-int	get_value_external(const zbx_dc_item_t *item, AGENT_RESULT *result);
+int	get_value_external(const zbx_dc_item_t *item, const char *config_externalscripts, AGENT_RESULT *result);
 
 #endif

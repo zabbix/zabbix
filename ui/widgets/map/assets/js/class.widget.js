@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -55,7 +55,9 @@ class CWidgetMap extends CWidget {
 	promiseUpdate() {
 		const fields_data = this.getFieldsData();
 
-		if (this.isFieldsReferredDataUpdated('sysmapid')) {
+		fields_data.sysmapid = fields_data.sysmapid ? fields_data.sysmapid[0] : fields_data.sysmapid;
+
+		if (this.#map_svg !== null || this.isFieldsReferredDataUpdated('sysmapid')) {
 			this.#previous_maps = [];
 			this.#sysmapid = fields_data.sysmapid;
 			this.#map_svg = null;
@@ -84,6 +86,16 @@ class CWidgetMap extends CWidget {
 					this._startUpdating({delay_sec: this._update_retry_sec});
 				}
 			});
+	}
+
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		if (this.#map_svg !== null) {
+			readiness.push(this.#map_svg.promiseRendered());
+		}
+
+		return Promise.all(readiness);
 	}
 
 	getUpdateRequestData() {

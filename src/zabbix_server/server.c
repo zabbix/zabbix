@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,34 @@
 #	error SQLite is not supported as a main Zabbix database backend.
 #endif
 
+#include "postinit/postinit.h"
+#include "dbconfig/dbconfig.h"
+#include "discoverer/discoverer.h"
+#include "httppoller/httppoller.h"
+#include "housekeeper/housekeeper.h"
+#include "pinger/pinger.h"
+#include "poller/poller.h"
+#include "timer/timer.h"
+#include "trapper/trapper.h"
+#include "escalator/escalator.h"
+#include "proxypoller/proxypoller.h"
+#include "taskmanager/taskmanager_server.h"
+#include "connector/connector_manager.h"
+#include "connector/connector_worker.h"
+#include "service/service_manager.h"
+#include "housekeeper/trigger_housekeeper.h"
+#include "lld/lld_manager.h"
+#include "lld/lld_worker.h"
+#include "reporter/report_manager.h"
+#include "reporter/report_writer.h"
+#include "events/events.h"
+#include "ha/ha.h"
+#include "rtc/rtc_server.h"
+#include "stats/zabbix_stats.h"
+#include "diag/diag_server.h"
+#include "preproc/preproc_server.h"
+#include "lld/lld_protocol.h"
+
 #include "zbxexport.h"
 #include "zbxself.h"
 
@@ -34,61 +62,41 @@
 #include "zbxmodules.h"
 #include "zbxnix.h"
 #include "zbxcomms.h"
-
+#include "zbxcacheconfig.h"
+#include "zbxdb.h"
+#include "zbxdbhigh.h"
+#include "zbxeval.h"
+#include "zbxjson.h"
+#include "zbxpreproc.h"
+#include "zbxstr.h"
+#include "zbxtime.h"
+#include "zbxvmware.h"
 #include "zbxalerter.h"
 #include "zbxdbsyncer.h"
-#include "dbconfig/dbconfig.h"
-#include "discoverer/discoverer.h"
-#include "httppoller/httppoller.h"
-#include "housekeeper/housekeeper.h"
-#include "pinger/pinger.h"
-#include "poller/poller.h"
-#include "timer/timer.h"
-#include "trapper/trapper.h"
-#include "escalator/escalator.h"
-#include "proxypoller/proxypoller.h"
-#include "vmware/vmware.h"
-#include "taskmanager/taskmanager_server.h"
-#include "connector/connector_manager.h"
-#include "connector/connector_worker.h"
 #include "zbxconnector.h"
 #include "zbxdbconfigworker.h"
-#include "service/service_manager.h"
-#include "housekeeper/trigger_housekeeper.h"
-#include "lld/lld_manager.h"
-#include "lld/lld_worker.h"
-#include "reporter/report_manager.h"
-#include "reporter/report_writer.h"
-#include "events/events.h"
 #include "zbxcachevalue.h"
 #include "zbxcachehistory.h"
 #include "zbxhistory.h"
-#include "postinit.h"
 #include "zbxvault.h"
 #include "zbxtrends.h"
-#include "ha/ha.h"
 #include "zbxrtc.h"
-#include "rtc/rtc_server.h"
 #include "zbxstats.h"
-#include "stats/zabbix_stats.h"
-#include "zbxdiag.h"
-#include "diag/diag_server.h"
-#include "zbxip.h"
-#include "zbxsysinfo.h"
-#include "zbx_rtc_constants.h"
-#include "zbxthreads.h"
-#include "zbxicmpping.h"
-#include "zbxipcservice.h"
-#include "preproc/preproc_server.h"
-#include "zbxavailability.h"
-#include "zbxdbwrap.h"
-#include "lld/lld_protocol.h"
 #include "zbxdiscovery.h"
 #include "zbxscripts.h"
 #include "zbxsnmptrapper.h"
 #ifdef HAVE_OPENIPMI
 #include "zbxipmi.h"
 #endif
+#include "zbxavailability.h"
+#include "zbxdbwrap.h"
+#include "zbxip.h"
+#include "zbxsysinfo.h"
+#include "zbx_rtc_constants.h"
+#include "zbxthreads.h"
+#include "zbxicmpping.h"
+#include "zbxipcservice.h"
+#include "zbxdiag.h"
 
 ZBX_GET_CONFIG_VAR2(const char*, const char*, zbx_progname, NULL)
 
@@ -208,8 +216,7 @@ static int	*threads_flags;
 
 static int	ha_status = ZBX_NODE_STATUS_UNKNOWN;
 static int	ha_failover_delay = ZBX_HA_DEFAULT_FAILOVER_DELAY;
-static char	*CONFIG_PID_FILE = NULL;
-
+ZBX_GET_CONFIG_VAR2(char *, const char *, zbx_config_pid_file, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, problems_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, history_export, NULL)
 ZBX_GET_CONFIG_VAR(zbx_export_file_t *, trends_export, NULL)
@@ -289,7 +296,7 @@ static char	*config_server		= NULL;		/* not used in zabbix_server, required for 
 
 static int	config_housekeeping_frequency	= 1;
 static int	config_max_housekeeper_delete	= 5000;		/* applies for every separate field value */
-int	CONFIG_CONFSYNCER_FREQUENCY	= 10;
+static int	config_confsyncer_frequency	= 10;
 
 static int	config_problemhousekeeping_frequency = 60;
 
@@ -301,25 +308,24 @@ static zbx_uint64_t	config_conf_cache_size		= 32 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_history_cache_size	= 16 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_history_index_cache_size	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_trends_cache_size	= 4 * ZBX_MEBIBYTE;
-static zbx_uint64_t	CONFIG_TREND_FUNC_CACHE_SIZE	= 4 * ZBX_MEBIBYTE;
+static zbx_uint64_t	config_trend_func_cache_size	= 4 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_value_cache_size		= 8 * ZBX_MEBIBYTE;
 static zbx_uint64_t	config_vmware_cache_size	= 8 * ZBX_MEBIBYTE;
 
 static int	config_unreachable_period		= 45;
 static int	config_unreachable_delay		= 15;
 static int	config_max_concurrent_checks_per_poller	= 1000;
-int	CONFIG_LOG_LEVEL		= LOG_LEVEL_WARNING;
-char	*CONFIG_EXTERNALSCRIPTS		= NULL;
-int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
+static int	config_log_level		= LOG_LEVEL_WARNING;
+static char	*config_externalscripts		= NULL;
+static int	config_allow_unsupported_db_versions = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_unsafe_user_parameters, 0)
 
-char	*zbx_config_snmptrap_file	= NULL;
-
-char	*CONFIG_JAVA_GATEWAY		= NULL;
-int	CONFIG_JAVA_GATEWAY_PORT	= ZBX_DEFAULT_GATEWAY_PORT;
+static char	*zbx_config_snmptrap_file	= NULL;
+static char	*config_java_gateway		= NULL;
+static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
@@ -353,12 +359,12 @@ char	*CONFIG_HISTORY_STORAGE_URL		= NULL;
 char	*CONFIG_HISTORY_STORAGE_OPTS		= NULL;
 int	CONFIG_HISTORY_STORAGE_PIPELINES	= 0;
 
-char	*CONFIG_STATS_ALLOWED_IP	= NULL;
+static char	*config_stats_allowed_ip	= NULL;
 static int	config_tcp_max_backlog_size	= SOMAXCONN;
 
 static char	*zbx_config_webservice_url	= NULL;
 
-int	CONFIG_SERVICEMAN_SYNC_FREQUENCY	= 60;
+static int	config_service_manager_sync_frequency = 60;
 
 static int	config_vps_limit		= 0;
 static int	config_vps_overcommit_limit	= 0;
@@ -609,8 +615,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_snmptrap_file)
 		zbx_config_snmptrap_file = zbx_strdup(zbx_config_snmptrap_file, "/tmp/zabbix_traps.tmp");
 
-	if (NULL == CONFIG_PID_FILE)
-		CONFIG_PID_FILE = zbx_strdup(CONFIG_PID_FILE, "/tmp/zabbix_server.pid");
+	if (NULL == zbx_config_pid_file)
+		zbx_config_pid_file = zbx_strdup(zbx_config_pid_file, "/tmp/zabbix_server.pid");
 
 	if (NULL == zbx_config_alert_scripts_path)
 		zbx_config_alert_scripts_path = zbx_strdup(zbx_config_alert_scripts_path, DEFAULT_ALERT_SCRIPTS_PATH);
@@ -627,8 +633,8 @@ static void	zbx_set_defaults(void)
 	if (NULL == zbx_config_fping6_location)
 		zbx_config_fping6_location = zbx_strdup(zbx_config_fping6_location, "/usr/sbin/fping6");
 #endif
-	if (NULL == CONFIG_EXTERNALSCRIPTS)
-		CONFIG_EXTERNALSCRIPTS = zbx_strdup(CONFIG_EXTERNALSCRIPTS, DEFAULT_EXTERNAL_SCRIPTS_PATH);
+	if (NULL == config_externalscripts)
+		config_externalscripts = zbx_strdup(config_externalscripts, DEFAULT_EXTERNAL_SCRIPTS_PATH);
 #ifdef HAVE_LIBCURL
 	if (NULL == config_ssl_cert_location)
 		config_ssl_cert_location = zbx_strdup(config_ssl_cert_location, DEFAULT_SSL_CERT_LOCATION);
@@ -685,7 +691,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if ((NULL == CONFIG_JAVA_GATEWAY || '\0' == *CONFIG_JAVA_GATEWAY) &&
+	if ((NULL == config_java_gateway || '\0' == *config_java_gateway) &&
 			0 < CONFIG_FORKS[ZBX_PROCESS_TYPE_JAVAPOLLER])
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"JavaGateway\" configuration parameter is not specified or empty");
@@ -699,7 +705,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (0 != CONFIG_TREND_FUNC_CACHE_SIZE && 128 * ZBX_KIBIBYTE > CONFIG_TREND_FUNC_CACHE_SIZE)
+	if (0 != config_trend_func_cache_size && 128 * ZBX_KIBIBYTE > config_trend_func_cache_size)
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "\"TrendFunctionCacheSize\" configuration parameter must be either 0"
 				" or greater than 128KB");
@@ -712,7 +718,7 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 		err = 1;
 	}
 
-	if (NULL != CONFIG_STATS_ALLOWED_IP && FAIL == zbx_validate_peer_list(CONFIG_STATS_ALLOWED_IP, &ch_error))
+	if (NULL != config_stats_allowed_ip && FAIL == zbx_validate_peer_list(config_stats_allowed_ip, &ch_error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "invalid entry in \"StatsAllowedIP\" configuration parameter: %s", ch_error);
 		zbx_free(ch_error);
@@ -841,9 +847,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1000},
 		{"StartEscalators",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_ESCALATOR],		TYPE_INT,
 			PARM_OPT,	1,			100},
-		{"JavaGateway",			&CONFIG_JAVA_GATEWAY,			TYPE_STRING,
+		{"JavaGateway",			&config_java_gateway,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"JavaGatewayPort",		&CONFIG_JAVA_GATEWAY_PORT,		TYPE_INT,
+		{"JavaGatewayPort",		&config_java_gateway_port,		TYPE_INT,
 			PARM_OPT,	1024,			32767},
 		{"SNMPTrapperFile",		&zbx_config_snmptrap_file,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -857,11 +863,11 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"TrendCacheSize",		&config_trends_cache_size,		TYPE_UINT64,
 			PARM_OPT,	128 * ZBX_KIBIBYTE,	__UINT64_C(2) * ZBX_GIBIBYTE},
-		{"TrendFunctionCacheSize",	&CONFIG_TREND_FUNC_CACHE_SIZE,		TYPE_UINT64,
+		{"TrendFunctionCacheSize",	&config_trend_func_cache_size,		TYPE_UINT64,
 			PARM_OPT,	0,			__UINT64_C(2) * ZBX_GIBIBYTE},
 		{"ValueCacheSize",		&config_value_cache_size,		TYPE_UINT64,
 			PARM_OPT,	0,			__UINT64_C(64) * ZBX_GIBIBYTE},
-		{"CacheUpdateFrequency",	&CONFIG_CONFSYNCER_FREQUENCY,		TYPE_INT,
+		{"CacheUpdateFrequency",	&config_confsyncer_frequency,		TYPE_INT,
 			PARM_OPT,	1,			SEC_PER_HOUR},
 		{"HousekeepingFrequency",	&config_housekeeping_frequency,		TYPE_INT,
 			PARM_OPT,	0,			24},
@@ -889,9 +895,9 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	1024,			32767},
 		{"SourceIP",			&zbx_config_source_ip,			TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"DebugLevel",			&CONFIG_LOG_LEVEL,			TYPE_INT,
+		{"DebugLevel",			&config_log_level,			TYPE_INT,
 			PARM_OPT,	0,			5},
-		{"PidFile",			&CONFIG_PID_FILE,			TYPE_STRING,
+		{"PidFile",			&zbx_config_pid_file,			TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"LogType",			&log_file_cfg.log_type_str,		TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -901,7 +907,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			1024},
 		{"AlertScriptsPath",		&zbx_config_alert_scripts_path,		TYPE_STRING,
 			PARM_OPT,	0,			0},
-		{"ExternalScripts",		&CONFIG_EXTERNALSCRIPTS,		TYPE_STRING,
+		{"ExternalScripts",		&config_externalscripts,		TYPE_STRING,
 			PARM_OPT,	0,			0},
 		{"DBHost",			&(zbx_config_dbhigh->config_dbhost),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -929,7 +935,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPort",			&(zbx_config_dbhigh->config_dbport),	TYPE_INT,
 			PARM_OPT,	1024,			65535},
-		{"AllowUnsupportedDBVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
+		{"AllowUnsupportedDBVersions",	&config_allow_unsupported_db_versions,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"DBTLSConnect",		&(zbx_config_dbhigh->config_db_tls_connect),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1017,7 +1023,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	ZBX_MEBIBYTE,	ZBX_GIBIBYTE},
 		{"StartLLDProcessors",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_LLDWORKER],		TYPE_INT,
 			PARM_OPT,	1,			100},
-		{"StatsAllowedIP",		&CONFIG_STATS_ALLOWED_IP,		TYPE_STRING_LIST,
+		{"StatsAllowedIP",		&config_stats_allowed_ip,		TYPE_STRING_LIST,
 			PARM_OPT,	0,			0},
 		{"StartHistoryPollers",		&CONFIG_FORKS[ZBX_PROCESS_TYPE_HISTORYPOLLER],		TYPE_INT,
 			PARM_OPT,	0,			1000},
@@ -1027,7 +1033,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"ProblemHousekeepingFrequency",	&config_problemhousekeeping_frequency,	TYPE_INT,
 			PARM_OPT,	1,			3600},
-		{"ServiceManagerSyncFrequency",	&CONFIG_SERVICEMAN_SYNC_FREQUENCY,	TYPE_INT,
+		{"ServiceManagerSyncFrequency",	&config_service_manager_sync_frequency,	TYPE_INT,
 			PARM_OPT,	1,			3600},
 		{"ListenBacklog",		&config_tcp_max_backlog_size,		TYPE_INT,
 			PARM_OPT,	0,			INT_MAX},
@@ -1079,16 +1085,6 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 static void	zbx_free_config(void)
 {
 	zbx_strarr_free(&CONFIG_LOAD_MODULE);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: callback function for providing PID file path to libraries        *
- *                                                                            *
- ******************************************************************************/
-static const char	*get_pid_file_path(void)
-{
-	return CONFIG_PID_FILE;
 }
 
 static void	zbx_on_exit(int ret)
@@ -1326,7 +1322,7 @@ int	main(int argc, char **argv)
 		exit(SUCCEED == ret ? EXIT_SUCCESS : EXIT_FAILURE);
 	}
 
-	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_pid_file_path, zbx_on_exit,
+	return zbx_daemon_start(config_allow_root, CONFIG_USER, t.flags, get_zbx_config_pid_file, zbx_on_exit,
 			log_file_cfg.log_type, log_file_cfg.log_file_name, NULL, get_zbx_threads, get_zbx_threads_num);
 }
 
@@ -1336,10 +1332,10 @@ static void	zbx_check_db(void)
 	int		ret;
 
 	memset(&db_version_info, 0, sizeof(db_version_info));
-	ret = zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, zbx_program_type);
+	ret = zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type);
 
 	if (SUCCEED == ret)
-		ret = zbx_db_check_extension(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS);
+		ret = zbx_db_check_extension(&db_version_info, config_allow_unsupported_db_versions);
 
 	if (SUCCEED == ret)
 	{
@@ -1380,7 +1376,7 @@ static void	zbx_check_db(void)
 		zbx_db_version_json_create(&db_version_json, &db_version_info);
 
 		if (SUCCEED == ret)
-			zbx_history_check_version(&db_version_json, &ret);
+			zbx_history_check_version(&db_version_json, &ret, config_allow_unsupported_db_versions);
 
 		zbx_db_flush_version_requirements(db_version_json.buffer);
 		zbx_json_free(&db_version_json);
@@ -1442,10 +1438,13 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_poller_args		poller_args = {&config_comms, get_zbx_program_type, get_zbx_progname,
 							ZBX_NO_POLLER, config_startup_time, config_unavailable_delay,
 							config_unreachable_period, config_unreachable_delay,
-							config_max_concurrent_checks_per_poller};
+							config_max_concurrent_checks_per_poller, get_config_forks,
+							config_java_gateway, config_java_gateway_port, config_externalscripts};
 	zbx_thread_trapper_args		trapper_args = {&config_comms, &zbx_config_vault, get_zbx_program_type,
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
-							config_proxydata_frequency, get_config_forks};
+							config_proxydata_frequency, get_config_forks,
+							config_stats_allowed_ip, config_java_gateway,
+							config_java_gateway_port, config_externalscripts};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
 							get_config_forks};
@@ -1470,8 +1469,9 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_taskmanager_args	taskmanager_args = {zbx_config_timeout, config_startup_time};
 	zbx_thread_dbconfig_args	dbconfig_args = {&zbx_config_vault, zbx_config_timeout,
 							config_proxyconfig_frequency, config_proxydata_frequency,
-							zbx_config_source_ip, config_ssl_ca_location,
-							config_ssl_cert_location, config_ssl_key_location};
+							config_confsyncer_frequency, zbx_config_source_ip,
+							config_ssl_ca_location, config_ssl_cert_location,
+							config_ssl_key_location};
 	zbx_thread_alerter_args		alerter_args = {zbx_config_source_ip, config_ssl_ca_location};
 	zbx_thread_pinger_args		pinger_args = {zbx_config_timeout};
 	zbx_thread_pp_manager_args	preproc_man_args = {
@@ -1486,7 +1486,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 									config_ssl_cert_location,
 									config_ssl_key_location};
 	zbx_thread_report_manager_args	report_manager_args = {get_config_forks};
-	zbx_thread_alert_syncer_args	alert_syncer_args = {CONFIG_CONFSYNCER_FREQUENCY};
+	zbx_thread_alert_syncer_args	alert_syncer_args = {config_confsyncer_frequency};
 	zbx_thread_alert_manager_args	alert_manager_args = {get_config_forks, get_zbx_config_alert_scripts_path,
 								zbx_config_dbhigh, zbx_config_source_ip};
 	zbx_thread_lld_manager_args	lld_manager_args = {get_config_forks};
@@ -1495,7 +1495,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 	zbx_thread_vmware_args			vmware_args = {zbx_config_source_ip, config_vmware_frequency,
 								config_vmware_perf_frequency, config_vmware_timeout};
 	zbx_thread_timer_args		timer_args = {get_config_forks};
-	zbx_thread_snmptrapper_args	snmptrapper_args = {zbx_config_snmptrap_file};
+	zbx_thread_snmptrapper_args	snmptrapper_args = {.config_snmptrap_file = zbx_config_snmptrap_file,
+								.config_ha_node_name = CONFIG_HA_NODE_NAME};
+	zbx_thread_service_manager_args	service_manager_args = {.config_timeout = zbx_config_timeout,
+								.config_service_manager_sync_frequency =
+								config_service_manager_sync_frequency};
 
 	if (SUCCEED != zbx_init_database_cache(get_zbx_program_type, zbx_sync_server_history, config_history_cache_size,
 			config_history_index_cache_size, &config_trends_cache_size, &error))
@@ -1536,7 +1540,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		return FAIL;
 	}
 
-	if (SUCCEED != zbx_tfc_init(CONFIG_TREND_FUNC_CACHE_SIZE, &error))
+	if (SUCCEED != zbx_tfc_init(config_trend_func_cache_size, &error))
 	{
 		zabbix_log(LOG_LEVEL_CRIT, "cannot initialize trends read cache: %s", error);
 		zbx_free(error);
@@ -1604,6 +1608,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 		{
 			case ZBX_PROCESS_TYPE_SERVICEMAN:
 				threads_flags[i] = ZBX_THREAD_PRIORITY_SECOND;
+				thread_args.args = &service_manager_args;
 				zbx_thread_start(service_manager_thread, &thread_args, &zbx_threads[i]);
 				break;
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
@@ -1611,7 +1616,12 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				thread_args.args = &dbconfig_args;
 				zbx_thread_start(dbconfig_thread, &thread_args, &zbx_threads[i]);
 
-				if (FAIL == (ret = zbx_rtc_wait_config_sync(rtc, rtc_process_request_ex_server)))
+				/* wait for service manager startup */
+				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc, rtc_process_request_ex_server)))
+					goto out;
+
+				/* wait for configuration sync */
+				if (FAIL == (ret = zbx_rtc_wait_for_sync_finish(rtc, rtc_process_request_ex_server)))
 					goto out;
 
 				if (SUCCEED != (ret = zbx_ha_get_status(CONFIG_HA_NODE_NAME, ha_stat, ha_failover,
@@ -1639,7 +1649,7 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 				}
 
 				/* update maintenance states */
-				zbx_dc_update_maintenances();
+				zbx_dc_update_maintenances(MAINTENANCE_TIMER_PENDING);
 
 				zbx_db_close();
 				break;
@@ -1826,7 +1836,7 @@ static int	server_restart_logger(char **error)
 	if (SUCCEED != zbx_locks_create(error))
 		return FAIL;
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, error))
 		return FAIL;
 
 	return SUCCEED;
@@ -1993,7 +2003,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		exit(EXIT_FAILURE);
 	}
 
-	if (SUCCEED != zbx_open_log(&log_file_cfg, CONFIG_LOG_LEVEL, syslog_app_name, &error))
+	if (SUCCEED != zbx_open_log(&log_file_cfg, config_log_level, syslog_app_name, &error))
 	{
 		zbx_error("cannot open log: %s", error);
 		zbx_free(error);

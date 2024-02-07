@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -745,8 +745,9 @@ class CMacrosResolverGeneral {
 						$param = strtr($hist_function_parser->getParam($i), $macros);
 
 						if ($parameter['type'] != CHistFunctionParser::PARAM_TYPE_PERIOD) {
-							$param = CExpressionParser::quoteString($param, true,
-								$parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED
+							$force = $parameter['type'] == CHistFunctionParser::PARAM_TYPE_QUOTED;
+							$param = CHistFunctionParser::quoteParam($param, $force,
+								['usermacros' => true, 'lldmacros' => true]
 							);
 						}
 
@@ -2910,5 +2911,38 @@ class CMacrosResolverGeneral {
 		}
 
 		return $new_array;
+	}
+
+	/**
+	 * Get manualinput macros.
+	 *
+	 * @param array  $macros
+	 * @param array  $macros[<id>]
+	 * @param array  $macros[<id>][<macro>]
+	 * @param array  $macro_values
+	 * @param array  $macro_values[<id>]
+	 * @param string $macro_values[<id>][<token>]
+	 * @param array  $manualinput_values
+	 * @param string $manualinput_values[<id>]
+	 *
+	 * @return array
+	 */
+	protected static function getManualInputMacros(array $macros, array $macro_values,
+			array $manualinput_values): array {
+		foreach ($macros as $id => $macro_tokens) {
+			if (array_key_exists($id, $manualinput_values)) {
+				$value = $manualinput_values[$id];
+
+				foreach ($macro_tokens as $macro => $tokens) {
+					foreach ($tokens as $token) {
+						$macro_values[$id][$token['token']] = array_key_exists('macrofunc', $token)
+							? CMacroFunction::calcMacrofunc($value, $token['macrofunc'])
+							: $value;
+					}
+				}
+			}
+		}
+
+		return $macro_values;
 	}
 }

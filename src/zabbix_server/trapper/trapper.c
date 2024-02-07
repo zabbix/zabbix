@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -59,8 +59,6 @@ zbx_get_program_type_f	trapper_get_program_type(void)
 {
 	return zbx_get_program_type_cb;
 }
-
-extern size_t				(*find_psk_in_cache)(const unsigned char *, unsigned char *, unsigned int *);
 
 typedef struct
 {
@@ -889,22 +887,24 @@ out:
 #undef ZBX_GET_STATUS_FULL
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: process Zabbix stats request                                      *
- *                                                                            *
- * Parameters: sock                - [IN] request socket                      *
- *             jp                  - [IN] request data                        *
- *             config_comms        - [IN] Zabbix server/proxy configuration   *
- *                        for communication                                   *
- *             config_startup_time - [IN] program startup time                *
- *                                                                            *
- * Return value:  SUCCEED - processed successfully                            *
- *                FAIL - an error occurred                                    *
- *                                                                            *
- ******************************************************************************/
+/********************************************************************************
+ *                                                                              *
+ * Purpose: processes Zabbix stats request                                      *
+ *                                                                              *
+ * Parameters: sock                    - [IN] request socket                    *
+ *             jp                      - [IN] request data                      *
+ *             config_comms            - [IN] Zabbix server/proxy configuration *
+ *                                            for communication                 *
+ *             config_startup_time     - [IN] program startup time              *
+ *             config_stats_allowed_ip - [IN]                                   *
+ *                                                                              *
+ * Return value:  SUCCEED - processed successfully                              *
+ *                FAIL - an error occurred                                      *
+ *                                                                              *
+ ********************************************************************************/
 static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_parse *jp,
-		const zbx_config_comms_args_t *config_comms, int config_startup_time)
+		const zbx_config_comms_args_t *config_comms, int config_startup_time,
+		const char *config_stats_allowed_ip)
 {
 	struct zbx_json	json;
 	char		type[MAX_STRING_LEN], error[MAX_STRING_LEN];
@@ -912,11 +912,11 @@ static int	send_internal_stats_json(zbx_socket_t *sock, const struct zbx_json_pa
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-	if (NULL == CONFIG_STATS_ALLOWED_IP ||
-			SUCCEED != zbx_tcp_check_allowed_peers(sock, CONFIG_STATS_ALLOWED_IP))
+	if (NULL == config_stats_allowed_ip ||
+			SUCCEED != zbx_tcp_check_allowed_peers(sock, config_stats_allowed_ip))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, "failed to accept an incoming stats request: %s",
-				NULL == CONFIG_STATS_ALLOWED_IP ? "StatsAllowedIP not set" : zbx_socket_strerror());
+				NULL == config_stats_allowed_ip ? "StatsAllowedIP not set" : zbx_socket_strerror());
 		zbx_strscpy(error, "Permission denied.");
 		goto out;
 	}
@@ -1109,7 +1109,8 @@ static int	comms_parse_response(char *xml, char *host, size_t host_len, char *ke
 static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
-		zbx_get_config_forks_f get_config_forks)
+		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
 {
 	int	ret = SUCCEED;
 
@@ -1179,7 +1180,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ZABBIX_STATS))
 		{
-			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time);
+			ret = send_internal_stats_json(sock, &jp, config_comms, config_startup_time,
+					config_stats_allowed_ip);
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_PREPROCESSING_TEST))
 		{
@@ -1196,7 +1198,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			if (0 != (zbx_get_program_type_cb() & ZBX_PROGRAM_TYPE_SERVER))
 			{
 				zbx_trapper_item_test(sock, &jp, config_comms, config_startup_time,
-						zbx_get_program_type_cb());
+						zbx_get_program_type_cb(), progname, get_config_forks,
+						config_java_gateway, config_java_gateway_port, config_externalscripts);
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_ACTIVE_CHECK_HEARTBEAT))
@@ -1204,7 +1207,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			ret = process_active_check_heartbeat(&jp);
 		}
 		else if (SUCCEED != trapper_process_request(value, sock, &jp, ts, config_comms, config_vault,
-				proxydata_frequency, zbx_get_program_type_cb, events_cbs))
+				proxydata_frequency, zbx_get_program_type_cb, events_cbs, get_config_forks))
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "unknown request received from \"%s\": [%s]", sock->peer,
 				value);
@@ -1296,7 +1299,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
-		zbx_get_config_forks_f get_config_forks)
+		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
 {
 	ssize_t	bytes_received;
 
@@ -1304,7 +1308,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		return;
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
-			events_cbs, proxydata_frequency, get_config_forks);
+			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
+			config_java_gateway, config_java_gateway_port, config_externalscripts);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1334,8 +1339,7 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 	memcpy(&s, trapper_args_in->listen_sock, sizeof(zbx_socket_t));
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb);
-	find_psk_in_cache = zbx_dc_get_psk_by_identity;
+	zbx_tls_init_child(trapper_args_in->config_comms->config_tls, zbx_get_program_type_cb, zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);
 
@@ -1401,7 +1405,11 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 			process_trapper_child(&s, &ts, trapper_args_in->config_comms, trapper_args_in->config_vault,
 					trapper_args_in->config_startup_time, trapper_args_in->events_cbs,
 					trapper_args_in->proxydata_frequency,
-					trapper_args_in->get_process_forks_cb_arg);
+					trapper_args_in->get_process_forks_cb_arg,
+					trapper_args_in->config_stats_allowed_ip, trapper_args_in->progname,
+					trapper_args_in->config_java_gateway,
+					trapper_args_in->config_java_gateway_port,
+					trapper_args_in->config_externalscripts);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

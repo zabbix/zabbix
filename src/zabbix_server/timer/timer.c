@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -30,6 +30,7 @@
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbx_host_constants.h"
+#include "zbxservice.h"
 
 /* addition data for event maintenance calculations to pair with zbx_event_suppress_query_t */
 typedef struct
@@ -154,6 +155,25 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
 	zbx_free(sql);
 }
 
+static void     service_send_suppression_data(const zbx_vector_uint64_t *eventids, int suppressed)
+{
+	unsigned char   *data = NULL;
+	size_t          data_alloc = 0, data_offset = 0;
+	int             i;
+
+	for (i = 0; i < eventids->values_num; i++)
+		zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventids->values[i]);
+
+	if (NULL == data)
+		return;
+
+	if (suppressed == 0)
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, (zbx_uint32_t)data_offset);
+	else
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, (zbx_uint32_t)data_offset);
+	zbx_free(data);
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: removes expired event_suppress records                            *
@@ -161,10 +181,32 @@ static void	db_update_host_maintenances(const zbx_vector_host_maintenance_diff_p
  ******************************************************************************/
 static void	db_remove_expired_event_suppress_data(time_t now)
 {
+	zbx_vector_uint64_t	eventids;
+	zbx_db_row_t		row;
+	zbx_db_result_t		result;
+
+	zbx_vector_uint64_create(&eventids);
+
+	result = zbx_db_select("select eventid from event_suppress where suppress_until<" ZBX_FS_TIME_T
+			" and suppress_until<>0", (zbx_fs_time_t)now);
+
+	while (NULL != (row = zbx_db_fetch(result)))
+	{
+		zbx_uint64_t	eventid;
+		ZBX_STR2UINT64(eventid, row[0]);
+
+		zbx_vector_uint64_append(&eventids, eventid);
+	}
+	zbx_db_free_result(result);
+
 	zbx_db_begin();
 	zbx_db_execute("delete from event_suppress where suppress_until<" ZBX_FS_TIME_T " and suppress_until<>0",
 			(zbx_fs_time_t)now);
 	zbx_db_commit();
+
+	service_send_suppression_data(&eventids, 0);
+
+	zbx_vector_uint64_destroy(&eventids);
 }
 
 /******************************************************************************
@@ -295,7 +337,7 @@ static void	db_get_query_events(zbx_vector_event_suppress_query_ptr_t *event_que
 
 	result = zbx_db_select("select eventid,maintenanceid,suppress_until"
 			" from event_suppress"
-			" where " ZBX_SQL_MOD(eventid, %d) "=%d"
+			" where " ZBX_SQL_MOD(eventid, %d) "=%d and maintenanceid is not null"
 			" order by eventid",
 			get_forks_cb(ZBX_PROCESS_TYPE_TIMER), process_num - 1);
 
@@ -382,11 +424,13 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 {
 	zbx_vector_event_suppress_query_ptr_t	event_queries;
 	zbx_vector_event_suppress_data_ptr_t	event_data;
+	zbx_vector_uint64_t			s_eventids;
 
 	*suppressed_num = 0;
 
 	zbx_vector_event_suppress_query_ptr_create(&event_queries);
 	zbx_vector_event_suppress_data_ptr_create(&event_data);
+	zbx_vector_uint64_create(&s_eventids);
 
 	db_get_query_events(&event_queries, &event_data, process_num, get_forks_cb);
 
@@ -399,7 +443,7 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 		zbx_event_suppress_query_t	*query;
 		zbx_event_suppress_data_t	*data;
 		zbx_vector_uint64_pair_t	del_event_maintenances;
-		zbx_vector_uint64_t		maintenanceids;
+		zbx_vector_uint64_t		maintenanceids, eventids;
 		zbx_uint64_pair_t		pair;
 
 		zbx_vector_uint64_create(&maintenanceids);
@@ -499,10 +543,12 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 							(int)query->maintenances.values[k].second);
 
 					(*suppressed_num)++;
+					zbx_vector_uint64_append(&s_eventids, query->eventid);
 				}
 			}
 		}
 
+		zbx_vector_uint64_create(&eventids);
 		for (int i = 0; i < del_event_maintenances.values_num; i++)
 		{
 			zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
@@ -512,9 +558,14 @@ static void	db_update_event_suppress_data(int *suppressed_num, int process_num, 
 						del_event_maintenances.values[i].first,
 						del_event_maintenances.values[i].second);
 
+			zbx_vector_uint64_append(&eventids, del_event_maintenances.values[i].first);
+
 			if (FAIL == zbx_db_execute_overflowed_sql(&sql, &sql_alloc, &sql_offset))
 				goto cleanup;
 		}
+		service_send_suppression_data(&eventids, 0);
+
+		zbx_vector_uint64_destroy(&eventids);
 
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
@@ -534,6 +585,8 @@ cleanup:
 
 		zbx_vector_uint64_pair_destroy(&del_event_maintenances);
 		zbx_vector_uint64_destroy(&maintenanceids);
+
+		service_send_suppression_data(&s_eventids, 1);
 	}
 
 	zbx_vector_event_suppress_data_ptr_clear_ext(&event_data, event_suppress_data_free);
@@ -541,6 +594,8 @@ cleanup:
 
 	zbx_vector_event_suppress_query_ptr_clear_ext(&event_queries, zbx_event_suppress_query_free);
 	zbx_vector_event_suppress_query_ptr_destroy(&event_queries);
+
+	zbx_vector_uint64_destroy(&s_eventids);
 }
 
 /******************************************************************************
@@ -594,7 +649,7 @@ static int	update_host_maintenances(void)
 ZBX_THREAD_ENTRY(timer_thread, args)
 {
 #define ZBX_MAINTENANCE_TIMER_DELAY	SEC_PER_MIN
-	time_t			maintenance_time = 0, update_time = 0;
+	time_t			schedule_time = 0, update_time = 0;
 	char			*info = NULL;
 	size_t			info_alloc = 0, info_offset = 0;
 	const zbx_thread_info_t	*thread_info = &((zbx_thread_args_t *)args)->info;
@@ -623,17 +678,25 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 
 		if (1 == process_num)
 		{
+			zbx_maintenance_timer_t	maintenance_timer;
+
+			if (ZBX_MAINTENANCE_TIMER_DELAY <= sec - (double)schedule_time)
+				maintenance_timer = MAINTENANCE_TIMER_PENDING;
+			else
+				maintenance_timer = MAINTENANCE_TIMER_INITIALIZED;
+
 			/* start update process only when all timers have finished their updates */
-			if (sec - (double)maintenance_time >= ZBX_MAINTENANCE_TIMER_DELAY &&
+			if ((SUCCEED == zbx_dc_maintenance_check_immediate_update() ||
+					MAINTENANCE_TIMER_PENDING == maintenance_timer) &&
 					FAIL == zbx_dc_maintenance_check_update_flags())
 			{
 				zbx_setproctitle("%s #%d [%s, processing maintenances]",
 						get_process_type_string(process_type), process_num, info);
 
-				update = zbx_dc_update_maintenances();
+				update = zbx_dc_update_maintenances(maintenance_timer);
 
 				/* force maintenance updates at server startup */
-				if (0 == maintenance_time)
+				if (0 == schedule_time)
 					update = SUCCEED;
 
 				/* update hosts if there are modified (stopped, started, changed) maintenances */
@@ -642,7 +705,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 				else
 					hosts_num = 0;
 
-				db_remove_expired_event_suppress_data((time_t)sec);
+				if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+					db_remove_expired_event_suppress_data((time_t)sec);
 
 				if (SUCCEED == update)
 				{
@@ -659,7 +723,8 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 						"updated %d hosts, suppressed %d events in " ZBX_FS_DBL " sec",
 						hosts_num, events_num, zbx_time() - sec);
 
-				update_time = (time_t)sec;
+				if (MAINTENANCE_TIMER_PENDING == maintenance_timer)
+					update_time = (time_t)sec;
 			}
 		}
 		else if (SUCCEED == zbx_dc_maintenance_check_update_flag(process_num))
@@ -677,12 +742,12 @@ ZBX_THREAD_ENTRY(timer_thread, args)
 			zbx_dc_maintenance_reset_update_flag(process_num);
 		}
 
-		if (maintenance_time != update_time)
+		if (schedule_time != update_time)
 		{
 			update_time -= update_time % 60;
-			maintenance_time = update_time;
+			schedule_time = update_time;
 
-			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)maintenance_time))))
+			if (0 > (idle = (int)(ZBX_MAINTENANCE_TIMER_DELAY - (zbx_time() - (double)schedule_time))))
 				idle = 0;
 
 			zbx_setproctitle("%s #%d [%s, idle %d sec]",

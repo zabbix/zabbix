@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,6 +86,8 @@ zbx_uint64_t	mock_eval_read_rules(const char *path)
 			rules |= ZBX_EVAL_PROCESS_ERROR;
 		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_COMPOUND_CONST"))
 			rules |= ZBX_EVAL_PARSE_COMPOUND_CONST;
+		else if (0 == strcmp(flag, "ZBX_EVAL_PARSE_STR_V64_COMPAT"))
+			rules |= ZBX_EVAL_PARSE_STR_V64_COMPAT;
 		else
 			fail_msg("Unsupported flag: %s", flag);
 

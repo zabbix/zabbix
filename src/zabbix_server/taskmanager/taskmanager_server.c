@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -19,9 +19,9 @@
 
 #include "taskmanager_server.h"
 
-#include "../db_lengths.h"
+#include "../db_lengths_constants.h"
 #include "../events/events.h"
-#include "../actions.h"
+#include "../actions/actions.h"
 
 #include "zbxservice.h"
 #include "zbxnix.h"
@@ -1008,16 +1008,36 @@ static void	tm_process_passive_proxy_cache_reload_request(zbx_ipc_async_socket_t
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
 	}
 
-	zbx_audit_prepare();
-	zbx_audit_proxy_config_reload(proxyid, hostname);
-	zbx_audit_flush();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
+	zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxyid, hostname);
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
+}
+
+#define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
+#define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
+#define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
+static void	tm_service_manager_send_suppression_action(zbx_uint64_t eventid, zbx_uint64_t action)
+{
+	unsigned char	*data = NULL;
+	size_t          data_alloc = 0, data_offset = 0;
+
+	zbx_service_serialize_id(&data, &data_alloc, &data_offset, eventid);
+
+	if (NULL == data)
+		return;
+
+	if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS)
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_UNSUPPRESS, data, (zbx_uint32_t)data_offset);
+	else if (action == ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS)
+		zbx_service_flush(ZBX_IPC_SERVICE_SERVICE_EVENTS_SUPPRESS, data, (zbx_uint32_t)data_offset);
+	else
+		THIS_SHOULD_NEVER_HAPPEN;
+
+	zbx_free(data);
 }
 
 static void	tm_process_temp_suppression(const char *data)
 {
-#define ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS		32
-#define ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS	64
-#define ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME		0
 	struct zbx_json_parse	jp;
 	char			tmp_eventid[MAX_ID_LEN], tmp_userid[MAX_ID_LEN], tmp_ts[MAX_ID_LEN], tmp_action[12];
 	zbx_uint64_t		eventid, userid, action;
@@ -1124,10 +1144,12 @@ static void	tm_process_temp_suppression(const char *data)
 	}
 	else
 		THIS_SHOULD_NEVER_HAPPEN;
+
+	tm_service_manager_send_suppression_action(eventid, action);
+}
 #undef ZBX_TM_TEMP_SUPPRESION_ACTION_SUPPRESS
 #undef ZBX_TM_TEMP_SUPPRESION_ACTION_UNSUPPRESS
 #undef ZBX_TM_TEMP_SUPPRESION_INDEFINITE_TIME
-}
 
 /******************************************************************************
  *                                                                            *
@@ -1448,7 +1470,7 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 
 	zabbix_log(LOG_LEVEL_WARNING, "reloading configuration cache on all proxies");
 
-	zbx_audit_prepare();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	for (int i = 0; i < proxies.values_num; i++)
 	{
@@ -1471,10 +1493,10 @@ static void	tm_reload_each_proxy_cache(zbx_ipc_async_socket_t *rtc)
 				notify_proxypollers = 1;
 		}
 
-		zbx_audit_proxy_config_reload(proxy->proxyid, proxy->name);
+		zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxy->proxyid, proxy->name);
 	}
 
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	if (0 != notify_proxypollers)
 		zbx_ipc_async_socket_send(rtc, ZBX_RTC_PROXYPOLLER_PROCESS, NULL, 0);
@@ -1525,7 +1547,7 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 
 	zbx_vector_tm_task_create(&tasks_active);
 
-	zbx_audit_prepare();
+	zbx_audit_prepare(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	for (const char *ptr = NULL; NULL != (ptr = zbx_json_next(&jp_data, ptr));)
 	{
@@ -1560,11 +1582,11 @@ static void	tm_reload_proxy_cache_by_names(zbx_ipc_async_socket_t *rtc, const un
 					zbx_vector_str_append(&proxynames_log, zbx_strdup(NULL, name));
 			}
 
-			zbx_audit_proxy_config_reload(proxyid, name);
+			zbx_audit_proxy_config_reload(ZBX_AUDIT_TASKS_RELOAD_CONTEXT, proxyid, name);
 		}
 	}
 
-	zbx_audit_flush();
+	zbx_audit_flush(ZBX_AUDIT_TASKS_RELOAD_CONTEXT);
 
 	if (1 == proxynames_log.values_num)
 	{

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -57,7 +57,7 @@ void	zbx_history_sql_init(zbx_history_iface_t *hist, unsigned char value_type);
 
 /* elastic hist */
 int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type, char **error);
-void	zbx_elastic_version_extract(struct zbx_json *json, int *result);
+void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_allow_unsupported_db_versions);
 zbx_uint32_t	zbx_elastic_version_get(void);
 
 #endif

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,6 +23,9 @@ class CWidgetPieChart extends CWidget {
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V = 8;
 	static ZBX_STYLE_DASHBOARD_WIDGET_PADDING_H = 10;
 
+	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
+	static LEGEND_LINE_HEIGHT = 18;
+
 	/**
 	 * @type {CSVGPie|null}
 	 */
@@ -32,6 +35,16 @@ class CWidgetPieChart extends CWidget {
 		if (this.getState() === WIDGET_STATE_ACTIVE && this.#pie_chart !== null) {
 			this.#pie_chart.setSize(this.#getSize());
 		}
+	}
+
+	promiseReady() {
+		const readiness = [super.promiseReady()];
+
+		if (this.#pie_chart !== null) {
+			readiness.push(this.#pie_chart.promiseRendered());
+		}
+
+		return Promise.all(readiness);
 	}
 
 	getUpdateRequestData() {
@@ -150,13 +163,17 @@ class CWidgetPieChart extends CWidget {
 		const legend = this._body.querySelector('.svg-pie-chart-legend');
 
 		if (legend !== null) {
-			const box = legend.getBoundingClientRect();
+			const legend_lines = getComputedStyle(legend).getPropertyValue('--lines');
 
-			size.height -= box.height + CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V;
-		}
+			let pie_chart_height = size.height
+				- (legend_lines * CWidgetPieChart.LEGEND_LINE_HEIGHT
+					+ CWidgetPieChart.ZBX_STYLE_DASHBOARD_WIDGET_PADDING_V);
 
-		if (size.height < 0) {
-			size.height = 0;
+			if (pie_chart_height < 0) {
+				pie_chart_height = 0;
+			}
+
+			size.height = pie_chart_height;
 		}
 
 		return size;

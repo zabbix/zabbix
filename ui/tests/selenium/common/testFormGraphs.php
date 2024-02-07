@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -559,7 +559,7 @@ class testFormGraphs extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'fields' => [
-						'Name' => 'Empty Y MIN and MAX itmes',
+						'Name' => 'Empty Y MIN and MAX items',
 						'Width' => 200,
 						'Height' => 400,
 						'Graph type' => CFormElement::RELOADABLE_FILL('Normal'),
@@ -1098,6 +1098,7 @@ class testFormGraphs extends CWebTest {
 	}
 
 	/**
+	 * Function checks available item types in dialog form.
 	 *
 	 * @param CFormElement	$form		form element of widget
 	 * @param string		$button		name of a button

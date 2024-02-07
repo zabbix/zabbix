@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@ void	zbx_audit_ha_create_entry(int audit_action, const char *nodeid, const char 
 {
 	zbx_audit_entry_t	local_audit_entry, *plocal_audit_entry = &local_audit_entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_HA_CONTEXT);
 
 	local_audit_entry.id = 0;
 	local_audit_entry.cuid = (char *)nodeid;
@@ -47,7 +47,7 @@ void	zbx_audit_ha_add_create_fields(const char *nodeid, const char *name, int st
 {
 	zbx_audit_entry_t	*entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_HA_CONTEXT);
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 
@@ -61,7 +61,7 @@ void	zbx_audit_ha_update_field_string(const char *nodeid, const char *key, const
 {
 	zbx_audit_entry_t	*entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_HA_CONTEXT);
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 	zbx_audit_entry_append_string(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);
@@ -71,7 +71,7 @@ void	zbx_audit_ha_update_field_int(const char *nodeid, const char *key, int old_
 {
 	zbx_audit_entry_t	*entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_HA_CONTEXT);
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_UPDATE, key, old_value, new_value);
@@ -81,7 +81,7 @@ void	zbx_audit_ha_add_field_int(const char *nodeid, const char *key, int value)
 {
 	zbx_audit_entry_t	*entry;
 
-	RETURN_IF_AUDIT_OFF();
+	RETURN_IF_AUDIT_OFF(ZBX_AUDIT_HA_CONTEXT);
 
 	entry = zbx_audit_get_entry(0, nodeid, AUDIT_HA_NODE_ID);
 	zbx_audit_entry_append_int(entry, ZBX_AUDIT_ACTION_ADD, key, value);

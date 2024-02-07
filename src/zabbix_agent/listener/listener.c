@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -26,6 +26,7 @@
 #include "zbxstr.h"
 #include "zbxtime.h"
 #include "zbx_rtc_constants.h"
+#include "zbxjson.h"
 
 #if defined(ZABBIX_SERVICE)
 #	include "zbxwinservice.h"
@@ -36,66 +37,176 @@
 #ifndef _WINDOWS
 static volatile sig_atomic_t	need_update_userparam;
 #endif
+static int	process_passive_checks_json(zbx_socket_t *s, int config_timeout, struct zbx_json_parse *jp)
+{
+	struct zbx_json_parse	jp_data, jp_row;
+	const char		*p = NULL;
+	size_t			key_alloc = 0;
+	char			tmp[MAX_STRING_LEN], error_tmp[MAX_STRING_LEN], *key = NULL, *error = NULL;
+	int			timeout, ret = SUCCEED;
+	struct zbx_json		j;
+	AGENT_RESULT		result;
+	char			**value;
+
+	zbx_json_init(&j, ZBX_JSON_STAT_BUF_LEN);
+	zbx_json_addstring(&j, ZBX_PROTO_TAG_VERSION, ZABBIX_VERSION_SHORT, ZBX_JSON_TYPE_STRING);
+
+	if (FAIL == zbx_json_value_by_name(jp, ZBX_PROTO_TAG_REQUEST, tmp, sizeof(tmp), NULL))
+	{
+		error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object: %s",
+				ZBX_PROTO_TAG_REQUEST, zbx_json_strerror());
+		goto fail;
+	}
+
+	if (0 != strcmp(ZBX_PROTO_VALUE_GET_PASSIVE_CHECKS, tmp))
+	{
+		error = zbx_dsprintf(NULL, "unknown request \"%s\"", tmp);
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_brackets_by_name(jp, ZBX_PROTO_TAG_DATA, &jp_data))
+	{
+		error = zbx_dsprintf(NULL, "cannot find the \"%s\" array in the received JSON object: %s",
+				ZBX_PROTO_TAG_DATA, zbx_json_strerror());
+		goto fail;
+	}
+
+	if (NULL == (p = zbx_json_next(&jp_data, p)))
+	{
+		error = zbx_dsprintf(NULL, "received empty \"%s\" tag", ZBX_PROTO_TAG_DATA);
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_brackets_open(p, &jp_row))
+	{
+		error = zbx_dsprintf(NULL, "%s", zbx_json_strerror());
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name(&jp_row, ZBX_PROTO_TAG_TIMEOUT, tmp, sizeof(tmp), NULL))
+	{
+		error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object: %s",
+				ZBX_PROTO_TAG_TIMEOUT, zbx_json_strerror());
+		goto fail;
+	}
+
+	if (FAIL == zbx_json_value_by_name_dyn(&jp_row, ZBX_PROTO_TAG_KEY, &key, &key_alloc,
+			NULL))
+	{
+		error = zbx_dsprintf(NULL, "cannot find the \"%s\" object in the received JSON object: %s",
+				ZBX_PROTO_TAG_KEY, zbx_json_strerror());
+		goto fail;
+	}
+
+	zbx_init_agent_result(&result);
+
+	zbx_json_addarray(&j, ZBX_PROTO_TAG_DATA);
+	zbx_json_addobject(&j, NULL);
+
+	if (FAIL == zbx_validate_item_timeout(tmp, &timeout, error_tmp, sizeof(error_tmp)))
+	{
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, error_tmp, ZBX_JSON_TYPE_STRING);
+	}
+	else
+	{
+		if (SUCCEED == zbx_execute_agent_check(key, ZBX_PROCESS_WITH_ALIAS, &result, timeout))
+		{
+			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_VALUE, *value, ZBX_JSON_TYPE_STRING);
+		}
+		else
+		{
+			if (NULL != (value = ZBX_GET_MSG_RESULT(&result)))
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, *value, ZBX_JSON_TYPE_STRING);
+			else
+				zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, ZBX_NOTSUPPORTED, ZBX_JSON_TYPE_STRING);
+		}
+	}
+
+	zbx_json_close(&j);
+	zbx_json_close(&j);
+
+	zbx_free_agent_result(&result);
+fail:
+	if (NULL != error)
+		zbx_json_addstring(&j, ZBX_PROTO_TAG_ERROR, error, ZBX_JSON_TYPE_STRING);
+
+	zbx_json_close(&j);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", j.buffer);
+	ret = zbx_tcp_send_bytes_to(s, j.buffer, j.buffer_size, config_timeout);
+
+	zbx_free(key);
+	zbx_json_free(&j);
+	zbx_free(error);
+
+	return ret;
+}
+
 
 static void	process_listener(zbx_socket_t *s, int config_timeout)
 {
-	AGENT_RESULT	result;
-	char		**value = NULL;
-	int		ret;
+	int	ret;
 
 	if (SUCCEED == (ret = zbx_tcp_recv_to(s, config_timeout)))
 	{
-		zbx_uint32_t	timeout;
+		struct zbx_json_parse	jp;
 
 		zbx_rtrim(s->buffer, "\r\n");
 
 		zabbix_log(LOG_LEVEL_DEBUG, "Requested [%s]", s->buffer);
 
-		if (0 != s->reserved_payload)
-			timeout = s->reserved_payload;
-		else
-			timeout = (zbx_uint32_t)config_timeout;
-
-		zbx_init_agent_result(&result);
-
-		if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result, (int)timeout))
+		if (SUCCEED == zbx_json_open(s->buffer, &jp))
 		{
-			if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
-				ret = zbx_tcp_send_to(s, *value, config_timeout);
-			}
+			ret = process_passive_checks_json(s, config_timeout, &jp);
 		}
 		else
 		{
-			value = ZBX_GET_MSG_RESULT(&result);
+			AGENT_RESULT	result;
+			char		**value = NULL;
 
-			if (NULL != value)
+			zbx_init_agent_result(&result);
+
+			if (SUCCEED == zbx_execute_agent_check(s->buffer, ZBX_PROCESS_WITH_ALIAS, &result,
+					config_timeout))
 			{
-				static char	*buffer = NULL;
-				static size_t	buffer_alloc = 256;
-				size_t		buffer_offset = 0;
-
-				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED ": %s]", *value);
-
-				if (NULL == buffer)
-					buffer = (char *)zbx_malloc(buffer, buffer_alloc);
-
-				zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
-						ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED));
-				buffer_offset++;
-				zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, *value);
-
-				ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, config_timeout);
+				if (NULL != (value = ZBX_GET_TEXT_RESULT(&result)))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Sending back [%s]", *value);
+					ret = zbx_tcp_send_to(s, *value, config_timeout);
+				}
 			}
 			else
 			{
-				zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED "]");
-				ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, config_timeout);
-			}
-		}
+				value = ZBX_GET_MSG_RESULT(&result);
 
-		zbx_free_agent_result(&result);
+				if (NULL != value)
+				{
+					static char	*buffer = NULL;
+					static size_t	buffer_alloc = 256;
+					size_t		buffer_offset = 0;
+
+					zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED ": %s]", *value);
+
+					if (NULL == buffer)
+						buffer = (char *)zbx_malloc(buffer, buffer_alloc);
+
+					zbx_strncpy_alloc(&buffer, &buffer_alloc, &buffer_offset,
+							ZBX_NOTSUPPORTED, ZBX_CONST_STRLEN(ZBX_NOTSUPPORTED));
+					buffer_offset++;
+					zbx_strcpy_alloc(&buffer, &buffer_alloc, &buffer_offset, *value);
+
+					ret = zbx_tcp_send_bytes_to(s, buffer, buffer_offset, config_timeout);
+				}
+				else
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "Sending back [" ZBX_NOTSUPPORTED "]");
+					ret = zbx_tcp_send_to(s, ZBX_NOTSUPPORTED, config_timeout);
+				}
+			}
+
+			zbx_free_agent_result(&result);
+		}
 	}
 
 	if (FAIL == ret)
@@ -133,7 +244,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	zbx_free(args);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg, NULL);
 #endif
 
 #ifndef _WINDOWS

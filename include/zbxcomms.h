@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -207,7 +207,6 @@ typedef struct
 	int				protocol;
 	int				timeout;
 	zbx_timespec_t			deadline;
-	zbx_uint32_t			reserved_payload;
 }
 zbx_socket_t;
 
@@ -427,7 +426,10 @@ void	zbx_tls_validate_config(zbx_config_tls_t *config_tls, int config_active_for
 void	zbx_tls_library_deinit(zbx_tls_status_t status);
 void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg);
 
-void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg);
+typedef size_t	(*zbx_find_psk_in_cache_f)(const unsigned char *, unsigned char *, unsigned int *);
+
+void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg,
+		zbx_find_psk_in_cache_f zbx_find_psk_in_cache_cb_arg);
 
 void	zbx_tls_free(void);
 void	zbx_tls_free_on_signal(void);

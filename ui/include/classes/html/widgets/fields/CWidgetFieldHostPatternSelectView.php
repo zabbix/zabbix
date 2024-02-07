@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,14 +35,8 @@ class CWidgetFieldHostPatternSelectView extends CWidgetFieldView {
 		return $this;
 	}
 
-	public function getLabel(): ?CLabel {
-		$label = parent::getLabel();
-
-		if ($label !== null) {
-			$label->setFor(zbx_formatDomId($this->field->getName().'[]').'_ms');
-		}
-
-		return $label;
+	public function getFocusableElementId(): string {
+		return zbx_formatDomId($this->field->getName().'[]').'_ms';
 	}
 
 	public function getView(): CPatternSelect {

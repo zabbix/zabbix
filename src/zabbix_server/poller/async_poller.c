@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -56,7 +56,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 
 	/* don't try activating interface if there were no errors detected */
 	if (SUCCEED != item->ret || ZBX_INTERFACE_AVAILABLE_TRUE != item->interface.available ||
-			0 != item->interface.errors_from)
+			0 != item->interface.errors_from || item->version != item->interface.version)
 	{
 		if (NULL == (interface_status = zbx_hashset_search(&poller_config->interfaces,
 				&item->interface.interfaceid)))
@@ -77,6 +77,7 @@ static void	process_async_result(zbx_dc_item_context_t *item, zbx_poller_config_
 		zbx_free(interface_status->key_orig);
 		interface_status->key_orig = item->key_orig;
 		item->key_orig = NULL;
+		interface_status->version = item->version;
 	}
 
 	if (SUCCEED == item->ret)
@@ -139,9 +140,8 @@ static void	process_snmp_result(void *data)
 static void	process_httpagent_result(CURL *easy_handle, CURLcode err, void *arg)
 {
 	long				response_code;
-	char				*error, *out = NULL;
+	char				*status_codes, *error, *out = NULL;
 	AGENT_RESULT			result;
-	char				*status_codes;
 	zbx_httpagent_context		*httpagent_context;
 	zbx_dc_httpitem_context_t	*item_context;
 	zbx_timespec_t			timespec;
@@ -217,9 +217,8 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 {
 	zbx_dc_item_t			*items = NULL;
 	AGENT_RESULT			*results;
-	int				*errcodes;
+	int				*errcodes, total = 0;
 	zbx_timespec_t			timespec;
-	int				i, total = 0;
 	zbx_vector_poller_item_t	poller_items;
 
 	zbx_vector_poller_item_create(&poller_items);
@@ -258,7 +257,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 
 		total += num;
 
-		for (i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 				continue;
@@ -303,7 +302,7 @@ static void	async_initiate_queued_checks(zbx_poller_config_t *poller_config, con
 		zbx_timespec(&timespec);
 
 		/* process item values */
-		for (i = 0; i < num; i++)
+		for (int i = 0; i < num; i++)
 		{
 			if (SUCCEED != errcodes[i])
 			{
@@ -472,19 +471,21 @@ static void	socket_read_event_cb(evutil_socket_t fd, short what, void *arg)
 
 ZBX_THREAD_ENTRY(async_poller_thread, args)
 {
-	zbx_thread_poller_args	*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
+	zbx_thread_poller_args		*poller_args_in = (zbx_thread_poller_args *)(((zbx_thread_args_t *)args)->args);
 
 	time_t				last_stat_time;
+#ifdef HAVE_NETSNMP
+	time_t				last_snmp_engineid_hk_time = 0;
+#endif
 	zbx_ipc_async_socket_t		rtc;
 	const zbx_thread_info_t		*info = &((zbx_thread_args_t *)args)->info;
-	int				server_num = ((zbx_thread_args_t *)args)->info.server_num;
-	int				process_num = ((zbx_thread_args_t *)args)->info.process_num;
-	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type;
-	unsigned char			poller_type = poller_args_in->poller_type;
+	int				msgs_num, server_num = ((zbx_thread_args_t *)args)->info.server_num,
+					process_num = ((zbx_thread_args_t *)args)->info.process_num;
+	unsigned char			process_type = ((zbx_thread_args_t *)args)->info.process_type,
+					poller_type = poller_args_in->poller_type;
 	zbx_poller_config_t		poller_config = {.queued = 0, .processed = 0};
 	struct event			*rtc_event;
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
-	int				msgs_num;
 #ifdef HAVE_LIBCURL
 	zbx_asynchttppoller_config	*asynchttppoller_config;
 #endif
@@ -523,11 +524,23 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	{
 		async_poller_dns_init(&poller_config, poller_args_in);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-		zbx_tls_init_child(poller_args_in->config_comms->config_tls, poller_args_in->zbx_get_program_type_cb_arg);
+		zbx_tls_init_child(poller_args_in->config_comms->config_tls,
+				poller_args_in->zbx_get_program_type_cb_arg,
+				zbx_dc_get_psk_by_identity);
 #endif
 	}
 	else
+	{
 		async_poller_dns_init(&poller_config, poller_args_in);
+
+#ifdef HAVE_NETSNMP
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
+		{
+			zbx_init_snmp_engineid_cache();
+			last_snmp_engineid_hk_time = time(NULL);
+		}
+#endif
+	}
 
 	while (ZBX_IS_RUNNING())
 	{
@@ -582,10 +595,28 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 			}
 #endif
 		}
+
+#ifdef HAVE_NETSNMP
+#define	SNMP_ENGINEID_HK_INTERVAL	86400
+		if (ZBX_POLLER_TYPE_SNMP == poller_type && time(NULL) >=
+				SNMP_ENGINEID_HK_INTERVAL + last_snmp_engineid_hk_time)
+		{
+			last_snmp_engineid_hk_time = time(NULL);
+			zbx_housekeep_snmp_engineid_cache();
+		}
+#undef SNMP_ENGINEID_HK_INTERVAL
+#endif
 	}
 
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
+	{
+#ifdef HAVE_NETSNMP
+		if (ZBX_POLLER_TYPE_SNMP == poller_type)
+			zbx_destroy_snmp_engineid_cache();
+#endif
+
 		async_poller_dns_destroy(&poller_config);
+	}
 
 	event_del(rtc_event);
 	async_poller_stop(&poller_config);

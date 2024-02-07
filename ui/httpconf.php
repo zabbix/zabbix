@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -243,12 +243,11 @@ elseif (hasRequest('add') || hasRequest('update')) {
 
 		foreach (['variables', 'headers'] as $pair_type) {
 			foreach (getRequest($pair_type, []) as $pair) {
+				$pair['name'] = array_key_exists('name', $pair) ? trim($pair['name']) : '';
+				$pair['value'] = array_key_exists('value', $pair) ? trim($pair['value']) : '';
+
 				if ($pair['name'] === '' && $pair['value'] === '') {
 					continue;
-				}
-
-				if ($pair_type === 'variables') {
-					$pair['name'] = trim($pair['name']);
 				}
 
 				$httpTest[$pair_type][] = $pair;

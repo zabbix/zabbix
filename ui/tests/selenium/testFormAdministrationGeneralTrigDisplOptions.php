@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -212,11 +212,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 	 */
 	public function getCheckFormData() {
 		return [
-			// All valid custom values, checked checkboxes, custom colors.
+			// #0 All valid custom values, checked checkboxes, custom colors.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Unacknowledged PROBLEM events' => true,
 						'Acknowledged PROBLEM events' => true,
@@ -268,11 +267,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Unchecked checkboxes.
+			//  #1 Unchecked checkboxes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => false,
 						'Unacknowledged PROBLEM events' => false,
 						'Acknowledged PROBLEM events' => false,
@@ -288,11 +286,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Zeros in custom colors.
+			// #2 Zeros in custom colors.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => '000000',
 						'xpath://button[@id="lbl_problem_ack_color"]/..' => '000000',
@@ -320,11 +317,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Letters in custom colors.
+			// #3 Letters in custom colors.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'xpath://button[@id="lbl_problem_unack_color"]/..' => 'AAAAAA',
 						'xpath://button[@id="lbl_problem_ack_color"]/..' => 'BBBBBB',
@@ -352,11 +348,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Maximal valid values.
+			// #4 Maximal valid values.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Not classified' => 'NNNNNNNNNNNNNNNNNNNNNNNNNNNNNNNN',
 						'Information' => 'IIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII',
@@ -396,11 +391,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in time in period fields without "s".
+			// #5 Valid zero values in time in period fields without "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0',
 						'On status change triggers blink for' => '0'
 					],
@@ -410,11 +404,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in time in period fields with "s".
+			// #6 Valid zero values in time in period fields with "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0s',
 						'On status change triggers blink for' => '0s'
 					],
@@ -424,11 +417,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in minutes.
+			// #7 Valid zero values in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0m',
 						'On status change triggers blink for' => '0m'
 					],
@@ -438,11 +430,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in hours.
+			// #8 Valid zero values in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0h',
 						'On status change triggers blink for' => '0h'
 					],
@@ -452,11 +443,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in days.
+			// #9 Valid zero values in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0d',
 						'On status change triggers blink for' => '0d'
 					],
@@ -466,11 +456,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid zero values in weeks.
+			// #10 Valid zero values in weeks.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0w',
 						'On status change triggers blink for' => '0w'
 					],
@@ -480,11 +469,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields in seconds without "s".
+			// #11 Valid maximum values in period fields in seconds without "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86400',
 						'On status change triggers blink for' => '86400'
 					],
@@ -494,11 +482,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields in seconds with "s".
+			// #12 Valid maximum values in period fields in seconds with "s".
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86400s',
 						'On status change triggers blink for' => '86400s'
 					],
@@ -508,11 +495,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields with in minutes.
+			// #13 Valid maximum values in period fields with in minutes.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '1440m',
 						'On status change triggers blink for' => '1440m'
 					],
@@ -522,11 +508,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields with in hours.
+			// #14 Valid maximum values in period fields with in hours.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '24h',
 						'On status change triggers blink for' => '24h'
 					],
@@ -536,11 +521,10 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Valid maximum values in period fields with in days.
+			// #15 Valid maximum values in period fields with in days.
 			[
 				[
-					'expected' => TEST_GOOD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '1d',
 						'On status change triggers blink for' => '1d'
 					],
@@ -550,11 +534,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid zero values in Moths (Months not supported).
+			// #16 Invalid zero values in Moths (Months not supported).
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0M',
 						'On status change triggers blink for' => '0M'
 					],
@@ -564,11 +548,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid zero values in years (years not supported).
+			// #17 Invalid zero values in years (years not supported).
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '0y',
 						'On status change triggers blink for' => '0y'
 					],
@@ -578,11 +562,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in seconds without "s".
+			// #18 Invalid maximum values in period fields in seconds without "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86401',
 						'On status change triggers blink for' => '86401'
 					],
@@ -592,11 +576,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in seconds with "s".
+			// #19 Invalid maximum values in period fields in seconds with "s".
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '86401s',
 						'On status change triggers blink for' => '86401s'
 					],
@@ -606,11 +590,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in minutes.
+			// #20 Invalid maximum values in period fields in minutes.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '1441m',
 						'On status change triggers blink for' => '1441m'
 					],
@@ -620,11 +604,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in hours.
+			// #21 Invalid maximum values in period fields in hours.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '25h',
 						'On status change triggers blink for' => '25h'
 					],
@@ -634,11 +618,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid maximum values in period fields in days.
+			// #22 Invalid maximum values in period fields in days.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '2d',
 						'On status change triggers blink for' => '2d'
 					],
@@ -648,11 +632,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Maximal invalid values in period fields.
+			// #23 Maximal invalid values in period fields.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Display OK triggers for' => '99999999999999999999999999999999',
 						'On status change triggers blink for' => '99999999999999999999999999999999'
 					],
@@ -662,11 +646,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid string values.
+			// #24 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => 'test',
 						'On status change triggers blink for' => 'test'
@@ -677,11 +661,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid string values.
+			// #25 Invalid string values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => '!@#$%^&*()_+',
 						'On status change triggers blink for' => '!@#$%^&*()_+',
@@ -712,11 +696,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid empty values.
+			// #26 Invalid empty values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => '',
 						'On status change triggers blink for' => '',
@@ -759,11 +743,11 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 					]
 				]
 			],
-			// Invalid negative values.
+			// #27 Invalid negative values.
 			[
 				[
 					'expected' => TEST_BAD,
-					'fields' =>  [
+					'fields' => [
 						'Use custom event status colours' => true,
 						'Display OK triggers for' => '-1',
 						'On status change triggers blink for' => '-1',
@@ -793,12 +777,38 @@ class testFormAdministrationGeneralTrigDisplOptions extends testFormAdministrati
 						'Incorrect value for field "severity_color_5": a hexadecimal colour code (6 symbols) is expected.'
 					]
 				]
+			],
+			// #28 Trimming spaces.
+			[
+				[
+					'trim' => true,
+					'fields' => [
+						'Display OK triggers for' => '   25m   ',
+						'On status change triggers blink for' => '   12m   ',
+						'Not classified' => '   Test Not classified     ',
+						'Information' => '   Test Information    ',
+						'Warning' => '   Test Warning    ',
+						'Average' => '  Test Average    ',
+						'High' => '   Test High    ',
+						'Disaster' => '     Test Disaster    '
+					],
+					'db' => [
+						'ok_period' => '25m',
+						'blink_period' => '12m',
+						'severity_name_0' => 'Test Not classified',
+						'severity_name_1' => 'Test Information',
+						'severity_name_2' => 'Test Warning',
+						'severity_name_3' => 'Test Average',
+						'severity_name_4' => 'Test High',
+						'severity_name_5' => 'Test Disaster'
+					]
+				]
 			]
 		];
 	}
 
 	/**
-	 * Backup in needed because of DEV-1673, and can be removed after bug is fixed.
+	 * TODO: Backup is needed because of DEV-1673, and can be removed after bug is fixed.
 	 * @backup config
 	 *
 	 * @dataProvider getCheckFormData

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -149,7 +149,7 @@ $scenario_tab
 						(new CTextAreaFlexible('variables[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-							->setMaxlength(2000)
+							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
 							->setAttribute('placeholder', _('value'))
 							->disableSpellcheck(),
 						(new CCol(
@@ -188,7 +188,7 @@ $scenario_tab
 						(new CTextAreaFlexible('headers[#{rowNum}][value]', '#{value}', ['add_post_js' => false]))
 							->removeId()
 							->setWidth(ZBX_TEXTAREA_HTTP_PAIR_VALUE_WIDTH)
-							->setMaxlength(2000)
+							->setMaxlength(DB::getFieldLength('httpstep_field', 'value'))
 							->setAttribute('placeholder', _('value'))
 							->disableSpellcheck(),
 						(new CCol(
@@ -196,7 +196,7 @@ $scenario_tab
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->addClass('form_row')
-						->addClass('sortable')
+						->addClass(CSortable::ZBX_STYLE_SORTABLE)
 				)
 			]))
 				->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
@@ -293,7 +293,7 @@ $steps_tab = (new CFormGrid())->addItem([
 						))->addClass(ZBX_STYLE_NOWRAP)
 					]))
 						->setAttribute('data-row_index', '#{row_index}')
-						->addClass('sortable')
+						->addClass(CSortable::ZBX_STYLE_SORTABLE)
 				)
 		]))
 			->addClass(ZBX_STYLE_TABLE_FORMS_SEPARATOR)
