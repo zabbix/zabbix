@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup scripts
  *
- * @onBefore prepareScriptData
+ * @onBefore prepareData
  */
 class testFormAlertsScripts extends CWebTest {
 
@@ -44,6 +44,13 @@ class testFormAlertsScripts extends CWebTest {
 	protected static $ids;
 
 	/**
+	 * Id of host.
+	 *
+	 * @var array
+	 */
+	protected static $hostid;
+
+	/**
 	 * Attach MessageBehavior to the test.
 	 *
 	 * @return array
@@ -52,10 +59,7 @@ class testFormAlertsScripts extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	/**
-	 * Function used to create scripts.
-	 */
-	public function prepareScriptData() {
+	public function prepareData() {
 		$response = CDataHelper::call('script.create', [
 			[
 				'name' => 'Script for Clone',
@@ -153,6 +157,47 @@ class testFormAlertsScripts extends CWebTest {
 		]);
 		$this->assertArrayHasKey('scriptids', $scripts);
 		self::$ids = CDataHelper::getIds('name');
+
+		// Create host and trapper item for manual user input test.
+		$host = CDataHelper::createHosts([
+			[
+				'host' => 'A host for scripts check',
+				'interfaces' => [
+					[
+						'type' => INTERFACE_TYPE_AGENT,
+						'main' => INTERFACE_PRIMARY,
+						'useip' => INTERFACE_USE_IP,
+						'ip' => '127.1.9.1',
+						'dns' => '',
+						'port' => '10777'
+					]
+				],
+				'groups' => [
+					'groupid' => '19' // Applications.
+				],
+				'items' => [
+					[
+						'name' => 'Scripts trapper',
+						'key_' => 'script_trap',
+						'type' => ITEM_TYPE_TRAPPER,
+						'value_type' => ITEM_VALUE_TYPE_UINT64
+					]
+				]
+			]
+		]);
+		self::$hostid = $host['hostids']['A host for scripts check'];
+
+		CDataHelper::call('trigger.create', [
+			[
+				'description' => 'Attention: script execution is needed',
+				'expression' => 'last(/A host for scripts check/script_trap)<>0',
+				'type' => 1,
+				'priority' => TRIGGER_SEVERITY_WARNING
+			]
+		]);
+
+		// Create problem for manual event action check.
+		CDBHelper::setTriggerProblem('Attention: script execution is needed', TRIGGER_VALUE_TRUE);
 	}
 
 	/**
@@ -2188,7 +2233,7 @@ class testFormAlertsScripts extends CWebTest {
 					],
 					'manualinput' => '0',
 					'prompt' => 'Enter host id',
-					'host' => 'ЗАББИКС Сервер',
+					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -2219,7 +2264,7 @@ class testFormAlertsScripts extends CWebTest {
 					],
 					'manualinput' => '0',
 					'prompt' => 'Enter host id',
-					'event' => 'Inheritance trigger with tags',
+					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -2275,7 +2320,7 @@ class testFormAlertsScripts extends CWebTest {
 					],
 					'manualinput' => '0',
 					'prompt' => 'Enter host id',
-					'host' => 'ЗАББИКС Сервер',
+					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
 							'\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
 					'urls' => [
@@ -2286,7 +2331,145 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #4 Host script with {MANUALINPUT} macro, confirmation message and input type - string.
+			// #4 Host webhook without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'parameters' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'A',
+							'Value' => '{MANUALINPUT}'
+						]
+					],
+					'fields' => [
+						'Name' => 'Host webhook without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Webhook',
+						'Script' => 'var params = JSON.parse(value); return params.a;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter value for parameter A',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => 'a',
+					'prompt' => 'Enter value for parameter A',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #5 Event webhook without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'parameters' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'A',
+							'Value' => '{MANUALINPUT}'
+						]
+					],
+					'fields' => [
+						'Name' => 'Event webhook without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'var params = JSON.parse(value); return params.a;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter value for parameter A',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '10',
+					'prompt' => 'Enter value for parameter A',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #6 Host webhook with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'parameters' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'A',
+							'Value' => '{MANUALINPUT}'
+						]
+					],
+					'fields' => [
+						'Name' => 'Host webhook with confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Webhook',
+						'Script' => 'var params = JSON.parse(value); return params.a;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter value for parameter A',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Parameter A will contain {MANUALINPUT} value. Proceed?'
+					],
+					'manualinput' => '10',
+					'prompt' => 'Enter value for parameter A',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #7 Event webhook with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'parameters' => [
+						[
+							'action' => USER_ACTION_ADD,
+							'Name' => 'A',
+							'Value' => '{MANUALINPUT}'
+						]
+					],
+					'fields' => [
+						'Name' => 'Event webhook with confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'Webhook',
+						'Script' => 'var params = JSON.parse(value); return params.a;',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter value for parameter A',
+						'Default input string' => '1',
+						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Parameter A will contain {MANUALINPUT} value. Proceed?'
+					],
+					'manualinput' => '',
+					'prompt' => 'Enter value for parameter A',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #8 Host script with {MANUALINPUT} macro, confirmation message and input type - string.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2304,8 +2487,8 @@ class testFormAlertsScripts extends CWebTest {
 						'Confirmation text' => 'Ping count: {MANUALINPUT}'
 					],
 					'manualinput' => '0',
-					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
-					'host' => 'Host for triggers filtering',
+					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
+					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2315,7 +2498,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #5 Event script with {MANUALINPUT} macro, confirmation message and input type - string.
+			// #9 Event script with {MANUALINPUT} macro, confirmation message and input type - string.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2333,8 +2516,8 @@ class testFormAlertsScripts extends CWebTest {
 						'Confirmation text' => 'Ping count: {MANUALINPUT}'
 					],
 					'manualinput' => '0',
-					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
-					'event' => 'Inheritance trigger with tags',
+					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
+					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2342,7 +2525,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #6 Event script without confirmation message (input type - string).
+			// #10 Event script without confirmation message.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2359,8 +2542,8 @@ class testFormAlertsScripts extends CWebTest {
 						'Enable confirmation' => false
 					],
 					'manualinput' => '10',
-					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
-					'event' => 'Inheritance trigger with tags',
+					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
+					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2368,7 +2551,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #7 Host script without confirmation message (input type - string).
+			// #11 Host script without confirmation message.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -2385,8 +2568,8 @@ class testFormAlertsScripts extends CWebTest {
 						'Enable confirmation' => false
 					],
 					'manualinput' => '',
-					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
-					'host' => 'Host for triggers filtering',
+					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
+					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
@@ -2396,7 +2579,365 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #8 Host url without confirmation message.
+			// #12 Host SSH without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host SSH without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'ssh zabbix@{MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter hostname',
+						'Default input string' => 'Aa',
+						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
+						'Enable confirmation' => false
+					],
+					'manualinput' => '11',
+					'prompt' => 'Enter hostname',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #13 Host SSH with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host SSH with confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'ssh zabbix@{MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter hostname',
+						'Default input string' => 'Aa',
+						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Hostname is {MANUALINPUT}'
+					],
+					'manualinput' => '.',
+					'prompt' => 'Enter hostname',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #14 Event SSH without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event SSH without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'ssh zabbix@{MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter hostname',
+						'Default input string' => 'Aa',
+						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
+						'Enable confirmation' => false
+					],
+					'manualinput' => '?',
+					'prompt' => 'Enter hostname',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #15 Event SSH with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event SSH with confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'SSH',
+						'Username' => 'zabbix',
+						'Commands' => 'ssh zabbix@{MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter hostname',
+						'Default input string' => 'Aa',
+						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Hostname is {MANUALINPUT}'
+					],
+					'manualinput' => '',
+					'prompt' => 'Enter hostname',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #16 Host Telnet without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host Telnet without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Telnet',
+						'Username' => 'zabbix',
+						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter port',
+						'Default input string' => '22',
+						'Input validation rule' => '\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '1',
+					'prompt' => 'Enter port',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #17 Host Telnet with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host Telnet with confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'Telnet',
+						'Username' => 'zabbix',
+						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter port',
+						'Default input string' => '22',
+						'Input validation rule' => '\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
+					],
+					'manualinput' => '.',
+					'prompt' => 'Enter port',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #18 Event Telnet without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event Telnet without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'Telnet',
+						'Username' => 'zabbix',
+						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter port',
+						'Default input string' => '22',
+						'Input validation rule' => '\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
+						'Enable confirmation' => false
+					],
+					'manualinput' => '?',
+					'prompt' => 'Enter port',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #19 Event Telnet with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event Telnet with confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Username' => 'zabbix',
+						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'Enter port',
+						'Default input string' => '22',
+						'Input validation rule' => '\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
+								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
+					],
+					'manualinput' => '',
+					'prompt' => 'Enter port',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'\b([1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|[1-9][0-9][0-9][0-9][0-9])\b.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #20 Host IPMI without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host IPMI without confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+								'one digit, one special character and minimum eight in length',
+						'Default input string' => 'Ex@mple7',
+						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+						'Enable confirmation' => false
+					],
+					'manualinput' => 'example1',
+					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+							'one digit, one special character and minimum eight in length',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #21 Host IPMI with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Host IPMI with confirmation message',
+						'Scope' => 'Manual host action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+								'one digit, one special character and minimum eight in length',
+						'Default input string' => 'Ex@mple7',
+						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Are you sure?'
+					],
+					'manualinput' => '.',
+					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+							'one digit, one special character and minimum eight in length',
+					'host' => 'A host for scripts check',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Hosts' => 'zabbix.php?action=host.view',
+						'Latest data' => 'zabbix.php?action=latest.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #22 Event IPMI without confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event IPMI without confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+								'one digit, one special character and minimum eight in length',
+						'Default input string' => 'Ex@mple7',
+						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+						'Enable confirmation' => false
+					],
+					'manualinput' => '?',
+					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+							'one digit, one special character and minimum eight in length',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #23 Event IPMI with confirmation message.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Event IPMI with confirmation message',
+						'Scope' => 'Manual event action',
+						'Type' => 'IPMI',
+						'Command' => 'ipmitool -I lan -H localhost -U zabbix -P {MANUALINPUT} -L user sensor',
+						'Advanced configuration' => true,
+						'Enable user input' => true,
+						'Input prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+								'one digit, one special character and minimum eight in length',
+						'Default input string' => 'Ex@mple7',
+						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
+						'Enable confirmation' => true,
+						'Confirmation text' => 'Are you sure?'
+					],
+					'manualinput' => '',
+					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
+							'one digit, one special character and minimum eight in length',
+					'event' => 'Attention: script execution is needed',
+					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
+							'^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$.',
+					'urls' => [
+						'Problems' => 'zabbix.php?action=problem.view',
+						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
+					]
+				]
+			],
+			// #24 Host url without confirmation message.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2414,9 +2955,9 @@ class testFormAlertsScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '10084',
+					'manualinput' => 'id',
 					'prompt' => 'Enter host id',
-					'host' => 'ЗАББИКС Сервер',
+					'host' => 'A host for scripts check',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2425,7 +2966,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #9 Event url without confirmation message.
+			// #25 Event url without confirmation message.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2443,16 +2984,16 @@ class testFormAlertsScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '10084',
+					'manualinput' => 'id',
 					'prompt' => 'Enter host id',
-					'event' => 'Test trigger with tag',
+					'event' => 'Attention: script execution is needed',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
 					]
 				]
 			],
-			// #10 Event url without confirmation message and with dropdown.
+			// #26 Event url without confirmation message and with dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2470,16 +3011,16 @@ class testFormAlertsScripts extends CWebTest {
 						'Dropdown options' => '10080,10084,10081,',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '10084',
+					'manualinput' => 'id',
 					'prompt' => 'Choose host id',
-					'event' => 'Test trigger with tag',
+					'event' => 'Attention: script execution is needed',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
 					]
 				]
 			],
-			// #11 Host url with confirmation message and with dropdown.
+			// #27 Host url with confirmation message and with dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2495,12 +3036,12 @@ class testFormAlertsScripts extends CWebTest {
 						'Input type' => 'Dropdown',
 						'Dropdown options' => '10080,10084,10081,',
 						'Enable confirmation' => true,
-						'Confirmation text' => 'Confirm selected host id {MANUALINPUT}?'
+						'Confirmation text' => 'Confirm selected host?'
 					],
-					'manualinput' => '10084',
+					'manualinput' => 'id',
 					'prompt' => 'Choose host id',
-					'confirmation' => 'Confirm selected host id 10084?',
-					'host' => 'ЗАББИКС Сервер',
+					'confirmation' => 'Confirm selected host?',
+					'host' => 'A host for scripts check',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2509,7 +3050,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #12 Event url with confirmation message and with input type - string.
+			// #28 Event url with confirmation message and with input type - string.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2526,19 +3067,19 @@ class testFormAlertsScripts extends CWebTest {
 						'Input validation rule' => '\b([1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]'.
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => true,
-						'Confirmation text' => 'Confirm selected host id {MANUALINPUT}?'
+						'Confirmation text' => 'Confirm selected host?'
 					],
-					'manualinput' => '10084',
+					'manualinput' => 'id',
 					'prompt' => 'Choose host id',
-					'confirmation' => 'Confirm selected host id 10084?',
-					'event' => 'Test trigger with tag',
+					'confirmation' => 'Confirm selected host?',
+					'event' => 'Attention: script execution is needed',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
 					]
 				]
 			],
-			// #13 Host script with {MANUALINPUT} macro, confirmation message and input type - dropdown.
+			// #29 Host script with {MANUALINPUT} macro, confirmation message and input type - dropdown.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2558,7 +3099,7 @@ class testFormAlertsScripts extends CWebTest {
 					'manualinput' => '6.4',
 					'prompt' => 'Choose supported version',
 					'confirmation' => 'Confirm 6.4 as supported version?',
-					'host' => 'ЗАББИКС Сервер',
+					'host' => 'A host for scripts check',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2567,7 +3108,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #14 Manual host script with {MANUALINPUT} macro, confirmation message and input type - string.
+			// #30 Manual host script with {MANUALINPUT} macro, confirmation message and input type - string.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2585,9 +3126,9 @@ class testFormAlertsScripts extends CWebTest {
 						'Confirmation text' => 'Ping count: {MANUALINPUT}'
 					],
 					'manualinput' => '2',
-					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
+					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'confirmation' => 'Ping count: 2',
-					'host' => 'Host for triggers filtering',
+					'host' => 'A host for scripts check',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2596,7 +3137,7 @@ class testFormAlertsScripts extends CWebTest {
 					]
 				]
 			],
-			// #15 Manual host script with {MANUALINPUT} macro and without confirmation message (input type - string).
+			// #31 Manual host script with {MANUALINPUT} macro and without confirmation message (input type - string).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2613,8 +3154,8 @@ class testFormAlertsScripts extends CWebTest {
 						'Enable confirmation' => false
 					],
 					'manualinput' => '2',
-					'prompt' => 'Enter 🚩Host for triggers filtering🚩 ping count',
-					'host' => 'Host for triggers filtering',
+					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
+					'host' => 'A host for scripts check',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Hosts' => 'zabbix.php?action=host.view',
@@ -2642,14 +3183,14 @@ class testFormAlertsScripts extends CWebTest {
 //					],
 //					'manualinput' => '7.0',
 //					'prompt' => 'Choose supported version',
-//					'event' => 'Inheritance trigger with tags',
+//					'event' => 'Attention: script execution is needed',
 //					'urls' => [
 //						'Problems' => 'zabbix.php?action=problem.view',
 //						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
 //					]
 //				]
 //			],
-			// #16 Manual event script with confirmation message (input type - string).
+			// #32 Manual event script with confirmation message (input type - string).
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -2669,7 +3210,7 @@ class testFormAlertsScripts extends CWebTest {
 					'manualinput' => 'Zabbix 6.4.11',
 					'prompt' => 'Test version?',
 					'confirmation' => 'Selected version is Zabbix 6.4.11, proceed?',
-					'event' => 'Inheritance trigger with tags',
+					'event' => 'Attention: script execution is needed',
 					'urls' => [
 						'Problems' => 'zabbix.php?action=problem.view',
 						'Global view' => 'zabbix.php?action=dashboard.view&dashboardid=1'
@@ -2685,14 +3226,25 @@ class testFormAlertsScripts extends CWebTest {
 	public function testFormAlertsScripts_ManualUserInput($data) {
 		$modal = $this->openScriptForm();
 		$form = $modal->asForm();
+
+		if (($data['manualinput'] === 'id') && (array_key_exists('Dropdown options', $data['fields']))) {
+			$data['fields']['Dropdown options'] = $data['fields']['Dropdown options'].self::$hostid;
+		}
+
+		if (array_key_exists('parameters', $data)) {
+			$modal->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['parameters']);
+		}
 		$form->fill($data['fields'])->submit();
 		$this->assertMessage(TEST_GOOD, 'Script added');
 
 		foreach ($data['urls'] as $content => $url) {
 			$this->page->open($url)->waitUntilReady();
 			$this->page->assertHeader($content);
+			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
 
 			if ($content === 'Latest data') {
+				$this->query('link', $data[$scope])->one()->click();
+				$this->page->waitUntilReady();
 				$table = $this->query('xpath://table[@class="list-table fixed"]')->asTable()->one();
 			}
 			elseif ($content === 'Global view') {
@@ -2702,18 +3254,18 @@ class testFormAlertsScripts extends CWebTest {
 				$table = $this->query('class:list-table')->asTable()->one();
 			}
 
-			$scope = (array_key_exists('host', $data)) ? 'host' : 'event';
 			$table->query('link', $data[$scope])->one()->click();
-
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			$popup->fill($data['fields']['Name']);
 			$manualinput_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
 			$this->assertEquals('Manual input', $manualinput_dialog->getTitle());
 			$this->assertEquals($data['prompt'], $manualinput_dialog->query('class:wordbreak')->one()->getText());
 
+			$manualinput = ($data['manualinput'] === 'id') ? self::$hostid : $data['manualinput'];
+
 			$input_type = (array_key_exists('Input type', $data['fields']))
-				? $manualinput_dialog->query('name:manualinput')->asDropdown()->one()->select($data['manualinput'])
-				: $manualinput_dialog->query('id:manualinput')->one()->fill($data['manualinput']);
+				? $manualinput_dialog->query('name:manualinput')->asDropdown()->one()->select($manualinput)
+				: $manualinput_dialog->query('id:manualinput')->one()->fill($manualinput);
 
 			$action = ($data['fields']['Enable confirmation'] === true) ? 'Continue' : 'Execute';
 
@@ -2745,8 +3297,8 @@ class testFormAlertsScripts extends CWebTest {
 
 				if ($data['fields']['Type'] === 'URL') {
 					COverlayDialogElement::ensureNotPresent();
-					$scope = (array_key_exists('host', $data)) ? $data['host'] : 'ЗАББИКС Сервер';
-					$this->assertEquals($scope, $this->query('id:visiblename')->one()->getValue());
+					$scope = (array_key_exists('host', $data)) ? $data['host'] : 'A host for scripts check';
+					$this->assertEquals($scope, $this->query('id:host')->one()->getValue());
 				}
 				else {
 					$this->query('button:Ok')->waitUntilVisible()->one();
