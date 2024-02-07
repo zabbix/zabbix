@@ -39,11 +39,6 @@
 
 #define OK_250	"250"
 
-/* SMTP security options */
-#define SMTP_SECURITY_NONE	0
-#define SMTP_SECURITY_STARTTLS	1
-#define SMTP_SECURITY_SSL	2
-
 /******************************************************************************
  *                                                                            *
  * Purpose: Encode a string into a base64 string as required by rfc2047.      *
@@ -707,6 +702,11 @@ out:
 #undef OK_354
 }
 
+/* SMTP security options */
+#define SMTP_SECURITY_NONE	0
+#define SMTP_SECURITY_STARTTLS	1
+#define SMTP_SECURITY_SSL	2
+
 /* SMTP authentication options */
 #define SMTP_AUTHENTICATION_NONE		0
 #define SMTP_AUTHENTICATION_NORMAL_PASSWORD	1
@@ -726,7 +726,10 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	struct curl_slist	*recipients = NULL;
 	smtp_payload_status_t	payload_status;
 
-	if (SUCCEED != zbx_curl_has_smtp_auth(error))
+	if (SMTP_SECURITY_NONE != smtp_security && SUCCEED != zbx_curl_has_ssl(error))
+		goto out;
+
+	if (SMTP_AUTHENTICATION_NONE != smtp_authentication && SUCCEED != zbx_curl_has_smtp_auth(error))
 		goto out;
 
 	if (NULL == (easyhandle = curl_easy_init()))
@@ -738,7 +741,12 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 	memset(&payload_status, 0, sizeof(payload_status));
 
 	if (SMTP_SECURITY_SSL == smtp_security)
+	{
+		if (SUCCEED != zbx_curl_protocol("smtps", error))
+			goto out;
+
 		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtps://");
+	}
 	else
 		url_offset += zbx_snprintf(url + url_offset, sizeof(url) - url_offset, "smtp://");
 
@@ -979,6 +987,10 @@ clean:
 }
 #undef SMTP_AUTHENTICATION_NONE
 #undef SMTP_AUTHENTICATION_NORMAL_PASSWORD
+
+#undef SMTP_SECURITY_NONE
+#undef SMTP_SECURITY_STARTTLS
+#undef SMTP_SECURITY_SSL
 
 char	*zbx_email_make_body(const char *message, unsigned char content_type,  const char *attachment_name,
 		const char *attachment_type, const char *attachment, size_t attachment_size)

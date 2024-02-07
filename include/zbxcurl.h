@@ -80,11 +80,12 @@ CURLMcode	curl_multi_wait(CURLM *multi_handle, void *, unsigned int extra_nfds, 
 #	define CURLOPT_PROTOCOLS_STR	318L
 #endif
 
-int	zbx_curl_supports_protocol(const char *protocol, char *error, size_t max_error_len);
+int	zbx_curl_protocol(const char *protocol, char **error);
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);
 int	zbx_curl_has_bearer(char **error);
 int	zbx_curl_has_multi_wait(char **error);
+int	zbx_curl_has_ssl(char **error);
 #endif /* HAVE_LIBCURL */
 int	zbx_curl_has_smtp_auth(char **error);
 
