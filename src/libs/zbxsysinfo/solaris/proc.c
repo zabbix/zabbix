@@ -664,7 +664,8 @@ int	PROC_NUM(AGENT_REQUEST *request, AGENT_RESULT *result)
 					" with agent running on a Solaris version with zone support, but compiled on"
 					" a Solaris version without zone support. Consider using \"all\" or install"
 					" agent with Solaris zone support."));
-			return SYSINFO_RET_FAIL;
+			ret = SYSINFO_RET_FAIL;
+			goto clean;
 		}
 #endif
 	}
