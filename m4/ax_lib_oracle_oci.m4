@@ -156,27 +156,21 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
 
         for d in $oracle_rpm_include_dir; do
             if test -d $d; then
-                h_files="$d/*.h"
-                for f in $h_files; do
-                    if test -f $f; then
-                        ((cnt_include++))
-                        tmp_include_dir=$d
-                        break;
-                    fi
-                done
+                if test -f "$d/oci.h" -o -f "$d/ociver.h"; then
+                    ((cnt_include++))
+                    tmp_include_dir=$d
+                    break;
+                fi
             fi
         done
 
         for d in $oracle_rpm_lib_dir; do
             if test -d $d; then
-                so_files="$d/*.so"
-                for f in $so_files; do
-                    if test -f $f; then
-                        ((cnt_lib++))
-                        tmp_lib_dir=$d
-                        break;
-                    fi
-                done
+                if test -f "$d/libclntsh.so"; then
+                    ((cnt_lib++))
+                    tmp_lib_dir=$d
+                    break;
+                fi
             fi
         done
 
