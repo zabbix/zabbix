@@ -2792,7 +2792,7 @@ class testFormAlertsScripts extends CWebTest {
 					'fields' => [
 						'Name' => 'Event Telnet with confirmation message',
 						'Scope' => 'Manual event action',
-						'Type' => 'IPMI',
+						'Type' => 'Telnet',
 						'Username' => 'zabbix',
 						'Commands' => 'telnet 127.0.0.1 {MANUALINPUT}',
 						'Advanced configuration' => true,
