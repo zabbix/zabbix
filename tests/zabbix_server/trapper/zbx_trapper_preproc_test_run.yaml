@@ -1250,7 +1250,7 @@ out:
 ---
 test case: 'Check no cutoff'
 in:
-  value_rand_gen_len: 524288
+  value_gen_length: 524288
   value_append: ""
 out:
   return: SUCCEED
@@ -1259,7 +1259,7 @@ out:
 ---
 test case: 'Check cutoff'
 in:
-  value_rand_gen_len: 524290
+  value_gen_length: 524290
   value_append: ""
 out:
   return: SUCCEED
@@ -1268,7 +1268,7 @@ out:
 ---
 test case: 'Check cutoff before 2 byte'
 in:
-  value_rand_gen_len: 524288
+  value_gen_length: 524288
   value_append: "Ä"
 out:
   return: SUCCEED
@@ -1277,7 +1277,7 @@ out:
 ---
 test case: 'Check cutoff middle 2 byte'
 in:
-  value_rand_gen_len: 524287
+  value_gen_length: 524287
   value_append: "Ä"
 out:
   return: SUCCEED
@@ -1286,7 +1286,7 @@ out:
 ---
 test case: 'Check cutoff before 3 byte'
 in:
-  value_rand_gen_len: 524288
+  value_gen_length: 524288
   value_append: "ế"
 out:
   return: SUCCEED
@@ -1295,7 +1295,7 @@ out:
 ---
 test case: 'Check cutoff middle 3 byte'
 in:
-  value_rand_gen_len: 524286
+  value_gen_length: 524286
   value_append: "ế"
 out:
   return: SUCCEED
@@ -1304,7 +1304,7 @@ out:
 ---
 test case: 'Check cutoff before 4 byte'
 in:
-  value_rand_gen_len: 524288
+  value_gen_length: 524288
   value_append: "𨉟"
 out:
   return: SUCCEED
@@ -1313,7 +1313,7 @@ out:
 ---
 test case: 'Check cutoff middle 4 byte'
 in:
-  value_rand_gen_len: 524285
+  value_gen_length: 524285
   value_append: "𨉟"
 out:
   return: SUCCEED

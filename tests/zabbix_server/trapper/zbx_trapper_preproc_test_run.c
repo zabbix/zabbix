@@ -138,7 +138,7 @@ void	zbx_mock_test_entry(void **state)
 	struct zbx_json		out;
 	int			returned_ret, expected_ret;
 	zbx_mock_handle_t	handle;
-	zbx_uint64_t		random_gen_length = 0, expected_data_len = 0;
+	zbx_uint64_t		value_gen_length = 0, expected_data_len = 0;
 	size_t			tmp_alloc = 0, tmp_offset = 0;
 
 	ZBX_UNUSED(state);
@@ -146,8 +146,8 @@ void	zbx_mock_test_entry(void **state)
 	zbx_json_init(&out, 1024);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_rand_gen_len", &handle) &&
-			ZBX_MOCK_SUCCESS == zbx_mock_uint64(handle, &random_gen_length))
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_gen_length", &handle) &&
+			ZBX_MOCK_SUCCESS == zbx_mock_uint64(handle, &value_gen_length))
 	{
 		#define RANG_GEN_REQUEST "{\
 			\"data\": {\
@@ -177,7 +177,7 @@ void	zbx_mock_test_entry(void **state)
 
 		size_t append_len, required_length;
 
-		required_length = random_gen_length;
+		required_length = value_gen_length;
 		value_append = zbx_mock_get_parameter_string("in.value_append");
 		expected_data_len = zbx_mock_get_parameter_uint64("out.expected_len");
 		expected_truncation = zbx_mock_get_parameter_string("out.expected_truncated");
@@ -185,10 +185,10 @@ void	zbx_mock_test_entry(void **state)
 		required_length += append_len = strlen(value_append);
 		value_override = (char *)malloc((required_length + 1) * sizeof(char));
 
-		memset(value_override, (int)'a', random_gen_length);
+		memset(value_override, (int)'a', value_gen_length);
 
 		for (size_t i = 0; i < append_len; i++)
-			value_override[i + random_gen_length] = value_append[i];
+			value_override[i + value_gen_length] = value_append[i];
 
 		value_override[required_length] = '\0';
 		zbx_snprintf_alloc(&request_override, &tmp_alloc, &tmp_offset, RANG_GEN_REQUEST, value_override);
