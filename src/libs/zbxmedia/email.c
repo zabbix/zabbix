@@ -394,6 +394,7 @@ static char	*smtp_prepare_payload(zbx_vector_ptr_t *from_mails, zbx_vector_ptr_t
 	return tmp;
 }
 
+#ifdef HAVE_LIBCURL
 typedef struct
 {
 	char	*payload;
@@ -433,6 +434,7 @@ static int	smtp_debug_function(CURL *easyhandle, curl_infotype type, char *data,
 out:
 	return 0;
 }
+#endif
 
 static char	*smtp_get_helo_from_system(void)
 {
@@ -715,6 +717,7 @@ static int	send_email_curl(const char *smtp_server, unsigned short smtp_port, co
 		const char *username, const char *password, unsigned char content_type, int timeout,
 		const char *config_source_ip, const char *config_ssl_ca_location, char **error)
 {
+#ifdef HAVE_LIBCURL
 	int			ret = FAIL, i;
 	CURL			*easyhandle;
 	CURLcode		err;
@@ -883,6 +886,30 @@ clean:
 	curl_easy_cleanup(easyhandle);
 out:
 	return ret;
+#else
+	ZBX_UNUSED(smtp_server);
+	ZBX_UNUSED(smtp_port);
+	ZBX_UNUSED(smtp_helo);
+	ZBX_UNUSED(from_mails);
+	ZBX_UNUSED(to_mails);
+	ZBX_UNUSED(inreplyto);
+	ZBX_UNUSED(mailsubject);
+	ZBX_UNUSED(mailbody);
+	ZBX_UNUSED(smtp_security);
+	ZBX_UNUSED(smtp_verify_peer);
+	ZBX_UNUSED(smtp_verify_host);
+	ZBX_UNUSED(smtp_authentication);
+	ZBX_UNUSED(username);
+	ZBX_UNUSED(password);
+	ZBX_UNUSED(content_type);
+	ZBX_UNUSED(timeout);
+	ZBX_UNUSED(config_source_ip);
+	ZBX_UNUSED(config_ssl_ca_location);
+
+	*error = zbx_strdup(*error, "Zabbix server was compiled without cURL library required for SMTP authentication");
+
+	return FAIL;
+#endif
 }
 
 /******************************************************************************

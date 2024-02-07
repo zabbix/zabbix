@@ -20,7 +20,6 @@
 #include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
-
 static unsigned int	zbx_curl_version_num(void)
 {
 	return curl_version_info(CURLVERSION_NOW)->version_num;
@@ -121,23 +120,6 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 	return ret;
 }
 
-int	zbx_curl_has_smtp_auth(char **error)
-{
-	/* added in 7.20.0 */
-	if (zbx_curl_version_num() < 0x071400)
-	{
-		if (NULL != error)
-		{
-			*error = zbx_dsprintf(*error, "cURL library version %s does not support SMTP authentication"
-					" (7.20.0 or newer is required)", zbx_curl_version());
-		}
-
-		return FAIL;
-	}
-
-	return SUCCEED;
-}
-
 int	zbx_curl_has_bearer(char **error)
 {
 	/* added in 7.61.0 (0x073d00) */
@@ -171,5 +153,27 @@ int	zbx_curl_has_multi_wait(char **error)
 
 	return SUCCEED;
 }
-
 #endif /* HAVE_LIBCURL */
+
+int	zbx_curl_has_smtp_auth(char **error)
+{
+#ifdef HAVE_LIBCURL
+	/* added in 7.20.0 */
+	if (zbx_curl_version_num() < 0x071400)
+	{
+		if (NULL != error)
+		{
+			*error = zbx_dsprintf(*error, "cURL library version %s does not support SMTP authentication"
+					" (7.20.0 or newer is required)", zbx_curl_version());
+		}
+
+		return FAIL;
+	}
+
+	return SUCCEED;
+#else
+	ZBX_UNUSED(error);
+
+	return FAIL;
+#endif
+}
