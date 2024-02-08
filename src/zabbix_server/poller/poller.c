@@ -841,7 +841,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
-			poller_args_in->zbx_get_program_type_cb_arg);
+			poller_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{
