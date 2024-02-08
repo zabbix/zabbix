@@ -159,7 +159,6 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
                 if test -f "$d/oci.h" -o -f "$d/ociver.h"; then
                     ((cnt_include++))
                     tmp_include_dir=$d
-                    break;
                 fi
             fi
         done
@@ -169,29 +168,34 @@ AC_DEFUN([AX_LIB_ORACLE_OCI],
                 if test -f "$d/libclntsh.so"; then
                     ((cnt_lib++))
                     tmp_lib_dir=$d
-                    break;
                 fi
             fi
         done
 
-        if test $cnt_include -eq 1 && test $cnt_lib -eq 1; then
-            oracle_include_dir=$tmp_include_dir
-            oracle_lib_dir=$tmp_lib_dir
-            want_oracle_but_no_path="no"
-        fi
-
         AC_MSG_CHECKING([for Oracle include dir installed from RPM package])
-        if test -n "$oracle_include_dir"; then
+        if test $cnt_include -eq 1; then
             AC_MSG_RESULT([$oracle_include_dir])
+            oracle_include_dir=$tmp_include_dir
         else
             AC_MSG_RESULT([no])
+            if test $cnt_include -gt 1; then
+                AC_MSG_WARN([$cnt_include Oracle include dirs installed from RPM packages, impossible to choose automatically])
+            fi
         fi
 
         AC_MSG_CHECKING([for Oracle lib dir installed from RPM package])
-        if test -n "$oracle_lib_dir"; then
+        if test $cnt_lib -eq 1; then
             AC_MSG_RESULT([$oracle_lib_dir])
+            oracle_lib_dir=$tmp_lib_dir
         else
             AC_MSG_RESULT([no])
+            if test $cnt_lib -gt 1; then
+                AC_MSG_WARN([$cnt_lib Oracle lib dirs installed from RPM packages, impossible to choose automatically])
+            fi
+        fi
+
+        if test $cnt_include -eq 1 && test $cnt_lib -eq 1; then
+            want_oracle_but_no_path="no"
         fi
     fi
 
