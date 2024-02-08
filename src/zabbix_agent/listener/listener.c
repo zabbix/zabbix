@@ -244,7 +244,7 @@ ZBX_THREAD_ENTRY(listener_thread, args)
 	zbx_free(args);
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(init_child_args_in->zbx_config_tls, init_child_args_in->zbx_get_program_type_cb_arg, NULL);
 #endif
 
 #ifndef _WINDOWS
