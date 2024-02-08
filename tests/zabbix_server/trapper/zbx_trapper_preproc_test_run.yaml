@@ -262,7 +262,9 @@ out:
     {
       "steps": [
         {
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "error": "/.*"
@@ -310,7 +312,9 @@ out:
           "result": "data: 4"
         },
         {
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "error": "/.*"
@@ -361,7 +365,9 @@ out:
           "result": "x"
         },
         {
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "error": "/.*"
@@ -411,7 +417,9 @@ out:
         {
           "result": null,
           "action": 1,
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "result": null
@@ -461,7 +469,9 @@ out:
         {
           "result": "5",
           "action": 2,
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         },
         {
           "result": "10"
@@ -514,7 +524,10 @@ out:
         {
           "failed": "Validation error",
           "action": 3,
-          "error": "/[^V][^a][^l][^i][^d].*"
+
+          "error": {
+            "value": "/[^V][^a][^l][^i][^d].*"
+          }
         }
       ],
       "error": "Validation error"
@@ -722,7 +735,9 @@ out:
       "previous": true,
       "steps": [
         {
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "error": "/.*"
@@ -777,7 +792,9 @@ out:
           "result": "data: 4"
         },
         {
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "error": "/.*"
@@ -835,7 +852,9 @@ out:
           "result": "x"
         },
         {
-          "error": "/.*"
+          "error": {
+            "value": "/.*"
+          }
         }
       ],
       "error": "/.*"
@@ -1006,7 +1025,9 @@ out:
         {
           "failed": "Validation error",
           "action": 3,
-          "error": "/[^V][^a][^l][^i][^d].*"
+          "error": {
+            "value": "/[^V][^a][^l][^i][^d].*"
+          }
         }
       ],
       "error": "Validation error"
@@ -1263,9 +1284,11 @@ out:
     {
       "steps": [
         {
-           "action": 3,
-           "error":"error 123",
-           "failed":"123"
+          "action": 3,
+          "error": {
+            "value":"error 123"
+          },
+          "failed":"123"
         }
       ],
       "error": "123"
@@ -1301,9 +1324,11 @@ out:
     {
       "steps": [
         {
-           "action": 3,
-           "error":"error",
-           "failed":"new error"
+          "action": 3,
+          "error": {
+            "value": "error"
+          },
+          "failed":"new error"
         }
       ],
       "error": "new error"
@@ -1406,19 +1431,25 @@ out:
     {
       "steps": [
         {
-           "action": 3,
-           "error":"error 123",
-           "failed":"123"
+          "action": 3,
+          "error": {
+            "value": "error 123"
+          },
+          "failed":"123"
         },
         {
-           "action": 3,
-           "error":"123",
-           "failed": "333"
+          "action": 3,
+          "error": {
+            "value":"123"
+          },
+          "failed": "333"
         },
         {
-           "action": 2,
-           "error":"333",
-           "result":"444"
+          "action": 2,
+          "error": {
+            "value":"333"
+          },
+          "result":"444"
         }
        ],
       "result": "444"
