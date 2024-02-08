@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-28T10:12:19Z'
+  date: '2024-01-22T15:35:35Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -63,91 +63,91 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                cookies = [],
-                token = "",
-                error_msg = "";
+            	request = new HttpRequest(),
+            	cookies = [],
+            	token = "",
+            	error_msg = "";
             
             function authenticate(url) {
-                var payload = 'j_username=' + encodeURIComponent(params.username)
-                    + '&j_password=' + encodeURIComponent(params.password);
-                request.addHeader('Content-Type', 'application/x-www-form-urlencoded');
-                response = request.post(url, payload);
-                Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	var payload = 'j_username=' + encodeURIComponent(params.username)
+            		+ '&j_password=' + encodeURIComponent(params.password);
+            	request.addHeader('Content-Type', 'application/x-www-form-urlencoded');
+            	response = request.post(url, payload);
+            	Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code.';
+            	}
             
-                if (response !== null && response != "") {
-                    throw 'Authentication failed.';
-                }
+            	if (response !== null && response != "") {
+            		throw 'Authentication failed.';
+            	}
             
-                var headers = request.getHeaders();
-                for (key in headers) {
-                    if (key.toLowerCase() == 'set-cookie') {
-                        var entries = headers[key].split(',');
-                        for (idx in entries) {
-                            var value = entries[idx].split(';')[0];
-                            cookies.push(value);
-                        }
-                    }
-                }
+            	var headers = request.getHeaders();
+            	for (key in headers) {
+            		if (key.toLowerCase() == 'set-cookie') {
+            			var entries = headers[key].split(',');
+            			for (idx in entries) {
+            				var value = entries[idx].split(';')[0];
+            				cookies.push(value);
+            			}
+            		}
+            	}
             };
             
             function getToken(url) {
-                response = request.get(url);
-                Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code.';
+            	}
             
-                var headers = request.getHeaders();
-                for (key in headers) {
-                    if (key.toLowerCase() == 'content-type' && headers[key] != 'application/json') {
-                        throw 'Something went wrong while getting the authentication token. Check debug log for more information.';
-                    }
-                }
+            	var headers = request.getHeaders();
+            	for (key in headers) {
+            		if (key.toLowerCase() == 'content-type' && headers[key] != 'application/json') {
+            			throw 'Something went wrong while getting the authentication token. Check debug log for more information.';
+            		}
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                ['username', 'password', 'url'].forEach(function (field) {
-                    var macro = '{$SDWAN.API.' + field.toUpperCase() + '}';
-                    if (params[field] === macro || params[field] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[field] === 'undefined') {
-                        throw 'Please set \'' + field + '\' script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['username', 'password', 'url'].forEach(function (field) {
+            		var macro = '{$SDWAN.API.' + field.toUpperCase() + '}';
+            		if (params[field] === macro || params[field] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[field] === 'undefined') {
+            			throw 'Please set \'' + field + '\' script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                authenticate(params.url + 'j_security_check');
-                token = getToken(params.url + 'dataservice/client/token');
+            	authenticate(params.url + 'j_security_check');
+            	token = getToken(params.url + 'dataservice/client/token');
             
             } catch (err) {
-                error_msg = err;
+            	error_msg = err;
             };
             
             return JSON.stringify({
-                'cookie': cookies.join('; '),
-                'token': token,
-                'error': error_msg.toString()
+            	'cookie': cookies.join('; '),
+            	'token': token,
+            	'error': error_msg.toString()
             });
           description: |
             Cisco SD-WAN authentication with service account parameters and temporary-generated token usage.
@@ -182,104 +182,104 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var creds = JSON.parse(value);
+                  	var creds = JSON.parse(value);
                   }
                   catch (error) {
-                      throw 'Failed to parse authentication data from input value.';
+                  	throw 'Failed to parse authentication data from input value.';
                   }
                   
                   var request = new HttpRequest(),
-                      devices = [],
-                      error_msg = "",
-                      url = "{$SDWAN.API.URL}",
-                      http_proxy = "{$SDWAN.HTTP_PROXY}";
+                  	devices = [],
+                  	error_msg = "",
+                  	url = "{$SDWAN.API.URL}",
+                  	http_proxy = "{$SDWAN.HTTP_PROXY}";
                   
                   function getHttpData(url, token, cookie) {
-                      request.addHeader('Cookie: ' + cookie);
-                      request.addHeader('X-XSRF-TOKEN: ' + token);
-                      response = request.get(url);
-                      Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+                  	request.addHeader('Cookie: ' + cookie);
+                  	request.addHeader('X-XSRF-TOKEN: ' + token);
+                  	response = request.get(url);
+                  	Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
                   
-                      if (request.getStatus() !== 200) {
-                          throw 'Failed to receive data: invalid response status code.';
-                      }
+                  	if (request.getStatus() !== 200) {
+                  		throw 'Failed to receive data: invalid response status code.';
+                  	}
                   
-                      if (response !== null) {
-                          try {
-                              response = JSON.parse(response);
-                          }
-                          catch (error) {
-                              throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
-                          }
-                      }
+                  	if (response !== null) {
+                  		try {
+                  			response = JSON.parse(response);
+                  		}
+                  		catch (error) {
+                  			throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
+                  		}
+                  	}
                   
-                      if (typeof response !== 'object' || response === null) {
-                          throw 'Cannot process response data: received data is not an object.';
-                      }
+                  	if (typeof response !== 'object' || response === null) {
+                  		throw 'Cannot process response data: received data is not an object.';
+                  	}
                   
-                      return response;
+                  	return response;
                   };
                   
                   try {
                   
-                      ['token', 'cookie'].forEach(function (field) {
-                          if (creds[field] === null || creds[field] == "" || typeof creds[field] === 'undefined') {
-                              throw 'Unexpected token value has been received'
-                                  + ((typeof creds.error !== 'undefined' && creds.error != "") ? ': ' + creds.error : '');
-                          }
-                      });
+                  	['token', 'cookie'].forEach(function (field) {
+                  		if (creds[field] === null || creds[field] == "" || typeof creds[field] === 'undefined') {
+                  			throw 'Unexpected token value has been received'
+                  			+ ((typeof creds.error !== 'undefined' && creds.error != "") ? ': ' + creds.error : '');
+                  		}
+                  	});
                   
-                      if (url === '{' + '$SDWAN.API.URL}') {
-                          throw 'Please change {' + '$SDWAN.API.URL} macro to the proper value.';
-                      }
+                  	if (url === '{' + '$SDWAN.API.URL}') {
+                  		throw 'Please change {' + '$SDWAN.API.URL} macro to the proper value.';
+                  	}
                   
-                      if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
-                          url = 'https://' + url;
-                      }
+                  	if (url.indexOf('http://') === -1 && url.indexOf('https://') === -1) {
+                  		url = 'https://' + url;
+                  	}
                   
-                      if (!url.endsWith('/')) {
-                          url += '/';
-                      }
+                  	if (!url.endsWith('/')) {
+                  		url += '/';
+                  	}
                   
-                      if (http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && http_proxy !== '') {
-                          request.setProxy(http_proxy);
-                      }
+                  	if (http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && http_proxy !== '') {
+                  		request.setProxy(http_proxy);
+                  	}
                   
-                      devices = getHttpData(
-                          url + 'dataservice/device',
-                          creds.token,
-                          creds.cookie
-                      );
+                  	devices = getHttpData(
+                  		url + 'dataservice/device',
+                  		creds.token,
+                  		creds.cookie
+                  	);
                   
-                      if (Array.isArray(devices.data)) {
-                          devices = devices.data;
-                      }
-                      else {
-                          throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
-                      }
+                  	if (Array.isArray(devices.data)) {
+                  		devices = devices.data;
+                  	}
+                  	else {
+                  		throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
+                  	}
                   
                   } catch (err) {
-                      error_msg = err;
+                  	error_msg = err;
                   };
                   
                   return JSON.stringify({
-                      'devices': devices.map(function (device) {
-                          obj = {
-                              'name': device['host-name'],
-                              'token': creds.token,
-                              'cookie': creds.cookie,
-                              'id': device['deviceId'],
-                              'uuid': device['uuid'],
-                              'type': device['device-type'],
-                              'model': device['device-model'],
-                              'ip': device['system-ip'],
-                              'int_ip': device['local-system-ip'],
-                              'cert_valid': device['certificate-validity']
-                          };
-                      
-                          return obj;
-                      }),
-                      'error': error_msg.toString()
+                  	'devices': devices.map(function (device) {
+                  		obj = {
+                  			'name': device['host-name'],
+                  			'token': creds.token,
+                  			'cookie': creds.cookie,
+                  			'id': device['deviceId'],
+                  			'uuid': device['uuid'],
+                  			'type': device['device-type'],
+                  			'model': device['device-model'],
+                  			'ip': device['system-ip'],
+                  			'int_ip': device['local-system-ip'],
+                  			'cert_valid': device['certificate-validity']
+                  		};
+                  
+                  		return obj;
+                  	}),
+                  	'error': error_msg.toString()
                   });
           master_item:
             key: sd_wan.authentication
@@ -678,9 +678,9 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [   // 10 - Unknown (default)
-                      'Valid',     // 0
-                      'Invalid',   // 1
+                  const idx = [
+                  	'Valid',
+                  	'Invalid',
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -1124,12 +1124,11 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [   // 10 - unknown (default)
-                      'reachable',   // 0
-                      'unreachable', // 1
-                      'auth-failed', // 2
-                      'staging'      // 3
-                      
+                  const idx = [
+                  	'reachable',
+                  	'unreachable',
+                  	'auth-failed',
+                  	'staging'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -1216,11 +1215,10 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  const idx = [   // 10 - unknown (default)
-                      'green',   // 0
-                      'yellow',  // 1
-                      'red'      // 2
-                      
+                  const idx = [
+                  	'green',
+                  	'yellow',
+                  	'red'
                   ].indexOf(value);
                   return idx !== -1 ? idx : 10;
           master_item:
@@ -1312,89 +1310,89 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                device_info = {}
-                error_msg = "";
+            	request = new HttpRequest(),
+            	device_info = {},
+            	error_msg = "";
             
             function getHttpData(url, token, cookie) {
-                request.addHeader('Cookie: ' + cookie);
-                request.addHeader('X-XSRF-TOKEN: ' + token);
-                response = request.get(url);
-                Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	request.addHeader('Cookie: ' + cookie);
+            	request.addHeader('X-XSRF-TOKEN: ' + token);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['auth.token', 'auth.cookie', 'api.url', 'device_id'].forEach(function (field) {
-                    var macro = '{$SDWAN.' + field.toUpperCase() + '}';
-                    var key = field.split('.').slice(-1);
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['auth.token', 'auth.cookie', 'api.url', 'device_id'].forEach(function (field) {
+            		var macro = '{$SDWAN.' + field.toUpperCase() + '}';
+            		var key = field.split('.').slice(-1);
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                device_info = getHttpData(
-                    params.url + 'dataservice/device?deviceId=' + encodeURIComponent(params.device_id),
-                    params.token,
-                    params.cookie
-                );
+            	device_info = getHttpData(
+            		params.url + 'dataservice/device?deviceId=' + encodeURIComponent(params.device_id),
+            		params.token,
+            		params.cookie
+            	);
             
-                if (Array.isArray(device_info.data) && device_info.data.length > 0) {
-                    device_info = device_info.data[0];
-                }
-                else {
-                    throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                }
+            	if (Array.isArray(device_info.data) && device_info.data.length > 0) {
+            		device_info = device_info.data[0];
+            	}
+            	else {
+            		throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            	}
             
-                var system_info = getHttpData(
-                    params.url + 'dataservice/device/system/status?deviceId=' + params.device_id,
-                    params.token,
-                    params.cookie
-                );
+            	var system_info = getHttpData(
+            		params.url + 'dataservice/device/system/status?deviceId=' + params.device_id,
+            		params.token,
+            		params.cookie
+            	);
             
-                if (Array.isArray(system_info.data) && system_info.data.length > 0) {
-                    device_info = Object.assign(device_info, system_info.data[0]);
-                }
-                else {
-                    throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                }
+            	if (Array.isArray(system_info.data) && system_info.data.length > 0) {
+            		device_info = Object.assign(device_info, system_info.data[0]);
+            	}
+            	else {
+            		throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            	}
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += (error_msg.endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += (error_msg.endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
             };
             
             device_info.error = error_msg;
@@ -1454,98 +1452,98 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = {"data":[],"error":""},
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = { "data": [], "error": "" },
+            	error_msg = "";
             
             function getHttpData(url, token, cookie) {
-                request.addHeader('Cookie: ' + cookie);
-                request.addHeader('X-XSRF-TOKEN: ' + token);
-                response = request.get(url);
-                Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	request.addHeader('Cookie: ' + cookie);
+            	request.addHeader('X-XSRF-TOKEN: ' + token);
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['auth.token', 'auth.cookie', 'api.url', 'device_id'].forEach(function (field) {
-                    var macro = '{$SDWAN.' + field.toUpperCase() + '}';
-                    var key = field.split('.').slice(-1);
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['auth.token', 'auth.cookie', 'api.url', 'device_id'].forEach(function (field) {
+            		var macro = '{$SDWAN.' + field.toUpperCase() + '}';
+            		var key = field.split('.').slice(-1);
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                var interface_list = getHttpData(
-                    params.url + 'dataservice/device/interface?deviceId=' + encodeURIComponent(params.device_id),
-                    params.token,
-                    params.cookie
-                );
+            	var interface_list = getHttpData(
+            		params.url + 'dataservice/device/interface?deviceId=' + encodeURIComponent(params.device_id),
+            		params.token,
+            		params.cookie
+            	);
             
-                if (Array.isArray(interface_list.data) && interface_list.data.length > 0) {
-                    var interfaces = {};
-                    interface_list.data.forEach(function (if_item) {
-                        var if_key = if_item['vdevice-name'] + '_' + if_item.ifname + '_' + if_item.ifindex;
-                        interfaces[if_key] = (typeof interfaces[if_key] !== 'undefined') ? interfaces[if_key] : {};
-                        if (typeof if_item['af-type'] !== 'undefined') {
-                            if (if_item['af-type'].includes('ipv6')) {
-                                Object.keys(if_item).sort().forEach(function (key) {
-                                    if (key.match(/([tr]x-)/g)) {
-                                        interfaces[if_key]['ipv6-' + key] = if_item[key];
-                                    }
-                                });
-                            }
-                            else {
-                                interfaces[if_key] = if_item
-                            }
-                        }
-                        else {
-                            interfaces[if_key] = if_item
-                        }
-                    });
-                    Object.keys(interfaces).forEach(function (key) {
-                        result.data.push(interfaces[key]);
-                    });
-                }
-                else {
-                    throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                }
+            	if (Array.isArray(interface_list.data) && interface_list.data.length > 0) {
+            		var interfaces = {};
+            		interface_list.data.forEach(function (if_item) {
+            			var if_key = if_item['vdevice-name'] + '_' + if_item.ifname + '_' + if_item.ifindex;
+            			interfaces[if_key] = (typeof interfaces[if_key] !== 'undefined') ? interfaces[if_key] : {};
+            			if (typeof if_item['af-type'] !== 'undefined') {
+            				if (if_item['af-type'].includes('ipv6')) {
+            					Object.keys(if_item).sort().forEach(function (key) {
+            						if (key.match(/([tr]x-)/g)) {
+            							interfaces[if_key]['ipv6-' + key] = if_item[key];
+            						}
+            					});
+            				}
+            				else {
+            					interfaces[if_key] = if_item;
+            				}
+            			}
+            			else {
+            				interfaces[if_key] = if_item;
+            			}
+            		});
+            		Object.keys(interfaces).forEach(function (key) {
+            			result.data.push(interfaces[key]);
+            		});
+            	}
+            	else {
+            		throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            	}
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += (error_msg.endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += (error_msg.endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -1606,147 +1604,147 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                result = { "data": [], "error": "" },
-                error_msg = "";
+            	request = new HttpRequest(),
+            	result = { "data": [], "error": "" },
+            	error_msg = "";
             
             function getHttpData(url, data, token, cookie) {
-                request.addHeader('Cookie: ' + cookie);
-                request.addHeader('Content-Type: application/json');
-                request.addHeader('X-XSRF-TOKEN: ' + token);
+            	request.addHeader('Cookie: ' + cookie);
+            	request.addHeader('Content-Type: application/json');
+            	request.addHeader('X-XSRF-TOKEN: ' + token);
             
-                if (typeof data !== 'undefined') {
-                    data = JSON.stringify(data);
-                }
+            	if (typeof data !== 'undefined') {
+            		data = JSON.stringify(data);
+            	}
             
-                response = request.post(url, data);
-                Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.post(url, data);
+            	Zabbix.log(4, '[ Cisco SD-WAN ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (request.getStatus() !== 200) {
-                    throw 'Failed to receive data: invalid response status code.';
-                }
+            	if (request.getStatus() !== 200) {
+            		throw 'Failed to receive data: invalid response status code.';
+            	}
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
-                ['auth.token', 'auth.cookie', 'api.url', 'device_id'].forEach(function (field) {
-                    var macro = '{$SDWAN.' + field.toUpperCase() + '}';
-                    var key = field.split('.').slice(-1);
-                    if (params[key] === macro || params[key] === '') {
-                        throw 'Please change ' + macro + ' macro to the proper value.';
-                    }
-                    if (typeof params[key] === 'undefined') {
-                        throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
-                    }
-                });
+            	['auth.token', 'auth.cookie', 'api.url', 'device_id'].forEach(function (field) {
+            		var macro = '{$SDWAN.' + field.toUpperCase() + '}';
+            		var key = field.split('.').slice(-1);
+            		if (params[key] === macro || params[key] === '') {
+            			throw 'Please change ' + macro + ' macro to the proper value.';
+            		}
+            		if (typeof params[key] === 'undefined') {
+            			throw 'Please set \'' + key + '\' script input parameter to ' + macro + ' macro value.';
+            		}
+            	});
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
-                    request.setProxy(params.http_proxy);
-                }
+            	if (typeof params.http_proxy !== 'undefined' && params.http_proxy !== '{' + '$SDWAN.HTTP_PROXY}' && params.http_proxy !== '') {
+            		request.setProxy(params.http_proxy);
+            	}
             
-                if (!params.interval.endsWith('h')) {
-                    throw 'The value of {' + '$SDWAN.ROUTES.INTERVAL} must be expressed in hours.';
-                }
-                else {
-                    try {
-                        params.interval = Number(params.interval.replace('h',''));
-                    }
-                    catch (error) {
-                        throw 'Please change {' + '$SDWAN.ROUTES.INTERVAL} macro to the proper value.';
-                    }
-                }
+            	if (!params.interval.endsWith('h')) {
+            		throw 'The value of {' + '$SDWAN.ROUTES.INTERVAL} must be expressed in hours.';
+            	}
+            	else {
+            		try {
+            			params.interval = Number(params.interval.replace('h', ''));
+            		}
+            		catch (error) {
+            			throw 'Please change {' + '$SDWAN.ROUTES.INTERVAL} macro to the proper value.';
+            		}
+            	}
             
-                var req_data = {
-                    "query": {
-                        "condition": "AND",
-                        "rules": [
-                            {
-                                "value": [
-                                    String(params.interval)
-                                ],
-                                "field": "entry_time",
-                                "type": "date",
-                                "operator": "last_n_hours"
-                            },
-                            {
-                                "value": [
-                                    params.device_id
-                                ],
-                                "field": "vdevice_name",
-                                "type": "string",
-                                "operator": "in"
-                            }
-                        ]
-                    },
-                    "aggregation": {
-                        "field": [
-                            {
-                                "property": "local_color",
-                                "order": "asc",
-                                "sequence": 1
-                            },
-                            {
-                                "property": "remote_color",
-                                "order": "asc",
-                                "sequence": 1
-                            }
-                        ],
-                        "metrics": [
-                            {
-                                "property": "loss_percentage",
-                                "type": "avg"
-                            },
-                            {
-                                "property": "latency",
-                                "type": "avg"
-                            },
-                            {
-                                "property": "jitter",
-                                "type": "avg"
-                            }
-                        ]
-                    }
-                }
+            	var req_data = {
+            		"query": {
+            			"condition": "AND",
+            			"rules": [
+            				{
+            					"value": [
+            						String(params.interval)
+            					],
+            					"field": "entry_time",
+            					"type": "date",
+            					"operator": "last_n_hours"
+            				},
+            				{
+            					"value": [
+            						params.device_id
+            					],
+            					"field": "vdevice_name",
+            					"type": "string",
+            					"operator": "in"
+            				}
+            			]
+            		},
+            		"aggregation": {
+            			"field": [
+            				{
+            					"property": "local_color",
+            					"order": "asc",
+            					"sequence": 1
+            				},
+            				{
+            					"property": "remote_color",
+            					"order": "asc",
+            					"sequence": 1
+            				}
+            			],
+            			"metrics": [
+            				{
+            					"property": "loss_percentage",
+            					"type": "avg"
+            				},
+            				{
+            					"property": "latency",
+            					"type": "avg"
+            				},
+            				{
+            					"property": "jitter",
+            					"type": "avg"
+            				}
+            			]
+            		}
+            	};
             
-                var routes = getHttpData(
-                    params.url + 'dataservice/statistics/approute/aggregation',
-                    req_data,
-                    params.token,
-                    params.cookie
-                );
+            	var routes = getHttpData(
+            		params.url + 'dataservice/statistics/approute/aggregation',
+            		req_data,
+            		params.token,
+            		params.cookie
+            	);
             
-                if (Array.isArray(routes.data)) {
-                    result["data"] = routes.data;
-                }
-                else {
-                    throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
-                }
+            	if (Array.isArray(routes.data)) {
+            		result["data"] = routes.data;
+            	}
+            	else {
+            		throw 'Failed to parse response received from Cisco SD-WAN API. Check debug log for more information.';
+            	}
             } catch (error) {
-                error_msg = error.toString();
-                error_msg += (error_msg.endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
+            	error_msg = error.toString();
+            	error_msg += (error_msg.endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Cisco SD-WAN ] ERROR: ' + error_msg);
             };
             
             result.error = error_msg;
@@ -1836,7 +1834,7 @@ zabbix_export:
                       const sizes = ['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
                       var multiplier = sizes.indexOf(value.slice(-1));
                       if (multiplier === -1) {
-                          return value;
+                      	return value;
                       }
                       return Number(value.slice(0, -1)) * 1024 * multiplier;
               master_item:
@@ -1860,13 +1858,13 @@ zabbix_export:
                   parameters:
                     - |
                       var input = JSON.parse(value),
-                          output = {};
+                      	output = {};
                       
                       Object.keys(input).sort().forEach(function (key) {
-                          var re = new RegExp("^{#FSKEY}[-_]");
-                          if (key.match(re)) {
-                              output[key.replace(re,'')] = input[key];
-                          }
+                      	var re = new RegExp("^{#FSKEY}[-_]");
+                      	if (key.match(re)) {
+                      		output[key.replace(re, '')] = input[key];
+                      	}
                       });
                       
                       return JSON.stringify(output);
@@ -1947,7 +1945,7 @@ zabbix_export:
                       const sizes = ['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
                       var multiplier = sizes.indexOf(value.slice(-1));
                       if (multiplier === -1) {
-                          return value;
+                      	return value;
                       }
                       return Number(value.slice(0, -1)) * 1024 * multiplier;
               master_item:
@@ -1976,7 +1974,7 @@ zabbix_export:
                       const sizes = ['K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y'];
                       var multiplier = sizes.indexOf(value.slice(-1));
                       if (multiplier === -1) {
-                          return value;
+                      	return value;
                       }
                       return Number(value.slice(0, -1)) * 1024 * multiplier;
               master_item:
@@ -2013,14 +2011,14 @@ zabbix_export:
               parameters:
                 - |
                   var input = JSON.parse(value),
-                  output = [];
+                      output = [];
                   
                   Object.keys(input).sort().forEach(function (key) {
                       if (key.match(/(disk[-_]mount)/g)) {
                           output.push(
                               {
                                   'mount': input[key],
-                                  'key': key.replace(/[-_]mount/,'')
+                                  'key': key.replace(/[-_]mount/, '')
                               }
                           );
                       }
@@ -2065,12 +2063,12 @@ zabbix_export:
                   parameters:
                     - |
                       var idx = [
-                          'if-state-up',    //0
-                          'if-state-down'   //1
+                      	'if-state-up',
+                      	'if-state-down'
                       ].indexOf(value);
-                      var idx = idx !== -1 ? idx : [   // 10 - Unknown (default)
-                          'Up',     // 0
-                          'Down',   // 1
+                      var idx = idx !== -1 ? idx : [
+                      	'Up',
+                      	'Down',
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
               master_item:
@@ -2378,13 +2376,13 @@ zabbix_export:
                   parameters:
                     - |
                       var idx = [
-                          'if-oper-state-ready',              //0
-                          'if-oper-state-lower-layer-down',   //1
-                          'if-oper-state-no-pass'             //2
+                      	'if-oper-state-ready',
+                      	'if-oper-state-lower-layer-down',
+                      	'if-oper-state-no-pass'
                       ].indexOf(value);
-                      var idx = idx !== -1 ? idx : [   // 10 - Unknown (default)
-                          'Up',     // 0
-                          'Down',   // 1
+                      var idx = idx !== -1 ? idx : [
+                      	'Up',
+                      	'Down',
                       ].indexOf(value);
                       return idx !== -1 ? idx : 10;
               master_item:
@@ -2561,11 +2559,11 @@ zabbix_export:
               parameters:
                 - |
                   var input = JSON.parse(value),
-                  output = [];
+                      output = [];
                   
                   input.data.forEach(function (if_item) {
-                      var desc = (typeof if_item['desc'] !== 'undefined') 
-                          ? if_item['desc'] 
+                      var desc = (typeof if_item['desc'] !== 'undefined')
+                          ? if_item['desc']
                           : ((typeof if_item['description'] !== 'undefined') ? if_item['description'] : '');
                       output.push(
                           {

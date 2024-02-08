@@ -33,6 +33,7 @@
 #include "zbxtrends.h"
 #include "zbxvault.h"
 #include "zbxserialize.h"
+#include "valuecache.h"
 
 int	sync_in_progress = 0;
 
@@ -60,6 +61,8 @@ int	sync_in_progress = 0;
 #define DCin_maintenance_without_data_collection(dc_host, dc_item)			\
 		in_maintenance_without_data_collection(dc_host->maintenance_status,	\
 				dc_host->maintenance_type, dc_item->type)
+
+ZBX_PTR_VECTOR_IMPL(dc_item_ptr, ZBX_DC_ITEM *)
 
 /******************************************************************************
  *                                                                            *
@@ -2690,7 +2693,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	DCsync_items(zbx_dbsync_t *sync, int flags)
+static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
 	zbx_uint64_t		rowid;
@@ -2816,7 +2819,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags)
 		if (0 == found)
 		{
 			item->triggers = NULL;
-			item->update_triggers = 0;
+
+			if (NULL != new_items)
+			{
+				zbx_vector_dc_item_ptr_append(new_items, item);
+				item->update_triggers = ZBX_ITEM_UPDATE_TRIGGER_NEW_ITEM;
+			}
+			else
+				item->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
+
 			item->nextcheck = 0;
 			item->state = (unsigned char)atoi(row[12]);
 			ZBX_STR2UINT64(item->lastlogsize, row[20]);
@@ -5735,7 +5746,7 @@ static void	dc_item_reset_triggers(ZBX_DC_ITEM *item, ZBX_DC_TRIGGER *trigger_ex
 {
 	ZBX_DC_TRIGGER	**trigger;
 
-	item->update_triggers = 1;
+	item->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_REFRESH;
 
 	if (NULL == item->triggers)
 		return;
@@ -5807,7 +5818,7 @@ static void	dc_trigger_update_cache(void)
 		}
 
 		/* cache item - trigger link */
-		if (0 != item->update_triggers)
+		if (ZBX_DC_ITEM_UPDATE_TRIGGER_REFRESH == item->update_triggers)
 		{
 			itemtrig.first = item;
 			itemtrig.second = trigger;
@@ -5845,7 +5856,7 @@ static void	dc_trigger_update_cache(void)
 			}
 
 			item = (ZBX_DC_ITEM *)itemtrigs.values[i].first;
-			item->update_triggers = 0;
+			item->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
 			item->triggers = (ZBX_DC_TRIGGER **)config->items.mem_realloc_func(item->triggers,
 					(size_t)(j - i + 1) * sizeof(ZBX_DC_TRIGGER *));
 
@@ -5950,6 +5961,43 @@ static void	dc_load_trigger_queue(zbx_hashset_t *trend_functions)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: add new items with triggers to value cache                        *
+ *                                                                            *
+ ******************************************************************************/
+static void	dc_add_new_items_to_valuecache(const zbx_vector_dc_item_ptr_t *items)
+{
+	if (0 != items->values_num)
+	{
+		zbx_vector_uint64_pair_t	vc_items;
+		int				i;
+
+		zbx_vector_uint64_pair_create(&vc_items);
+		zbx_vector_uint64_pair_reserve(&vc_items, (size_t)items->values_num);
+
+		for (i = 0; i < items->values_num; i++)
+		{
+			if (ZBX_DC_ITEM_UPDATE_TRIGGER_REFRESH == items->values[i]->update_triggers)
+			{
+				zbx_uint64_pair_t	pair = {
+						.first = items->values[i]->itemid,
+						.second = (zbx_uint64_t)items->values[i]->value_type
+				};
+
+				zbx_vector_uint64_pair_append_ptr(&vc_items, &pair);
+			}
+			else
+				items->values[i]->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
+		}
+
+		if (0 != items->values_num)
+			zbx_vc_add_new_items(&vc_items);
+
+		zbx_vector_uint64_pair_destroy(&vc_items);
+	}
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: Synchronize configuration data from database                      *
  *                                                                            *
  ******************************************************************************/
@@ -5976,7 +6024,8 @@ void	DCsync_configuration(unsigned char mode)
 	zbx_dbsync_t	autoreg_config_sync;
 	zbx_uint64_t	update_flags = 0;
 
-	zbx_hashset_t		trend_queue;
+	zbx_hashset_t			trend_queue;
+	zbx_vector_dc_item_ptr_t	new_items, *pnew_items = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -5988,6 +6037,11 @@ void	DCsync_configuration(unsigned char mode)
 	{
 		zbx_hashset_create(&trend_queue, 1000, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 		dc_load_trigger_queue(&trend_queue);
+	}
+	else if (0 != (program_type & ZBX_PROGRAM_TYPE_SERVER))
+	{
+		zbx_vector_dc_item_ptr_create(&new_items);
+		pnew_items = &new_items;
 	}
 
 	/* global configuration must be synchronized directly with database */
@@ -6218,7 +6272,7 @@ void	DCsync_configuration(unsigned char mode)
 	/* relies on hosts, proxies and interfaces, must be after DCsync_{hosts,interfaces}() */
 
 	sec = zbx_time();
-	DCsync_items(&items_sync, flags);
+	DCsync_items(&items_sync, flags, pnew_items);
 	isec2 = zbx_time() - sec;
 
 	sec = zbx_time();
@@ -6266,6 +6320,12 @@ void	DCsync_configuration(unsigned char mode)
 	DCsync_functions(&func_sync);
 	fsec2 = zbx_time() - sec;
 	FINISH_SYNC;
+
+	if (NULL != pnew_items)
+	{
+		dc_add_new_items_to_valuecache(pnew_items);
+		zbx_vector_dc_item_ptr_clear(pnew_items);
+	}
 
 	/* sync rest of the data */
 
@@ -6718,6 +6778,16 @@ out:
 		zbx_hashset_destroy(&trend_queue);
 
 	zbx_dbsync_free_env();
+
+	if (NULL != pnew_items)
+	{
+		/* Reset update trigger flags for items that could be left because of database errors. */
+		/* Can be done without locking as no other processes can remove items.                 */
+		for (i = 0; i < pnew_items->values_num; i++)
+			pnew_items->values[i]->update_triggers = ZBX_DC_ITEM_UPDATE_TRIGGER_NONE;
+
+		zbx_vector_dc_item_ptr_destroy(pnew_items);
+	}
 
 	if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_TRACE))
 		DCdump_configuration();

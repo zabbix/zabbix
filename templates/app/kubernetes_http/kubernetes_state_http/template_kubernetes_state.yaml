@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-11-02T11:58:59Z'
+  date: '2024-01-22T16:20:36Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -49,119 +49,119 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Kube = {
-                params: {},
+            	params: {},
             
-                setParams: function (params) {
-                    ['api_token', 'api_url', 'api_server_scheme', 'api_server_port', 'controller_scheme', 'controller_port',
-                        'scheduler_scheme', 'scheduler_port', 'control_plane_taint'].forEach(function (field) {
-                            if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                                || params[field] === '') {
-                                throw 'Required param is not set: "' + field + '".';
-                            }
-                        });
+            	setParams: function (params) {
+            		['api_token', 'api_url', 'api_server_scheme', 'api_server_port', 'controller_scheme', 'controller_port',
+            			'scheduler_scheme', 'scheduler_port', 'control_plane_taint'].forEach(function (field) {
+            				if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            					|| params[field] === '') {
+            					throw 'Required param is not set: "' + field + '".';
+            				}
+            			});
             
-                    Kube.params = params;
-                    if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
-                        Kube.params.api_url += '/';
-                    }
-                },
+            		Kube.params = params;
+            		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
+            			Kube.params.api_url += '/';
+            		}
+            	},
             
-                apiRequest: function (query) {
-                    var request = new HttpRequest(),
-                        response,
-                        url = encodeURI(Kube.params.api_url + query);
-                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
-                        request.setProxy(Kube.params.http_proxy);
-                    }
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
+            	apiRequest: function (query) {
+            		var request = new HttpRequest(),
+            			response,
+            			url = encodeURI(Kube.params.api_url + query);
+            		if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+            			request.setProxy(Kube.params.http_proxy);
+            		}
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
-                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    if (Kube.params.http_proxy) {
-                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
-                    }
+            		if (Kube.params.http_proxy) {
+            			Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+            		}
             
-                    response = request.get(url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                    }
-                    return response;
-                },
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+            		}
+            		return response;
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                getNodes: function () {
-                    var result = Kube.apiRequest('api/v1/nodes?labelSelector=' + Kube.params.control_plane_taint);
+            	getNodes: function () {
+            		var result = Kube.apiRequest('api/v1/nodes?labelSelector=' + Kube.params.control_plane_taint);
             
-                    if (typeof result !== 'object'
-                        || typeof result.items === 'undefined') {
-                        throw 'Cannot get control plane nodes from Kubernetes API. Check debug log for more information.';
-                    };
+            		if (typeof result !== 'object'
+            			|| typeof result.items === 'undefined') {
+            			throw 'Cannot get control plane nodes from Kubernetes API. Check debug log for more information.';
+            		};
             
-                    var nodes = result.items,
-                        IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
-                        controlPlaneNodes = [],
-                        hostname = Kube.params.api_url.match(/https?:\/\/([\w.-]+|\[[a-f0-9:]+\]|[^a-zA-Z:]+)(?::\d+)?/);
+            		var nodes = result.items,
+            			IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
+            			controlPlaneNodes = [],
+            			hostname = Kube.params.api_url.match(/https?:\/\/([\w.-]+|\[[a-f0-9:]+\]|[^a-zA-Z:]+)(?::\d+)?/);
             
-                    if (typeof hostname[1] === 'undefined') {
-                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
-                        throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                    };
+            		if (typeof hostname[1] === 'undefined') {
+            			Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+            			throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+            		};
             
-                    controlPlaneNodes = nodes.map(function (node) {
-                        var internalIPs = Kube.getField(node, 'status.addresses').filter(function (addr) {
-                            return addr.type === 'InternalIP';
-                        });
-                        var internalIP = internalIPs.length && internalIPs[0].address;
+            		controlPlaneNodes = nodes.map(function (node) {
+            			var internalIPs = Kube.getField(node, 'status.addresses').filter(function (addr) {
+            				return addr.type === 'InternalIP';
+            			});
+            			var internalIP = internalIPs.length && internalIPs[0].address;
             
-                        return {
-                            '{#NAME}': Kube.getField(node, 'metadata.name'),
-                            '{#IP}': internalIP,
-                            '{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.api_server_port + '/metrics',
-                            '{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.controller_port + '/metrics',
-                            '{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.scheduler_port + '/metrics',
-                            '{#COMPONENT.API}': 'API',
-                            '{#COMPONENT.CONTROLLER}': 'Controller manager',
-                            '{#COMPONENT.SCHEDULER}': 'Scheduler',
-                            '{#CLUSTER_HOSTNAME}': hostname[1]
-                        };
-                    });
+            			return {
+            				'{#NAME}': Kube.getField(node, 'metadata.name'),
+            				'{#IP}': internalIP,
+            				'{#KUBE.API.SERVER.URL}': Kube.params.api_server_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.api_server_port + '/metrics',
+            				'{#KUBE.CONTROLLER.SERVER.URL}': Kube.params.controller_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.controller_port + '/metrics',
+            				'{#KUBE.SCHEDULER.SERVER.URL}': Kube.params.scheduler_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.scheduler_port + '/metrics',
+            				'{#COMPONENT.API}': 'API',
+            				'{#COMPONENT.CONTROLLER}': 'Controller manager',
+            				'{#COMPONENT.SCHEDULER}': 'Scheduler',
+            				'{#CLUSTER_HOSTNAME}': hostname[1]
+            			};
+            		});
             
-                    return JSON.stringify(controlPlaneNodes);
-                }
+            		return JSON.stringify(controlPlaneNodes);
+            	}
             };
             
             try {
-                Kube.setParams(JSON.parse(value));
-                return Kube.getNodes();
+            	Kube.setParams(JSON.parse(value));
+            	return Kube.getNodes();
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
-                return JSON.stringify({ error: error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
             }
           description: 'Generation of data for Control plane discovery rules.'
           preprocessing:
@@ -281,15 +281,15 @@ zabbix_export:
               parameters:
                 - |
                   var output = [],
-                      component;
+                  	component;
                   
                   value.split(/\n/).forEach(function (entry) {
-                      if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
-                          output.push({
-                              name: component[1],
-                              value: component[2]
-                          });
-                      }
+                  	if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
+                  		output.push({
+                  			name: component[1],
+                  			value: component[2]
+                  		});
+                  	}
                   });
                   
                   return JSON.stringify(output);
@@ -349,161 +349,161 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Kube = {
-                params: {},
+            	params: {},
             
-                setParams: function (params) {
-                    ['api_url', 'api_token', 'kubelet_scheme', 'kubelet_port'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
-                    ['node_filter_labels', 'node_filter_annotations'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined') {
-                            throw 'Parameter can be empty but not removed: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_url', 'api_token', 'kubelet_scheme', 'kubelet_port'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            		});
+            		['node_filter_labels', 'node_filter_annotations'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined') {
+            				throw 'Parameter can be empty but not removed: "' + field + '".';
+            			}
+            		});
             
-                    Kube.params = params;
-                    if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
-                        Kube.params.api_url += '/';
-                    }
+            		Kube.params = params;
+            		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
+            			Kube.params.api_url += '/';
+            		}
             
-                },
+            	},
             
-                apiRequest: function (query) {
-                    var request = new HttpRequest(),
-                        response,
-                        url = encodeURI(Kube.params.api_url + query);
+            	apiRequest: function (query) {
+            		var request = new HttpRequest(),
+            			response,
+            			url = encodeURI(Kube.params.api_url + query);
             
-                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
-                        request.setProxy(Kube.params.http_proxy);
-                    }
+            		if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+            			request.setProxy(Kube.params.http_proxy);
+            		}
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
-                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    if (Kube.params.http_proxy) {
-                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
-                    }
+            		if (Kube.params.http_proxy) {
+            			Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+            		}
             
-                    response = request.get(url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
             
-                    }
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                    }
-                    return response;
+            		}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+            		}
+            		return response;
             
-                },
+            	},
             
-                parseFilters: function (filter) {
-                    var pairs = {};
+            	parseFilters: function (filter) {
+            		var pairs = {};
             
-                    filter.split(/\s*,\s*/).forEach(function (kv) {
-                        if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
-                            var pair = kv.split(/\s*:\s*/);
-                            pairs[pair[0]] = pair[1];
-                        }
-                    });
-                    return pairs;
-                },
+            		filter.split(/\s*,\s*/).forEach(function (kv) {
+            			if (/!?([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*\/)?([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9]\s*:\s*.+/.test(kv)) {
+            				var pair = kv.split(/\s*:\s*/);
+            				pairs[pair[0]] = pair[1];
+            			}
+            		});
+            		return pairs;
+            	},
             
-                filter: function (name, data, filters) {
-                    var filtered = true;
-                    if (typeof data === 'object') {
-                        Object.keys(filters).some(function (filter) {
-                            var exclude = filter.match(/^!(.+)/);
-                            if (filter in data || (exclude && exclude[1] in data)) {
-                                if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
-                                    || (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
-                                    Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
+            	filter: function (name, data, filters) {
+            		var filtered = true;
+            		if (typeof data === 'object') {
+            			Object.keys(filters).some(function (filter) {
+            				var exclude = filter.match(/^!(.+)/);
+            				if (filter in data || (exclude && exclude[1] in data)) {
+            					if ((exclude && new RegExp(filters[filter]).test(data[exclude[1]]))
+            						|| (!exclude && !(new RegExp(filters[filter]).test(data[filter])))) {
+            						Zabbix.log(4, '[ Kubernetes ] Discarded "' + name + '" by filter "' + filter + ': ' + filters[filter] + '"');
             
-                                    filtered = false;
-                                    return true;
-                                }
-                            };
-                        });
-                    }
-                    return filtered;
-                },
+            						filtered = false;
+            						return true;
+            					}
+            				};
+            			});
+            		}
+            		return filtered;
+            	},
             
-                getField: function (data, path) {
-                    var steps = path.split('.');
-                    for (var i = 0; i < steps.length; i++) {
-                        var step = steps[i];
-                        if (typeof data !== 'object' || typeof data[step] === 'undefined') {
-                            throw 'Required field was not found: ' + path;
-                        }
+            	getField: function (data, path) {
+            		var steps = path.split('.');
+            		for (var i = 0; i < steps.length; i++) {
+            			var step = steps[i];
+            			if (typeof data !== 'object' || typeof data[step] === 'undefined') {
+            				throw 'Required field was not found: ' + path;
+            			}
             
-                        data = data[step];
-                    }
+            			data = data[step];
+            		}
             
-                    return data;
-                },
+            		return data;
+            	},
             
-                getNodes: function () {
-                    var result = Kube.apiRequest('api/v1/nodes');
-                    if (typeof result !== 'object'
-                        || typeof result.items === 'undefined') {
-                        throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
-                    };
-                    var nodes = result.items,
-                        IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
-                        kubeNodes = [],
-                        hostname = Kube.params.api_url.match(/https?:\/\/([\w.-]+|\[[a-f0-9:]+\]|[^a-zA-Z:]+)(?::\d+)?/),
-                        filterNodeLabels = Kube.parseFilters(Kube.params.node_filter_labels),
-                        filterNodeAnnotations = Kube.parseFilters(Kube.params.node_filter_annotations);
+            	getNodes: function () {
+            		var result = Kube.apiRequest('api/v1/nodes');
+            		if (typeof result !== 'object'
+            			|| typeof result.items === 'undefined') {
+            			throw 'Cannot get nodes from Kubernetes API. Check debug log for more information.';
+            		};
+            		var nodes = result.items,
+            			IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
+            			kubeNodes = [],
+            			hostname = Kube.params.api_url.match(/https?:\/\/([\w.-]+|\[[a-f0-9:]+\]|[^a-zA-Z:]+)(?::\d+)?/),
+            			filterNodeLabels = Kube.parseFilters(Kube.params.node_filter_labels),
+            			filterNodeAnnotations = Kube.parseFilters(Kube.params.node_filter_annotations);
             
-                    if (typeof hostname[1] === 'undefined') {
-                        Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
-                        throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
-                    };
+            		if (typeof hostname[1] === 'undefined') {
+            			Zabbix.log(4, '[ Kubernetes ] Received incorrect Kubernetes API url: ' + api_url + '. Expected format: <scheme>://<host>:<port>');
+            			throw 'Cannot get hostname from Kubernetes API url. Check debug log for more information.';
+            		};
             
-                    kubeNodes = nodes.map(function (node) {
-                        if (Kube.filter(Kube.getField(node, 'metadata.name'), Kube.getField(node, 'metadata.labels'), filterNodeLabels)
-                            && Kube.filter(Kube.getField(node, 'metadata.name'), Kube.getField(node, 'metadata.annotations'), filterNodeAnnotations)) {
-                            Zabbix.log(4, '[ Kubernetes ] Filtered node "' + node.metadata.name + '"');
+            		kubeNodes = nodes.map(function (node) {
+            			if (Kube.filter(Kube.getField(node, 'metadata.name'), Kube.getField(node, 'metadata.labels'), filterNodeLabels)
+            				&& Kube.filter(Kube.getField(node, 'metadata.name'), Kube.getField(node, 'metadata.annotations'), filterNodeAnnotations)) {
+            				Zabbix.log(4, '[ Kubernetes ] Filtered node "' + node.metadata.name + '"');
             
-                            var internalIPs = Kube.getField(node, 'status.addresses').filter(function (addr) {
-                                return addr.type === 'InternalIP';
-                            });
+            				var internalIPs = Kube.getField(node, 'status.addresses').filter(function (addr) {
+            					return addr.type === 'InternalIP';
+            				});
             
-                            var internalIP = internalIPs.length && internalIPs[0].address;
+            				var internalIP = internalIPs.length && internalIPs[0].address;
             
-                            return {
-                                '{#NAME}': node.metadata.name,
-                                '{#IP}': internalIP,
-                                '{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.kubelet_port,
-                                '{#COMPONENT}': 'Kubelet',
-                                '{#CLUSTER_HOSTNAME}': hostname[1]
-                            };
-                        }
-                    });
+            				return {
+            					'{#NAME}': node.metadata.name,
+            					'{#IP}': internalIP,
+            					'{#KUBE.KUBELET.URL}': Kube.params.kubelet_scheme + '://' + (IPv4.test(internalIP) ? internalIP : '[' + internalIP + ']') + ':' + Kube.params.kubelet_port,
+            					'{#COMPONENT}': 'Kubelet',
+            					'{#CLUSTER_HOSTNAME}': hostname[1]
+            				};
+            			}
+            		});
             
-                    return JSON.stringify(kubeNodes);
+            		return JSON.stringify(kubeNodes);
             
-                },
+            	},
             };
             
             try {
-                Kube.setParams(JSON.parse(value));
-                return Kube.getNodes();
+            	Kube.setParams(JSON.parse(value));
+            	return Kube.getNodes();
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
-                return JSON.stringify({ error: error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
             }
           description: 'Generation of data for Kubelet discovery rules.'
           preprocessing:
@@ -541,15 +541,15 @@ zabbix_export:
               parameters:
                 - |
                   var output = [],
-                      component;
+                  	component;
                   
                   value.split(/\n/).forEach(function (entry) {
-                      if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
-                          output.push({
-                              name: component[1],
-                              value: component[2]
-                          });
-                      }
+                  	if (component = entry.match(/^\[.+\](.+)\s(\w+)$/)) {
+                  		output.push({
+                  			name: component[1],
+                  			value: component[2]
+                  		});
+                  	}
                   });
                   
                   return JSON.stringify(output);
@@ -590,155 +590,155 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Kube = {
-                params: {},
+            	params: {},
             
-                setParams: function (params) {
-                    ['api_url', 'api_token', 'state_endpoint_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                            || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_url', 'api_token', 'state_endpoint_name'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            				|| params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            		});
             
-                    Kube.params = params;
-                    if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
-                        Kube.params.api_url += '/';
-                    }
-                },
+            		Kube.params = params;
+            		if (typeof Kube.params.api_url === 'string' && !Kube.params.api_url.endsWith('/')) {
+            			Kube.params.api_url += '/';
+            		}
+            	},
             
-                apiRequest: function (query) {
-                    var request = new HttpRequest(),
-                        response,
-                        url = encodeURI(Kube.params.api_url + query);
+            	apiRequest: function (query) {
+            		var request = new HttpRequest(),
+            			response,
+            			url = encodeURI(Kube.params.api_url + query);
             
-                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
-                        request.setProxy(Kube.params.http_proxy);
-                    }
+            		if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+            			request.setProxy(Kube.params.http_proxy);
+            		}
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
-                    Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            		Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
             
-                    if (Kube.params.http_proxy) {
-                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
-                    }
+            		if (Kube.params.http_proxy) {
+            			Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+            		}
             
-                    response = request.get(url);
+            		response = request.get(url);
             
-                    Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
-                    }
-                    return response;
-                },
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from Kubernetes API. Check debug log for more information.';
+            		}
+            		return response;
+            	},
             
-                getEndpoint: function (ep) {
-                    if (typeof ep.subsets[0].addresses !== 'undefined') {
-                        var scheme,
-                            addr,
-                            port;
-                        ep.subsets.forEach(function (subset) {
-                            var lp = subset.ports.filter(function (port) {
-                                if (port.name !== 'http' &&
-                                    port.name !== 'https' &&
-                                    port.name !== 'https-main') {
-                                    return false;
-                                }
-                                scheme = port.name.match(/https?/);
-                                return true;
-                            })
-                            if (lp.length) {
-                                port = lp[0].port
-                                addr = subset.addresses[0].ip
-                            }
-                        })
-                        return {
-                            scheme: scheme || 'http',
-                            address: addr || ep.subsets[0].addresses[0].ip,
-                            port: port || 8080
-                        }
-                    }
-                },
+            	getEndpoint: function (ep) {
+            		if (typeof ep.subsets[0].addresses !== 'undefined') {
+            			var scheme,
+            				addr,
+            				port;
+            			ep.subsets.forEach(function (subset) {
+            				var lp = subset.ports.filter(function (port) {
+            					if (port.name !== 'http' &&
+            						port.name !== 'https' &&
+            						port.name !== 'https-main') {
+            						return false;
+            					}
+            					scheme = port.name.match(/https?/);
+            					return true;
+            				});
+            				if (lp.length) {
+            					port = lp[0].port;
+            					addr = subset.addresses[0].ip;
+            				}
+            			});
+            			return {
+            				scheme: scheme || 'http',
+            				address: addr || ep.subsets[0].addresses[0].ip,
+            				port: port || 8080
+            			};
+            		}
+            	},
             
-                getMetricsEndpoint: function () {
-                    var result = Kube.apiRequest('api/v1/endpoints'),
-                        endpoint = [];
+            	getMetricsEndpoint: function () {
+            		var result = Kube.apiRequest('api/v1/endpoints'),
+            			endpoint = [];
             
-                    if (typeof result !== 'object'
-                        || typeof result.items === 'undefined') {
-                        throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
-                    };
+            		if (typeof result !== 'object'
+            			|| typeof result.items === 'undefined') {
+            			throw 'Cannot get endpoints from Kubernetes API. Check debug log for more information.';
+            		};
             
-                    result.items.forEach(function (ep) {
-                        if (ep.metadata.name === Kube.params.state_endpoint_name && Array.isArray(ep.subsets)) {
-                            endpoint.push(Kube.getEndpoint(ep));
-                        }
-                        if (typeof Kube.params.openshift_endpoint_name !== 'undefined' && Kube.params.openshift_endpoint_name !== ''
-                            && ep.metadata.name === Kube.params.openshift_endpoint_name && Array.isArray(ep.subsets)) {
-                            endpoint.push(Kube.getEndpoint(ep));
-                        }
-                    });
-                    if (endpoint.length === 0) {
-                        throw 'Cannot get state metrics endpoints from Kubernetes API. Check debug log for more information.';
-                    }
-                    return endpoint;
-                },
+            		result.items.forEach(function (ep) {
+            			if (ep.metadata.name === Kube.params.state_endpoint_name && Array.isArray(ep.subsets)) {
+            				endpoint.push(Kube.getEndpoint(ep));
+            			}
+            			if (typeof Kube.params.openshift_endpoint_name !== 'undefined' && Kube.params.openshift_endpoint_name !== ''
+            				&& ep.metadata.name === Kube.params.openshift_endpoint_name && Array.isArray(ep.subsets)) {
+            				endpoint.push(Kube.getEndpoint(ep));
+            			}
+            		});
+            		if (endpoint.length === 0) {
+            			throw 'Cannot get state metrics endpoints from Kubernetes API. Check debug log for more information.';
+            		}
+            		return endpoint;
+            	},
             
-                getStateMetrics: function () {
-                    var metrics_endpoint = Kube.getMetricsEndpoint(),
-                        IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
-                        result = '',
-                        request = new HttpRequest();
+            	getStateMetrics: function () {
+            		var metrics_endpoint = Kube.getMetricsEndpoint(),
+            			IPv4 = /(?:\d{1,3}\.){3}\d{1,3}/,
+            			result = '',
+            			request = new HttpRequest();
             
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('Authorization: Bearer ' + Kube.params.api_token);
             
-                    if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
-                        request.setProxy(Kube.params.http_proxy);
-                        Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
-                    }
+            		if (typeof Kube.params.http_proxy !== 'undefined' && Kube.params.http_proxy !== '') {
+            			request.setProxy(Kube.params.http_proxy);
+            			Zabbix.log(4, '[ Kubernetes ] Using http proxy: ' + Kube.params.http_proxy);
+            		}
             
-                    metrics_endpoint.forEach(function (endpoint) {
-                        var url = endpoint.scheme + '://' + (IPv4.test(endpoint.address) ? endpoint.address : '[' + endpoint.address + ']') + ':' + endpoint.port + '/metrics';
+            		metrics_endpoint.forEach(function (endpoint) {
+            			var url = endpoint.scheme + '://' + (IPv4.test(endpoint.address) ? endpoint.address : '[' + endpoint.address + ']') + ':' + endpoint.port + '/metrics';
             
-                        Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
-                        response = request.get(url);
-                        Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
+            			Zabbix.log(4, '[ Kubernetes ] Sending request: ' + url);
+            			response = request.get(url);
+            			Zabbix.log(4, '[ Kubernetes ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                        if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                            throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                        }
-                        if (response === null) {
-                            throw 'Failed to get state metrics. Check debug log for more information.';
-                        }
-                        result += response + '\n';
-                    }
-                    );
+            			if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            				throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            			}
+            			if (response === null) {
+            				throw 'Failed to get state metrics. Check debug log for more information.';
+            			}
+            			result += response + '\n';
+            		}
+            		);
             
-                    return result;
+            		return result;
             
-                }
+            	}
             };
             
             try {
-                Kube.setParams(JSON.parse(value));
+            	Kube.setParams(JSON.parse(value));
             
-                var stateMetrics = Kube.getStateMetrics();
+            	var stateMetrics = Kube.getStateMetrics();
             
-                return stateMetrics;
+            	return stateMetrics;
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
-                return JSON.stringify({ error: error });
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ Kubernetes ] ERROR: ' + error);
+            	return JSON.stringify({ error: error });
             }
           description: 'Collecting Kubernetes metrics from kube-state-metrics.'
           timeout: 10s
@@ -1360,20 +1360,20 @@ zabbix_export:
                   parameters:
                     - |
                       var data = JSON.parse(value),
-                          replicas_desired,
-                          replicas_available;
+                      	replicas_desired,
+                      	replicas_available;
                       
                       if (data.length !== 2) {
-                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      	throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
                       }
                       
                       JSON.parse(value).forEach(function (item) {
-                          if (item.name === 'kube_deployment_spec_replicas') {
-                              replicas_desired = item.value;
-                          }
-                          if (item.name === 'kube_deployment_status_replicas_available') {
-                              replicas_available = item.value;
-                          }
+                      	if (item.name === 'kube_deployment_spec_replicas') {
+                      		replicas_desired = item.value;
+                      	}
+                      	if (item.name === 'kube_deployment_status_replicas_available') {
+                      		replicas_available = item.value;
+                      	}
                       });
                       
                       return Math.abs(replicas_desired - replicas_available);
@@ -3278,20 +3278,20 @@ zabbix_export:
                   parameters:
                     - |
                       var data = JSON.parse(value),
-                          replicas_desired,
-                          replicas_ready;
+                      	replicas_desired,
+                      	replicas_ready;
                       
                       if (data.length !== 2) {
-                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      	throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
                       }
                       
                       JSON.parse(value).forEach(function (item) {
-                          if (item.name === 'kube_replicaset_spec_replicas') {
-                              replicas_desired = item.value;
-                          }
-                          if (item.name === 'kube_replicaset_status_ready_replicas') {
-                              replicas_ready = item.value;
-                          }
+                      	if (item.name === 'kube_replicaset_spec_replicas') {
+                      		replicas_desired = item.value;
+                      	}
+                      	if (item.name === 'kube_replicaset_status_ready_replicas') {
+                      		replicas_ready = item.value;
+                      	}
                       });
                       
                       return Math.abs(replicas_desired - replicas_ready);
@@ -3465,20 +3465,20 @@ zabbix_export:
                   parameters:
                     - |
                       var data = JSON.parse(value),
-                          replicas,
-                          replicas_ready;
+                      	replicas,
+                      	replicas_ready;
                       
                       if (data.length !== 2) {
-                          throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
+                      	throw 'Incorrect length of JSON (must be 2). Actual length: ' + data.length;
                       }
                       
                       JSON.parse(value).forEach(function (item) {
-                          if (item.name === 'kube_statefulset_status_replicas') {
-                              replicas = item.value;
-                          }
-                          if (item.name === 'kube_statefulset_status_replicas_ready') {
-                              replicas_ready = item.value;
-                          }
+                      	if (item.name === 'kube_statefulset_status_replicas') {
+                      		replicas = item.value;
+                      	}
+                      	if (item.name === 'kube_statefulset_status_replicas_ready') {
+                      		replicas_ready = item.value;
+                      	}
                       });
                       
                       return Math.abs(replicas - replicas_ready);
@@ -3669,7 +3669,7 @@ zabbix_export:
                   error_handler: DISCARD_VALUE
                 - type: JAVASCRIPT
                   parameters:
-                    - 'return [''complete'', ''cancelled'', ''new'', ''pending'', ''running'', ''failed'', ''error''].indexOf(value) + 1 || ''Problem with status processing in JS, no such build status: '' + value;                  '
+                    - 'return [''complete'', ''cancelled'', ''new'', ''pending'', ''running'', ''failed'', ''error''].indexOf(value) + 1 || ''Problem with status processing in JS, no such build status: '' + value;'
               master_item:
                 key: kube.state.metrics
               tags:

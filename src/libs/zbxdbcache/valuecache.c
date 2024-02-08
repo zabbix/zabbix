@@ -2506,7 +2506,20 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 	{
 		h = (ZBX_DC_HISTORY *)history->values[i];
 
-		if (NULL != (item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid)))
+		item = (zbx_vc_item_t *)zbx_hashset_search(&vc_cache->items, &h->itemid);
+
+		if (NULL == item && 0 != (h->flags & ZBX_DC_FLAG_HASTRIGGER) && ZBX_VC_MODE_NORMAL == vc_cache->mode)
+		{
+			zbx_vc_item_t	item_local = {
+					.itemid = h->itemid,
+					.value_type = h->value_type,
+					.last_accessed = (int)time(NULL)
+			};
+
+			item = (zbx_vc_item_t *)zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local));
+		}
+
+		if (NULL != item)
 		{
 			zbx_history_record_t	record = {h->ts, h->value};
 			zbx_vc_chunk_t		*head = item->head;
@@ -2527,7 +2540,6 @@ int	zbx_vc_add_values(zbx_vector_ptr_t *history, int *ret_flush)
 			/* try to remove old (unused) chunks if a new chunk was added */
 			if (head != item->head)
 				vch_item_clean_cache(item);
-
 		}
 	}
 
@@ -2836,6 +2848,42 @@ void	zbx_vc_flush_stats(void)
 	zbx_vector_vc_itemupdate_clear(&vc_itemupdates);
 }
 
-#ifdef HAVE_TESTS
-#	include "../../../tests/libs/zbxdbcache/valuecache_test.c"
-#endif
+/******************************************************************************
+ *                                                                            *
+ * Purpose: add newly created items with triggers to value cache              *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
+{
+	if (ZBX_VC_DISABLED == vc_state || 0 == items->values_num)
+		return;
+
+	WRLOCK_CACHE;
+
+	if (ZBX_VC_MODE_NORMAL == vc_cache->mode)
+	{
+		int	i;
+
+		for (i = 0; i < items->values_num; i++)
+		{
+			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i].first))
+				continue;
+
+			zbx_vc_item_t	item_local = {
+					.itemid = items->values[i].first,
+					.value_type = (unsigned char)items->values[i].second,
+					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.last_accessed = (int)time(NULL)
+
+			};
+
+			if (NULL == zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local)))
+			{
+				/* out of memory - cache will switch to low memory mode on next caching request */
+				break;
+			}
+		}
+	}
+
+	UNLOCK_CACHE;
+}

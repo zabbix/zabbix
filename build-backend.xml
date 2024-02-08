@@ -139,8 +139,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
 						<arg line="@{target}"/>
 					</exec>
 					<if>
@@ -199,8 +197,6 @@
 			<trycatch>
 				<try>
 					<exec executable="make" failonerror="on">
-						<arg line="-s"/>
-						<arg line="-j5"/>
 						<arg line="tests_build"/>
 					</exec>
 					<mkdir dir="tests_results/@{conf-name}"/>

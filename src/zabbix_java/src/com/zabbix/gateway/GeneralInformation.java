@@ -24,7 +24,7 @@ class GeneralInformation
 	static final String APPLICATION_NAME = "Zabbix Java Gateway";
 	static final String REVISION_DATE = "29 January 2024";
 	static final String REVISION = "{ZABBIX_REVISION}";
-	static final String VERSION = "6.0.26";
+	static final String VERSION = "6.0.27rc1";
 
 	static void printVersion()
 	{
