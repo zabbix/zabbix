@@ -145,10 +145,6 @@ $httpTable = (new CTableInfo())
 $httpTestsLastData = $this->data['httpTestsLastData'];
 $http_tests = $data['http_tests'];
 
-$backurl = (new CUrl('httpconf.php'))
-	->setArgument('context', $data['context'])
-	->getUrl();
-
 foreach ($http_tests as $httpTestId => $httpTest) {
 	$name = [];
 	$name[] = makeHttpTestTemplatePrefix($httpTestId, $data['parent_templates'], $data['allowed_ui_conf_templates']);
@@ -200,7 +196,7 @@ foreach ($http_tests as $httpTestId => $httpTest) {
 					: 'httptest.massdisable'
 				)
 				->setArgument('context', $data['context'])
-				->setArgument('backurl', $backurl)
+				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)
