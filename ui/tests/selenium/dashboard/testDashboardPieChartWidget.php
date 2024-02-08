@@ -898,16 +898,16 @@ class testDashboardPieChartWidget extends CWebTest {
 					],
 					'item_data' => [
 						'item-3' => [
-							['value' => 0.00000000000000004]
+							['value' => 0.00000000000000003]
 						],
 						'item-4' => [
-							['value' => 0.00000000000000001]
+							['value' => 0.00000000000000002]
 						]
 					],
 					'expected_legend_function' => 'max',
 					'expected_sectors' => [
-						'item-3' => ['value' => '4E-17', 'color' => 'rgb(255, 70, 92)'],
-						'item-4' => ['value' => '1E-17', 'color' => 'rgb(255, 197, 219)']
+						'item-3' => ['value' => '3E-17', 'color' => 'rgb(255, 70, 92)'],
+						'item-4' => ['value' => '2E-17', 'color' => 'rgb(255, 197, 219)']
 					],
 					'screenshot_id' => 'two_items'
 				]
@@ -1065,6 +1065,9 @@ class testDashboardPieChartWidget extends CWebTest {
 		if (CTestArrayHelper::get($data, 'expected_sectors')) {
 			$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
 		}
+
+		// Wait for the sector animation to end before clicking to increase test stability.
+		sleep(1);
 
 		// Assert Pie chart sectors by inspecting 'data-hintbox-contents' attribute.
 		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
