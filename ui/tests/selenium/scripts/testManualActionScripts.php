@@ -2231,6 +2231,7 @@ class testManualActionScripts extends CWebTest {
 		if (array_key_exists('parameters', $data)) {
 			$modal->query('id:parameters-table')->asMultifieldTable()->one()->fill($data['parameters']);
 		}
+
 		$form->fill($data['fields'])->submit();
 		$this->assertMessage(TEST_GOOD, 'Script added');
 
@@ -2293,8 +2294,8 @@ class testManualActionScripts extends CWebTest {
 
 				if ($data['fields']['Type'] === 'URL') {
 					COverlayDialogElement::ensureNotPresent();
-					$scope = (array_key_exists('host', $data)) ? $data['host'] : 'A host for scripts check';
-					$this->assertEquals($scope, $this->query('id:host')->one()->getValue());
+					$host_name = (array_key_exists('host', $data)) ? $data['host'] : 'A host for scripts check';
+					$this->assertEquals($host_name, $this->query('id:host')->one()->getValue());
 				}
 				else {
 					$this->query('button:Ok')->waitUntilVisible()->one();
