@@ -372,8 +372,11 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 
 			$test_outcome = ['action' => ZBX_PREPROC_FAIL_DEFAULT];
 			$test_failed = false;
+			$clear_step_fields = array_flip(['type', 'params', 'error_handler', 'error_handler_params',
+				'truncated', 'original_size'
+			]);
 
-			foreach ($result_preproc['steps'] as $i => &$step) {
+			foreach ($steps_data as $i => &$step) {
 				// If test considered failed, further steps are skipped.
 				if ($test_failed) {
 					unset($result_preproc['steps'][$i]);
@@ -414,16 +417,14 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 					}
 				}
 
-				$step = array_diff_key($step, array_flip(['type', 'params', 'error_handler', 'error_handler_params',
-					'truncated', 'original_size'
-				]));
+				$step = array_diff_key($step, $clear_step_fields);
 
 				// Latest executed step due to the error or end of preprocessing.
 				$test_outcome = $step + ['action' => ZBX_PREPROC_FAIL_DEFAULT];
 			}
 			unset($step);
 
-			$output['steps'] = $result_preproc['steps'];
+			$output['steps'] = $steps_data;
 
 			if (array_key_exists('error', $result_preproc)) {
 				throw new ErrorException($result_preproc['error'] === ''
