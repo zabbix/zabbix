@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 class testPageItemPrototypes extends testPagePrototypes {
 
 	public $page_name = 'item';
-	public $tag = '5 Item prototype trapper with text type';
+	public $tag = 'y Item prototype trapper with text type';
 
 	protected $link = 'zabbix.php?action=item.prototype.list&context=host&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_itemids;
@@ -85,8 +85,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 15,
-				'history' => '60d',
-				'trends' => '200d'
+				'history' => '1h',
+				'trends' => '24h'
 			],
 			[
 				'name' => '2 Item prototype not monitored discovered',
@@ -97,8 +97,8 @@ class testPageItemPrototypes extends testPagePrototypes {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 30,
 				'status' => ITEM_STATUS_DISABLED,
-				'history' => '70d',
-				'trends' => '250d'
+				'history' => '61m',
+				'trends' => '86450s'
 			],
 			[
 				'name' => '3 Item prototype not monitored not discovered',
@@ -111,12 +111,12 @@ class testPageItemPrototypes extends testPagePrototypes {
 				'delay' => 45,
 				'status' => ITEM_STATUS_DISABLED,
 				'discover' => ITEM_NO_DISCOVER,
-				'history' => '80d',
-				'trends' => '300d'
+				'history' => '2d',
+				'trends' => '2d'
 			],
 			[
-				'name' => '4 Item prototype monitored not discovered',
-				'key_' => '4_key[{#KEY}]',
+				'name' => 'a Item prototype monitored not discovered',
+				'key_' => 'a_key[{#KEY}]',
 				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_CALCULATED,
@@ -124,12 +124,12 @@ class testPageItemPrototypes extends testPagePrototypes {
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 60,
 				'discover' => ITEM_NO_DISCOVER,
-				'history' => '90d',
-				'trends' => '350d'
+				'history' => '1w',
+				'trends' => '1w'
 			],
 			[
-				'name' => '5 Item prototype trapper with text type',
-				'key_' => '5_key[{#KEY}]',
+				'name' => 'y Item prototype trapper with text type',
+				'key_' => 'y_key[{#KEY}]',
 				'hostid' => $hostids['Host for prototype check'],
 				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
 				'type' => ITEM_TYPE_TRAPPER,

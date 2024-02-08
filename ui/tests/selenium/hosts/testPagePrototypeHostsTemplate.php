@@ -90,7 +90,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 				'status' => HOST_STATUS_NOT_MONITORED
 			],
 			[
-				'host' => '3 Host prototype not monitored not discovered {#H}',
+				'host' => 'a Host prototype not monitored not discovered {#H}',
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'groupLinks' => [
 					[
@@ -101,7 +101,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 				'discover' => HOST_NO_DISCOVER
 			],
 			[
-				'host' => '4 Host prototype monitored not discovered {#H}',
+				'host' => 'y Host prototype monitored not discovered {#H}',
 				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
 				'groupLinks' => [
 					[

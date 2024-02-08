@@ -29,7 +29,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 
 	public $page_name = 'trigger';
-	public $tag = '4 Trigger prototype monitored not discovered_{#KEY}';
+	public $tag = 'a Trigger prototype monitored not discovered_{#KEY}';
 
 	protected $link = 'zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&';
 	protected static $prototype_triggerids;
@@ -95,7 +95,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
-				'description' => '4 Trigger prototype monitored not discovered_{#KEY}',
+				'description' => 'a Trigger prototype monitored not discovered_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'discover' => TRIGGER_NO_DISCOVER,
 				'tags' => [
@@ -112,13 +112,13 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
-				'description' => '5 Trigger prototype for high severity_{#KEY}',
+				'description' => 'o Trigger prototype for high severity_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '{$TEST}',
 				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
-				'description' => '6 Trigger prototype for disaster severity_{#KEY}',
+				'description' => 'y Trigger prototype for disaster severity_{#KEY}',
 				'expression' => 'last(/Template for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '🙂🙃',
 				'priority' => TRIGGER_SEVERITY_DISASTER

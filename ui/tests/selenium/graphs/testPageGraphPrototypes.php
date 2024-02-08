@@ -107,7 +107,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			],
 			[
-				'name' => '3 Graph prototype pie discovered_{#KEY}',
+				'name' => 'a Graph prototype pie discovered_{#KEY}',
 				'width' => 300,
 				'height' => 300,
 				'graphtype' => 2,
@@ -119,7 +119,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			],
 			[
-				'name' => '4 Graph prototype exploded not discovered_{#KEY}',
+				'name' => 'y Graph prototype exploded not discovered_{#KEY}',
 				'width' => 400,
 				'height' => 400,
 				'graphtype' => 3,
