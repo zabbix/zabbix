@@ -31,6 +31,7 @@ typedef struct
 	int			config_trapper_timeout;
 	const char		*config_source_ip;
 	zbx_get_config_forks_f	get_process_forks_cb_arg;
+	int			config_enable_global_scripts;
 }
 zbx_thread_escalator_args;
 

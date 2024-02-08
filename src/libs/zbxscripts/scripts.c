@@ -862,8 +862,8 @@ out:
  **********************************************************************************/
 int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, const char *params,
 		int config_timeout, int config_trapper_timeout, const char *config_source_ip,
-		zbx_get_config_forks_f get_config_forks, unsigned char program_type, char **result, char *error,
-		size_t max_error_len, char **debug)
+		zbx_get_config_forks_f get_config_forks, int config_enable_global_scripts,
+		unsigned char program_type, char **result, char *error, size_t max_error_len, char **debug)
 {
 	int	ret = FAIL;
 
@@ -887,7 +887,14 @@ int	zbx_script_execute(const zbx_script_t *script, const zbx_dc_host_t *host, co
 					break;
 				case ZBX_SCRIPT_EXECUTE_ON_SERVER:
 				case ZBX_SCRIPT_EXECUTE_ON_PROXY:
-					if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
+					if (0 == config_enable_global_scripts &&
+							!(ZBX_SCRIPT_EXECUTE_ON_PROXY == script->execute_on &&
+							0 != host->proxyid))
+					{
+						zbx_snprintf(error, max_error_len, "global scripts are disabled");
+						ret = FAIL;
+					}
+					else if (SUCCEED != (ret = zbx_execute(script->command, result, error, max_error_len,
 							config_trapper_timeout, ZBX_EXIT_CODE_CHECKS_ENABLED, NULL)))
 					{
 						ret = FAIL;

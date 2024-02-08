@@ -1439,7 +1439,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, config_proxydata_frequency,
 								get_config_forks, config_stats_allowed_ip,
 								config_java_gateway, config_java_gateway_port,
-								config_externalscripts};
+								config_externalscripts, .config_enable_global_scripts = 1};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};

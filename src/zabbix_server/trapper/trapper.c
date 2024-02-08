@@ -1110,7 +1110,8 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
-		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
+		int config_enable_global_scripts)
 {
 	int	ret = SUCCEED;
 
@@ -1165,7 +1166,7 @@ static int	process_trap(zbx_socket_t *sock, char *s, ssize_t bytes_received, zbx
 			{
 				ret = node_process_command(sock, s, &jp, config_comms->config_timeout,
 						config_comms->config_trapper_timeout, config_comms->config_source_ip,
-						get_config_forks, zbx_get_program_type_cb());
+						get_config_forks, config_enable_global_scripts, zbx_get_program_type_cb());
 			}
 		}
 		else if (0 == strcmp(value, ZBX_PROTO_VALUE_GET_QUEUE))
@@ -1300,7 +1301,8 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 		const zbx_config_comms_args_t *config_comms, const zbx_config_vault_t *config_vault,
 		int config_startup_time, const zbx_events_funcs_t *events_cbs, int proxydata_frequency,
 		zbx_get_config_forks_f get_config_forks, const char *config_stats_allowed_ip, const char *progname,
-		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts)
+		const char *config_java_gateway, int config_java_gateway_port, const char *config_externalscripts,
+		int config_enable_global_scripts)
 {
 	ssize_t	bytes_received;
 
@@ -1309,7 +1311,7 @@ static void	process_trapper_child(zbx_socket_t *sock, zbx_timespec_t *ts,
 
 	process_trap(sock, sock->buffer, bytes_received, ts, config_comms, config_vault, config_startup_time,
 			events_cbs, proxydata_frequency, get_config_forks, config_stats_allowed_ip, progname,
-			config_java_gateway, config_java_gateway_port, config_externalscripts);
+			config_java_gateway, config_java_gateway_port, config_externalscripts, config_enable_global_scripts);
 }
 
 ZBX_THREAD_ENTRY(trapper_thread, args)
@@ -1409,7 +1411,8 @@ ZBX_THREAD_ENTRY(trapper_thread, args)
 					trapper_args_in->config_stats_allowed_ip, trapper_args_in->progname,
 					trapper_args_in->config_java_gateway,
 					trapper_args_in->config_java_gateway_port,
-					trapper_args_in->config_externalscripts);
+					trapper_args_in->config_externalscripts,
+					trapper_args_in->config_enable_global_scripts);
 			sec = zbx_time() - sec;
 
 			zbx_tcp_unaccept(&s);

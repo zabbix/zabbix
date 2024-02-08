@@ -369,6 +369,8 @@ static int	config_service_manager_sync_frequency = 60;
 static int	config_vps_limit		= 0;
 static int	config_vps_overcommit_limit	= 0;
 
+static int	config_enable_global_scripts	= 1;
+
 static char	*config_file	= NULL;
 static int	config_allow_root	= 0;
 static zbx_config_log_t	log_file_cfg = {NULL, NULL, ZBX_LOG_TYPE_UNDEFINED, 1};
@@ -1057,6 +1059,8 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			ZBX_MEBIBYTE},
 		{"VPSOvercommitLimit",		&config_vps_overcommit_limit,	TYPE_INT,
 			PARM_OPT,	0,			ZBX_MEBIBYTE},
+		{"EnableGlobalScripts",		&config_enable_global_scripts,		TYPE_INT,
+			PARM_OPT,	0,			1},
 	{NULL}
 	};
 
@@ -1406,6 +1410,11 @@ static void	zbx_db_save_server_status(void)
 
 	zbx_json_addstring(&json, "version", ZABBIX_VERSION, ZBX_JSON_TYPE_STRING);
 
+	zbx_json_addobject(&json, "configuration");
+	zbx_json_addstring(&json, "enable_global_scripts", (1 == config_enable_global_scripts ? "true" : "false"),
+			ZBX_JSON_TYPE_INT);
+	zbx_json_close(&json);
+
 	zbx_json_close(&json);
 
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);
@@ -1444,10 +1453,11 @@ static int	server_startup(zbx_socket_t *listen_sock, int *ha_stat, int *ha_failo
 							zbx_progname, &events_cbs, listen_sock, config_startup_time,
 							config_proxydata_frequency, get_config_forks,
 							config_stats_allowed_ip, config_java_gateway,
-							config_java_gateway_port, config_externalscripts};
+							config_java_gateway_port, config_externalscripts,
+							config_enable_global_scripts};
 	zbx_thread_escalator_args	escalator_args = {zbx_config_tls, get_zbx_program_type, zbx_config_timeout,
 							zbx_config_trapper_timeout, zbx_config_source_ip,
-							get_config_forks};
+							get_config_forks, config_enable_global_scripts};
 	zbx_thread_proxy_poller_args	proxy_poller_args = {zbx_config_tls, &zbx_config_vault, get_zbx_program_type,
 							zbx_config_timeout, zbx_config_trapper_timeout,
 							zbx_config_source_ip, config_ssl_ca_location,

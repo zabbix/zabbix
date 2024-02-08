@@ -145,7 +145,7 @@ static int	tm_execute_remote_command(zbx_uint64_t taskid, int clock, int ttl, ti
 	}
 
 	if (SUCCEED != (ret = zbx_script_execute(&script, &host, NULL, config_timeout, config_trapper_timeout,
-			config_source_ip, get_config_forks, program_type, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
+			config_source_ip, get_config_forks, 1, program_type, 0 == alertid ? &info : NULL, error, sizeof(error), NULL)))
 	{
 		task->data = zbx_tm_remote_command_result_create(parent_taskid, ret, error);
 	}
