@@ -1110,7 +1110,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment test cases below when ZBX-24042 will be fixed.
+			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// #Event webhook without confirmation message and with input type - string (default).
 //			[
 //				[
@@ -1588,7 +1588,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment test cases below when ZBX-24042 will be fixed.
+			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// Event SSH without confirmation message and with input type - string (default).
 //			[
 //				[
@@ -1814,7 +1814,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment test cases below when ZBX-24042 will be fixed.
+			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// Event Telnet without confirmation message and with input type - string (default).
 //			[
 //				[
@@ -2042,7 +2042,7 @@ class testManualActionScripts extends CWebTest {
 					]
 				]
 			],
-			// TODO: uncomment test cases below when ZBX-24042 will be fixed.
+			// TODO: uncomment below test cases when ZBX-24042 will be fixed.
 			// Event IPMI without confirmation message and with input type - string (default).
 //			[
 //				[
