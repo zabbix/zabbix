@@ -32,7 +32,7 @@
  * @return {jQuery}
  */
 function makeStepResult(step) {
-	if ('error' in step) {
+	if (step.error !== undefined) {
 		return jQuery(new Template(jQuery('#preprocessing-step-error-icon').html()).evaluate(
 			{error: step.error || <?= json_encode(htmlspecialchars(_('<empty string>'))) ?>}
 		));
@@ -43,7 +43,7 @@ function makeStepResult(step) {
 	else if (step.result === '') {
 		return jQuery('<span>', {'class': '<?= ZBX_STYLE_GREY ?>'}).text(<?= json_encode(_('<empty string>')) ?>);
 	}
-	else if ('warning' in step) {
+	else if (step.warning !== undefined) {
 		return jQuery(new Template(jQuery('#preprocessing-step-result-warning').html()).evaluate(step));
 	}
 	else if (step.result.indexOf("\n") != -1 || step.result.length > 25) {
