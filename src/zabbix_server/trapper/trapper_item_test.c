@@ -155,6 +155,7 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
  *             jp_steps     - [IN] steps object of the request                *
  *             value        - [IN] item value for preprocessing               *
  *             value_size   - [IN] size of the item value for preprocessing   *
+ *             state        - [IN] the item state                             *
  *             values       - [OUT] the values to test optional               *
  *                                  (history + current)                       *
  *             ts           - [OUT] value timestamps                          *
@@ -162,7 +163,6 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
  *             value_type   - [OUT] the value type                            *
  *             steps        - [OUT] the preprocessing steps                   *
  *             single       - [OUT] is preproc step single                    *
- *             state        - [OUT] the item state                            *
  *             bypass_first - [OUT] the flag to bypass first step             *
  *             error        - [OUT] the error message                         *
  *                                                                            *
@@ -172,8 +172,9 @@ static void	db_int_from_json(const struct zbx_json_parse *jp, const char *name, 
  ******************************************************************************/
 static int	trapper_parse_preproc_test(const struct zbx_json_parse *jp_item,
 		const struct zbx_json_parse *jp_options, const struct zbx_json_parse *jp_steps, char *value,
-		size_t value_size, char **values, zbx_timespec_t *ts, int *values_num, unsigned char *value_type,
-		zbx_vector_pp_step_ptr_t *steps, int *single, int state, int *bypass_first, char **error)
+		size_t value_size, int state, char **values, zbx_timespec_t *ts, int *values_num,
+		unsigned char *value_type, zbx_vector_pp_step_ptr_t *steps, int *single, int *bypass_first,
+		char **error)
 {
 	char			buffer[MAX_STRING_LEN], *step_params = NULL, *error_handler_params = NULL;
 	const char		*ptr;
@@ -362,8 +363,8 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 	zbx_vector_pp_result_ptr_create(&results);
 	zbx_pp_history_init(&history);
 
-	if (FAIL == trapper_parse_preproc_test(jp_item, jp_options, jp_steps, value, value_size, values, ts,
-			&values_num, &value_type, &steps, &single, state, &bypass_first, error))
+	if (FAIL == trapper_parse_preproc_test(jp_item, jp_options, jp_steps, value, value_size, state, values, ts,
+			&values_num, &value_type, &steps, &single, &bypass_first, error))
 	{
 		goto out;
 	}
@@ -462,8 +463,16 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 			{
 				if (ZBX_PREPROC_FAIL_DEFAULT == result->action)
 				{
-					zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, result->value.data.err,
-						ZBX_JSON_TYPE_STRING);
+					original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_ERROR,
+							result->value.data.err, ZBX_JSON_TYPE_STRING,
+							ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+					if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+					{
+						zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true",
+								ZBX_JSON_TYPE_TRUE);
+						zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+					}
 				}
 			}
 			else if (ZBX_VARIANT_NONE != result->value.type)
