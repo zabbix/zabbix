@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testWidgets.php';
 /**
  * @dataSource TopHostsWidget, ItemValueWidget, AllItemValueTypes
  *
- * @backup dashboard, profiles
+ * @backup dashboard
  *
  * @onBefore prepareData
  */
