@@ -324,6 +324,17 @@ out:
 	return ret;
 }
 
+static void	json_add_string_with_limit(struct zbx_json *j, const char *tag, const char *value, zbx_json_type_t type)
+{
+	size_t	original_size = zbx_json_addstring_limit(j, tag, value, type, ZBX_JSON_TEST_DATA_MAX_SIZE);
+
+	if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
+	{
+		zbx_json_addstring(j, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
+		zbx_json_adduint64(j, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: executes preprocessing test request                               *
@@ -357,7 +368,6 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 	zbx_pp_result_t			*result;
 	zbx_vector_pp_result_ptr_t	results;
 	zbx_pp_history_t		history;
-	size_t				original_size;
 
 	zbx_vector_pp_step_ptr_create(&steps);
 	zbx_vector_pp_result_ptr_create(&results);
@@ -425,16 +435,7 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 	for (i = 0; i < bypass_first; i++)
 	{
 		zbx_json_addobject(json, NULL);
-
-		original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1],
-			ZBX_JSON_TYPE_STRING, ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
-		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
-		}
-
+		json_add_string_with_limit(json, ZBX_PROTO_TAG_RESULT, values[values_num - 1], ZBX_JSON_TYPE_STRING);
 		zbx_json_close(json);
 	}
 
@@ -463,29 +464,14 @@ int	trapper_preproc_test_run(const struct zbx_json_parse *jp_item, const struct 
 			{
 				if (ZBX_PREPROC_FAIL_DEFAULT == result->action)
 				{
-					original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_ERROR,
-							result->value.data.err, ZBX_JSON_TYPE_STRING,
-							ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-					if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
-					{
-						zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true",
-								ZBX_JSON_TYPE_TRUE);
-						zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
-					}
+					json_add_string_with_limit(json, ZBX_PROTO_TAG_ERROR, result->value.data.err,
+							ZBX_JSON_TYPE_STRING);
 				}
 			}
 			else if (ZBX_VARIANT_NONE != result->value.type)
 			{
-				original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
-						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
-						ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-				if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
-				{
-					zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-					zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
-				}
+				json_add_string_with_limit(json, ZBX_PROTO_TAG_RESULT,
+						zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING);
 			}
 			else
 				zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
@@ -502,21 +488,14 @@ err:
 
 		if (ZBX_VARIANT_NONE != result->value.type)
 		{
-			original_size = zbx_json_addstring_limit(json, ZBX_PROTO_TAG_RESULT,
-					zbx_variant_value_desc(&result->value), ZBX_JSON_TYPE_STRING,
-					ZBX_JSON_TEST_DATA_MAX_SIZE);
-
-			if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
-			{
-				zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-				zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
-			}
+			json_add_string_with_limit(json, ZBX_PROTO_TAG_RESULT, zbx_variant_value_desc(&result->value),
+					ZBX_JSON_TYPE_STRING);
 		}
 		else
 			zbx_json_addstring(json, ZBX_PROTO_TAG_RESULT, NULL, ZBX_JSON_TYPE_NULL);
 	}
 	else
-		zbx_json_addstring(json, ZBX_PROTO_TAG_ERROR, preproc_error, ZBX_JSON_TYPE_STRING);
+		json_add_string_with_limit(json, ZBX_PROTO_TAG_ERROR, preproc_error, ZBX_JSON_TYPE_STRING);
 
 	ret = SUCCEED;
 out:
@@ -877,7 +856,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 	char			tmp[MAX_ID_LEN + 1], *info = NULL, *value = NULL, buffer[MAX_STRING_LEN];
 	zbx_uint64_t		proxyid;
 	int			ret = FAIL, state = 0;
-	size_t			original_size, value_size = 0;
+	size_t			value_size = 0;
 
 	zbx_user_init(&user);
 
@@ -952,18 +931,11 @@ preproc_test:
 	{
 		zbx_json_addobject(json, ZBX_PROTO_TAG_ITEM);
 
-		original_size = zbx_json_addstring_limit(json, SUCCEED == ret ?
-				ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info, ZBX_JSON_TYPE_STRING,
-				ZBX_JSON_TEST_DATA_MAX_SIZE);
+		json_add_string_with_limit(json, SUCCEED == ret ? ZBX_PROTO_TAG_RESULT : ZBX_PROTO_TAG_ERROR, info,
+				ZBX_JSON_TYPE_STRING);
 
 		zbx_json_addstring(json, ZBX_PROTO_TAG_EOL, NULL != strstr(info, "\r\n") ? "CRLF" : "LF",
 				ZBX_JSON_TYPE_STRING);
-
-		if (ZBX_JSON_TEST_DATA_MAX_SIZE < original_size)
-		{
-			zbx_json_addstring(json, ZBX_PROTO_TAG_TRUNCATED, "true", ZBX_JSON_TYPE_TRUE);
-			zbx_json_adduint64(json, ZBX_PROTO_TAG_ORIGINAL_SIZE, original_size);
-		}
 
 		zbx_json_close(json);
 
