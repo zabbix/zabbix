@@ -217,7 +217,7 @@ void	zbx_mock_test_entry(void **state)
 	zbx_json_init(&out, 1024);
 	expected_ret = zbx_mock_str_to_return_code(zbx_mock_get_parameter_string("out.return"));
 
-	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_gen_len", &handle) &&
+	if (ZBX_MOCK_SUCCESS == zbx_mock_parameter("in.value_gen_length", &handle) &&
 			ZBX_MOCK_SUCCESS == zbx_mock_uint64(handle, &value_gen_length))
 	{
 		#define RANG_GEN_REQUEST "{\
