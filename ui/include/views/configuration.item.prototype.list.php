@@ -125,6 +125,7 @@ foreach ($data['items'] as $item) {
 				: 'itemprototype.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $url)
 			->getUrl()
 	))
 		->addClass(ZBX_STYLE_LINK_ACTION)
@@ -148,10 +149,7 @@ foreach ($data['items'] as $item) {
 	$item_menu = CMenuPopupHelper::getItemPrototypeConfiguration([
 		'itemid' => $item['itemid'],
 		'context' => $data['context'],
-		'backurl' => (new CUrl('disc_prototypes.php'))
-			->setArgument('parent_discoveryid', $data['parent_discoveryid'])
-			->setArgument('context', $data['context'])
-			->getUrl()
+		'backurl' => $url
 	]);
 
 	$wizard = (new CButton(null))
@@ -168,6 +166,7 @@ foreach ($data['items'] as $item) {
 					: 'itemprototype.massdiscover.disable'
 				)
 				->setArgument('context', $data['context'])
+				->setArgument('backurl', $url)
 				->getUrl()
 		))
 			->addSID()

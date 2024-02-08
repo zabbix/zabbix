@@ -236,6 +236,7 @@ $fields = [
 	'cancel' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form' =>						[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
+	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	// sort and sortorder
@@ -277,6 +278,11 @@ if ($itemPrototypeId) {
 	if (!$item_prorotypes) {
 		access_deny();
 	}
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 // Convert CR+LF to LF in preprocessing script.
@@ -581,16 +587,29 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 
 	$result = (bool) API::ItemPrototype()->update($item_prototypes);
 
-	if ($result) {
-		uncheckTableRows(getRequest('parent_discoveryid'));
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = _n('Item prototype updated', 'Item prototypes updated', $updated);
-	$messageFailed = _n('Cannot update item prototype', 'Cannot update item prototypes', $updated);
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Item prototype enabled', 'Item prototypes enabled', $updated)
+			: _n('Item prototype disabled', 'Item prototypes disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Cannot enable item prototype', 'Cannot enable item prototypes', $updated)
+			: _n('Cannot disable item prototype', 'Cannot disable item prototypes', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'itemprototype.massdelete' && hasRequest('group_itemid')) {
 	DBstart();
@@ -615,16 +634,21 @@ elseif (hasRequest('action') && hasRequest('group_itemid')
 
 	$result = (bool) API::ItemPrototype()->update($item_prototypes);
 
-	if ($result) {
-		uncheckTableRows(getRequest('parent_discoveryid'));
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = _n('Item prototype updated', 'Item prototypes updated', $updated);
-	$messageFailed = _n('Cannot update item prototype', 'Cannot update item prototypes', $updated);
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		CMessageHelper::setSuccessTitle(_n('Item prototype updated', 'Item prototypes updated', $updated));
+	}
+	else {
+		CMessageHelper::setErrorTitle(_n('Cannot update item prototype', 'Cannot update item prototypes', $updated));
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 
 /*

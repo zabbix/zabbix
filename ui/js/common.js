@@ -758,11 +758,11 @@ function redirect(uri, method, needle, invert_needle, add_sid, allow_empty) {
 			if ((is_needle && !invert_needle) || (!is_needle && invert_needle)) {
 				if (Array.isArray(args[key])) {
 					for (var i = 0, l = args[key].length; i < l; i++) {
-						action += '&' + key + '[]=' + args[key][i];
+						action += '&' + key + '[]=' + encodeURIComponent(args[key][i]);
 					}
 				}
 				else {
-					action += '&' + key + '=' + args[key];
+					action += '&' + key + '=' + encodeURIComponent(args[key]);
 				}
 
 				continue;

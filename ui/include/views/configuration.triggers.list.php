@@ -210,6 +210,10 @@ $data['triggers'] = CMacrosResolverHelper::resolveTriggerExpressions($data['trig
 	'context' => $data['context']
 ]);
 
+$backurl = (new CUrl('triggers.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 foreach ($data['triggers'] as $tnum => $trigger) {
 	$triggerid = $trigger['triggerid'];
 
@@ -290,6 +294,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			)
 			->setArgument('g_triggerid[]', $triggerid)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $backurl)
 			->getUrl()
 		))
 		->addClass(ZBX_STYLE_LINK_ACTION)

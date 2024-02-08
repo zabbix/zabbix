@@ -204,6 +204,10 @@ $discoveryTable = (new CTableInfo())
 
 $update_interval_parser = new CUpdateIntervalParser(['usermacros' => true]);
 
+$backurl = (new CUrl('host_discovery.php'))
+	->setArgument('context', $data['context'])
+	->getUrl();
+
 foreach ($data['discoveries'] as $discovery) {
 	// description
 	$description = [];
@@ -249,6 +253,7 @@ foreach ($data['discoveries'] as $discovery) {
 				: 'discoveryrule.massdisable'
 			)
 			->setArgument('context', $data['context'])
+			->setArgument('backurl', $backurl)
 			->getUrl()
 		))
 			->addClass(ZBX_STYLE_LINK_ACTION)

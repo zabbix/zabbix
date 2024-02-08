@@ -462,8 +462,7 @@ elseif (isset($_REQUEST['add_dependency']) && isset($_REQUEST['new_dependency'])
 	}
 }
 elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.massenable', 'trigger.massdisable']) && hasRequest('g_triggerid')) {
-	$enable = (getRequest('action') === 'trigger.massenable');
-	$status = $enable ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
+	$status = getRequest('action') === 'trigger.massenable' ? TRIGGER_STATUS_ENABLED : TRIGGER_STATUS_DISABLED;
 	$update = [];
 
 	// Get requested triggers with permission check.
@@ -488,19 +487,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['trigger.mas
 	}
 
 	$updated = count($update);
-	$messageSuccess = $enable
-		? _n('Trigger enabled', 'Triggers enabled', $updated)
-		: _n('Trigger disabled', 'Triggers disabled', $updated);
-	$messageFailed = $enable
-		? _n('Cannot enable trigger', 'Cannot enable triggers', $updated)
-		: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
 
 	if ($result) {
 		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 		unset($_REQUEST['g_triggerid']);
+
+		$message = $status == TRIGGER_STATUS_ENABLED
+			? _n('Trigger enabled', 'Triggers enabled', $updated)
+			: _n('Trigger disabled', 'Triggers disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == TRIGGER_STATUS_ENABLED
+			? _n('Cannot enable trigger', 'Cannot enable triggers', $updated)
+			: _n('Cannot disable trigger', 'Cannot disable triggers', $updated);
+
+		CMessageHelper::setErrorTitle($message);
 	}
 
-	show_messages($result, $messageSuccess, $messageFailed);
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'trigger.masscopyto' && hasRequest('copy')
 		&& hasRequest('g_triggerid')) {

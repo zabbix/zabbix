@@ -238,6 +238,7 @@ $fields = [
 	'form_refresh' =>				[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	'tags' =>						[T_ZBX_STR, O_OPT, P_ONLY_TD_ARRAY,	null,		null],
 	'show_inherited_tags' =>		[T_ZBX_INT, O_OPT, null,	IN([0,1]),	null],
+	'backurl' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
 	// filter
 	'filter_set' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
 	'filter_rst' =>					[T_ZBX_STR, O_OPT, null,			null,	null],
@@ -340,6 +341,11 @@ else {
 			access_deny();
 		}
 	}
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
+	access_deny();
 }
 
 // Set sub-groups of selected groups.
@@ -918,20 +924,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['item.massen
 
 	$result = (bool) API::Item()->update($items);
 
-	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Item enabled', 'Items enabled', $updated)
-		: _n('Item disabled', 'Items disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable item', 'Cannot enable items', $updated)
-		: _n('Cannot disable item', 'Cannot disable items', $updated);
+	if ($result) {
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Item enabled', 'Items enabled', $updated)
+			: _n('Item disabled', 'Items disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Cannot enable item', 'Cannot enable items', $updated)
+			: _n('Cannot disable item', 'Cannot disable items', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'item.masscopyto' && hasRequest('copy')
 		&& hasRequest('group_itemid')) {

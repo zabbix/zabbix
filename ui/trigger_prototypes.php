@@ -430,16 +430,29 @@ elseif (getRequest('action') && str_in_array(getRequest('action'), ['triggerprot
 		$result = true;
 	}
 
-	if ($result) {
-		uncheckTableRows(getRequest('parent_discoveryid'));
-	}
-
 	$updated = count($update);
 
-	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
-	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == TRIGGER_STATUS_ENABLED
+			? _n('Trigger prototype enabled', 'Trigger prototypes enabled', $updated)
+			: _n('Trigger prototype disabled', 'Trigger prototypes disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == TRIGGER_STATUS_ENABLED
+			? _n('Cannot enable trigger prototype', 'Cannot enable trigger prototypes', $updated)
+			: _n('Cannot disable trigger prototype', 'Cannot disable trigger prototypes', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'triggerprototype.massdelete' && hasRequest('g_triggerid')) {
 	$result = API::TriggerPrototype()->delete(getRequest('g_triggerid'));
@@ -478,16 +491,23 @@ elseif (getRequest('action') && hasRequest('g_triggerid')
 		$result = true;
 	}
 
-	if ($result) {
-		uncheckTableRows(getRequest('parent_discoveryid'));
-	}
-
 	$updated = count($update);
 
-	$messageSuccess = _n('Trigger prototype updated', 'Trigger prototypes updated', $updated);
-	$messageFailed = _n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated);
+	if ($result) {
+		uncheckTableRows(getRequest('parent_discoveryid'));
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		CMessageHelper::setSuccessTitle(_n('Trigger prototype updated', 'Trigger prototypes updated', $updated));
+	}
+	else {
+		CMessageHelper::setErrorTitle(
+			_n('Cannot update trigger prototype', 'Cannot update trigger prototypes', $updated)
+		);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 
 /*
