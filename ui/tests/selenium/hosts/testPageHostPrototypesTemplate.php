@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
  *
  * @onBefore prepareHostPrototypeTemplateData
  */
-class testPagePrototypeHostsTemplate extends testPagePrototypes {
+class testPageHostPrototypesTemplate extends testPagePrototypes {
 
 	public $page_name = 'host';
 	public $tag = '1 Host prototype monitored discovered {#H}';
@@ -118,7 +118,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 		self::$entity_count = count(self::$prototype_hostids);
 	}
 
-	public function testPagePrototypeHostsTemplate_Layout() {
+	public function testPageHostPrototypesTemplate_Layout() {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
 	}
@@ -128,7 +128,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getHostsSortingData
 	 */
-	public function testPagePrototypeHostsTemplate_Sorting($data) {
+	public function testPageHostPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('host_prototypes.php?context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
@@ -139,7 +139,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getHostsButtonLinkData
 	 */
-	public function testPagePrototypeHostsTemplate_ButtonLink($data) {
+	public function testPageHostPrototypesTemplate_ButtonLink($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
@@ -149,7 +149,7 @@ class testPagePrototypeHostsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getHostsDeleteData
 	 */
-	public function testPagePrototypeHostsTemplate_Delete($data) {
+	public function testPageHostPrototypesTemplate_Delete($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];

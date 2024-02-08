@@ -96,6 +96,7 @@ require_once dirname(__FILE__).'/graphs/testGraphAxis.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraph.php';
 require_once dirname(__FILE__).'/graphs/testInheritanceGraphPrototype.php';
 require_once dirname(__FILE__).'/graphs/testPageGraphPrototypes.php';
+require_once dirname(__FILE__).'/graphs/testPageGraphPrototypesTemplate.php';
 require_once dirname(__FILE__).'/graphs/testPageHostGraph.php';
 require_once dirname(__FILE__).'/graphs/testPageMonitoringHostsGraph.php';
 
@@ -117,6 +118,7 @@ require_once dirname(__FILE__).'/hosts/testFormHostLinkTemplates.php';
 require_once dirname(__FILE__).'/hosts/testFormHostPrototype.php';
 require_once dirname(__FILE__).'/hosts/testPageHostInterfaces.php';
 require_once dirname(__FILE__).'/hosts/testPageHostPrototypes.php';
+require_once dirname(__FILE__).'/hosts/testPageHostPrototypesTemplate.php';
 require_once dirname(__FILE__).'/hosts/testPageHosts.php';
 require_once dirname(__FILE__).'/hosts/testPageMonitoringHosts.php';
 
@@ -136,6 +138,7 @@ require_once dirname(__FILE__).'/items/testInheritanceItem.php';
 require_once dirname(__FILE__).'/items/testInheritanceItemPrototype.php';
 require_once dirname(__FILE__).'/items/testItemTypeSelection.php';
 require_once dirname(__FILE__).'/items/testPageItemPrototypes.php';
+require_once dirname(__FILE__).'/items/testPageItemPrototypesTemplate.php';
 require_once dirname(__FILE__).'/items/testPageItems.php';
 require_once dirname(__FILE__).'/items/testPageMassUpdateItemPrototypes.php';
 require_once dirname(__FILE__).'/items/testPageMassUpdateItems.php';
@@ -198,12 +201,6 @@ require_once dirname(__FILE__).'/preprocessing/testFormPreprocessingTest.php';
 require_once dirname(__FILE__).'/problems/testFormUpdateProblem.php';
 require_once dirname(__FILE__).'/problems/testPageProblems.php';
 
-// Prototype pages.
-require_once dirname(__FILE__) . '/graphs/testPagePrototypeGraphsTemplate.php';
-require_once dirname(__FILE__) . '/hosts/testPagePrototypeHostsTemplate.php';
-require_once dirname(__FILE__) . '/items/testPagePrototypeItemsTemplate.php';
-require_once dirname(__FILE__) . '/triggers/testPagePrototypeTriggersTemplate.php';
-
 // Proxies.
 require_once dirname(__FILE__).'/proxies/testFormAdministrationProxies.php';
 require_once dirname(__FILE__).'/proxies/testPageAdministrationProxies.php';
@@ -261,19 +258,20 @@ require_once dirname(__FILE__).'/templates/testPageTemplates.php';
 require_once dirname(__FILE__).'/templates/testTemplateInheritance.php';
 
 // Timeouts.
-require_once dirname(__FILE__) . '/timeouts/testTimeoutsHosts.php';
-require_once dirname(__FILE__) . '/timeouts/testTimeoutsLinkedTemplates.php';
-require_once dirname(__FILE__) . '/timeouts/testTimeoutsTemplates.php';
+require_once dirname(__FILE__).'/timeouts/testTimeoutsHosts.php';
+require_once dirname(__FILE__).'/timeouts/testTimeoutsLinkedTemplates.php';
+require_once dirname(__FILE__).'/timeouts/testTimeoutsTemplates.php';
 
 // Trigger dependencies.
-require_once dirname(__FILE__) . '/triggers/testHostTriggerDependencies.php';
-require_once dirname(__FILE__) . '/triggers/testTemplateTriggerDependencies.php';
+require_once dirname(__FILE__).'/triggers/testHostTriggerDependencies.php';
+require_once dirname(__FILE__).'/triggers/testTemplateTriggerDependencies.php';
 
 // Triggers.
 require_once dirname(__FILE__).'/triggers/testFormTrigger.php';
 require_once dirname(__FILE__).'/triggers/testFormTriggerPrototype.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerDescription.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypes.php';
+require_once dirname(__FILE__).'/triggers/testPageTriggerPrototypesTemplate.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggers.php';
 require_once dirname(__FILE__).'/triggers/testPageTriggerUrl.php';
 require_once dirname(__FILE__).'/triggers/testTriggerExpressions.php';
@@ -420,6 +418,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceGraph');
 		$suite->addTestSuite('testInheritanceGraphPrototype');
 		$suite->addTestSuite('testPageGraphPrototypes');
+		$suite->addTestSuite('testPageGraphPrototypesTemplate');
 		$suite->addTestSuite('testPageHostGraph');
 		$suite->addTestSuite('testPageMonitoringHostsGraph');
 
@@ -441,6 +440,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormHostPrototype');
 		$suite->addTestSuite('testPageHostInterfaces');
 		$suite->addTestSuite('testPageHostPrototypes');
+		$suite->addTestSuite('testPageHostPrototypesTemplate');
 		$suite->addTestSuite('testPageHosts');
 		$suite->addTestSuite('testPageMonitoringHosts');
 
@@ -460,6 +460,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testInheritanceItemPrototype');
 		$suite->addTestSuite('testItemTypeSelection');
 		$suite->addTestSuite('testPageItemPrototypes');
+		$suite->addTestSuite('testPageItemPrototypesTemplate');
 		$suite->addTestSuite('testPageItems');
 		$suite->addTestSuite('testPageMassUpdateItemPrototypes');
 		$suite->addTestSuite('testPageMassUpdateItems');
@@ -515,12 +516,6 @@ class SeleniumTests {
 		// Problems.
 		$suite->addTestSuite('testPageProblems');
 		$suite->addTestSuite('testFormUpdateProblem');
-
-		// Prototype pages.
-		$suite->addTestSuite('testPagePrototypeGraphsTemplate');
-		$suite->addTestSuite('testPagePrototypeHostsTemplate');
-		$suite->addTestSuite('testPagePrototypeItemsTemplate');
-		$suite->addTestSuite('testPagePrototypeTriggersTemplate');
 
 		// Proxies.
 		$suite->addTestSuite('testFormAdministrationProxies');
@@ -592,6 +587,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormTriggerPrototype');
 		$suite->addTestSuite('testPageTriggerDescription');
 		$suite->addTestSuite('testPageTriggerPrototypes');
+		$suite->addTestSuite('testPageTriggerPrototypesTemplate');
 		$suite->addTestSuite('testPageTriggers');
 		$suite->addTestSuite('testPageTriggerUrl');
 		$suite->addTestSuite('testTriggerExpressions');

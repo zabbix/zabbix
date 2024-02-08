@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
  *
  * @onBefore prepareItemPrototypeTemplateData
  */
-class testPagePrototypeItemsTemplate extends testPagePrototypes {
+class testPageItemPrototypesTemplate extends testPagePrototypes {
 
 	public $page_name = 'item';
 	public $tag = 'y Item prototype trapper with text type';
@@ -139,7 +139,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 		self::$entity_count = count(self::$prototype_itemids);
 	}
 
-	public function testPagePrototypeItemsTemplate_Layout() {
+	public function testPageItemPrototypesTemplate_Layout() {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
@@ -150,7 +150,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getItemsSortingData
 	 */
-	public function testPagePrototypeItemsTemplate_Sorting($data) {
+	public function testPageItemPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort='.$data['sort'].
 				'&sortorder=ASC&parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
@@ -161,7 +161,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getItemsButtonLinkData
 	 */
-	public function testPagePrototypeItemsTemplate_ButtonLink($data) {
+	public function testPageItemPrototypesTemplate_ButtonLink($data) {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
@@ -172,7 +172,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getItemsDeleteData
 	 */
-	public function testPagePrototypeItemsTemplate_Delete($data) {
+	public function testPageItemPrototypesTemplate_Delete($data) {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
@@ -190,7 +190,7 @@ class testPagePrototypeItemsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getItemsNotDisplayedValuesData
 	 */
-	public function testPagePrototypeItemsTemplate_NotDisplayedValues($data) {
+	public function testPageItemPrototypesTemplate_NotDisplayedValues($data) {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkNotDisplayedValues($data);

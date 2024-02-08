@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
  *
  * @onBefore prepareGraphPrototypeTemplateData
  */
-class testPagePrototypeGraphsTemplate extends testPagePrototypes {
+class testPageGraphPrototypesTemplate extends testPagePrototypes {
 
 	public $page_name = 'graph';
 
@@ -127,7 +127,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 		self::$entity_count = count(self::$prototype_graphids);
 	}
 
-	public function testPagePrototypeGraphsTemplate_Layout() {
+	public function testPageGraphPrototypesTemplate_Layout() {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
 	}
@@ -137,7 +137,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getGraphsSortingData
 	 */
-	public function testPagePrototypeGraphsTemplate_Sorting($data) {
+	public function testPageGraphPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('graphs.php?context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
@@ -148,7 +148,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getGraphsButtonLinkData
 	 */
-	public function testPagePrototypeGraphsTemplate_ButtonLink($data) {
+	public function testPageGraphPrototypesTemplate_ButtonLink($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
 	}
@@ -158,7 +158,7 @@ class testPagePrototypeGraphsTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getGraphsDeleteData
 	 */
-	public function testPagePrototypeGraphsTemplate_Delete($data) {
+	public function testPageGraphPrototypesTemplate_Delete($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
 		$ids = [];

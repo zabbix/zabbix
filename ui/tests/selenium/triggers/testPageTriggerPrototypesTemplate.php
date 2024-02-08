@@ -26,7 +26,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
  *
  * @onBefore prepareTriggerPrototypeTemplateData
  */
-class testPagePrototypeTriggersTemplate extends testPagePrototypes {
+class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 
 	public $page_name = 'trigger';
 	public $tag = 'a Trigger prototype monitored not discovered_{#KEY}';
@@ -129,7 +129,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 		self::$entity_count = count(self::$prototype_triggerids);
 	}
 
-	public function testPagePrototypeTriggersTemplate_Layout() {
+	public function testPageTriggerPrototypesTemplate_Layout() {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkLayout(true);
@@ -140,7 +140,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getTriggersSortingData
 	 */
-	public function testPagePrototypeTriggersTemplate_Sorting($data) {
+	public function testPageTriggerPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort='.$data['sort'].'&sortorder=ASC&'.
 				'parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->executeSorting($data);
@@ -151,7 +151,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getTriggersButtonLinkData
 	 */
-	public function testPagePrototypeTriggersTemplate_ButtonLink($data) {
+	public function testPageTriggerPrototypesTemplate_ButtonLink($data) {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 		$this->checkTableAction($data);
@@ -162,7 +162,7 @@ class testPagePrototypeTriggersTemplate extends testPagePrototypes {
 	 *
 	 * @dataProvider getTriggersDeleteData
 	 */
-	public function testPagePrototypeTriggersTemplate_Delete($data) {
+	public function testPageTriggerPrototypesTemplate_Delete($data) {
 		$this->page->login()->open($this->link.'parent_discoveryid='.
 				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
 
