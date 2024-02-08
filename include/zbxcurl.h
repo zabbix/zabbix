@@ -86,7 +86,8 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);
 int	zbx_curl_has_bearer(char **error);
 int	zbx_curl_has_multi_wait(char **error);
 int	zbx_curl_has_ssl(char **error);
-#endif /* HAVE_LIBCURL */
 int	zbx_curl_has_smtp_auth(char **error);
+
+#endif /* HAVE_LIBCURL */
 
 #endif /* ZABBIX_CURL_H */

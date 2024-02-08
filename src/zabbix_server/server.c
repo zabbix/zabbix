@@ -760,6 +760,19 @@ static void	zbx_validate_config(ZBX_TASK_EX *task)
 
 	err |= (FAIL == check_cfg_feature_int("StartReportWriters", CONFIG_FORKS[ZBX_PROCESS_TYPE_REPORTWRITER],
 			"cURL library"));
+#else
+	if (SUCCEED != zbx_curl_has_ssl(NULL))
+	{
+		err |= (FAIL == check_cfg_feature_str("SSLCALocation", config_ssl_ca_location,
+				"cURL library that supports SSL/TLS"));
+		/* can't check SSLCertLocation and SSLKeyLocation because they have defaults */
+		err |= (FAIL == check_cfg_feature_str("Vault", zbx_config_vault.name,
+				"cURL library that supports SSL/TLS"));
+		err |= (FAIL == check_cfg_feature_str("VaultToken", zbx_config_vault.token,
+				"cURL library that supports SSL/TLS"));
+		err |= (FAIL == check_cfg_feature_str("VaultDBPath", zbx_config_vault.db_path,
+				"cURL library that supports SSL/TLS"));
+	}
 #endif
 
 #if !defined(HAVE_LIBXML2) || !defined(HAVE_LIBCURL)
@@ -1975,7 +1988,7 @@ static void	server_restart_ha(zbx_rtc_t *rtc)
 
 int	MAIN_ZABBIX_ENTRY(int flags)
 {
-	char		*error = NULL;
+	char		*error = NULL, *smtp_auth_feature_status = NULL;
 	int		i, db_type, ret, ha_status_old;
 
 	zbx_socket_t	listen_sock;
@@ -2033,6 +2046,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 #else
 #	define VMWARE_FEATURE_STATUS	" NO"
 #endif
+#ifdef HAVE_LIBCURL
+	if (SUCCEED == zbx_curl_has_smtp_auth(NULL))
+		smtp_auth_feature_status = zbx_strdup(smtp_auth_feature_status, "YES");
+	else
+		smtp_auth_feature_status = zbx_strdup(smtp_auth_feature_status, " NO");
+#else
+	smtp_auth_feature_status = zbx_strdup(smtp_auth_feature_status, " NO");
+#endif
 #ifdef HAVE_UNIXODBC
 #	define ODBC_FEATURE_STATUS	"YES"
 #else
@@ -2062,13 +2083,14 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPMI monitoring:           " IPMI_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "Web monitoring:            " LIBCURL_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "VMware monitoring:         " VMWARE_FEATURE_STATUS);
-	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       %s",
-			(SUCCEED == zbx_curl_has_smtp_auth(NULL) ? "YES" : " NO"));
+	zabbix_log(LOG_LEVEL_INFORMATION, "SMTP authentication:       %s", smtp_auth_feature_status);
 	zabbix_log(LOG_LEVEL_INFORMATION, "ODBC:                      " ODBC_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "SSH support:               " SSH_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "IPv6 support:              " IPV6_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "TLS support:               " TLS_FEATURE_STATUS);
 	zabbix_log(LOG_LEVEL_INFORMATION, "******************************");
+
+	zbx_free(smtp_auth_feature_status);
 
 	zabbix_log(LOG_LEVEL_INFORMATION, "using configuration file: %s", config_file);
 

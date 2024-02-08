@@ -165,15 +165,20 @@ int	zbx_curl_has_ssl(char **error)
 {
 	if (NULL == zbx_curl_ssl_version())
 	{
-		*error = zbx_dsprintf(*error, "the cURL library does not support SSL/TLS (using version %s)",
-				zbx_curl_version());
+		if (NULL != error)
+		{
+			*error = zbx_dsprintf(*error, "the cURL library does not support SSL/TLS (using version %s)",
+					zbx_curl_version());
+		}
+
+		return FAIL;
 	}
+
+	return SUCCEED;
 }
-#endif /* HAVE_LIBCURL */
 
 int	zbx_curl_has_smtp_auth(char **error)
 {
-#ifdef HAVE_LIBCURL
 	/* added in 7.20.0 */
 	if (zbx_curl_version_num() < 0x071400)
 	{
@@ -187,9 +192,5 @@ int	zbx_curl_has_smtp_auth(char **error)
 	}
 
 	return SUCCEED;
-#else
-	ZBX_UNUSED(error);
-
-	return FAIL;
-#endif
 }
+#endif /* HAVE_LIBCURL */
