@@ -983,10 +983,6 @@
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
 
-	.dashboard-widget-head {
-		margin: 8px 10px;
-	}
-
 	.list-table {
 		border: 0;
 
@@ -1019,21 +1015,6 @@
 
 	&:last-child {
 		padding-right: 10px;
-	}
-}
-
-.dashboard-widget-head {
-	display: flex;
-	margin-bottom: 8px;
-
-	h4 {
-		color: widget-head-font-color($font-color);
-		font-weight: bold;
-		margin-right: auto;
-	}
-
-	& > ul {
-		margin: -8px -10px -10px 10px;
 	}
 }
 

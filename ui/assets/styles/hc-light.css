@@ -1186,7 +1186,7 @@ button, .btn, .btn-alt, .btn-grey, .btn-icon, .btn-link, .btn-overlay-close, .bt
 .form-grid table .btn-icon,
 .form-grid table .icon, button.btn-medium, .btn-medium.btn, .btn-medium.btn-alt, .btn-medium.btn-grey, .btn-medium.btn-icon, .btn-medium.btn-link, .btn-medium.btn-overlay-close, .btn-medium.btn-debug, .btn-overlay-close, .list-table .btn-icon:not(.btn-small),
 .list-table .icon, .multiselect .multiselect-list .subfilter-enabled .btn-icon, .service-info .service-info-value .service-info-value-sla .btn-icon, div.dashboard-widget-navtree .navtree .tree .tree-item .tree-row .tools .btn-icon, form.dashboard-widget-piechart .list-item-actions .btn-icon, form.dashboard-widget-svggraph .list-item-actions .btn-icon, .table-forms .table-forms-td-right table .btn-icon:not(.btn-small),
-.table-forms .table-forms-td-right table .icon, .overlay-dialogue .dashboard-widget-head .btn-icon {
+.table-forms .table-forms-td-right table .icon, .overlay-dialogue .overlay-dialogue-header .btn-icon {
   min-width: 18px;
   height: 18px; }
 
@@ -1339,7 +1339,7 @@ button {
 .problem-icon-list .problem-icon-list-item::before {
   font-size: 16px; }
 
-.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .dashboard-widget-head .btn-overlay-close::before {
+.zi-arrow-down-small::before, .zi-arrow-up-small::before, .zi-chevron-down-small::before, .zi-help-small::before, .zi-help-filled-small::before, .zi-i-negative::before, .zi-i-positive::before, .zi-i-warning::before, .zi-plus-small::before, .zi-remove-small::before, .zi-tree-top-bottom-small::before, .zi-tree-top-right-small::before, .zi-tree-top-right-bottom-small::before, .zi-user-filled-small::before, .zi-wrench-alt-small::before, .overlay-dialogue .overlay-dialogue-header .btn-overlay-close::before {
   font-size: 12px; }
 
 .btn-overlay-close::before, .zi-remove-smaller::before {
@@ -2083,8 +2083,6 @@ button {
   margin: 0 10px 10px 0;
   background-color: #ffffff;
   border: 1px solid #9f9f9f; }
-  .dashboard-widget .dashboard-widget-head {
-    margin: 8px 10px; }
   .dashboard-widget .list-table {
     border: 0; }
     .dashboard-widget .list-table tbody tr:last-child td {
@@ -2098,16 +2096,6 @@ button {
   padding-left: 10px; }
 .dashboard-grid-widget-contents .list-table th:last-child, .dashboard-grid-widget-contents .list-table td:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table th:last-child, .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .list-table td:last-child, .dashboard-widget .list-table th:last-child, .dashboard-widget .list-table td:last-child {
   padding-right: 10px; }
-
-.dashboard-widget-head {
-  display: flex;
-  margin-bottom: 8px; }
-  .dashboard-widget-head h4 {
-    color: #262626;
-    font-weight: bold;
-    margin-right: auto; }
-  .dashboard-widget-head > ul {
-    margin: -8px -10px -10px 10px; }
 
 .dashboard-widget-foot {
   text-align: right;
@@ -5677,23 +5665,30 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
   border: 1px solid #383838;
   border-bottom-color: #353535;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5); }
-  .overlay-dialogue .dashboard-widget-head {
+  .overlay-dialogue .overlay-dialogue-header {
     margin: -8px -10px 6px -10px;
-    padding: 8px 10px; }
-    .overlay-dialogue .dashboard-widget-head .btn-icon,
-    .overlay-dialogue .dashboard-widget-head .btn-overlay-close {
+    padding: 8px 10px;
+    display: flex; }
+    .overlay-dialogue .overlay-dialogue-header .btn-icon,
+    .overlay-dialogue .overlay-dialogue-header .btn-overlay-close {
       position: initial;
       margin-top: -9px;
       margin-left: 4px; }
-      .overlay-dialogue .dashboard-widget-head .btn-icon:last-child,
-      .overlay-dialogue .dashboard-widget-head .btn-overlay-close:last-child {
+      .overlay-dialogue .overlay-dialogue-header .btn-icon:last-child,
+      .overlay-dialogue .overlay-dialogue-header .btn-overlay-close:last-child {
         margin-right: -6px; }
+    .overlay-dialogue .overlay-dialogue-header h4 {
+      color: #262626;
+      font-weight: bold;
+      margin-right: auto; }
+    .overlay-dialogue .overlay-dialogue-header > ul {
+      margin: -8px -10px -10px 10px; }
   .overlay-dialogue.modal {
     position: fixed;
     overflow: hidden;
     margin: 0 10px;
     padding: 13px 10px 10px; }
-    .overlay-dialogue.modal .dashboard-widget-head {
+    .overlay-dialogue.modal .overlay-dialogue-header {
       margin-bottom: 12px; }
     .overlay-dialogue.modal .overlay-dialogue-body {
       overflow-y: auto;
@@ -5975,13 +5970,13 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
 
 .notif.overlay-dialogue {
   width: 250px; }
-  .notif.overlay-dialogue .dashboard-widget-head ul {
+  .notif.overlay-dialogue .overlay-dialogue-header ul {
     margin: 0 auto 0 0; }
-    .notif.overlay-dialogue .dashboard-widget-head ul li {
+    .notif.overlay-dialogue .overlay-dialogue-header ul li {
       display: inline-block; }
-      .notif.overlay-dialogue .dashboard-widget-head ul li:not(:first-child) {
+      .notif.overlay-dialogue .overlay-dialogue-header ul li:not(:first-child) {
         margin-left: 5px; }
-      .notif.overlay-dialogue .dashboard-widget-head ul li .btn-icon {
+      .notif.overlay-dialogue .overlay-dialogue-header ul li .btn-icon {
         margin-left: 0;
         margin-right: 0; }
 
@@ -6457,14 +6452,14 @@ z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, tex
 .drag-icon, .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .dashboard-widget-head {
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-accordion-item > .drag-icon:not(.disabled) + label, .ui-draggable .overlay-dialogue-header {
   cursor: move;
   cursor: grab; }
 
 .dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable-item.sortable-dragging > div, .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable.ui-draggable-dragging .dashboard-widget-head, .cursor-dragging {
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable.ui-draggable-dragging .overlay-dialogue-header, .cursor-dragging {
   cursor: move;
   cursor: grabbing; }
 

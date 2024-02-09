@@ -45,7 +45,7 @@ class COverlayDialogElement extends CElement {
 	 * @return string
 	 */
 	public function getTitle() {
-		return $this->query('xpath:./div[@class="dashboard-widget-head"]/h4')->one()->getText();
+		return $this->query('xpath:./div[@class="overlay-dialogue-header"]/h4')->one()->getText();
 	}
 
 	/**
