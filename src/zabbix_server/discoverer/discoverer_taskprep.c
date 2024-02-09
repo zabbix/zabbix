@@ -127,7 +127,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
 	zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
 
-	tasks_ptr = (NULL != tasks_local && SUCCEED == dcheck_is_async(dcheck) && SVC_SNMPv3 != dcheck->type) ?
+	tasks_ptr = (0 == drule->concurrency_max && SUCCEED == dcheck_is_async(dcheck) && SVC_SNMPv3 != dcheck->type) ?
 			tasks_local : tasks;
 
 	if (NULL != (task = zbx_hashset_search(tasks_ptr, &task_local)))
@@ -285,7 +285,7 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
 void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
 		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
 {
-	zbx_hashset_t	tasks_local, *tasks_ptr;
+	zbx_hashset_t	tasks_local;
 	zbx_uint64_t	checks_count = 0;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
 	unsigned int	uniq_ips = 0;
@@ -339,12 +339,11 @@ next:
 	}
 
 	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
-	tasks_ptr = 0 == drule->concurrency_max ? &tasks_local : NULL;
 
 	if (0 != drule->unique_dcheckid)
-		checks_count = process_checks(drule, 1, queue_capacity, tasks, tasks_ptr, dchecks_common, ipranges);
+		checks_count = process_checks(drule, 1, queue_capacity, tasks, &tasks_local, dchecks_common, ipranges);
 
-	checks_count += process_checks(drule, 0, queue_capacity, tasks, tasks_ptr, dchecks_common, ipranges);
+	checks_count += process_checks(drule, 0, queue_capacity, tasks, &tasks_local, dchecks_common, ipranges);
 
 	if (0 == *queue_capacity || 0 == checks_count)
 		goto out;
