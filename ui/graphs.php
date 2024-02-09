@@ -62,6 +62,7 @@ $fields = [
 	'cancel' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form' =>				[T_ZBX_STR, O_OPT, P_SYS,		null,			null],
 	'form_refresh' =>		[T_ZBX_INT, O_OPT, P_SYS,		null,			null],
+	'backurl' =>			[T_ZBX_STR, O_OPT, null,		null,			null],
 	// filter
 	'filter_set' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
 	'filter_rst' =>			[T_ZBX_STR, O_OPT, P_SYS,			null,	null],
@@ -141,6 +142,11 @@ elseif (hasRequest('graphid')) {
 	}
 }
 elseif ($hostid && !isWritableHostTemplates([$hostid])) {
+	access_deny();
+}
+
+// Validate backurl.
+if (hasRequest('backurl') && !CHtmlUrlValidator::validateSameSite(getRequest('backurl'))) {
 	access_deny();
 }
 
@@ -286,7 +292,17 @@ elseif (getRequest('graphid', '') && getRequest('action', '') === 'graph.updated
 		'discover' => getRequest('discover', DB::getDefault('graphs', 'discover'))
 	]);
 
-	show_messages($result, _('Graph prototype updated'), _('Cannot update graph prototype'));
+	if ($result) {
+		CMessageHelper::setSuccessTitle(_('Graph prototype updated'));
+	}
+	else {
+		CMessageHelper::setErrorTitle(_('Cannot update graph prototype'));
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'graph.massdelete' && hasRequest('group_graphid')) {
 	$graphIds = getRequest('group_graphid');

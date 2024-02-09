@@ -663,20 +663,29 @@ elseif (hasRequest('action') && str_in_array(getRequest('action'), ['discoveryru
 
 	$result = (bool) API::DiscoveryRule()->update($lld_rules);
 
-	if ($result) {
-		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
-	}
-
 	$updated = count($itemids);
 
-	$messageSuccess = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
-		: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
-	$messageFailed = ($status == ITEM_STATUS_ACTIVE)
-		? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
-		: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+	if ($result) {
+		$filter_hostids ? uncheckTableRows($checkbox_hash) : uncheckTableRows();
 
-	show_messages($result, $messageSuccess, $messageFailed);
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Discovery rule enabled', 'Discovery rules enabled', $updated)
+			: _n('Discovery rule disabled', 'Discovery rules disabled', $updated);
+
+		CMessageHelper::setSuccessTitle($message);
+	}
+	else {
+		$message = $status == ITEM_STATUS_ACTIVE
+			? _n('Cannot enable discovery rule', 'Cannot enable discovery rules', $updated)
+			: _n('Cannot disable discovery rule', 'Cannot disable discovery rules', $updated);
+
+		CMessageHelper::setErrorTitle($message);
+	}
+
+	if (hasRequest('backurl')) {
+		$response = new CControllerResponseRedirect(getRequest('backurl'));
+		$response->redirect();
+	}
 }
 elseif (hasRequest('action') && getRequest('action') === 'discoveryrule.massdelete' && hasRequest('g_hostdruleid')) {
 	$result = API::DiscoveryRule()->delete(getRequest('g_hostdruleid'));
