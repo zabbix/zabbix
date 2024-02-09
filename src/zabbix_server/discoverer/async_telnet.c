@@ -71,7 +71,7 @@ static int	async_telnet_recv(zbx_telnet_context_t *telnet_context, short *events
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s():%d", __func__, r->state);
 
-	if (ZABBIX_TELNET_PROTOCOL_CONNECT == r->state || ZABBIX_TELNET_PROTOCOL_SEND == r->state)
+	if (ZABBIX_TELNET_PROTOCOL_SEND == r->state)
 		r->state = ZABBIX_TELNET_PROTOCOL_RECV_FIRST;
 
 	if (0 == r->buff.values_num)
@@ -248,6 +248,7 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 			}
 
 			telnet_context->step = ZABBIX_TELNET_STEP_RECV;
+			telnet_context->recv_context.state = ZABBIX_TELNET_PROTOCOL_RECV_FIRST;
 			telnet_context->item.ret = NOTSUPPORTED;	/* preliminary init for recv loop */
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d key:%s", __func__,
@@ -378,6 +379,7 @@ void	zbx_async_check_telnet(zbx_dc_item_t *item, zbx_async_task_clear_cb_t clear
 	zbx_init_agent_result(&telnet_context->item.result);
 	zbx_socket_clean(&telnet_context->s);
 	zbx_vector_telnet_recv_create(&telnet_context->recv_context.buff);
+	zbx_tcp_send_context_init(NULL, 0, 0, 0, &telnet_context->tcp_send_context);
 
 	telnet_context->step = ZABBIX_TELNET_STEP_CONNECT_INIT;
 
