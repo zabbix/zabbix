@@ -1864,7 +1864,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 			return ZBX_PROTO_ERROR;
 		}
 
-		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
+		if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, n))
 		{
 			*error = zbx_dsprintf(*error, "cannot wait socket: %s",
 					zbx_strerror_from_system(zbx_socket_last_error()));
