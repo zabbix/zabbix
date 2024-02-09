@@ -235,7 +235,7 @@ void	zbx_mock_test_entry(void **state)
 			\"steps\": [],\
 			\"truncated\": %s,\
 			\"result\": \"%s\",\
-			\"original_size\": %llu\
+			\"original_size\": %zu\
 		}"
 		#define RANG_GEN_RESPONSE_UNTRUNCATED "{\
 			\"steps\": [],\
