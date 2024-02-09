@@ -106,7 +106,6 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 {
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
-	zbx_task_range_t	range_cmp = {.id = 0};
 	zbx_hashset_t		*tasks_ptr;
 	int			port = ZBX_PORTRANGE_INIT_PORT;
 	unsigned int		checks_count = 0;
@@ -124,7 +123,7 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	else
 		checks_count = 1;
 
-	task_local.range = &range_cmp;
+	task_local.range.id = 0;
 	zbx_vector_dc_dcheck_ptr_create(&task_local.dchecks);
 	zbx_vector_dc_dcheck_ptr_append(&task_local.dchecks, dcheck);
 
@@ -138,16 +137,15 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 		if (FAIL == zbx_vector_dc_dcheck_ptr_search(&task->dchecks, dcheck, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC))
 		{
 			zbx_vector_dc_dcheck_ptr_append(&task->dchecks, dcheck);
-			task->range->state.checks_per_ip += checks_count;
+			task->range.state.checks_per_ip += checks_count;
 		}
 	}
 	else
 	{
-		task_local.range = (zbx_task_range_t *)zbx_malloc(NULL, sizeof(zbx_task_range_t));
-		memset(task_local.range, 0, sizeof(zbx_task_range_t));
-		task_local.range->ipranges = ipranges;
-		task_local.range->state.port = ZBX_PORTRANGE_INIT_PORT;
-		task_local.range->state.checks_per_ip = checks_count;
+		memset(&task_local.range, 0, sizeof(zbx_task_range_t));
+		task_local.range.ipranges = ipranges;
+		task_local.range.state.port = ZBX_PORTRANGE_INIT_PORT;
+		task_local.range.state.checks_per_ip = checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
 		zbx_hashset_insert(tasks_ptr, &task_local, sizeof(zbx_discoverer_task_t));
 
@@ -193,9 +191,8 @@ static void	process_rangetask_copy(zbx_discoverer_task_t *task, zbx_task_range_t
 
 	zbx_vector_dc_dcheck_ptr_create(&task_out->dchecks);
 	zbx_vector_dc_dcheck_ptr_append_array(&task_out->dchecks, task->dchecks.values, task->dchecks.values_num);
-	task_out->range = (zbx_task_range_t *)zbx_malloc(NULL, sizeof(zbx_task_range_t));
-	*task_out->range = *range;
-	task->range->id++;
+	task_out->range = *range;
+	task->range.id++;
 }
 
 static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *tasks_dst)
@@ -214,38 +211,38 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 	{
 		zbx_task_range_t	range;
 
-		task->range->state.count = 0;
-		range = *task->range;
+		task->range.state.count = 0;
+		range = task->range;
 
-		while (SUCCEED == zbx_iprange_uniq_iter(task->range->ipranges->values,
-				task->range->ipranges->values_num, &task->range->state.index_ip,
-				task->range->state.ipaddress))
+		while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values,
+				task->range.ipranges->values_num, &task->range.state.index_ip,
+				task->range.state.ipaddress))
 		{
-			for (; task->range->state.dcheck_index < task->dchecks.values_num;
-					task->range->state.dcheck_index++)
+			for (; task->range.state.dcheck_index < task->dchecks.values_num;
+					task->range.state.dcheck_index++)
 			{
-				zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range->state.dcheck_index];
+				zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.dcheck_index];
 
 				dcheck_port_ranges_get(dcheck->ports, &port_ranges);
 
 				while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
-						&task->range->state.index_port, &task->range->state.port))
+						&task->range.state.index_port, &task->range.state.port))
 				{
 					if (DISCOVERER_JOB_TASKS_INPROGRESS_MAX == range.state.count)
 					{
 						process_rangetask_copy(task, &range, tasks_dst);
-						range = *task->range;
+						range = task->range;
 					}
 
 					range.state.count++;
 					total++;
 				}
 
-				task->range->state.port = ZBX_PORTRANGE_INIT_PORT;
+				task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
 				zbx_vector_portrange_clear(&port_ranges);
 			}
 
-			task->range->state.dcheck_index = 0;
+			task->range.state.dcheck_index = 0;
 		}
 
 		if (0 != range.state.count)
@@ -276,7 +273,7 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
 		if (SVC_ICMPPING == task->dchecks.values[0]->type)
 			continue;
 
-		task->range->state.count = task->range->state.checks_per_ip * ips_num;
+		task->range.state.count = task->range.state.checks_per_ip * ips_num;
 	}
 }
 

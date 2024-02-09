@@ -27,7 +27,7 @@ zbx_hash_t	discoverer_task_hash(const void *data)
 	const zbx_discoverer_task_t	*task = (const zbx_discoverer_task_t *)data;
 	zbx_hash_t			hash;
 
-	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&task->range->id);
+	hash = ZBX_DEFAULT_UINT64_HASH_FUNC(&task->range.id);
 	hash = ZBX_DEFAULT_STRING_HASH_ALGO(&task->dchecks.values[0]->type, sizeof(task->dchecks.values[0]->type), hash);
 
 	return hash;
@@ -38,7 +38,7 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	const zbx_discoverer_task_t	*task1 = (const zbx_discoverer_task_t *)d1;
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
 
-	ZBX_RETURN_IF_NOT_EQUAL(task1->range->id, task2->range->id);
+	ZBX_RETURN_IF_NOT_EQUAL(task1->range.id, task2->range.id);
 	ZBX_RETURN_IF_NOT_EQUAL(task1->dchecks.values[0]->type, task2->dchecks.values[0]->type);
 
 	return 0;
@@ -46,8 +46,6 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 
 void	discoverer_task_clear(zbx_discoverer_task_t *task)
 {
-	zbx_free(task->range);	/* the range vector is stored on job level */
-
 	/* dcheck is stored in job->dcheck_common */
 	zbx_vector_dc_dcheck_ptr_destroy(&task->dchecks);
 }

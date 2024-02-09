@@ -65,7 +65,7 @@ zbx_task_range_t;
 typedef struct
 {
 	zbx_vector_dc_dcheck_ptr_t	dchecks;
-	zbx_task_range_t		*range;
+	zbx_task_range_t		range;
 	zbx_uint64_t			unique_dcheckid;
 }
 zbx_discoverer_task_t;

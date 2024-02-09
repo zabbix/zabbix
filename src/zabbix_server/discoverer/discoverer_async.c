@@ -544,8 +544,8 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
 			" checks per ip:%u dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
-			task->range->id, task->range->state.count, task->range->state.checks_per_ip,
-			task->dchecks.values_num, task->dchecks.values[task->range->state.dcheck_index]->type,
+			task->range.id, task->range.state.count, task->range.state.checks_per_ip,
+			task->dchecks.values_num, task->dchecks.values[task->range.state.dcheck_index]->type,
 			worker_max);
 
 	if (0 == worker_max)
@@ -556,20 +556,20 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zbx_vector_portrange_create(&port_ranges);
 	*first_ip = '\0';
 
-	if (0 == memcmp(task->range->state.ipaddress, z,
-			ZBX_IPRANGE_V4 == task->range->ipranges->values[task->range->state.index_ip].type ?
+	if (0 == memcmp(task->range.state.ipaddress, z,
+			ZBX_IPRANGE_V4 == task->range.ipranges->values[task->range.state.index_ip].type ?
 			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
 	{
-		task->range->state.index_ip = 0;
-		zbx_iprange_first(task->range->ipranges->values, task->range->state.ipaddress);
+		task->range.state.index_ip = 0;
+		zbx_iprange_first(task->range.ipranges->values, task->range.state.ipaddress);
 	}
 
 	do
 	{
 		zbx_discoverer_results_t	*result;
 
-		(void)zbx_iprange_ip2str(task->range->ipranges->values[task->range->state.index_ip].type,
-				task->range->state.ipaddress, ip, sizeof(ip));
+		(void)zbx_iprange_ip2str(task->range.ipranges->values[task->range.state.index_ip].type,
+				task->range.state.ipaddress, ip, sizeof(ip));
 
 		if ('\0' == *first_ip)
 			zbx_strlcpy(first_ip, ip, sizeof(first_ip));
@@ -578,17 +578,17 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 
-		for (; task->range->state.dcheck_index < task->dchecks.values_num && 0 == *stop &&
-				0 != task->range->state.count; task->range->state.dcheck_index++)
+		for (; task->range.state.dcheck_index < task->dchecks.values_num && 0 == *stop &&
+				0 != task->range.state.count; task->range.state.dcheck_index++)
 		{
-			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range->state.dcheck_index];
+			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.dcheck_index];
 
 			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
 
-			if (ZBX_PORTRANGE_INIT_PORT == task->range->state.port)
+			if (ZBX_PORTRANGE_INIT_PORT == task->range.state.port)
 			{
-				task->range->state.index_port = 0;
-				task->range->state.port = port_ranges.values->from;
+				task->range.state.index_port = 0;
+				task->range.state.port = port_ranges.values->from;
 			}
 
 			do
@@ -600,7 +600,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 				case SVC_SNMPv3:
 #ifdef HAVE_NETSNMP
 					ret = discovery_snmp(&poller_config, dcheck, ip,
-							(unsigned short)task->range->state.port, result, error);
+							(unsigned short)task->range.state.port, result, error);
 #else
 					ret = FAIL;
 					*error = zbx_strdup(*error, "Support for SNMP checks was not compiled in.");
@@ -608,7 +608,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 					break;
 				case SVC_AGENT:
 					ret = discovery_agent(&poller_config, dcheck, ip,
-							(unsigned short)task->range->state.port, result, error);
+							(unsigned short)task->range.state.port, result, error);
 					break;
 				case SVC_SSH:
 				case SVC_LDAP:
@@ -621,11 +621,11 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 				case SVC_TCP:
 				case SVC_HTTPS:
 					ret = discovery_tcpsvc(&poller_config, dcheck, ip,
-							(unsigned short)task->range->state.port, result, error);
+							(unsigned short)task->range.state.port, result, error);
 					break;
 				case SVC_TELNET:
 					ret = discovery_telnet(&poller_config, dcheck, ip,
-							(unsigned short)task->range->state.port, result);
+							(unsigned short)task->range.state.port, result);
 					break;
 				default:
 					ret = FAIL;
@@ -639,23 +639,23 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 				while (worker_max == poller_config.processing)
 					event_base_loop(poller_config.base, EVLOOP_ONCE);
 
-				task->range->state.count--;
+				task->range.state.count--;
 			}
 			while (SUCCEED == zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num,
-					&task->range->state.index_port, &task->range->state.port) &&
-					0 != task->range->state.count && 0 == *stop);
+					&task->range.state.index_port, &task->range.state.port) &&
+					0 != task->range.state.count && 0 == *stop);
 
-			task->range->state.port = ZBX_PORTRANGE_INIT_PORT;
+			task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
 			zbx_vector_portrange_clear(&port_ranges);
 
 		}
 
-		task->range->state.dcheck_index = 0;
+		task->range.state.dcheck_index = 0;
 		discoverer_net_check_result_flush(dmanager, task, &results, 0);
 	}
-	while (SUCCEED == zbx_iprange_uniq_iter(task->range->ipranges->values,
-			task->range->ipranges->values_num, &task->range->state.index_ip,
-			task->range->state.ipaddress) && 0 != task->range->state.count && 0 == *stop);
+	while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values,
+			task->range.ipranges->values_num, &task->range.state.index_ip,
+			task->range.state.ipaddress) && 0 != task->range.state.count && 0 == *stop);
 
 out:	/* try to close all handles if they are exhausted */
 	while (0 != poller_config.processing)
@@ -673,8 +673,8 @@ out:	/* try to close all handles if they are exhausted */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
 			" last ip:%s", log_worker_id, __func__, druleid,
-			task->dchecks.values[task->range->state.dcheck_index]->type,
-			task->range->state.count, first_ip, ip);
+			task->dchecks.values[task->range.state.dcheck_index]->type,
+			task->range.state.count, first_ip, ip);
 
 	return ret;
 }
