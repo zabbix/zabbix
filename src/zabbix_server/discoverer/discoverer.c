@@ -1144,7 +1144,7 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() dchecks:%d key[0]:%s", log_worker_id, __func__,
 			task->dchecks.values_num, 0 != task->dchecks.values_num ?
 			task->dchecks.values[0]->key_ : "empty");
-// check first ip and port but not a range index
+
 	if (0 == task->range->state.index_ip && 0 == task->range->state.index_port &&
 			0 == task->range->state.dcheck_index)
 	{
@@ -1177,7 +1177,6 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 	result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
 
-// check that dst dns is not empty
 	if (0 == task->range->state.index_ip && 0 == task->range->state.index_port &&
 			0 == task->range->state.dcheck_index)
 	{
@@ -1198,9 +1197,6 @@ out:
 
 static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 {
-// change the logic: ip->dcheck->port
-// rename to index_dcheck
-
 	int			ret, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 	zbx_vector_portrange_t	port_ranges;
 	zbx_dc_dcheck_t		*dcheck = task->dchecks.values[task->range->state.dcheck_index];
@@ -1262,7 +1258,6 @@ int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 		case SVC_IMAP:
 		case SVC_HTTP:
 		case SVC_SSH:
-		case SVC_TELNET:
 			return SUCCEED;
 		default:
 			return FAIL;
@@ -1329,8 +1324,6 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (FAIL == dcheck_is_async(task->dchecks.values[0]))
 			{
-// move all 'if' to separate function: discoverer_range_check_pop
-// live only 'range state' in new task for sync checks (we need only 1 ip and port)
 				if (SUCCEED != discoverer_net_check_iter(task))
 				{
 					discoverer_task_free(task);

@@ -444,7 +444,7 @@ static void	process_telnet_result(void *data)
 	discovery_async_result_t	*async_result = (discovery_async_result_t *)telnet_context->arg;
 	zbx_dc_item_context_t		*item = &telnet_context->item;
 
-	zabbix_log(LOG_LEVEL_WARNING, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
 			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
 
 	async_result->poller_config->processing--;
