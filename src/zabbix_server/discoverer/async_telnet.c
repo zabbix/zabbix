@@ -249,7 +249,6 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 
 			telnet_context->step = ZABBIX_TELNET_STEP_RECV;
 			telnet_context->recv_context.state = ZABBIX_TELNET_PROTOCOL_RECV_FIRST;
-			telnet_context->item.ret = NOTSUPPORTED;	/* preliminary init for recv loop */
 
 			zabbix_log(LOG_LEVEL_DEBUG, "%s() step '%s' event:%d key:%s", __func__,
 					get_telnet_step_string(telnet_context->step), event, telnet_context->item.key);
@@ -275,19 +274,8 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 			telnet_context->step = ZABBIX_TELNET_STEP_RECV;
 			ZBX_FALLTHROUGH;
 		case ZABBIX_TELNET_STEP_RECV:
-			zabbix_log(LOG_LEVEL_DEBUG, "%s() receiving data for key:%s where item.ret:%s", __func__,
-					telnet_context->item.key, zbx_result_string(telnet_context->item.ret));
-
-			if (SUCCEED == telnet_context->item.ret)
-			{
-				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == telnet_context->resolve_reverse_dns)
-				{
-					telnet_context->rdns_step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
-					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
-				}
-
-				break;
-			}
+			zabbix_log(LOG_LEVEL_DEBUG, "%s() receiving data for key:%s", __func__,
+					telnet_context->item.key);
 
 			if (ZABBIX_TELNET_PROTOCOL_SEND == (rc = async_telnet_recv(telnet_context, &event_new)))
 			{
@@ -307,6 +295,13 @@ static int	telnet_task_process(short event, void *data, int *fd, const char *add
 					telnet_context->recv_context.buff.values_num))
 			{
 				SET_RESULT_SUCCEED;
+
+				if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == telnet_context->resolve_reverse_dns)
+				{
+					telnet_context->rdns_step = ZABBIX_ASYNC_STEP_REVERSE_DNS;
+					return ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+				}
+
 				break;
 			}
 
