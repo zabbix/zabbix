@@ -344,6 +344,7 @@ static void	json_add_string_with_limit(struct zbx_json *j, const char *tag, cons
  *             jp_steps   - [IN] steps object of the request                  *
  *             value      - [IN] item value for preprocessing                 *
  *             value_size - [IN] size of the item value for preprocessing     *
+ *             state      - [IN] the item state                               *
  *             json       - [OUT] the output json                             *
  *             error      - [OUT] the error message                           *
  *                                                                            *
