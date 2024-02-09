@@ -23,23 +23,14 @@
 
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
-
 static int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 {
-	int			ret, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
+	int			ret;
 	zbx_vector_portrange_t	port_ranges;
 	zbx_dc_dcheck_t		*dcheck = task->dchecks.values[task->range.state.index_dcheck];
 
 	if (0 == task->range.state.count)
 		return FAIL;
-
-	if (0 == memcmp(task->range.state.ipaddress, z,
-			ZBX_IPRANGE_V4 == task->range.ipranges->values[task->range.state.index_ip].type ?
-			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
-	{
-		task->range.state.index_ip = 0;
-		zbx_iprange_first(task->range.ipranges->values, task->range.state.ipaddress);
-	}
 
 	zbx_vector_portrange_create(&port_ranges);
 	dcheck_port_ranges_get(dcheck->ports, &port_ranges);
@@ -124,7 +115,8 @@ static zbx_discoverer_task_t	*discoverer_task_clone(zbx_discoverer_task_t *task)
 
 zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
 {
-	zbx_discoverer_task_t	*task, *task_next;
+	zbx_discoverer_task_t	*task;
+	zbx_task_range_t	range;
 
 	if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
 		return NULL;
@@ -132,12 +124,12 @@ zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
 	if (SUCCEED == dcheck_is_async(task->dchecks.values[0]))
 		return task;
 
-	task_next = discoverer_task_clone(task);
+	range = task->range;
 
-	if (SUCCEED != discoverer_range_check_iter(task_next))
-		discoverer_task_free(task_next);
-	else
-		(void)zbx_list_append(&job->tasks, task_next, NULL);
+	if (SUCCEED == discoverer_range_check_iter(task))
+		(void)zbx_list_append(&job->tasks, discoverer_task_clone(task), NULL);
+
+	task->range = range;
 
 	return task;
 }
