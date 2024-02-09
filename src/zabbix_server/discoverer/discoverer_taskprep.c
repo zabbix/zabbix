@@ -118,6 +118,9 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 		while (SUCCEED == zbx_portrange_uniq_next(port_ranges.values, port_ranges.values_num, &port))
 			checks_count++;
 
+		if (0 != port_ranges.values_num)
+			port = port_ranges.values[0].from;	/* get value of first port in range */
+
 		zbx_vector_portrange_destroy(&port_ranges);
 	}
 	else
@@ -144,7 +147,8 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	{
 		memset(&task_local.range, 0, sizeof(zbx_task_range_t));
 		task_local.range.ipranges = ipranges;
-		task_local.range.state.port = ZBX_PORTRANGE_INIT_PORT;
+		task_local.range.state.port = port;
+		zbx_iprange_first(task_local.range.ipranges->values, task_local.range.state.ipaddress);
 		task_local.range.state.checks_per_ip = checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
 		zbx_hashset_insert(tasks_ptr, &task_local, sizeof(zbx_discoverer_task_t));

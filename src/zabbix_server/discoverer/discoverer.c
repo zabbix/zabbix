@@ -187,9 +187,6 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
 		case SVC_HTTPS:
 			service = "https";
 			break;
-		case SVC_TELNET:
-			service = "telnet";
-			break;
 		default:
 			ret = FAIL;
 			break;
@@ -1132,67 +1129,51 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 	return ret;
 }
 
-static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task, char **error)
+static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task_t *task)
 {
-	int					ret = SUCCEED;
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_dc_dcheck_t				*dcheck;
-	zbx_vector_discoverer_services_ptr_t	services;
+	zbx_discoverer_dservice_t		*service;
 	zbx_discoverer_results_t		*result = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() dchecks:%d key[0]:%s", log_worker_id, __func__,
 			task->dchecks.values_num, 0 != task->dchecks.values_num ?
 			task->dchecks.values[0]->key_ : "empty");
 
-	if (0 == task->range.state.index_ip && 0 == task->range.state.index_port &&
-			0 == task->range.state.index_dcheck)
-	{
-		zbx_gethost_by_ip(ip, dns, sizeof(dns));
-	}
-
-	zbx_vector_discoverer_services_ptr_create(&services);
 	dcheck = task->dchecks.values[task->range.state.index_dcheck];
 	(void)zbx_iprange_ip2str(task->range.ipranges->values[task->range.state.index_ip].type,
 			task->range.state.ipaddress, ip, sizeof(ip));
 
-	if (SUCCEED == discover_service(dcheck, ip, (unsigned short)task->range.state.port))
-	{
-		zbx_discoverer_dservice_t	*service;
+	if (SUCCEED != discover_service(dcheck, ip, (unsigned short)task->range.state.port))
+		goto out;
 
-		service = result_dservice_create((unsigned short)task->range.state.port, dcheck->dcheckid);
-		service->status = DOBJECT_STATUS_UP;
-		zbx_vector_discoverer_services_ptr_append(&services, service);
-	}
+	service = result_dservice_create((unsigned short)task->range.state.port, dcheck->dcheckid);
+	service->status = DOBJECT_STATUS_UP;
+	zbx_gethost_by_ip(ip, dns, sizeof(dns));
 
 	pthread_mutex_lock(&dmanager.results_lock);
 
-	if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
+	if (SUCCEED == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
 	{
-		zbx_vector_discoverer_services_ptr_clear_ext(&services, service_free);
-		*error = zbx_dsprintf(*error, "Cannot decrease incomplete checks count, IP: '%s'.", ip);
-		ret = FAIL;
-		goto out;
+		result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
+
+		if (NULL == result->dnsname || ('\0' == *result->dnsname && '\0' != *dns))
+		{
+			result->dnsname = zbx_strdup(result->dnsname, dns);
+		}
+
+		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 	}
+	else
+		service_free(service);	/* drule revision has been changed or drule aborted */
 
-	result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
-
-	if (0 == task->range.state.index_ip && 0 == task->range.state.index_port &&
-			0 == task->range.state.index_dcheck)
-	{
-		result->dnsname = zbx_strdup(result->dnsname, dns);
-	}
-
-	zbx_vector_discoverer_services_ptr_append_array(&result->services, services.values, services.values_num);
-out:
 	pthread_mutex_unlock(&dmanager.results_lock);
-
-	zbx_vector_discoverer_services_ptr_destroy(&services);
-
+out:
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d", log_worker_id, __func__,
 			ip, NULL != result ? result->services.values_num : -1);
 
-	return ret;
+	return SUCCEED;
 }
 
 int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
@@ -1303,7 +1284,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (FAIL == dcheck_is_async(task->dchecks.values[0]))
 			{
-				ret = discoverer_net_check_common(druleid, task, &error);
+				ret = discoverer_net_check_common(druleid, task);
 			}
 			else if (SVC_ICMPPING == task->dchecks.values[0]->type)
 			{
