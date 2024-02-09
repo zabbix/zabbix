@@ -1,10 +1,21 @@
 Changes for 7.0.0beta2
 
 New features:
+..F....... [ZBXNEXT-8838] changed LLD rule default update interval to 1h (dpetra)
+.......PS. [ZBXNEXT-8983] updated max supported MariaDB version to 11.2 (mprihodko)
+.......PS. [ZBXNEXT-8984] updated max supported MySQL version to 8.3 (mprihodko)
 ........S. [ZBXNEXT-8963] improved maintenances to be recalculated immediately when timer period is changed (vso)
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
+...G...PS. [ZBX-24059] fixed libmodbus unnecessary linking into all binaries (askolmeisters)
+.........T [ZBX-24055] added missing API port macros in URL of script items in HPE Synergy by HTTP and HPE Primera by HTTP templates (drasikhov)
+.......PS. [ZBX-24062] fixed btoa javascript function (wiper)
+..F....... [ZBX-23817] fixed console error in chart.view when selecting time period for graph (averza, esekace)
+...G...... [ZBX-20525] fixed vfs.dir.size performance issues when walking through directory that has a lot of subdirs/files (dgoloscapov)
+.........T [ZBX-23773] improved trigger functionality for Acronis Cyber Protect Cloud MSP by HTTP template (knaglis)
+........S. [ZBX-23979] improved trend recalculation performance by performing trend updates in own transaction (vso)
+....I..... [ZBX-21192] updated date and time format in zabbix trap receiver script (vso)
 ........S. [ZBX-23688] improved new item value retrieval performance by adding such items to value cache after configuration sync (wiper)
 .......PS. [ZBX-22130] changed jsonpath expression evaluator to treat null values as empty variants (wiper)
 .......... [ZBX-23986] added a license to the Go module (jxl)
