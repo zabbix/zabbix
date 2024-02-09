@@ -70,10 +70,10 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 	int		ret = SUCCEED;
 	CURLcode	err;
 
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
 	if (zbx_curl_version_num() >= 0x071304)
 	{
-		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in version 7.85.0 (0x075500) */
+		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in 7.85.0 (0x075500) */
 		if (zbx_curl_version_num() >= 0x075500)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
@@ -84,8 +84,8 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 		}
 		else
 		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS,
-					CURLPROTO_HTTP | CURLPROTO_HTTPS)))
+			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 			{
 				ret = FAIL;
 				setopt_error("HTTP/HTTPS", err, error);
@@ -101,10 +101,10 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 	int		ret = SUCCEED;
 	CURLcode	err;
 
-	/* CURLOPT_PROTOCOLS is supported starting with version 7.19.4 (0x071304) */
+	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
 	if (zbx_curl_version_num() >= 0x071304)
 	{
-		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in version 7.85.0 (0x075500) */
+		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in 7.85.0 (0x075500) */
 		if (zbx_curl_version_num() >= 0x075500)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "SMTP,SMTPS")))
@@ -115,8 +115,8 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 		}
 		else
 		{
-			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS,
-					CURLPROTO_SMTP | CURLPROTO_SMTPS)))
+			/* 181L is CURLOPT_PROTOCOLS, remove when cURL requirement will become >= 7.85.0 */
+			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, 181L, CURLPROTO_SMTP | CURLPROTO_SMTPS)))
 			{
 				ret = FAIL;
 				setopt_error("SMTP/SMTPS", err, error);

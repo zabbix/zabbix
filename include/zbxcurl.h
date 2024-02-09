@@ -31,7 +31,6 @@
 
 /* added in 7.19.4 (0x071304), deprecated since 7.85.0 */
 #if LIBCURL_VERSION_NUM < 0x071304
-#	define CURLOPT_PROTOCOLS	181L
 #	define CURLPROTO_HTTP		(1<<0)
 #	define CURLPROTO_HTTPS		(1<<1)
 #	define CURLPROTO_SMTP   	(1<<16)
