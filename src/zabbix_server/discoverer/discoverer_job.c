@@ -124,12 +124,12 @@ zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
 	if (SUCCEED == dcheck_is_async(task->dchecks.values[0]))
 		return task;
 
-	range = task->range;
+	range.state = task->range.state;
 
 	if (SUCCEED == discoverer_range_check_iter(task))
 		(void)zbx_list_append(&job->tasks, discoverer_task_clone(task), NULL);
 
-	task->range = range;
+	task->range.state = range.state;
 
 	return task;
 }
