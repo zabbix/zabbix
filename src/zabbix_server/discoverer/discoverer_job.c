@@ -24,7 +24,7 @@
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
 
-static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
+static int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 {
 	int			ret, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 	zbx_vector_portrange_t	port_ranges;
@@ -56,7 +56,7 @@ static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 	task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
 
 	if (++task->range.state.index_dcheck < task->dchecks.values_num)
-		return discoverer_net_check_iter(task);
+		return discoverer_range_check_iter(task);
 
 	task->range.state.index_dcheck = 0;
 
@@ -64,7 +64,7 @@ static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 			task->range.ipranges->values_num, &task->range.state.index_ip,
 			task->range.state.ipaddress))
 	{
-		return discoverer_net_check_iter(task);
+		return discoverer_range_check_iter(task);
 	}
 
 	return FAIL;
@@ -134,7 +134,7 @@ zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
 
 	task_next = discoverer_task_clone(task);
 
-	if (SUCCEED != discoverer_net_check_iter(task_next))
+	if (SUCCEED != discoverer_range_check_iter(task_next))
 		discoverer_task_free(task_next);
 	else
 		(void)zbx_list_append(&job->tasks, task_next, NULL);
