@@ -103,6 +103,14 @@ class CPage {
 				'--disable-dev-shm-usage'
 			]);
 
+			if (defined('PHPUNIT_BROWSER_LOG_DIR')) {
+				$options->addArguments([
+					'--enable-logging',
+					'--log-file='.PHPUNIT_BROWSER_LOG_DIR.'/'.microtime(true).'.log',
+					'--log-level=0'
+				]);
+			}
+
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}
 
