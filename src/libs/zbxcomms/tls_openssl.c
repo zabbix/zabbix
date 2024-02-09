@@ -24,8 +24,8 @@
 
 #include "zbxsysinc.h"
 #include "zbxlog.h"
-#include "zbxcrypto.h"
 #include "zbxstr.h"
+#include "zbxcrypto.h"
 
 #if OPENSSL_VERSION_NUMBER < 0x1010000fL || defined(LIBRESSL_VERSION_NUMBER)
 /* for OpenSSL 1.0.1/1.0.2 (before 1.1.0) or LibreSSL */
@@ -649,6 +649,7 @@ static void	zbx_log_peer_cert(const char *function_name, const zbx_tls_context_t
 
 	if (SUCCEED != ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG))
 		return;
+
 	if (NULL == (cert = SSL_get_peer_certificate(tls_ctx->ctx)))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() cannot obtain peer certificate", function_name);
@@ -1491,34 +1492,6 @@ void	zbx_tls_free(void)
 	zbx_tls_library_deinit(ZBX_TLS_INIT_PROCESS);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: establish a TLS connection over an established TCP connection     *
- *                                                                            *
- * Parameters:                                                                *
- *     s           - [IN] socket with opened connection                       *
- *     error       - [OUT] dynamically allocated memory with error message    *
- *     tls_connect - [IN] how to connect. Allowed values:                     *
- *                        ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.          *
- *     tls_arg1    - [IN] required issuer of peer certificate (may be NULL    *
- *                        or empty string if not important) or PSK identity   *
- *                        to connect with depending on value of               *
- *                        'tls_connect'.                                      *
- *     tls_arg2    - [IN] required subject of peer certificate (may be NULL   *
- *                        or empty string if not important) or PSK            *
- *                        (in hex-string) to connect with depending on value  *
- *                        of 'tls_connect'.                                   *
- *     server_name - [IN] optional server name indication for TLS             *
- *     event       - [OUT] may be NULL for blocking TLS handshake, otherwise  *
-*                          informs caller to wait for POLLIN or POLLOUT and   *
-*                          retry function to complete async TLS handshake     *
- *     error       - [OUT] dynamically allocated memory with error message    *
- *                                                                            *
- * Return value:                                                              *
- *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
- *     FAIL - an error occurred or retry is needed if event is filled         *
- *                                                                            *
- ******************************************************************************/
 static int	zbx_tls_get_error(const SSL *s, ssize_t res, const char *func, size_t *error_alloc,
 		size_t *error_offset, char **error)
 {
@@ -1592,6 +1565,34 @@ static const char	*tls_error_string(int err)
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: establish a TLS connection over an established TCP connection     *
+ *                                                                            *
+ * Parameters:                                                                *
+ *     s           - [IN] socket with opened connection                       *
+ *     error       - [OUT] dynamically allocated memory with error message    *
+ *     tls_connect - [IN] how to connect. Allowed values:                     *
+ *                        ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.          *
+ *     tls_arg1    - [IN] required issuer of peer certificate (may be NULL    *
+ *                        or empty string if not important) or PSK identity   *
+ *                        to connect with depending on value of               *
+ *                        'tls_connect'.                                      *
+ *     tls_arg2    - [IN] required subject of peer certificate (may be NULL   *
+ *                        or empty string if not important) or PSK            *
+ *                        (in hex-string) to connect with depending on value  *
+ *                        of 'tls_connect'.                                   *
+ *     server_name - [IN] optional server name indication for TLS             *
+ *     event       - [OUT] may be NULL for blocking TLS handshake, otherwise  *
+ *                         informs caller to wait for POLLIN or POLLOUT and   *
+ *                         retry function to complete async TLS handshake     *
+ *     error       - [OUT] dynamically allocated memory with error message    *
+ *                                                                            *
+ * Return value:                                                              *
+ *     SUCCEED - successful TLS handshake with a valid certificate or PSK     *
+ *     FAIL - an error occurred or retry is needed if event is filled         *
+ *                                                                            *
+ ******************************************************************************/
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		const char *server_name, short *event, char **error)
 {
@@ -2085,11 +2086,6 @@ out1:
 	return ret;
 }
 
-#define ZBX_TLS_WRITE(ctx, buf, len)	SSL_write(ctx, buf, (int)(len))
-#define ZBX_TLS_READ(ctx, buf, len)	SSL_read(ctx, buf, (int)(len))
-#define ZBX_TLS_WRITE_FUNC_NAME		"SSL_write"
-#define ZBX_TLS_READ_FUNC_NAME		"SSL_read"
-#define ZBX_TLS_ERROR(s, res)		(size_t)SSL_get_error(s, (int)res)
 /* SSL_ERROR_WANT_READ or SSL_ERROR_WANT_WRITE should not be returned here because we set */
 /* SSL_MODE_AUTO_RETRY flag in zbx_tls_init_child() */
 
@@ -2101,14 +2097,14 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 
 	while (1)
 	{
-		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
+		if (0 == (n = (ssize_t)SSL_write(s->tls_ctx->ctx, buf + offset, (int)(len - (size_t)offset))))
 			break;
 
 		if (0 > n)
 		{
 			ssize_t	err;
 
-			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
+			err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n);
 			if (SUCCEED != tls_is_nonblocking_error(err))
 				break;
 
@@ -2144,10 +2140,10 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
-		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, ZBX_TLS_WRITE_FUNC_NAME, &error_alloc,
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_write", &error_alloc,
 				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, ZBX_TLS_WRITE_FUNC_NAME "() unexpected result code");
+			*error = zbx_strdup(*error, "SSL_write () unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -2166,10 +2162,10 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 	{
 		ssize_t	err;
 
-		if (0 <= (n = (ssize_t)ZBX_TLS_READ(s->tls_ctx->ctx, buf, len)))
+		if (0 <= (n = (ssize_t)SSL_read(s->tls_ctx->ctx, buf, (int)(len))))
 			break;
 
-		err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
+		err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n);
 		if (SUCCEED != tls_is_nonblocking_error(err))
 			break;
 
@@ -2197,10 +2193,10 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 	{
 		size_t	error_alloc = 0, error_offset = 0;
 
-		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, ZBX_TLS_READ_FUNC_NAME, &error_alloc,
+		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_read", &error_alloc,
 				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, ZBX_TLS_READ_FUNC_NAME "() unexpected result code");
+			*error = zbx_strdup(*error, "SSL_read() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -2233,7 +2229,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 		{
 			int	err;
 
-			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, res);
+			err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)res);
 			if (SUCCEED != tls_is_nonblocking_error(err))
 			{
 				int	result_code;

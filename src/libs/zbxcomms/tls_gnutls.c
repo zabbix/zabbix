@@ -1181,6 +1181,19 @@ void	zbx_tls_free(void)
 	zbx_tls_library_deinit(ZBX_TLS_INIT_PROCESS);
 }
 
+static const char	*tls_error_string(int err)
+{
+	switch(err)
+	{
+		case GNUTLS_E_INTERRUPTED:
+			return "GNUTLS_E_INTERRUPTED";
+		case GNUTLS_E_AGAIN:
+			return "GNUTLS_E_AGAIN";
+		default:
+			return "unknown error";
+	}
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: establish a TLS connection over an established TCP connection     *
@@ -1200,8 +1213,8 @@ void	zbx_tls_free(void)
  *                        of 'tls_connect'.                                   *
  *     server_name - [IN] optional server name indication for TLS             *
  *     event       - [OUT] may be NULL for blocking TLS handshake, otherwise  *
-*                          informs caller to wait for POLLIN or POLLOUT and   *
-*                          retry function to complete async TLS handshake     *
+ *                         informs caller to wait for POLLIN or POLLOUT and   *
+ *                         retry function to complete async TLS handshake     *
  *     error       - [OUT] dynamically allocated memory with error message    *
  *                                                                            *
  * Return value:                                                              *
@@ -1209,19 +1222,6 @@ void	zbx_tls_free(void)
  *     FAIL - an error occurred or retry is needed if event is filled         *
  *                                                                            *
  ******************************************************************************/
-static const char	*tls_error_string(int err)
-{
-	switch(err)
-	{
-		case GNUTLS_E_INTERRUPTED:
-			return "GNUTLS_E_INTERRUPTED";
-		case GNUTLS_E_AGAIN:
-			return "GNUTLS_E_AGAIN";
-		default:
-			return "unknown error";
-	}
-}
-
 int	zbx_tls_connect(zbx_socket_t *s, unsigned int tls_connect, const char *tls_arg1, const char *tls_arg2,
 		const char *server_name, short *event, char **error)
 {
@@ -1787,36 +1787,27 @@ out1:
 	return ret;
 }
 
-#define ZBX_TLS_WRITE(ctx, buf, len)	gnutls_record_send(ctx, buf, len)
-#define ZBX_TLS_READ(ctx, buf, len)	gnutls_record_recv(ctx, buf, len)
-#define ZBX_TLS_WRITE_FUNC_NAME		"gnutls_record_send"
-#define ZBX_TLS_READ_FUNC_NAME		"gnutls_record_recv"
-#define ZBX_TLS_ERROR(s, res)		res
-
 ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event, char **error)
 {
 	ssize_t		offset = 0, n;
 
 	while (1)
 	{
-		if (0 == (n = (ssize_t)ZBX_TLS_WRITE(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
+		if (0 == (n = (ssize_t)gnutls_record_send(s->tls_ctx->ctx, buf + offset, len - (size_t)offset)))
 			break;
 
 		if (0 > n)
 		{
-			ssize_t	err;
-
-			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
-			if (SUCCEED != tls_is_nonblocking_error(err))
+			if (SUCCEED != tls_is_nonblocking_error(n))
 				break;
 
 			if (NULL != event)
 			{
-				tls_socket_event(s->tls_ctx->ctx, err, event);
+				tls_socket_event(s->tls_ctx->ctx, n, event);
 				return offset;
 			}
 
-			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
+			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, n))
 			{
 				*error = zbx_dsprintf(*error, "cannot wait socket: %s",
 						zbx_strerror_from_system(zbx_socket_last_error()));
@@ -1861,18 +1852,15 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 
 	while (1)
 	{
-		ssize_t	err;
-
-		if (0 <= (n = (ssize_t)ZBX_TLS_READ(s->tls_ctx->ctx, buf, len)))
+		if (0 <= (n = (ssize_t)gnutls_record_recv(s->tls_ctx->ctx, buf, len)))
 			break;
 
-		err = ZBX_TLS_ERROR(s->tls_ctx->ctx, n);
-		if (SUCCEED != tls_is_nonblocking_error(err))
+		if (SUCCEED != tls_is_nonblocking_error(n))
 			break;
 
 		if (NULL != events)
 		{
-			tls_socket_event(s->tls_ctx->ctx, err, events);
+			tls_socket_event(s->tls_ctx->ctx, n, events);
 			return ZBX_PROTO_ERROR;
 		}
 
@@ -1927,10 +1915,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 		/* shutdown TLS connection */
 		while (GNUTLS_E_SUCCESS != (res = gnutls_bye(s->tls_ctx->ctx, GNUTLS_SHUT_WR)))
 		{
-			int	err;
-
-			err = ZBX_TLS_ERROR(s->tls_ctx->ctx, res);
-			if (SUCCEED != tls_is_nonblocking_error(err))
+			if (SUCCEED != tls_is_nonblocking_error(res))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "gnutls_bye() with %s returned error code: %d %s",
 						s->peer, res, gnutls_strerror(res));
@@ -1939,7 +1924,7 @@ void	zbx_tls_close(zbx_socket_t *s)
 					break;
 			}
 
-			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
+			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, res))
 			{
 				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
 						zbx_strerror_from_system(zbx_socket_last_error()));
