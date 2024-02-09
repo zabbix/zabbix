@@ -115,10 +115,10 @@ $zi-wrench: "\ea70";
 
 @font-face {
 	font-family: "zabbix-icons";
-	src: url("#{$icons-path}zabbix-icons.woff2?t=1707317729146") format("woff2"),
-	url("#{$icons-path}zabbix-icons.woff?t=1707317729146") format("woff"),
-	url('#{$icons-path}zabbix-icons.ttf?t=1707317729146') format('truetype'),
-	url('#{$icons-path}zabbix-icons.svg?t=1707317729146#zabbix-icons') format('svg');
+	src: url("#{$icons-path}zabbix-icons.woff2?t=1707489012140") format("woff2"),
+	url("#{$icons-path}zabbix-icons.woff?t=1707489012140") format("woff"),
+	url('#{$icons-path}zabbix-icons.ttf?t=1707489012140') format('truetype'),
+	url('#{$icons-path}zabbix-icons.svg?t=1707489012140#zabbix-icons') format('svg');
 }
 
 %icons-font {

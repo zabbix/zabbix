@@ -1,9 +1,9 @@
 @font-face {
   font-family: "zabbix-icons";
-  src: url("zabbix-icons.woff2?t=1707317729146") format("woff2"),
-  url("zabbix-icons.woff?t=1707317729146") format("woff"),
-  url('zabbix-icons.ttf?t=1707317729146') format('truetype'),
-  url('zabbix-icons.svg?t=1707317729146#zabbix-icons') format('svg');
+  src: url("zabbix-icons.woff2?t=1707489012140") format("woff2"),
+  url("zabbix-icons.woff?t=1707489012140") format("woff"),
+  url('zabbix-icons.ttf?t=1707489012140') format('truetype'),
+  url('zabbix-icons.svg?t=1707489012140#zabbix-icons') format('svg');
 }
 
 [class^="zi-"]::before, [class*=" zi-"]::before {
