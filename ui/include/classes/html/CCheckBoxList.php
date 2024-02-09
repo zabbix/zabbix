@@ -56,6 +56,11 @@ class CCheckBoxList extends CList {
 	protected $columns;
 
 	/**
+	 * @var bool $are_checkbox_titles_enabled
+	 */
+	protected bool $are_checkbox_titles_enabled = false;
+
+	/**
 	 * @param string $name
 	 */
 	public function __construct($name = '') {
@@ -161,6 +166,17 @@ class CCheckBoxList extends CList {
 		return $this;
 	}
 
+	/**
+	 * @param bool $enable_label_titles
+	 *
+	 * @return $this
+	 */
+	public function enableLabelTitles(bool $enable_label_titles = true): self {
+		$this->are_checkbox_titles_enabled = $enable_label_titles;
+
+		return $this;
+	}
+
 	/*
 	 * @param bool $destroy
 	 *
@@ -170,8 +186,7 @@ class CCheckBoxList extends CList {
 		$this->addStyle('--columns: '.$this->columns.';');
 
 		if ($this->vertical) {
-			$values_count = count($this->values);
-			$max_rows = (int) ceil($values_count / $this->columns);
+			$max_rows = (int) ceil(count($this->values) / $this->columns);
 
 			$this->addClass(self::ZBX_STYLE_VERTICAL);
 			$this->addStyle('--rows: '.$max_rows.';');
@@ -180,7 +195,7 @@ class CCheckBoxList extends CList {
 		foreach ($this->values as $value) {
 			$name = array_key_exists('name', $value) ? $value['name'] : $this->name.'['.$value['value'].']';
 			$checkbox = (new CCheckBox($name, $value['value']))
-				->setLabel($value['label'])
+				->setLabel($value['label'], $this->are_checkbox_titles_enabled)
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
 

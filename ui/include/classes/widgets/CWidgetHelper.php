@@ -559,7 +559,8 @@ class CWidgetHelper {
 			->setEnabled(!($field->getFlags() & CWidgetField::FLAG_DISABLED))
 			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
 			->setColumns(3)
-			->setVertical();
+			->setVertical()
+			->enableLabelTitles();
 	}
 
 	/**
