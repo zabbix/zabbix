@@ -32,6 +32,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	protected static $item_ids;
 	const TYPE_ITEM_PATTERN = 'Item pattern';
 	const TYPE_ITEM_LIST = 'Item list';
+	const TYPE_DATA_SET_CLONE = 'Clone';
 	const HOST_NAME_ITEM_LIST = 'Host for Pie charts';
 	const HOST_NAME_SCREENSHOTS = 'Host for Pie chart screenshots';
 
@@ -731,6 +732,64 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->createUpdatePieChart($data, 'Edit widget');
 	}
 
+	/**
+	 * Test data set cloning.
+	 */
+	public function testDashboardPieChartWidget_CloneDataSets() {
+		$dashboard = $this->openDashboard();
+		$form = $dashboard->edit()->addWidget()->asForm();
+
+		// Data to input.
+		$fields = [
+			'main_fields' => [
+				'Name' => 'Pie chart for data set cloning'
+			],
+			'Data set' => [
+				[
+					'host' => ['Host*', 'one', 'two'],
+					'item' => ['Item*', 'one', 'two'],
+					'color' => '00BCD4',
+					'Aggregation function' => 'min',
+					'Data set aggregation' => 'not used',
+					'Data set label' => 'Label 1'
+				],
+				[
+					'type' => self::TYPE_DATA_SET_CLONE
+				],
+				[
+					'type' => self::TYPE_ITEM_LIST,
+					'host' => self::HOST_NAME_ITEM_LIST,
+					'Aggregation function' => 'max',
+					'Data set aggregation' => 'not used',
+					'Data set label' => 'Label 2',
+					'items' => [
+						[
+							'name' => 'item-1',
+							'il_color' => '000000'
+						],
+						[
+							'name' => 'item-2'
+						]
+					]
+				],
+				[
+					'type' => self::TYPE_DATA_SET_CLONE
+				]
+			]
+		];
+		$this->fillForm($form, $fields);
+		$form->submit();
+
+		// Transform the cloned data. The colors are expected to change.
+		$fields['Data set'][1] = $fields['Data set'][0];
+		$fields['Data set'][1]['color'] = 'FF465C';
+		$fields['Data set'][3] = $fields['Data set'][2];
+		$fields['Data set'][3]['items'][0]['il_color'] = '0EC9AC';
+
+		// Assert the result.
+		$this->assertEditFormAfterSave($dashboard, ['fields' => $fields]);
+	}
+
 	public function getSimpleUpdateAndCanceData() {
 		return [
 			// Simple update.
@@ -801,7 +860,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Fill mandatory fields in the create scenario.
 		if (!$update) {
-			$this->fillForm([], $form);
+			$this->fillForm($form, []);
 		}
 
 		// Save the widget or cancel.
@@ -1158,11 +1217,11 @@ class testDashboardPieChartWidget extends CWebTest {
 			? $dashboard->edit()->getWidget($edit_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
 
-		$this->fillForm($data['fields'], $form);
+		$this->fillForm($form, $data['fields']);
 		$form->submit();
 
 		// Assert the result.
-		$this->assertEditFormAfterSave($data, $dashboard);
+		$this->assertEditFormAfterSave($dashboard, $data);
 
 		// Check total Widget count.
 		$count_added = !$edit_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD ? 1 : 0;
@@ -1236,10 +1295,10 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Asserts that the data is saved and displayed as expected in the Edit form.
 	 *
-	 * @param array             $data         data from data provider
 	 * @param CDashboardElement $dashboard    dashboard element
+	 * @param array             $data         data from data provider
 	 */
-	protected function assertEditFormAfterSave($data, $dashboard) {
+	protected function assertEditFormAfterSave($dashboard, $data) {
 		$widget_name = CTestArrayHelper::get($data['fields'], 'main_fields.Name', md5(serialize($data['fields'])));
 		$count_sql = 'SELECT NULL FROM widget WHERE name='.zbx_dbstr($widget_name);
 
@@ -1321,10 +1380,10 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Fill Pie chart widget edit form with provided data.
 	 *
-	 * @param array        $fields    field data to fill
 	 * @param CFormElement $form      form to be filled
+	 * @param array        $fields    field data to fill
 	 */
-	protected function fillForm($fields, $form) {
+	protected function fillForm($form, $fields) {
 		// Fill main fields.
 		$main_fields = CTestArrayHelper::get($fields, 'main_fields', []);
 		$main_fields['Name'] = CTestArrayHelper::get($fields, 'main_fields.Name', md5(serialize($fields)));
@@ -1344,7 +1403,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		}
 
 		if (!$delete) {
-			$this->fillDatasets($this->extractDataSets($fields), $form);
+			$this->fillDatasets($form, $this->extractDataSets($fields));
 		}
 
 		// Fill the other tabs.
@@ -1359,10 +1418,10 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Fill "Data sets" tab with field data.
 	 *
-	 * @param array        $data_sets    array of data sets to be filled
 	 * @param CFormElement $form         CFormElement to be filled
+	 * @param array        $data_sets    array of data sets to be filled
 	 */
-	protected function fillDatasets($data_sets, $form) {
+	protected function fillDatasets($form, $data_sets) {
 		// Count of data sets that already exist (needed for updating).
 		$count_sets = $form->query('xpath:.//li[contains(@class, "list-accordion-item")]')->all()->count();
 
