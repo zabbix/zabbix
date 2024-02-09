@@ -545,7 +545,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() druleid:" ZBX_FS_UI64 " range id:" ZBX_FS_UI64 " state.count:%d"
 			" checks per ip:%u dchecks:%d type:%u worker_max:%d", log_worker_id, __func__, druleid,
 			task->range.id, task->range.state.count, task->range.state.checks_per_ip,
-			task->dchecks.values_num, task->dchecks.values[task->range.state.dcheck_index]->type,
+			task->dchecks.values_num, task->dchecks.values[task->range.state.index_dcheck]->type,
 			worker_max);
 
 	if (0 == worker_max)
@@ -578,10 +578,10 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 
-		for (; task->range.state.dcheck_index < task->dchecks.values_num && 0 == *stop &&
-				0 != task->range.state.count; task->range.state.dcheck_index++)
+		for (; task->range.state.index_dcheck < task->dchecks.values_num && 0 == *stop &&
+				0 != task->range.state.count; task->range.state.index_dcheck++)
 		{
-			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.dcheck_index];
+			zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.index_dcheck];
 
 			dcheck_port_ranges_get(dcheck->ports, &port_ranges);
 
@@ -650,7 +650,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 
 		}
 
-		task->range.state.dcheck_index = 0;
+		task->range.state.index_dcheck = 0;
 		discoverer_net_check_result_flush(dmanager, task, &results, 0);
 	}
 	while (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values,
@@ -673,7 +673,7 @@ out:	/* try to close all handles if they are exhausted */
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"
 			" last ip:%s", log_worker_id, __func__, druleid,
-			task->dchecks.values[task->range.state.dcheck_index]->type,
+			task->dchecks.values[task->range.state.index_dcheck]->type,
 			task->range.state.count, first_ip, ip);
 
 	return ret;

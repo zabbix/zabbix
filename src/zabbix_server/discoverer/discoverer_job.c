@@ -61,6 +61,39 @@ zbx_uint64_t	discoverer_task_check_count_get(zbx_discoverer_task_t *task)
 	return (zbx_uint64_t)task->dchecks.values_num;
 }
 
+static zbx_discoverer_task_t	*discoverer_task_clone(zbx_discoverer_task_t *task)
+{
+	zbx_discoverer_task_t	*task_copy;
+
+	task_copy = (zbx_discoverer_task_t*)zbx_malloc(NULL, sizeof(zbx_discoverer_task_t));
+	zbx_vector_dc_dcheck_ptr_create(&task_copy->dchecks);
+	zbx_vector_dc_dcheck_ptr_append_array(&task_copy->dchecks, task->dchecks.values, task->dchecks.values_num);
+	task_copy->unique_dcheckid = task->unique_dcheckid;
+	task_copy->range = task->range;
+
+	return task_copy;
+}
+
+zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job)
+{
+	zbx_discoverer_task_t	*task, *task_next;
+
+	if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
+		return NULL;
+
+	if (SUCCEED == dcheck_is_async(task->dchecks.values[0]))
+		return task;
+
+	task_next = discoverer_task_clone(task);
+
+	if (SUCCEED != discoverer_net_check_iter(task_next))
+		discoverer_task_free(task_next);
+	else
+		(void)zbx_list_append(&job->tasks, task_next, NULL);
+
+	return task;
+}
+
 zbx_uint64_t	discoverer_job_tasks_free(zbx_discoverer_job_t *job)
 {
 	zbx_uint64_t		check_count = 0;

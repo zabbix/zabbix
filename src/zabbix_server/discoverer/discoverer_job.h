@@ -52,7 +52,7 @@ typedef struct
 		int		index_ip;
 		int		port;
 		int		index_port;
-		int		dcheck_index;
+		int		index_dcheck;
 		zbx_uint64_t	count;		/* total count of checks in range */
 		unsigned int	checks_per_ip;	/* count of checks per ip */
 	}
@@ -84,5 +84,6 @@ zbx_discoverer_job_t	*discoverer_job_create(zbx_dc_drule_t *drule, zbx_vector_dc
 					zbx_vector_iprange_t *ipranges);
 void			discoverer_job_abort(zbx_discoverer_job_t *job, zbx_uint64_t *pending_checks_count,
 					zbx_vector_discoverer_drule_error_t *errors, char *error);
+zbx_discoverer_task_t	*discoverer_task_pop(zbx_discoverer_job_t *job);
 
 #endif

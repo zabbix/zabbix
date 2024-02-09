@@ -218,10 +218,10 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 				task->range.ipranges->values_num, &task->range.state.index_ip,
 				task->range.state.ipaddress))
 		{
-			for (; task->range.state.dcheck_index < task->dchecks.values_num;
-					task->range.state.dcheck_index++)
+			for (; task->range.state.index_dcheck < task->dchecks.values_num;
+					task->range.state.index_dcheck++)
 			{
-				zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.dcheck_index];
+				zbx_dc_dcheck_t	*dcheck = task->dchecks.values[task->range.state.index_dcheck];
 
 				dcheck_port_ranges_get(dcheck->ports, &port_ranges);
 
@@ -242,7 +242,7 @@ static void	process_task_range_split(zbx_hashset_t *tasks_src, zbx_hashset_t *ta
 				zbx_vector_portrange_clear(&port_ranges);
 			}
 
-			task->range.state.dcheck_index = 0;
+			task->range.state.index_dcheck = 0;
 		}
 
 		if (0 != range.state.count)

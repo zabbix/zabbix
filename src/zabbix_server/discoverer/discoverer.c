@@ -1146,13 +1146,13 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 			task->dchecks.values[0]->key_ : "empty");
 
 	if (0 == task->range.state.index_ip && 0 == task->range.state.index_port &&
-			0 == task->range.state.dcheck_index)
+			0 == task->range.state.index_dcheck)
 	{
 		zbx_gethost_by_ip(ip, dns, sizeof(dns));
 	}
 
 	zbx_vector_discoverer_services_ptr_create(&services);
-	dcheck = task->dchecks.values[task->range.state.dcheck_index];
+	dcheck = task->dchecks.values[task->range.state.index_dcheck];
 	(void)zbx_iprange_ip2str(task->range.ipranges->values[task->range.state.index_ip].type,
 			task->range.state.ipaddress, ip, sizeof(ip));
 
@@ -1178,7 +1178,7 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
 
 	if (0 == task->range.state.index_ip && 0 == task->range.state.index_port &&
-			0 == task->range.state.dcheck_index)
+			0 == task->range.state.index_dcheck)
 	{
 		result->dnsname = zbx_strdup(result->dnsname, dns);
 	}
@@ -1199,7 +1199,7 @@ static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 {
 	int			ret, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 	zbx_vector_portrange_t	port_ranges;
-	zbx_dc_dcheck_t		*dcheck = task->dchecks.values[task->range.state.dcheck_index];
+	zbx_dc_dcheck_t		*dcheck = task->dchecks.values[task->range.state.index_dcheck];
 
 	if (0 == task->range.state.count)
 		return FAIL;
@@ -1226,10 +1226,10 @@ static int	discoverer_net_check_iter(zbx_discoverer_task_t *task)
 
 	task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
 
-	if (++task->range.state.dcheck_index < task->dchecks.values_num)
+	if (++task->range.state.index_dcheck < task->dchecks.values_num)
 		return discoverer_net_check_iter(task);
 
-	task->range.state.dcheck_index = 0;
+	task->range.state.index_dcheck = 0;
 
 	if (SUCCEED == zbx_iprange_uniq_iter(task->range.ipranges->values,
 			task->range.ipranges->values_num, &task->range.state.index_ip,
@@ -1307,7 +1307,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			zbx_uint64_t		druleid;
 			zbx_discoverer_task_t	*task;
 
-			if (SUCCEED != zbx_list_pop(&job->tasks, (void*)&task))
+			if (NULL == (task = discoverer_task_pop(job)))
 			{
 				if (0 == job->workers_used)
 				{
@@ -1324,31 +1324,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 
 			if (FAIL == dcheck_is_async(task->dchecks.values[0]))
-			{
-				if (SUCCEED != discoverer_net_check_iter(task))
-				{
-					discoverer_task_free(task);
-					discoverer_queue_push(queue, job);
-					continue;
-				}
-
-				if (0 < task->range.state.count)
-				{
-					zbx_discoverer_task_t	*task_copy;
-
-					task_copy = (zbx_discoverer_task_t*)zbx_malloc(NULL,
-							sizeof(zbx_discoverer_task_t));
-					zbx_vector_dc_dcheck_ptr_create(&task_copy->dchecks);
-					zbx_vector_dc_dcheck_ptr_append_array(&task_copy->dchecks,
-							task->dchecks.values, task->dchecks.values_num);
-					task_copy->unique_dcheckid = task->unique_dcheckid;
-					task_copy->range = task->range;
-
-					(void)zbx_list_append(&job->tasks, task_copy, NULL);
-				}
-
 				queue->pending_checks_count--;
-			}
 			else
 				queue->pending_checks_count -= discoverer_task_check_count_get(task);
 
