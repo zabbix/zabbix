@@ -862,12 +862,6 @@ void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg)
 	zbx_tls_library_init(ZBX_TLS_INIT_THREADS);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: read available configuration parameters and initialize TLS        *
- *          library in a child process                                        *
- *                                                                            *
- ******************************************************************************/
 static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, const char *priority_str,
 		const char *err_msg)
 {
@@ -883,6 +877,12 @@ static void	zbx_gnutls_priority_init_or_exit(gnutls_priority_t *ciphersuites, co
 	}
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read available configuration parameters and initialize TLS        *
+ *          library in a child process                                        *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg,
 		zbx_find_psk_in_cache_f zbx_find_psk_in_cache_cb_arg)
 {

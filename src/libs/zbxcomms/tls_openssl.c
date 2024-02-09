@@ -817,12 +817,6 @@ void	zbx_tls_init_parent(zbx_get_program_type_f zbx_get_program_type_cb_arg)
 	zbx_tls_library_init(ZBX_TLS_INIT_THREADS);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: read available configuration parameters and initialize TLS        *
- *          library in a child process                                        *
- *                                                                            *
- ******************************************************************************/
 static const char	*zbx_ctx_name(SSL_CTX *param)
 {
 	if (ctx_cert == param)
@@ -878,6 +872,12 @@ static int	zbx_set_ecdhe_parameters(SSL_CTX *ctx)
 	return ret;
 }
 
+/******************************************************************************
+ *                                                                            *
+ * Purpose: read available configuration parameters and initialize TLS        *
+ *          library in a child process                                        *
+ *                                                                            *
+ ******************************************************************************/
 void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type_f zbx_get_program_type_cb_arg,
 		zbx_find_psk_in_cache_f zbx_find_psk_in_cache_cb_arg)
 {
