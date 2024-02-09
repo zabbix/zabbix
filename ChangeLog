@@ -2147,9 +2147,16 @@ A.F....PS. [ZBXNEXT-7402,ZBXNEXT-7413] added support for CyberArk Vault (acikuns
 Changes for 6.0.27rc1
 
 New features:
+.......PS. [ZBXNEXT-8983] updated max supported MariaDB version to 11.2 (mprihodko)
+.......PS. [ZBXNEXT-8984] updated max supported MySQL version to 8.3 (mprihodko)
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
+...G...PS. [ZBX-24059] fixed libmodbus unnecessary linking into all binaries (askolmeisters)
+.........T [ZBX-24055] added missing API port macros in URL of script items in HPE Synergy by HTTP and HPE Primera by HTTP templates (drasikhov)
+...G...... [ZBX-20525] fixed vfs.dir.size performance issues when walking through directory that has a lot of subdirs/files (dgoloscapov)
+.........T [ZBX-23773] improved trigger functionality for Acronis Cyber Protect Cloud MSP by HTTP template (knaglis)
+........S. [ZBX-23979] improved trend recalculation performance by performing trend updates in own transaction (vso)
 ........S. [ZBX-23688] improved new item value retrieval performance by adding such items to value cache after configuration sync (wiper)
 .......PS. [ZBX-22130] changed jsonpath expression evaluator to treat null values as empty variants (wiper)
 .......... [ZBX-23986] added a license to the Go module (jxl)
