@@ -290,6 +290,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		{
 			case ITEM_TYPE_ZABBIX:
 			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_EXTERNAL:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
@@ -505,14 +506,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				break;
-			case ITEM_TYPE_EXTERNAL:
-				if (ZBX_MACRO_EXPAND_NO == expand_macros)
-					break;
-
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
 				break;
 		}
 
