@@ -25,7 +25,7 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 /**
  * @backup scripts
  *
- * @onBefore prepareData
+ * @onBefore prepareScriptData
  */
 class testFormAlertsScripts extends CWebTest {
 
@@ -52,7 +52,10 @@ class testFormAlertsScripts extends CWebTest {
 		return [CMessageBehavior::class];
 	}
 
-	public function prepareData() {
+	/**
+	 * Function used to create scripts.
+	 */
+	public function prepareScriptData() {
 		$response = CDataHelper::call('script.create', [
 			[
 				'name' => 'Script for Clone',
