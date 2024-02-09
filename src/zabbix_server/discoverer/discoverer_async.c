@@ -370,9 +370,6 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 		case SVC_SSH:
 			service = "ssh";
 			break;
-		case SVC_LDAP:
-			service = "ldap";
-			break;
 		case SVC_SMTP:
 			service = "smtp";
 			break;
@@ -393,14 +390,6 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 			break;
 		case SVC_TCP:
 			service = "tcp";
-			break;
-		case SVC_HTTPS:
-			service = "https";
-			break;
-		case SVC_TELNET:
-			service = "telnet";
-			break;
-		case SVC_AGENT:
 			break;
 		default:
 			*error = zbx_dsprintf(*error, "Error of unknown service:%u", dcheck->type);
@@ -447,6 +436,78 @@ static int	discovery_tcpsvc(discovery_poller_config_t *poller_config, const zbx_
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s ret:%d", log_worker_id, __func__,
 			ip, port, item.key_orig, ret);
 	return ret;
+}
+
+static void	process_telnet_result(void *data)
+{
+	zbx_telnet_context_t		*telnet_context = (zbx_telnet_context_t *)data;
+	discovery_async_result_t	*async_result = (discovery_async_result_t *)telnet_context->arg;
+	zbx_dc_item_context_t		*item = &telnet_context->item;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() key:'%s' host:'%s' addr:'%s' ret:%s", log_worker_id, __func__,
+			item->key, item->host, item->interface.addr, zbx_result_string(item->ret));
+
+	async_result->poller_config->processing--;
+	async_result->dresult->processed_checks_per_ip++;
+
+	if (SUCCEED == item->ret && ZBX_ISSET_UI64(&item->result) && 0 != item->result.ui64)
+	{
+		zbx_discoverer_dservice_t	*service;
+
+		service = result_dservice_create(item->interface.port, async_result->dcheckid);
+		service->status = DOBJECT_STATUS_UP;
+		zbx_vector_discoverer_services_ptr_append(&async_result->dresult->services, service);
+
+		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
+		{
+			const char	*rdns = ZBX_NULL2EMPTY_STR(telnet_context->reverse_dns);
+
+			if ('\0' != *rdns && SUCCEED != zbx_validate_hostname(rdns))
+				rdns = "";
+
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, rdns);
+		}
+	}
+
+	zbx_free(async_result);
+	zbx_async_check_telnet_free(telnet_context);
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
+}
+
+static int	discovery_telnet(discovery_poller_config_t *poller_config, const zbx_dc_dcheck_t *dcheck,
+		char *ip, const unsigned short port, zbx_discoverer_results_t *dresult)
+{
+	zbx_dc_item_t			item;
+	discovery_async_result_t	*async_result;
+
+	async_result = (discovery_async_result_t *) zbx_malloc(NULL, sizeof(discovery_async_result_t));
+	async_result->dresult = dresult;
+	async_result->poller_config = poller_config;
+	async_result->dcheckid = dcheck->dcheckid;
+
+	memset(&item, 0, sizeof(zbx_dc_item_t));
+	zbx_snprintf(item.key_orig, sizeof(item.key_orig), "net.tcp.service[telnet,%s,%d]", ip, (int)port);
+	item.key = item.key_orig;
+
+	item.interface.useip = 1;
+	zbx_strscpy(item.interface.ip_orig, ip);
+	item.interface.addr = item.interface.ip_orig;
+	item.interface.port = port;
+
+	item.value_type = ITEM_VALUE_TYPE_UINT64;
+	item.type = ITEM_TYPE_SIMPLE;
+
+	item.host.tls_connect = ZBX_TCP_SEC_UNENCRYPTED;
+	item.timeout = dcheck->timeout;
+
+	zbx_async_check_telnet(&item, process_telnet_result, async_result, NULL, poller_config->base,
+			poller_config->dnsbase, poller_config->config_source_ip, ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES);
+	poller_config->processing++;
+
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() ip:%s port:%d, key:%s", log_worker_id, __func__,
+			ip, port, item.key_orig);
+	return SUCCEED;
 }
 
 static void	discoverer_net_check_result_flush(zbx_discoverer_manager_t *dmanager, zbx_discoverer_task_t *task,
@@ -559,9 +620,12 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 				case SVC_IMAP:
 				case SVC_TCP:
 				case SVC_HTTPS:
-				case SVC_TELNET:
 					ret = discovery_tcpsvc(&poller_config, dcheck, ip,
 							(unsigned short)task->range->state.port, result, error);
+					break;
+				case SVC_TELNET:
+					ret = discovery_telnet(&poller_config, dcheck, ip,
+							(unsigned short)task->range->state.port, result);
 					break;
 				default:
 					ret = FAIL;

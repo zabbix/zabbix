@@ -101,7 +101,6 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 	zbx_async_task_state_t	state;
 	const char		*buf;
 
-	ZBX_UNUSED(fd);
 	ZBX_UNUSED(dnserr);
 
 	if (NULL != poller_config && ZBX_PROCESS_STATE_IDLE == poller_config->state)
@@ -173,7 +172,7 @@ static int	tcpsvc_task_process(short event, void *data, int *fd, const char *add
 			}
 
 			tcpsvc_context->step = ZABBIX_TCPSVC_STEP_RECV;
-			tcpsvc_context->item.ret = FAIL;	/* preliminary init for recv loop */
+			tcpsvc_context->item.ret = NOTSUPPORTED;	/* preliminary init for recv loop */
 
 			zbx_tcp_recv_context_init(&tcpsvc_context->s, &tcpsvc_context->tcp_recv_context,
 					tcpsvc_context->item.flags);
@@ -341,12 +340,7 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 
 	tcpsvc_context->config_source_ip = config_source_ip;
 	tcpsvc_context->config_timeout = item->timeout;
-#if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	if (SUCCEED != zbx_is_ip(tcpsvc_context->item.interface.addr))
-		tcpsvc_context->server_name = tcpsvc_context->item.interface.addr;
-	else
-		tcpsvc_context->server_name = NULL;
-#endif
+	tcpsvc_context->server_name = NULL;
 	tcpsvc_context->send_data = NULL;
 	zbx_init_agent_result(&tcpsvc_context->item.result);
 	zbx_socket_clean(&tcpsvc_context->s);
