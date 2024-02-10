@@ -902,7 +902,8 @@ static void	discovery_icmp_result_proc(const zbx_uint64_t druleid, const int dch
 }
 
 static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
-		const int dcheck_idx, int worker_max, zbx_vector_discoverer_results_ptr_t *results, char **error)
+		const int dcheck_idx, int worker_max, zbx_vector_discoverer_results_ptr_t *results, int *stop,
+		char **error)
 {
 	char				err[ZBX_ITEM_ERROR_LEN_MAX], ip[ZBX_INTERFACE_IP_LEN_MAX];
 	int				i, ret = SUCCEED;
@@ -924,7 +925,7 @@ static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t
 	zbx_vector_fping_host_reserve(&hosts, (size_t)hosts.values_num + (size_t)count);
 	*ip = '\0';
 
-	while (SUCCEED == zbx_iprange_uniq_next(task->range.ipranges->values,
+	while (0 == *stop && SUCCEED == zbx_iprange_uniq_next(task->range.ipranges->values,
 			task->range.ipranges->values_num, ip, sizeof(ip)))
 	{
 		ZBX_FPING_HOST	host;
@@ -958,7 +959,7 @@ static int	discover_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t
 		zbx_vector_fping_host_clear(&hosts);
 	}
 
-	if (0 != hosts.values_num && ret == SUCCEED)
+	if (0 == *stop && 0 != hosts.values_num && ret == SUCCEED)
 	{
 		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, 0, dcheck->allow_redirect,
 				1, err, sizeof(err))))
@@ -1108,7 +1109,7 @@ static void	discover_results_merge(zbx_hashset_t *hr_dst, zbx_vector_discoverer_
 			hr_dst->num_data);
 }
 
-static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max,
+static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		char **error)
 {
 	zbx_vector_discoverer_results_ptr_t	results;
@@ -1117,7 +1118,7 @@ static int	discoverer_net_check_icmp(zbx_uint64_t druleid, zbx_discoverer_task_t
 	zbx_vector_discoverer_results_ptr_create(&results);
 
 	for (i = 0; i < task->dchecks.values_num && SUCCEED == ret; i++)
-		ret = discover_icmp(druleid, task, i, worker_max, &results, error);
+		ret = discover_icmp(druleid, task, i, worker_max, &results, stop, error);
 
 	pthread_mutex_lock(&dmanager.results_lock);
 	discover_results_merge(&dmanager.results, &results, task);
@@ -1288,7 +1289,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 			else if (SVC_ICMPPING == task->dchecks.values[0]->type)
 			{
-				ret = discoverer_net_check_icmp(druleid, task, worker_max, &error);
+				ret = discoverer_net_check_icmp(druleid, task, worker_max, &worker->stop, &error);
 			}
 			else
 			{
