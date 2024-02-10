@@ -50,6 +50,7 @@
 			</and>
 		</condition>
 		<property environment="env"/>
+		<property name="phpunit_browser_log_dir" value="${PHPUNIT_BROWSER_LOG_DIR}"/>
 
 		<!-- Create bootstrap.php -->
 		<copy overwrite="true" file="ui/tests/bootstrap.php.template" tofile="ui/tests/bootstrap.php"/>
@@ -65,6 +66,7 @@
 		<replace file="ui/tests/bootstrap.php" token="{SCREENSHOT_REFERENCES_DIR}" value="${screenshot_references_dir}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DRIVER_ADDRESS}" value="${phpunit_driver_address}"/>
 		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_DATA_SOURCES_DIR}" value="${basedir}/ui/tests/selenium/data/sources/"/>
+		<replace file="ui/tests/bootstrap.php" token="{PHPUNIT_BROWSER_LOG_DIR}" value="${phpunit_browser_log_dir}"/>
 	</target>
 
 	<target name="show-browser-info">
