@@ -147,12 +147,18 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 	{
 		memset(&task_local.range, 0, sizeof(zbx_task_range_t));
 		task_local.range.ipranges = ipranges;
-		task_local.range.state.port = port;
-		zbx_iprange_first(task_local.range.ipranges->values, task_local.range.state.ipaddress);
 		task_local.range.state.checks_per_ip = checks_count;
 		task_local.unique_dcheckid = drule->unique_dcheckid;
-		zbx_hashset_insert(tasks_ptr, &task_local, sizeof(zbx_discoverer_task_t));
 
+		if (tasks_ptr == tasks)
+		{
+			task_local.range.state.port = port;
+			zbx_iprange_first(task_local.range.ipranges->values, task_local.range.state.ipaddress);
+		}
+		else	/* required for process_task_range_split() */
+			task_local.range.state.port = ZBX_PORTRANGE_INIT_PORT;
+
+		zbx_hashset_insert(tasks_ptr, &task_local, sizeof(zbx_discoverer_task_t));
 		(*queue_capacity)--;
 	}
 

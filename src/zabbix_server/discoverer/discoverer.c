@@ -1171,8 +1171,8 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 	pthread_mutex_unlock(&dmanager.results_lock);
 out:
-	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d", log_worker_id, __func__,
-			ip, NULL != result ? result->services.values_num : -1);
+	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d rdns:%s", log_worker_id, __func__,
+			ip, NULL != result ? result->services.values_num : -1, NULL != result ? result->dnsname : "");
 
 	return SUCCEED;
 }
