@@ -100,6 +100,7 @@ class CPage {
 				'--no-sandbox',
 				'--enable-font-antialiasing=false',
 				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
+				'--disable-features=dbus',
 				'--disable-dev-shm-usage'
 			]);
 
