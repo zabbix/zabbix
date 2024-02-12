@@ -26,7 +26,7 @@ require_once dirname(__FILE__).'/include/forms.inc.php';
 $page['title'] = _('Configuration of network maps');
 $page['file'] = 'sysmap.php';
 $page['scripts'] = ['class.svg.canvas.js', 'class.svg.map.js', 'class.cmap.js', 'colorpicker.js',
-	'class.tagfilteritem.js', 'class.sortable.js'
+	'class.tagfilteritem.js'
 ];
 $page['type'] = detect_page_type();
 

@@ -466,6 +466,7 @@ if (empty($_GET['files'])) {
 		'class.script.js',
 		'class.scrollable.js',
 		'class.sidebar.js',
+		'class.sortable.js',
 		'class.template.js',
 		'chkbxrange.js',
 		'functions.js',

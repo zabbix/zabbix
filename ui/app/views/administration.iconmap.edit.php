@@ -24,8 +24,6 @@
  * @var array $data
  */
 
-$this->addJsFile('class.sortable.js');
-
 $this->includeJsFile('administration.iconmap.edit.js.php');
 
 $html_page = (new CHtmlPage())
