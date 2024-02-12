@@ -605,14 +605,13 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 	zbx_vector_discoverer_results_ptr_create(&results);
 	*first_ip = '\0';
 #ifdef HAVE_LIBCURL
-	if ((SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)) && NULL == (http_config =
-			zbx_async_httpagent_create(poller_config.base, process_http_response, NULL, &poller_config,
-			error)))
+	if ((SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)) &&
+			NULL == (http_config = zbx_async_httpagent_create(poller_config.base, process_http_response,
+			NULL, &poller_config, error)))
 	{
-			goto out;
+		goto out;
 	}
 #endif
-
 	do
 	{
 		zbx_discoverer_results_t	*result;
@@ -680,9 +679,8 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		discovery_net_check_result_flush(dmanager, task, &results, 0);
 	}
 	while (0 == *stop && SUCCEED == discoverer_range_check_iter(task));
-
-out:	/* try to close all handles if they are exhausted */
-	while (0 != poller_config.processing)
+out:
+	while (0 != poller_config.processing)	/* try to close all handles if they are exhausted */
 	{
 		event_base_loop(poller_config.base, EVLOOP_ONCE);
 		discovery_net_check_result_flush(dmanager, task, &results, 0);
@@ -691,9 +689,8 @@ out:	/* try to close all handles if they are exhausted */
 	discovery_net_check_result_flush(dmanager, task, &results, 1);
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);	/* Incomplete results*/
 	zbx_vector_discoverer_results_ptr_destroy(&results);
-
 #ifdef HAVE_LIBCURL
-	if (NULL != http_config && (SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)))
+	if (NULL != http_config)
 	{
 		zbx_async_httpagent_clean(http_config);
 		zbx_free(http_config);

@@ -1172,8 +1172,6 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	else
 		service_free(service);	/* drule revision has been changed or drule aborted */
 
-
-
 	pthread_mutex_unlock(&dmanager.results_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d rdns:%s", log_worker_id, __func__,
