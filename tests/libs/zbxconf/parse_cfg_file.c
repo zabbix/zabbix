@@ -27,7 +27,8 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	handle, parameters, parameter;
-	const char		*cfg_file, *validation, *tmp, **multi_string, *string_list;
+	const char		*validation, *tmp, **multi_string, *string_list;
+	char			*cfg_file;
 	int			strict = 42, exit_code, parameter_count = 0, i;
 	struct cfg_line		*cfg = NULL;
 	void			**expected_values = NULL;
