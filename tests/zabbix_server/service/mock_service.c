@@ -27,6 +27,8 @@
 #include "mock_service.h"
 
 zbx_uint64_t __wrap_DCget_nextid(const char *table_name, int num);
+void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group);
+void	__wrap_zbx_config_get(void *cfg, int flags);
 void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint64_t objectid,
 		const zbx_timespec_t *timespec, int value, const char *trigger_description,
 		const char *trigger_expression, const char *trigger_recovery_expression, unsigned char trigger_priority,
@@ -36,10 +38,8 @@ void	*__wrap_zbx_add_event(unsigned char source, unsigned char object, zbx_uint6
 int	__wrap_zbx_process_events(zbx_vector_ptr_t *trigger_diff, zbx_vector_uint64_t *triggerids_lock);
 void	__wrap_zbx_clean_events(void);
 int	__wrap_zbx_interface_availability_is_set(const void *ia);
-void	__wrap_zbx_rtc_subscribe(unsigned char proc_type, int proc_num, zbx_uint32_t *msgs, int msgs_num, int config_timeout,
-		void *rtc);
-void	__wrap_zbx_rtc_notify_finished_sync(int config_timeout, zbx_uint32_t code, const char *process_name,
-		void *rtc);
+void	__wrap_zbx_rtc_subscribe(void *rtc, unsigned char proc_type, int proc_num);
+void	__wrap_zbx_rtc_notify_finished_sync(void *rtc, zbx_uint32_t code, const char *process_name);
 
 void	__wrap_zbx_recalc_time_period(int *tm_start, int table_group)
 {
