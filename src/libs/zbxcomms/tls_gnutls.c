@@ -1200,7 +1200,6 @@ static const char	*tls_error_string(int err)
  *                                                                            *
  * Parameters:                                                                *
  *     s           - [IN] socket with opened connection                       *
- *     error       - [OUT] dynamically allocated memory with error message    *
  *     tls_connect - [IN] how to connect. Allowed values:                     *
  *                        ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.          *
  *     tls_arg1    - [IN] required issuer of peer certificate (may be NULL    *

@@ -1571,7 +1571,6 @@ static const char	*tls_error_string(int err)
  *                                                                            *
  * Parameters:                                                                *
  *     s           - [IN] socket with opened connection                       *
- *     error       - [OUT] dynamically allocated memory with error message    *
  *     tls_connect - [IN] how to connect. Allowed values:                     *
  *                        ZBX_TCP_SEC_TLS_CERT, ZBX_TCP_SEC_TLS_PSK.          *
  *     tls_arg1    - [IN] required issuer of peer certificate (may be NULL    *
@@ -2143,7 +2142,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 		if (SUCCEED == zbx_tls_get_error(s->tls_ctx->ctx, n, "SSL_write", &error_alloc,
 				&error_offset, error))
 		{
-			*error = zbx_strdup(*error, "SSL_write () unexpected result code");
+			*error = zbx_strdup(*error, "SSL_write() unexpected result code");
 		}
 
 		return ZBX_PROTO_ERROR;
@@ -2162,7 +2161,7 @@ ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char
 	{
 		ssize_t	err;
 
-		if (0 <= (n = (ssize_t)SSL_read(s->tls_ctx->ctx, buf, (int)(len))))
+		if (0 <= (n = (ssize_t)SSL_read(s->tls_ctx->ctx, buf, (int)len)))
 			break;
 
 		err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)n);
