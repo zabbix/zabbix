@@ -27,8 +27,7 @@ void	zbx_mock_test_entry(void **state)
 {
 	zbx_mock_error_t	error;
 	zbx_mock_handle_t	handle, parameters, parameter;
-	const char		*validation, *tmp, **multi_string, *string_list;
-	char			*cfg_file;
+	const char		*cfg_file, *validation, *tmp, **multi_string, *string_list;
 	int			strict = 42, exit_code, parameter_count = 0, i;
 	struct cfg_line		*cfg = NULL;
 	void			**expected_values = NULL;
@@ -230,9 +229,10 @@ void	zbx_mock_test_entry(void **state)
 	cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(struct cfg_line));
 	cfg[parameter_count].parameter = NULL;
 
-	CONFIG_FILE = cfg_file;
+	CONFIG_FILE = zbx_strdup(NULL, cfg_file);
+	zbx_free(cfg_file);
 
-	parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{

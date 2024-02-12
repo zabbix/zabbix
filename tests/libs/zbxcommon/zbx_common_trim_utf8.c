@@ -51,10 +51,10 @@ static const char	*read_utf8(const char *path_str, const char *path_hex)
 
 void	zbx_mock_test_entry_common_trim_utf8(void **state, int trim_utf8_func)
 {
-	ZBX_UNUSED(state);
-
 	char		*in;
 	const char	*charlist, *expected;
+
+	ZBX_UNUSED(state);
 
 	in = zbx_strdup(NULL, read_utf8("in.text.str", "in.text.hex"));
 	charlist = read_utf8("in.charlist.str", "in.charlist.hex");
