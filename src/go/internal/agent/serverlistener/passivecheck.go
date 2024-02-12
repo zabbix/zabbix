@@ -43,7 +43,7 @@ type passiveChecksRequest struct {
 }
 
 type passiveChecksResponseData struct {
-	Value *string `json:"value,omitempty"`
+	Value *string `json:"value"`
 	Error *string `json:"error,omitempty"`
 }
 
@@ -90,7 +90,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 		errString := err.Error()
 		response = passiveChecksResponse{Version: version.LongNoRC(), Error: &errString}
 	} else {
-		var value string
+		var value *string
 
 		if timeout, err = scheduler.ParseItemTimeoutAny(request.Data[0].Timeout); err == nil {
 			// direct passive check timeout is handled by the scheduler
@@ -101,7 +101,7 @@ func (pc *passiveCheck) handleCheckJSON(data []byte) (errJson error) {
 			errString := err.Error()
 			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Error: &errString}}}
 		} else {
-			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Value: &value}}}
+			response = passiveChecksResponse{Version: version.LongNoRC(), Data: []passiveChecksResponseData{{Value: value}}}
 		}
 	}
 
@@ -131,14 +131,14 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	checkTimeout = timeoutForSinglePassiveChecks
 
 	// direct passive check timeout is handled by the scheduler
-	s, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
+	taskResult, err := pc.scheduler.PerformTask(string(data), checkTimeout, agent.PassiveChecksClientID)
 
 	if err != nil {
 		log.Debugf("sending passive check response: %s: '%s' to '%s'", notsupported, err.Error(), pc.conn.Address())
 		_, err = pc.conn.Write(pc.formatError(err.Error()))
-	} else {
-		log.Debugf("sending passive check response: '%s' to '%s'", s, pc.conn.Address())
-		_, err = pc.conn.Write([]byte(s))
+	} else if taskResult != nil {
+		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, pc.conn.Address())
+		_, err = pc.conn.Write([]byte(*taskResult))
 	}
 
 	if err != nil {

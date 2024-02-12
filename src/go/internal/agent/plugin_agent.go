@@ -38,7 +38,7 @@ var (
 	performTask   PerformTask
 )
 
-type PerformTask func(key string, timeout time.Duration, clientID uint64) (result string, err error)
+type PerformTask func(key string, timeout time.Duration, clientID uint64) (result *string, err error)
 
 // Plugin -
 type Plugin struct {
@@ -83,10 +83,13 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 	}
 
 	var err error
-	value, err = performTask(item, timeout, clientID)
+	var taskResult *string
+	taskResult, err = performTask(item, timeout, clientID)
 	if err != nil {
 		return "", err
 	}
+
+	value = *taskResult
 
 	if !utf8.ValidString(value) {
 		return "", fmt.Errorf("value is not a UTF-8 string.")
