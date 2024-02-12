@@ -275,13 +275,12 @@ static void	tls_socket_event(SSL *ctx, ssize_t ssl_err, short *event)
 	ZBX_UNUSED(ctx);
 	switch (ssl_err)
 	{
-		case SSL_ERROR_WANT_READ:
-			*event = POLLIN;
-			break;
 		case SSL_ERROR_WANT_WRITE:
 			*event = POLLOUT;
 			break;
+		/*case SSL_ERROR_WANT_READ:*/
 		default:
+			*event = POLLIN;
 			break;
 	}
 }
