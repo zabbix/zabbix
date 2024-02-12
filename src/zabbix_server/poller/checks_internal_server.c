@@ -18,15 +18,12 @@
 **/
 
 #include "poller_server.h"
-#include "zbxpoller.h"
 
 #include "../ha/ha.h"
 #include "../lld/lld_protocol.h"
 
 #include "zbxcachevalue.h"
 #include "zbxcacheconfig.h"
-#include "zbxjson.h"
-#include "zbxtime.h"
 #include "zbxconnector.h"
 #include "zbxproxybuffer.h"
 

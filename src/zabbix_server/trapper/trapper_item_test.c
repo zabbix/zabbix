@@ -20,6 +20,13 @@
 #include "trapper_item_test.h"
 #include "zbxexpression.h"
 
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxeval.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
 #include "zbxpoller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
