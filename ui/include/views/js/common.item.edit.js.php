@@ -224,10 +224,13 @@
 				$(':radio', '#retrieve_mode')
 					.filter('[value=<?= HTTPTEST_STEP_RETRIEVE_MODE_HEADERS ?>]').click()
 					.end()
-					.prop('disabled', true);
+					.prop('disabled', true)
+					.prop('readonly', true);
 			}
 			else {
-				$(':radio', '#retrieve_mode').prop('disabled', false);
+				$(':radio', '#retrieve_mode')
+					.prop('disabled', false)
+					.prop('readonly', false);
 			}
 		});
 	});
