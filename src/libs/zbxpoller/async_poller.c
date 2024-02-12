@@ -527,7 +527,8 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 		async_poller_dns_init(&poller_config, poller_args_in);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 		zbx_tls_init_child(poller_args_in->config_comms->config_tls,
-				poller_args_in->zbx_get_program_type_cb_arg);
+				poller_args_in->zbx_get_program_type_cb_arg,
+				zbx_dc_get_psk_by_identity);
 #endif
 	}
 	else

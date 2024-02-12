@@ -481,7 +481,7 @@ ZBX_THREAD_ENTRY(taskmanager_thread, args)
 
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(taskmanager_args_in->config_comms->config_tls,
-			taskmanager_args_in->zbx_get_program_type_cb_arg);
+			taskmanager_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);
 #endif
 	zbx_setproctitle("%s [connecting to the database]", get_process_type_string(process_type));
 	zbx_db_connect(ZBX_DB_CONNECT_NORMAL);

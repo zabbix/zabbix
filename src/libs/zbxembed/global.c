@@ -86,7 +86,7 @@ static duk_ret_t	es_btoa(duk_context *ctx)
 	if (NULL == (str = es_get_buffer_dyn(ctx, 0, &len)))
 		return duk_error(ctx, DUK_RET_TYPE_ERROR, "cannot obtain parameter");
 
-	zbx_base64_encode_dyn(str, &b64str, (int)strlen(str));
+	zbx_base64_encode_dyn(str, &b64str, (int)len);
 	duk_push_string(ctx, b64str);
 	zbx_free(str);
 	zbx_free(b64str);
