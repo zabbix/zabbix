@@ -32,7 +32,7 @@
 function Overlay(type, dialogueid) {
 	this.type = type;
 	this.dialogueid = dialogueid || overlays_stack.getNextId();
-	this.headerid = this.dialogueid;
+	this.headerid =  'overlay-dialogue-' + this.dialogueid;
 	this.$backdrop = jQuery('<div>', {
 		'class': 'overlay-bg',
 		'data-dialogueid': this.dialogueid
