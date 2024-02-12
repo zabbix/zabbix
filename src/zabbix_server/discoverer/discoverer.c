@@ -1046,13 +1046,12 @@ void	discover_results_partrange_merge(zbx_hashset_t *hr_dst, zbx_vector_discover
 	for (i = vr_src->values_num - 1; i >= 0; i--)
 	{
 		zbx_discoverer_results_t	*src = vr_src->values[i];
-		zbx_uint64_t 			check_count_rest;
 
 		if (0 == force && src->processed_checks_per_ip != task->range.state.checks_per_ip)
 			continue;
 
 		if (FAIL == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid,
-				src->ip, src->processed_checks_per_ip, &check_count_rest))
+				src->ip, src->processed_checks_per_ip, NULL))
 		{
 			continue;	/* config revision id was changed */
 		}
@@ -1135,7 +1134,7 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	char					dns[ZBX_INTERFACE_DNS_LEN_MAX];
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX];
 	zbx_dc_dcheck_t				*dcheck;
-	zbx_discoverer_dservice_t		*service;
+	zbx_discoverer_dservice_t		*service = NULL;
 	zbx_discoverer_results_t		*result = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] In %s() dchecks:%d key[0]:%s", log_worker_id, __func__,
@@ -1146,16 +1145,19 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 	(void)zbx_iprange_ip2str(task->range.ipranges->values[task->range.state.index_ip].type,
 			task->range.state.ipaddress, ip, sizeof(ip));
 
-	if (SUCCEED != discover_service(dcheck, ip, (unsigned short)task->range.state.port))
-		goto out;
-
-	service = result_dservice_create((unsigned short)task->range.state.port, dcheck->dcheckid);
-	service->status = DOBJECT_STATUS_UP;
-	zbx_gethost_by_ip(ip, dns, sizeof(dns));
+	if (SUCCEED == discover_service(dcheck, ip, (unsigned short)task->range.state.port))
+	{
+		service = result_dservice_create((unsigned short)task->range.state.port, dcheck->dcheckid);
+		service->status = DOBJECT_STATUS_UP;
+		zbx_gethost_by_ip(ip, dns, sizeof(dns));
+	}
 
 	pthread_mutex_lock(&dmanager.results_lock);
 
-	if (SUCCEED == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
+	if (SUCCEED != discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
+		service_free(service);	/* drule revision has been changed or drule aborted */
+
+	if (NULL != service)
 	{
 		result = discover_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
 
@@ -1166,11 +1168,9 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 		zbx_vector_discoverer_services_ptr_append(&result->services, service);
 	}
-	else
-		service_free(service);	/* drule revision has been changed or drule aborted */
 
 	pthread_mutex_unlock(&dmanager.results_lock);
-out:
+
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() ip:%s dresult services:%d rdns:%s", log_worker_id, __func__,
 			ip, NULL != result ? result->services.values_num : -1, NULL != result ? result->dnsname : "");
 
