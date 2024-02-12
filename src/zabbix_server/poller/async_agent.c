@@ -24,6 +24,8 @@
 #include "zbxself.h"
 #include "async_poller.h"
 #include "zbxagentget.h"
+#include "zbxcachehistory.h"
+#include "zbx_item_constants.h"
 
 static const char	*get_agent_step_string(zbx_zabbix_agent_step_t step)
 {
@@ -231,6 +233,15 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 				{
 					/* retry with other protocol */
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
+				}
+
+				if (agent_context->item.result.type == 0)
+				{
+					zbx_timespec_t	ts;
+
+					zbx_timespec(&ts);
+					zbx_dc_add_history(agent_context->item.itemid, agent_context->item.value_type,
+							0, &agent_context->item.result, &ts, ITEM_STATE_NORMAL, NULL);
 				}
 
 				break;
