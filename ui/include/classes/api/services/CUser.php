@@ -622,6 +622,7 @@ class CUser extends CApiService {
 	private static function addAffectedObjects(array $users, array &$db_users): void {
 		self::addAffectedUserGroups($users, $db_users);
 		self::addAffectedMedias($users, $db_users);
+		self::addAffectedMfaTotpSecrets($users, $db_users);
 	}
 
 	private static function addAffectedUserGroups(array $users, array &$db_users): void {
@@ -649,6 +650,31 @@ class CUser extends CApiService {
 		while ($db_usrgrp = DBfetch($result)) {
 			$db_users[$db_usrgrp['userid']]['usrgrps'][$db_usrgrp['id']] =
 				array_diff_key($db_usrgrp, array_flip(['userid']));
+		}
+	}
+
+	private static function addAffectedMfaTotpSecrets(array $users, array $db_users): void {
+		$userids = [];
+
+		foreach ($users as $user) {
+			if (array_key_exists('mfa_totp_secrets', $user)) {
+				$userids[] = $user['userid'];
+				$db_users[$user['userid']]['mfa_totp_secrets'] = [];
+			}
+		}
+
+		if (!$userids) {
+			return;
+		}
+
+		$db_mfa_totp_secrets = DB::select('mfa_totp_secret', [
+			'output' => ['mfa_totp_secretid', 'mfaid', 'userid', 'totp_secret'],
+			'filter' => ['userid' => $userids]
+		]);
+
+		foreach ($db_mfa_totp_secrets as $db_mfa_totp_secret) {
+			$db_users[$db_mfa_totp_secret['userid']]['mfa_totp_secrets'][$db_mfa_totp_secret['mfa_totp_secretid']] =
+				array_diff_key($db_mfa_totp_secret, array_flip(['userid']));
 		}
 	}
 
