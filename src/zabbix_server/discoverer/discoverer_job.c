@@ -23,7 +23,7 @@
 
 ZBX_VECTOR_IMPL(iprange, zbx_iprange_t)
 
-static int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
+int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 {
 	int			ret;
 	zbx_vector_portrange_t	port_ranges;

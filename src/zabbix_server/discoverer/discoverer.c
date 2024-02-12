@@ -1154,20 +1154,25 @@ static int	discoverer_net_check_common(zbx_uint64_t druleid, zbx_discoverer_task
 
 	pthread_mutex_lock(&dmanager.results_lock);
 
-	if (SUCCEED != discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
-		service_free(service);	/* drule revision has been changed or drule aborted */
-
-	if (NULL != service)
+	if (SUCCEED == discoverer_check_count_decrease(&dmanager.incomplete_checks_count, druleid, ip, 1, NULL))
 	{
+		/* we must register at least 1 empty result per ip */
 		result = discoverer_results_host_reg(&dmanager.results, druleid, task->unique_dcheckid, ip);
 
-		if (NULL == result->dnsname || ('\0' == *result->dnsname && '\0' != *dns))
+		if (NULL != service)
 		{
-			result->dnsname = zbx_strdup(result->dnsname, dns);
-		}
+			if (NULL == result->dnsname || ('\0' == *result->dnsname && '\0' != *dns))
+			{
+				result->dnsname = zbx_strdup(result->dnsname, dns);
+			}
 
-		zbx_vector_discoverer_services_ptr_append(&result->services, service);
+			zbx_vector_discoverer_services_ptr_append(&result->services, service);
+		}
 	}
+	else
+		service_free(service);	/* drule revision has been changed or drule aborted */
+
+
 
 	pthread_mutex_unlock(&dmanager.results_lock);
 
@@ -1294,7 +1299,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 			else
 			{
-				ret = discoverer_net_check_range(druleid, task, worker_max, &worker->stop,
+				ret = discovery_net_check_range(druleid, task, worker_max, &worker->stop,
 						&dmanager, log_worker_id, &error);
 			}
 

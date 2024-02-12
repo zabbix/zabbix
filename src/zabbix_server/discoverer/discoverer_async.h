@@ -44,7 +44,7 @@ typedef struct
 discovery_async_result_t;
 
 void	process_http_result(void *data);
-int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
+int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error);
 
 #endif /* ZABBIX_DISCOVERER_ASYNC_H */
