@@ -660,7 +660,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zbx_vector_discoverer_results_ptr_create(&results);
 	zbx_vector_portrange_create(&port_ranges);
 	*first_ip = '\0';
-#if defined(HAVE_LIBCURL)
+#ifdef HAVE_LIBCURL
 	if (SVC_HTTP == task->dchecks.values[0]->type || SVC_HTTPS == task->dchecks.values[0]->type)
 		http_config = zbx_async_httpagent_create(poller_config.base, process_http_result, NULL, &poller_config);
 #endif

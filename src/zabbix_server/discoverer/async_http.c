@@ -41,14 +41,14 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 	char		url[MAX_STRING_LEN];
 	CURLoption	opt;
 
-	zbx_snprintf(url, sizeof(url), SUCCEED == zbx_is_ip6(ip) ? "%s[%s]" : "%s%s",
-			SVC_HTTPS == type ? "https://" : "http://", ip);
-
 	if (NULL == (http_ctx->easyhandle = curl_easy_init()))
 	{
 		*error = zbx_strdup(*error, "Cannot initialize cURL library");
-		goto fail;
+		return FAIL;
 	}
+
+	zbx_snprintf(url, sizeof(url), SUCCEED == zbx_is_ip6(ip) ? "%s[%s]" : "%s%s",
+			SVC_HTTPS == type ? "https://" : "http://", ip);
 
 	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = CURLOPT_USERAGENT,
 			"Zabbix " ZABBIX_VERSION)) ||
@@ -98,6 +98,7 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 
 	return SUCCEED;
 fail:
+	curl_easy_cleanup(http_ctx->easyhandle);
 	return FAIL;
 }
 #endif
