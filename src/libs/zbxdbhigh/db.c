@@ -4079,7 +4079,7 @@ char	*zbx_db_get_schema_esc(void)
 void	zbx_recalc_time_period(int *ts_from, int table_group)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
-	int			least_ts, now;
+	int			least_ts = 0, now;
 	zbx_config_t		cfg;
 	static int		last_cfg_retrieval = 0;
 	static zbx_config_hk_t	hk;

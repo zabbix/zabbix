@@ -230,7 +230,6 @@ void	zbx_mock_test_entry(void **state)
 	cfg[parameter_count].parameter = NULL;
 
 	CONFIG_FILE = zbx_strdup(NULL, cfg_file);
-	zbx_free(cfg_file);
 
 	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
 
@@ -381,4 +380,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(expected_values);
 	zbx_free(cfg);
+	zbx_free(CONFIG_FILE);
 }
