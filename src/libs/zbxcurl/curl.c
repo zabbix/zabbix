@@ -20,17 +20,17 @@
 #include "zbxcurl.h"
 
 #ifdef HAVE_LIBCURL
-static unsigned int	zbx_curl_version_num(void)
+static unsigned int	libcurl_version_num(void)
 {
 	return curl_version_info(CURLVERSION_NOW)->version_num;
 }
 
-static const char	*zbx_curl_version(void)
+static const char	*libcurl_version_str(void)
 {
 	return curl_version_info(CURLVERSION_NOW)->version;
 }
 
-static const char	*zbx_curl_ssl_version(void)
+static const char	*libcurl_ssl_version(void)
 {
 	return curl_version_info(CURLVERSION_NOW)->ssl_version;
 }
@@ -53,7 +53,7 @@ int	zbx_curl_protocol(const char *protocol, char **error)
 	if (NULL != error)
 	{
 		*error = zbx_dsprintf(*error, "the cURL library does not support \"%s\" protocol (using version %s)",
-				protocol, zbx_curl_version());
+				protocol, libcurl_version_str());
 	}
 
 	return FAIL;
@@ -62,7 +62,7 @@ int	zbx_curl_protocol(const char *protocol, char **error)
 static void	setopt_error(const char *option, CURLcode err, char **error)
 {
 	*error = zbx_dsprintf(*error, "the cURL library returned an error when trying to enable %s: %s"
-			" (using version %s)", option, curl_easy_strerror(err), zbx_curl_version());
+			" (using version %s)", option, curl_easy_strerror(err), libcurl_version_str());
 }
 
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
@@ -71,10 +71,10 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
 	CURLcode	err;
 
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
-	if (zbx_curl_version_num() >= 0x071304)
+	if (libcurl_version_num() >= 0x071304)
 	{
 		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in 7.85.0 (0x075500) */
-		if (zbx_curl_version_num() >= 0x075500)
+		if (libcurl_version_num() >= 0x075500)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "HTTP,HTTPS")))
 			{
@@ -102,10 +102,10 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 	CURLcode	err;
 
 	/* CURLOPT_PROTOCOLS (181L) is supported starting with version 7.19.4 (0x071304) */
-	if (zbx_curl_version_num() >= 0x071304)
+	if (libcurl_version_num() >= 0x071304)
 	{
 		/* CURLOPT_PROTOCOLS was replaced by CURLOPT_PROTOCOLS_STR and deprecated in 7.85.0 (0x075500) */
-		if (zbx_curl_version_num() >= 0x075500)
+		if (libcurl_version_num() >= 0x075500)
 		{
 			if (CURLE_OK != (err = curl_easy_setopt(easyhandle, CURLOPT_PROTOCOLS_STR, "SMTP,SMTPS")))
 			{
@@ -130,12 +130,12 @@ int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error)
 int	zbx_curl_has_bearer(char **error)
 {
 	/* added in 7.61.0 (0x073d00) */
-	if (zbx_curl_version_num() < 0x073d00)
+	if (libcurl_version_num() < 0x073d00)
 	{
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "the cURL library version %s does not support HTTP Bearer token"
-					" authentication, 7.61.0 or newer is required", zbx_curl_version());
+					" authentication, 7.61.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
@@ -147,12 +147,12 @@ int	zbx_curl_has_bearer(char **error)
 int	zbx_curl_has_multi_wait(char **error)
 {
 	/* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
-	if (zbx_curl_version_num() < 0x071c00)
+	if (libcurl_version_num() < 0x071c00)
 	{
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "the cURL library version %s is too old for Elasticsearch history"
-					" backend, 7.28.0 or newer is required", zbx_curl_version());
+					" backend, 7.28.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
@@ -163,12 +163,12 @@ int	zbx_curl_has_multi_wait(char **error)
 
 int	zbx_curl_has_ssl(char **error)
 {
-	if (NULL == zbx_curl_ssl_version())
+	if (NULL == libcurl_ssl_version())
 	{
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "the cURL library does not support SSL/TLS (using version %s)",
-					zbx_curl_version());
+					libcurl_version_str());
 		}
 
 		return FAIL;
@@ -180,12 +180,12 @@ int	zbx_curl_has_ssl(char **error)
 int	zbx_curl_has_smtp_auth(char **error)
 {
 	/* added in 7.20.0 */
-	if (zbx_curl_version_num() < 0x071400)
+	if (libcurl_version_num() < 0x071400)
 	{
 		if (NULL != error)
 		{
 			*error = zbx_dsprintf(*error, "the cURL library version %s does not support SMTP authentication,"
-					" 7.20.0 or newer is required", zbx_curl_version());
+					" 7.20.0 or newer is required", libcurl_version_str());
 		}
 
 		return FAIL;
