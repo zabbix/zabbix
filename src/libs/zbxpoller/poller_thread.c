@@ -723,7 +723,7 @@ static int	get_values(unsigned char poller_type, int *nextcheck, const zbx_confi
 				}
 				break;
 			case NETWORK_ERROR:
-		case GATEWAY_ERROR:
+			case GATEWAY_ERROR:
 			case TIMEOUT_ERROR:
 				if (ZBX_INTERFACE_AVAILABLE_FALSE != last_available)
 				{
