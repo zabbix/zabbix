@@ -17,6 +17,8 @@ libzbxdiscoverer_a_SOURCES = \
 	async_tcpsvc.h \
 	async_telnet.c \
 	async_telnet.h \
+	async_http.c \
+	async_http.h \
 	discoverer_int.h
 
 libzbxdiscoverer_a_CFLAGS = \

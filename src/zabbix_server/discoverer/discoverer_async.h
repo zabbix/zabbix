@@ -20,8 +20,28 @@
 #ifndef ZABBIX_DISCOVERER_ASYNC_H
 #define ZABBIX_DISCOVERER_ASYNC_H
 
+#include <event2/dns.h>
 #include "discoverer_int.h"
 #include "discoverer_job.h"
+
+typedef struct
+{
+	int			processing;
+	int			config_timeout;
+	const char		*config_source_ip;
+	const char		*progname;
+	struct event_base	*base;
+	struct evdns_base	*dnsbase;
+}
+discovery_poller_config_t;
+
+typedef struct
+{
+	discovery_poller_config_t	*poller_config;
+	zbx_discoverer_results_t	*dresult;
+	zbx_uint64_t			dcheckid;
+}
+discovery_async_result_t;
 
 int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task, int worker_max, int *stop,
 		zbx_discoverer_manager_t *dmanager, int worker_id, char **error);

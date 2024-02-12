@@ -38,6 +38,7 @@ typedef struct
 }
 zbx_asynchttppoller_config;
 
+void	zbx_async_httpagent_init(void);
 zbx_asynchttppoller_config	*zbx_async_httpagent_create(struct event_base *ev,
 		process_httpagent_result_callback_fn process_httpagent_result_callback,
 		httpagent_action_callback_fn httpagent_action_callback, void *arg);

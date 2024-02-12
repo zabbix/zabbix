@@ -23,10 +23,11 @@
 #include "../poller/async_agent.h"
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
+#include "async_http.h"
 #include "zbxsysinfo.h"
 #include "zbx_discoverer_constants.h"
-#include <event2/dns.h>
 #include "zbxasyncpoller.h"
+#include "zbxasynchttppoller.h"
 #include "zbxcacheconfig.h"
 #include "zbxcomms.h"
 #include "zbxdbhigh.h"
@@ -34,25 +35,6 @@
 #include "zbxstr.h"
 
 static ZBX_THREAD_LOCAL int log_worker_id;
-
-typedef struct
-{
-	int			processing;
-	int			config_timeout;
-	const char		*config_source_ip;
-	const char		*progname;
-	struct event_base	*base;
-	struct evdns_base	*dnsbase;
-}
-discovery_poller_config_t;
-
-typedef struct
-{
-	discovery_poller_config_t	*poller_config;
-	zbx_discoverer_results_t	*dresult;
-	zbx_uint64_t			dcheckid;
-}
-discovery_async_result_t;
 
 static void	discovery_async_poller_dns_init(discovery_poller_config_t *poller_config)
 {
@@ -510,6 +492,126 @@ static int	discovery_telnet(discovery_poller_config_t *poller_config, const zbx_
 	return SUCCEED;
 }
 
+#ifdef HAVE_LIBCURL
+static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
+{
+	int					 task_ret = ZBX_ASYNC_TASK_STOP;
+	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
+
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(dnserr);
+
+	if (ZBX_ASYNC_HTTP_STEP_RDNS == http_context->step)
+	{
+		if (NULL != addr)
+			http_context->reverse_dns = zbx_strdup(NULL, addr);
+
+		goto stop;
+	}
+
+	if (0 != (event & EV_TIMEOUT))
+		goto stop;
+
+	if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == http_context->resolve_reverse_dns)
+	{
+		task_ret = ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+		http_context->step = ZBX_ASYNC_HTTP_STEP_RDNS;
+	}
+stop:
+	return task_ret;
+}
+
+static void	process_http_result_rdns(void *data)
+{
+	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
+	discovery_async_result_t		*async_result = (discovery_async_result_t *)http_context->async_result;
+
+	async_result->poller_config->processing--;
+	async_result->dresult->processed_checks_per_ip++;
+
+	if (SUCCEED == http_context->res)
+	{
+		zbx_discoverer_dservice_t	*service;
+
+		service = result_dservice_create(http_context->port, async_result->dcheckid);
+		service->status = DOBJECT_STATUS_UP;
+		zbx_vector_discoverer_services_ptr_append(&async_result->dresult->services, service);
+
+		if (NULL ==  async_result->dresult->dnsname || '\0' == *async_result->dresult->dnsname)
+		{
+			const char	*rdns = ZBX_NULL2EMPTY_STR(http_context->reverse_dns);
+
+			if ('\0' != *rdns && SUCCEED != zbx_validate_hostname(rdns))
+				rdns = "";
+
+			async_result->dresult->dnsname = zbx_strdup(async_result->dresult->dnsname, rdns);
+		}
+	}
+
+	zbx_free(async_result);
+	zbx_discovery_async_http_context_destroy(http_context);
+}
+
+static void	process_http_result(CURL *easy_handle, CURLcode err, void *arg)
+{
+	zbx_discovery_async_http_context_t	*http_context;
+	discovery_poller_config_t		*poller_config = (discovery_poller_config_t *)arg;
+	CURLcode				err_info;
+
+	if (CURLE_OK != (err_info = curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &http_context)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get pointer to private data: %s", curl_easy_strerror(err_info));
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (CURLE_OK != err)
+	{
+		http_context->res = FAIL;
+		process_http_result_rdns(http_context);
+	}
+	else
+	{
+		http_context->res = SUCCEED;
+		zbx_async_poller_add_task(poller_config->base, poller_config->dnsbase,
+				http_context->async_result->dresult->ip, http_context, http_context->config_timeout,
+				http_task_process, process_http_result_rdns);
+	}
+}
+
+static int	discovery_http(discovery_poller_config_t *poller_config, zbx_asynchttppoller_config *http_config,
+		const zbx_dc_dcheck_t *dcheck, const unsigned short port, zbx_discoverer_results_t *dresult,
+		char **error)
+{
+	int					ret;
+	discovery_async_result_t		*async_result;
+	zbx_discovery_async_http_context_t	*async_http_context;
+
+	async_result = (discovery_async_result_t *) zbx_malloc(NULL, sizeof(discovery_async_result_t));
+	async_result->dresult = dresult;
+	async_result->poller_config = poller_config;
+	async_result->dcheckid = dcheck->dcheckid;
+
+	async_http_context = (zbx_discovery_async_http_context_t*)zbx_malloc(NULL,
+			sizeof(zbx_discovery_async_http_context_t));
+	async_http_context->port = port;
+	async_http_context->resolve_reverse_dns = ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES;
+	async_http_context->reverse_dns = NULL;
+	async_http_context->step = ZBX_ASYNC_HTTP_STEP_INIT;
+	async_http_context->async_result = async_result;
+	async_http_context->config_timeout = dcheck->timeout;
+
+	if (SUCCEED != (ret = zbx_discovery_async_check_http(http_config->curl_handle, poller_config->config_source_ip,
+			dcheck->timeout, dresult->ip, port, dcheck->type, async_http_context, error)))
+	{
+		zbx_free(async_result);
+	}
+	else
+		poller_config->processing++;
+
+	return ret;
+}
+#endif
+
 static void	discoverer_net_check_result_flush(zbx_discoverer_manager_t *dmanager, zbx_discoverer_task_t *task,
 		zbx_vector_discoverer_results_ptr_t *results, int force)
 {
@@ -536,6 +638,9 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zbx_vector_discoverer_results_ptr_t	results;
 	zbx_vector_portrange_t			port_ranges;
 	discovery_poller_config_t		poller_config;
+#if defined(HAVE_LIBCURL)
+	zbx_asynchttppoller_config		*http_config;
+#endif
 	char					ip[ZBX_INTERFACE_IP_LEN_MAX], first_ip[ZBX_INTERFACE_IP_LEN_MAX];
 	int					ret = FAIL, z[ZBX_IPRANGE_GROUPS_V6] = {0, 0, 0, 0, 0, 0, 0, 0};
 
@@ -555,7 +660,10 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zbx_vector_discoverer_results_ptr_create(&results);
 	zbx_vector_portrange_create(&port_ranges);
 	*first_ip = '\0';
-
+#if defined(HAVE_LIBCURL)
+	if (SVC_HTTP == task->dchecks.values[0]->type || SVC_HTTPS == task->dchecks.values[0]->type)
+		http_config = zbx_async_httpagent_create(poller_config.base, process_http_result, NULL, &poller_config);
+#endif
 	if (0 == memcmp(task->range.state.ipaddress, z,
 			ZBX_IPRANGE_V4 == task->range.ipranges->values[task->range.state.index_ip].type ?
 			ZBX_IPRANGE_GROUPS_V4 : ZBX_IPRANGE_GROUPS_V6))
@@ -610,16 +718,21 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 					ret = discovery_agent(&poller_config, dcheck, ip,
 							(unsigned short)task->range.state.port, result, error);
 					break;
+				case SVC_HTTP:
+#ifdef HAVE_LIBCURL
+				case SVC_HTTPS:
+					ret = discovery_http(&poller_config, http_config, dcheck,
+							(unsigned short)task->range.state.port, result, error);
+					break;
+#endif
 				case SVC_SSH:
 				case SVC_LDAP:
 				case SVC_SMTP:
 				case SVC_FTP:
-				case SVC_HTTP:
 				case SVC_POP:
 				case SVC_NNTP:
 				case SVC_IMAP:
 				case SVC_TCP:
-				case SVC_HTTPS:
 					ret = discovery_tcpsvc(&poller_config, dcheck, ip,
 							(unsigned short)task->range.state.port, result, error);
 					break;
@@ -669,6 +782,13 @@ out:	/* try to close all handles if they are exhausted */
 	zbx_vector_discoverer_results_ptr_destroy(&results);
 	zbx_vector_portrange_destroy(&port_ranges);
 
+#ifdef HAVE_LIBCURL
+	if (SVC_HTTP == task->dchecks.values[0]->type || SVC_HTTPS == task->dchecks.values[0]->type)
+	{
+		zbx_async_httpagent_clean(http_config);
+		zbx_free(http_config);
+	}
+#endif
 	discovery_async_poller_destroy(&poller_config);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() druleid:" ZBX_FS_UI64 " type:%u state.count:%d first ip:%s"

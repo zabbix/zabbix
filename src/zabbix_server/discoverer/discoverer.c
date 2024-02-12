@@ -1193,6 +1193,7 @@ int	dcheck_is_async(zbx_dc_dcheck_t *dcheck)
 		case SVC_NNTP:
 		case SVC_IMAP:
 		case SVC_HTTP:
+		case SVC_HTTPS:
 		case SVC_SSH:
 		case SVC_TELNET:
 			return SUCCEED;

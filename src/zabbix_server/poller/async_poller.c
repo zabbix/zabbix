@@ -516,6 +516,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	if (ZBX_POLLER_TYPE_HTTPAGENT == poller_type)
 	{
 #ifdef HAVE_LIBCURL
+		zbx_async_httpagent_init();
 		asynchttppoller_config = zbx_async_httpagent_create(poller_config.base, process_httpagent_result,
 				poller_update_selfmon_counter, &poller_config);
 		poller_config.curl_handle = asynchttppoller_config->curl_handle;

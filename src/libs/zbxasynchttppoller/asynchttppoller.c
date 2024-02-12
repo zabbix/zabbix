@@ -92,7 +92,8 @@ static void	on_timeout(evutil_socket_t fd, short events, void *arg)
 	ZBX_UNUSED(fd);
 	ZBX_UNUSED(events);
 
-	asynchttppoller_config->http_agent_action(asynchttppoller_config->http_agent_arg);
+	if (NULL != asynchttppoller_config->http_agent_action)
+		asynchttppoller_config->http_agent_action(asynchttppoller_config->http_agent_arg);
 
 	curl_multi_socket_action(asynchttppoller_config->curl_handle, CURL_SOCKET_TIMEOUT, 0, &running_handles);
 	check_multi_info(asynchttppoller_config);
@@ -119,7 +120,9 @@ static void	curl_perform(int fd, short event, void *arg)
 	context = (zbx_curl_context_t *)arg;
 	asynchttppoller_config = context->asynchttppoller_config;
 
-	asynchttppoller_config->http_agent_action(asynchttppoller_config->http_agent_arg);
+	if (NULL != asynchttppoller_config->http_agent_action)
+		asynchttppoller_config->http_agent_action(asynchttppoller_config->http_agent_arg);
+
 	curl_multi_socket_action(asynchttppoller_config->curl_handle, context->sockfd, flags, &running_handles);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "running_handles:%d", running_handles);
@@ -200,18 +203,9 @@ static int	handle_socket(CURL *easy, curl_socket_t s, int action, void *userp, v
 	return 0;
 }
 
-zbx_asynchttppoller_config *zbx_async_httpagent_create(struct event_base *ev,
-		process_httpagent_result_callback_fn process_httpagent_result_callback,
-		httpagent_action_callback_fn httpagent_action_callback, void *arg)
+void	zbx_async_httpagent_init(void)
 {
-	CURLMcode			merr;
-	CURLcode			err;
-	zbx_asynchttppoller_config	*asynchttppoller_config = zbx_malloc(NULL ,sizeof(zbx_asynchttppoller_config));
-
-	asynchttppoller_config->process_httpagent_result = process_httpagent_result_callback;
-	asynchttppoller_config->http_agent_action = httpagent_action_callback;
-	asynchttppoller_config->http_agent_arg = arg;
-	asynchttppoller_config->ev = ev;
+	CURLcode	err;
 
 	if (CURLE_OK != (err = curl_global_init(CURL_GLOBAL_ALL)))
 	{
@@ -219,6 +213,19 @@ zbx_asynchttppoller_config *zbx_async_httpagent_create(struct event_base *ev,
 
 		exit(EXIT_FAILURE);
 	}
+}
+
+zbx_asynchttppoller_config	*zbx_async_httpagent_create(struct event_base *ev,
+		process_httpagent_result_callback_fn process_httpagent_result_callback,
+		httpagent_action_callback_fn httpagent_action_callback, void *arg)
+{
+	CURLMcode			merr;
+	zbx_asynchttppoller_config	*asynchttppoller_config = zbx_malloc(NULL ,sizeof(zbx_asynchttppoller_config));
+
+	asynchttppoller_config->process_httpagent_result = process_httpagent_result_callback;
+	asynchttppoller_config->http_agent_action = httpagent_action_callback;
+	asynchttppoller_config->http_agent_arg = arg;
+	asynchttppoller_config->ev = ev;
 
 	if (NULL == (asynchttppoller_config->curl_handle = curl_multi_init()))
 	{
