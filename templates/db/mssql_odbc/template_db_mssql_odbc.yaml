@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-07T12:29:54Z'
+  date: '2024-02-09T16:12:44Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -430,9 +430,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -674,9 +671,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Cache Objects in use'')].cntr_value.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.cache_info.raw
           tags:
@@ -693,9 +687,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Cache Object Counts'')].cntr_value.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.cache_info.raw
           tags:
@@ -752,9 +743,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Database pages'')].cntr_value.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.buffer_manager.raw
           tags:
@@ -839,9 +827,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -952,9 +937,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1017,9 +999,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.sql_errors.raw
           tags:
@@ -1315,9 +1294,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.db_info.raw
           tags:
@@ -1338,9 +1314,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1357,9 +1330,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Memory Grants Outstanding'')].cntr_value.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1376,9 +1346,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''Memory Grants Pending'')].cntr_value.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1451,9 +1418,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.sql_errors.raw
           tags:
@@ -1702,9 +1666,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -1824,9 +1785,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.access_methods.raw
           tags:
@@ -1868,9 +1826,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1912,9 +1867,6 @@ zabbix_export:
             - type: MULTIPLIER
               parameters:
                 - '1024'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.mem_manager.raw
           tags:
@@ -1973,9 +1925,6 @@ zabbix_export:
             - type: CHANGE_PER_SECOND
               parameters:
                 - ''
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.sql_statistics.raw
           tags:
@@ -2033,9 +1982,6 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$[?(@.counter_name==''User Connections'')].cntr_value.first()'
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 10m
           master_item:
             key: mssql.general_statistics.raw
           tags:
@@ -2643,9 +2589,6 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Active Transactions'')].cntr_value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2668,9 +2611,6 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 1h
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2716,9 +2656,6 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2741,9 +2678,6 @@ zabbix_export:
                 - type: MULTIPLIER
                   parameters:
                     - '1024'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2766,9 +2700,6 @@ zabbix_export:
                 - type: CHANGE_PER_SECOND
                   parameters:
                     - ''
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2856,9 +2787,6 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Log Growths'')].cntr_value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2877,9 +2805,6 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Log Shrinks'')].cntr_value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -2898,9 +2823,6 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - '$[?(@.counter_name==''Log Truncations'')].cntr_value.first()'
-                - type: DISCARD_UNCHANGED_HEARTBEAT
-                  parameters:
-                    - 10m
               master_item:
                 key: 'mssql.db.perf_raw["{#DBNAME}"]'
               tags:
@@ -3152,7 +3074,7 @@ zabbix_export:
                     - $.enabled
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 15m
+                    - 12h
               master_item:
                 key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
@@ -3177,7 +3099,7 @@ zabbix_export:
                     - 'return value == ''null'' ? 0 : Math.floor(new Date(value) / 1000);'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1d
+                    - 12h
               master_item:
                 key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
@@ -3200,7 +3122,7 @@ zabbix_export:
                     - $.last_run_status_message
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 15m
+                    - 12h
               master_item:
                 key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
@@ -3225,7 +3147,7 @@ zabbix_export:
                     - 'return value == ''null'' ? 0 : Math.floor(new Date(value) / 1000);'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1d
+                    - 12h
               master_item:
                 key: 'mssql.job.status_raw["{#JOBNAME}"]'
               tags:
