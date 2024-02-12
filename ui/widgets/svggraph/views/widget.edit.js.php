@@ -234,6 +234,20 @@ window.widget_svggraph_form = new class {
 				);
 			});
 
+		const legend_lines_mode = document.getElementById('legend_lines_mode');
+		const legend_lines_label = document.querySelector('[for=legend_lines]');
+
+		legend_lines_mode
+			.addEventListener('change', () => {
+				legend_lines_label.innerHTML = legend_lines_mode.querySelector(':checked').value === '1'
+					? '<?= _('Maximum number of rows') ?>'
+					: '<?= _('Number of rows') ?>';
+			});
+
+		legend_lines_label.innerHTML = legend_lines_mode.querySelector(':checked').value === '1'
+			? '<?= _('Maximum number of rows') ?>'
+			: '<?= _('Number of rows') ?>';
+
 		document.getElementById('legend_statistic')
 			.addEventListener('click', (e) => {
 				jQuery('#legend_columns').rangeControl(

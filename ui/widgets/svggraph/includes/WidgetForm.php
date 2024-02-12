@@ -52,6 +52,9 @@ class WidgetForm extends CWidgetForm {
 	private const PERCENTILE_MIN = 1;
 	private const PERCENTILE_MAX = 100;
 
+	private const LEGEND_LINES_MODE_FIXED = 0;
+	private const LEGEND_LINES_MODE_VARIABLE = 1;
+
 	private bool $percentile_left_on = false;
 	private bool $percentile_right_on = false;
 
@@ -348,7 +351,7 @@ class WidgetForm extends CWidgetForm {
 				(new CWidgetFieldCheckBox('legend', _('Show legend')))->setDefault(SVG_GRAPH_LEGEND_ON)
 			)
 			->addField(
-				(new CWidgetFieldCheckBox('legend_statistic', _('Display min/max/avg')))
+				(new CWidgetFieldCheckBox('legend_statistic', _('Display min/avg/max')))
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
@@ -356,7 +359,15 @@ class WidgetForm extends CWidgetForm {
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(
-				(new CWidgetFieldRangeControl('legend_lines', _('Number of rows'),
+				(new CWidgetFieldRadioButtonList('legend_lines_mode', _('Rows'), [
+					self::LEGEND_LINES_MODE_FIXED => _('Fixed'),
+					self::LEGEND_LINES_MODE_VARIABLE => _('Variable')
+				]))
+					->setDefault(self::LEGEND_LINES_MODE_FIXED)
+					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
+				(new CWidgetFieldRangeControl('legend_lines',  _('Number of rows'),
 					SVG_GRAPH_LEGEND_LINES_MIN, SVG_GRAPH_LEGEND_LINES_MAX
 				))
 					->setDefault(SVG_GRAPH_LEGEND_LINES_MIN)

@@ -56,6 +56,8 @@ class WidgetForm extends CWidgetForm {
 	private const LEGEND_COLUMNS_MIN = 1;
 	private const LEGEND_LINES_MAX = 10;
 	private const LEGEND_LINES_MIN = 1;
+	private const LEGEND_LINES_MODE_FIXED = 0;
+	private const LEGEND_LINES_MODE_VARIABLE = 1;
 
 	private const MERGE_PERCENT_MAX = 10;
 	private const MERGE_PERCENT_MIN = 1;
@@ -203,6 +205,14 @@ class WidgetForm extends CWidgetForm {
 			)
 			->addField(
 				(new CWidgetFieldCheckBox('legend_aggregation', _('Show aggregation function')))
+					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
+			)
+			->addField(
+				(new CWidgetFieldRadioButtonList('legend_lines_mode', _('Rows'), [
+					self::LEGEND_LINES_MODE_FIXED => _('Fixed'),
+					self::LEGEND_LINES_MODE_VARIABLE => _('Variable')
+				]))
+					->setDefault(self::LEGEND_LINES_MODE_FIXED)
 					->setFlags(!$this->legend_on ? CWidgetField::FLAG_DISABLED : 0x00)
 			)
 			->addField(

@@ -174,6 +174,7 @@ function getTimePeriodTab(CWidgetFormView $form, array $fields): CFormGrid {
 function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 	$show_legend_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend']));
 	$show_aggregation_field = $form->registerField(new CWidgetFieldCheckBoxView($fields['legend_aggregation']));
+	$legend_lines_mode_field = $form->registerField(new CWidgetFieldRadioButtonListView($fields['legend_lines_mode']));
 	$legend_lines_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_lines']));
 	$legend_columns_field = $form->registerField(new CWidgetFieldRangeControlView($fields['legend_columns']));
 
@@ -193,6 +194,10 @@ function getLegendTab(CWidgetFormView $form, array $fields): CDiv {
 		)
 		->addItem(
 			(new CFormGrid())
+				->addItem([
+					$legend_lines_mode_field->getLabel(),
+					new CFormField($legend_lines_mode_field->getView())
+				])
 				->addItem([
 					$legend_lines_field->getLabel(),
 					new CFormField($legend_lines_field->getView())
