@@ -2300,7 +2300,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background-color: #a3a3a3 !important;
       transition: none; }
     .radio-list-control input[type="radio"][disabled] + label {
-      transition: none; }
+      transition: none;
+      cursor: default; }
     .radio-list-control input[type="radio"]:checked[readonly] + label {
       background-color: #a3a3a3 !important; }
   .radio-list-control + .icon-info {

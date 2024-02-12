@@ -93,6 +93,7 @@
 
 		&[disabled] + label {
 			transition: none;
+			cursor: default;
 			@extend %form-disabled;
 		}
 
