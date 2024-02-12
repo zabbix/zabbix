@@ -38,6 +38,8 @@ const char	*zbx_mock_get_parameter_string(const char *path)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return NULL;
 	}
 
 	return parameter;
@@ -53,6 +55,8 @@ const char	*zbx_mock_get_object_member_string(zbx_mock_handle_t object, const ch
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_string(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return NULL;
 	}
 
 	return member;
@@ -235,6 +239,8 @@ zbx_uint64_t	zbx_mock_get_parameter_uint64(const char *path)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return parameter;
@@ -250,6 +256,8 @@ zbx_uint64_t	zbx_mock_get_object_member_uint64(zbx_mock_handle_t object, const c
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_uint64(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return member;
@@ -265,6 +273,8 @@ double	zbx_mock_get_parameter_float(const char *path)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &parameter)))
 	{
 		fail_msg("Cannot read parameter at \"%s\": %s", path, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return parameter;
@@ -280,6 +290,8 @@ double	zbx_mock_get_object_member_float(zbx_mock_handle_t object, const char *na
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_float(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return member;
@@ -295,6 +307,8 @@ int	zbx_mock_get_object_member_int(zbx_mock_handle_t object, const char *name)
 			ZBX_MOCK_SUCCESS != (err = zbx_mock_int(handle, &member)))
 	{
 		fail_msg("Cannot read object member \"%s\": %s", name, zbx_mock_error_string(err));
+
+		return 0;
 	}
 
 	return member;

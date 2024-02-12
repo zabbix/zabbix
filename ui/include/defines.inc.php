@@ -548,6 +548,7 @@ define('SYSMAP_GRID_ALIGN_OFF',	0);
 define('PUBLIC_SHARING',	0);
 define('PRIVATE_SHARING',	1);
 
+define('ZBX_LLD_RULE_DELAY_DEFAULT',		'1h');
 define('ZBX_ITEM_DELAY_DEFAULT',			'1m');
 define('ZBX_ITEM_FLEXIBLE_DELAY_DEFAULT',	'50s');
 define('ZBX_ITEM_SCHEDULING_DEFAULT',		'wd1-5h9-18');
