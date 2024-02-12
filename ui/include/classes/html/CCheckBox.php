@@ -71,7 +71,7 @@ class CCheckBox extends CInput {
 	 *
 	 * @var bool
 	 */
-	private bool $set_title = false;
+	private string $label_title = '';
 
 	public function __construct($name = 'checkbox', $value = '1') {
 		$this->name = $name;
@@ -110,11 +110,14 @@ class CCheckBox extends CInput {
 	 *
 	 * @return CCheckBox
 	 */
-	public function setLabel($label, $set_title = false) {
+	public function setLabel($label) {
 		$this->label = $label;
-		$this->set_title = $set_title;
 
 		return $this;
+	}
+
+	public function setLabelTitle(string $label_title) {
+		$this->label_title = $label_title;
 	}
 
 	/**
@@ -166,8 +169,8 @@ class CCheckBox extends CInput {
 		$label = (new CLabel($elements, $this->getId()))
 			->addClass($this->label_position === self::LABEL_POSITION_LEFT ? 'label-pos-left' : null);
 
-		if ($this->set_title) {
-			$label->setTitle($this->label);
+		if ($this->label_title !== '') {
+			$label->setTitle($this->label_title);
 		}
 
 		return parent::toString($destroy).$label->toString();

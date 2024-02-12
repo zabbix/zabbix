@@ -195,9 +195,13 @@ class CCheckBoxList extends CList {
 		foreach ($this->values as $value) {
 			$name = array_key_exists('name', $value) ? $value['name'] : $this->name.'['.$value['value'].']';
 			$checkbox = (new CCheckBox($name, $value['value']))
-				->setLabel($value['label'], $this->are_checkbox_titles_enabled)
+				->setLabel($value['label'])
 				->setChecked($value['checked'])
 				->setEnabled($this->enabled);
+
+			if ($this->are_checkbox_titles_enabled) {
+				$checkbox->setLabelTitle($value['label']);
+			}
 
 			if (array_key_exists('id', $value) || $this->uniqid !== '') {
 				$checkbox->setId(array_key_exists('id', $value)
