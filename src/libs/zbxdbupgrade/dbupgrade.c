@@ -1119,6 +1119,17 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
 			table_name, indexed_column_name, function);
+#else
+	ZBX_UNUSED(sql_alloc);
+	ZBX_UNUSED(sql_offset);
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(original_column_name);
+	ZBX_UNUSED(idname);
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(original_column_name);
+	ZBX_UNUSED(indexed_column_name);
+	ZBX_UNUSED(function);
+	ZBX_UNUSED(idname);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1178,6 +1189,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name,
 			original_column_name, table_name, table_name, indexed_column_name, function);
+#else
+	ZBX_UNUSED(sql_alloc);
+	ZBX_UNUSED(sql_offset);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;

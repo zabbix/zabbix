@@ -695,6 +695,8 @@ static int	correlation_match_event_hostgroup(const DB_EVENT *event, zbx_uint64_t
 static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *condition, const DB_EVENT *event,
 		int old_value)
 {
+	int	ret;
+
 	/* return SUCCEED for conditions using old events */
 	switch (condition->type)
 	{
@@ -702,8 +704,6 @@ static const char	*correlation_condition_match_new_event(zbx_corr_condition_t *c
 		case ZBX_CORR_CONDITION_OLD_EVENT_TAG_VALUE:
 			return (SUCCEED == old_value) ? ZBX_UNKNOWN_STR "0" : "0";
 	}
-
-	int	ret;
 
 	switch (condition->type)
 	{
