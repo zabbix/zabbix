@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $widget = new CWidget();
@@ -178,7 +179,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($readonly)
+		->setReadonly($readonly)
 		->setFocusableElementId('ymin_type_label');
 
 	if ($data['ymin_type'] == GRAPH_YAXIS_TYPE_FIXED) {
@@ -273,7 +274,7 @@ if ($data['graphtype'] == GRAPH_TYPE_NORMAL || $data['graphtype'] == GRAPH_TYPE_
 			GRAPH_YAXIS_TYPE_FIXED => _('Fixed'),
 			GRAPH_YAXIS_TYPE_ITEM_VALUE => _('Item')
 		]))
-		->setDisabled($readonly)
+		->setReadonly($readonly)
 		->setFocusableElementId('ymax_type_label');
 
 	if ($data['ymax_type'] == GRAPH_YAXIS_TYPE_FIXED) {

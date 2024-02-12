@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 $this->includeJsFile('inventory.host.view.js.php');
@@ -94,7 +95,7 @@ foreach (CItem::INTERFACE_TYPES_BY_PRIORITY as $type) {
 					->addValue('IP', INTERFACE_USE_IP)
 					->addValue('DNS', INTERFACE_USE_DNS)
 					->setModern(true)
-					->setEnabled(false),
+					->setReadonly(true),
 				(new CTextBox('port', $interface['port'], true, 64))
 					->setWidth(ZBX_TEXTAREA_INTERFACE_PORT_WIDTH)
 					->removeId(),

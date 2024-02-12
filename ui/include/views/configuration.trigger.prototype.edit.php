@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 require_once dirname(__FILE__).'/js/configuration.triggers.edit.js.php';
@@ -308,7 +309,7 @@ $triggersFormList->addRow(_('OK event generation'),
 		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
 		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
 		->setModern(true)
-		->setEnabled(!$data['limited'])
+		->setReadonly($data['limited'])
 );
 
 $add_recovery_expression_button = (new CButton('insert',
@@ -510,14 +511,14 @@ $triggersFormList
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern(true)
-			->setEnabled(!$data['limited'])
+			->setReadonly($data['limited'])
 	)
 	->addRow(_('OK event closes'),
 		(new CRadioButtonList('correlation_mode', (int) $data['correlation_mode']))
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern(true)
-			->setEnabled(!$data['limited']),
+			->setReadonly($data['limited']),
 		'correlation_mode_row'
 	)
 	->addRow(
