@@ -998,7 +998,7 @@ void	zbx_tls_init_child(const zbx_config_tls_t *config_tls, zbx_get_program_type
 
 		zbx_check_psk_identity_len(my_psk_identity_len);
 
-		zbx_read_psk_file(config_tls->psk_file);
+		zbx_read_psk_file(config_tls->psk_file, &my_psk, &my_psk_len);
 
 		key.data = (unsigned char *)my_psk;
 		key.size = (unsigned int)my_psk_len;
@@ -2154,4 +2154,15 @@ void	zbx_tls_take_vars(ZBX_THREAD_SENDVAL_TLS_ARGS *args)
 unsigned int	zbx_tls_get_psk_usage(void)
 {
 	return	psk_usage;
+}
+
+/******************************************************************************
+ *                                                                            *
+ * Purpose: TLS cleanup for using in signal handlers                          *
+ *                                                                            *
+ ******************************************************************************/
+void	zbx_tls_free_on_signal(void)
+{
+	if (NULL != my_psk)
+		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
 }

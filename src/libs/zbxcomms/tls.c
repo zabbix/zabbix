@@ -24,9 +24,6 @@
 #include "zbxsysinc.h"
 #include "zbxcrypto.h"
 
-static ZBX_THREAD_LOCAL char		*my_psk			= NULL;
-static ZBX_THREAD_LOCAL size_t		my_psk_len		= 0;
-
 void	zbx_psk_warn_misconfig(const char *psk_identity)
 {
 	zabbix_log(LOG_LEVEL_WARNING, "same PSK identity \"%s\" but different PSK values used in proxy configuration"
@@ -65,7 +62,7 @@ void	zbx_check_psk_identity_len(size_t psk_identity_len)
  *     at runtime.                                                            *
  *                                                                            *
  ******************************************************************************/
-void	zbx_read_psk_file(char *file_name)
+void	zbx_read_psk_file(const char *file_name, char **psk, size_t *psk_len)
 {
 	FILE		*f;
 	size_t		len;
@@ -114,9 +111,9 @@ void	zbx_read_psk_file(char *file_name)
 		goto out;
 	}
 
-	my_psk_len = (size_t)len_bin;
-	my_psk = zbx_malloc(my_psk, my_psk_len);
-	memcpy(my_psk, buf_bin, my_psk_len);
+	*psk_len = (size_t)len_bin;
+	*psk = zbx_malloc(*psk, *psk_len);
+	memcpy(*psk, buf_bin, *psk_len);
 
 	ret = SUCCEED;
 out:
@@ -179,15 +176,4 @@ int	zbx_check_server_issuer_subject(const zbx_socket_t *sock, const char *allowe
 	}
 
 	return SUCCEED;
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: TLS cleanup for using in signal handlers                          *
- *                                                                            *
- ******************************************************************************/
-void	zbx_tls_free_on_signal(void)
-{
-	if (NULL != my_psk)
-		zbx_guaranteed_memset(my_psk, 0, my_psk_len);
 }

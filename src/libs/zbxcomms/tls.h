@@ -30,7 +30,7 @@ ssize_t	zbx_tls_write(zbx_socket_t *s, const char *buf, size_t len, short *event
 ssize_t	zbx_tls_read(zbx_socket_t *s, char *buf, size_t len, short *events, char **error);
 void	zbx_tls_close(zbx_socket_t *s);
 
-void	zbx_read_psk_file(char *file_name);
+void	zbx_read_psk_file(const char *file_name, char **psk, size_t *psk_len);
 void	zbx_check_psk_identity_len(size_t psk_identity_len);
 void	zbx_psk_warn_misconfig(const char *psk_identity);
 
