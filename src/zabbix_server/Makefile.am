@@ -33,8 +33,7 @@ sbin_PROGRAMS = zabbix_server
 noinst_LIBRARIES = libzbxserver.a
 
 libzbxserver_a_SOURCES = \
-	db_lengths_constants.h \
-	zbxreport.h
+	db_lengths_constants.h
 
 libzbxserver_a_CFLAGS = \
 	-DZABBIX_DAEMON \
