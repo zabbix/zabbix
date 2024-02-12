@@ -2866,15 +2866,16 @@ void	zbx_vc_add_new_items(const zbx_vector_uint64_pair_t *items)
 
 		for (i = 0; i < items->values_num; i++)
 		{
-			zbx_vc_item_t	item_local;
-
 			if (NULL != zbx_hashset_search(&vc_cache->items, &items->values[i].first))
 				continue;
 
-			item_local.itemid = items->values[i].first;
-			item_local.value_type = (unsigned char)items->values[i].second;
-			item_local.status = ZBX_ITEM_STATUS_CACHED_ALL;
-			item_local.last_accessed = (int)time(NULL);
+			zbx_vc_item_t	item_local = {
+					.itemid = items->values[i].first,
+					.value_type = (unsigned char)items->values[i].second,
+					.status = ZBX_ITEM_STATUS_CACHED_ALL,
+					.last_accessed = (int)time(NULL)
+
+			};
 
 			if (NULL == zbx_hashset_insert(&vc_cache->items, &item_local, sizeof(item_local)))
 			{
