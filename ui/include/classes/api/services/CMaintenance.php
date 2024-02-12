@@ -97,112 +97,66 @@ class CMaintenance extends CApiService {
 		$this->checkDeprecatedParam($options, 'selectGroups');
 
 		// editable + PERMISSION CHECK
-		$maintenanceids = [];
-		if (self::$userData['type'] == USER_TYPE_SUPER_ADMIN || $options['nopermissions']) {
-			if (!is_null($options['groupids']) || !is_null($options['hostids'])) {
-				if (!is_null($options['groupids'])) {
-					zbx_value2array($options['groupids']);
-					$res = DBselect(
-						'SELECT mmg.maintenanceid'.
-						' FROM maintenances_groups mmg'.
-						' WHERE '.dbConditionInt('mmg.groupid', $options['groupids'])
-					);
-					while ($maintenance = DBfetch($res)) {
-						$maintenanceids[] = $maintenance['maintenanceid'];
-					}
-				}
-
-				$sql = 'SELECT mmh.maintenanceid'.
-						' FROM maintenances_hosts mmh,hosts_groups hg'.
-						' WHERE hg.hostid=mmh.hostid';
-
-				if (!is_null($options['groupids'])) {
-					zbx_value2array($options['groupids']);
-					$sql .= ' AND '.dbConditionInt('hg.groupid', $options['groupids']);
-				}
-
-				if (!is_null($options['hostids'])) {
-					zbx_value2array($options['hostids']);
-					$sql .= ' AND '.dbConditionInt('hg.hostid', $options['hostids']);
-				}
-				$res = DBselect($sql);
-				while ($maintenance = DBfetch($res)) {
-					$maintenanceids[] = $maintenance['maintenanceid'];
-				}
-				$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
+		if (self::$userData['type'] != USER_TYPE_SUPER_ADMIN && !$options['nopermissions']) {
+			if (self::$userData['ugsetid'] == 0) {
+				return $options['countOutput'] ? '0' : [];
 			}
-		}
-		else {
-			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
+
+			$permission_condition = $options['editable']
+				? ' AND (p.permission IS NULL OR p.permission < '.PERM_READ_WRITE.')'
+				: ' AND p.permission IS NULL';
+
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_hosts mh'.
+				' JOIN host_hgset hh ON mh.hostid=hh.hostid'.
+				' LEFT JOIN permission p ON hh.hgsetid=p.hgsetid'.
+					' AND p.ugsetid='.self::$userData['ugsetid'].
+				' WHERE m.maintenanceid=mh.maintenanceid'.
+					$permission_condition.
+			')';
+
 			$userGroups = getUserGroupsByUserId(self::$userData['userid']);
+			$permission = $options['editable'] ? PERM_READ_WRITE : PERM_READ;
 
-			$sql = 'SELECT m.maintenanceid'.
-					' FROM maintenances m'.
-					' WHERE NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM maintenances_hosts mh,hosts_groups hg'.
-							' LEFT JOIN rights r'.
-								' ON r.id=hg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $userGroups).
-						' WHERE m.maintenanceid=mh.maintenanceid'.
-							' AND mh.hostid=hg.hostid'.
-						' GROUP by mh.hostid'.
-						' HAVING MIN(r.permission) IS NULL'.
-							' OR MIN(r.permission)='.PERM_DENY.
-							' OR MAX(r.permission)<'.zbx_dbstr($permission).
-						')'.
-					' AND NOT EXISTS ('.
-						'SELECT NULL'.
-						' FROM maintenances_groups mg'.
-							' LEFT JOIN rights r'.
-								' ON r.id=mg.groupid'.
-									' AND '.dbConditionInt('r.groupid', $userGroups).
-						' WHERE m.maintenanceid=mg.maintenanceid'.
-						' GROUP by mg.groupid'.
-						' HAVING MIN(r.permission) IS NULL'.
-							' OR MIN(r.permission)='.PERM_DENY.
-							' OR MAX(r.permission)<'.zbx_dbstr($permission).
-						')';
+			$sqlParts['where'][] = 'NOT EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_groups mg'.
+				' LEFT JOIN rights r ON mg.groupid=r.id'.
+					' AND '.dbConditionId('r.groupid', $userGroups).
+				' WHERE m.maintenanceid=mg.maintenanceid'.
+				' GROUP by mg.groupid'.
+				' HAVING MIN(r.permission) IS NULL'.
+					' OR MIN(r.permission)='.PERM_DENY.
+					' OR MAX(r.permission)<'.zbx_dbstr($permission).
+			')';
+		}
 
-			if (!is_null($options['groupids'])) {
-				zbx_value2array($options['groupids']);
-				$sql .= ' AND ('.
-						'EXISTS ('.
-							'SELECT NULL'.
-								' FROM maintenances_groups mg'.
-								' WHERE m.maintenanceid=mg.maintenanceid'.
-								' AND '.dbConditionInt('mg.groupid', $options['groupids']).
-							')'.
-						' OR EXISTS ('.
-							'SELECT NULL'.
-								' FROM maintenances_hosts mh,hosts_groups hg'.
-								' WHERE m.maintenanceid=mh.maintenanceid'.
-									' AND mh.hostid=hg.hostid'.
-									' AND '.dbConditionInt('hg.groupid', $options['groupids']).
-							')'.
-						')';
-			}
+		if ($options['groupids'] !== null) {
+			$sqlParts['where'][] = '('.
+				'EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_groups mg'.
+					' WHERE m.maintenanceid=mg.maintenanceid'.
+						' AND '.dbConditionId('mg.groupid', $options['groupids']).
+				')'.
+				' OR EXISTS ('.
+					'SELECT NULL'.
+					' FROM maintenances_hosts mh,hosts_groups hg'.
+					' WHERE m.maintenanceid=mh.maintenanceid'.
+						' AND mh.hostid=hg.hostid'.
+						' AND '.dbConditionId('hg.groupid', $options['groupids']).
+				')'.
+			')';
+		}
 
-			if (!is_null($options['hostids'])) {
-				zbx_value2array($options['hostids']);
-				$sql .= ' AND EXISTS ('.
-						'SELECT NULL'.
-							' FROM maintenances_hosts mh'.
-							' WHERE m.maintenanceid=mh.maintenanceid'.
-								' AND '.dbConditionInt('mh.hostid', $options['hostids']).
-						')';
-			}
-
-			if (!is_null($options['maintenanceids'])) {
-				zbx_value2array($options['maintenanceids']);
-				$sql .= ' AND '.dbConditionInt('m.maintenanceid', $options['maintenanceids']);
-			}
-
-			$res = DBselect($sql);
-			while ($maintenance = DBfetch($res)) {
-				$maintenanceids[] = $maintenance['maintenanceid'];
-			}
-			$sqlParts['where'][] = dbConditionInt('m.maintenanceid', $maintenanceids);
+		if ($options['hostids'] !== null) {
+			$sqlParts['where'][] = 'EXISTS ('.
+				'SELECT NULL'.
+				' FROM maintenances_hosts mh'.
+				' WHERE m.maintenanceid=mh.maintenanceid'.
+					' AND '.dbConditionId('mh.hostid', $options['hostids']).
+			')';
 		}
 
 		// maintenanceids

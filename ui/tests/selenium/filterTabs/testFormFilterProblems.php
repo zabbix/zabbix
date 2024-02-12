@@ -231,9 +231,9 @@ class testFormFilterProblems extends testFormFilter {
 		return [
 			[
 				[
-					'Hosts' => ['Host for tag permissions'],
-					'Not classified' => true,
-					'Show tags' => '2'
+					'Hosts' => ['Host for triggers filtering'],
+					'Average' => true,
+					'Show tags' => '1'
 				]
 			],
 			[

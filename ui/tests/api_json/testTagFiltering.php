@@ -390,7 +390,7 @@ class testTagFiltering extends CAPITest {
 					'Template OS - Windows'
 				]
 			],
-			'templates-equals-unexisting-value-tag' => [
+			'templates-equals-nonexistent-value-tag' => [
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_AND_OR,
 					'tags' => [
@@ -515,7 +515,7 @@ class testTagFiltering extends CAPITest {
 					'Template Browser - FF', 'Template OS - Ubuntu Bionic Beaver', 'Template OS - Windows'
 				]
 			],
-			'templates-not-equal-one-of-two-unexisting-tags' => [
+			'templates-not-equal-one-of-two-nonexistent-tags' => [
 				'filter' => [
 					'evaltype' => TAG_EVAL_TYPE_OR,
 					'tags' => [

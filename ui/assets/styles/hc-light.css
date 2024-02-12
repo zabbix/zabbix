@@ -3367,7 +3367,12 @@ section {
 .svg-gauge {
   fill: #000000; }
   .svg-gauge .svg-gauge-description {
-    text-anchor: middle; }
+    text-align: center;
+    white-space: nowrap;
+    color: #000000; }
+    .svg-gauge .svg-gauge-description div {
+      overflow: hidden;
+      text-overflow: ellipsis; }
   .svg-gauge .svg-gauge-thresholds-arc-sector,
   .svg-gauge .svg-gauge-empty-arc-sector {
     fill: #f3f3f3; }
@@ -3467,6 +3472,8 @@ section {
     fill: #333333; }
 
 .svg-pie-chart-legend {
+  position: relative;
+  top: 4px;
   box-sizing: border-box;
   display: grid;
   grid-template-columns: repeat(var(--columns, 4), auto);
@@ -6361,23 +6368,20 @@ span.is-loading {
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
   overflow: hidden; }
 
-.menu-popup-preloader,
-.hintbox-preloader {
+.menu-popup-preloader {
   background: #ffffff;
   border: 1px solid #383838;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  height: 128px;
-  width: 128px;
+  height: 50px;
+  width: 50px;
   position: fixed;
   right: auto;
   bottom: auto;
   z-index: 1010; }
-  .menu-popup-preloader::before,
-  .hintbox-preloader::before {
-    background: #ffffff; }
 
 .hintbox-preloader {
-  position: absolute; }
+  height: 50px;
+  width: 50px; }
 
 .browser-logo-chrome, .browser-logo-ff, .browser-logo-ed, .browser-logo-opera, .browser-logo-safari {
   background: url("../img/browser-sprite.png?20220722") no-repeat;

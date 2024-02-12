@@ -256,7 +256,7 @@ class C10ImportConverter extends CConverter {
 				}
 			}
 
-			// If a least one IPMI item exists on a host, create an IPMI interface.
+			// If at least one IPMI item exists on a host, create an IPMI interface.
 			if ($hasIpmiItem) {
 				if (array_key_exists('ipmi_ip', $host) && $host['ipmi_ip'] !== '') {
 					$ip_parser = new CIPParser(['v6' => ZBX_HAVE_IPV6]);

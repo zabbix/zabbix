@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-10-19 13:48+0300\n"
-"PO-Revision-Date: 2024-01-15 12:42+0000\n"
+"PO-Revision-Date: 2024-01-28 21:34+0000\n"
 "Last-Translator: Vicente Salvador <vicentesalvadorcubedo@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: es\n"
@@ -448,44 +448,44 @@ msgstr "Métodos de API"
 
 #: app/controllers/CControllerAuditLogList.php:222
 msgid "API token"
-msgstr "Testigo de API"
+msgstr "Token de API"
 
 #: include/classes/api/services/CToken.php:287
 #, c-format
 msgid "API token \"%1$s\" already exists for userid \"%2$s\"."
-msgstr "El testigo de la API \"%1$s\" ya existe para el ID de usuario \"%2$s\"."
+msgstr "El token de la API \"%1$s\" ya existe para el ID de usuario \"%2$s\"."
 
 #: app/controllers/CControllerTokenCreate.php:116
 #: app/controllers/CControllerTokenCreate.php:129
 msgid "API token added"
-msgstr "Testigo de API añadido"
+msgstr "Token de API añadido"
 
 #: app/controllers/CControllerTokenDelete.php:64
 msgid "API token deleted"
 msgid_plural "API tokens deleted"
-msgstr[0] "Testigo de API borrado"
-msgstr[1] "Testigos de API borrados"
+msgstr[0] "Token de API borrado"
+msgstr[1] "Tokens de API borrados"
 
 #: app/controllers/CControllerTokenDisable.php:63
 msgid "API token disabled"
 msgid_plural "API tokens disabled"
-msgstr[0] "Testigo de API desactivado"
-msgstr[1] "Testigos de API desactivados"
+msgstr[0] "Token de API desactivado"
+msgstr[1] "Tokens de API desactivados"
 
 #: app/controllers/CControllerTokenEnable.php:63
 msgid "API token enabled"
 msgid_plural "API tokens enabled"
-msgstr[0] "Testigo de API activado"
-msgstr[1] "Testigos de API activados"
+msgstr[0] "Token de API activado"
+msgstr[1] "Tokens de API activados"
 
 #: include/classes/api/services/CUser.php:1807
 msgid "API token expired."
-msgstr "Testigo de API caducado."
+msgstr "Token de API caducado."
 
 #: app/controllers/CControllerTokenUpdate.php:107
 #: app/controllers/CControllerTokenUpdate.php:135
 msgid "API token updated"
-msgstr "Testigo de API actualizado"
+msgstr "Token de API actualizado"
 
 #: app/controllers/CControllerPopupTokenEdit.php:116
 #: app/controllers/CControllerPopupTokenView.php:75
@@ -497,7 +497,7 @@ msgstr "Testigo de API actualizado"
 #: include/classes/helpers/CMenuHelper.php:467
 #: include/classes/helpers/CRoleHelper.php:495 include/html.inc.php:848
 msgid "API tokens"
-msgstr "Testigos de API"
+msgstr "Tokens de API"
 
 #: widgets/gauge/includes/WidgetForm.php:265
 #: widgets/item/includes/WidgetForm.php:209
@@ -748,7 +748,7 @@ msgstr "Activo"
 
 #: include/hosts.inc.php:497
 msgid "Active checks"
-msgstr "Cheques activos"
+msgstr "Comprobación activa"
 
 #: app/views/maintenance.edit.php:144 app/views/maintenance.list.php:96
 msgid "Active since"
@@ -1524,7 +1524,7 @@ msgstr "Tal cual"
 
 #: include/views/monitoring.history.php:97
 msgid "As plain text"
-msgstr "Como texto sencillo"
+msgstr "Como texto sin formato"
 
 #: app/views/administration.authentication.edit.php:366
 #: app/views/administration.authentication.edit.php:403
@@ -1683,7 +1683,7 @@ msgstr "Agosto"
 
 #: app/views/popup.token.view.php:45
 msgid "Auth token"
-msgstr "Testigo de autenticación"
+msgstr "Token de autenticación"
 
 #: app/views/administration.authentication.edit.php:372
 msgid "AuthN requests"
@@ -6793,7 +6793,7 @@ msgstr "Descartar valor"
 #: include/views/configuration.item.prototype.edit.php:923
 #: include/views/configuration.item.prototype.list.php:74
 msgid "Discover"
-msgstr "Descubrimiento"
+msgstr "Descubrir"
 
 #: app/partials/configuration.filter.items.php:213
 #: app/views/trigger.list.php:142 include/discovery.inc.php:112
@@ -12269,6 +12269,10 @@ msgstr "Longitud de ubicación"
 msgid "Log"
 msgstr "Registro"
 
+#: app/views/administration.audit.settings.edit.php:50
+msgid "Log changes by low-level discovery, network discovery and autoregistration"
+msgstr "Registro de cambios mediante descubrimiento de bajo nivel, descubrimiento de red y registro automático"
+
 #: include/classes/data/CItemData.php:1063
 msgid "Log file monitoring with log rotation support. Returns log"
 msgstr "Monitorización de archivos de registro con soporte para rotación. Devuelve el registro"
@@ -12276,6 +12280,10 @@ msgstr "Monitorización de archivos de registro con soporte para rotación. Devu
 #: include/classes/data/CItemData.php:1049
 msgid "Log file monitoring. Returns log"
 msgstr "Monitorización de archivos de registro. Devuelve el registro"
+
+#: app/views/administration.audit.settings.edit.php:49
+msgid "Log system actions"
+msgstr "Registro de acciones del sistema"
 
 #: app/views/popup.massupdate.item.php:365
 #: include/views/configuration.item.edit.php:948
@@ -12657,7 +12665,7 @@ msgstr "Marcar como causa"
 
 #: include/views/monitoring.sysmap.edit.php:150
 msgid "Mark elements on trigger status change"
-msgstr "Marcar elementos en el cambio de estado del iniciador"
+msgstr "Marcar elementos al cambiar el estado del iniciador"
 
 #: include/views/monitoring.history.php:171
 msgid "Mark others"
@@ -12738,7 +12746,7 @@ msgstr "Período máximo de visualización del historial"
 
 #: app/views/administration.gui.edit.php:99
 msgid "Max number of columns and rows in overview tables"
-msgstr "Número máximo de columnas y filas en tablas de descripción general"
+msgstr "Número máximo de columnas y filas en tablas de vista general"
 
 #: widgets/piechart/includes/WidgetForm.php:209
 #: widgets/svggraph/includes/WidgetForm.php:359
@@ -13314,7 +13322,7 @@ msgstr "Silenciar"
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
-msgstr "Mi"
+msgstr "Mio"
 
 #: include/classes/helpers/CServiceHelper.php:37
 #: include/classes/helpers/CServiceHelper.php:47
@@ -15594,7 +15602,7 @@ msgstr "Algoritmo de colocación"
 #: app/views/mediatype.edit.php:274 include/classes/setup/CSetupWizard.php:559
 #: widgets/plaintext/Widget.php:29
 msgid "Plain text"
-msgstr "Texto plano"
+msgstr "Texto sin formato"
 
 #: app/views/administration.user.edit.php:761
 #: app/views/administration.user.edit.php:796
@@ -16205,7 +16213,7 @@ msgstr "Detalles de la cola"
 #: app/views/administration.queue.overview.proxy.php:33
 #: include/classes/helpers/CMenuHelper.php:389
 msgid "Queue overview"
-msgstr "Descripción general de la cola"
+msgstr "Vista general de la cola"
 
 #: app/views/administration.queue.details.php:36
 #: app/views/administration.queue.overview.php:36
@@ -16213,7 +16221,7 @@ msgstr "Descripción general de la cola"
 #: app/views/administration.queue.overview.proxy.php:36
 #: include/classes/helpers/CMenuHelper.php:391
 msgid "Queue overview by proxy"
-msgstr "Descripción general por proxy"
+msgstr "Vista general por proxy"
 
 #: include/classes/graph/CSvgGraph.php:1480 include/events.inc.php:304
 msgid "RESOLVED"
@@ -20034,7 +20042,7 @@ msgstr "Tendencias"
 #: include/views/js/monitoring.sysmaps.js.php:813 jsLoader.php:257
 #: jsLoader.php:386 widgets/toptriggers/views/widget.view.php:32
 msgid "Trigger"
-msgstr "Iniciadores"
+msgstr "Iniciador"
 
 #: include/classes/api/services/CTriggerGeneral.php:744
 #, c-format
@@ -20176,7 +20184,7 @@ msgstr "Límite de iniciador"
 
 #: widgets/trigover/Widget.php:29
 msgid "Trigger overview"
-msgstr "Descripción general del iniciador"
+msgstr "Vista general de iniciador"
 
 #: app/controllers/CControllerAuditLogList.php:258
 #: app/views/popup.lldoperation.php:50 app/views/trigger.massupdate.php:181
@@ -23112,7 +23120,7 @@ msgstr "se espera un entero sin signo"
 
 #: app/views/administration.authentication.edit.php:112
 msgid "an uppercase and a lowercase Latin letter"
-msgstr "una letra latina mayúscula y minúscula"
+msgstr "una letra latina mayúscula y una minúscula"
 
 #: app/views/administration.geomaps.edit.php:47
 msgid "and"
@@ -24446,9 +24454,29 @@ msgstr "now() - Número de segundos desde la Época"
 msgid "number"
 msgstr "número"
 
+#: include/classes/api/services/CUser.php:852
+msgid "object does not exist"
+msgstr "el objeto no existe"
+
 #: include/classes/api/services/CHostPrototype.php:836
 msgid "object does not exist or belongs to another object"
 msgstr "el objeto no existe o pertenece a otro objeto"
+
+#: include/classes/api/services/CHostBase.php:146
+#: include/classes/api/services/CHostBase.php:174
+#: include/classes/api/services/CHostGeneral.php:89
+#: include/classes/api/services/CHostGroup.php:1096
+#: include/classes/api/services/CHostGroup.php:1120
+#: include/classes/api/services/CHost.php:913
+#: include/classes/api/services/CHost.php:1262
+#: include/classes/api/services/CHost.php:1369
+#: include/classes/api/services/CTemplateGroup.php:767
+#: include/classes/api/services/CTemplateGroup.php:791
+#: include/classes/api/services/CTemplate.php:903
+#: include/classes/api/services/CTemplate.php:986
+#: include/classes/api/services/CTemplate.php:1066
+msgid "object does not exist, or you have no permissions to it"
+msgstr "el objeto no existe o no tiene permisos para ello"
 
 #: include/blocks.inc.php:506 widgets/problemhosts/views/widget.view.php:136
 msgid "of"

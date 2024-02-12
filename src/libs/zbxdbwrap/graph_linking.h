@@ -23,6 +23,6 @@
 #include "zbxcommon.h"
 #include "zbxalgo.h"
 
-int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids);
+int	DBcopy_template_graphs(zbx_uint64_t hostid, const zbx_vector_uint64_t *templateids, int audit_context_mode);
 
 #endif

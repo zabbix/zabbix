@@ -96,7 +96,6 @@ $available_js = [
 	'class.crangecontrol.js' => '',
 	'class.csuggest.js' => '',
 	'class.csvggraph.js' => '',
-	'class.csvggauge.js' => '',
 	'class.curl.js' => '',
 	'class.form.fieldset.collapsible.js' => '',
 	'class.overlaycollection.js' => '',
