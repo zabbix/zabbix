@@ -493,6 +493,9 @@ class HostInterfaceManager {
 					break;
 
 				case 'radio':
+					el.readOnly = true;
+					el.disabled = true;
+					break;
 				case 'checkbox':
 					const {checked, name, value} = el;
 					el.disabled = true;

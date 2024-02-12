@@ -161,7 +161,7 @@ $trigger_form_grid->addItem([new CLabel(_('OK event generation'), 'recovery_mode
 		->addValue(_('Recovery expression'), ZBX_RECOVERY_MODE_RECOVERY_EXPRESSION)
 		->addValue(_('None'), ZBX_RECOVERY_MODE_NONE)
 		->setModern()
-		->setEnabled(!$readonly)
+		->setReadonly($readonly)
 	)
 ]);
 
@@ -239,7 +239,7 @@ $trigger_form_grid
 			->addValue(_('Single'), TRIGGER_MULT_EVENT_DISABLED)
 			->addValue(_('Multiple'), TRIGGER_MULT_EVENT_ENABLED)
 			->setModern()
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 		)
 	])
 	->addItem([new CLabel(_('OK event closes'), 'correlation_mode'),
@@ -247,7 +247,7 @@ $trigger_form_grid
 			->addValue(_('All problems'), ZBX_TRIGGER_CORRELATION_NONE)
 			->addValue(_('All problems if tag values match'), ZBX_TRIGGER_CORRELATION_TAG)
 			->setModern()
-			->setEnabled(!$readonly)
+			->setReadonly($readonly)
 		))->setId('ok-event-closes')
 	])
 	->addItem([(new CLabel(_('Tag for matching'), 'correlation_tag'))->setAsteriskMark(),

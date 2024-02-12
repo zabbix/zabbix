@@ -136,13 +136,18 @@ window.proxy_edit_popup = new class {
 			}
 		}
 
-		const custom_timeouts_disabled =
-			this.form.querySelector('#custom_timeouts input:checked').value == <?= ZBX_PROXY_CUSTOM_TIMEOUTS_DISABLED ?>;
+		const custom_timeouts_enabled =
+			this.form.querySelector('#custom_timeouts input:checked').value == <?= ZBX_PROXY_CUSTOM_TIMEOUTS_ENABLED ?>;
 
 		for (const id of ['timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent',
 				'timeout_external_check', 'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent',
 				'timeout_telnet_agent', 'timeout_script']) {
-			document.getElementById(id).disabled = custom_timeouts_disabled;
+			if (custom_timeouts_enabled) {
+				document.getElementById(id).removeAttribute('readonly');
+			}
+			else {
+				document.getElementById(id).setAttribute('readonly', 'readonly');
+			}
 		}
 	}
 

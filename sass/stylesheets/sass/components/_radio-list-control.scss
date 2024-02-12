@@ -91,5 +91,14 @@
 			cursor: default;
 			@extend %form-disabled;
 		}
+
+		&:checked[readonly] + label {
+			background-color: lighten($ui-bg-selected-color, 33%) !important;
+			@extend %form-readonly;
+		}
+
+		&[readonly] + label {
+			@extend %form-readonly;
+		}
 	}
 }
