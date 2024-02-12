@@ -29,9 +29,6 @@ int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 	zbx_vector_portrange_t	port_ranges;
 	zbx_dc_dcheck_t		*dcheck = task->dchecks.values[task->range.state.index_dcheck];
 
-	if (0 == task->range.state.count)
-		return FAIL;
-
 	zbx_vector_portrange_create(&port_ranges);
 	dcheck_port_ranges_get(dcheck->ports, &port_ranges);
 	ret = zbx_portrange_uniq_iter(port_ranges.values, port_ranges.values_num, &task->range.state.index_port,
@@ -39,10 +36,7 @@ int	discoverer_range_check_iter(zbx_discoverer_task_t *task)
 	zbx_vector_portrange_destroy(&port_ranges);
 
 	if (SUCCEED == ret)
-	{
-		task->range.state.count--;
 		return SUCCEED;
-	}
 
 	task->range.state.port = ZBX_PORTRANGE_INIT_PORT;
 

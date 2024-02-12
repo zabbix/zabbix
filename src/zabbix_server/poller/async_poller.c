@@ -488,7 +488,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 	zbx_uint32_t			rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
 	int				msgs_num;
 #ifdef HAVE_LIBCURL
-	zbx_asynchttppoller_config	*asynchttppoller_config;
+	zbx_asynchttppoller_config	*asynchttppoller_config = NULL;
 #endif
 	msgs_num = ZBX_POLLER_TYPE_SNMP == poller_type ? 1 : 0;
 
