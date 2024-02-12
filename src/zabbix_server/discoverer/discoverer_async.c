@@ -493,7 +493,7 @@ static int	discovery_telnet(discovery_poller_config_t *poller_config, const zbx_
 }
 
 #ifdef HAVE_LIBCURL
-void	discoverer_finalize_http_result(void *data)
+void	process_http_result(void *data)
 {
 	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
 	discovery_async_result_t		*async_result = (discovery_async_result_t *)http_context->async_result;
@@ -607,8 +607,12 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zbx_vector_portrange_create(&port_ranges);
 	*first_ip = '\0';
 #ifdef HAVE_LIBCURL
-	if (SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task))
-		http_config = zbx_async_httpagent_create(poller_config.base, process_http_result, NULL, &poller_config);
+	if ((SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)) && NULL == (http_config =
+			zbx_async_httpagent_create(poller_config.base, process_http_response, NULL, &poller_config,
+			error)))
+	{
+			goto out;
+	}
 #endif
 	if (0 == memcmp(task->range.state.ipaddress, z,
 			ZBX_IPRANGE_V4 == task->range.ipranges->values[task->range.state.index_ip].type ?
@@ -727,9 +731,8 @@ out:	/* try to close all handles if they are exhausted */
 	zbx_vector_discoverer_results_ptr_clear_ext(&results, results_free);	/* Incomplete results*/
 	zbx_vector_discoverer_results_ptr_destroy(&results);
 	zbx_vector_portrange_destroy(&port_ranges);
-
 #ifdef HAVE_LIBCURL
-	if (SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task))
+	if (NULL != http_config && (SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task)))
 	{
 		zbx_async_httpagent_clean(http_config);
 		zbx_free(http_config);

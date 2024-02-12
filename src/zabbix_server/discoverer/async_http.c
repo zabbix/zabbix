@@ -53,7 +53,7 @@ stop:
 	return task_ret;
 }
 
-void	process_http_result(CURL *easy_handle, CURLcode err, void *arg)
+void	process_http_response(CURL *easy_handle, CURLcode err, void *arg)
 {
 	zbx_discovery_async_http_context_t	*http_context;
 	discovery_poller_config_t		*poller_config = (discovery_poller_config_t *)arg;
@@ -68,14 +68,14 @@ void	process_http_result(CURL *easy_handle, CURLcode err, void *arg)
 	if (CURLE_OK != err)
 	{
 		http_context->res = FAIL;
-		discoverer_finalize_http_result(http_context);
+		process_http_result(http_context);
 	}
 	else
 	{
 		http_context->res = SUCCEED;
 		zbx_async_poller_add_task(poller_config->base, poller_config->dnsbase,
 				http_context->async_result->dresult->ip, http_context, http_context->config_timeout,
-				http_task_process, discoverer_finalize_http_result);
+				http_task_process, process_http_result);
 	}
 }
 

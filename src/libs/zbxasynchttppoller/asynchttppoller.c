@@ -217,7 +217,7 @@ void	zbx_async_httpagent_init(void)
 
 zbx_asynchttppoller_config	*zbx_async_httpagent_create(struct event_base *ev,
 		process_httpagent_result_callback_fn process_httpagent_result_callback,
-		httpagent_action_callback_fn httpagent_action_callback, void *arg)
+		httpagent_action_callback_fn httpagent_action_callback, void *arg, char **error)
 {
 	CURLMcode			merr;
 	zbx_asynchttppoller_config	*asynchttppoller_config = zbx_malloc(NULL ,sizeof(zbx_asynchttppoller_config));
@@ -229,45 +229,52 @@ zbx_asynchttppoller_config	*zbx_async_httpagent_create(struct event_base *ev,
 
 	if (NULL == (asynchttppoller_config->curl_handle = curl_multi_init()))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot initialize cURL multi session");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot initialize cURL multi session");
+		goto err;
 	}
 
 	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_SOCKETFUNCTION,
 			handle_socket)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETFUNCTION: %s", curl_multi_strerror(merr));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot set CURLMOPT_SOCKETFUNCTION: %s", curl_multi_strerror(merr));
+		goto err;
 	}
 
 	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_SOCKETDATA,
 			asynchttppoller_config)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_SOCKETDATA: %s", curl_multi_strerror(merr));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot set CURLMOPT_SOCKETDATA: %s", curl_multi_strerror(merr));
+		goto err;
 	}
 
 	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_TIMERFUNCTION,
 			start_timeout)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_TIMERFUNCTION: %s", curl_multi_strerror(merr));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot set CURLMOPT_TIMERFUNCTION: %s", curl_multi_strerror(merr));
+		goto err;
 	}
 
 	if (CURLM_OK != (merr = curl_multi_setopt(asynchttppoller_config->curl_handle, CURLMOPT_TIMERDATA,
 			asynchttppoller_config)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "Cannot set CURLMOPT_TIMERDATA: %s", curl_multi_strerror(merr));
-		exit(EXIT_FAILURE);
+		*error = zbx_dsprintf(*error, "cannot set CURLMOPT_TIMERDATA: %s", curl_multi_strerror(merr));
+		goto err;
 	}
 
 	if (NULL == (asynchttppoller_config->curl_timeout = evtimer_new(ev, on_timeout, asynchttppoller_config)))
 	{
-		zabbix_log(LOG_LEVEL_ERR, "cannot create timer event");
-		exit(EXIT_FAILURE);
+		*error = zbx_strdup(*error, "cannot create timer event");
+		goto err;
 	}
 
 	return asynchttppoller_config;
+err:
+	if (NULL != asynchttppoller_config->curl_handle)
+		curl_multi_cleanup(asynchttppoller_config->curl_handle);
+
+	zbx_free(asynchttppoller_config);
+
+	return NULL;
 }
 
 void	zbx_async_httpagent_clean(zbx_asynchttppoller_config *asynchttppoller_config)
