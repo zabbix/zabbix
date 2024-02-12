@@ -78,7 +78,7 @@ int	discoverer_task_compare(const void *d1, const void *d2)
 	const zbx_discoverer_task_t	*task2 = (const zbx_discoverer_task_t *)d2;
 
 	ZBX_RETURN_IF_NOT_EQUAL(task1->range.id, task2->range.id);
-	ZBX_RETURN_IF_NOT_EQUAL(task1->dchecks.values[0]->type, task2->dchecks.values[0]->type);
+	ZBX_RETURN_IF_NOT_EQUAL(GET_DTYPE(task1), GET_DTYPE(task2));
 
 	return 0;
 }

@@ -28,6 +28,8 @@
 #define DISCOVERER_WORKER_INIT_NONE	0x00
 #define DISCOVERER_WORKER_INIT_THREAD	0x01
 
+#define GET_DTYPE(t)	t->dchecks.values[0]->type
+
 typedef struct
 {
 	zbx_uint64_t	druleid;

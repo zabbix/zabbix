@@ -280,7 +280,7 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
 
 	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 	{
-		if (SVC_ICMPPING == task->dchecks.values[0]->type)
+		if (SVC_ICMPPING == GET_DTYPE(task))
 			continue;
 
 		task->range.state.count = task->range.state.checks_per_ip * ips_num;

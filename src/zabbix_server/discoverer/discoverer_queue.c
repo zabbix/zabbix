@@ -20,6 +20,7 @@
 #include "discoverer_queue.h"
 #include "discoverer_job.h"
 #include "zbx_discoverer_constants.h"
+#include "discoverer_int.h"
 
 #define DISCOVERER_QUEUE_INIT_NONE	0x00
 #define DISCOVERER_QUEUE_INIT_LOCK	0x01
@@ -104,7 +105,7 @@ zbx_discoverer_job_t	*discoverer_queue_pop(zbx_discoverer_queue_t *queue)
 		if (SUCCEED != zbx_list_peek(&job->tasks, (void*)&task))
 			break;
 
-		if (SVC_SNMPv3 != task->dchecks.values[0]->type)
+		if (SVC_SNMPv3 != GET_DTYPE(task))
 			break;
 
 		if (0 != queue->snmpv3_allowed_workers)

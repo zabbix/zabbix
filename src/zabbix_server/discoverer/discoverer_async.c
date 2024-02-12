@@ -661,7 +661,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 	zbx_vector_portrange_create(&port_ranges);
 	*first_ip = '\0';
 #ifdef HAVE_LIBCURL
-	if (SVC_HTTP == task->dchecks.values[0]->type || SVC_HTTPS == task->dchecks.values[0]->type)
+	if (SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task))
 		http_config = zbx_async_httpagent_create(poller_config.base, process_http_result, NULL, &poller_config);
 #endif
 	if (0 == memcmp(task->range.state.ipaddress, z,
@@ -783,7 +783,7 @@ out:	/* try to close all handles if they are exhausted */
 	zbx_vector_portrange_destroy(&port_ranges);
 
 #ifdef HAVE_LIBCURL
-	if (SVC_HTTP == task->dchecks.values[0]->type || SVC_HTTPS == task->dchecks.values[0]->type)
+	if (SVC_HTTP == GET_DTYPE(task) || SVC_HTTPS == GET_DTYPE(task))
 	{
 		zbx_async_httpagent_clean(http_config);
 		zbx_free(http_config);

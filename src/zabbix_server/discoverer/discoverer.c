@@ -1288,7 +1288,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			{
 				ret = discoverer_net_check_common(druleid, task);
 			}
-			else if (SVC_ICMPPING == task->dchecks.values[0]->type)
+			else if (SVC_ICMPPING == GET_DTYPE(task))
 			{
 				ret = discoverer_net_check_icmp(druleid, task, worker_max, &worker->stop, &error);
 			}
@@ -1304,7 +1304,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 						worker->worker_id, job->druleid, error);
 			}
 
-			dcheck_type = task->dchecks.values[0]->type;
+			dcheck_type = GET_DTYPE(task);
 			discoverer_task_free(task);
 			zbx_timekeeper_update(worker->timekeeper, worker->worker_id - 1, ZBX_PROCESS_STATE_IDLE);
 
