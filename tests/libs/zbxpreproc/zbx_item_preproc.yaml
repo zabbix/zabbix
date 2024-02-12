@@ -4430,4 +4430,17 @@ in:
 out:
   return: FAIL
   error: custom error 123
+---
+test case: btoa in JavaScript - binary
+in:
+  value:
+    value_type: ITEM_VALUE_TYPE_STR
+    time: 2017-10-29 03:15:00 +03:00
+    data: "k"
+  step:
+    type: ZBX_PREPROC_SCRIPT
+    params: "return btoa(new Uint8Array([49, 0, 51]));"
+out:
+  return: SUCCEED
+  value: 'MQAz'
 ...

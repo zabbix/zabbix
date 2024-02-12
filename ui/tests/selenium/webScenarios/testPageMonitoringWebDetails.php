@@ -204,6 +204,7 @@ class testPageMonitoringWebDetails extends CWebTest {
 
 		// Test Kiosk mode.
 		$this->query('xpath://button[@title="Kiosk mode"]')->one()->click();
+		$this->query('xpath://button[@title="Normal view"]')->waitUntilPresent();
 		$this->page->waitUntilReady();
 
 		// Check that Header and Filter disappeared.

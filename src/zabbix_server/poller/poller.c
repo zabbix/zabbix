@@ -290,6 +290,7 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 		{
 			case ITEM_TYPE_ZABBIX:
 			case ITEM_TYPE_ZABBIX_ACTIVE:
+			case ITEM_TYPE_EXTERNAL:
 				if (ZBX_MACRO_EXPAND_NO == expand_macros)
 					break;
 
@@ -505,14 +506,6 @@ void	zbx_prepare_items(zbx_dc_item_t *items, int *errcodes, int num, AGENT_RESUL
 				zbx_substitute_simple_macros_unmasked(NULL, NULL, NULL, NULL, &items[i].host.hostid,
 						NULL, NULL, NULL, NULL, NULL, NULL, NULL, &items[i].password,
 						ZBX_MACRO_TYPE_COMMON, NULL, 0);
-				break;
-			case ITEM_TYPE_EXTERNAL:
-				if (ZBX_MACRO_EXPAND_NO == expand_macros)
-					break;
-
-				zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &items[i].host.hostid, NULL, NULL,
-						NULL, NULL, NULL, NULL, NULL, &timeout, ZBX_MACRO_TYPE_COMMON, NULL,
-						0);
 				break;
 		}
 
@@ -841,7 +834,7 @@ ZBX_THREAD_ENTRY(poller_thread, args)
 	zbx_get_progname_cb = poller_args_in->zbx_get_progname_cb_arg;
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
 	zbx_tls_init_child(poller_args_in->config_comms->config_tls,
-			poller_args_in->zbx_get_program_type_cb_arg);
+			poller_args_in->zbx_get_program_type_cb_arg, zbx_dc_get_psk_by_identity);
 #endif
 	if (ZBX_POLLER_TYPE_HISTORY == poller_type)
 	{
