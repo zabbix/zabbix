@@ -45,6 +45,7 @@ typedef struct
 }
 zbx_discovery_async_http_context_t;
 
+void	process_http_result(CURL *easy_handle, CURLcode err, void *arg);
 void	zbx_discovery_async_http_context_destroy(zbx_discovery_async_http_context_t *http_ctx);
 int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_source_ip, int timeout, const char *ip,
 		unsigned short port, unsigned char type, zbx_discovery_async_http_context_t *http_ctx, char **error);

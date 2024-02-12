@@ -17,7 +17,6 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 #include "async_http.h"
 #include "zbxcommon.h"
 #include "zbxip.h"
@@ -25,6 +24,60 @@
 #include "zbxhttp.h"
 
 #ifdef HAVE_LIBCURL
+
+static int	http_task_process(short event, void *data, int *fd, const char *addr, char *dnserr)
+{
+	int					 task_ret = ZBX_ASYNC_TASK_STOP;
+	zbx_discovery_async_http_context_t	*http_context = (zbx_discovery_async_http_context_t *)data;
+
+	ZBX_UNUSED(fd);
+	ZBX_UNUSED(dnserr);
+
+	if (ZBX_ASYNC_HTTP_STEP_RDNS == http_context->step)
+	{
+		if (NULL != addr)
+			http_context->reverse_dns = zbx_strdup(NULL, addr);
+
+		goto stop;
+	}
+
+	if (0 != (event & EV_TIMEOUT))
+		goto stop;
+
+	if (ZABBIX_ASYNC_RESOLVE_REVERSE_DNS_YES == http_context->resolve_reverse_dns)
+	{
+		task_ret = ZBX_ASYNC_TASK_RESOLVE_REVERSE;
+		http_context->step = ZBX_ASYNC_HTTP_STEP_RDNS;
+	}
+stop:
+	return task_ret;
+}
+
+void	process_http_result(CURL *easy_handle, CURLcode err, void *arg)
+{
+	zbx_discovery_async_http_context_t	*http_context;
+	discovery_poller_config_t		*poller_config = (discovery_poller_config_t *)arg;
+	CURLcode				err_info;
+
+	if (CURLE_OK != (err_info = curl_easy_getinfo(easy_handle, CURLINFO_PRIVATE, &http_context)))
+	{
+		zabbix_log(LOG_LEVEL_CRIT, "Cannot get pointer to private data: %s", curl_easy_strerror(err_info));
+		THIS_SHOULD_NEVER_HAPPEN;
+	}
+
+	if (CURLE_OK != err)
+	{
+		http_context->res = FAIL;
+		discoverer_finalize_http_result(http_context);
+	}
+	else
+	{
+		http_context->res = SUCCEED;
+		zbx_async_poller_add_task(poller_config->base, poller_config->dnsbase,
+				http_context->async_result->dresult->ip, http_context, http_context->config_timeout,
+				http_task_process, discoverer_finalize_http_result);
+	}
+}
 
 void	zbx_discovery_async_http_context_destroy(zbx_discovery_async_http_context_t *http_ctx)
 {
