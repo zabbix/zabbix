@@ -13,8 +13,26 @@ You can extend it or create your template for your specific needs.
 * Ceph, version 14+
 
 ## Installation
+
 * Configure the Ceph RESTful Module according to [documentation.](https://docs.ceph.com/en/latest/mgr/restful/)
 * Make sure a RESTful API endpoint is available for connection.  
+* Additionally, the `mgr` instance providing the `restful` module requires 
+  extended capabilities for `mon` instances.
+  * Run
+    ```sh
+    ceph auth caps $YOUR_MGR_INSTANCE_NAME mon 'allow *' ...other caps...
+    # Omitting other caps, run `ceph auth ls` to find out what they are on 
+    # your setup.
+
+    # Running `ceph auth caps $YOUR_MGR_INSTANCE_NAME mon 'allow *'` with just
+    # the `mon` capability, will remove all other capabilities from the instance
+    # so make sure to include them all.
+    ```
+  * Restart the `mgr` instance.
+  * Why? - The plugin uses the `restful` module from the `mgr` instance to run 
+    commands that the `mgr` component further executes on other Ceph components 
+    like `mon` and `osd`. The default capabilities are not enough to run 
+    `pg dumg` command, hence the capability boost.
 
 ## Configuration
 The Zabbix agent 2 configuration file is used to configure plugins.
