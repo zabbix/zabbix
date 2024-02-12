@@ -65,6 +65,7 @@ void	zbx_mock_test_entry(void **state)
 		if (ZBX_MOCK_SUCCESS != (error = zbx_mock_out_parameter("func_pos", &param_handle)) ||
 			ZBX_MOCK_SUCCESS != (error = zbx_mock_string(param_handle, &tmp)))
 		{
+			num = 0;
 			fail_msg("Cannot get expected 'func_pos' parameter from test case data: %s",
 				zbx_mock_error_string(error));
 		}

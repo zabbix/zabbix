@@ -146,20 +146,6 @@ static void	lld_rule_clear(zbx_lld_rule_t *rule)
 
 /******************************************************************************
  *                                                                            *
- * Function: lld_worker_free                                                  *
- *                                                                            *
- * Purpose: frees LLD worker                                                  *
- *                                                                            *
- ******************************************************************************/
-static void	lld_worker_free(zbx_lld_worker_t *worker)
-{
-	zbx_free(worker);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_manager_init                                                 *
- *                                                                            *
  * Purpose: initializes LLD manager                                           *
  *                                                                            *
  * Parameters: manager - [IN] the manager to initialize                       *
@@ -199,27 +185,6 @@ static void	lld_manager_init(zbx_lld_manager_t *manager)
 }
 
 /******************************************************************************
- *                                                                            *
- * Function: lld_manager_destroy                                              *
- *                                                                            *
- * Purpose: destroys LLD manager                                              *
- *                                                                            *
- * Parameters: manager - [IN] the manager to destroy                          *
- *                                                                            *
- ******************************************************************************/
-static void	lld_manager_destroy(zbx_lld_manager_t *manager)
-{
-	zbx_binary_heap_destroy(&manager->rule_queue);
-	zbx_hashset_destroy(&manager->rule_index);
-	zbx_queue_ptr_destroy(&manager->free_workers);
-	zbx_hashset_destroy(&manager->workers_client);
-	zbx_vector_ptr_clear_ext(&manager->workers, (zbx_clean_func_t)lld_worker_free);
-	zbx_vector_ptr_destroy(&manager->workers);
-}
-
-/******************************************************************************
- *                                                                            *
- * Function: lld_get_worker_by_client                                         *
  *                                                                            *
  * Purpose: returns worker by connected IPC client data                       *
  *                                                                            *
@@ -687,7 +652,4 @@ ZBX_THREAD_ENTRY(lld_manager_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_service_close(&lld_service);
-	lld_manager_destroy(&manager);
 }

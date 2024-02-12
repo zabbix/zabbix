@@ -378,4 +378,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(expected_values);
 	zbx_free(cfg);
+	zbx_free(CONFIG_FILE);
 }
