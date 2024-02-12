@@ -623,7 +623,7 @@ static void	discoverer_net_check_result_flush(zbx_discoverer_manager_t *dmanager
 		return;
 
 	pthread_mutex_lock(&dmanager->results_lock);
-	discover_results_partrange_merge(&dmanager->results, results, task, force);
+	discoverer_results_partrange_merge(&dmanager->results, results, task, force);
 	pthread_mutex_unlock(&dmanager->results_lock);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() results:%d saved:%d", log_worker_id, __func__, results->values_num,
@@ -682,7 +682,7 @@ int	discoverer_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task
 		if ('\0' == *first_ip)
 			zbx_strlcpy(first_ip, ip, sizeof(first_ip));
 
-		result = discovery_result_create(druleid, task->unique_dcheckid);
+		result = discoverer_result_create(druleid, task->unique_dcheckid);
 		result->ip = zbx_strdup(NULL, ip);
 		zbx_vector_discoverer_results_ptr_append(&results, result);
 
