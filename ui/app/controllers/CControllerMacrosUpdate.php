@@ -16,6 +16,42 @@
 
 class CControllerMacrosUpdate extends CController {
 
+	protected function init(): void {
+		$this->setInputValidationMethod(self::INPUT_VALIDATION_FORM);
+		$this->setPostContentType(self::POST_CONTENT_TYPE_JSON);
+	}
+
+	static function getValidationRules() {
+		return ['object', 'fields' => [
+			'macros' => ['objects',
+				'uniq' => [['macro']],
+				'fields' => [
+					'globalmacroid' => ['db globalmacro.globalmacroid'],
+					'macro' => [
+						['db globalmacro.macro',
+							'use' => [CUserMacroParser::class, []],
+							'messages' => ['use' => _('Expected user macro format is "{$MACRO}".')]
+						],
+						['db globalmacro.macro', 'required', 'not_empty', 'when' => ['value', 'not_empty']],
+						['db globalmacro.macro', 'required', 'not_empty', 'when' => ['description', 'not_empty']]
+					],
+					'value' => [
+						['db globalmacro.value'],
+						['db globalmacro.value', 'required', 'not_empty',
+							'use' => [CVaultSecretParser::class, ['provider' => CSettingsHelper::get(CSettingsHelper::VAULT_PROVIDER)]],
+							'when' => [['macro', 'not_empty'], ['type', 'in' => [ZBX_MACRO_TYPE_VAULT]]]
+						]
+					],
+					'description' => ['db globalmacro.description'],
+					'type' => ['db globalmacro.type', 'required', 'in' => [ZBX_MACRO_TYPE_TEXT, ZBX_MACRO_TYPE_SECRET, ZBX_MACRO_TYPE_VAULT]]
+				],
+				'messages' => [
+					'uniq' => _('Entry is not unique by macro name.')
+				]
+			]
+		]];
+	}
+
 	protected function checkInput() {
 		$fields = [
 			'macros' => 'array'
