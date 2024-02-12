@@ -68,14 +68,17 @@ class CControllerMfaCheck extends CController {
 			'hash_function' => TOTP_HASH_SHA1,
 			'code_length' => TOTP_CODE_LENGTH_6,
 			'api_hostname' => '',
-			'clientid' => '',
-			'client_secret' => ''
+			'clientid' => ''
 		];
 
 		$this->getInputs($data, array_keys($data));
 
 		if ($this->hasInput('mfaid')) {
 			$data['mfaid'] = $this->getInput('mfaid');
+		}
+
+		if ($this->hasInput('client_secret')) {
+			$data['client_secret'] = $this->getInput('client_secret');
 		}
 
 		$data['type_name'] = ($data['type'] == MFA_TYPE_TOTP) ? _('TOTP') : _('DUO Universal Prompt');

@@ -441,7 +441,7 @@ class CControllerAuthenticationEdit extends CController {
 		]);
 
 		$duo_methods = API::Mfa()->get([
-			'output' => ['mfaid', 'type', 'name', 'api_hostname', 'clientid', 'client_secret'],
+			'output' => ['mfaid', 'type', 'name', 'api_hostname', 'clientid'],
 			'selectUsrgrps' => API_OUTPUT_COUNT,
 			'filter' => ['type' => MFA_TYPE_DUO]
 		]);

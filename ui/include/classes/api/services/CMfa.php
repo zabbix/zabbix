@@ -37,9 +37,7 @@ class CMfa extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected $output_fields = ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid',
-		'client_secret'
-	];
+	protected $output_fields = ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid'];
 
 	/**
 	 * @param array $options
@@ -281,7 +279,8 @@ class CMfa extends CApiService {
 		$upd_mfas = [];
 
 		foreach ($mfas as $mfaid => $mfa) {
-			$upd_mfa = DB::getUpdatedValues('mfa', array_intersect_key($mfa, array_flip($this->output_fields)),
+			$upd_mfa = DB::getUpdatedValues('mfa',
+				array_intersect_key($mfa, array_flip($this->output_fields) + ['client_secret' => '']),
 				$db_mfas[$mfaid]
 			);
 
