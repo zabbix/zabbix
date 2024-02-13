@@ -54,7 +54,7 @@ void	zbx_mock_test_entry(void **state)
 
 	in_fragments = (size_t)received;
 
-	buffer = zbx_yaml_assemble_binary_sequence("in.fragments", &in_fragments);
+	buffer = zbx_yaml_assemble_binary_sequence("in.fragments", in_fragments);
 
 	if (0 != memcmp(buffer, s.buffer, in_fragments))
 		fail_msg("Received message mismatch expected");
