@@ -1,1 +1,0 @@
-........S. [ZBX-23979] improved trend recalculation performance by performing trend updates in own transaction (vso)
