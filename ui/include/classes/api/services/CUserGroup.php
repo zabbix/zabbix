@@ -124,9 +124,9 @@ class CUserGroup extends CApiService {
 		}
 
 		if (!is_null($options['mfaids'])) {
-			zbx_value2array($options['userids']);
+			zbx_value2array($options['mfaids']);
 
-			$sqlParts['where'][] = dbConditionInt('g.mfaid', $options['mfaids']);
+			$sqlParts['where'][] = dbConditionId('g.mfaid', $options['mfaids']);
 		}
 
 		// status
@@ -135,7 +135,9 @@ class CUserGroup extends CApiService {
 		}
 
 		if (!is_null($options['mfa_status'])) {
-			$sqlParts['where'][] = 'g.mfa_status='.zbx_dbstr($options['mfa_status']);
+			zbx_value2array($options['mfa_status']);
+
+			$sqlParts['where'][] = dbConditionInt('g.mfa_status', $options['mfa_status']);
 		}
 
 		// filter
