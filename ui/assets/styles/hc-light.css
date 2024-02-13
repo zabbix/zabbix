@@ -700,12 +700,11 @@ svg a {
   overflow: hidden; }
   .sortable .sortable-item {
     position: relative; }
-    .sortable .sortable-item.sortable-item-dragging {
-      opacity: 0.6;
-      z-index: 1; }
   .sortable.sortable-dragging {
     isolation: isolate; }
     .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
+      opacity: 0.6;
+      z-index: 1;
       transition: none; }
 
 .sortable.sortable-disabled .sortable-item .drag-icon {

@@ -711,12 +711,11 @@ svg a {
   .sortable .sortable-item {
     position: relative;
     transition: left 0.2s, top 0.2s; }
-    .sortable .sortable-item.sortable-item-dragging {
-      opacity: 0.6;
-      z-index: 1; }
   .sortable.sortable-dragging {
     isolation: isolate; }
     .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
+      opacity: 0.6;
+      z-index: 1;
       transition: none; }
 
 .sortable.sortable-disabled .sortable-item .drag-icon {

@@ -7,11 +7,6 @@
 		@if $ui-transitions {
 			transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
 		}
-
-		&.sortable-item-dragging {
-			opacity: 0.6;
-			z-index: 1;
-		}
 	}
 
 	&.sortable-dragging {
@@ -19,6 +14,8 @@
 
 		.sortable-item {
 			&.sortable-item-dragging {
+				opacity: 0.6;
+				z-index: 1;
 				transition: none;
 			}
 		}
