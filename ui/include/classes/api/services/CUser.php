@@ -1819,7 +1819,7 @@ class CUser extends CApiService {
 
 					$upd_mfa_totp_secret = DB::getUpdatedValues('mfa_totp_secret', $mfa_totp_secret, $db_mfa_totp_secret);
 
-					if ($mfa_totp_secret) {
+					if ($upd_mfa_totp_secret) {
 						$upd_mfa_totp_secrets[] = [
 							'values' => $upd_mfa_totp_secret,
 							'where' => ['mfa_totp_secretid' => $db_mfa_totp_secret['mfa_totp_secretid']]
