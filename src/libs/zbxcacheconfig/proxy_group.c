@@ -507,7 +507,7 @@ void	zbx_dc_set_proxy_failover_delay(const char *failover_delay)
 {
 	WRLOCK_CACHE;
 
-	int	found = (NULL == config->proxy_failover_delay_raw);
+	int	found = (NULL != config->proxy_failover_delay_raw);
 
 	/* failover delay can be updated only by one process at time, */
 	/* so it can be checked without locking before update        */

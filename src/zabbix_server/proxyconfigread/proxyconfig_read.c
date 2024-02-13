@@ -1147,7 +1147,8 @@ static int	proxyconfig_get_hostmap(const zbx_dc_proxy_t *proxy, zbx_uint64_t rev
 	sql_offset = 0;
 
 	zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
-			"select hp.hostproxyid,h.host,hp.proxyid,hp.revision"
+			"select hp.hostproxyid,h.host,hp.proxyid,hp.revision,h.tls_connect,h.tls_issuer,h.tls_subject,"
+				"h.tls_psk_identity,h.tls_psk"
 			" from proxy p,host_proxy hp"
 			" left join hosts h on"
 				" h.hostid=hp.hostid"
@@ -1195,10 +1196,11 @@ out:
 }
 
 static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t proxy_config_revision,
-		zbx_uint64_t proxy_hostmap_revision, const zbx_dc_revision_t *dc_revision, struct zbx_json *j,
-		zbx_proxyconfig_status_t *status, const zbx_config_vault_t *config_vault, const char *config_source_ip,
+		const zbx_dc_revision_t *dc_revision, unsigned char hostmap_sync, zbx_uint64_t proxy_hostmap_revision,
+		zbx_uint64_t hostmap_revision, const char *failover_delay, const zbx_vector_uint64_t *del_hostproxyids,
+		const zbx_config_vault_t *config_vault, const char *config_source_ip,
 		const char *config_ssl_ca_location, const char *config_ssl_cert_location,
-		const char *config_ssl_key_location, char **error)
+		const char *config_ssl_key_location, struct zbx_json *j, zbx_proxyconfig_status_t *status, char **error)
 {
 #define ZBX_PROXYCONFIG_SYNC_HOSTS		0x0001
 #define ZBX_PROXYCONFIG_SYNC_GMACROS		0x0002
@@ -1218,12 +1220,10 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 					ZBX_PROXYCONFIG_SYNC_PROXY_LIST | ZBX_PROXYCONFIG_SYNC_HOSTMAP)
 
 	zbx_vector_uint64_t		hostids, httptestids, updated_hostids, removed_hostids, del_macro_hostids,
-					macro_hostids, del_hostproxyids;
+					macro_hostids;
 	zbx_vector_keys_path_ptr_t	keys_paths;
 	int				global_macros = FAIL, ret = FAIL;
-	zbx_uint64_t			flags = 0, hostmap_revision = proxy_hostmap_revision, proxy_group_revision;
-	unsigned char			hostmap_sync = ZBX_PROXY_SYNC_FULL;
-	char				*failover_delay = NULL;
+	zbx_uint64_t			flags = 0, proxy_group_revision;
 
 	zbx_vector_uint64_create(&hostids);
 	zbx_vector_uint64_create(&updated_hostids);
@@ -1232,7 +1232,6 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 	zbx_vector_uint64_create(&macro_hostids);
 	zbx_vector_uint64_create(&del_macro_hostids);
 	zbx_vector_keys_path_ptr_create(&keys_paths);
-	zbx_vector_uint64_create(&del_hostproxyids);
 
 	if (proxy_config_revision < proxy->revision || proxy_config_revision < proxy->macro_revision)
 	{
@@ -1287,14 +1286,8 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 	else
 		flags = ZBX_PROXYCONFIG_SYNC_ALL;
 
-	if (0 != proxy->proxy_groupid)
-	{
-		proxyconfig_get_proxy_group_updates(proxy, &hostmap_revision, &hostmap_sync, &failover_delay,
-				&del_hostproxyids);
-
-		if (ZBX_PROXY_SYNC_NONE != hostmap_sync)
-			flags |= ZBX_PROXYCONFIG_SYNC_PROXY_LIST | ZBX_PROXYCONFIG_SYNC_HOSTMAP;
-	}
+	if (ZBX_PROXY_SYNC_NONE != hostmap_sync)
+		flags |= ZBX_PROXYCONFIG_SYNC_PROXY_LIST | ZBX_PROXYCONFIG_SYNC_HOSTMAP;
 
 	zbx_json_addobject(j, ZBX_PROTO_TAG_DATA);
 
@@ -1361,34 +1354,31 @@ static int	proxyconfig_get_tables(const zbx_dc_proxy_t *proxy, zbx_uint64_t prox
 			goto out;
 		}
 
-		if (0 != proxy->proxy_groupid)
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_PROXY_LIST))
 		{
-			if (0 != (flags & ZBX_PROXYCONFIG_SYNC_PROXY_LIST))
+			zbx_vector_uint64_t	proxy_groupids;
+
+			zbx_vector_uint64_create(&proxy_groupids);
+			zbx_vector_uint64_append(&proxy_groupids, proxy->proxy_groupid);
+
+			if (SUCCEED != proxyconfig_get_table_data("proxy", "proxy_groupid", &proxy_groupids,
+					NULL, NULL, j, error))
 			{
-				zbx_vector_uint64_t	proxy_groupids;
-
-				zbx_vector_uint64_create(&proxy_groupids);
-				zbx_vector_uint64_append(&proxy_groupids, proxy->proxy_groupid);
-
-				if (SUCCEED != proxyconfig_get_table_data("proxy", "proxy_groupid", &proxy_groupids,
-						NULL, NULL, j, error))
-				{
-					zbx_vector_uint64_destroy(&proxy_groupids);
-					goto out;
-				}
-
 				zbx_vector_uint64_destroy(&proxy_groupids);
+				goto out;
 			}
 
-			if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HOSTMAP))
-			{
-				zbx_uint64_t	rev;
+			zbx_vector_uint64_destroy(&proxy_groupids);
+		}
 
-				rev = (ZBX_PROXY_SYNC_FULL == hostmap_sync ? 0 : proxy_hostmap_revision);
+		if (0 != (flags & ZBX_PROXYCONFIG_SYNC_HOSTMAP))
+		{
+			zbx_uint64_t	rev;
 
-				if (FAIL == proxyconfig_get_hostmap(proxy, rev, &del_hostproxyids, j, error))
-					goto out;
-			}
+			rev = (ZBX_PROXY_SYNC_FULL == hostmap_sync ? 0 : proxy_hostmap_revision);
+
+			if (FAIL == proxyconfig_get_hostmap(proxy, rev, del_hostproxyids, j, error))
+				goto out;
 		}
 	}
 
@@ -1443,9 +1433,6 @@ out:
 	if (0 != flags)
 		zbx_db_commit();
 
-	zbx_free(failover_delay);
-
-	zbx_vector_uint64_destroy(&del_hostproxyids);
 	zbx_vector_keys_path_ptr_clear_ext(&keys_paths, key_path_free);
 	zbx_vector_keys_path_ptr_destroy(&keys_paths);
 	zbx_vector_uint64_destroy(&httptestids);
@@ -1482,8 +1469,12 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 	char			token[ZBX_SESSION_TOKEN_SIZE + 1], tmp[ZBX_MAX_UINT64_LEN + 1];
 	zbx_uint64_t		proxy_config_revision, proxy_hostmap_revision;
 	zbx_dc_revision_t	dc_revision;
+	char			*failover_delay = NULL;
+	zbx_vector_uint64_t	del_hostproxyids;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() proxyid:" ZBX_FS_UI64, __func__, proxy->proxyid);
+
+	zbx_vector_uint64_create(&del_hostproxyids);
 
 	if (SUCCEED != zbx_json_value_by_name(jp_request, ZBX_PROTO_TAG_SESSION, token, sizeof(token), NULL))
 	{
@@ -1527,11 +1518,21 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 				__func__, proxy_config_revision, dc_revision.config);
 	}
 
-	if (proxy_config_revision != dc_revision.config)
+	unsigned char		hostmap_sync = ZBX_PROXY_SYNC_NONE;
+	zbx_uint64_t		hostmap_revision = proxy_hostmap_revision;
+
+	if (0 != proxy->proxy_groupid)
 	{
-		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, proxy_hostmap_revision,
-				&dc_revision, j, status, config_vault, config_source_ip, config_ssl_ca_location,
-				config_ssl_cert_location, config_ssl_key_location, error)))
+		proxyconfig_get_proxy_group_updates(proxy, &hostmap_revision, &hostmap_sync, &failover_delay,
+				&del_hostproxyids);
+	}
+
+	if (proxy_config_revision != dc_revision.config || proxy_hostmap_revision != hostmap_revision)
+	{
+		if (SUCCEED != (ret = proxyconfig_get_tables(proxy, proxy_config_revision, &dc_revision,
+				hostmap_sync, proxy_hostmap_revision, hostmap_revision, failover_delay,
+				&del_hostproxyids, config_vault, config_source_ip, config_ssl_ca_location,
+				config_ssl_cert_location, config_ssl_key_location, j, status, error)))
 		{
 			goto out;
 		}
@@ -1546,6 +1547,10 @@ int	zbx_proxyconfig_get_data(zbx_dc_proxy_t *proxy, const struct zbx_json_parse 
 		ret = SUCCEED;
 	}
 out:
+	zbx_vector_uint64_destroy(&del_hostproxyids);
+
+	zbx_free(failover_delay);
+
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;

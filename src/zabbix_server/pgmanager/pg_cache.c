@@ -461,7 +461,9 @@ void	pg_cache_get_updates(zbx_pg_cache_t *cache, zbx_vector_pg_update_t *groups,
 			i++;
 		}
 		else
+		{
 			zbx_vector_pg_group_ptr_remove_noorder(&cache->group_updates, i);
+		}
 	}
 
 	if (0 != cache->hostmap_updates.num_data)
