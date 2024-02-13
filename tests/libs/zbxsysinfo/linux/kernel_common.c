@@ -70,11 +70,18 @@ void	zbx_mock_test_entry_kernel_common(void **state, int kernel_func)
 	zbx_init_library_sysinfo(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL);
 
 	if (ZABBIX_MOCK_KERNEL_MAXPROC == kernel_func)
+	{
 		actual_result = kernel_maxproc(&request, &param_result);
+	}
 	else if (ZABBIX_MOCK_KERNEL_MAXFILES == kernel_func)
+	{
 		actual_result = kernel_maxfiles(&request, &param_result);
+	}
 	else
+	{
+		actual_result = 0;
 		fail_msg("Invalid kernel_func");
+	}
 
 	if (expected_result != actual_result)
 	{
