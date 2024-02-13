@@ -94,12 +94,7 @@ static void	pg_update_proxy_lastaccess(zbx_pg_service_t *pgs, zbx_ipc_message_t 
 	zbx_pg_proxy_t 	*proxy;
 
 	if (NULL != (proxy = (zbx_pg_proxy_t *)zbx_hashset_search(&pgs->cache->proxies, &proxyid)))
-	{
 		proxy->lastaccess = lastaccess;
-		if (NULL != proxy->group && ZBX_PG_PROXY_STATUS_ONLINE != proxy->status)
-			pg_cache_queue_group_update(pgs->cache, proxy->group);
-
-	}
 
 	pg_cache_unlock(pgs->cache);
 
