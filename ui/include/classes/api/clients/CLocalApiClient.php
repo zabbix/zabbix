@@ -141,7 +141,7 @@ class CLocalApiClient extends CApiClient {
 			if ($newTransaction) {
 				// if we're calling user.login and authentication failed - commit the transaction to save the
 				// failed attempt data
-				if (($api === 'user' && $method === 'login')) {
+				if ($api === 'user' && $method === 'login') {
 					DBend(true);
 				}
 				// otherwise - revert the transaction
