@@ -1658,11 +1658,12 @@ if test "x$agent" = "xyes"; then
 	if test "x$want_libmodbus" = "xyes"; then
 		if test "x$found_libmodbus" = "xyes"; then
 			have_libmodbus="yes"
+
+			AGENT_CFLAGS="$AGENT_CFLAGS $LIBMODBUS_CFLAGS"
+			AGENT_LDFLAGS="$AGENT_LDFLAGS $LIBMODBUS_LDFLAGS"
+			AGENT_LIBS="$AGENT_LIBS $LIBMODBUS_LIBS"
 		fi
 	fi
-	LDFLAGS="$LDFLAGS $LIBMODBUS_LDFLAGS"
-	CFLAGS="$CFLAGS $LIBMODBUS_CFLAGS"
-	LIBS="$LIBS $LIBMODBUS_LIBS"
 fi
 AM_CONDITIONAL(HAVE_LIBMODBUS, [test "x$have_libmodbus" = "xyes"])
 
@@ -2101,6 +2102,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
+	src/zabbix_proxy/poller/Makefile
 	src/zabbix_proxy/preproc/Makefile
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile

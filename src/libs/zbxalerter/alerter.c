@@ -394,6 +394,4 @@ ZBX_THREAD_ENTRY(zbx_alerter_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_socket_close(&alerter_socket);
 }
