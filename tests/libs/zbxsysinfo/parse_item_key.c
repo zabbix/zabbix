@@ -23,7 +23,7 @@
 #include "common.h"
 #include "sysinfo.h"
 
-const char *request_parameter_type_to_str(zbx_request_parameter_type_t type)
+static const char	*request_parameter_type_to_str(zbx_request_parameter_type_t type)
 {
 	const char *ret = "undefined";
 

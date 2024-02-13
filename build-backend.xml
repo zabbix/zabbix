@@ -113,7 +113,7 @@
 			<property name="common.cflags" value="-O2 -g"/>
 			<switch value="@{cc}">
 				<case value="gcc">
-					<property name="cc.cflags" value="-Wall -Wextra -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wno-deprecated-declarations"/>
+					<property name="cc.cflags" value="-Wall -Wextra -Wno-null-pointer-subtraction -Wno-missing-field-initializers -Wdeclaration-after-statement -Wpointer-arith -Wno-maybe-uninitialized -Wformat -Wmissing-prototypes -Wno-deprecated-declarations"/>
 				</case>
 				<case value="clang">
 					<property name="cc.cflags" value=""/>
