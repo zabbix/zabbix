@@ -241,7 +241,7 @@ define('PAGE_TYPE_TEXT_RETURN_JSON',	11); // input plaintext output json
 
 define('ZBX_SESSION_ACTIVE',				0);
 define('ZBX_SESSION_PASSIVE',				1);
-define('ZBX_SESSION_VERIFICATION_REQUIRED',	2);
+define('ZBX_SESSION_CONFIRMATION_REQUIRED',	2);
 
 define('T_ZBX_STR',			0);
 define('T_ZBX_INT',			1);

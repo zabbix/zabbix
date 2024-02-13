@@ -2675,7 +2675,7 @@ class CUser extends CApiService {
 		$session_status = ZBX_SESSION_ACTIVE;
 
 		if (array_key_exists('mfaid', $db_user) && $db_user['mfaid'] != 0) {
-			$session_status = ZBX_SESSION_VERIFICATION_REQUIRED;
+			$session_status = ZBX_SESSION_CONFIRMATION_REQUIRED;
 		}
 
 		DB::insert('sessions', [[
@@ -3546,7 +3546,7 @@ class CUser extends CApiService {
 		DBexecute(
 			'DELETE FROM sessions'.
 				' WHERE '.dbConditionId('userid', [$userid['userid']]).
-					' AND '.dbConditionInt('status', [ZBX_SESSION_VERIFICATION_REQUIRED]).
+					' AND '.dbConditionInt('status', [ZBX_SESSION_CONFIRMATION_REQUIRED]).
 					' AND lastaccess<'.zbx_dbstr($outdated)
 		);
 
