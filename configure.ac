@@ -2099,6 +2099,7 @@ AC_CONFIG_FILES([
 	src/zabbix_proxy/housekeeper/Makefile
 	src/zabbix_proxy/proxyconfig/Makefile
 	src/zabbix_proxy/rtc/Makefile
+	src/zabbix_proxy/poller/Makefile
 	src/zabbix_proxy/preproc/Makefile
 	src/zabbix_proxy/proxyconfigwrite/Makefile
 	src/zabbix_proxy/stats/Makefile
