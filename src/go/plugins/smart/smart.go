@@ -22,7 +22,6 @@ package smart
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"git.zabbix.com/ap/plugin-support/conf"
@@ -45,8 +44,6 @@ const (
 )
 
 var impl Plugin
-
-var cleanRegex = regexp.MustCompile(`^[a-zA-Z0-9 \-_/\\\.]*$`)
 
 // Options -
 type Options struct {
@@ -160,13 +157,6 @@ func (p *Plugin) diskDiscovery() (jsonArray []byte, err error) {
 }
 
 func (p *Plugin) diskGet(params []string) ([]byte, error) {
-	for _, v := range params {
-		err := clearString(v)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	switch len(params) {
 	case twoParameters:
 		return p.diskGetSingle(params[firstParameter], params[secondParameter])
@@ -451,12 +441,4 @@ func getTypeByRateAndAttr(rate int, tables []table) string {
 	}
 
 	return ssdType
-}
-
-func clearString(str string) error {
-	if !cleanRegex.MatchString(str) {
-		return errs.Errorf("invalid characters found in parameter %q", str)
-	}
-
-	return nil
 }
