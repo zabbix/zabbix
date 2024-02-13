@@ -41,7 +41,10 @@ static const char	*read_utf8(const char *path_str, const char *path_hex)
 		zbx_mock_binary(hdata, &data, &len);
 	}
 	else
+	{
+		data = NULL;
 		fail_msg("cannot read %s/%s parameter", path_str, path_hex);
+	}
 
 	return data;
 }

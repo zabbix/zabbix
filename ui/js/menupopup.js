@@ -1439,7 +1439,7 @@ function getMenuPopupTriggerMacro(options) {
 /**
  * Build script menu tree.
  *
- * @param {array}  scripts            Script names and nenu paths.
+ * @param {array}  scripts            Script names and menu paths.
  * @param {Node}   trigger_element    UI element which triggered opening of overlay dialogue.
  * @param {array}  hostid             Host ID.
  * @param {array}  eventid            Event ID.

@@ -879,8 +879,8 @@ class CControllerMenuPopup extends CController {
 	 * Process menu path and sort scripts or URLs according to it.
 	 *
 	 * @param array  $entities                 Scripts and URLs.
-	 * @param string $entities[]['name']       Name of the ccript or URL.
-	 * @param string $entities[]['menu_path']  Menu path of the ccript or URL.
+	 * @param string $entities[]['name']       Name of the script or URL.
+	 * @param string $entities[]['menu_path']  Menu path of the script or URL.
 	 *
 	 * @return array
 	 */

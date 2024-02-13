@@ -111,7 +111,10 @@ static void	lld_process_task(zbx_ipc_message_t *message)
 						NULL, NULL, error);
 			}
 
+			zbx_db_begin();
 			zbx_process_events(NULL, NULL);
+			zbx_db_commit();
+
 			zbx_clean_events();
 		}
 
@@ -247,8 +250,4 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_db_close();
-
-	zbx_ipc_socket_close(&lld_socket);
 }

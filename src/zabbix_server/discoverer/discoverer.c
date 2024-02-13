@@ -577,8 +577,11 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 			}
 
 			memset(&dhost, 0, sizeof(zbx_db_dhost));
-			host_status = process_services(handle, result->druleid, &dhost, result->ip,
-					result->dnsname, result->now, result->unique_dcheckid, &result->services,
+
+			zbx_db_begin();
+
+			host_status = process_services(handle, result->druleid, &dhost, result->ip, result->dnsname,
+					result->now, result->unique_dcheckid, &result->services,
 					events_cbs->add_event_cb);
 
 			zbx_discovery_update_host(handle, result->druleid, &dhost, result->ip, result->dnsname,
@@ -589,6 +592,8 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			if (NULL != events_cbs->clean_events_cb)
 				events_cbs->clean_events_cb();
+
+			zbx_db_commit();
 		}
 
 		zbx_discovery_close(handle);
@@ -1619,7 +1624,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	zbx_get_program_type_cb = discoverer_args_in->zbx_get_program_type_cb_arg;
 	zbx_update_selfmon_counter(info, ZBX_PROCESS_STATE_BUSY);
 #if defined(HAVE_GNUTLS) || defined(HAVE_OPENSSL)
-	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg);
+	zbx_tls_init_child(discoverer_args_in->zbx_config_tls, discoverer_args_in->zbx_get_program_type_cb_arg,
+			zbx_dc_get_psk_by_identity);
 #endif
 	zbx_get_progname_cb = discoverer_args_in->zbx_get_progname_cb_arg;
 	zbx_setproctitle("%s #%d [connecting to the database]", get_process_type_string(process_type), process_num);

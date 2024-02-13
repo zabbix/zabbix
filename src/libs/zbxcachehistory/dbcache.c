@@ -2698,6 +2698,9 @@ static void	DCmass_prepare_history(zbx_dc_history_t *history, zbx_history_sync_i
 
 			zbx_vector_uint64_pair_append(proxy_subscriptions, p);
 		}
+
+		if (0 != item->has_trigger)
+			h->flags |= ZBX_DC_FLAG_HASTRIGGER;
 	}
 
 	zbx_vector_ptr_sort(inventory_values, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
@@ -3085,8 +3088,20 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 				{
 					zbx_db_begin();
 
-					DBmass_update_items(&item_diff, &inventory_values);
 					DBmass_update_trends(trends, trends_num, &trends_diff);
+
+					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
+						DCupdate_trends(&trends_diff);
+
+					zbx_vector_uint64_pair_clear(&trends_diff);
+				}
+				while (ZBX_DB_DOWN == txn_error);
+
+				do
+				{
+					zbx_db_begin();
+
+					DBmass_update_items(&item_diff, &inventory_values);
 
 					if (NULL != events_cbs->process_events_cb)
 					{
@@ -3094,16 +3109,11 @@ void	zbx_sync_server_history(int *values_num, int *triggers_num, const zbx_event
 						events_cbs->process_events_cb(NULL, NULL);
 					}
 
-					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
-					{
-						DCupdate_trends(&trends_diff);
-					}
-					else
+					if (ZBX_DB_OK != (txn_error = zbx_db_commit()))
 					{
 						if (NULL != events_cbs->reset_event_recovery_cb)
 							events_cbs->reset_event_recovery_cb();
 					}
-					zbx_vector_uint64_pair_clear(&trends_diff);
 				}
 				while (ZBX_DB_DOWN == txn_error);
 			}

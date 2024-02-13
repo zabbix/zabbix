@@ -1553,7 +1553,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Keyspace["{#DB}"]'
+                    - '$[''{#DB}'']'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: redis.keyspace.info_raw
@@ -2438,12 +2438,12 @@ zabbix_export:
                     - |
                       var repl = JSON.parse(value);
                       var res = Object.keys(repl)
-                          .filter(function (v) {return v.match(/slave\d+/)})
-                          .filter(function (v) {return (repl[v].ip === "{#SLAVE_IP}" && repl[v].port === "{#SLAVE_PORT}")})
-                          .map(function (v) {return repl[v].offset})[0];
+                      	.filter(function (v) {return v.match(/slave\d+/)})
+                      	.filter(function (v) {return (repl[v].ip === "{#SLAVE_IP}" && repl[v].port === "{#SLAVE_PORT}")})
+                      	.map(function (v) {return repl[v].offset})[0];
                       
                       if (res === undefined) {
-                          throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.';
+                      	throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.';
                       }
                       
                       return res;
@@ -2471,7 +2471,7 @@ zabbix_export:
                   return JSON.stringify(Object.keys(repl)
                     .filter(function (v) {return v.match(/slave\d+/)})
                     .map(function (v){
-                      return {"{#SLAVE_IP}": repl[v].ip, "{#SLAVE_PORT}": repl[v].port}
+                  	return {"{#SLAVE_IP}": repl[v].ip, "{#SLAVE_PORT}": repl[v].port}
                     }));
         - uuid: ca9296a7acb548789865ac716a54ce10
           name: 'Slave metrics discovery'
