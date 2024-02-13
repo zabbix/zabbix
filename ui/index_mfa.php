@@ -84,14 +84,11 @@ if (!CSessionHelper::has('state') && !hasRequest('enter')) {
 			CSessionHelper::set('username', $data['username']);
 			CSessionHelper::set('sessionid', $data['sessionid']);
 
-			header('Location: '.$data['prompt_uri']);
+			redirect($data['prompt_uri']);
 		}
 	}
 	catch (Exception $e) {
 		$error['error']['message'] = $e->getMessage();
-
-		redirectToGeneralWarningPage($error, $redirect_to);
-		exit;
 	}
 }
 else {
@@ -138,25 +135,18 @@ else {
 			echo (new CView('mfa.login', $data + $error))->getOutput();
 			exit;
 		}
-
-		redirectToGeneralWarningPage($error, $redirect_to);
-		exit;
 	}
 }
 
-function redirectToGeneralWarningPage(array $error, CUrl $redirect_to): void {
-	CMessageHelper::clear();
+echo (new CView('general.warning', [
+	'header' => _('You are not logged in'),
+	'messages' => $error,
+	'buttons' => [
+		(new CButton('login', _('Login')))
+			->setAttribute('data-url', $redirect_to->getUrl())
+			->onClick('document.location = this.dataset.url;')
+	],
+	'theme' => getUserTheme(CWebUser::$data)
+]))->getOutput();
 
-	echo (new CView('general.warning', [
-		'header' => _('You are not logged in'),
-		'messages' => $error,
-		'buttons' => [
-			(new CButton('login', _('Login')))
-				->setAttribute('data-url', $redirect_to->getUrl())
-				->onClick('document.location = this.dataset.url;')
-		],
-		'theme' => getUserTheme(CWebUser::$data)
-	]))->getOutput();
-
-	session_write_close();
-}
+session_write_close();
