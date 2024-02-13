@@ -3261,7 +3261,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 				do
 				{
-					zbx_db_begin();
+					DBbegin();
 
 					DBmass_update_items(&item_diff, &inventory_values);
 
