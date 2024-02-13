@@ -235,7 +235,7 @@ static int	agent_task_process(short event, void *data, int *fd, const char *addr
 					agent_context->step = ZABBIX_AGENT_STEP_CONNECT_INIT;
 				}
 
-				if (agent_context->item.result.type == 0)
+				if (0 == agent_context->item.result.type)
 				{
 					zbx_timespec_t	ts;
 
