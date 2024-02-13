@@ -98,6 +98,8 @@ class CSortable {
 	#is_enabled = false;
 	#is_enabled_sorting;
 
+	#is_visible;
+
 	#items = [];
 
 	#scroll_pos = 0;
@@ -115,6 +117,9 @@ class CSortable {
 
 	#mutation_observer;
 	#mutation_observer_connected = false;
+
+	#intersection_observer;
+	#intersection_observer_connected = false;
 
 	#transitions = new Map();
 	#transitions_end_callbacks = new Map();
@@ -160,6 +165,9 @@ class CSortable {
 		this.#is_enabled_sorting = enable_sorting;
 
 		this.#mutation_observer = new MutationObserver(this.#listeners.mutation);
+		this.#intersection_observer = new IntersectionObserver(this.#listeners.intersection);
+
+		this.#is_visible = this.#getTargetLoc().dim > 0;
 
 		if (enable) {
 			this.enable();
@@ -193,12 +201,14 @@ class CSortable {
 		if (enable) {
 			this.#toggleListeners(CSortable.LISTENERS_SCROLL);
 			this.#observeMutations();
+			this.#observeIntersection();
 			this.#updateItems();
 			this.#render();
 		}
 		else {
 			this.#toggleListeners(CSortable.LISTENERS_OFF);
 			this.#observeMutations(false);
+			this.#observeIntersection(false);
 			this.#cancelDragging();
 		}
 
@@ -772,6 +782,23 @@ class CSortable {
 		return !observe_mutations;
 	}
 
+	#observeIntersection(observe_intersection = true) {
+		if (observe_intersection === this.#intersection_observer_connected) {
+			return observe_intersection;
+		}
+
+		if (observe_intersection) {
+			this.#intersection_observer.observe(this.#target);
+		}
+		else {
+			this.#intersection_observer.disconnect();
+		}
+
+		this.#intersection_observer_connected = observe_intersection;
+
+		return !observe_intersection;
+	}
+
 	#mutate(callback) {
 		const observe_mutations = this.#observeMutations(false);
 
@@ -1023,6 +1050,14 @@ class CSortable {
 
 			if (item !== null) {
 				this.#revealItem(item);
+			}
+		},
+
+		intersection: (entries) => {
+			if (entries[0].isIntersecting !== this.#is_visible) {
+				this.#is_visible = entries[0].isIntersecting;
+
+				this.#update();
 			}
 		}
 	};
