@@ -20,9 +20,7 @@
 #include "async_telnet.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
-#include "zbxip.h"
 #include "zbxself.h"
-#include "zbxsysinfo.h"
 #include "../poller/async_poller.h"
 
 ZBX_VECTOR_IMPL(telnet_recv, unsigned char)
