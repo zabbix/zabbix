@@ -586,7 +586,7 @@ $mfa_tab = (new CFormGrid())
 						(new CTag('tfoot', true))
 							->addItem(
 								(new CCol(
-									(new CButtonLink(_('Add')))->addClass('js-add')		// TODO rename class?
+									(new CButtonLink(_('Add')))->addClass('js-add')
 								))->setColSpan(5)
 							)
 					)->addStyle('width: 100%')

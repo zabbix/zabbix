@@ -116,7 +116,7 @@ $form
 					(new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
 						->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 						->addStyle('display: none;')
-						->setAttribute('disabled', 'disabled')
+						->setEnabled(false)
 				]
 				: (new CPassBox('client_secret', '', DB::getFieldLength('mfa', 'client_secret')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)

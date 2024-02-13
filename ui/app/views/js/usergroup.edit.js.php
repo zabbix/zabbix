@@ -294,12 +294,12 @@
 			const mfa = document.querySelector('[name="mfaid"]');
 
 			switch (parseInt(gui_access)) {
-				case <?= GROUP_GUI_ACCESS_DISABLED ?>:
+				case GROUP_GUI_ACCESS_DISABLED:
 					userdirectory.disabled = true;
 					mfa.disabled = true;
 					break;
 
-				case <?= GROUP_GUI_ACCESS_INTERNAL ?>:
+				case GROUP_GUI_ACCESS_INTERNAL:
 					userdirectory.disabled = true;
 					mfa.disabled = false;
 					break;

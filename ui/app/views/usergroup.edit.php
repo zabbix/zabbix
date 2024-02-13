@@ -162,7 +162,7 @@ else {
 			new CFormField(
 				(new CSpan(user_auth_type2str($data['gui_access'])))
 					->addClass('text-field')
-					->addClass('green')
+					->addClass(ZBX_STYLE_GREEN)
 			)
 		])
 		->addItem([
@@ -170,7 +170,7 @@ else {
 			new CFormField(
 				(new CSpan($mfa_name))
 					->addClass('text-field')
-					->addClass('green')
+					->addClass(ZBX_STYLE_GREEN)
 			)
 		])
 		->addItem([
@@ -178,7 +178,7 @@ else {
 			new CFormField(
 				(new CSpan(_('Enabled')))
 					->addClass('text-field')
-					->addClass('green')
+					->addClass(ZBX_STYLE_GREEN)
 			)
 		]);
 }
