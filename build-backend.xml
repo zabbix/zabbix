@@ -225,7 +225,7 @@
 		<property name="cmocka-2-agent-only" value="-q CFLAGS='${COMP_FLAGS_CMOCKA}' --enable-agent"/>
 		<property name="cmocka-3-server-only" value="-q CFLAGS='${COMP_FLAGS_CMOCKA}' --enable-server --with-mysql"/>
 		<property name="cmocka-4-proxy-only" value="-q CFLAGS='${COMP_FLAGS_CMOCKA}' --enable-proxy --with-sqlite3"/>
-		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_CMOCKA} -Wenum-conversion' -g -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
+		<property name="cmocka-5-sanitizer" value="CC=clang CFLAGS='${COMP_FLAGS_CMOCKA} -Wenum-conversion -g -fsanitize=leak,address' LDFLAGS='-fsanitize=leak,address' -q --enable-server --enable-agent --enable-proxy --enable-ipv6 --with-mysql --with-libxml2 --with-unixodbc --with-net-snmp --with-ssh2 --with-openipmi --with-libevent --with-openssl --with-ldap --with-libcurl --with-iconv --with-libpcre"/>
 	</target>
 
 	<target name="cmocka-tests" depends="init-cmocka-test-conf-options">
