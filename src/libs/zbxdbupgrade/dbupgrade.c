@@ -411,6 +411,7 @@ static void	DBdrop_foreign_key_sql(char **sql, size_t *sql_alloc, size_t *sql_of
 	zbx_snprintf_alloc(sql, sql_alloc, sql_offset, "alter table %s" ZBX_DROP_FK " c_%s_%d",
 			table_name, table_name, id);
 }
+
 int	DBcreate_table(const ZBX_TABLE *table)
 {
 	char	*sql = NULL;
