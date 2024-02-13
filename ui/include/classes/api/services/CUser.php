@@ -813,7 +813,7 @@ class CUser extends CApiService {
 
 		if (in_array(MFA_TYPE_DUO, $types)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS,
-				_('Incorrect MFA method type "DUO Universal Prompt" is not available for TOTP secret.')
+				_('Incorrect MFA method type, TOTP secret is not available.')
 			);
 		}
 	}
@@ -3584,8 +3584,14 @@ class CUser extends CApiService {
 
 		$totp_generator->setWindow(TOTP_VERIFICATION_DELAY_WINDOW);
 
-		if ($data['code_length'] == TOTP_CODE_LENGTH_8) {
-			$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
+		switch ($data['code_length']) {
+			case TOTP_CODE_LENGTH_6:
+				$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_6);
+				break;
+
+			case TOTP_CODE_LENGTH_8:
+				$totp_generator->setOneTimePasswordLength(TOTP_CODE_LENGTH_8);
+				break;
 		}
 
 		return $totp_generator;
