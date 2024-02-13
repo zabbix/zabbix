@@ -172,30 +172,30 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	VARIANT			*vtProp = NULL;
 	IWbemClassObject	*pclsObj = 0;
 	ULONG			uReturn = 0;
-	HRESULT			hres;
+	HRESULT			hres1, hres2;
 	zbx_vector_wmi_prop_t	*inst_val;
 	zbx_wmi_prop_t		prop;
 
-	hres = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
+	hres1 = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
 
-	if (WBEM_S_TIMEDOUT == hres)
+	if (WBEM_S_TIMEDOUT == hres1)
 	{
 		*error = zbx_strdup(*error, "WMI query timeout.");
 		goto out2;
 	}
 
-	if (FAILED(hres))
+	if (FAILED(hres1))
 	{
-		get_error_code_text(hres, error);
+		get_error_code_text(hres1, error);
 		goto out2;
 	}
 
 	if (0 == uReturn)
 		goto out2;
 
-	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
+	hres2 = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
-	if (FAILED(hres))
+	if (FAILED(hres2))
 	{
 		*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
 		goto out1;
@@ -203,18 +203,16 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 
 	vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
 	VariantInit(vtProp);
-	hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
+	hres2 = pclsObj->Next(0, NULL, vtProp, 0, 0);
 
-	if (FAILED(hres))
+	if (FAILED(hres2))
 	{
 		*error = zbx_strdup(*error, "Cannot parse WMI result field.");
 		zbx_free(vtProp);
 		goto out1;
 	}
 
-	pclsObj->EndEnumeration();
-
-	if (hres == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
+	if (hres2 == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
 	{
 		zbx_free(vtProp);
 		goto out1;
@@ -229,8 +227,17 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_prop_append(inst_val, prop);
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
 out1:
+	pclsObj->EndEnumeration();
 	pclsObj->Release();
-out2:	
+
+	while (WBEM_S_NO_ERROR == hres1)
+	{
+		hres1 = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
+
+		if (0 != uReturn)
+			pclsObj->Release();
+	}
+out2:
 	return ret;
 }
 
