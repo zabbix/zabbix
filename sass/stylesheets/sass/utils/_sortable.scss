@@ -1,6 +1,5 @@
 .sortable {
 	overflow: hidden;
-	isolation: isolate;
 
 	.sortable-item {
 		position: relative;
@@ -16,6 +15,8 @@
 	}
 
 	&.sortable-dragging {
+		isolation: isolate;
+
 		.sortable-item {
 			&.sortable-item-dragging {
 				transition: none;

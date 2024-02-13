@@ -707,16 +707,17 @@ svg a {
     transition: opacity 0.3s ease-out, width 0.3s ease-out 2s; }
 
 .sortable {
-  overflow: hidden;
-  isolation: isolate; }
+  overflow: hidden; }
   .sortable .sortable-item {
     position: relative;
     transition: left 0.2s, top 0.2s; }
     .sortable .sortable-item.sortable-item-dragging {
       opacity: 0.6;
       z-index: 1; }
-  .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
-    transition: none; }
+  .sortable.sortable-dragging {
+    isolation: isolate; }
+    .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
+      transition: none; }
 
 .sortable.sortable-disabled .sortable-item .drag-icon {
   cursor: unset;
