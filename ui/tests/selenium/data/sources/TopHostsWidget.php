@@ -421,7 +421,7 @@ class TopHostsWidget {
 				'pages' => [[]]
 			]
 		]);
-		$dashboardids  = CDataHelper::getIds('name');
+		$dashboardids = CDataHelper::getIds('name');
 
 		return [
 			'dashboardids' => $dashboardids,
