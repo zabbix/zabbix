@@ -37,6 +37,8 @@ $fields = [
 ];
 check_fields($fields);
 
+$page['scripts'] = ['qrcode.js'];
+
 $redirect_to = (new CUrl('index.php'))->setArgument('form', 'default');
 $request = getRequest('request', '');
 

@@ -24,7 +24,6 @@
  */
 ?>
 
-<script src="js/vendors/qrcode/qrcode.js"></script>
 <script>
 	const view = {
 
