@@ -164,6 +164,9 @@ class CSortable {
 		if (enable) {
 			this.enable();
 		}
+		else {
+			this.#target.classList.add(CSortable.ZBX_STYLE_DISABLED);
+		}
 	}
 
 	/**
@@ -201,7 +204,7 @@ class CSortable {
 
 		this.#is_enabled = enable;
 
-		this.#updateTargetActive();
+		this.#updateTargetDisabled();
 
 		return !enable;
 	}
@@ -221,7 +224,7 @@ class CSortable {
 
 		this.#is_enabled_sorting = enable_sorting;
 
-		this.#updateTargetActive();
+		this.#updateTargetDisabled();
 
 		return !enable_sorting;
 	}
@@ -300,7 +303,7 @@ class CSortable {
 		this.#cancelDragging();
 		this.#updateItems();
 		this.#render();
-		this.#updateTargetActive();
+		this.#updateTargetDisabled();
 	}
 
 	#updateItems() {
@@ -335,7 +338,7 @@ class CSortable {
 		this.#updateItemsLoc();
 	}
 
-	#updateTargetActive() {
+	#updateTargetDisabled() {
 		this.#target.classList.toggle(CSortable.ZBX_STYLE_DISABLED,
 			!this.#is_enabled || !this.#is_enabled_sorting
 				|| this.#items.length - this.#freeze_start - this.#freeze_end < 2
