@@ -49,7 +49,7 @@ class CSortable {
 	static ZBX_STYLE_ITEM = 'sortable-item';
 
 	/**
-	 * Class applied to item elements while it is being dragged.
+	 * Class applied to elements of item while it is being dragged.
 	 *
 	 * @type {string}
 	 */
