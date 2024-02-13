@@ -212,6 +212,8 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 		goto out1;
 	}
 
+	pclsObj->EndEnumeration();
+
 	if (hres2 == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
 	{
 		zbx_free(vtProp);
@@ -227,7 +229,6 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_prop_append(inst_val, prop);
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
 out1:
-	pclsObj->EndEnumeration();
 	pclsObj->Release();
 
 	while (WBEM_S_NO_ERROR == hres1)
