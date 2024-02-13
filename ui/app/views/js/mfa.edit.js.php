@@ -58,7 +58,7 @@ window.mfa_edit = new class {
 		let totp_fields = ['hash_function', 'code_length'];
 		let duo_fields = ['api_hostname', 'clientid', 'client_secret'];
 
-		switch (type) {
+		switch (parseInt(type)) {
 			case MFA_TYPE_TOTP:
 				this.#toggleFields(duo_fields, totp_fields);
 				break;
