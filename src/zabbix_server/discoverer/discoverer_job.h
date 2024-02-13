@@ -53,7 +53,7 @@ typedef struct
 		int		port;
 		int		index_port;
 		int		index_dcheck;
-		zbx_uint64_t	count;		/* total count of checks in range */
+		zbx_uint64_t	count;		/* max count of checks processed by parallel tasks within one range */
 		unsigned int	checks_per_ip;	/* count of checks per ip */
 	}
 	state;

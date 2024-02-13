@@ -906,7 +906,7 @@ static void	discoverer_icmp_result_proc(const zbx_uint64_t druleid, const int dc
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s() results:%d", log_worker_id, __func__, results->values_num);
 }
 
-static int	discoverer_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task_t *task,
+static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		const int dcheck_idx, int worker_max, zbx_vector_discoverer_results_ptr_t *results, int *stop,
 		char **error)
 {
@@ -931,7 +931,7 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task
 	*ip = '\0';
 
 	while (0 == *stop && SUCCEED == zbx_iprange_uniq_next(task->range.ipranges->values,
-			task->range.ipranges->values_num, ip, sizeof(ip)))
+			task->range.ipranges->values_num, ip, sizeof(ip)) && 0 != task->range.state.count--)
 	{
 		ZBX_FPING_HOST	host;
 
@@ -942,8 +942,8 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task
 		if (worker_max > hosts.values_num)
 			continue;
 
-		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, 0, dcheck->allow_redirect,
-				1, err, sizeof(err))))
+		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout,
+				dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s",
 					log_worker_id, __func__, worker_max, err);
@@ -966,8 +966,8 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, const zbx_discoverer_task
 
 	if (0 == *stop && 0 != hosts.values_num && ret == SUCCEED)
 	{
-		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, 0, dcheck->allow_redirect,
-				1, err, sizeof(err))))
+		if (SUCCEED != (ret = zbx_ping(&hosts.values[0], hosts.values_num, 3, 0, 0, dcheck->timeout,
+				dcheck->allow_redirect, 1, err, sizeof(err))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "[%d] %s() %d icmp checks failed with err:%s", log_worker_id,
 					__func__, worker_max, err);

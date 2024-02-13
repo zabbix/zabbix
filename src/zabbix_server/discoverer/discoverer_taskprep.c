@@ -276,9 +276,6 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
 
 	while (NULL != (task = (zbx_discoverer_task_t*)zbx_hashset_iter_next(&iter)))
 	{
-		if (SVC_ICMPPING == GET_DTYPE(task))
-			continue;
-
 		task->range.state.count = task->range.state.checks_per_ip * ips_num;
 	}
 }
@@ -294,7 +291,6 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashs
 	zbx_hashset_t	tasks_local;
 	zbx_uint64_t	checks_count = 0;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
-	unsigned int	uniq_ips = 0;
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
@@ -358,21 +354,17 @@ next:
 
 	while (SUCCEED == zbx_iprange_uniq_next(ipranges->values, ipranges->values_num, ip, sizeof(ip)))
 	{
-		zbx_discoverer_check_count_t	*check_count, cmp;
+		zbx_discoverer_check_count_t	dcc;
 
-		cmp.druleid = drule->druleid;
-		zbx_strlcpy(cmp.ip, ip, sizeof(cmp.ip));
-		cmp.count = 0;
-
-		check_count = zbx_hashset_insert(check_counts, &cmp, sizeof(zbx_discoverer_check_count_t));
-		check_count->count += checks_count;
-
-		uniq_ips++;
+		dcc.druleid = drule->druleid;
+		zbx_strlcpy(dcc.ip, ip, sizeof(dcc.ip));
+		dcc.count = checks_count;
+		zbx_hashset_insert(check_counts, &dcc, sizeof(zbx_discoverer_check_count_t));
 	}
 
-	process_task_range_count(tasks, uniq_ips);
+	process_task_range_count(tasks, check_counts->num_data);
 
-	if (0 == drule->concurrency_max)
+	if (0 != tasks_local.num_data)
 		process_task_range_split(&tasks_local, tasks);
 out:
 	if (0 != tasks_local.num_data)
