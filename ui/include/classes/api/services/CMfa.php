@@ -154,13 +154,10 @@ class CMfa extends CApiService {
 				'mfa_status' => GROUP_MFA_ENABLED
 			]);
 
-			$db_usergroups_default_mfa = array_filter($db_usergroups_mfa_enabled, function ($usrgrp) {
-				return $usrgrp['mfaid'] == 0;
-			});
-
-			foreach ($db_usergroups_default_mfa as $db_usergroup) {
-				$result[$default_mfaid]['usrgrps'][] =
-					array_diff_key($db_usergroup, array_flip(['mfaid']));
+			foreach ($db_usergroups_mfa_enabled as $db_usergroup) {
+				if ($db_usergroup['mfaid'] == 0) {
+					$result[$default_mfaid]['usrgrps'][] = array_diff_key($db_usergroup, array_flip(['mfaid']));
+				}
 			}
 		}
 
@@ -351,7 +348,6 @@ class CMfa extends CApiService {
 	public function delete(array $mfaids): array {
 		self::validateDelete($mfaids, $db_mfaids);
 
-		DB::delete('mfa_totp_secret', ['mfaid' => $mfaids]);
 		DB::delete('mfa', ['mfaid' => $mfaids]);
 
 		self::addAuditLog(CAudit::ACTION_DELETE, CAudit::RESOURCE_MFA, $db_mfaids);
