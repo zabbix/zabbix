@@ -424,12 +424,7 @@ class TopHostsWidget {
 		$dashboardids  = CDataHelper::getIds('name');
 
 		return [
-			'top_host_update' => $dashboardids['top_host_update'],
-			'top_host_create' => $dashboardids['top_host_create'],
-			'top_host_delete' => $dashboardids['top_host_delete'],
-			'top_host_remove' => $dashboardids['top_host_remove'],
-			'top_host_screenshots' => $dashboardids['top_host_screenshots'],
-			'top_host_text_items' => $dashboardids['top_host_text_items'],
+			'dashboardids' => $dashboardids,
 			'itemids' => $itemids
 		];
 	}
