@@ -465,8 +465,6 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 
 		switch (token.type)
 		{
-			int		ret;
-
 			case ZBX_TOKEN_USER_FUNC_MACRO:
 				um_cache_resolve_const(config->um_cache, hostids, hostids_num, text + token.loc.l + 1,
 						env, &value);
@@ -474,8 +472,7 @@ char	*dc_expand_user_and_func_macros_dyn(const char *text, const zbx_uint64_t *h
 				if (NULL != value)
 					out = zbx_strdup(NULL, value);
 
-				ret = zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
-				ZBX_UNUSED(ret);
+				(void)zbx_calculate_macro_function(text + token.loc.l, &token.data.func_macro, &out);
 				value = out;
 				break;
 			case ZBX_TOKEN_USER_MACRO:
