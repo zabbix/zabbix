@@ -105,7 +105,7 @@ $form
 		])
 		->addItem([
 			(new CLabel(_('Client secret'), 'client_secret')),
-			(new CFormField($data['add_mfa_method'] == 0
+			(new CFormField($data['add_mfa_method'] == 0 && $data['type'] == MFA_TYPE_DUO
 				? [
 					array_key_exists('client_secret', $data)
 						? (new CVar('client_secret', $data['client_secret']))->removeId()
