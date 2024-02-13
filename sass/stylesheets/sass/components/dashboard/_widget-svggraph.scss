@@ -85,6 +85,14 @@ form.dashboard-widget-svggraph {
 		overflow: visible;
 		margin-top: -5px;
 		margin-bottom: 5px;
+
+		.sortable:not(.sortable-disabled) {
+			.list-accordion-item {
+				> .drag-icon + label {
+					@extend %cursor-drag;
+				}
+			}
+		}
 	}
 
 	.list-accordion-item {
@@ -106,12 +114,6 @@ form.dashboard-widget-svggraph {
 			line-height: 24px;
 			text-align: left;
 			text-overflow: ellipsis;
-		}
-
-		&:not(.sortable-item-disabled) {
-			> .drag-icon + label {
-				@extend %cursor-drag;
-			}
 		}
 
 		&.list-accordion-item-opened {

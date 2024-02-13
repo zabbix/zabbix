@@ -1,23 +1,36 @@
 .sortable {
-	isolation: isolate;
 	overflow: hidden;
+	isolation: isolate;
 
 	.sortable-item {
 		position: relative;
-		box-sizing: border-box;
+
+		@if $ui-transitions {
+			transition: left $ui-controls-transition-duration, top $ui-controls-transition-duration;
+		}
 
 		&.sortable-item-dragging {
 			opacity: 0.6;
 			z-index: 1;
 		}
 	}
+
+	&.sortable-dragging {
+		.sortable-item {
+			&.sortable-item-dragging {
+				transition: none;
+			}
+		}
+	}
 }
 
 .sortable {
-	.sortable-item-disabled {
-		.drag-icon {
-			cursor: unset;
-			color: $btn-icon-disabled-color;
+	&.sortable-disabled {
+		.sortable-item {
+			.drag-icon {
+				cursor: unset;
+				color: $btn-icon-disabled-color;
+			}
 		}
 	}
 }

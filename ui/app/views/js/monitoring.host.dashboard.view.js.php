@@ -195,7 +195,7 @@
 			const sortable_element = document.createElement('ul');
 			this.#host_dashboard_navigation_tabs.appendChild(sortable_element);
 			this.#dashboard_tabs = new CSortable(sortable_element, {
-				is_vertical: false,
+				is_horizontal: true,
 				enable_sorting: false
 			});
 		}
@@ -221,7 +221,7 @@
 				tab_contents_name.textContent = host_dashboard.name;
 				tab_contents_name.title = host_dashboard.name;
 
-				this.#dashboard_tabs.update(target => target.insertBefore(tab, null));
+				this.#dashboard_tabs.getTarget().insertBefore(tab, null);
 				this.#host_dashboard_tabs.set(host_dashboard.dashboardid, tab);
 			}
 

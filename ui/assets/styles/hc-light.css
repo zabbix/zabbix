@@ -697,16 +697,17 @@ svg a {
       opacity: 1; }
 
 .sortable {
-  isolation: isolate;
-  overflow: hidden; }
+  overflow: hidden;
+  isolation: isolate; }
   .sortable .sortable-item {
-    position: relative;
-    box-sizing: border-box; }
+    position: relative; }
     .sortable .sortable-item.sortable-item-dragging {
       opacity: 0.6;
       z-index: 1; }
+  .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
+    transition: none; }
 
-.sortable .sortable-item-disabled .drag-icon {
+.sortable.sortable-disabled .sortable-item .drag-icon {
   cursor: unset;
   color: #cccccc; }
 
@@ -6439,7 +6440,7 @@ z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, tex
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-accordion-item:not(.sortable-item-disabled) > .drag-icon + label, .ui-draggable .dashboard-widget-head, .drag-icon {
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-accordion-item > .drag-icon:not(.disabled) + label, form.dashboard-widget-svggraph .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label, .ui-draggable .dashboard-widget-head, .drag-icon {
   cursor: move;
   cursor: grab; }
 

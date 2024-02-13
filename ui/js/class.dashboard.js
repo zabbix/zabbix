@@ -1797,7 +1797,7 @@ class CDashboard {
 			tab_contents.append(properties_button);
 		}
 
-		this._tabs.update(target => target.insertBefore(tab, null));
+		this._tabs.getTarget().insertBefore(tab, null);
 		this._tabs_dashboard_pages.set(tab, dashboard_page);
 	}
 
