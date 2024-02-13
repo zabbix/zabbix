@@ -59,7 +59,6 @@ $this->addJsFile('layout.mode.js');
 $this->addJsFile('class.csvggraph.js');
 $this->addJsFile('class.svg.canvas.js');
 $this->addJsFile('class.svg.map.js');
-$this->addJsFile('class.csvggauge.js');
 $this->addJsFile('class.sortable.js');
 $this->addJsFile('items.js');
 $this->addJsFile('multilineinput.js');

@@ -1070,13 +1070,18 @@ static int zbx_iso8601_timezone(const char *zone, long int *offset)
 
 	ptr++;
 
-	if (ZBX_CONST_STRLEN("00:00") > strlen(ptr) || ':' != ptr[2])
+	if (ZBX_CONST_STRLEN("0000") > strlen(ptr))
 		return FAIL;
 
-	if (0 == isdigit(*ptr) || 23 < (h = atoi(ptr)))
+	if (SUCCEED != zbx_is_uint_n_range(ptr, 2, &h, sizeof(h), 0, 23))
 		return FAIL;
 
-	if (0 == isdigit(ptr[3]) || 59 < (m = atoi(&ptr[3])))
+	ptr += 2;
+
+	if (':' == *ptr)
+		ptr++;
+
+	if (0 == isdigit(*ptr) || 59 < (m = atoi(ptr)))
 		return FAIL;
 
 	*offset = sign * (m + h * 60) * 60;

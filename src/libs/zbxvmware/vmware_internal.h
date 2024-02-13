@@ -63,7 +63,7 @@ int	zbx_vmware_service_update_tags(zbx_vmware_service_t *service, const char *co
 		int config_vmware_timeout);
 int	zbx_vmware_job_remove(zbx_vmware_job_t *job);
 void	zbx_vmware_shared_tags_error_set(const char *error, zbx_vmware_data_tags_t *data_tags);
-void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_t *src, zbx_vmware_data_tags_t *dst);
+void	zbx_vmware_shared_tags_replace(const zbx_vector_vmware_entity_tags_ptr_t *src, zbx_vmware_data_tags_t *dst);
 int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, xmlDoc **xdoc,
 		char **token , char **error);
 
@@ -87,7 +87,7 @@ typedef struct
 }
 zbx_vmware_cq_value_t;
 
-ZBX_PTR_VECTOR_DECL(cq_value, zbx_vmware_cq_value_t *)
+ZBX_PTR_VECTOR_DECL(cq_value_ptr, zbx_vmware_cq_value_t *)
 
 /* VMware alarms cache information */
 typedef struct
@@ -100,12 +100,12 @@ typedef struct
 }
 zbx_vmware_alarm_details_t;
 
-ZBX_PTR_VECTOR_DECL(vmware_alarm_details, zbx_vmware_alarm_details_t *)
+ZBX_PTR_VECTOR_DECL(vmware_alarm_details_ptr, zbx_vmware_alarm_details_t *)
 
 typedef struct
 {
-	zbx_vector_vmware_alarm_t		*alarms;
-	zbx_vector_vmware_alarm_details_t	details;
+	zbx_vector_vmware_alarm_ptr_t		*alarms;
+	zbx_vector_vmware_alarm_details_ptr_t	details;
 }
 zbx_vmware_alarms_data_t;
 /* VMware alarms cache information END */
@@ -143,8 +143,8 @@ void	zbx_property_collection_free(zbx_property_collection_iter *iter);
 
 int	vmware_ds_id_compare(const void *d1, const void *d2);
 
-char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_t *cq_values, const char *soap_type,
-		const char *obj_id, zbx_vector_cq_value_t *cqvs);
+char	*vmware_cq_prop_soap_request(const zbx_vector_cq_value_ptr_t *cq_values, const char *soap_type,
+		const char *obj_id, zbx_vector_cq_value_ptr_t *cqvs);
 
 typedef int	(*nodeprocfunc_t)(void *, char **);
 
@@ -163,7 +163,7 @@ int	vmware_service_get_alarms_data(const char *func_parent, const zbx_vmware_ser
 		CURL *easyhandle, xmlDoc *xdoc, xmlNode *node, zbx_vector_str_t *ids,
 		zbx_vmware_alarms_data_t *alarms_data, char **error);
 
-void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_t *cqvs);
+void	vmware_service_cq_prop_value(const char *fn_parent, xmlDoc *xdoc, zbx_vector_cq_value_ptr_t *cqvs);
 
 #define ZBX_XPATH_VM_HARDWARE(property)									\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.hardware']]"	\

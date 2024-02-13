@@ -98,7 +98,7 @@
 		#initVariables(variables) {
 			const $variables = jQuery('#variables');
 
-			jQuery('#variables').dynamicRows({
+			$variables.dynamicRows({
 				template: '#variable-row-tmpl',
 				rows: variables
 			});
