@@ -387,11 +387,13 @@ class CSortable {
 		for (const element of item.elements_live) {
 			const rect = element.getBoundingClientRect();
 			const computed_style = getComputedStyle(element);
+			const element_style_pos = this.#is_horizontal ? element.style.left : element.style.top;
+			const computed_style_pos = this.#is_horizontal ? computed_style.left : computed_style.top;
 
 			const loc = {
 				pos: (this.#is_horizontal ? rect.x : rect.y)
-					+ parseFloat(this.#is_horizontal ? (element.style.left || '0') : (element.style.top || '0'))
-					- parseFloat(this.#is_horizontal ? computed_style.left : computed_style.top),
+					+ (element_style_pos === 'auto' ? 0 : parseFloat(element_style_pos || '0'))
+					- (computed_style_pos === 'auto' ? 0 : parseFloat(computed_style_pos || '0')),
 				dim: this.#is_horizontal ? rect.width : rect.height
 			};
 
