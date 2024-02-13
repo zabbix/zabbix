@@ -3252,7 +3252,7 @@ static void	sync_server_history(int *values_num, int *triggers_num, int *more)
 
 					DBmass_update_trends(trends, trends_num, &trends_diff);
 
-					if (ZBX_DB_OK == (txn_error = zbx_db_commit()))
+					if (ZBX_DB_OK == (txn_error = DBcommit()))
 						DCupdate_trends(&trends_diff);
 
 					zbx_vector_uint64_pair_clear(&trends_diff);
