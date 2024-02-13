@@ -668,10 +668,16 @@ window.item_edit_form = new class {
 		const disable = this.field.request_method.value == HTTPCHECK_REQUEST_HEAD;
 
 		if (disable) {
-			this.field.retrieve_mode.item(0).checked = true;
+			this.field.retrieve_mode.item(1).checked = true;
 		}
 
-		this.field.retrieve_mode.forEach(radio => radio.disabled = disable);
+		this.field.retrieve_mode.forEach(radio => {
+			radio.disabled = disable || this.form_readonly;
+
+			disable || this.form_readonly
+				? radio.setAttribute('readonly', 'readonly')
+				: radio.removeAttribute('readonly');
+		});
 	}
 
 	#updateValueTypeHintVisibility(preprocessing_active) {
