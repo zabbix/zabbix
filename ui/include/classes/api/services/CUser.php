@@ -701,7 +701,7 @@ class CUser extends CApiService {
 		}
 	}
 
-	private static function addAffectedMfaTotpSecrets(array $users, array $db_users): void {
+	private static function addAffectedMfaTotpSecrets(array $users, array &$db_users): void {
 		$userids = [];
 
 		foreach ($users as $user) {
@@ -1793,72 +1793,69 @@ class CUser extends CApiService {
 	 */
 	private static function updateMfaTotpSecret(array &$users, array $db_users = null): void {
 		$ins_mfa_totp_secrets = [];
-		$upd_mfa_totp_secrets = [];
 		$del_mfa_totp_secrets = [];
 
-		foreach ($users as $user) {
+		foreach ($users as $i => &$user) {
 			if (!array_key_exists('mfa_totp_secrets', $user)) {
 				continue;
 			}
 
-			$db_mfa_totp_secrets =[];
-
-			if ($db_users != null) {
-				$db_users_mfa_totp_secrets = DB::select('mfa_totp_secret', [
-					'output' => ['mfa_totp_secretid', 'mfaid', 'totp_secret'],
-					'filter' => ['userid' => $user['userid']]
-				]);
-				$db_mfa_totp_secrets = array_column($db_users_mfa_totp_secrets, null, 'mfaid');
-			}
+			$changed = false;
+			$db_mfa_totp_secrets = ($db_users !== null) ? $db_users[$user['userid']]['mfa_totp_secrets'] : [];
 
 			foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-				if (array_key_exists($mfa_totp_secret['mfaid'], $db_mfa_totp_secrets)) {
-					$db_mfa_totp_secret = $db_mfa_totp_secrets[$mfa_totp_secret['mfaid']];
-					$mfa_totp_secret['mfa_totp_secretid'] = $db_mfa_totp_secret['mfa_totp_secretid'];
-					unset($db_mfa_totp_secrets[$mfa_totp_secret['mfaid']]);
+				$mfa_totp_secretid = key(array_filter($db_mfa_totp_secrets, static function (array $db_mfa_totp_secret) use ($mfa_totp_secret): bool {
+					return $mfa_totp_secret['mfaid'] === $db_mfa_totp_secret['mfaid']
+						&& (!array_key_exists('totp_secret', $mfa_totp_secret) || $mfa_totp_secret['totp_secret'] === $db_mfa_totp_secret['totp_secret']);
+				}));
 
-					$upd_mfa_totp_secret = DB::getUpdatedValues('mfa_totp_secret', $mfa_totp_secret, $db_mfa_totp_secret);
-
-					if ($upd_mfa_totp_secret) {
-						$upd_mfa_totp_secrets[] = [
-							'values' => $upd_mfa_totp_secret,
-							'where' => ['mfa_totp_secretid' => $db_mfa_totp_secret['mfa_totp_secretid']]
-						];
-					}
+				if ($mfa_totp_secretid !== null) {
+					$mfa_totp_secret['mfa_totp_secretid'] = $mfa_totp_secretid;
+					unset($db_mfa_totp_secrets[$mfa_totp_secretid]);
 				}
 				else {
 					$ins_mfa_totp_secrets[] = ['userid' => $user['userid']] + $mfa_totp_secret;
+					$changed = true;
 				}
 			}
 			unset($mfa_totp_secret);
 
-			$del_mfa_totp_secrets = array_merge($del_mfa_totp_secrets,
-				array_column($db_mfa_totp_secrets, 'mfa_totp_secretid')
-			);
+			if ($db_mfa_totp_secrets) {
+				$del_mfa_totp_secrets = array_merge($del_mfa_totp_secrets, array_keys($db_mfa_totp_secrets));
+				$changed = true;
+			}
+
+			if ($db_users !== null) {
+				if (!$changed) {
+					unset($user['mfa_totp_secrets'], $db_users[$user['userid']]['mfa_totp_secrets']);
+				}
+			}
 		}
+		unset($user);
 
 		if ($del_mfa_totp_secrets) {
 			DB::delete('mfa_totp_secret', ['mfa_totp_secretid' => $del_mfa_totp_secrets]);
 		}
 
-		if ($upd_mfa_totp_secrets) {
-			DB::update('mfa_totp_secret', $upd_mfa_totp_secrets);
-		}
-
 		if ($ins_mfa_totp_secrets) {
 			$mfa_totp_secretids = DB::insert('mfa_totp_secret', $ins_mfa_totp_secrets);
+		}
 
-			foreach ($users as &$user) {
-				if (array_key_exists('mfa_totp_secrets', $user)) {
-					foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
-						$mfa_totp_secret['mfa_totp_secretid'] = array_shift($mfa_totp_secretids);
-					}
-					unset($mfa_totp_secret);
+		foreach ($users as &$user) {
+			if (!array_key_exists('mfa_totp_secrets', $user)) {
+				continue;
+			}
+
+			foreach ($user['mfa_totp_secrets'] as &$mfa_totp_secret) {
+				if (!array_key_exists('mfa_totp_secretid', $mfa_totp_secret)) {
+					$mfa_totp_secret['mfa_totp_secretid'] = array_shift($mfa_totp_secretids);
 				}
 			}
-			unset($user);
+			unset($mfa_totp_secret);
 		}
+		unset($user);
 	}
+
 
 	/**
 	 * @param array $userids
