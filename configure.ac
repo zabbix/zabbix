@@ -1024,9 +1024,6 @@ freebsd*)
 netbsd*)
 	ARCH="netbsd"
 	;;
-osf*)
-	ARCH="osf"
-	;;
 openbsd*)
 	ARCH="openbsd"
 	;;
@@ -2067,7 +2064,6 @@ AC_CONFIG_FILES([
 	src/libs/zbxsysinfo/linux/Makefile
 	src/libs/zbxsysinfo/netbsd/Makefile
 	src/libs/zbxsysinfo/openbsd/Makefile
-	src/libs/zbxsysinfo/osf/Makefile
 	src/libs/zbxsysinfo/osx/Makefile
 	src/libs/zbxsysinfo/simple/Makefile
 	src/libs/zbxsysinfo/solaris/Makefile
