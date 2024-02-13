@@ -62,10 +62,7 @@ class CControllerUserResetTotp extends CController {
 
 		unset($resetids[CWebUser::$data['userid']]);
 
-		DB::update('sessions', [
-			'values' => ['status' => ZBX_SESSION_PASSIVE],
-			'where' => ['userid' => $resetids]
-		]);
+		CUser::terminateActiveSessions($resetids);
 
 		$response = new CControllerResponseRedirect(
 			(new CUrl('zabbix.php'))

@@ -3596,4 +3596,11 @@ class CUser extends CApiService {
 
 		return $totp_generator;
 	}
+
+	public static function terminateActiveSessions(array $userids): void {
+		DB::update('sessions', [
+			'values' => ['status' => ZBX_SESSION_PASSIVE],
+			'where' => ['userid' => $userids]
+		]);
+	}
 }
