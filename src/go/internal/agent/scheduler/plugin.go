@@ -87,7 +87,6 @@ func (p *pluginAgent) queued() bool {
 	return p.index != -1
 }
 
-
 func (p *pluginAgent) hasCapacity() bool {
 	if len(p.tasks) == 0 {
 		return false
@@ -95,11 +94,14 @@ func (p *pluginAgent) hasCapacity() bool {
 
 	w := p.tasks[0].getWeight()
 
-	if p.maxCapacity-p.usedCapacity < w && p.maxCapacity != overridenMaxCapacity {
+	if p.maxCapacity-p.usedCapacity < w {
+		if overridenMaxCapacity-p.usedCapacity < w {
+			return false
+		}
 		p.maxCapacity = overridenMaxCapacity
 	}
 
-	 return p.maxCapacity-p.usedCapacity >= w
+	return true
 }
 
 func (p *pluginAgent) active() bool {
