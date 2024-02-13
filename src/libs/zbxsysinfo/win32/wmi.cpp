@@ -231,12 +231,7 @@ out1:
 	pclsObj->Release();
 
 	while (WBEM_S_NO_ERROR == hres1)
-	{
-		hres1 = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
-
-		if (0 != uReturn)
-			pclsObj->Release();
-	}
+		hres1 = pEnumerator->Skip((long)(1000 * timeout), 1);
 out2:
 	return ret;
 }
