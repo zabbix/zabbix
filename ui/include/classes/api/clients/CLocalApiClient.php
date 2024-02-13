@@ -141,7 +141,7 @@ class CLocalApiClient extends CApiClient {
 			if ($newTransaction) {
 				// if we're calling user.login and authentication failed - commit the transaction to save the
 				// failed attempt data
-				if (($api === 'user' && $method === 'login') || ($api === 'user' && $method === 'confirm')) {
+				if (($api === 'user' && $method === 'login')) {
 					DBend(true);
 				}
 				// otherwise - revert the transaction
@@ -218,8 +218,6 @@ class CLocalApiClient extends CApiClient {
 	protected function requiresAuthentication($api, $method) {
 		return !(($api === 'user' && $method === 'login')
 			|| ($api === 'user' && $method === 'checkauthentication')
-			|| ($api === 'user' && $method === 'getconfirmdata')
-			|| ($api === 'user' && $method === 'confirm')
 			|| ($api === 'apiinfo' && $method === 'version')
 			|| ($api === 'settings' && $method === 'getglobal'));
 	}
