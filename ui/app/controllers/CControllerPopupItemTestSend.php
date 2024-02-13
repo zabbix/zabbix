@@ -408,6 +408,8 @@ class CControllerPopupItemTestSend extends CControllerPopupItemTest {
 							unset($step['result']);
 							$test_failed = $step['type'] != ZBX_PREPROC_VALIDATE_NOT_SUPPORTED;
 						}
+
+						$step['error'] = $step['error']['value'];
 					}
 					elseif (array_key_exists('truncated', $step) && $step['truncated']) {
 						$step['warning'] = _s('First %1$s of %2$s shown.',

@@ -1198,12 +1198,12 @@ abstract class CControllerPopupItemTest extends CController {
 		// Server defaults to checking status code is 200 if field not present. Turn off code check if unspecified.
 		if ($this->item_type == ITEM_TYPE_HTTPAGENT) {
 			$data['item'] += ['status_codes' => ''];
+
+			self::transformHttpFields($data['item']);
 		}
 
-		self::transformHttpFields($data['item']);
-
 		if (array_key_exists('parameters', $data['item'])) {
-			$data['item']['parameters'] = $this->transformParametersFields($data['item']['parameters']);
+			$data['item']['parameters'] = array_column($data['item']['parameters'], 'value', 'name');
 		}
 	}
 
@@ -1227,16 +1227,6 @@ abstract class CControllerPopupItemTest extends CController {
 			unset($header);
 
 			$item['headers'] = implode("\r\n", $item['headers']);
-		}
-
-		if (array_key_exists('parameters', $item)) {
-			$parameters = [];
-
-			foreach ($item['parameters'] as $parameter) {
-				$parameters += [$parameter['name'] => $parameter['value']];
-			}
-
-			$data['parameters'] = $parameters;
 		}
 	}
 
