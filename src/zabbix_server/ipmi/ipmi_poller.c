@@ -279,10 +279,6 @@ ZBX_THREAD_ENTRY(ipmi_poller_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_ipc_async_socket_close(&ipmi_socket);
-
-	zbx_free_ipmi_handler();
 #undef STAT_INTERVAL
 }
 

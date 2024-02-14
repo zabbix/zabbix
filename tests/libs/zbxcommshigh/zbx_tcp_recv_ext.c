@@ -33,6 +33,7 @@ void	zbx_mock_test_entry(void **state)
 	char		*buffer;
 	zbx_socket_t	s;
 	ssize_t		received;
+	size_t		out_fragments;
 	int		expected_ret, offset = ZBX_TCP_HEADER_DATALEN_LEN;
 
 	ZBX_UNUSED(state);
@@ -56,7 +57,8 @@ void	zbx_mock_test_entry(void **state)
 	if (0 == received)
 		return;
 
-	buffer = zbx_yaml_assemble_binary_sequence("out.fragments", received);
+	out_fragments = (size_t)received;
+	buffer = zbx_yaml_assemble_binary_sequence("out.fragments", out_fragments);
 
 	if (0 != (ZBX_TCP_LARGE & s.protocol))
 		offset += 8;

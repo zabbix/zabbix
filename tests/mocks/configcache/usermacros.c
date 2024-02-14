@@ -180,7 +180,9 @@ void	mock_config_load_user_macros(const char *path)
 	mock_config.initialized |= ZBX_MOCK_CONFIG_USERMACROS;
 }
 
-void	mock_config_free_user_macros()
+void	mock_config_free_user_macros(void);
+
+void	mock_config_free_user_macros(void)
 {
 	int	i, j;
 

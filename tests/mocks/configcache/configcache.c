@@ -18,6 +18,7 @@
 **/
 
 #include "configcache.h"
+#include "configcache_mock.h"
 
 #include "zbxmocktest.h"
 #include "zbxmockdata.h"
@@ -36,9 +37,10 @@
 zbx_mock_config_t	mock_config;
 
 void	*__real_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
+void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 
-void	mock_config_free_user_macros();
-void	mock_config_free_hosts();
+void	mock_config_free_user_macros(void);
+void	mock_config_free_hosts(void);
 
 void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
@@ -121,13 +123,13 @@ void	free_string(const char *str)
 	zbx_free(ptr);
 }
 
-void	mock_config_init()
+void	mock_config_init(void)
 {
 	memset(&mock_config, 0, sizeof(mock_config));
 	config = &mock_config.dc;
 }
 
-void	mock_config_free()
+void	mock_config_free(void)
 {
 	if (0 != (mock_config.initialized & ZBX_MOCK_CONFIG_USERMACROS))
 		mock_config_free_user_macros();
