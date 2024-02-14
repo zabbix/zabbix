@@ -19,7 +19,7 @@
 **/
 
 
-class CControllerNotificationsRead extends CController {
+class CControllerNotificationsSnooze extends CController {
 
 	protected function init(): void {
 		$this->disableCsrfValidation();
@@ -27,7 +27,7 @@ class CControllerNotificationsRead extends CController {
 
 	protected function checkInput(): bool {
 		$fields = [
-			'ids' => 'array_db events.eventid|required'
+			'eventid' => 'required|db events.eventid'
 		];
 
 		$ret = $this->validateInput($fields);
@@ -51,32 +51,11 @@ class CControllerNotificationsRead extends CController {
 
 	protected function doAction(): void {
 		$msg_settings = getMessageSettings();
+		$msg_settings['snoozed.eventid'] = $this->getInput('eventid');
 
-		$events = API::Event()->get([
-			'output' => ['clock', 'r_eventid'],
-			'eventids' => $this->input['ids'],
-			'preservekeys' => true
-		]);
-
-		$recovery_eventids = array_filter(zbx_objectValues($events, 'r_eventid'));
-		if ($recovery_eventids) {
-			$events += API::Event()->get([
-				'output' => ['clock'],
-				'eventids' => $recovery_eventids,
-				'preservekeys' => true
-			]);
-		}
-
-		CArrayHelper::sort($events, [
-			['field' => 'clock', 'order' => ZBX_SORT_DOWN]
-		]);
-
-		$last_event = reset($events);
-
-		$msg_settings['last.clock'] = $last_event['clock'] + 1;
 		updateMessageSettings($msg_settings);
 
-		$data = json_encode(['ids' => array_keys($events)]);
+		$data = json_encode(['snoozed_eventid' => (int) $msg_settings['snoozed.eventid']]);
 		$this->setResponse(new CControllerResponseData(['main_block' => $data]));
 	}
 }
