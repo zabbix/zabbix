@@ -92,7 +92,7 @@ class CMfa extends CApiService {
 			// output
 			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
+			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid', 'mfa_status', 'mfaid']), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
@@ -136,23 +136,23 @@ class CMfa extends CApiService {
 			$output = ['mfaid'];
 		}
 		elseif ($options['selectUsrgrps'] === API_OUTPUT_EXTEND) {
-			$output = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'mfaid'];
+			$output = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid', 'mfa_status', 'mfaid'];
 		}
 		else {
-			$output = array_unique(array_merge(['mfaid'], $options['selectUsrgrps']));
+			$output = array_merge(['mfaid'], $options['selectUsrgrps']);
 		}
 
 		$default_mfaid = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
+
 		if (array_key_exists($default_mfaid, $result)) {
 			$db_usergroups_mfa_enabled = API::UserGroup()->get([
 				'output' => $output,
+				'mfaids' => 0,
 				'mfa_status' => GROUP_MFA_ENABLED
 			]);
 
 			foreach ($db_usergroups_mfa_enabled as $db_usergroup) {
-				if ($db_usergroup['mfaid'] == 0) {
-					$result[$default_mfaid]['usrgrps'][] = array_diff_key($db_usergroup, array_flip(['mfaid']));
-				}
+				$result[$default_mfaid]['usrgrps'][] = array_diff_key($db_usergroup, array_flip(['mfaid']));
 			}
 		}
 
@@ -162,8 +162,7 @@ class CMfa extends CApiService {
 		]);
 
 		foreach ($db_usergroups as $db_usergroup) {
-			$result[$db_usergroup['mfaid']]['usrgrps'][] =
-				array_diff_key($db_usergroup, array_flip(['mfaid']));
+			$result[$db_usergroup['mfaid']]['usrgrps'][] = array_diff_key($db_usergroup, array_flip(['mfaid']));
 		}
 
 		if ($options['selectUsrgrps'] === API_OUTPUT_COUNT) {
