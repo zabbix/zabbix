@@ -131,7 +131,7 @@ int	zbx_agent_handle_response(char *buffer, size_t read_bytes, ssize_t received_
 			SET_TEXT_RESULT(result, zbx_strdup(NULL, value));
 		}
 		else
-			result->type = 0;
+			zbx_free_agent_result(result);
 
 		zbx_free(value);
 

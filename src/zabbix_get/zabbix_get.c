@@ -325,7 +325,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 					zbx_rtrim(result.msg, "\r\n");
 					printf("%s: %s\n", ZBX_NOTSUPPORTED, result.msg);
 				}
-				else if (0 == result.type)
+				else if (0 == ZBX_ISSET_VALUE(&result))
 				{
 					puts("No value was received.");
 				}
