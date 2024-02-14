@@ -73,9 +73,9 @@ $form
 					->setFocusableElementId('hash_function')
 					->setValue($data['hash_function'])
 					->addOptions(CSelect::createOptionsFromArray([
-						TOTP_HASH_SHA1 => _('SHA-1'),
-						TOTP_HASH_SHA256 => _('SHA-256'),
-						TOTP_HASH_SHA512 => _('SHA-512')
+						TOTP_HASH_SHA1 => 'SHA-1',
+						TOTP_HASH_SHA256 => 'SHA-256',
+						TOTP_HASH_SHA512 => 'SHA-512'
 					]))
 			))->setId('hash_function')
 		])
@@ -86,8 +86,8 @@ $form
 					->setFocusableElementId('code_length')
 					->setValue($data['code_length'])
 					->addOptions(CSelect::createOptionsFromArray([
-						TOTP_CODE_LENGTH_6 => _('6'),
-						TOTP_CODE_LENGTH_8 => _('8')
+						TOTP_CODE_LENGTH_6 => '6',
+						TOTP_CODE_LENGTH_8 => '8'
 					]))
 			))->setId('code_length')
 		])

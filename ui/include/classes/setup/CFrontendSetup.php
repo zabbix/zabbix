@@ -684,11 +684,11 @@ class CFrontendSetup {
 		$current = function_exists('curl_init');
 
 		return [
-			'name' => _('PHP Curl'),
+			'name' => _('PHP curl'),
 			'current' => $current ? _('on') : _('off'),
 			'required' => null,
 			'result' => $current ? self::CHECK_OK : self::CHECK_WARNING,
-			'error' => _('PHP Curl extension missing.')
+			'error' => _('PHP curl extension missing.')
 		];
 	}
 }
