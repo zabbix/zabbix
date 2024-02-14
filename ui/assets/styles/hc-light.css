@@ -3077,7 +3077,8 @@ output {
       transition: none;
       cursor: default; }
     .radio-list-control input[type="radio"]:checked[readonly] + label {
-      background-color: #878787 !important; }
+      background-color: #878787 !important;
+      -webkit-text-fill-color: #000000 !important; }
 
 .range-control {
   position: relative;

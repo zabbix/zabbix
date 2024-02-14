@@ -3123,7 +3123,8 @@ output {
       transition: none;
       cursor: default; }
     .radio-list-control input[type="radio"]:checked[readonly] + label {
-      background-color: #d6dde1 !important; }
+      background-color: #d6dde1 !important;
+      -webkit-text-fill-color: #1f2c33 !important; }
 
 .range-control {
   position: relative;
