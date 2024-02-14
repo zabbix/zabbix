@@ -23,6 +23,8 @@ require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
+ *  @dataSource TopHostsWidget, ItemValueWidget
+ *
  * @backup dashboard, dashboard_user, dashboard_usrgrp
  */
 class testPageDashboardList extends CWebTest {
@@ -78,7 +80,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 20
+					'result_count' => 26
 				]
 			],
 			[
@@ -86,7 +88,7 @@ class testPageDashboardList extends CWebTest {
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 19
+					'result_count' => 25
 				]
 			],
 			[
@@ -104,7 +106,7 @@ class testPageDashboardList extends CWebTest {
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 12
+					'result_count' => 10
 				]
 			],
 			[
