@@ -109,7 +109,6 @@ static ub4	OCI_DBserver_status(void);
 #define ZBX_PG_DEADLOCK		"40P01"
 
 static PGconn			*conn = NULL;
-static unsigned int		ZBX_PG_BYTEAOID = 0;
 int			ZBX_TSDB_VERSION = -1;
 static zbx_uint32_t		ZBX_PG_SVERSION = ZBX_DBVERSION_UNDEFINED;
 char				ZBX_PG_ESCAPE_BACKSLASH = 1;
@@ -833,18 +832,6 @@ int	zbx_db_connect(char *host, char *user, char *password, char *dbname, char *d
 
 	if (ZBX_DB_FAIL == ret || ZBX_DB_DOWN == ret)
 		goto out;
-
-	result = zbx_db_select("select oid from pg_type where typname='bytea'");
-
-	if ((DB_RESULT)ZBX_DB_DOWN == result || NULL == result)
-	{
-		ret = (NULL == result) ? ZBX_DB_FAIL : ZBX_DB_DOWN;
-		goto out;
-	}
-
-	if (NULL != (row = zbx_db_fetch(result)))
-		ZBX_PG_BYTEAOID = atoi(row[0]);
-	DBfree_result(result);
 
 	/* disable "nonstandard use of \' in a string literal" warning */
 	if (0 < (ret = zbx_db_execute("set escape_string_warning to off")))
@@ -2121,35 +2108,27 @@ DB_ROW	zbx_db_fetch(DB_RESULT result)
 
 	return result->values;
 #elif defined(HAVE_POSTGRESQL)
-	/* free old data */
-	if (NULL != result->values)
-		zbx_free(result->values);
-
 	/* EOF */
 	if (result->cursor == result->row_num)
 		return NULL;
 
 	/* init result */
-	result->fld_num = PQnfields(result->pg_result);
+	if (0 == result->cursor)
+		result->fld_num = PQnfields(result->pg_result);
 
 	if (result->fld_num > 0)
 	{
 		int	i;
 
-		result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
+		if (NULL == result->values)
+			result->values = zbx_malloc(result->values, sizeof(char *) * result->fld_num);
 
 		for (i = 0; i < result->fld_num; i++)
 		{
-			if (PQgetisnull(result->pg_result, result->cursor, i))
-			{
-				result->values[i] = NULL;
-			}
-			else
-			{
-				result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
-				if (PQftype(result->pg_result, i) == ZBX_PG_BYTEAOID)	/* binary data type BYTEAOID */
-					zbx_db_bytea_unescape((u_char *)result->values[i]);
-			}
+			result->values[i] = PQgetvalue(result->pg_result, result->cursor, i);
+
+			if ('\0' == *result->values[i] && PQgetisnull(result->pg_result, result->cursor, i))
+					result->values[i] = NULL;
 		}
 	}
 
