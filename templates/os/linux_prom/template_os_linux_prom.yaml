@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T16:01:13Z'
+  date: '2024-02-14T13:41:35Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1927,8 +1927,8 @@ zabbix_export:
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-          value: ^7$
-          description: 'Ignore notPresent(7).'
+          value: ^notpresent$
+          description: 'Ignore notpresent(1).'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'
