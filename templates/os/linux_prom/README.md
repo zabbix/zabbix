@@ -59,7 +59,7 @@ Please refer to the node_exporter docs. Use node_exporter v0.18.0 or above.
 |{$NET.IF.IFNAME.MATCHES}||`^.*$`|
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}||`^.*$`|
-|{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notPresent(7).</p>|`^7$`|
+|{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notpresent(1).</p>|`^notpresent$`|
 |{$NET.IF.IFALIAS.MATCHES}||`^.*$`|
 |{$NET.IF.IFALIAS.NOT_MATCHES}||`CHANGE_IF_NEEDED`|
 |{$VFS.FS.FREE.MIN.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`5G`|
