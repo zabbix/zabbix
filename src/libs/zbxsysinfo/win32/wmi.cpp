@@ -172,30 +172,30 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	VARIANT			*vtProp = NULL;
 	IWbemClassObject	*pclsObj = 0;
 	ULONG			uReturn = 0;
-	HRESULT			hres1, hres2;
+	HRESULT			hres, hres_enum;
 	zbx_vector_wmi_prop_t	*inst_val;
 	zbx_wmi_prop_t		prop;
 
-	hres1 = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
+	hres_enum = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
 
-	if (WBEM_S_TIMEDOUT == hres1)
+	if (WBEM_S_TIMEDOUT == hres_enum)
 	{
 		*error = zbx_strdup(*error, "WMI query timeout.");
 		goto out2;
 	}
 
-	if (FAILED(hres1))
+	if (FAILED(hres_enum))
 	{
-		get_error_code_text(hres1, error);
+		get_error_code_text(hres_enum, error);
 		goto out2;
 	}
 
 	if (0 == uReturn)
 		goto out2;
 
-	hres2 = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
+	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
-	if (FAILED(hres2))
+	if (FAILED(hres))
 	{
 		*error = zbx_strdup(*error, "Cannot start WMI query result enumeration.");
 		goto out1;
@@ -203,9 +203,9 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 
 	vtProp = (VARIANT*) zbx_malloc(NULL, sizeof(VARIANT));
 	VariantInit(vtProp);
-	hres2 = pclsObj->Next(0, NULL, vtProp, 0, 0);
+	hres = pclsObj->Next(0, NULL, vtProp, 0, 0);
 
-	if (FAILED(hres2))
+	if (FAILED(hres))
 	{
 		*error = zbx_strdup(*error, "Cannot parse WMI result field.");
 		zbx_free(vtProp);
@@ -214,7 +214,7 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 
 	pclsObj->EndEnumeration();
 
-	if (hres2 == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
+	if (hres == WBEM_S_NO_MORE_DATA || VT_EMPTY == V_VT(vtProp) || VT_NULL == V_VT(vtProp))
 	{
 		zbx_free(vtProp);
 		goto out1;
@@ -231,8 +231,8 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 out1:
 	pclsObj->Release();
 
-	while (WBEM_S_NO_ERROR == hres1)
-		hres1 = pEnumerator->Skip((long)(1000 * timeout), 1);
+	while (WBEM_S_NO_ERROR == hres_enum)
+		hres_enum = pEnumerator->Skip((long)(1000 * timeout), 1);
 out2:
 	return ret;
 }
