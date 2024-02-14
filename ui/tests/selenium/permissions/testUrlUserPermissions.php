@@ -717,6 +717,11 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			}
 			if ($user && !array_key_exists('no_permissions_to_object', $data)) {
 				$this->zbxTestOpen($data['url']);
+
+				if ($alias === 'guest') {
+					$this->guestLogin();
+				}
+
 				$this->zbxTestCheckTitle($data['title']);
 				if ($data['url'] === 'zabbix.php?action=userprofile.edit') {
 					$this->zbxTestCheckHeader($data['header'].$alias);
@@ -727,11 +732,21 @@ class testUrlUserPermissions extends CLegacyWebTest {
 			}
 			elseif ($user && array_key_exists('no_permissions_to_object', $data) ) {
 				$this->zbxTestOpen($data['url']);
+
+				if ($alias === 'guest') {
+					$this->guestLogin();
+				}
+
 				$this->zbxTestCheckTitle($data['title']);
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'No permissions to referred object or it does not exist!');
 			}
 			else {
 				$this->zbxTestOpen($data['url']);
+
+				if ($alias === 'guest') {
+					$this->guestLogin();
+				}
+
 				$this->zbxTestWaitUntilMessageTextPresent('msg-bad', 'Access denied');
 				$this->zbxTestAssertElementText("//ul/li[1]", 'You are logged in as "'.$alias.'". You have no permissions to access this page.');
 				$this->zbxTestAssertElementText("//ul/li[2]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
@@ -752,5 +767,15 @@ class testUrlUserPermissions extends CLegacyWebTest {
 		$this->zbxTestAssertElementText("//ul/li[1]", 'You must login to view this page.');
 		$this->zbxTestAssertElementText("//ul/li[2]", 'Possibly the session has expired or the password was changed.');
 		$this->zbxTestAssertElementText("//ul/li[3]", 'If you think this message is wrong, please consult your administrators about getting the necessary permissions.');
+	}
+
+	/**
+	 * Login as guest user.
+	 */
+	protected function guestLogin() {
+		$this->query('button:Login')->one()->click();
+		$this->page->waitUntilReady();
+		$this->query('link:sign in as guest')->one()->click();
+		$this->page->waitUntilReady();
 	}
 }
