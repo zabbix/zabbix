@@ -38,7 +38,6 @@ const DASHBOARD_PAGE_EVENT_RESERVE_HEADER_LINES = 'dashboard-page-reserve-header
 // Dashboard page ready event: informs the dashboard that the dashboard page has been fully loaded (fired once).
 const DASHBOARD_PAGE_EVENT_READY = 'dashboard-page-ready';
 
-
 class CDashboardPage extends CBaseComponent {
 
 	constructor(target, {
