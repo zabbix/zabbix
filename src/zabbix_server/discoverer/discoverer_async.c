@@ -620,7 +620,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 		(void)zbx_iprange_ip2str(task->range.ipranges->values[task->range.state.index_ip].type,
 				task->range.state.ipaddress, ip, sizeof(ip));
 
-		if ('\0' == *first_ip)
+		if (SUCCEED == ZBX_CHECK_LOG_LEVEL(LOG_LEVEL_DEBUG) && '\0' == *first_ip)
 			zbx_strlcpy(first_ip, ip, sizeof(first_ip));
 
 		result = discoverer_result_create(druleid, task->unique_dcheckid);

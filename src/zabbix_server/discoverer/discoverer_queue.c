@@ -184,6 +184,7 @@ void	discoverer_queue_destroy(zbx_discoverer_queue_t *queue)
 	discoverer_queue_clear_jobs(&queue->jobs);
 	zbx_list_destroy(&queue->jobs);
 
+	zbx_vector_uint64_destroy(&queue->del_jobs);
 	zbx_vector_discoverer_drule_error_clear_ext(&queue->errors, zbx_discoverer_drule_error_free);
 	zbx_vector_discoverer_drule_error_destroy(&queue->errors);
 
@@ -256,6 +257,7 @@ int	discoverer_queue_init(zbx_discoverer_queue_t *queue, int snmpv3_allowed_work
 	queue->snmpv3_allowed_workers = snmpv3_allowed_workers;
 	queue->flags = DISCOVERER_QUEUE_INIT_NONE;
 	zbx_vector_discoverer_drule_error_create(&queue->errors);
+	zbx_vector_uint64_create(&queue->del_jobs);
 
 	zbx_list_create(&queue->jobs);
 

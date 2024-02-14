@@ -549,25 +549,6 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 			result = results.values[i];
 
-			if ('\0' == *result->ip)
-			{
-				int				j;
-				char				*err = NULL;
-				zbx_discoverer_drule_error_t	derror = {.druleid = result->druleid};
-
-				if (FAIL != (j = zbx_vector_discoverer_drule_error_search(drule_errors, derror,
-						ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
-				{
-					err = drule_errors->values[j].error;
-					zbx_vector_discoverer_drule_error_remove(drule_errors, j);
-				}
-
-				zbx_discovery_update_drule(handle, result->druleid, err, result->now);
-				zbx_free(err);
-
-				continue;
-			}
-
 			if (NULL == result->dnsname)
 			{
 				zabbix_log(LOG_LEVEL_WARNING,
@@ -609,6 +590,43 @@ static int	process_results(zbx_discoverer_manager_t *manager, zbx_vector_uint64_
 
 	return DISCOVERER_BATCH_RESULTS_NUM <= res_check_count ? 1 : 0;
 #undef DISCOVERER_BATCH_RESULTS_NUM
+}
+
+static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_discoverer_drule_error_t *drule_errors,
+		zbx_hashset_t *incomplete_druleids)
+{
+	void	*handle;
+	int	i;
+	time_t	now;
+
+	if (0 == del_jobs->values_num)
+		return;
+
+	now = time(NULL);
+	handle = zbx_discovery_open();
+
+	for (i = del_jobs->values_num; i != 0; i--)
+	{
+		int				j;
+		char				*err = NULL;
+		zbx_discoverer_drule_error_t	derror = {.druleid = del_jobs->values[i - 1]};
+
+		if (NULL != zbx_hashset_search(incomplete_druleids, &derror.druleid))
+			continue;
+
+		if (FAIL != (j = zbx_vector_discoverer_drule_error_search(drule_errors, derror,
+				ZBX_DEFAULT_UINT64_COMPARE_FUNC)))
+		{
+			err = drule_errors->values[j].error;
+			zbx_vector_discoverer_drule_error_remove(drule_errors, j);
+		}
+
+		zbx_discovery_update_drule(handle, derror.druleid, err, now);
+		zbx_free(err);
+		zbx_vector_uint64_remove(del_jobs, i - 1);
+	}
+
+	zbx_discovery_close(handle);
 }
 
 static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
@@ -1219,10 +1237,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			{
 				if (0 == job->workers_used)
 				{
-					pthread_mutex_lock(&dmanager.results_lock);
-					(void)discoverer_results_host_reg(&dmanager.results, job->druleid, 0, "");
-					pthread_mutex_unlock(&dmanager.results_lock);
-
+					zbx_vector_uint64_append(&queue->del_jobs, job->druleid);
 					discoverer_job_remove(job);
 				}
 				else
@@ -1300,10 +1315,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			}
 			else if (DISCOVERER_JOB_STATUS_REMOVING == job->status && 0 == job->workers_used)
 			{
-				pthread_mutex_lock(&dmanager.results_lock);
-				(void)discoverer_results_host_reg(&dmanager.results, job->druleid, 0, "");
-				pthread_mutex_unlock(&dmanager.results_lock);
-
+				zbx_vector_uint64_append(&queue->del_jobs, job->druleid);
 				discoverer_job_remove(job);
 			}
 
@@ -1575,7 +1587,7 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 	unsigned char				process_type = ((zbx_thread_args_t *)args)->info.process_type;
 	char					*error = NULL;
 	zbx_vector_uint64_pair_t		revisions;
-	zbx_vector_uint64_t			del_druleids;
+	zbx_vector_uint64_t			del_druleids, del_jobs;
 	zbx_vector_discoverer_drule_error_t	drule_errors;
 	zbx_hashset_t				incomplete_druleids;
 	zbx_uint32_t				rtc_msgs[] = {ZBX_RTC_SNMP_CACHE_RELOAD};
@@ -1615,6 +1627,8 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 	zbx_vector_uint64_pair_create(&revisions);
 	zbx_vector_uint64_create(&del_druleids);
+	zbx_vector_uint64_create(&del_jobs);
+
 	zbx_hashset_create(&incomplete_druleids, 1, ZBX_DEFAULT_UINT64_HASH_FUNC, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
 	zbx_vector_discoverer_drule_error_create(&drule_errors);
 
@@ -1666,11 +1680,26 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				dmanager.queue.errors.values_num);
 		zbx_vector_discoverer_drule_error_clear(&dmanager.queue.errors);
 
+		zbx_vector_uint64_clear(&del_jobs);
+		zbx_vector_uint64_append_array(&del_jobs, dmanager.queue.del_jobs.values,
+				dmanager.queue.del_jobs.values_num);
+		zbx_vector_uint64_clear(&dmanager.queue.del_jobs);
+
 		discoverer_queue_unlock(&dmanager.queue);
 
 		zbx_vector_uint64_sort(&del_druleids, ZBX_DEFAULT_UINT64_COMPARE_FUNC);
+
 		more_results = process_results(&dmanager, &del_druleids, &incomplete_druleids, &unsaved_checks,
 				&drule_errors, discoverer_args_in->events_cbs);
+
+		process_job_finalize(&del_jobs, &drule_errors, &incomplete_druleids);
+
+		if (0 != del_jobs.values_num)
+		{
+			discoverer_queue_lock(&dmanager.queue);
+			zbx_vector_uint64_append_array(&dmanager.queue.del_jobs, del_jobs.values, del_jobs.values_num);
+			discoverer_queue_unlock(&dmanager.queue);
+		}
 
 		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_UI64 " unsaved checks]",
 				get_process_type_string(process_type), process_num, processing_rules_num, unsaved_checks);

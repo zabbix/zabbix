@@ -31,6 +31,7 @@ typedef struct
 	pthread_mutex_t				lock;
 	pthread_cond_t				event;
 	int					flags;
+	zbx_vector_uint64_t			del_jobs;
 	zbx_vector_discoverer_drule_error_t	errors;
 }
 zbx_discoverer_queue_t;
