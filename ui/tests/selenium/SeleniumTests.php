@@ -26,6 +26,7 @@ require_once dirname(__FILE__).'/actions/testPageActions.php';
 // Administration.
 require_once dirname(__FILE__).'/administration/testFormAdministrationAuditLog.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralAutoregistration.php';
+require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralGeomaps.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralGUI.php';
 //require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralImages.php';
 require_once dirname(__FILE__).'/administration/testFormAdministrationGeneralOtherParams.php';
@@ -70,6 +71,7 @@ require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteGraphsWid
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardFavoriteMapsWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGaugeWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidget.php';
+require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGeomapWidgetScreenshots.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphPrototypeWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidget.php';
 require_once dirname(__FILE__).'/dashboardWidgets/testDashboardGraphWidgetSelectedHosts.php';
@@ -94,10 +96,6 @@ require_once dirname(__FILE__).'/eventCorrelation/testPageEventCorrelation.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterHosts.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterLatestData.php';
 require_once dirname(__FILE__).'/filterTabs/testFormFilterProblems.php';
-
-// Geomaps.
-require_once dirname(__FILE__).'/geomaps/testFormAdministrationGeneralGeomaps.php';
-require_once dirname(__FILE__).'/geomaps/testGeomapWidgetScreenshots.php';
 
 // Graphs.
 require_once dirname(__FILE__).'/graphs/testDataDisplayInGraphs.php';
@@ -345,6 +343,7 @@ class SeleniumTests {
 		// Administration.
 		$suite->addTestSuite('testFormAdministrationAuditLog');
 		$suite->addTestSuite('testFormAdministrationGeneralAutoregistration');
+		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
 		$suite->addTestSuite('testFormAdministrationGeneralGUI');
 //		$suite->addTestSuite('testFormAdministrationGeneralImages');
 		$suite->addTestSuite('testFormAdministrationGeneralOtherParams');
@@ -389,6 +388,7 @@ class SeleniumTests {
 		$suite->addTestSuite('testDashboardFavoriteMapsWidget');
 		$suite->addTestSuite('testDashboardGaugeWidget');
 		$suite->addTestSuite('testDashboardGeomapWidget');
+		$suite->addTestSuite('testDashboardGeomapWidgetScreenshots');
 		$suite->addTestSuite('testDashboardGraphPrototypeWidget');
 		$suite->addTestSuite('testDashboardGraphWidget');
 		$suite->addTestSuite('testDashboardGraphWidgetSelectedHosts');
@@ -413,10 +413,6 @@ class SeleniumTests {
 		$suite->addTestSuite('testFormFilterHosts');
 		$suite->addTestSuite('testFormFilterLatestData');
 		$suite->addTestSuite('testFormFilterProblems');
-
-		// Geomaps.
-		$suite->addTestSuite('testFormAdministrationGeneralGeomaps');
-		$suite->addTestSuite('testGeomapWidgetScreenshots');
 
 		// Graphs.
 		$suite->addTestSuite('testDataDisplayInGraphs');

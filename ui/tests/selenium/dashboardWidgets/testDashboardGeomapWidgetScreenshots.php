@@ -32,7 +32,7 @@ require_once dirname(__FILE__).'/../../include/helpers/CDataHelper.php';
  * Failed to load resource: the server responded with a status of 404 (Not Found)
  * @ignoreBrowserErrors
  */
-class testGeomapWidgetScreenshots extends CWebTest {
+class testDashboardGeomapWidgetScreenshots extends CWebTest {
 
 	// Dashboard for zoom screenshot tests.
 	protected static $zoom_dashboardid;
@@ -281,7 +281,7 @@ class testGeomapWidgetScreenshots extends CWebTest {
 	 *
 	 * @dataProvider getZoomWidgetData
 	 */
-	public function testGeomapWidgetScreenshots_Zoom($data) {
+	public function testDashboardGeomapWidgetScreenshots_Zoom($data) {
 		$this->page->login()->open('zabbix.php?action=geomaps.edit');
 		$this->page->waitUntilReady();
 
