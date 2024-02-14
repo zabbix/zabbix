@@ -362,13 +362,14 @@ abstract class CControllerPopupItemTest extends CController {
 	protected function getItemTestProperties(array $input, bool $for_server = false): array {
 		$data_host = [];
 		$data_item = [
-			'value_type' => (int) $input['value_type'],
-			'type' => $this->item_type
+			'value_type' => (int) $input['value_type']
 		];
 
 		if (!$this->is_item_testable) {
 			return ['item' => $data_item];
 		}
+
+		$data_item['type'] = $this->item_type;
 
 		if (array_key_exists('itemid', $input)) {
 			$data_item['itemid'] = $input['itemid'];
