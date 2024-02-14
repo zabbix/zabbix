@@ -21,6 +21,8 @@
 
 #include "zbxtime.h"
 #include "zbxnum.h"
+#include "zbxstr.h"
+#include "zbxalgo.h"
 
 typedef struct
 {

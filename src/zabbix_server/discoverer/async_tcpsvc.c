@@ -20,7 +20,6 @@
 #include "async_tcpsvc.h"
 #include "zbxcommon.h"
 #include "zbxcomms.h"
-#include "zbxip.h"
 #include "zbxself.h"
 #include "zbxsysinfo.h"
 #include "../poller/async_poller.h"

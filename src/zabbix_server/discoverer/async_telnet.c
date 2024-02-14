@@ -42,7 +42,7 @@ static const char	*get_telnet_step_string(zbx_zabbix_telnet_step_t step)
 	}
 }
 
-static char	telnet_lastchar(const char *buf, size_t offset)
+static char	telnet_lastchar(const char *buf, int offset)
 {
 	while (0 < offset)
 	{

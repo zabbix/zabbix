@@ -993,9 +993,9 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 }
 
 static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_dst, zbx_uint64_t druleid,
-		zbx_uint64_t unique_dcheckid, char *ip)
+		zbx_uint64_t unique_dcheckid, const char *ip)
 {
-	zbx_discoverer_results_t	*dst, src = {.druleid = druleid, .ip = ip};
+	zbx_discoverer_results_t	*dst, src = {.druleid = druleid, .ip = (char *)ip};
 
 	if (NULL == (dst = zbx_hashset_search(hr_dst, &src)))
 	{
@@ -1257,7 +1257,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 				if (0 == job->workers_used)
 				{
 					pthread_mutex_lock(&dmanager.results_lock);
-					discoverer_results_host_reg(&dmanager.results, job->druleid, 0, "");
+					(void)discoverer_results_host_reg(&dmanager.results, job->druleid, 0, "");
 					pthread_mutex_unlock(&dmanager.results_lock);
 
 					discoverer_job_remove(job);
@@ -1338,7 +1338,7 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 			else if (DISCOVERER_JOB_STATUS_REMOVING == job->status && 0 == job->workers_used)
 			{
 				pthread_mutex_lock(&dmanager.results_lock);
-				discoverer_results_host_reg(&dmanager.results, job->druleid, 0, "");
+				(void)discoverer_results_host_reg(&dmanager.results, job->druleid, 0, "");
 				pthread_mutex_unlock(&dmanager.results_lock);
 
 				discoverer_job_remove(job);
@@ -1739,7 +1739,10 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				pthread_mutex_lock(&dmanager.results_lock);
 
 				for (i = 0; i < err_druleids.values_num; i++)
-					discoverer_results_host_reg(&dmanager.results, err_druleids.values[i], 0, "");
+				{
+					(void)discoverer_results_host_reg(&dmanager.results, err_druleids.values[i],
+							0, "");
+				}
 
 				pthread_mutex_unlock(&dmanager.results_lock);
 			}
