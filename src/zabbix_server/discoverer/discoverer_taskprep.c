@@ -288,7 +288,8 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
 
-	for (i = 1; NULL != (start = strchr(start, ',')); i++);	/* i = 1 to guarantee at least 1 iprange */
+	/* i = 1 to guarantee at least 1 iprange */
+	for (i = 1; NULL != (start = strchr(start, ',')); i++, start++);
 
 	zbx_vector_iprange_reserve(ipranges, (size_t)i);
 
