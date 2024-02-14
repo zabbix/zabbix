@@ -974,9 +974,9 @@ static int	discoverer_icmp(const zbx_uint64_t druleid, zbx_discoverer_task_t *ta
 }
 
 static zbx_discoverer_results_t	*discoverer_results_host_reg(zbx_hashset_t *hr_dst, zbx_uint64_t druleid,
-		zbx_uint64_t unique_dcheckid, const char *ip)
+		zbx_uint64_t unique_dcheckid, char *ip)
 {
-	zbx_discoverer_results_t	*dst, src = {.druleid = druleid, .ip = (char *)ip};
+	zbx_discoverer_results_t	*dst, src = {.druleid = druleid, .ip = ip};
 
 	if (NULL == (dst = zbx_hashset_search(hr_dst, &src)))
 	{
@@ -1680,7 +1680,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 				dmanager.queue.errors.values_num);
 		zbx_vector_discoverer_drule_error_clear(&dmanager.queue.errors);
 
-		zbx_vector_uint64_clear(&del_jobs);
 		zbx_vector_uint64_append_array(&del_jobs, dmanager.queue.del_jobs.values,
 				dmanager.queue.del_jobs.values_num);
 		zbx_vector_uint64_clear(&dmanager.queue.del_jobs);
@@ -1694,13 +1693,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 		process_job_finalize(&del_jobs, &drule_errors, &incomplete_druleids);
 
-		if (0 != del_jobs.values_num)
-		{
-			discoverer_queue_lock(&dmanager.queue);
-			zbx_vector_uint64_append_array(&dmanager.queue.del_jobs, del_jobs.values, del_jobs.values_num);
-			discoverer_queue_unlock(&dmanager.queue);
-		}
-
 		zbx_setproctitle("%s #%d [processing %d rules, " ZBX_FS_UI64 " unsaved checks]",
 				get_process_type_string(process_type), process_num, processing_rules_num, unsaved_checks);
 
@@ -1713,28 +1705,13 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 			int					rule_count;
 			zbx_vector_discoverer_jobs_ptr_t	jobs;
 			zbx_hashset_t				check_counts;
-			zbx_vector_uint64_t			err_druleids;
 
 			zbx_vector_discoverer_jobs_ptr_create(&jobs);
 			zbx_hashset_create(&check_counts, 1, discoverer_check_count_hash,
 					discoverer_check_count_compare);
-			zbx_vector_uint64_create(&err_druleids);
 
 			rule_count = process_discovery(&nextcheck, &incomplete_druleids, &jobs, &check_counts,
-					&drule_errors, &err_druleids);
-
-			if (0 != err_druleids.values_num)
-			{
-				pthread_mutex_lock(&dmanager.results_lock);
-
-				for (i = 0; i < err_druleids.values_num; i++)
-				{
-					(void)discoverer_results_host_reg(&dmanager.results, err_druleids.values[i],
-							0, "");
-				}
-
-				pthread_mutex_unlock(&dmanager.results_lock);
-			}
+					&drule_errors, &del_jobs);
 
 			if (0 < rule_count)
 			{
@@ -1774,8 +1751,6 @@ ZBX_THREAD_ENTRY(discoverer_thread, args)
 
 			zbx_vector_discoverer_jobs_ptr_destroy(&jobs);
 			zbx_hashset_destroy(&check_counts);
-			zbx_vector_uint64_destroy(&err_druleids);
-
 		}
 
 		/* update sleeptime */
