@@ -27,7 +27,6 @@
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
-#include "../poller/checks_snmp.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"
@@ -377,7 +376,7 @@ static int	discover_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port, c
 						item.snmpv3_privprotocol = dcheck->snmpv3_privprotocol;
 					}
 
-					if (SUCCEED == get_value_snmp(&item, &result, ZBX_NO_POLLER, source_ip,
+					if (SUCCEED == zbx_get_value_snmp(&item, &result, ZBX_NO_POLLER, source_ip,
 							zbx_get_progname_cb()) &&
 							NULL != (pvalue = ZBX_GET_TEXT_RESULT(&result)))
 					{

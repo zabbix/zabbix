@@ -18,15 +18,16 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-
 require_once dirname(__FILE__).'/../../include/CWebTest.php';
 require_once dirname(__FILE__).'/../behaviors/CMessageBehavior.php';
 require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
 
 /**
+ *  @dataSource TopHostsWidget, ItemValueWidget
+ *
  * @backup dashboard, dashboard_user, dashboard_usrgrp
  */
-class testDashboardsListPage extends CWebTest {
+class testPageDashboardList extends CWebTest {
 
 	/**
 	 * Attach MessageBehavior and TableBehavior to the test.
@@ -40,7 +41,7 @@ class testDashboardsListPage extends CWebTest {
 		];
 	}
 
-	public function testDashboardsListPage_CheckLayout() {
+	public function testPageDashboardList_CheckLayout() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->page->assertTitle('Dashboards');
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -74,25 +75,22 @@ class testDashboardsListPage extends CWebTest {
 
 	public static function getCheckFilterData() {
 		return [
-			// #0.
 			[
 				[
 					'fields' => [
 						'Show' => 'All'
 					],
-					'result_count' => 16
+					'result_count' => 26
 				]
 			],
-			// #1.
 			[
 				[
 					'fields' => [
 						'Show' => 'Created by me'
 					],
-					'result_count' => 15
+					'result_count' => 25
 				]
 			],
-			// #2.
 			[
 				[
 					'fields' => [
@@ -102,17 +100,15 @@ class testDashboardsListPage extends CWebTest {
 					'result_count' => 3
 				]
 			],
-			// #3.
 			[
 				[
 					'fields' => [
 						'Name' => 'widget',
 						'Show' => 'Created by me'
 					],
-					'result_count' => 9
+					'result_count' => 10
 				]
 			],
-			// #4.
 			[
 				[
 					'fields' => [
@@ -121,7 +117,6 @@ class testDashboardsListPage extends CWebTest {
 					'result_count' => 0
 				]
 			],
-			// #5.
 			[
 				[
 					'fields' => [
@@ -130,7 +125,6 @@ class testDashboardsListPage extends CWebTest {
 					'result_count' => 1
 				]
 			],
-			// #6.
 			[
 				[
 					'fields' => [
@@ -146,7 +140,7 @@ class testDashboardsListPage extends CWebTest {
 	/**
 	 * @dataProvider getCheckFilterData
 	 */
-	public function testDashboardsListPage_CheckFilter($data) {
+	public function testPageDashboardList_CheckFilter($data) {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 		$start_rows_count = $table->getRows()->count();
@@ -162,14 +156,13 @@ class testDashboardsListPage extends CWebTest {
 		}
 		$this->assertTableStats($data['result_count']);
 		$form->query('button:Reset')->one()->click();
-		$this->page->waitUntilReady();
 		$this->assertEquals($start_rows_count, $table->getRows()->count());
 	}
 
 	/**
 	 * Check that My and Sharing tags displays correctly in Dashboard Lists for Admin.
 	 */
-	public function testDashboardsListPage_CheckOwners() {
+	public function testPageDashboardList_CheckOwners() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$table = $this->query('class:list-table')->asTable()->one();
 
@@ -195,7 +188,7 @@ class testDashboardsListPage extends CWebTest {
 		}
 	}
 
-	public function testDashboardsListPage_DeleteSingleDashboard() {
+	public function testPageDashboardList_DeleteSingleDashboard() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$dashboard_name = 'Testing share dashboard';
 		$table = $this->query('class:list-table')->asTable()->one();
@@ -214,7 +207,7 @@ class testDashboardsListPage extends CWebTest {
 		$this->assertEquals(0, CDBHelper::getCount('SELECT * FROM dashboard WHERE name='.zbx_dbstr($dashboard_name)));
 	}
 
-	public function testDashboardsListPage_DeleteAllDashboards() {
+	public function testPageDashboardList_DeleteAllDashboards() {
 		$this->page->login()->open('zabbix.php?action=dashboard.list');
 		$this->selectTableRows();
 		$this->query('button:Delete')->one()->click();

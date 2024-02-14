@@ -17,12 +17,13 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcommon.h"
+
+#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxpoller.h"
 #include "zbxcomms.h"
 
 #include "ssh_run.h"
-
-#if defined(HAVE_SSH2) || defined(HAVE_SSH)
 
 #include "zbxsysinfo.h"
 

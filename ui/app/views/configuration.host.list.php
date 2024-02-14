@@ -498,7 +498,7 @@ foreach ($data['hosts'] as $host) {
 		$monitored_by,
 		$hostTemplates,
 		$toggle_status_link,
-		getHostAvailabilityTable($host['interfaces']),
+		getHostAvailabilityTable($host['interfaces'], $host['has_passive_checks']),
 		$encryption,
 		makeInformationList($info_icons),
 		$data['tags'][$host['hostid']]
