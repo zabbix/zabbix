@@ -228,22 +228,20 @@ class CControllerAuthenticationUpdate extends CController {
 	}
 
 	/**
-	 * Validate LDAP settings.
+	 * Validate MFA settings.
 	 *
 	 * @return bool
 	 */
 	private function validateMfa(): bool {
-		$mfa_methods = $this->getInput('mfa_methods', []);
+		$default_mfa = $this->hasInput('mfa_default_row_index') ? $this->getInput('mfa_default_row_index') : null;
+		$error = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
+			&& !array_key_exists($default_mfa, $this->getInput('mfa_methods', []));
 
-		if ($this->getInput('mfa_status', MFA_DISABLED) && $mfa_methods
-			&& (!$this->hasInput('mfa_default_row_index')
-				|| !array_key_exists($this->getInput('mfa_default_row_index'), $mfa_methods))) {
+		if ($error) {
 			error(_('Default MFA method must be specified.'));
-
-			return false;
 		}
 
-		return true;
+		return !$error;
 	}
 
 	/**
@@ -310,18 +308,9 @@ class CControllerAuthenticationUpdate extends CController {
 
 				if ($mfa_methods) {
 					$mfaids = $this->processMfaMethods($mfa_methods);
-					$mfa_default_row_index = $this->getInput('mfa_default_row_index', 0);
-
-					if (!$mfaids) {
-						$result = false;
-					}
-					elseif (!array_key_exists($mfa_default_row_index, $mfaids)) {
-						CMessageHelper::setErrorTitle(_('Failed to select default MFA method.'));
-						$result = false;
-					}
-					else {
-						$mfaid = $mfaids[$mfa_default_row_index];
-					}
+					$mfaid = $this->getInput('mfa_status', MFA_DISABLED) == MFA_ENABLED
+						? $mfaids[$this->getInput('mfa_default_row_index')]
+						: 0;
 				}
 			}
 
@@ -519,20 +508,22 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		$result = $upd_mfa_methods ? API::Mfa()->update($upd_mfa_methods) : [];
-		$result = $result !== false && $ins_mfa_methods ? API::Mfa()->create($ins_mfa_methods) : $result;
+		$result = ($result !== false && $ins_mfa_methods) ? API::Mfa()->create($ins_mfa_methods) : $result;
 
-		if ($result) {
+		if (!$result) {
+			return [];
+		}
+
+		if ($ins_mfa_methods) {
 			foreach ($mfaid_map as $row_index => $mfaid) {
 				if ($mfaid === null) {
 					$mfaid_map[$row_index] = array_shift($result['mfaids']);
 				}
 			}
+		}
 
-			return $mfaid_map;
-		}
-		else {
-			return [];
-		}
+		return $mfaid_map;
+
 	}
 
 	/**
