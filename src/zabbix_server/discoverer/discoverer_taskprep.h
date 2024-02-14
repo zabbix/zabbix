@@ -24,7 +24,7 @@
 #include "zbxalgo.h"
 #include "zbxcacheconfig.h"
 
-void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
-		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges);
+void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
+		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges);
 
 #endif /* ZABBIX_DISCOVERER_TASKPREP_H_ */

@@ -101,8 +101,7 @@ static zbx_dc_dcheck_t	*dcheck_clone_get(zbx_dc_dcheck_t *dcheck, zbx_vector_dc_
 }
 
 static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dcheck_t *dcheck,
-		zbx_vector_iprange_t *ipranges, zbx_uint64_t *queue_capacity,
-		zbx_hashset_t *tasks, zbx_hashset_t *tasks_local)
+		zbx_vector_iprange_t *ipranges, zbx_hashset_t *tasks, zbx_hashset_t *tasks_local)
 {
 	zbx_discoverer_task_t	task_local, *task;
 	zbx_vector_portrange_t	port_ranges;
@@ -153,15 +152,13 @@ static zbx_uint64_t	process_check_range(const zbx_dc_drule_t *drule, zbx_dc_dche
 		zbx_iprange_first(task_local.range.ipranges->values, task_local.range.state.ipaddress);
 
 		zbx_hashset_insert(tasks_ptr, &task_local, sizeof(zbx_discoverer_task_t));
-		(*queue_capacity)--;
 	}
 
 	return (zbx_uint64_t)checks_count;
 }
 
-static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_uint64_t *queue_capacity,
-		zbx_hashset_t *tasks, zbx_hashset_t *tasks_local, zbx_vector_dc_dcheck_ptr_t *dchecks_common,
-		zbx_vector_iprange_t *ipranges)
+static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_hashset_t *tasks,
+		zbx_hashset_t *tasks_local, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
 {
 	int		i;
 	zbx_uint64_t	checks_count = 0;
@@ -169,9 +166,6 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 	for (i = 0; i < drule->dchecks.values_num; i++)
 	{
 		zbx_dc_dcheck_t	*dcheck_common, *dcheck = (zbx_dc_dcheck_t*)drule->dchecks.values[i];
-
-		if (0 == *queue_capacity)
-			break;
 
 		if (0 != drule->unique_dcheckid &&
 				((1 == unique && drule->unique_dcheckid != dcheck->dcheckid) ||
@@ -181,9 +175,7 @@ static zbx_uint64_t	process_checks(const zbx_dc_drule_t *drule, int unique, zbx_
 		}
 
 		dcheck_common = dcheck_clone_get(dcheck, dchecks_common);
-
-		checks_count += process_check_range(drule, dcheck_common, ipranges, queue_capacity,
-				tasks, tasks_local);
+		checks_count += process_check_range(drule, dcheck_common, ipranges, tasks, tasks_local);
 	}
 
 	return checks_count;
@@ -285,12 +277,13 @@ static void	process_task_range_count(zbx_hashset_t *tasks, unsigned int ips_num)
  * Purpose: process single discovery rule                                     *
  *                                                                            *
  ******************************************************************************/
-void	process_rule(zbx_dc_drule_t *drule, zbx_uint64_t *queue_capacity, zbx_hashset_t *tasks,
-		zbx_hashset_t *check_counts, zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
+void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *check_counts,
+		zbx_vector_dc_dcheck_ptr_t *dchecks_common, zbx_vector_iprange_t *ipranges)
 {
 	zbx_hashset_t	tasks_local;
 	zbx_uint64_t	checks_count = 0;
 	char		ip[ZBX_INTERFACE_IP_LEN_MAX], *comma, *start = drule->iprange;
+	unsigned int	uniq_ips_num = 0;
 	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() rule:'%s' range:'%s'", __func__, drule->name, drule->iprange);
@@ -343,11 +336,11 @@ next:
 	zbx_hashset_create(&tasks_local, 1, discoverer_task_hash, discoverer_task_compare);
 
 	if (0 != drule->unique_dcheckid)
-		checks_count = process_checks(drule, 1, queue_capacity, tasks, &tasks_local, dchecks_common, ipranges);
+		checks_count = process_checks(drule, 1, tasks, &tasks_local, dchecks_common, ipranges);
 
-	checks_count += process_checks(drule, 0, queue_capacity, tasks, &tasks_local, dchecks_common, ipranges);
+	checks_count += process_checks(drule, 0, tasks, &tasks_local, dchecks_common, ipranges);
 
-	if (0 == *queue_capacity || 0 == checks_count)
+	if (0 == checks_count)
 		goto out;
 
 	*ip = '\0';
@@ -360,9 +353,10 @@ next:
 		zbx_strlcpy(dcc.ip, ip, sizeof(dcc.ip));
 		dcc.count = checks_count;
 		zbx_hashset_insert(check_counts, &dcc, sizeof(zbx_discoverer_check_count_t));
+		uniq_ips_num++;
 	}
 
-	process_task_range_count(tasks, check_counts->num_data);
+	process_task_range_count(tasks, uniq_ips_num);
 
 	if (0 != tasks_local.num_data)
 		process_task_range_split(&tasks_local, tasks);
