@@ -172,26 +172,29 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	VARIANT			*vtProp = NULL;
 	IWbemClassObject	*pclsObj = 0;
 	ULONG			uReturn = 0;
-	HRESULT			hres, hres_enum;
+	HRESULT			hres;
 	zbx_vector_wmi_prop_t	*inst_val;
 	zbx_wmi_prop_t		prop;
 
-	hres_enum = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
+	hres = pEnumerator->Next((long)(1000 * timeout), 1, &pclsObj, &uReturn);
 
-	if (WBEM_S_TIMEDOUT == hres_enum)
+	if (WBEM_S_TIMEDOUT == hres)
 	{
 		*error = zbx_strdup(*error, "WMI query timeout.");
 		goto out2;
 	}
 
-	if (FAILED(hres_enum))
+	if (FAILED(hres))
 	{
-		get_error_code_text(hres_enum, error);
+		get_error_code_text(hres, error);
 		goto out2;
 	}
 
 	if (0 == uReturn)
 		goto out2;
+
+	while (WBEM_S_NO_ERROR == hres)
+		hres = pEnumerator->Skip((long)(1000 * timeout), 1);
 
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
@@ -230,9 +233,6 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	zbx_vector_wmi_instance_append(wmi_values, inst_val);
 out1:
 	pclsObj->Release();
-
-	while (WBEM_S_NO_ERROR == hres_enum)
-		hres_enum = pEnumerator->Skip((long)(1000 * timeout), 1);
 out2:
 	return ret;
 }
