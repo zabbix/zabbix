@@ -42,14 +42,11 @@ class CControllerUserResetTotp extends CController {
 	protected function doAction(): void {
 		$userids = $this->getInput('userids');
 
-		$users_with_totp_secret = DB::select('mfa_totp_secret', [
-			'output' => ['userid', 'totp_secret'],
-			'filter' => ['userid' => $userids]
-		]);
+		$users_with_totp_secret = CUser::getUseridsWithMfaTotpSecrets($userids);
 
 		$users_to_update = [];
 		foreach ($userids as $userid) {
-			if (in_array($userid, array_column($users_with_totp_secret, 'userid'))) {
+			if (in_array($userid, $users_with_totp_secret)) {
 				$users_to_update[] = [
 					'userid' => $userid,
 					'mfa_totp_secrets' => []

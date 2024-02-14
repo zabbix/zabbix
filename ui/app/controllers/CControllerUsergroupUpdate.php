@@ -126,11 +126,11 @@ class CControllerUsergroupUpdate extends CController {
 			}
 		}
 
-		if ($user_group['mfaid'] == -1) {
+		if (array_key_exists('mfaid', $user_group) && $user_group['mfaid'] == -1) {
 			$user_group['mfa_status'] = GROUP_MFA_DISABLED;
 			$user_group['mfaid'] = 0;
 		}
-		else {
+		elseif (array_key_exists('mfaid', $user_group)) {
 			$user_group['mfa_status'] = GROUP_MFA_ENABLED;
 		}
 

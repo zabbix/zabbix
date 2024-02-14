@@ -3603,4 +3603,27 @@ class CUser extends CApiService {
 			'where' => ['userid' => $userids]
 		]);
 	}
+
+	/**
+	 * Returns the list of userids that have enrolled to TOTP mfa and have TOTP secrets.
+	 *
+	 * @param array $userids  Userids to check for TOTP secrets.
+	 *
+	 * Returns array of userids that have TOTP secrets or empty array.
+	 */
+	public static function getUseridsWithMfaTotpSecrets(array $userids = []): array {
+		if ($userids) {
+			$options = [
+				'output' => ['userid'],
+				'filter' => ['userid' => $userids]
+			];
+		}
+		else {
+			$options = ['output' => ['userid']];
+		}
+
+		$userids_with_totp = DB::select('mfa_totp_secret', $options);
+
+		return array_column($userids_with_totp, 'userid');
+	}
 }
