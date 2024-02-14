@@ -91,7 +91,7 @@ class testZBX6648 extends CLegacyWebTest {
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['hostgroup'].'"]');
 				break;
 			case 'no triggers' :
-				COverlayDialogElement::find()->one()->query('class:multiselect-button')->one()->click();
+				COverlayDialogElement::find()->one()->waitUntilReady()->query('class:multiselect-button')->one()->click();
 				COverlayDialogElement::find()->all()->last()->waitUntilReady()->setDataContext($zbx_data['hostgroup']);
 				$this->zbxTestLaunchOverlayDialog('Hosts');
 				$this->zbxTestAssertElementNotPresentXpath('//a[text()="'.$zbx_data['host'].'"]');
