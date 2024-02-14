@@ -651,7 +651,7 @@ class CSVGHoneycomb {
 
 			return {lines, lines_count, lines_max_count: 0,
 				font_size: container_width * this.#container_params.scale > CSVGHoneycomb.LABEL_WIDTH_MIN
-					? this.#getFontSizeByWidth(lines, container_width, font_weight)
+					? this.#getFontSizeByWidth(lines, container_width * .9, font_weight)
 					: 0,
 				font_weight: font_weight,
 				line_max_length: Math.ceil(Math.max(...lines.map(line => line.length)) / 8) * 8
