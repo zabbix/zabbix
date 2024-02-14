@@ -20,23 +20,18 @@
 		--py: calc(var(--y) + var(--dy, 0px));
 
 		cursor: pointer;
-		transform: translate(var(--px), var(--py));
-
-		@if $ui-transitions {
-			transition: transform $ui-transition-duration;
-		}
 
 		path {
-			transform: scale(var(--scale, 1));
 			fill: var(--fill);
 			stroke: var(--stroke, var(--fill));
 			stroke-width: var(--stroke-width, 0);
+			transform: translate(var(--px), var(--py)) scale(var(--scale, 1));
 
 			&.svg-honeycomb-backdrop {
 				--fill: transparent;
 				--stroke: transparent;
 
-				transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px)));
+				transform: translate(var(--x), var(--y));
 			}
 
 			@if $ui-transitions {
@@ -46,8 +41,11 @@
 		}
 
 		foreignObject {
+			transform: translate(var(--px), var(--py));
+
 			@if $ui-transitions {
-				transition: x $ui-transition-duration,
+				transition: transform $ui-transition-duration,
+							x $ui-transition-duration,
 							y $ui-transition-duration,
 							width $ui-transition-duration,
 							height $ui-transition-duration;
@@ -90,6 +88,8 @@
 	}
 
 	.svg-honeycomb-cell-other-ellipsis {
+		transform: translate(var(--px), var(--py));
+
 		circle {
 			fill: var(--color);
 		}

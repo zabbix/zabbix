@@ -3516,28 +3516,29 @@ section {
   .svg-honeycomb .svg-honeycomb-cell {
     --px: calc(var(--x) + var(--dx, 0px));
     --py: calc(var(--y) + var(--dy, 0px));
-    cursor: pointer;
-    transform: translate(var(--px), var(--py)); }
+    cursor: pointer; }
     .svg-honeycomb .svg-honeycomb-cell path {
-      transform: scale(var(--scale, 1));
       fill: var(--fill);
       stroke: var(--stroke, var(--fill));
-      stroke-width: var(--stroke-width, 0); }
+      stroke-width: var(--stroke-width, 0);
+      transform: translate(var(--px), var(--py)) scale(var(--scale, 1)); }
       .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
         --fill: transparent;
         --stroke: transparent;
-        transform: translate(calc(0px - var(--dx, 0px)), calc(0px - var(--dy, 0px))); }
-    .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-content {
-      display: grid;
-      align-content: space-evenly;
-      height: 100%;
-      text-align: center;
-      line-height: 1.2;
-      color: var(--color); }
-    .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-label {
-      overflow: hidden;
-      text-overflow: ellipsis;
-      white-space: nowrap; }
+        transform: translate(var(--x), var(--y)); }
+    .svg-honeycomb .svg-honeycomb-cell foreignObject {
+      transform: translate(var(--px), var(--py)); }
+      .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-content {
+        display: grid;
+        align-content: space-evenly;
+        height: 100%;
+        text-align: center;
+        line-height: 1.2;
+        color: var(--color); }
+      .svg-honeycomb .svg-honeycomb-cell foreignObject .svg-honeycomb-label {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap; }
     .svg-honeycomb .svg-honeycomb-cell:hover {
       --stroke: var(--stroke-hover); }
   .svg-honeycomb .svg-honeycomb-cell-no-data,
@@ -3547,8 +3548,10 @@ section {
     --stroke: var(--no-data-stroke);
     --stroke-hover: var(--no-data-stroke);
     cursor: default; }
-  .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
-    fill: var(--color); }
+  .svg-honeycomb .svg-honeycomb-cell-other-ellipsis {
+    transform: translate(var(--px), var(--py)); }
+    .svg-honeycomb .svg-honeycomb-cell-other-ellipsis circle {
+      fill: var(--color); }
 
 .filter-container.tabfilter-container {
   padding: 0;

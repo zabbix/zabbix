@@ -505,7 +505,7 @@ class CSVGHoneycomb {
 			cell
 				.append('path')
 				.classed(CSVGHoneycomb.ZBX_STYLE_BACKDROP, true)
-				.attr('d', this.#generatePath(Math.min(this.#cell_height, scaled_size.height * .65), 0));
+				.attr('d', this.#generatePath(Math.min(this.#cell_height * 1.75, scaled_size.height * .75), 0));
 		}
 		else {
 			clearTimeout(d.backdrop_timeout);
