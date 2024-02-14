@@ -37,9 +37,11 @@ if (array_key_exists('mfaid', $data)) {
 
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
-$curl_warning = !$data['curl_error']
-		? ''
-		: (makeWarningIcon($data['curl_error']));
+$curl_warning = $data['curl_error']
+		? (makeWarningIcon(
+			_('You are not able to choose some of the MFA methods, because PHP CURL extension is not installed on the web server.')
+		))
+		: '';
 
 $form
 	->addItem((new CFormGrid())
