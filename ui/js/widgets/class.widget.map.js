@@ -162,6 +162,16 @@ class CWidgetMap extends CWidget {
 			});
 	}
 
+	_promiseReady() {
+		const readiness = [super._promiseReady()];
+
+		if (this._map_svg !== null) {
+			readiness.push(this._map_svg.promiseRendered());
+		}
+
+		return Promise.all(readiness);
+	}
+
 	_getUpdateRequestData() {
 		return {
 			...super._getUpdateRequestData(),

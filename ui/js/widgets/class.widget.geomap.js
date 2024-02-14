@@ -19,6 +19,7 @@
 
 
 class CWidgetGeoMap extends CWidget {
+
 	static SEVERITY_NO_PROBLEMS = -1;
 	static SEVERITY_NOT_CLASSIFIED = 0;
 	static SEVERITY_INFORMATION = 1;
@@ -35,6 +36,20 @@ class CWidgetGeoMap extends CWidget {
 		this._initial_load = true;
 		this._home_coords = {};
 		this._severity_levels = new Map();
+	}
+
+	_promiseReady() {
+		const readiness = [super._promiseReady()];
+
+		if (this._map !== null) {
+			readiness.push(
+				new Promise(resolve => {
+					this._map.whenReady(() => setTimeout(resolve, 300));
+				})
+			);
+		}
+
+		return Promise.all(readiness);
 	}
 
 	_getUpdateRequestData() {
