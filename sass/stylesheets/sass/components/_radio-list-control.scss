@@ -99,6 +99,7 @@
 
 		&:checked[readonly] + label {
 			background-color: lighten($ui-bg-selected-color, 33%) !important;
+			-webkit-text-fill-color: $font-color !important;
 			@extend %form-readonly;
 		}
 
