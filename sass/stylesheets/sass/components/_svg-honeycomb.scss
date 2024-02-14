@@ -30,6 +30,7 @@
 			transform: scale(var(--scale, 1));
 			fill: var(--fill);
 			stroke: var(--stroke, var(--fill));
+			stroke-width: var(--stroke-width, 0);
 
 			&.svg-honeycomb-backdrop {
 				--fill: transparent;
@@ -40,8 +41,7 @@
 
 			@if $ui-transitions {
 				transition: transform $ui-transition-duration,
-							fill $ui-transition-duration * 2,
-							stroke $ui-transition-duration;
+							fill $ui-transition-duration * 2;
 			}
 		}
 

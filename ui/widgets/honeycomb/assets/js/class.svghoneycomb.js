@@ -194,7 +194,7 @@ class CSVGHoneycomb {
 				.append('feDropShadow')
 				.attr('dx', 0)
 				.attr('dy', 0)
-				.attr('flood-color', 'rgba(0, 0, 0, .25)')
+				.attr('flood-color', 'rgba(0, 0, 0, .2)')
 			)
 			.on('mouseleave', () => this.#containerLeave());
 
@@ -304,10 +304,6 @@ class CSVGHoneycomb {
 		this.#container.attr('transform',
 			`translate(${this.#container_params.x} ${this.#container_params.y}) scale(${this.#container_params.scale})`
 		);
-
-		this.#svg
-			.select(`#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id} feDropShadow`)
-			.attr('stdDeviation', 20 / this.#container_params.scale);
 	}
 
 	#updateCells() {
@@ -353,10 +349,10 @@ class CSVGHoneycomb {
 					.style('--y', d => `${d.position.y}px`)
 					.style('--fill', d => this.#getFillColor(d))
 					.style('--stroke', d => this.#getFillColor(d))
+					.style('--stroke-width', 2 / this.#container_params.scale)
 					.call(cell => cell
 						.append('path')
 						.attr('d', this.#cell_path)
-						.style('stroke-width', 2 / this.#container_params.scale)
 					)
 					.each((d, i, cells) => {
 						const cell = d3.select(cells[i]);
@@ -377,6 +373,7 @@ class CSVGHoneycomb {
 					.style('--y', d => `${d.position.y}px`)
 					.style('--fill', d => this.#getFillColor(d))
 					.style('--stroke', d => this.#getFillColor(d))
+					.style('--stroke-width', 2 / this.#container_params.scale)
 					.each((d, i, cells) => {
 						const cell = d3.select(cells[i]);
 
@@ -485,6 +482,8 @@ class CSVGHoneycomb {
 			height: scale
 		}
 
+		const cell_scale = scale / (this.#cell_height - this.#cells_gap);
+
 		const scaled_position = {
 			dx: Math.max(
 				scaled_size.width / 2 - margin.horizontal,
@@ -517,11 +516,16 @@ class CSVGHoneycomb {
 		this.#calculateLabelsParams([d], scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
 		this.#resizeLabels(cell, scaled_size.width, (scaled_size.height + this.#cells_gap) / 2);
 
+		this.#svg
+			.select(`#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id} feDropShadow`)
+			.attr('stdDeviation', 25 / this.#container_params.scale / cell_scale);
+
 		cell
 			.style('--dx', `${scaled_position.dx}px`)
 			.style('--dy', `${scaled_position.dy}px`)
 			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
-			.style('--scale', scale / (this.#cell_height - this.#cells_gap))
+			.style('--stroke-width', 2 / this.#container_params.scale / cell_scale)
+			.style('--scale', cell_scale)
 			.select('path')
 			.style('filter', `url(#${CSVGHoneycomb.ZBX_STYLE_CELL_SHADOW}-${this.#svg_id})`);
 
@@ -556,6 +560,7 @@ class CSVGHoneycomb {
 			.style('--dy', null)
 			.style('--stroke', d => this.#getFillColor(d))
 			.style('--scale', null)
+			.style('--stroke-width', null)
 			.select('path')
 			.style('filter', null);
 

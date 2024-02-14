@@ -3567,7 +3567,8 @@ section {
       transform: scale(var(--scale, 1));
       fill: var(--fill);
       stroke: var(--stroke, var(--fill));
-      transition: transform 0.3s, fill 0.6s, stroke 0.3s; }
+      stroke-width: var(--stroke-width, 0);
+      transition: transform 0.3s, fill 0.6s; }
       .svg-honeycomb .svg-honeycomb-cell path.svg-honeycomb-backdrop {
         --fill: transparent;
         --stroke: transparent;
