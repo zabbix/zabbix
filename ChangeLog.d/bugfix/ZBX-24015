@@ -1,1 +1,1 @@
-.......PS. [ZBX-24015] improved data fetch performance for PostgreSQL (vso)
+.......PS. [ZBX-24015] improved zabbix[queue] internal item not to block history syncers and pollers (vso)
