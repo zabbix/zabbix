@@ -854,11 +854,7 @@ func (m *Manager) PerformTask(
 	)
 
 	r := <-w
-	if r.Error == nil {
-		return r.Value, nil
-	}
-
-	return nil, r.Error
+	return r.Value, r.Error
 }
 
 func (m *Manager) FinishTask(task performer) {
