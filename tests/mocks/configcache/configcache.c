@@ -41,6 +41,7 @@ void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 
 void	mock_config_free_user_macros(void);
 void	mock_config_free_hosts(void);
+
 void	*__wrap_zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
 	int	i;
