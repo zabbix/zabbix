@@ -37,7 +37,7 @@ class CMfa extends CApiService {
 	 *
 	 * @var array
 	 */
-	protected $output_fields = ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid'];
+	public const OUTPUT_FIELDS = ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid'];
 
 	/**
 	 * @param array $options
