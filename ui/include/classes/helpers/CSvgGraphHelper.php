@@ -71,7 +71,7 @@ class CSvgGraphHelper {
 
 		$legend = self::getLegend($metrics, $options['legend']);
 
-		$svg_height = $height - ($legend !== null ? $legend->getLinesCount() * CSvgGraphLegend::LINE_HEIGHT : 0);
+		$svg_height = $height - ($legend !== null ? $legend->calculateLineCount() * CSvgGraphLegend::LINE_HEIGHT : 0);
 
 		if (0 > $svg_height) {
 			$svg_height = 0;
@@ -798,6 +798,7 @@ class CSvgGraphHelper {
 		return (new CSvgGraphLegend($items))
 			->setColumnsCount($legend_options['legend_columns'])
 			->setLinesCount($legend_options['legend_lines'])
+			->setLinesMode($legend_options['legend_lines_mode'])
 			->showStatistic($legend_options['legend_statistic']);
 	}
 

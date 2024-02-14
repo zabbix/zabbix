@@ -31,11 +31,12 @@ class CSvgGraphLegend extends CDiv {
 	private const ZBX_STYLE_GRAPH_LEGEND_ITEM = 'svg-graph-legend-item';
 	private const ZBX_STYLE_GRAPH_LEGEND_NO_DATA = 'svg-graph-legend-no-data';
 
-	private $legend_items;
+	private array $legend_items;
 
-	private $columns_count = 0;
-	private $lines_count = 0;
-	private $show_statistic = false;
+	private int $columns_count = 0;
+	private int $lines_count = 0;
+	private int $lines_mode = 0;
+	private bool $show_statistic = false;
 
 	/**
 	 * @param array  $legend_items
@@ -58,14 +59,28 @@ class CSvgGraphLegend extends CDiv {
 		return $this;
 	}
 
-	public function getLinesCount(): int {
-		return $this->lines_count + ($this->show_statistic ? 1 : 0);
-	}
-
 	public function setLinesCount(int $lines_count): self {
 		$this->lines_count = $lines_count;
 
 		return $this;
+	}
+
+	public function setLinesMode(int $lines_mode): self {
+		$this->lines_mode = $lines_mode;
+
+		return $this;
+	}
+
+	public function calculateLineCount() :int {
+		$column_count = $this->show_statistic ? 1 : min($this->columns_count, count($this->legend_items));
+
+		$lines_count = $this->lines_mode == SVG_GRAPH_LEGEND_LINES_MODE_VARIABLE
+			? min(ceil(count($this->legend_items) / $column_count), $this->lines_count)
+			: $this->lines_count;
+
+		$lines_count += $this->show_statistic ? 1 : 0;
+
+		return $lines_count;
 	}
 
 	public function showStatistic(int $show_statistic): self {
@@ -124,7 +139,7 @@ class CSvgGraphLegend extends CDiv {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass($this->show_statistic ? self::ZBX_STYLE_GRAPH_LEGEND_STATISTIC : null)
-			->addStyle('--lines: '.$this->getLinesCount().';');
+			->addStyle('--lines: '. $this->calculateLineCount().';');
 
 		if (!$this->show_statistic) {
 			$this->addStyle('--columns: '. min($this->columns_count, count($this->legend_items)).';');

@@ -119,6 +119,7 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show_legend' => $this->fields_values['legend'] == SVG_GRAPH_LEGEND_ON,
 				'legend_columns' => $this->fields_values['legend_columns'],
 				'legend_lines' => $this->fields_values['legend_lines'],
+				'legend_lines_mode' => $this->fields_values['legend_lines_mode'],
 				'legend_statistic' => $this->fields_values['legend_statistic'],
 				'show_aggregation' => $this->fields_values['legend_aggregation'] == self::LEGEND_AGGREGATION_ON
 			],
