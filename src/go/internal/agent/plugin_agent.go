@@ -87,6 +87,8 @@ func processConfigItem(timeout time.Duration, name, value, item string, length i
 	taskResult, err = performTask(item, timeout, clientID)
 	if err != nil {
 		return "", err
+	} else if taskResult == nil {
+		return "", fmt.Errorf("no value was received")
 	}
 
 	value = *taskResult
