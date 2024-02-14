@@ -51,13 +51,13 @@ class CMfa extends CApiService {
 
 		if (!$options['countOutput']) {
 			if ($options['output'] === API_OUTPUT_EXTEND) {
-				$options['output'] = $this->output_fields;
+				$options['output'] = self::OUTPUT_FIELDS;
 			}
 
 			$request_output = $options['output'];
 			$db_mfas = [];
 
-			$options['output'] = array_intersect($request_output, $this->output_fields);
+			$options['output'] = array_intersect($request_output, self::OUTPUT_FIELDS);
 		}
 
 		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
@@ -93,7 +93,7 @@ class CMfa extends CApiService {
 			'excludeSearch' =>				['type' => API_FLAG, 'default' => false],
 			'searchWildcardsEnabled' =>		['type' => API_BOOLEAN, 'default' => false],
 			// output
-			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', $this->output_fields), 'default' => API_OUTPUT_EXTEND],
+			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
 			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode']), 'default' => null],
 			// sort and limit
@@ -277,7 +277,7 @@ class CMfa extends CApiService {
 
 		foreach ($mfas as $mfaid => $mfa) {
 			$upd_mfa = DB::getUpdatedValues('mfa',
-				array_intersect_key($mfa, array_flip($this->output_fields) + ['client_secret' => '']),
+				array_intersect_key($mfa, array_flip(self::OUTPUT_FIELDS) + ['client_secret' => '']),
 				$db_mfas[$mfaid]
 			);
 
