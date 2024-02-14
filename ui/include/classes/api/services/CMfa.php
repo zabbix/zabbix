@@ -54,10 +54,7 @@ class CMfa extends CApiService {
 				$options['output'] = self::OUTPUT_FIELDS;
 			}
 
-			$request_output = $options['output'];
 			$db_mfas = [];
-
-			$options['output'] = array_intersect($request_output, self::OUTPUT_FIELDS);
 		}
 
 		$result = DBselect($this->createSelectQuery($this->tableName, $options), $options['limit']);
@@ -72,7 +69,7 @@ class CMfa extends CApiService {
 
 		if ($db_mfas) {
 			$db_mfas = $this->addRelatedObjects($options, $db_mfas);
-			$db_mfas = $this->unsetExtraFields($db_mfas, ['mfaid'], $request_output);
+			$db_mfas = $this->unsetExtraFields($db_mfas, ['mfaid'], $options['output']);
 
 			if (!$options['preservekeys']) {
 				$db_mfas = array_values($db_mfas);
@@ -85,7 +82,7 @@ class CMfa extends CApiService {
 	private function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
-			'mfaids' =>			['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
+			'mfaids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
 			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['mfaid', 'type']],
 			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
@@ -116,8 +113,6 @@ class CMfa extends CApiService {
 	 * @return array
 	 */
 	protected function addRelatedObjects(array $options, array $result): array {
-		$result = parent::addRelatedObjects($options, $result);
-
 		self::addRelatedUserGroups($options, $result);
 
 		return $result;
@@ -215,7 +210,30 @@ class CMfa extends CApiService {
 	 * @throws APIException
 	 */
 	private function validateCreate(array &$mfas): void {
-		$api_input_rules = $this->getValidationRules();
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
+			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
+			'hash_function' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'code_length' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'api_hostname' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'api_hostname')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'clientid')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'client_secret' =>		['type' => API_MULTIPLE, 'rules' => [
+				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'client_secret')],
+				['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $mfas, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
@@ -328,7 +346,32 @@ class CMfa extends CApiService {
 		}
 		unset($mfa);
 
-		$api_input_rules = $this->getValidationRules('update');
+		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
+			'mfaid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
+			'type' =>			['type' => API_INT32, 'flags' =>  API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
+			'hash_function' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'code_length' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'api_hostname' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]],
+			'client_secret' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['else' => true, 'type' => API_UNEXPECTED]
+			]]
+		]];
+
 		if (!CApiInputValidator::validate($api_input_rules, $mfas, '/', $error)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
@@ -414,58 +457,5 @@ class CMfa extends CApiService {
 			// If last (default) is removed, reset default mfaid to prevent from foreign key constraint.
 			API::Authentication()->update(['mfaid' => 0]);
 		}
-	}
-
-	private function getValidationRules(string $method = 'create'): array {
-		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
-			'hash_function' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'code_length' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'api_hostname' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'api_hostname')],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'clientid')],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]],
-			'client_secret' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'client_secret')],
-				['else' => true, 'type' => API_UNEXPECTED]
-			]]
-		]];
-
-		if ($method === 'update') {
-			// Make all fields optional and remove default values.
-			foreach ($api_input_rules['fields'] as &$field) {
-				if (array_key_exists('rules', $field)) {
-					foreach ($field['rules'] as &$rule) {
-						if (array_key_exists('flags', $rule) && API_REQUIRED & $rule['flags']) {
-							$rule['flags'] &= ~API_REQUIRED;
-						}
-						unset($rule['default']);
-					}
-					unset($rule);
-				}
-				else {
-					if (array_key_exists('flags', $field) && API_REQUIRED & $field['flags']) {
-						$field['flags'] &= ~API_REQUIRED;
-					}
-					unset($field['default']);
-				}
-			}
-			unset($field);
-
-			$api_input_rules['fields']['mfaid'] = ['type' => API_ID, 'flags' => API_REQUIRED];
-		}
-
-		return $api_input_rules;
 	}
 }
