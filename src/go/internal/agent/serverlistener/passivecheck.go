@@ -139,6 +139,8 @@ func (pc *passiveCheck) handleCheck(data []byte) {
 	} else if taskResult != nil {
 		log.Debugf("sending passive check response: '%s' to '%s'", *taskResult, pc.conn.Address())
 		_, err = pc.conn.Write([]byte(*taskResult))
+	} else {
+		log.Debugf("got nil value, skipping sending of response")
 	}
 
 	if err != nil {
