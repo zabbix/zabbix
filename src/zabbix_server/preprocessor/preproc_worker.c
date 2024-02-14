@@ -650,6 +650,4 @@ ZBX_THREAD_ENTRY(preprocessing_worker_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	zbx_es_destroy(&es_engine);
 }
