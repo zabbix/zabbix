@@ -96,21 +96,12 @@ class CWebUser {
 	}
 
 	public static function checkAuthentication(string $sessionid): bool {
-		try {
-			self::$data = API::User()->checkAuthentication([
-				'sessionid' => $sessionid,
-				'extend' => self::$extend_session
-			]);
+		self::$data = API::User()->checkAuthentication([
+			'sessionid' => $sessionid,
+			'extend' => self::$extend_session
+		]);
 
-			if (!self::$data || self::$data['gui_access'] == GROUP_GUI_ACCESS_DISABLED) {
-				throw new Exception();
-			}
-
-			return true;
-		}
-		catch (Exception $e) {
-			return false;
-		}
+		return self::$data && self::$data['gui_access'] != GROUP_GUI_ACCESS_DISABLED;
 	}
 
 	/**
