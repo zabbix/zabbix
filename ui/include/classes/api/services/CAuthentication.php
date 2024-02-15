@@ -88,7 +88,7 @@ class CAuthentication extends CApiService {
 		];
 
 		$db_auth = DB::select('config', ['output' => $output_fields]);
-		$db_auth = $db_auth ? array_diff_key(reset($db_auth), array_flip(['configid'])) : [];
+		$db_auth = $db_auth ? reset($db_auth) : [];
 
 		return $db_auth;
 	}

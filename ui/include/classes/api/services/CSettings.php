@@ -92,7 +92,7 @@ class CSettings extends CApiService {
 		];
 
 		$db_settings = DB::select('config', ['output' => $output_fields]);
-		$db_settings = $db_settings ? array_diff_key(reset($db_settings), array_flip(['configid'])) : [];
+		$db_settings = $db_settings ? reset($db_settings) : [];
 
 		return $db_settings;
 	}
@@ -104,7 +104,7 @@ class CSettings extends CApiService {
 		$output_fields = ['session_key', 'dbversion_status'];
 
 		$db_settings = DB::select('config', ['output' => $output_fields]);
-		$db_settings = $db_settings ? array_diff_key(reset($db_settings), array_flip(['configid'])) : [];
+		$db_settings = $db_settings ? reset($db_settings) : [];
 
 		if (array_key_exists('dbversion_status', $db_settings)) {
 			$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
