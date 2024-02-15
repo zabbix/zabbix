@@ -66,11 +66,16 @@ form.dashboard-widget-piechart {
 
 	.list-vertical-accordion {
 		position: relative;
+		overflow: visible;
+		margin-top: -5px;
+		margin-bottom: 5px;
 
-		&.sortable {
-			overflow: visible;
-			margin-top: -5px;
-			margin-bottom: 5px;
+		.sortable:not(.sortable-disabled) {
+			.list-accordion-item {
+				> .drag-icon + label {
+					@extend %cursor-drag;
+				}
+			}
 		}
 	}
 
@@ -85,12 +90,6 @@ form.dashboard-widget-piechart {
 		> .drag-icon {
 			height: 24px;
 			margin-left: -2px;
-
-			&:not(.disabled) {
-				& + label {
-					@extend %cursor-drag;
-				}
-			}
 		}
 
 		> label {

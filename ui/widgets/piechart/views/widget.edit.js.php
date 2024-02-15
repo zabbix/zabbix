@@ -367,25 +367,16 @@ window.widget_pie_chart_form = new class {
 	}
 
 	#initDataSetSortable() {
-		const datasets_count = this.#dataset_wrapper.querySelectorAll('.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>').length;
-
-		for (const drag_icon of this.#dataset_wrapper.querySelectorAll('.js-main-drag-icon')) {
-			drag_icon.classList.toggle('disabled', datasets_count < 2);
-		}
-
 		if (this._sortable_data_set === undefined) {
-			this._sortable_data_set = new CSortable(
-				document.querySelector('#data_set .<?= ZBX_STYLE_LIST_VERTICAL_ACCORDION ?>'),
-				{is_vertical: true}
-			);
+			this._sortable_data_set = new CSortable(document.querySelector('#data_sets'), {
+				selector_handle: '.js-main-drag-icon, .js-dataset-label'
+			});
 
-			this._sortable_data_set.on(SORTABLE_EVENT_DRAG_END, () => {
+			this._sortable_data_set.on(CSortable.EVENT_SORT, () => {
 				this.#updateVariableOrder(this.#dataset_wrapper, '.<?= ZBX_STYLE_LIST_ACCORDION_ITEM ?>', 'ds');
 				this.#updateDatasetsLabel();
 			});
 		}
-
-		this._sortable_data_set.enableSorting(datasets_count > 1);
 	}
 
 	#selectItems() {
