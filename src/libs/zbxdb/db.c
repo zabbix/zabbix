@@ -2020,6 +2020,8 @@ int	zbx_db_get_row_num(DB_RESULT result)
 {
 #if defined(HAVE_POSTGRESQL)
 	return result->row_num;
+#elif defined(HAVE_MYSQL)
+	return mysql_num_rows(result->result);
 #else
 	return 0;
 #endif
