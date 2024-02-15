@@ -2023,7 +2023,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
