@@ -4453,10 +4453,10 @@ form.dashboard-widget-piechart {
   form.dashboard-widget-piechart .single-item-table th:first-child,
   form.dashboard-widget-piechart .single-item-table td:first-child {
     padding-left: 5px; }
-  form.dashboard-widget-piechart .single-item-table .single-item-table-row:last-child td {
-    padding-bottom: 0; }
   form.dashboard-widget-piechart .single-item-table tfoot td {
     padding: 5px 5px 5px 10px; }
+  form.dashboard-widget-piechart .single-item-table tbody:not(:empty) + tfoot td {
+    padding-top: 0; }
   form.dashboard-widget-piechart .no-items-message {
     display: none;
     line-height: 24px;

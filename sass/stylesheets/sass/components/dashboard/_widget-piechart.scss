@@ -173,12 +173,12 @@ form.dashboard-widget-piechart {
 			}
 		}
 
-		.single-item-table-row:last-child td {
-			padding-bottom: 0;
-		}
-
 		tfoot td {
 			padding: 5px 5px 5px 10px;
+		}
+
+		tbody:not(:empty) + tfoot td {
+			padding-top: 0;
 		}
 	}
 
