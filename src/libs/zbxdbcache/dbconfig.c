@@ -20,6 +20,7 @@
 #include "dbconfig.h"
 
 #include "log.h"
+#include "zbxalgo.h"
 #include "zbxtasks.h"
 #include "zbxserver.h"
 #include "zbxregexp.h"
@@ -447,6 +448,13 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 	}
 
 	return ptr;
+}
+
+void	*DCfind_id_uniq(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
+{
+	*found = 0;
+
+	return zbx_hashset_insert_ext2(hashset, &id, size, 0, sizeof(id));
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
@@ -2724,7 +2732,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
-	int			found, update_index, ret, i,  old_nextcheck;
+	int			found, update_index, ret, i,  old_nextcheck, row_num, clean_sync = 0;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 
@@ -2733,6 +2741,15 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	now = time(NULL);
+
+	if (0 == config->items.num_slots)
+	{
+		row_num = zbx_db_get_row_num(sync->dbresult);
+
+		zbx_hashset_reserve(&config->items, MAX(row_num, 100));
+		zbx_hashset_reserve(&config->items_hk, MAX(row_num, 100));
+		clean_sync = 1;
+	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -2748,7 +2765,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
 			continue;
 
-		item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+		if (1 == clean_sync)
+			item = (ZBX_DC_ITEM *)DCfind_id_uniq(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+		else
+		 	item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
 		/* template item */
 		ZBX_DBROW2UINT64(item->templateid, row[48]);
@@ -2878,7 +2898,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item_hk_local.hostid = item->hostid;
 			item_hk_local.key = zbx_strpool_acquire(item->key);
 			item_hk_local.item_ptr = item;
-			zbx_hashset_insert(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK));
+			zbx_hashset_insert_ext2(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK), 0,
+					sizeof(ZBX_DC_ITEM_HK));
 		}
 
 		/* process item intervals and update item nextcheck */
@@ -2892,7 +2913,16 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			int	trends_sec;
 
-			numitem = (ZBX_DC_NUMITEM *)DCfind_id(&config->numitems, itemid, sizeof(ZBX_DC_NUMITEM), &found);
+			if (1 == clean_sync)
+			{
+				numitem = (ZBX_DC_NUMITEM *)DCfind_id_uniq(&config->numitems, itemid,
+						sizeof(ZBX_DC_NUMITEM), &found);
+			}
+			else
+			{
+				numitem = (ZBX_DC_NUMITEM *)DCfind_id(&config->numitems, itemid,
+						sizeof(ZBX_DC_NUMITEM), &found);
+			}
 
 			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
 				trends_sec = ZBX_HK_PERIOD_MAX;
@@ -7181,7 +7211,7 @@ int	init_configuration_cache(char **error)
 	zbx_hashset_create_ext(&hashset, hashset_size, hash_func, compare_func, NULL,				\
 			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
-	CREATE_HASHSET(config->items, 100);
+	CREATE_HASHSET(config->items, 0);
 	CREATE_HASHSET(config->numitems, 0);
 	CREATE_HASHSET(config->snmpitems, 0);
 	CREATE_HASHSET(config->ipmiitems, 0);
@@ -7238,7 +7268,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->maintenance_periods, 0);
 	CREATE_HASHSET(config->maintenance_tags, 0);
 
-	CREATE_HASHSET_EXT(config->items_hk, 100, __config_item_hk_hash, __config_item_hk_compare);
+	CREATE_HASHSET_EXT(config->items_hk, 0, __config_item_hk_hash, __config_item_hk_compare);
 	CREATE_HASHSET_EXT(config->hosts_h, 10, __config_host_h_hash, __config_host_h_compare);
 	CREATE_HASHSET_EXT(config->hosts_p, 0, __config_host_h_hash, __config_host_h_compare);
 	CREATE_HASHSET_EXT(config->gmacros_m, 0, __config_gmacro_m_hash, __config_gmacro_m_compare);

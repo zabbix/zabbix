@@ -2016,6 +2016,15 @@ static size_t	zbx_db_bytea_unescape(u_char *io)
 }
 #endif
 
+int	zbx_db_get_row_num(DB_RESULT result)
+{
+#if defined(HAVE_POSTGRESQL)
+	return result->row_num;
+#else
+	return 0;
+#endif
+}
+
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_ORACLE)

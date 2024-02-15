@@ -166,6 +166,7 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs);
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
 void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
+void	*zbx_hashset_insert_ext2(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, size_t len);
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);

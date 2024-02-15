@@ -236,6 +236,37 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 	return entry->data;
 }
 
+void	*zbx_hashset_insert_ext2(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, size_t len)
+{
+	int			slot;
+	zbx_hash_t		hash;
+	ZBX_HASHSET_ENTRY_T	*entry = NULL;
+	if (0 == hs->num_slots && SUCCEED != zbx_hashset_init_slots(hs, ZBX_HASHSET_DEFAULT_SLOTS))
+		return NULL;
+
+	hash = hs->hash_func(data);
+	if (NULL == entry)
+	{
+		if (SUCCEED != zbx_hashset_reserve(hs, hs->num_data + 1))
+			return NULL;
+		/* recalculate new slot */
+		slot = hash % hs->num_slots;
+
+		if (NULL == (entry = (ZBX_HASHSET_ENTRY_T *)hs->mem_malloc_func(NULL, ZBX_HASHSET_ENTRY_OFFSET + size)))
+			return NULL;
+		memcpy((char *)entry->data + offset, (const char *)data + offset, len - offset);
+		
+		entry->hash = hash;
+		entry->next = hs->slots[slot];
+		
+		hs->slots[slot] = entry;
+
+		hs->num_data++;
+	}
+
+	return entry->data;
+}
+
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data)
 {
 	int			slot;
