@@ -2768,7 +2768,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		if (1 == clean_sync)
 			item = (ZBX_DC_ITEM *)DCfind_id_uniq(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 		else
-		 	item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+			item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
 		/* template item */
 		ZBX_DBROW2UINT64(item->templateid, row[48]);
