@@ -18,7 +18,6 @@
 **/
 
 #include "discoverer.h"
-
 #include "zbxlog.h"
 #include "zbxcacheconfig.h"
 #include "zbxicmpping.h"
