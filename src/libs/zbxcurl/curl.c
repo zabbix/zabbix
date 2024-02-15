@@ -61,8 +61,8 @@ int	zbx_curl_protocol(const char *protocol, char **error)
 
 static void	setopt_error(const char *option, CURLcode err, char **error)
 {
-	*error = zbx_dsprintf(*error, "the cURL library returned an error when trying to enable %s: %s"
-			" (using version %s)", option, curl_easy_strerror(err), libcurl_version_str());
+	*error = zbx_dsprintf(*error, "the cURL library returned error when enabling %s: %s (using version %s)",
+			option, curl_easy_strerror(err), libcurl_version_str());
 }
 
 int	zbx_curl_setopt_https(CURL *easyhandle, char **error)
