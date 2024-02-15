@@ -53,17 +53,16 @@ class testPagePrototypes extends CWebTest {
 	public $tag;
 
 	/**
-	 * Layouts of prototype page and SQL used in delete scenarios.
+	 * Layouts of prototype pages.
 	 */
-	protected $layout_sql_data = [
+	protected $layout_data = [
 		'graph' => [
 			'headers' => ['', 'Name', 'Width', 'Height', 'Graph type', 'Discover'],
 			'clickable_headers' => ['Name', 'Graph type', 'Discover'],
 			'buttons' => [
 				'Delete' => false,
 				'Create graph prototype' => true
-			],
-			'sql' => 'SELECT null FROM graphs WHERE graphid='
+			]
 		],
 		'host' => [
 			'headers' => ['', 'Name', 'Templates', 'Create enabled', 'Discover', 'Tags'],
@@ -73,8 +72,7 @@ class testPagePrototypes extends CWebTest {
 				'Create disabled' => false,
 				'Delete' => false,
 				'Create host prototype' => true
-			],
-			'sql' => 'SELECT null FROM hosts WHERE hostid='
+			]
 		],
 		'item' => [
 			'headers' => ['', '', 'Name', 'Key', 'Interval', 'History', 'Trends', 'Type', 'Create enabled', 'Discover', 'Tags'],
@@ -85,8 +83,7 @@ class testPagePrototypes extends CWebTest {
 				'Mass update' => false,
 				'Delete' => false,
 				'Create item prototype' => true
-			],
-			'sql' => 'SELECT null FROM items WHERE itemid='
+			]
 		],
 		'trigger' => [
 			'headers' => ['', 'Severity', 'Name', 'Operational data', 'Expression', 'Create enabled', 'Discover', 'Tags'],
@@ -97,8 +94,7 @@ class testPagePrototypes extends CWebTest {
 				'Mass update' => false,
 				'Delete' => false,
 				'Create trigger prototype' => true
-			],
-			'sql' => 'SELECT null FROM triggers WHERE triggerid='
+			]
 		]
 	];
 
@@ -113,7 +109,7 @@ class testPagePrototypes extends CWebTest {
 		$page_header  = ucfirst($this->source).' prototypes';
 		$this->page->assertHeader($page_header);
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertSame($this->layout_sql_data[$this->source]['headers'], $table->getHeadersText());
+		$this->assertSame($this->layout_data[$this->source]['headers'], $table->getHeadersText());
 		$this->assertTableStats(self::$entity_count);
 
 		// Check that Breadcrumbs exists.
@@ -136,7 +132,7 @@ class testPagePrototypes extends CWebTest {
 		);
 
 		// Check displayed buttons and their default status after opening prototype page.
-		foreach ($this->layout_sql_data[$this->source]['buttons'] as $button => $status) {
+		foreach ($this->layout_data[$this->source]['buttons'] as $button => $status) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
 			$this->assertTrue($this->query('button', $button)->one()->isDisplayed());
 		}
@@ -216,7 +212,7 @@ class testPagePrototypes extends CWebTest {
 		}
 
 		// Check clickable headers.
-		foreach ($this->layout_sql_data[$this->source]['clickable_headers'] as $header) {
+		foreach ($this->layout_data[$this->source]['clickable_headers'] as $header) {
 			$this->assertTrue($table->query('link', $header)->one()->isClickable());
 		}
 	}
@@ -990,7 +986,9 @@ class testPagePrototypes extends CWebTest {
 
 		// Check prototype in DB.
 		foreach ($ids as $id) {
-			$this->assertEquals($count, CDBHelper::getCount($this->layout_sql_data[$this->source]['sql'].$id));
+			$this->assertEquals($count, CDBHelper::getCount('SELECT null FROM '.$this->source.'s WHERE '.$this->source.'id='.
+					zbx_dbstr($id))
+			);
 		}
 	}
 
