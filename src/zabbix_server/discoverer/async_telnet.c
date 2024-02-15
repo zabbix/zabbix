@@ -21,7 +21,7 @@
 #include "zbxcommon.h"
 #include "zbxcomms.h"
 #include "zbxself.h"
-#include "../poller/async_poller.h"
+#include "../../libs/zbxpoller/async_poller.h"
 
 ZBX_VECTOR_IMPL(telnet_recv, unsigned char)
 

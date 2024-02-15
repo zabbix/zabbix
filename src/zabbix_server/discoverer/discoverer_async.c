@@ -19,8 +19,8 @@
 
 #include "discoverer_job.h"
 #include "discoverer_async.h"
-#include "../poller/checks_snmp.h"
-#include "../poller/async_agent.h"
+#include "../../libs/zbxpoller/checks_snmp.h"
+#include "../../libs/zbxpoller/async_agent.h"
 #include "async_tcpsvc.h"
 #include "async_telnet.h"
 #include "async_http.h"
