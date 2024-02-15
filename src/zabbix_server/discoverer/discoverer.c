@@ -182,9 +182,6 @@ static int	discoverer_service(const zbx_dc_dcheck_t *dcheck, char *ip, int port)
 		case SVC_LDAP:
 			service = "ldap";
 			break;
-		case SVC_HTTPS:
-			service = "https";
-			break;
 		default:
 			ret = FAIL;
 			break;
