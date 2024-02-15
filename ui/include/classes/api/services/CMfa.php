@@ -39,15 +39,8 @@ class CMfa extends CApiService {
 	 */
 	public const OUTPUT_FIELDS = ['mfaid', 'type', 'name', 'hash_function', 'code_length', 'api_hostname', 'clientid'];
 
-	/**
-	 * @param array $options
-	 *
-	 * @throws APIException
-	 *
-	 * @return array|string
-	 */
-	public function get(array $options) {
-		$this->validateGet($options);
+	public function get(array $options): array|string {
+		self::validateGet($options);
 
 		if (!$options['countOutput']) {
 			if ($options['output'] === API_OUTPUT_EXTEND) {
@@ -79,11 +72,11 @@ class CMfa extends CApiService {
 		return $db_mfas;
 	}
 
-	private function validateGet(array &$options): void {
+	private static function validateGet(array &$options): void {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'mfaids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['mfaid', 'type']],
+			'filt	er' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['mfaid', 'type']],
 			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
@@ -92,7 +85,7 @@ class CMfa extends CApiService {
 			// output
 			'output' =>						['type' => API_OUTPUT, 'in' => implode(',', self::OUTPUT_FIELDS), 'default' => API_OUTPUT_EXTEND],
 			'countOutput' =>				['type' => API_FLAG, 'default' => false],
-			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid', 'mfa_status', 'mfaid']), 'default' => null],
+			'selectUsrgrps' =>				['type' => API_OUTPUT, 'flags' => API_ALLOW_NULL | API_ALLOW_COUNT, 'in' => implode(',', array_diff(CUserGroup::OUTPUT_FIELDS, ['mfaid'])), 'default' => null],
 			// sort and limit
 			'sortfield' =>					['type' => API_STRINGS_UTF8, 'flags' => API_NORMALIZE, 'in' => implode(',', ['name']), 'uniq' => true, 'default' => []],
 			'sortorder' =>					['type' => API_SORTORDER, 'default' => []],
@@ -136,7 +129,7 @@ class CMfa extends CApiService {
 			$output = ['mfaid'];
 		}
 		elseif ($options['selectUsrgrps'] === API_OUTPUT_EXTEND) {
-			$output = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid', 'mfa_status', 'mfaid'];
+			$output = CUserGroup::OUTPUT_FIELDS;
 		}
 		else {
 			$output = array_merge(['mfaid'], $options['selectUsrgrps']);
@@ -145,23 +138,32 @@ class CMfa extends CApiService {
 		$default_mfaid = CAuthenticationHelper::get(CAuthenticationHelper::MFAID);
 
 		if (array_key_exists($default_mfaid, $result)) {
-			$db_usergroups_mfa_enabled = API::UserGroup()->get([
+			$db_usergroup_options = [
 				'output' => $output,
-				'mfaids' => 0,
-				'mfa_status' => GROUP_MFA_ENABLED
-			]);
+				'filter' => ['mfaid' => 0, 'mfa_status' => GROUP_MFA_ENABLED]
+			];
+			$db_usergroups = DBselect(DB::makeSql('usrgrp', $db_usergroup_options));
 
-			foreach ($db_usergroups_mfa_enabled as $db_usergroup) {
+			while ($db_usergroup = DBfetch($db_usergroups)) {
+				if (!in_array('usrgrpid', $output)) {
+					unset($db_usergroup['usrgrpid']);
+				}
+
 				$result[$default_mfaid]['usrgrps'][] = array_diff_key($db_usergroup, array_flip(['mfaid']));
 			}
 		}
 
-		$db_usergroups = API::UserGroup()->get([
+		$db_usergroup_options = [
 			'output' => $output,
-			'mfaids' => array_keys($result)
-		]);
+			'filter' => ['mfaid' => array_keys($result)]
+		];
+		$db_usergroups = DBselect(DB::makeSql('usrgrp', $db_usergroup_options));
 
-		foreach ($db_usergroups as $db_usergroup) {
+		while ($db_usergroup = DBfetch($db_usergroups)) {
+			if (!in_array('usrgrpid', $output)) {
+				unset($db_usergroup['usrgrpid']);
+			}
+
 			$result[$db_usergroup['mfaid']]['usrgrps'][] = array_diff_key($db_usergroup, array_flip(['mfaid']));
 		}
 
@@ -183,18 +185,18 @@ class CMfa extends CApiService {
 	public function create(array $mfas): array {
 		$this->validateCreate($mfas);
 
-		$db_mfa_method_count = DB::select('mfa', ['countOutput' => true]);
+		$no_mfa_methods = DB::select('mfa', ['countOutput' => true]) == 0;
 
 		$mfaids = DB::insert('mfa', $mfas);
 
-		foreach ($mfas as $index => &$mfa) {
-			$mfa['mfaid'] = $mfaids[$index];
+		foreach ($mfas as $i => &$mfa) {
+			$mfa['mfaid'] = $mfaids[$i];
 		}
 		unset($mfa);
 
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MFA, $mfas);
 
-		if ($db_mfa_method_count == 0 && $mfaids) {
+		if ($no_mfa_methods) {
 			$mfaid = reset($mfaids);
 
 			API::Authentication()->update(['mfaid' => $mfaid]);
@@ -210,27 +212,27 @@ class CMfa extends CApiService {
 	 */
 	private function validateCreate(array &$mfas): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
-			'type' =>				['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
-			'name' =>				['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
-			'hash_function' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
-				['else' => true, 'type' => API_UNEXPECTED]
+			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
+			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
+			'hash_function' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512])],
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'hash_function')]
 			]],
-			'code_length' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
-				['else' => true, 'type' => API_UNEXPECTED]
+			'code_length' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])],
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'code_length')]
 			]],
-			'api_hostname' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'api_hostname')],
-				['else' => true, 'type' => API_UNEXPECTED]
+			'api_hostname' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'api_hostname')]
 			]],
 			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'clientid')],
-				['else' => true, 'type' => API_UNEXPECTED]
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'clientid')]
 			]],
-			'client_secret' =>		['type' => API_MULTIPLE, 'rules' => [
-				['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'default' => DB::getDefault('mfa', 'client_secret')],
-				['else' => true, 'type' => API_UNEXPECTED]
+			'client_secret' =>	['type' => API_MULTIPLE, 'rules' => [
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'client_secret')]
 			]]
 		]];
 
@@ -253,12 +255,8 @@ class CMfa extends CApiService {
 		$names = [];
 
 		foreach ($mfas as $mfa) {
-			if (!array_key_exists('name', $mfa)) {
-				continue;
-			}
-
-			if ($db_mfas === null
-				|| $mfa['name'] !== $db_mfas[$mfa['mfaid']]['name']) {
+			if (array_key_exists('name', $mfa)
+					&& ($db_mfas === null || $mfa['name'] !== $db_mfas[$mfa['mfaid']]['name'])) {
 				$names[] = $mfa['name'];
 			}
 		}
@@ -351,23 +349,23 @@ class CMfa extends CApiService {
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
 			'hash_function' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'hash_function')]
 			]],
 			'code_length' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'code_length')]
 			]],
 			'api_hostname' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'api_hostname')]
 			]],
 			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'clientid')]
 			]],
 			'client_secret' =>	['type' => API_MULTIPLE, 'rules' => [
 									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
-									['else' => true, 'type' => API_UNEXPECTED]
+									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'client_secret')]
 			]]
 		]];
 

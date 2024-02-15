@@ -206,17 +206,38 @@ class CAuthentication extends CApiService {
 			}
 		}
 
-		// Check if at least one MFA method exists.
-		if ($auth['mfa_status'] == MFA_ENABLED) {
-			$mfa_methods_exists = (bool) API::Mfa()->get([
-				'countOutput' => true
-			]);
+		self::checkMfaExists($auth, $db_auth);
+		self::checkMfaid($auth, $db_auth);
 
-			if (!$mfa_methods_exists) {
+		return $db_auth;
+	}
+
+	private static function checkMfaExists(array $auth, array $db_auth): void {
+		if ($auth['mfa_status'] != $db_auth['mfa_status'] || $auth['mfa_status'] == MFA_ENABLED
+				|| $db_auth['mfaid'] == 0) {
+			$mfa_count = DB::select('mfa', ['countOutput' => true]);
+
+			if ($mfa_count == 0) {
 				static::exception(ZBX_API_ERROR_PARAMETERS, _('At least one MFA method must exist.'));
 			}
 		}
+	}
 
-		return $db_auth;
+	private static function checkMfaid(array $auth, array $db_auth): void {
+		$mfaid_changed = bccomp($auth['mfaid'], $db_auth['mfaid']) != 0;
+
+		if (($auth['mfa_status'] == MFA_DISABLED && $auth['mfaid'] != 0 && $mfaid_changed)
+				|| ($auth['mfa_status'] == MFA_ENABLED && ($mfaid_changed || $auth['mfaid'] == 0))) {
+			$db_mfas = DB::select('mfa', [
+				'output' => ['mfaid'],
+				'mfaids' => $auth['mfaid']
+			]);
+
+			if (!$db_mfas) {
+				self::exception(ZBX_API_ERROR_PARAMETERS, _s('Invalid parameter "%1$s": %2$s.', '/mfaid',
+					_('object does not exist')
+				));
+			}
+		}
 	}
 }

@@ -35,6 +35,10 @@ class CUserGroup extends CApiService {
 	protected $tableAlias = 'g';
 	protected $sortColumns = ['usrgrpid', 'name'];
 
+	public const OUTPUT_FIELDS = ['usrgrpid', 'name', 'gui_access', 'users_status', 'debug_mode', 'userdirectoryid',
+		'mfa_status', 'mfaid'
+	];
+
 	/**
 	 * Get user groups.
 	 *
