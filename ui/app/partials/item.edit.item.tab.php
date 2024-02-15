@@ -849,7 +849,13 @@ $formgrid
 
 if ($data['source'] === 'item') {
 	$formgrid->addItem([
-		new CLabel(_('Enabled'), 'status'),
+		new CLabel([
+			_('Enabled'),
+			$item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+				? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
+					->addClass('js-disabled-by-lld')
+				: null
+		], 'status'),
 		new CFormField(
 			(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
 	]);

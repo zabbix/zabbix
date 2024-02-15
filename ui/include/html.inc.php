@@ -360,10 +360,14 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
-		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-			$info_icons = [getHostLifetimeIndicator(time(), (int) $db_host['hostDiscovery']['ts_delete'])];
-			$list->addItem(makeInformationList($info_icons));
-		}
+		// todo - uncomment and update this. E.S.
+//		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
+//			$info_icons = [getLldLostEntityIndicator(time(), ZBX_LLD_DISABLE_AFTER, time()+5000,
+//				ZBX_LLD_DELETE_AFTER, time()+2500, 'host'
+//			)];
+
+//			$list->addItem(makeInformationList($info_icons));
+//		}
 	}
 
 	$content_menu = (new CList())
@@ -680,27 +684,82 @@ function getHostGroupLifetimeIndicator(int $current_time, int $ts_delete): CSimp
 }
 
 /**
- * Returns the discovered host lifetime indicator.
+ * Returns the indicator for lost LLD entity.
  *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the host.
+ * @param int     $current_time           Current Unix timestamp.
+ * @param int     $lifetime_type          Type of deletion. ????
+ * @param int     $ts_delete              Deletion timestamp of the entity.
+ * @param int     $enabled_lifetime_type  Type of disabling. ????
+ * @param int     $ts_disable             Disabling timestamp of the entity.
+ * @param string  $entity                 Type of entity.
  *
  * @throws Exception
  */
-function getHostLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The host is not discovered anymore and will be deleted the next time discovery rule is processed.'
+function getLldLostEntityIndicator(int $current_time, int $lifetime_type, int $ts_delete, int $enabled_lifetime_type,
+		int $ts_disable, string $entity): ?CSimpleButton {
+	$warning = '';
+
+	if ($lifetime_type != ZBX_LLD_DELETE_NEVER && $current_time > $ts_delete) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s.', _($entity),
+			_('will be deleted the next time discovery rule is processed')
 		);
 	}
-	else {
-		$warning = _s(
-			'The host is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
+	elseif ($enabled_lifetime_type != ZBX_LLD_DISABLE_NEVER && $current_time > $ts_disable) {
+		$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.',
+			_($entity),
+			_('will be disabled the next time discovery rule is processed'),
+			$lifetime_type == ZBX_LLD_DELETE_AFTER
+				? _s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+				: _('will not be deleted')
 		);
+	}
+	elseif ($current_time < $ts_delete && $current_time < $ts_disable) {
+		switch ($lifetime_type) {
+			case ZBX_LLD_DELETE_AFTER:
+				switch ($enabled_lifetime_type) {
+					case ZBX_LLD_DISABLE_AFTER:
+						$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+							_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
+							_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+						);
+						break;
+					case ZBX_LLD_DISABLE_IMMEDIATELY:
+						$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+							_('has been disabled'),
+							_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+						);
+						break;
+					case ZBX_LLD_DISABLE_NEVER:
+						$warning = _s('The %1$s is not discovered anymore and %2$s.',
+							_($entity),
+							_s('will be deleted in %1$s', zbx_date2age($current_time, $ts_delete))
+						);
+						break;
+				}
+				break;
+
+			case ZBX_LLD_DELETE_NEVER:
+				switch ($enabled_lifetime_type) {
+					case ZBX_LLD_DISABLE_AFTER:
+						$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+							_s('will be disabled in %1$s', zbx_date2age($current_time, $ts_disable)),
+							_('will not be deleted')
+						);
+						break;
+					case ZBX_LLD_DISABLE_IMMEDIATELY:
+						$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+							_('has been disabled'), _('will not be deleted')
+						);
+						break;
+					// todo - check whether icon should be displayed in this scenario. Probably not? E.S.
+//					case ZBX_LLD_DISABLE_NEVER:
+//						$warning = _s('The %1$s is not discovered anymore and %2$s, %3$s.', _($entity),
+//							_('will not be disabled'), _('will not be deleted')
+//						);
+//						break;
+				}
+				break;
+		}
 	}
 
 	return makeWarningIcon($warning);
@@ -724,60 +783,6 @@ function getGraphLifetimeIndicator(int $current_time, int $ts_delete): CSimpleBu
 	else {
 		$warning = _s(
 			'The graph is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
-	}
-
-	return makeWarningIcon($warning);
-}
-
-/**
- * Returns the discovered trigger lifetime indicator.
- *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the trigger.
- *
- * @throws Exception
- */
-function getTriggerLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The trigger is not discovered anymore and will be deleted the next time discovery rule is processed.'
-		);
-	}
-	else {
-		$warning = _s(
-			'The trigger is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
-			zbx_date2age($current_time, $ts_delete),
-			zbx_date2str(DATE_FORMAT, $ts_delete),
-			zbx_date2str(TIME_FORMAT, $ts_delete)
-		);
-	}
-
-	return makeWarningIcon($warning);
-}
-
-/**
- * Returns the discovered item lifetime indicator.
- *
- * @param int $current_time  Current Unix timestamp.
- * @param int $ts_delete     Deletion timestamp of the item.
- *
- * @throws Exception
- */
-function getItemLifetimeIndicator(int $current_time, int $ts_delete): CSimpleButton {
-	// Check if the element should've been deleted in the past.
-	if ($current_time > $ts_delete) {
-		$warning = _(
-			'The item is not discovered anymore and will be deleted the next time discovery rule is processed.'
-		);
-	}
-	else {
-		$warning = _s(
-			'The item is not discovered anymore and will be deleted in %1$s (on %2$s at %3$s).',
 			zbx_date2age($current_time, $ts_delete),
 			zbx_date2str(DATE_FORMAT, $ts_delete),
 			zbx_date2str(TIME_FORMAT, $ts_delete)

@@ -2377,8 +2377,8 @@ function getMainItemFieldNames(array $input): array {
 
 		case ZBX_FLAG_DISCOVERY_RULE:
 			if ($input['templateid'] == 0) {
-				$field_names = ['name', 'type', 'key_', 'lifetime', 'description', 'status', 'preprocessing',
-					'lld_macro_paths', 'overrides'
+				$field_names = ['name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime','description', 'status', 'preprocessing', 'lld_macro_paths', 'overrides'
 				];
 			}
 			else {

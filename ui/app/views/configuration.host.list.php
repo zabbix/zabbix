@@ -384,8 +384,11 @@ foreach ($data['hosts'] as $host) {
 
 	$info_icons = [];
 
-	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['ts_delete'] != 0) {
-		$info_icons[] = getHostLifetimeIndicator($current_time, (int) $host['hostDiscovery']['ts_delete']);
+	if ($host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+		$info_icons[] = getLldLostEntityIndicator($current_time, $host['discoveryRule']['lifetime_type'],
+			$host['hostDiscovery']['ts_delete'], $host['discoveryRule']['enabled_lifetime_type'],
+			$host['hostDiscovery']['ts_disable'], 'host'
+		);
 	}
 
 	if ($host['tls_connect'] == HOST_ENCRYPTION_NONE
@@ -497,7 +500,13 @@ foreach ($data['hosts'] as $host) {
 		getHostInterface($interface),
 		$monitored_by,
 		$hostTemplates,
-		$toggle_status_link,
+		[
+			$toggle_status_link,
+			$host['status'] == HOST_STATUS_NOT_MONITORED
+					&& $host['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+				? makeDescriptionIcon(_('Disabled automatically by an LLD rule.'))
+				: null
+		],
 		getHostAvailabilityTable($host['interfaces']),
 		$encryption,
 		makeInformationList($info_icons),

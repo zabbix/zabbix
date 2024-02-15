@@ -164,13 +164,21 @@ foreach ($data['items'] as $item) {
 			$info_cell[] = makeErrorIcon($item['error']);
 		}
 
-		// discovered item lifetime indicator
-		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['ts_delete'] != 0) {
-			$info_cell[] = getItemLifetimeIndicator($now_ts, (int) $item['itemDiscovery']['ts_delete']);
+		if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $item['itemDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_cell[] = getLldLostEntityIndicator(time(), $item['discoveryRule']['lifetime_type'],
+				$item['itemDiscovery']['ts_delete'], $item['discoveryRule']['enabled_lifetime_type'],
+				$item['itemDiscovery']['ts_disable'], 'item'
+			);
 		}
 
 		$info_cell = makeInformationList($info_cell);
 	}
+
+	$lost_lld_info_icon = $item['status'] == ITEM_STATUS_DISABLED
+			&& (array_key_exists('disable_source', $item['itemDiscovery'])
+				&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD)
+		? makeDescriptionIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
 
 	$can_execute = in_array($item['type'], $data['check_now_types']) && $item['status'] == ITEM_STATUS_ACTIVE
 		&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED;
@@ -198,11 +206,14 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		(new CLink(itemIndicator($item['status'], $item['state'])))
-			->addClass(ZBX_STYLE_LINK_ACTION)
-			->addClass(itemIndicatorStyle($item['status'], $item['state']))
-			->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
-			->setAttribute('data-itemid', $item['itemid']),
+		[
+			(new CLink(itemIndicator($item['status'], $item['state'])))
+				->addClass(ZBX_STYLE_LINK_ACTION)
+				->addClass(itemIndicatorStyle($item['status'], $item['state']))
+				->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
+				->setAttribute('data-itemid', $item['itemid']),
+			$lost_lld_info_icon
+		],
 		$data['tags'][$item['itemid']],
 		$info_cell
 	];

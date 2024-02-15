@@ -295,9 +295,12 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 			$info_icons[] = makeErrorIcon((new CDiv($trigger['error']))->addClass(ZBX_STYLE_WORDWRAP));
 		}
 
-		if (array_key_exists('ts_delete', $trigger['triggerDiscovery'])
-				&& $trigger['triggerDiscovery']['ts_delete'] > 0) {
-			$info_icons[] = getTriggerLifetimeIndicator(time(), (int) $trigger['triggerDiscovery']['ts_delete']);
+		if (array_key_exists('status', $trigger['triggerDiscovery'])
+				&& $trigger['triggerDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons[] = getLldLostEntityIndicator(time(), $trigger['discoveryRule']['lifetime_type'],
+				$trigger['triggerDiscovery']['ts_delete'], $trigger['discoveryRule']['enabled_lifetime_type'],
+				$trigger['triggerDiscovery']['ts_disable'], 'trigger'
+			);
 		}
 	}
 
@@ -336,6 +339,12 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		)
 		: '';
 
+	$lost_lld_info_icon = $trigger['status'] == TRIGGER_STATUS_DISABLED
+			&& (array_key_exists('disable_source', $trigger['triggerDiscovery'])
+				&& $trigger['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD)
+		? makeDescriptionIcon(_('Disabled automatically by an LLD rule.'))
+		: null;
+
 	$triggers_table->addRow([
 		new CCheckBox('g_triggerid['.$triggerid.']', $triggerid),
 		CSeverityHelper::makeSeverityCell((int) $trigger['priority']),
@@ -344,7 +353,7 @@ foreach ($data['triggers'] as $tnum => $trigger) {
 		$description,
 		$trigger['opdata'],
 		(new CDiv($expression))->addClass(ZBX_STYLE_WORDWRAP),
-		$status,
+		(new CDiv([$status, $lost_lld_info_icon]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['show_info_column'] ? makeInformationList($info_icons) : null,
 		$data['tags'][$triggerid]
 	]);

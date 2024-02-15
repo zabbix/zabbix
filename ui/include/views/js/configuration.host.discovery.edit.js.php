@@ -182,6 +182,32 @@ include __DIR__.'/configuration.host.discovery.edit.overr.js.php';
 			if (button instanceof Element) {
 				button.addEventListener('click', e => this.executeNow(e.target));
 			}
+
+			document.querySelectorAll('#lifetime_type, #enabled_lifetime_type').forEach(element => {
+				element.addEventListener('change', () => this.updateLostResourcesFields());
+			});
+
+			this.updateLostResourcesFields();
+		},
+
+		updateLostResourcesFields() {
+			const lifetime_type = document.querySelector('[name="lifetime_type"]:checked').value;
+			const enabled_lifetime_type = document.querySelector('[name="enabled_lifetime_type"]:checked').value;
+			const delete_immediately = lifetime_type == <?= ZBX_LLD_DELETE_IMMEDIATELY ?>;
+
+			document.querySelectorAll('[name="enabled_lifetime_type"]').forEach(radio => {
+				radio.style.display = delete_immediately ? 'none' : '';
+			});
+
+			document.getElementById('lifetime').style.display = lifetime_type == <?= ZBX_LLD_DELETE_AFTER ?>
+				? ''
+				: 'none';
+			document.getElementById('enabled_lifetime').style.display = (delete_immediately
+					|| enabled_lifetime_type != <?= ZBX_LLD_DISABLE_AFTER ?>)
+				? 'none'
+				: '';
+			document.getElementById('js-item-disable-resources-field').style.display = delete_immediately ? 'none' : '';
+			document.getElementById('js-item-disable-resources-label').style.display = delete_immediately ? 'none' : '';
 		},
 
 		updateExpression() {

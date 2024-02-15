@@ -107,8 +107,17 @@ $fields = [
 								],
 	'trapper_hosts' =>			[T_ZBX_STR, O_OPT, null,	null,
 									'(isset({add}) || isset({update})) && isset({type}) && {type} == 2'
+	],
+	'lifetime_type' =>			[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_LLD_DELETE_AFTER.','.ZBX_LLD_DELETE_NEVER.','.ZBX_LLD_DELETE_IMMEDIATELY]),
+									'(isset({add}) || isset({update}))'
 								],
 	'lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
+	'enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
+									IN([ZBX_LLD_DISABLE_AFTER.','.ZBX_LLD_DISABLE_NEVER.','.ZBX_LLD_DISABLE_IMMEDIATELY]),
+									'(isset({add}) || isset({update}))'
+								],
+	'enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'evaltype' =>				[T_ZBX_INT, O_OPT, null, 	IN($evalTypes), 'isset({add}) || isset({update})'],
 	'formula' =>				[T_ZBX_STR, O_OPT, null,	null,		'isset({add}) || isset({update})'],
 	'conditions' =>				[T_ZBX_STR, O_OPT, P_SYS|P_ONLY_TD_ARRAY,	null,	null],
@@ -216,35 +225,49 @@ $fields = [
 	'form' =>					[T_ZBX_STR, O_OPT, P_SYS,	null,		null],
 	'form_refresh' =>			[T_ZBX_INT, O_OPT, P_SYS,	null,		null],
 	// filter
-	'filter_set' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_rst' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_groupids' =>		[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_hostids' =>			[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
-	'filter_name' =>			[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_key' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_type' =>			[T_ZBX_INT, O_OPT, null,
-									IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE, ITEM_TYPE_INTERNAL,
-										ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL, ITEM_TYPE_DB_MONITOR,
-										ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET, ITEM_TYPE_JMX,
-										ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP, ITEM_TYPE_SCRIPT
-									]),
-									null
-								],
-	'filter_delay' =>			[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
-	'filter_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_snmp_oid' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
-	'filter_state' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
-									null
-								],
-	'filter_status' =>			[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
-									null
-								],
-	'backurl' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_set' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_rst' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_groupids' =>				[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_hostids' =>					[T_ZBX_INT, O_OPT, P_ONLY_ARRAY,	DB_ID,	null],
+	'filter_name' =>					[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_key' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_type' =>					[T_ZBX_INT, O_OPT, null,
+											IN([-1, ITEM_TYPE_ZABBIX, ITEM_TYPE_TRAPPER, ITEM_TYPE_SIMPLE,
+												ITEM_TYPE_INTERNAL, ITEM_TYPE_ZABBIX_ACTIVE, ITEM_TYPE_EXTERNAL,
+												ITEM_TYPE_DB_MONITOR, ITEM_TYPE_IPMI, ITEM_TYPE_SSH, ITEM_TYPE_TELNET,
+												ITEM_TYPE_JMX, ITEM_TYPE_DEPENDENT, ITEM_TYPE_HTTPAGENT, ITEM_TYPE_SNMP,
+												ITEM_TYPE_SCRIPT
+											]),
+											null
+										],
+	'filter_delay' =>					[T_ZBX_STR, O_OPT, P_UNSET_EMPTY, null, null, _('Update interval')],
+	'filter_lifetime_type' =>			[T_ZBX_INT, O_OPT, null,
+											IN([-1, ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER,
+												ZBX_LLD_DELETE_IMMEDIATELY
+											]),
+											null
+										],
+	'filter_lifetime' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_enabled_lifetime_type' =>	[T_ZBX_INT, O_OPT, null,
+											IN([-1, ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER,
+												ZBX_LLD_DISABLE_IMMEDIATELY
+											]),
+											null
+										],
+	'filter_enabled_lifetime' =>		[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_snmp_oid' =>				[T_ZBX_STR, O_OPT, null,	null,		null],
+	'filter_state' =>					[T_ZBX_INT, O_OPT, null,
+											IN([-1, ITEM_STATE_NORMAL, ITEM_STATE_NOTSUPPORTED]),
+											null
+										],
+	'filter_status' =>					[T_ZBX_INT, O_OPT, null,	IN([-1, ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED]),
+											null
+										],
+	'backurl' =>						[T_ZBX_STR, O_OPT, null,	null,		null],
 	// sort and sortorder
-	'sort' =>					[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
-	'sortorder' =>				[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
+	'sort' =>							[T_ZBX_STR, O_OPT, P_SYS, IN('"delay","key_","name","status","type"'),	null],
+	'sortorder' =>						[T_ZBX_STR, O_OPT, P_SYS, IN('"'.ZBX_SORT_DOWN.'","'.ZBX_SORT_UP.'"'),	null]
 ];
-
 check_fields($fields);
 
 $_REQUEST['params'] = getRequest($paramsFieldName, '');
@@ -309,7 +332,16 @@ if (hasRequest('filter_set')) {
 	CProfile::update($prefix.'host_discovery.filter.key', getRequest('filter_key', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'host_discovery.filter.type', getRequest('filter_type', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'host_discovery.filter.delay', getRequest('filter_delay', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.lifetime_type', getRequest('filter_lifetime_type', ''),
+		PROFILE_TYPE_INT
+	);
 	CProfile::update($prefix.'host_discovery.filter.lifetime', getRequest('filter_lifetime', ''), PROFILE_TYPE_STR);
+	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime_type',
+		getRequest('filter_enabled_lifetime_type', ''), PROFILE_TYPE_INT
+	);
+	CProfile::update($prefix.'host_discovery.filter.enabled_lifetime', getRequest('filter_enabled_lifetime', ''),
+		PROFILE_TYPE_STR
+	);
 	CProfile::update($prefix.'host_discovery.filter.snmp_oid', getRequest('filter_snmp_oid', ''), PROFILE_TYPE_STR);
 	CProfile::update($prefix.'host_discovery.filter.state', getRequest('filter_state', -1), PROFILE_TYPE_INT);
 	CProfile::update($prefix.'host_discovery.filter.status', getRequest('filter_status', -1), PROFILE_TYPE_INT);
@@ -325,7 +357,10 @@ elseif (hasRequest('filter_rst')) {
 	CProfile::delete($prefix.'host_discovery.filter.key');
 	CProfile::delete($prefix.'host_discovery.filter.type');
 	CProfile::delete($prefix.'host_discovery.filter.delay');
+	CProfile::delete($prefix.'host_discovery.filter.lifetime_type');
 	CProfile::delete($prefix.'host_discovery.filter.lifetime');
+	CProfile::delete($prefix.'host_discovery.filter.enabled_lifetime_type');
+	CProfile::delete($prefix.'host_discovery.filter.enabled_lifetime');
 	CProfile::delete($prefix.'host_discovery.filter.snmp_oid');
 	CProfile::delete($prefix.'host_discovery.filter.state');
 	CProfile::delete($prefix.'host_discovery.filter.status');
@@ -338,7 +373,10 @@ $filter = [
 	'key' => CProfile::get($prefix.'host_discovery.filter.key', ''),
 	'type' => CProfile::get($prefix.'host_discovery.filter.type', -1),
 	'delay' => CProfile::get($prefix.'host_discovery.filter.delay', ''),
+	'lifetime_type' => CProfile::get($prefix.'host_discovery.filter.lifetime_type', -1),
 	'lifetime' => CProfile::get($prefix.'host_discovery.filter.lifetime', ''),
+	'enabled_lifetime_type' => CProfile::get($prefix.'host_discovery.filter.enabled_lifetime_type', -1),
+	'enabled_lifetime' => CProfile::get($prefix.'host_discovery.filter.enabled_lifetime', ''),
 	'snmp_oid' => CProfile::get($prefix.'host_discovery.filter.snmp_oid', ''),
 	'state' => CProfile::get($prefix.'host_discovery.filter.state', -1),
 	'status' => CProfile::get($prefix.'host_discovery.filter.status', -1)
@@ -427,7 +465,6 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'name' => getRequest('name', DB::getDefault('items', 'name')),
 			'type' => $type,
 			'key_' => $key,
-			'lifetime' => getRequest('lifetime', DB::getDefault('items', 'lifetime')),
 			'description' => getRequest('description', DB::getDefault('items', 'description')),
 			'status' => getRequest('status', ITEM_STATUS_DISABLED),
 			'preprocessing' => normalizeItemPreprocessingSteps(getRequest('preprocessing', [])),
@@ -497,34 +534,86 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			'privatekey' => getRequest('privatekey', DB::getDefault('items', 'privatekey'))
 		];
 
+		$lifetime = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
+		$lifetime_type = getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type'));
+		$enabled_lifetime = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
+		$enabled_lifetime_type = getRequest('enabled_lifetime_type', DB::getDefault('items', 'enabled_lifetime_type'));
+
+		// Set the radio-button to Immediately, if value is '0'.
+		if ($lifetime == 0) {
+			$lifetime_type = ZBX_LLD_DELETE_IMMEDIATELY;
+		}
+
+		if ($enabled_lifetime == 0) {
+			$enabled_lifetime_type = ZBX_LLD_DISABLE_IMMEDIATELY;
+		}
+
+		if ($lifetime_type == ZBX_LLD_DELETE_IMMEDIATELY) {
+			$enabled_lifetime_type = DB::getDefault('items', 'enabled_lifetime_type');
+		}
+
+		// Reset the values to default.
+		if ($lifetime_type != ZBX_LLD_DELETE_AFTER) {
+			$lifetime = DB::getDefault('items', 'lifetime');
+		}
+
+		if ($enabled_lifetime_type != ZBX_LLD_DISABLE_AFTER) {
+			$enabled_lifetime = DB::getDefault('items', 'enabled_lifetime');
+		}
+
+		$input += [
+			'lifetime_type' => $lifetime_type,
+			'lifetime' => $lifetime,
+			'enabled_lifetime_type' => $enabled_lifetime_type,
+			'enabled_lifetime' => $enabled_lifetime
+		];
+
 		$result = true;
 
-		if (hasRequest('add')) {
-			$item = ['hostid' => $hostid];
+		$resolved_items = CMacrosResolverHelper::resolveTimeUnitMacros([$input], ['lifetime', 'enabled_lifetime']);
 
-			$item += getSanitizedItemFields($input + [
-				'templateid' => 0,
-				'flags' => ZBX_FLAG_DISCOVERY_RULE,
-				'hosts' => $hosts
-			]);
+		foreach ($resolved_items as $item) {
+			$item['lifetime'] = timeUnitToSeconds($item['lifetime']);
+			$item['enabled_lifetime'] = timeUnitToSeconds($item['enabled_lifetime']);
 
-			$response = API::DiscoveryRule()->create($item);
+			if (is_numeric($item['lifetime']) && is_numeric($item['enabled_lifetime'])
+					&& $item['lifetime'] < $item['enabled_lifetime']) {
+				$result = false;
 
-			if ($response === false) {
-				throw new Exception();
+				error(_s(
+					'"%1$s" value must be greater than "%2$s" value.', 'Delete lost resources', 'Disable lost resources'
+				));
 			}
 		}
 
-		if (hasRequest('update')) {
-			$item = getSanitizedItemFields($input + $db_item + [
-				'flags' => ZBX_FLAG_DISCOVERY_RULE,
-				'hosts' => $hosts
-			]);
+		if (!hasErrorMessages()) {
+			if (hasRequest('add')) {
+				$item = ['hostid' => $hostid];
 
-			$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
+				$item += getSanitizedItemFields($input + [
+						'templateid' => 0,
+						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'hosts' => $hosts
+					]);
 
-			if ($response === false) {
-				throw new Exception();
+				$response = API::DiscoveryRule()->create($item);
+
+				if ($response === false) {
+					throw new Exception();
+				}
+			}
+
+			if (hasRequest('update')) {
+				$item = getSanitizedItemFields($input + $db_item + [
+						'flags' => ZBX_FLAG_DISCOVERY_RULE,
+						'hosts' => $hosts
+					]);
+
+				$response = API::DiscoveryRule()->update(['itemid' => $itemid] + $item);
+
+				if ($response === false) {
+					throw new Exception();
+				}
 			}
 		}
 	}
@@ -650,7 +739,13 @@ if (hasRequest('form')) {
 	}
 
 	$data = getItemFormData($item);
+
+	$data['lifetime_type'] = getRequest('lifetime_type', DB::getDefault('items', 'lifetime_type'));
 	$data['lifetime'] = getRequest('lifetime', DB::getDefault('items', 'lifetime'));
+	$data['enabled_lifetime_type'] = getRequest('enabled_lifetime_type',
+		DB::getDefault('items', 'enabled_lifetime_type')
+	);
+	$data['enabled_lifetime'] = getRequest('enabled_lifetime', DB::getDefault('items', 'enabled_lifetime'));
 	$data['evaltype'] = getRequest('evaltype', CONDITION_EVAL_TYPE_AND_OR);
 	$data['formula'] = getRequest('formula');
 	$data['conditions'] = sortLldRuleFilterConditions(getRequest('conditions', []), $data['evaltype']);
@@ -691,7 +786,11 @@ if (hasRequest('form')) {
 
 	// update form
 	if (hasRequest('itemid') && !getRequest('form_refresh')) {
+		$data['lifetime_type'] = $item['lifetime_type'];
 		$data['lifetime'] = $item['lifetime'];
+		$data['enabled_lifetime_type'] = $item['enabled_lifetime_type'];
+		$data['enabled_lifetime'] = $item['enabled_lifetime'];
+
 		$data['evaltype'] = $item['filter']['evaltype'];
 		$data['formula'] = $item['filter']['formula'];
 		$data['conditions'] = sortLldRuleFilterConditions($item['filter']['conditions'], $item['filter']['evaltype']);
@@ -799,8 +898,20 @@ else {
 		}
 	}
 
+	if ($filter['lifetime_type'] != -1) {
+		$options['filter']['lifetime_type'] = $filter['lifetime_type'];
+	}
+
 	if ($filter['lifetime'] !== '') {
 		$options['filter']['lifetime'] = $filter['lifetime'];
+	}
+
+	if ($filter['enabled_lifetime_type'] != -1) {
+		$options['filter']['enabled_lifetime_type'] = $filter['enabled_lifetime_type'];
+	}
+
+	if ($filter['enabled_lifetime'] !== '') {
+		$options['filter']['enabled_lifetime'] = $filter['enabled_lifetime'];
 	}
 
 	if ($filter['snmp_oid'] !== '') {
