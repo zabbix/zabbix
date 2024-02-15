@@ -336,6 +336,8 @@ int	zbx_async_check_tcpsvc(zbx_dc_item_t *item, unsigned char svc_type, AGENT_RE
 
 	if (NOTSUPPORTED != async_check_service_validate(tcpsvc_context, NULL))
 		tcpsvc_context->validate_func = async_check_service_validate;
+	else
+		tcpsvc_context->validate_func = NULL;
 
 	tcpsvc_context->config_source_ip = config_source_ip;
 	tcpsvc_context->config_timeout = item->timeout;

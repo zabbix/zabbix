@@ -39,6 +39,7 @@
 #include "discoverer_taskprep.h"
 #include "discoverer_int.h"
 #include "zbxtimekeeper.h"
+#include "zbxpoller.h"
 
 #ifdef HAVE_LDAP
 #	include <ldap.h>
