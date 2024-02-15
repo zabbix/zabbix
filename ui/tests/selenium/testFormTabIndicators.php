@@ -702,7 +702,7 @@ class testFormTabIndicators extends CWebTest {
 							'count' => 7
 						],
 						[
-							'name' => 'Messaging',
+							'name' => 'Frontend notifications',
 							'entries' => [
 								'selector' => 'id:messages_enabled',
 								'value' => true,

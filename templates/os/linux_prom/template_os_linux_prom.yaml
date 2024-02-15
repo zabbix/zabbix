@@ -1929,8 +1929,8 @@ zabbix_export:
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-          value: ^7$
-          description: 'Ignore notPresent(7).'
+          value: ^notpresent$
+          description: 'Ignore notpresent(1).'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'

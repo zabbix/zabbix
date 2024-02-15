@@ -19,10 +19,11 @@
 
 #include "taskmanager_proxy.h"
 
-#include "zbxscripts.h"
 #include "../../zabbix_server/trapper/trapper_item_test.h"
-#include "../../zabbix_server/poller/checks_snmp.h"
+#include "../poller/poller_proxy.h"
 
+#include "zbxscripts.h"
+#include "zbxpoller.h"
 #include "zbxnix.h"
 #include "zbxself.h"
 #include "zbxtasks.h"
@@ -254,7 +255,8 @@ static int	tm_execute_data_json(int type, const char *data, char **info,
 		case ZBX_TM_DATA_TYPE_TEST_ITEM:
 			return zbx_trapper_item_test_run(&jp_data, 0, info, config_comms,
 					config_startup_time, program_type, progname, get_config_forks,
-					config_java_gateway, config_java_gateway_port, config_externalscripts);
+					config_java_gateway, config_java_gateway_port, config_externalscripts,
+					zbx_get_value_internal_ext_proxy);
 		case ZBX_TM_DATA_TYPE_DIAGINFO:
 			return zbx_diag_get_info(&jp_data, info);
 	}
