@@ -76,7 +76,7 @@ class CMfa extends CApiService {
 		$api_input_rules = ['type' => API_OBJECT, 'fields' => [
 			// filter
 			'mfaids' =>						['type' => API_IDS, 'flags' => API_ALLOW_NULL | API_NORMALIZE, 'default' => null],
-			'filt	er' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['mfaid', 'type']],
+			'filter' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['mfaid', 'type']],
 			'search' =>						['type' => API_FILTER, 'flags' => API_ALLOW_NULL, 'default' => null, 'fields' => ['name']],
 			'searchByAny' =>				['type' => API_BOOLEAN, 'default' => false],
 			'startSearch' =>				['type' => API_FLAG, 'default' => false],
@@ -197,9 +197,7 @@ class CMfa extends CApiService {
 		self::addAuditLog(CAudit::ACTION_ADD, CAudit::RESOURCE_MFA, $mfas);
 
 		if ($no_mfa_methods) {
-			$mfaid = reset($mfaids);
-
-			API::Authentication()->update(['mfaid' => $mfaid]);
+			API::Authentication()->update(['mfaid' => reset($mfaids)]);
 		}
 
 		return ['mfaids' => $mfaids];
