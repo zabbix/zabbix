@@ -2710,7 +2710,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_HOST		*host;
 
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_NUMITEM		*numitem;
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_TRAPITEM		*trapitem;
@@ -2838,6 +2837,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (0 == found)
 		{
+			item->numitem = NULL;
 			item->triggers = NULL;
 
 			if (NULL != new_items)
@@ -2913,16 +2913,13 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			int	trends_sec;
 
-			if (1 == clean_sync)
+			if (NULL == item->numitem)
 			{
-				numitem = (ZBX_DC_NUMITEM *)DCfind_id_uniq(&config->numitems, itemid,
-						sizeof(ZBX_DC_NUMITEM), &found);
+				item->numitem = (ZBX_DC_NUMITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_NUMITEM));
+				found = 0;
 			}
 			else
-			{
-				numitem = (ZBX_DC_NUMITEM *)DCfind_id(&config->numitems, itemid,
-						sizeof(ZBX_DC_NUMITEM), &found);
-			}
+				found = 1;
 
 			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
 				trends_sec = ZBX_HK_PERIOD_MAX;
@@ -2930,18 +2927,19 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
 				trends_sec = config->config->hk.trends;
 
-			numitem->trends = (0 != trends_sec);
-			numitem->trends_sec = trends_sec;
+			item->numitem->trends = (0 != trends_sec);
+			item->numitem->trends_sec = trends_sec;
 
-			DCstrpool_replace(found, &numitem->units, row[26]);
+			DCstrpool_replace(found, &item->numitem->units, row[26]);
 		}
-		else if (NULL != (numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid)))
+		else if (NULL != item->numitem)
 		{
 			/* remove parameters for non-numeric item */
 
-			zbx_strpool_release(numitem->units);
+			zbx_strpool_release(item->numitem->units);
 
-			zbx_hashset_remove_direct(&config->numitems, numitem);
+			__config_mem_free_func(item->numitem);
+			item->numitem = NULL;
 		}
 
 		/* SNMP items */
@@ -3352,11 +3350,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &itemid);
+			zbx_strpool_release(item->numitem->units);
 
-			zbx_strpool_release(numitem->units);
-
-			zbx_hashset_remove_direct(&config->numitems, numitem);
+			__config_mem_free_func(item->numitem);
+			item->numitem = NULL;
 		}
 
 		/* SNMP items */
@@ -6047,9 +6044,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 
 			if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				ZBX_DC_NUMITEM	*numitem;
-
-				numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &item->itemid);
+				ZBX_DC_NUMITEM	*numitem = item->numitem;
 
 				if (NULL != numitem && 0 != numitem->trends)
 					zbx_vector_uint64_append(&itemids, items->values[i]->itemid);
@@ -6709,8 +6704,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->items.num_data, config->items.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() items_hk   : %d (%d slots)", __func__,
 				config->items_hk.num_data, config->items_hk.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() numitems   : %d (%d slots)", __func__,
-				config->numitems.num_data, config->numitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocitems: %d (%d slots)", __func__,
 				config->preprocitems.num_data, config->preprocitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __func__,
@@ -7212,7 +7205,6 @@ int	init_configuration_cache(char **error)
 			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
 	CREATE_HASHSET(config->items, 0);
-	CREATE_HASHSET(config->numitems, 0);
 	CREATE_HASHSET(config->snmpitems, 0);
 	CREATE_HASHSET(config->ipmiitems, 0);
 	CREATE_HASHSET(config->trapitems, 0);

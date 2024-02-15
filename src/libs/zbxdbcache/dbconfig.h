@@ -88,6 +88,15 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
+	zbx_uint64_t	itemid;
+	const char	*units;
+	unsigned char	trends;
+	int		trends_sec;
+}
+ZBX_DC_NUMITEM;
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
@@ -98,6 +107,7 @@ typedef struct
 	const char		*error;
 	const char		*delay;
 	ZBX_DC_TRIGGER		**triggers;
+	ZBX_DC_NUMITEM		*numitem;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
@@ -151,15 +161,6 @@ typedef struct
 	ZBX_DC_ITEM	*item_ptr;
 }
 ZBX_DC_ITEM_HK;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*units;
-	unsigned char	trends;
-	int		trends_sec;
-}
-ZBX_DC_NUMITEM;
 
 typedef struct
 {

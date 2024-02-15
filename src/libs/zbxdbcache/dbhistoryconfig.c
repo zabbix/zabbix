@@ -78,7 +78,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&config->numitems, &src_item->itemid);
+			numitem = src_item->numitem;
 
 			dst_item->trends = numitem->trends;
 			dst_item->trends_sec = numitem->trends_sec;
