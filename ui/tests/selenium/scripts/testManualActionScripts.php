@@ -79,7 +79,7 @@ class testManualActionScripts extends CWebTest {
 			[
 				'description' => 'Attention: script execution is needed',
 				'expression' => 'last(/A host for scripts check/script_trap)<>0',
-				'type' => 1,
+				'type' => TRIGGER_MULT_EVENT_ENABLED,
 				'priority' => TRIGGER_SEVERITY_WARNING
 			]
 		]);
@@ -108,7 +108,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Host id {MANUALINPUT} is selected. Proceed?'
 					],
-					'manualinput' => '0',
+					'manual_input' => '0',
 					'prompt' => 'Enter host id',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -139,7 +139,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Host id {MANUALINPUT} is selected. Proceed?'
 					],
-					'manualinput' => '0',
+					'manual_input' => '0',
 					'prompt' => 'Enter host id',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -167,7 +167,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '999999',
+					'manual_input' => '999999',
 					'prompt' => 'Enter host id',
 					'event' => 'Inheritance trigger with tags',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -195,7 +195,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '0',
+					'manual_input' => '0',
 					'prompt' => 'Enter host id',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -231,7 +231,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'a',
+					'manual_input' => 'a',
 					'prompt' => 'Enter value for parameter A',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -266,7 +266,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '10',
+					'manual_input' => '10',
 					'prompt' => 'Enter value for parameter A',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -300,7 +300,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Parameter A will contain value => {MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '10',
+					'manual_input' => '10',
 					'prompt' => 'Enter value for parameter A',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -336,7 +336,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Parameter A will contain value => {MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '',
+					'manual_input' => '',
 					'prompt' => 'Enter value for parameter A',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -363,7 +363,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Ping count: {MANUALINPUT}'
 					],
-					'manualinput' => '0',
+					'manual_input' => '0',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -392,7 +392,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Ping count: {MANUALINPUT}'
 					],
-					'manualinput' => '0',
+					'manual_input' => '0',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -418,7 +418,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '10',
+					'manual_input' => '10',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -444,7 +444,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '',
+					'manual_input' => '',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: \b[1-9]\b.',
@@ -473,7 +473,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
 						'Enable confirmation' => false
 					],
-					'manualinput' => '11',
+					'manual_input' => '11',
 					'prompt' => 'Enter hostname',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
@@ -503,7 +503,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Hostname is {MANUALINPUT}'
 					],
-					'manualinput' => '.',
+					'manual_input' => '.',
 					'prompt' => 'Enter hostname',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
@@ -532,7 +532,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
 						'Enable confirmation' => false
 					],
-					'manualinput' => '?',
+					'manual_input' => '?',
 					'prompt' => 'Enter hostname',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
@@ -560,7 +560,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Hostname is {MANUALINPUT}'
 					],
-					'manualinput' => '',
+					'manual_input' => '',
 					'prompt' => 'Enter hostname',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: [A-Za-z].',
@@ -588,7 +588,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '1',
+					'manual_input' => '1',
 					'prompt' => 'Enter port',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -620,7 +620,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '.',
+					'manual_input' => '.',
 					'prompt' => 'Enter port',
 					'host' => 'A host for scripts check',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -651,7 +651,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '?',
+					'manual_input' => '?',
 					'prompt' => 'Enter port',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -681,7 +681,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '',
+					'manual_input' => '',
 					'prompt' => 'Enter port',
 					'event' => 'Attention: script execution is needed',
 					'error_message' => 'Incorrect value for field "manualinput": input does not match the provided pattern: '.
@@ -709,7 +709,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'example1',
+					'manual_input' => 'example1',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
 					'host' => 'A host for scripts check',
@@ -741,7 +741,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Are you sure?'
 					],
-					'manualinput' => '.',
+					'manual_input' => '.',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
 					'host' => 'A host for scripts check',
@@ -772,7 +772,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '?',
+					'manual_input' => '?',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
 					'event' => 'Attention: script execution is needed',
@@ -802,7 +802,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Are you sure?'
 					],
-					'manualinput' => '',
+					'manual_input' => '',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
 					'event' => 'Attention: script execution is needed',
@@ -832,7 +832,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Enter host id',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -860,7 +860,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => '10080,10084,10081,',
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Choose host id',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -889,7 +889,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 1-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Enter host id',
 					'event' => 'Attention: script execution is needed',
 					'urls' => [
@@ -915,7 +915,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => '10080,10084,10081,',
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Choose host id',
 					'event' => 'Attention: script execution is needed',
 					'urls' => [
@@ -943,7 +943,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Confirm selected host?'
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Enter host id',
 					'confirmation' => 'Confirm selected host?',
 					'host' => 'A host for scripts check',
@@ -973,7 +973,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Confirm selected host?'
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Choose host id',
 					'confirmation' => 'Confirm selected host?',
 					'host' => 'A host for scripts check',
@@ -1004,7 +1004,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Confirm selected host?'
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Enter host id',
 					'confirmation' => 'Confirm selected host?',
 					'event' => 'Attention: script execution is needed',
@@ -1032,7 +1032,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Confirm selected host?'
 					],
-					'manualinput' => 'id',
+					'manual_input' => 'id',
 					'prompt' => 'Choose host id',
 					'confirmation' => 'Confirm selected host?',
 					'event' => 'Attention: script execution is needed',
@@ -1065,7 +1065,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '2',
+					'manual_input' => '2',
 					'prompt' => 'Enter value for parameter A',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1099,7 +1099,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => '1,,2,3',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '3',
+					'manual_input' => '3',
 					'prompt' => 'Enter value for parameter A',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1134,7 +1134,7 @@ class testManualActionScripts extends CWebTest {
 //						'Input validation rule' => '\b[1-9]\b', // regex 1-9 for form validation.
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => '9',
+//					'manual_input' => '9',
 //					'prompt' => 'Enter value for parameter A',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1166,7 +1166,7 @@ class testManualActionScripts extends CWebTest {
 //						'Dropdown options' => '1,,2,3',
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => '3',
+//					'manual_input' => '3',
 //					'prompt' => 'Enter value for parameter A',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1199,7 +1199,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Parameter A will contain value => {MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '9',
+					'manual_input' => '9',
 					'prompt' => 'Enter value for parameter A',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Parameter A will contain value => 9. Proceed?',
@@ -1235,7 +1235,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Parameter A will contain value => {MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => 'B',
+					'manual_input' => 'B',
 					'prompt' => 'Enter value for parameter A',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Parameter A will contain value => B. Proceed?',
@@ -1271,7 +1271,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Parameter A will contain value => {MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '7',
+					'manual_input' => '7',
 					'prompt' => 'Enter value for parameter A',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Parameter A will contain value => 7. Proceed?',
@@ -1305,7 +1305,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Parameter A will contain value => {MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => 'D',
+					'manual_input' => 'D',
 					'prompt' => 'Enter value for parameter A',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Parameter A will contain value => D. Proceed?',
@@ -1332,7 +1332,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Confirm {MANUALINPUT} as supported version?'
 					],
-					'manualinput' => '6.4',
+					'manual_input' => '6.4',
 					'prompt' => 'Choose supported version',
 					'confirmation' => 'Confirm 6.4 as supported version?',
 					'host' => 'A host for scripts check',
@@ -1361,7 +1361,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Ping count: {MANUALINPUT}'
 					],
-					'manualinput' => '2',
+					'manual_input' => '2',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'confirmation' => 'Ping count: 2',
 					'host' => 'A host for scripts check',
@@ -1389,7 +1389,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '2',
+					'manual_input' => '2',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1416,7 +1416,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => '6.0,6.4,7.0',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '7.0',
+					'manual_input' => '7.0',
 					'prompt' => 'Choose supported version',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1444,7 +1444,7 @@ class testManualActionScripts extends CWebTest {
 //						'Dropdown options' => '6.0,6.4,7.0',
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => '7.0',
+//					'manual_input' => '7.0',
 //					'prompt' => 'Choose supported version',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1469,7 +1469,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '\b[1-9]\b',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '2',
+					'manual_input' => '2',
 					'prompt' => 'Enter 🚩A host for scripts check🚩 ping count',
 					'event' => 'Attention: script execution is needed',
 					'urls' => [
@@ -1495,7 +1495,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected version is {MANUALINPUT}, proceed?'
 					],
-					'manualinput' => 'Zabbix 6.4.11',
+					'manual_input' => 'Zabbix 6.4.11',
 					'prompt' => 'Test version?',
 					'confirmation' => 'Selected version is Zabbix 6.4.11, proceed?',
 					'event' => 'Attention: script execution is needed',
@@ -1522,7 +1522,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Confirm {MANUALINPUT} as supported version?'
 					],
-					'manualinput' => '7.0',
+					'manual_input' => '7.0',
 					'prompt' => 'Choose supported version',
 					'confirmation' => 'Confirm 7.0 as supported version?',
 					'event' => 'Attention: script execution is needed',
@@ -1549,7 +1549,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'TestHost',
+					'manual_input' => 'TestHost',
 					'prompt' => 'Enter hostname',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1577,7 +1577,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => 'AnyHost,,TestHost,TestZabbix',
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'TestHost',
+					'manual_input' => 'TestHost',
 					'prompt' => 'Choose hostname',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1606,7 +1606,7 @@ class testManualActionScripts extends CWebTest {
 //						'Input validation rule' => '[A-Za-z]', // all letters (uppercase and lowercase).
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => 'TestHost',
+//					'manual_input' => 'TestHost',
 //					'prompt' => 'Enter hostname',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1632,7 +1632,7 @@ class testManualActionScripts extends CWebTest {
 //						'Dropdown options' => 'AnyHost,,TestHost,TestZabbix',
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => 'TestZabbix',
+//					'manual_input' => 'TestZabbix',
 //					'prompt' => 'Choose hostname',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1659,7 +1659,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Hostname is {MANUALINPUT}'
 					],
-					'manualinput' => 'TestHost',
+					'manual_input' => 'TestHost',
 					'prompt' => 'Enter hostname',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Hostname is TestHost',
@@ -1689,7 +1689,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Hostname is {MANUALINPUT}'
 					],
-					'manualinput' => 'AnyHost',
+					'manual_input' => 'AnyHost',
 					'prompt' => 'Choose hostname',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Hostname is AnyHost',
@@ -1719,7 +1719,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Hostname is {MANUALINPUT}'
 					],
-					'manualinput' => 'TestHost',
+					'manual_input' => 'TestHost',
 					'prompt' => 'Enter hostname',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Hostname is TestHost',
@@ -1747,7 +1747,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Hostname is {MANUALINPUT}'
 					],
-					'manualinput' => 'TestZabbix',
+					'manual_input' => 'TestZabbix',
 					'prompt' => 'Choose hostname',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Hostname is TestZabbix',
@@ -1775,7 +1775,7 @@ class testManualActionScripts extends CWebTest {
 								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
 						'Enable confirmation' => false
 					],
-					'manualinput' => '777',
+					'manual_input' => '777',
 					'prompt' => 'Enter port',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1803,7 +1803,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => '22,23,999,10050',
 						'Enable confirmation' => false
 					],
-					'manualinput' => '10050',
+					'manual_input' => '10050',
 					'prompt' => 'Choose port',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -1833,7 +1833,7 @@ class testManualActionScripts extends CWebTest {
 //								'|[1-9][0-9][0-9][0-9][0-9])\b', // regex 10-99999 for form validation.
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => '23',
+//					'manual_input' => '23',
 //					'prompt' => 'Enter port',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1859,7 +1859,7 @@ class testManualActionScripts extends CWebTest {
 //						'Dropdown options' => '22,23,999,10050',
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => '999',
+//					'manual_input' => '999',
 //					'prompt' => 'Choose port',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -1887,7 +1887,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '9000',
+					'manual_input' => '9000',
 					'prompt' => 'Enter port',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Selected port:9000. Proceed?',
@@ -1917,7 +1917,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '23',
+					'manual_input' => '23',
 					'prompt' => 'Choose port',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Selected port:23. Proceed?',
@@ -1948,7 +1948,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '10051',
+					'manual_input' => '10051',
 					'prompt' => 'Enter port',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Selected port:10051. Proceed?',
@@ -1976,7 +1976,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected port:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => '10050',
+					'manual_input' => '10050',
 					'prompt' => 'Choose port',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Selected port:10050. Proceed?',
@@ -2003,7 +2003,7 @@ class testManualActionScripts extends CWebTest {
 						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'gNuSm@s2',
+					'manual_input' => 'gNuSm@s2',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
 					'host' => 'A host for scripts check',
@@ -2031,7 +2031,7 @@ class testManualActionScripts extends CWebTest {
 						'Dropdown options' => 'IPMI Watchdog,CPU Therm Trip,BB +1.05V PCH,',
 						'Enable confirmation' => false
 					],
-					'manualinput' => 'IPMI Watchdog',
+					'manual_input' => 'IPMI Watchdog',
 					'prompt' => 'Choose particular sensor',
 					'host' => 'A host for scripts check',
 					'urls' => [
@@ -2060,7 +2060,7 @@ class testManualActionScripts extends CWebTest {
 //						'Input validation rule' => '^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$',
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => 'gNuSm@s2',
+//					'manual_input' => 'gNuSm@s2',
 //					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 //							'one digit, one special character and minimum eight in length',
 //					'event' => 'Attention: script execution is needed',
@@ -2086,7 +2086,7 @@ class testManualActionScripts extends CWebTest {
 //						'Dropdown options' => 'IPMI Watchdog,CPU Therm Trip,BB +1.05V PCH,',
 //						'Enable confirmation' => false
 //					],
-//					'manualinput' => 'BB +1.05V PCH',
+//					'manual_input' => 'BB +1.05V PCH',
 //					'prompt' => 'Choose particular sensor',
 //					'event' => 'Attention: script execution is needed',
 //					'urls' => [
@@ -2113,7 +2113,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Are you sure?'
 					],
-					'manualinput' =>'gNuSm@s2',
+					'manual_input' =>'gNuSm@s2',
 					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 							'one digit, one special character and minimum eight in length',
 					'host' => 'A host for scripts check',
@@ -2143,7 +2143,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected sensor:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => 'BB +1.05V PCH',
+					'manual_input' => 'BB +1.05V PCH',
 					'prompt' => 'Choose particular sensor',
 					'host' => 'A host for scripts check',
 					'confirmation' => 'Selected sensor:BB +1.05V PCH. Proceed?',
@@ -2174,7 +2174,7 @@ class testManualActionScripts extends CWebTest {
 //						'Enable confirmation' => true,
 //						'Confirmation text' => 'Are you sure?'
 //					],
-//					'manualinput' => 'gNuSm@s2',
+//					'manual_input' => 'gNuSm@s2',
 //					'prompt' => 'regex will enforce these rules: At least one upper case letter, one lower case letter'.
 //							'one digit, one special character and minimum eight in length',
 //					'event' => 'Attention: script execution is needed',
@@ -2202,7 +2202,7 @@ class testManualActionScripts extends CWebTest {
 						'Enable confirmation' => true,
 						'Confirmation text' => 'Selected sensor:{MANUALINPUT}. Proceed?'
 					],
-					'manualinput' => 'BB +1.05V PCH',
+					'manual_input' => 'BB +1.05V PCH',
 					'prompt' => 'Choose particular sensor',
 					'event' => 'Attention: script execution is needed',
 					'confirmation' => 'Selected sensor:BB +1.05V PCH. Proceed?',
@@ -2224,7 +2224,7 @@ class testManualActionScripts extends CWebTest {
 		$modal = COverlayDialogElement::find()->one()->waitUntilReady();
 		$form = $modal->asForm();
 
-		if (($data['manualinput'] === 'id') && (array_key_exists('Dropdown options', $data['fields']))) {
+		if (($data['manual_input'] === 'id') && (array_key_exists('Dropdown options', $data['fields']))) {
 			$data['fields']['Dropdown options'] = $data['fields']['Dropdown options'].self::$hostid;
 		}
 
@@ -2255,26 +2255,29 @@ class testManualActionScripts extends CWebTest {
 			$table->query('link', $data[$scope])->one()->click();
 			$popup = CPopupMenuElement::find()->waitUntilVisible()->one();
 			$popup->fill($data['fields']['Name']);
-			$manualinput_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
-			$this->assertEquals('Manual input', $manualinput_dialog->getTitle());
-			$this->assertEquals($data['prompt'], $manualinput_dialog->query('class:wordbreak')->one()->getText());
+			$manual_input_dialog = COverlayDialogElement::find()->waitUntilReady()->one();
+			$this->assertEquals('Manual input', $manual_input_dialog->getTitle());
+			$this->assertEquals($data['prompt'], $manual_input_dialog->query('class:wordbreak')->one()->getText());
 
-			$manualinput = ($data['manualinput'] === 'id') ? self::$hostid : $data['manualinput'];
-			$input_type = (array_key_exists('Input type', $data['fields']))
-				? $manualinput_dialog->query('name:manualinput')->asDropdown()->one()->select($manualinput)
-				: $manualinput_dialog->query('id:manualinput')->one()->fill($manualinput);
+			$manual_input = ($data['manual_input'] === 'id') ? self::$hostid : $data['manual_input'];
+			if (array_key_exists('Input type', $data['fields'])) {
+				$manual_input_dialog->query('name:manualinput')->asDropdown()->one()->select($manual_input);
+			}
+			else {
+				$manual_input_dialog->query('id:manualinput')->one()->fill($manual_input);
+			}
 
 			$action = ($data['fields']['Enable confirmation'] === true) ? 'Continue' : 'Execute';
 
 			// Check if buttons present and clickable.
-			$this->assertEquals(['Cancel', $action], $manualinput_dialog->getFooter()->query('button')->all()
+			$this->assertEquals(['Cancel', $action], $manual_input_dialog->getFooter()->query('button')->all()
 					->filter(CElementFilter::CLICKABLE)->asText()
 			);
-			$manualinput_dialog->getFooter()->query('button', $action)->one()->click();
+			$manual_input_dialog->getFooter()->query('button', $action)->one()->click();
 
 			if ($data['expected'] === TEST_BAD) {
 				$this->assertMessage(TEST_BAD, 'Invalid input', $data['error_message']);
-				$manualinput_dialog->close();
+				$manual_input_dialog->close();
 			}
 			else {
 				if (array_key_exists('confirmation', $data)) {
