@@ -193,9 +193,6 @@ extern "C" static int	parse_first_first(IEnumWbemClassObject *pEnumerator, doubl
 	if (0 == uReturn)
 		goto out2;
 
-	while (WBEM_S_NO_ERROR == hres)
-		hres = pEnumerator->Skip((long)(1000 * timeout), 1);
-
 	hres = pclsObj->BeginEnumeration(WBEM_FLAG_NONSYSTEM_ONLY);
 
 	if (FAILED(hres))
@@ -406,7 +403,10 @@ extern "C" int	zbx_wmi_get_variant(const char *wmi_namespace, const char *wmi_qu
 		*error = zbx_strdup(*error, "Empty WMI search result.");
 exit:
 	if (0 != pEnumerator)
+	{
+		while (WBEM_S_NO_ERROR == pEnumerator->Skip((long)(1000 * timeout), 1)) {}
 		pEnumerator->Release();
+	}
 
 	if (0 != pService)
 		pService->Release();
