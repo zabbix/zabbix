@@ -48,8 +48,6 @@ window.widget_graph_form = new class {
 			element.style.display = is_graph ? 'none' : '';
 		});
 
-		this.#form.
-
 		$('#graphid').multiSelect(is_graph ? 'enable' : 'disable');
 		$('#itemid').multiSelect(is_graph ? 'disable' : 'enable');
 	}
