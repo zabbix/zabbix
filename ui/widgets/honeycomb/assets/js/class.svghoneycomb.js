@@ -195,8 +195,7 @@ class CSVGHoneycomb {
 				.attr('dx', 0)
 				.attr('dy', 0)
 				.attr('flood-color', 'rgba(0, 0, 0, .2)')
-			)
-			.on('mouseleave', () => this.#containerLeave());
+			);
 
 		this.#container = this.#svg
 			.append('g')
@@ -325,6 +324,19 @@ class CSVGHoneycomb {
 
 		this.#honeycomb_container
 			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
+			.each((d, i, cells) => {
+				if (d.scale_timeout !== undefined) {
+
+					clearTimeout(d.scale_timeout);
+					delete(d.scale_timeout);
+
+					if (d.scaled) {
+						d.scaled = true;
+
+						this.#cellLeave(d3.select(cells[i]), d);
+					}
+				}
+			})
 			.data(data, (d, i) => {
 				const row = Math.floor(i / this.#container_params.columns);
 				const column = i % this.#container_params.columns;
@@ -333,8 +345,6 @@ class CSVGHoneycomb {
 					x: this.#cell_width * (column + row % 2 * .5) + this.#cell_width * .5,
 					y: this.#cell_height * row * .75 + this.#cell_height * .5
 				};
-
-				d.scaled = false;
 
 				d.index = i;
 
@@ -434,38 +444,33 @@ class CSVGHoneycomb {
 					}
 				});
 			})
-			.on('mouseenter', (e, target_d) => {
-				this.#honeycomb_container
-					.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
-					.each((d, i, cells) => {
-						const cell = d3.select(cells[i]);
+			.on('mouseenter', (e, d) => {
+				if (d.scale_timeout === undefined) {
+					cell.raise();
 
-						if (d === target_d) {
-							if (!d.scaled) {
-								cell.raise();
+					d.scale_timeout = setTimeout(() => {
+						d.scaled = true;
 
-								setTimeout(() => {
-									this.#cellEnter(cell, d);
-								});
-							}
-						}
-						else if (d.scaled) {
-							this.#cellLeave(cell, d);
-						}
+						this.#cellEnter(cell, d);
 					});
+				}
 			})
 			.on('mouseleave', (e, d) => {
-				if (!d.scaled) {
-					return;
-				}
+				if (d.scale_timeout !== undefined) {
 
-				this.#cellLeave(d3.select(e.target), d);
+					clearTimeout(d.scale_timeout);
+					delete(d.scale_timeout);
+
+					if (d.scaled) {
+						d.scaled = true;
+
+						this.#cellLeave(cell, d);
+					}
+				}
 			});
 	}
 
 	#cellEnter(cell, d) {
-		d.scaled = true;
-
 		const margin = {
 			horizontal: (this.#padding.horizontal / 2 + this.#container_params.x) / this.#container_params.scale,
 			vertical: (this.#padding.vertical / 2 + this.#container_params.y) / this.#container_params.scale
@@ -539,18 +544,7 @@ class CSVGHoneycomb {
 			});
 	}
 
-	#containerLeave() {
-		this.#honeycomb_container
-			.selectAll(`g.${CSVGHoneycomb.ZBX_STYLE_CELL}`)
-			.each((d, i, cells) => {
-				if (d.scaled) {
-					this.#cellLeave(d3.select(cells[i]), d);
-				}
-			});
-	}
-
 	#cellLeave(cell, d) {
-		d.scaled = false;
 		d.labels = d.stored_labels;
 
 		this.#resizeLabels(cell, this.#cell_width - this.#cells_gap, this.#cell_height  / 2);
