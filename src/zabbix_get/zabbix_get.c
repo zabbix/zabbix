@@ -327,7 +327,7 @@ static int	get_value(const char *source_ip, const char *host, unsigned short por
 				}
 				else if (0 == ZBX_ISSET_VALUE(&result))
 				{
-					puts("No value was received.");
+					puts(ZBX_NODATA ": No value was received.");
 				}
 				else
 				{
