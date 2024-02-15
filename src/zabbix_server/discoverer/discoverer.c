@@ -26,7 +26,6 @@
 #include "zbxself.h"
 #include "zbxrtc.h"
 #include "zbxnix.h"
-#include "../poller/checks_snmp.h"
 #include "zbxnum.h"
 #include "zbxtime.h"
 #include "zbxip.h"

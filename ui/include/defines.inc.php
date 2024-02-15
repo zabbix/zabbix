@@ -1818,7 +1818,7 @@ define('TAB_INDICATOR_DEPENDENCY', 'dependency');
 define('TAB_INDICATOR_ENCRYPTION', 'encryption');
 define('TAB_INDICATOR_EXCLUDED_DOWNTIMES', 'excluded-downtimes');
 define('TAB_INDICATOR_FILTERS', 'filters');
-define('TAB_INDICATOR_FRONTEND_MESSAGE', 'frontend-message');
+define('TAB_INDICATOR_FRONTEND_NOTIFICATIONS', 'frontend-notifications');
 define('TAB_INDICATOR_GRAPH_AXES', 'graph-axes');
 define('TAB_INDICATOR_GRAPH_DATASET', 'graph-dataset');
 define('TAB_INDICATOR_GRAPH_LEGEND', 'graph-legend');

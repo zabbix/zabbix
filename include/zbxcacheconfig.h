@@ -787,6 +787,7 @@ void	zbx_dc_config_history_sync_get_triggers_by_itemids(zbx_hashset_t *trigger_i
 		int itemids_num);
 void	zbx_dc_config_clean_history_sync_items(zbx_history_sync_item_t *items, int *errcodes, size_t num);
 void	zbx_dc_config_history_sync_unset_existing_itemids(zbx_vector_uint64_t *itemids);
+int	zbx_dc_config_history_get_trends_sec(const char *trends_period, int trends_global, int hk_trends);
 
 void	zbx_dc_config_history_recv_get_items_by_keys(zbx_history_recv_item_t *items, const zbx_host_key_t *keys,
 		int *errcodes, size_t num);
@@ -1030,6 +1031,7 @@ zbx_trigger_dep_t;
 void	zbx_dc_get_trigger_dependencies(const zbx_vector_uint64_t *triggerids, zbx_vector_ptr_t *deps);
 
 void	zbx_dc_reschedule_items(const zbx_vector_uint64_t *itemids, time_t nextcheck, zbx_uint64_t *proxyids);
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids);
 
 /* data session support */
 

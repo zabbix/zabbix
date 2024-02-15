@@ -82,9 +82,16 @@ class CMultiselectElement extends CElement {
 	 * @return $this
 	 */
 	public function clear() {
+		$id = $this->getID();
 		$query = $this->query('xpath:.//span['.CXPathHelper::fromClass('zi-remove-smaller').']');
-		$query->all()->click();
+		$elements = $query->all();
+		$elements->click();
 		$query->waitUntilNotPresent();
+
+		// TODO: reload should be removed after fix DEV-1535
+		if ($elements->count() > 0 && $this->parents('class:overlay-dialogue-controls')->exists() && $id === $this->getID()) {
+			$this->waitUntilReloaded();
+		}
 
 		return $this;
 	}
@@ -214,10 +221,11 @@ class CMultiselectElement extends CElement {
 		/* TODO: extend the function for composite elements with two buttons,
 		 * Example of such multiselect: [ Input field ] ( Select item ) ( Select prototype )
 		 */
+		$index = COverlayDialogElement::find()->count();
 		$this->getControls()->first()->click();
 
-		return COverlayDialogElement::find()->waitUntilPresent()
-				->all()->last()->waitUntilReady()->setDataContext($context, $this->mode);
+		return COverlayDialogElement::find($index)->waitUntilPresent()->one()
+				->waitUntilReady()->setDataContext($context, $this->mode);
 	}
 
 	/**
