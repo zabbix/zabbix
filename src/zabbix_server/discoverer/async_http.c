@@ -96,7 +96,7 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 
 	if (NULL == (http_ctx->easyhandle = curl_easy_init()))
 	{
-		*error = zbx_strdup(*error, "Cannot initialize cURL library");
+		*error = zbx_strdup(*error, "cannot initialize cURL library");
 		return FAIL;
 	}
 
@@ -117,7 +117,7 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 			CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, opt = ZBX_CURLOPT_ACCEPT_ENCODING,
 			"")))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set cURL option [%d]: %s", (int)opt, curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "cannot set cURL option [%d]: %s", (int)opt, curl_easy_strerror(err));
 		goto fail;
 	}
 
@@ -131,20 +131,20 @@ int	zbx_discovery_async_check_http(CURLM *curl_mhandle, const char *config_sourc
 			CURLPROTO_HTTP | CURLPROTO_HTTPS)))
 #	endif
 	{
-		*error = zbx_dsprintf(*error, "Cannot set allowed protocols: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "cannot set allowed protocols: %s", curl_easy_strerror(err));
 		goto fail;
 	}
 #endif
 
 	if (CURLE_OK != (err = curl_easy_setopt(http_ctx->easyhandle, CURLOPT_PRIVATE, http_ctx)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot set pointer to private data: %s", curl_easy_strerror(err));
+		*error = zbx_dsprintf(*error, "cannot set pointer to private data: %s", curl_easy_strerror(err));
 		goto fail;
 	}
 
 	if (CURLM_OK != (merr = curl_multi_add_handle(curl_mhandle, http_ctx->easyhandle)))
 	{
-		*error = zbx_dsprintf(*error, "Cannot add a standard curl handle to the multi stack: %s",
+		*error = zbx_dsprintf(*error, "cannot add a standard curl handle to the multi stack: %s",
 				curl_multi_strerror(merr));
 		goto fail;
 	}

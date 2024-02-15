@@ -685,8 +685,7 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 
 		if (SUCCEED != drule_delay_get(drule->delay_str, &delay_str, &delay))
 		{
-			zbx_snprintf(error, sizeof(error), "discovery rule \"%s\": invalid update interval \"%s\"",
-					drule->name, delay_str);
+			zbx_snprintf(error, sizeof(error), "Invalid update interval \"%s\".", delay_str);
 			discoverer_queue_append_error(drule_errors, drule->druleid, error);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
 			goto next;
@@ -702,8 +701,8 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 				if (0 == tmt_agent && FAIL == dcheck_get_timeout(ITEM_TYPE_ZABBIX, &tmt_agent,
 						err, sizeof(err)))
 				{
-					zbx_snprintf(error, sizeof(error), "invalid global timeout for Zabbix Agent"
-							" checks:\"%s\"", err);
+					zbx_snprintf(error, sizeof(error), "Invalid global timeout for Zabbix Agent"
+							" checks: \"%s\"", err);
 					discoverer_queue_append_error(drule_errors, drule->druleid, error);
 					zbx_vector_uint64_append(err_druleids, drule->druleid);
 					goto next;
@@ -717,8 +716,8 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 				if (0 == tmt_snmp && FAIL == dcheck_get_timeout(ITEM_TYPE_SNMP, &tmt_snmp,
 						err, sizeof(err)))
 				{
-					zbx_snprintf(error, sizeof(error), "invalid global timeout for SNMP checks"
-							":\"%s\"", err);
+					zbx_snprintf(error, sizeof(error), "Invalid global timeout for SNMP checks"
+							": \"%s\"", err);
 					discoverer_queue_append_error(drule_errors, drule->druleid, error);
 					zbx_vector_uint64_append(err_druleids, drule->druleid);
 					goto next;
@@ -731,8 +730,8 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 				if (0 == tmt_simple && FAIL == dcheck_get_timeout(ITEM_TYPE_SIMPLE, &tmt_simple,
 						err, sizeof(err)))
 				{
-					zbx_snprintf(error, sizeof(error), "invalid global timeout for simple checks"
-							":\"%s\"", err);
+					zbx_snprintf(error, sizeof(error), "Invalid global timeout for simple checks"
+							": \"%s\"", err);
 					discoverer_queue_append_error(drule_errors, drule->druleid, error);
 					zbx_vector_uint64_append(err_druleids, drule->druleid);
 					goto next;
@@ -1308,6 +1307,8 @@ static void	*discoverer_worker_entry(void *net_check_worker)
 
 			if (NULL != error)
 			{
+				error = zbx_dsprintf(error, "'%s' checks failed: \"%s\"",
+						zbx_dservice_type_string(dcheck_type), error);
 				discoverer_job_abort(job, &queue->pending_checks_count, &queue->errors, error);
 				zbx_free(error);
 			}

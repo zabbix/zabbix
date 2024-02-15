@@ -644,12 +644,17 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			ret = discovery_agent(&poller_config, dcheck, ip,
 					(unsigned short)task->range.state.port, result, error);
 			break;
-		case SVC_HTTP:
-#ifdef HAVE_LIBCURL
 		case SVC_HTTPS:
+#ifdef HAVE_LIBCURL
+		case SVC_HTTP:
 			ret = discovery_http(&poller_config, http_config, dcheck,
 					(unsigned short)task->range.state.port, result, error);
 			break;
+#else
+			ret = FAIL;
+			*error = zbx_strdup(*error, "Support for HTTPS checks was not compiled in.");
+			break;
+		case SVC_HTTP:
 #endif
 		case SVC_SSH:
 		case SVC_SMTP:
@@ -667,7 +672,7 @@ int	discovery_net_check_range(zbx_uint64_t druleid, zbx_discoverer_task_t *task,
 			break;
 		default:
 			ret = FAIL;
-			*error = zbx_dsprintf(*error, "Support check type %u was not compiled in.", dcheck->type);
+			*error = zbx_dsprintf(*error, "Unsupported check type %u.", dcheck->type);
 		}
 
 		if (FAIL == ret)
