@@ -540,7 +540,6 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'zero_as_zero' => false
 			]);
 			unset($formatted_value['is_numeric']);
-			unset($sector['units']);
 
 			$sector['formatted_value'] = $formatted_value;
 		}
@@ -617,9 +616,11 @@ class WidgetView extends CControllerDashboardWidgetView {
 			$legend['data'][] = [
 				'id' => $sector['id'],
 				'name' => $sector['name'],
-				'value' => $sector['formatted_value']['units']
-					? $sector['formatted_value']['value'].' '.$sector['formatted_value']['units']
-					: $sector['formatted_value']['value'],
+				'value' => convertUnits([
+					'value' => $sector['value'],
+					'units' => $sector['units'],
+					'convert' => ITEM_CONVERT_NO_UNITS
+				]),
 				'color' => $sector['color'],
 				'is_total' => $sector['is_total']
 			];
