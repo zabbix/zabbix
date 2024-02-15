@@ -628,6 +628,20 @@ static void	process_job_finalize(zbx_vector_uint64_t *del_jobs, zbx_vector_disco
 	zbx_discovery_close(handle);
 }
 
+static int	drule_delay_get(const char *delay, char **delay_resolved, int *delay_int)
+{
+	int	ret;
+
+	*delay_resolved = zbx_strdup(*delay_resolved, delay);
+	zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
+			delay_resolved, ZBX_MACRO_TYPE_COMMON, NULL, 0);
+
+	if (SUCCEED != (ret = zbx_is_time_suffix(*delay_resolved, delay_int, ZBX_LENGTH_UNLIMITED)))
+		*delay_int = ZBX_DEFAULT_INTERVAL;
+
+	return ret;
+}
+
 static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		zbx_vector_discoverer_jobs_ptr_t *jobs, zbx_hashset_t *check_counts,
 		zbx_vector_discoverer_drule_error_t *drule_errors, zbx_vector_uint64_t *err_druleids)
@@ -668,19 +682,17 @@ static int	process_discovery(int *nextcheck, zbx_hashset_t *incomplete_druleids,
 		discoverer_queue_unlock(&dmanager.queue);
 
 		if (FAIL != i || NULL != zbx_hashset_search(incomplete_druleids, &drule->druleid))
+		{
+			(void)drule_delay_get(drule->delay_str, &delay_str, &delay);
 			goto next;
+		}
 
-		delay_str = zbx_strdup(delay_str, drule->delay_str);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&delay_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-
-		if (SUCCEED != zbx_is_time_suffix(delay_str, &delay, ZBX_LENGTH_UNLIMITED))
+		if (SUCCEED != drule_delay_get(drule->delay_str, &delay_str, &delay))
 		{
 			zbx_snprintf(error, sizeof(error), "discovery rule \"%s\": invalid update interval \"%s\"",
-					drule->delay_str, delay_str);
+					drule->name, delay_str);
 			discoverer_queue_append_error(drule_errors, drule->druleid, error);
 			zbx_vector_uint64_append(err_druleids, drule->druleid);
-			delay = ZBX_DEFAULT_INTERVAL;
 			goto next;
 		}
 
