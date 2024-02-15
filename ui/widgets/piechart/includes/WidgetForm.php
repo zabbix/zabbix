@@ -57,7 +57,7 @@ class WidgetForm extends CWidgetForm {
 	private const LEGEND_LINES_MAX = 10;
 	private const LEGEND_LINES_MIN = 1;
 	private const LEGEND_LINES_MODE_FIXED = 0;
-	private const LEGEND_LINES_MODE_VARIABLE = 1;
+	public const LEGEND_LINES_MODE_VARIABLE = 1;
 
 	private const MERGE_PERCENT_MAX = 10;
 	private const MERGE_PERCENT_MIN = 1;

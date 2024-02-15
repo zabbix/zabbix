@@ -22,7 +22,7 @@
 class CSvgGraphLegend extends CDiv {
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
-	public const LINE_HEIGHT = 18;
+	private const LINE_HEIGHT = 18;
 
 	private const ZBX_STYLE_CLASS = 'svg-graph-legend';
 
@@ -71,7 +71,7 @@ class CSvgGraphLegend extends CDiv {
 		return $this;
 	}
 
-	public function calculateLineCount() :int {
+	private function calculateLineCount(): int {
 		$column_count = $this->show_statistic ? 1 : min($this->columns_count, count($this->legend_items));
 
 		$lines_count = $this->lines_mode == SVG_GRAPH_LEGEND_LINES_MODE_VARIABLE
@@ -81,6 +81,10 @@ class CSvgGraphLegend extends CDiv {
 		$lines_count += $this->show_statistic ? 1 : 0;
 
 		return $lines_count;
+	}
+
+	public function getHeight(): int {
+		return $this->calculateLineCount() * self::LINE_HEIGHT;
 	}
 
 	public function showStatistic(int $show_statistic): self {

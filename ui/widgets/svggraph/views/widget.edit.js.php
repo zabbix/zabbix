@@ -232,6 +232,10 @@ window.widget_svggraph_form = new class {
 				document.getElementById('legend_aggregation').disabled = (!e.target.checked
 					|| !this._any_ds_aggregation_function_enabled
 				);
+
+				for (const input of document.getElementById('legend_lines_mode').querySelectorAll('input')) {
+					input.disabled = !e.target.checked;
+				}
 			});
 
 		document.getElementById('legend_statistic')
@@ -772,8 +776,8 @@ window.widget_svggraph_form = new class {
 
 		document.querySelector('[for=legend_lines]')
 			.innerHTML = document.getElementById('legend_lines_mode').querySelector(':checked').value === '1'
-			? '<?= _('Maximum number of rows') ?>'
-			: '<?= _('Number of rows') ?>';
+				? '<?= _('Maximum number of rows') ?>'
+				: '<?= _('Number of rows') ?>';
 
 		// Displaying options tab.
 		const percentile_left_checkbox = document.getElementById('percentile_left');
