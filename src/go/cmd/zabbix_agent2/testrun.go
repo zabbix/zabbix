@@ -34,7 +34,7 @@ func checkMetric(s scheduler.Scheduler, metric string) {
 	if err != nil {
 		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [%s]\n", metric, err.Error())
 	} else if value == nil {
-		fmt.Printf("%-46s[m|ZBX_NOTSUPPORTED] [No values was received]\n", metric)
+		fmt.Printf("%-46s[|]\n", metric)
 	} else {
 		fmt.Printf("%-46s[s|%s]\n", metric, *value)
 	}

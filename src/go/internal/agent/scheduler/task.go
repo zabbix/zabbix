@@ -561,7 +561,7 @@ func (t *commandTask) perform(s Scheduler) {
 			if ret != nil {
 				cr = &resultcache.CommandResult{
 					ID:     t.id,
-					Result: itemutil.ValueToString(ret),
+					Result: *itemutil.ValueToString(ret),
 				}
 			}
 		} else {
