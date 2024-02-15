@@ -91,10 +91,7 @@ class CSettings extends CApiService {
 			'default_lang', 'default_timezone', 'x_frame_options', 'auditlog_enabled'
 		];
 
-		$db_settings = DB::select('config', ['output' => $output_fields]);
-		$db_settings = $db_settings ? reset($db_settings) : [];
-
-		return $db_settings;
+		return DB::select('config', ['output' => $output_fields])[0];
 	}
 
 	/**
@@ -103,12 +100,9 @@ class CSettings extends CApiService {
 	public static function getPrivate(): array {
 		$output_fields = ['session_key', 'dbversion_status'];
 
-		$db_settings = DB::select('config', ['output' => $output_fields]);
-		$db_settings = $db_settings ? reset($db_settings) : [];
+		$db_settings = DB::select('config', ['output' => $output_fields])[0];
 
-		if (array_key_exists('dbversion_status', $db_settings)) {
-			$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
-		}
+		$db_settings['dbversion_status'] = json_decode($db_settings['dbversion_status'], true) ?: [];
 
 		return $db_settings;
 	}

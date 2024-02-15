@@ -87,10 +87,7 @@ class CAuthentication extends CApiService {
 			'saml_sign_logout_requests', 'saml_sign_logout_responses', 'saml_case_sensitive'
 		];
 
-		$db_auth = DB::select('config', ['output' => $output_fields]);
-		$db_auth = $db_auth ? reset($db_auth) : [];
-
-		return $db_auth;
+		return DB::select('config', ['output' => $output_fields])[0];
 	}
 
 	/**
