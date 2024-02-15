@@ -21,11 +21,11 @@
 
 class CControllerNotificationsRead extends CController {
 
-	public function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'ids' => 'array_db events.eventid|required'
 		];
@@ -45,11 +45,11 @@ class CControllerNotificationsRead extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (!CWebUser::isGuest() && $this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$msg_settings = getMessageSettings();
 
 		$events = API::Event()->get([

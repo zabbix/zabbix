@@ -1,0 +1,1 @@
+..F....... [ZBX-23663] fixed inability to enable SAML when PHP LDAP extension is missing (gcalenko)
