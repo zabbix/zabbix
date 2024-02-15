@@ -727,7 +727,7 @@ class testFormTabIndicators extends CWebTest {
 			$this->query('class:js-widget-edit')->one()->click();
 			COverlayDialogElement::find()->asForm()->one()->waitUntilReady();
 			$form = $this->query($data['form'])->asForm()->one()->waitUntilVisible();
-			$form->getField('Type')->fill($data['widget_type']);
+			$form->fill(['Type' => CFormElement::RELOADABLE_FILL($data['widget_type'])]);
 			$form->invalidate();
 		}
 		elseif ($data['url'] === 'zabbix.php?action=template.list') {
