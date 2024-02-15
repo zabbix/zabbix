@@ -25,8 +25,6 @@ import (
 	"git.zabbix.com/ap/plugin-support/plugin"
 )
 
-const overridenMaxCapacity = 1000
-
 // pluginAgent manages plugin usage
 type pluginAgent struct {
 	// the plugin
@@ -88,20 +86,7 @@ func (p *pluginAgent) queued() bool {
 }
 
 func (p *pluginAgent) hasCapacity() bool {
-	if len(p.tasks) == 0 {
-		return false
-	}
-
-	w := p.tasks[0].getWeight()
-
-	if p.maxCapacity-p.usedCapacity < w {
-		if overridenMaxCapacity-p.usedCapacity < w {
-			return false
-		}
-		p.maxCapacity = overridenMaxCapacity
-	}
-
-	return true
+	return len(p.tasks) != 0 && p.maxCapacity-p.usedCapacity >= p.tasks[0].getWeight()
 }
 
 func (p *pluginAgent) active() bool {
