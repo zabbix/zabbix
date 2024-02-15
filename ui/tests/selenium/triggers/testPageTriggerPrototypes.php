@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPageTriggerPrototypes extends testPagePrototypes {
 
-	public $page_name = 'trigger';
+	public $source = 'trigger';
 	public $tag = 'a Trigger prototype monitored not discovered_{#KEY}';
 
 	protected $link = 'zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&';
@@ -64,15 +64,15 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		$hostids = $host_result['hostids'];
-		self::$host_druleids = $host_result['discoveryruleids'];
+		$hostids = $host_result['hostids']['Host for prototype check'];
+		self::$host_druleids = $host_result['discoveryruleids']['Host for prototype check:drule'];
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for trigger',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => $hostids['Host for prototype check'],
-				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
+				'hostid' => $hostids,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -137,41 +137,38 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 	}
 
 	public function testPageTriggerPrototypes_Layout() {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->checkLayout();
 	}
 
 	/**
 	 * Sort trigger prototypes by Severity, Name, Create enabled and Discover columns.
 	 *
-	 * @dataProvider getTriggersSortingData
+	 * @dataProvider getTriggerPrototypesSortingData
 	 */
 	public function testPageTriggerPrototypes_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=host&sort='.$data['sort'].'&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+				'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @dataProvider getTriggersButtonLinkData
+	 * @dataProvider getTriggerPrototypesButtonLinkData
 	 */
 	public function testPageTriggerPrototypes_ButtonLink($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getTriggersDeleteData
+	 * @dataProvider getTriggerPrototypesDeleteData
 	 */
 	public function testPageTriggerPrototypes_Delete($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

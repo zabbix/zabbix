@@ -40,7 +40,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * What page should be checked - item/trigger/graph/host prototype.
 	 */
-	public $page_name;
+	public $source;
 
 	/**
 	 * How much item/trigger/graph/host displayed in table result opening page.
@@ -109,11 +109,11 @@ class testPagePrototypes extends CWebTest {
 	 */
 	public function checkLayout($template = false) {
 		// Checking Title, Header and Column names.
-		$this->page->assertTitle('Configuration of '.$this->page_name.' prototypes');
-		$page_header  = ucfirst($this->page_name).' prototypes';
+		$this->page->assertTitle('Configuration of '.$this->source.' prototypes');
+		$page_header  = ucfirst($this->source).' prototypes';
 		$this->page->assertHeader($page_header);
 		$table = $this->query('class:list-table')->asTable()->one();
-		$this->assertSame($this->layout_sql_data[$this->page_name]['headers'], $table->getHeadersText());
+		$this->assertSame($this->layout_sql_data[$this->source]['headers'], $table->getHeadersText());
 		$this->assertTableStats(self::$entity_count);
 
 		// Check that Breadcrumbs exists.
@@ -136,11 +136,12 @@ class testPagePrototypes extends CWebTest {
 		);
 
 		// Check displayed buttons and their default status after opening prototype page.
-		foreach ($this->layout_sql_data[$this->page_name]['buttons'] as $button => $status) {
+		foreach ($this->layout_sql_data[$this->source]['buttons'] as $button => $status) {
 			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
+			$this->assertTrue($this->query('button', $button)->one()->isDisplayed());
 		}
 
-		switch ($this->page_name) {
+		switch ($this->source) {
 			case 'graph':
 				// Check Width and Height columns for graph prototype page.
 				foreach (['Width', 'Height'] as $column) {
@@ -170,7 +171,6 @@ class testPagePrototypes extends CWebTest {
 				}
 
 				$popup_menu->close();
-
 				break;
 
 			case 'host':
@@ -178,7 +178,6 @@ class testPagePrototypes extends CWebTest {
 				$template_row = $table->findRow('Name', 'y Host prototype monitored not discovered {#H}');
 				$template_row->assertValues(['Templates' => 'Template for host prototype']);
 				$this->assertTrue($template_row->getColumn('Templates')->isClickable());
-
 				break;
 
 			case 'trigger':
@@ -200,12 +199,11 @@ class testPagePrototypes extends CWebTest {
 					$trigger_row->getColumn('Expression')->getText()
 				);
 				$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
-
 				break;
 		}
 
 		// Check tags (Graph prototypes doesn't have any tags).
-		if ($this->page_name !== 'graph') {
+		if ($this->source !== 'graph') {
 			$tags = $table->findRow('Name', $this->tag)->getColumn('Tags')->query('class:tag')->all();
 			$this->assertEquals(['name_1: value_1', 'name_2: value_2'], $tags->asText());
 
@@ -218,7 +216,7 @@ class testPagePrototypes extends CWebTest {
 		}
 
 		// Check clickable headers.
-		foreach ($this->layout_sql_data[$this->page_name]['clickable_headers'] as $header) {
+		foreach ($this->layout_sql_data[$this->source]['clickable_headers'] as $header) {
 			$this->assertTrue($table->query('link', $header)->one()->isClickable());
 		}
 	}
@@ -226,7 +224,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Host prototype sorting.
 	 */
-	public static function getHostsSortingData() {
+	public static function getHostPrototypesSortingData() {
 		return [
 			// #0 Sort by Name.
 			[
@@ -273,7 +271,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Item prototype sorting.
 	 */
-	public static function getItemsSortingData() {
+	public static function getItemPrototypesSortingData() {
 		return [
 			// #0 Sort by Name.
 			[
@@ -393,7 +391,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Trigger prototype sorting.
 	 */
-	public static function getTriggersSortingData() {
+	public static function getTriggerPrototypesSortingData() {
 		return [
 			// #0 Sort by Severity.
 			[
@@ -461,7 +459,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Graph prototype sorting.
 	 */
-	public static function getGraphsSortingData() {
+	public static function getGraphPrototypesSortingData() {
 		return [
 			// #0 Sort by Name.
 			[
@@ -522,7 +520,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Host prototype disable/enable by link and button.
 	 */
-	public static function getHostsButtonLinkData() {
+	public static function getHostPrototypesButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
 			[
@@ -602,7 +600,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Item prototype disable/enable by link and button.
 	 */
-	public static function getItemsButtonLinkData() {
+	public static function getItemPrototypesButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
 			[
@@ -682,7 +680,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Trigger prototype disable/enable by link and button.
 	 */
-	public static function getTriggersButtonLinkData() {
+	public static function getTriggerPrototypesButtonLinkData() {
 		return [
 			// #0 Click on Create disabled button.
 			[
@@ -762,7 +760,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Graph prototype disable/enable by link and button.
 	 */
-	public static function getGraphsButtonLinkData() {
+	public static function getGraphPrototypesButtonLinkData() {
 		return [
 			// #0 Enable discovering clicking on link in Discover column.
 			[
@@ -801,7 +799,7 @@ class testPagePrototypes extends CWebTest {
 
 		// Click on button or on link in column (Create enabled or Discover).
 		if (array_key_exists('button', $data)) {
-			// If there is no prototype name in data provider, then select all existing in table host prototypes.
+			// If there is no prototype name in data provider, then select all existing in table prototypes.
 			$selected = (array_key_exists('name', $data)) ? $data['name'] : null;
 			$this->selectTableRows($selected);
 			$this->query('button', $data['button'])->one()->click();
@@ -809,18 +807,18 @@ class testPagePrototypes extends CWebTest {
 			$this->page->waitUntilReady();
 		}
 		else {
-			// Click on link in table.
+			// Change prototype parameter "Create enabled" or "Discover".
 			$row->getColumn($data['column_check'])->query('link', $data['before'])->waitUntilClickable()->one()->click();
 			$this->page->waitUntilReady();
 		}
 
 		// Check column value for one or for all prototypes.
 		if (array_key_exists('name', $data)) {
-			$this->assertMessage(TEST_GOOD, ucfirst($this->page_name).' prototype updated');
+			$this->assertMessage(TEST_GOOD, ucfirst($this->source).' prototype updated');
 			$this->assertEquals($data['after'], $row->getColumn($data['column_check'])->getText());
 		}
 		else {
-			$this->assertMessage(TEST_GOOD, ucfirst($this->page_name).' prototypes updated');
+			$this->assertMessage(TEST_GOOD, ucfirst($this->source).' prototypes updated');
 			$this->assertTableDataColumn($data['after'], $data['column_check']);
 		}
 	}
@@ -828,7 +826,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Host prototype delete.
 	 */
-	public static function getHostsDeleteData() {
+	public static function getHostPrototypesDeleteData() {
 		return [
 			// #0 Cancel delete.
 			[
@@ -860,7 +858,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Item prototype delete.
 	 */
-	public static function getItemsDeleteData() {
+	public static function getItemPrototypesDeleteData() {
 		return [
 			// #0 Cancel delete.
 			[
@@ -892,7 +890,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Trigger prototype delete.
 	 */
-	public static function getTriggersDeleteData() {
+	public static function getTriggerPrototypesDeleteData() {
 		return [
 			// #0 Cancel delete.
 			[
@@ -924,7 +922,7 @@ class testPagePrototypes extends CWebTest {
 	/**
 	 * Graph prototype delete.
 	 */
-	public static function getGraphsDeleteData() {
+	public static function getGraphPrototypesDeleteData() {
 		return [
 			// #0 Cancel delete.
 			[
@@ -960,11 +958,6 @@ class testPagePrototypes extends CWebTest {
 	 * @param array $ids     ID's of deleted entity
 	 */
 	public function checkDelete($data, $ids) {
-		// Check that prototype exists in DB.
-		foreach ($ids as $id) {
-			$this->assertEquals(1, CDBHelper::getCount($this->layout_sql_data[$this->page_name]['sql'].$id));
-		}
-
 		// Check that prototype exists and displayed in prototype table.
 		$prototype_names = $this->getTableColumnData('Name');
 		foreach ($data['name'] as $name) {
@@ -997,14 +990,14 @@ class testPagePrototypes extends CWebTest {
 
 		// Check prototype in DB.
 		foreach ($ids as $id) {
-			$this->assertEquals($count, CDBHelper::getCount($this->layout_sql_data[$this->page_name]['sql'].$id));
+			$this->assertEquals($count, CDBHelper::getCount($this->layout_sql_data[$this->source]['sql'].$id));
 		}
 	}
 
 	/**
 	 * Check value display in table for item prototype page.
 	 */
-	public static function getItemsNotDisplayedValuesData() {
+	public static function getItemPrototypesNotDisplayedValuesData() {
 		return [
 			// #0 SNMP trapper without interval.
 			[

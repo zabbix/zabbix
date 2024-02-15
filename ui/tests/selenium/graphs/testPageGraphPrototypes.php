@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPageGraphPrototypes extends testPagePrototypes {
 
-	public $page_name = 'graph';
+	public $source = 'graph';
 
 	protected $link = 'graphs.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
@@ -63,15 +63,15 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			]
 		]);
-		$hostids = $host_result['hostids'];
-		self::$host_druleids = $host_result['discoveryruleids'];
+		$hostids = $host_result['hostids']['Host for prototype check'];
+		self::$host_druleids = $host_result['discoveryruleids']['Host for prototype check:drule'];
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for graphs',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => $hostids['Host for prototype check'],
-				'ruleid' => self::$host_druleids['Host for prototype check:drule'],
+				'hostid' => $hostids,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -137,38 +137,38 @@ class testPageGraphPrototypes extends testPagePrototypes {
 	}
 
 	public function testPageGraphPrototypes_Layout() {
-		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
 		$this->checkLayout();
 	}
 
 	/**
 	 * Sort graph prototypes by Name, Graph type and Discover columns.
 	 *
-	 * @dataProvider getGraphsSortingData
+	 * @dataProvider getGraphPrototypesSortingData
 	 */
 	public function testPageGraphPrototypes_Sorting($data) {
 		$this->page->login()->open('graphs.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+				self::$host_druleids)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
 	/**
 	 * Check link from Discover column.
 	 *
-	 * @dataProvider getGraphsButtonLinkData
+	 * @dataProvider getGraphPrototypesButtonLinkData
 	 */
 	public function testPageGraphPrototypes_ButtonLink($data) {
-		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getGraphsDeleteData
+	 * @dataProvider getGraphPrototypesDeleteData
 	 */
 	public function testPageGraphPrototypes_Delete($data) {
-		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

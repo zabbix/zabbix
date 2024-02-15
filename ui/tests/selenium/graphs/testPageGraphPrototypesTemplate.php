@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
  */
 class testPageGraphPrototypesTemplate extends testPagePrototypes {
 
-	public $page_name = 'graph';
+	public $source = 'graph';
 
 	protected $link = 'graphs.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_graphids;
@@ -135,7 +135,7 @@ class testPageGraphPrototypesTemplate extends testPagePrototypes {
 	/**
 	 * Sort graph prototypes by Name, Graph type and Discover columns.
 	 *
-	 * @dataProvider getGraphsSortingData
+	 * @dataProvider getGraphPrototypesSortingData
 	 */
 	public function testPageGraphPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('graphs.php?context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
@@ -146,7 +146,7 @@ class testPageGraphPrototypesTemplate extends testPagePrototypes {
 	/**
 	 * Check link from Discover column.
 	 *
-	 * @dataProvider getGraphsButtonLinkData
+	 * @dataProvider getGraphPrototypesButtonLinkData
 	 */
 	public function testPageGraphPrototypesTemplate_ButtonLink($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
@@ -156,7 +156,7 @@ class testPageGraphPrototypesTemplate extends testPagePrototypes {
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getGraphsDeleteData
+	 * @dataProvider getGraphPrototypesDeleteData
 	 */
 	public function testPageGraphPrototypesTemplate_Delete($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();

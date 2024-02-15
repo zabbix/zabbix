@@ -28,7 +28,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
  */
 class testPageItemPrototypesTemplate extends testPagePrototypes {
 
-	public $page_name = 'item';
+	public $source = 'item';
 	public $tag = 'y Item prototype trapper with text type';
 
 	protected $link = 'zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&';
@@ -59,15 +59,15 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 				]
 			]
 		]);
-		$template_id = $response['templateids'];
-		self::$host_druleids = $response['discoveryruleids'];
+		$template_id = $response['templateids']['Template for prototype check'];
+		self::$host_druleids = $response['discoveryruleids']['Template for prototype check:drule'];
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype monitored discovered',
 				'key_' => '1_key[{#KEY}]',
-				'hostid' => $template_id['Template for prototype check'],
-				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
+				'hostid' => $template_id,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 15,
@@ -77,8 +77,8 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 			[
 				'name' => '2 Item prototype not monitored discovered',
 				'key_' => '2_key[{#KEY}]',
-				'hostid' => $template_id['Template for prototype check'],
-				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
+				'hostid' => $template_id,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_INTERNAL,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 30,
@@ -89,8 +89,8 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 			[
 				'name' => '3 Item prototype not monitored not discovered',
 				'key_' => '3_key[{#KEY}]',
-				'hostid' => $template_id['Template for prototype check'],
-				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
+				'hostid' => $template_id,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'url' => 'test',
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -103,8 +103,8 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 			[
 				'name' => 'a Item prototype monitored not discovered',
 				'key_' => 'a_key[{#KEY}]',
-				'hostid' => $template_id['Template for prototype check'],
-				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
+				'hostid' => $template_id,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_CALCULATED,
 				'params' => '1+1',
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
@@ -116,8 +116,8 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 			[
 				'name' => 'y Item prototype trapper with text type',
 				'key_' => 'y_key[{#KEY}]',
-				'hostid' => $template_id['Template for prototype check'],
-				'ruleid' => self::$host_druleids['Template for prototype check:drule'],
+				'hostid' => $template_id,
+				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_TEXT,
 				'delay' => '',
@@ -140,41 +140,38 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 	}
 
 	public function testPageItemPrototypesTemplate_Layout() {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->checkLayout(true);
 	}
 
 	/**
 	 * Sort item prototypes by Name, Key, Interval, History, Trends, Type, Create enabled and Discover columns.
 	 *
-	 * @dataProvider getItemsSortingData
+	 * @dataProvider getItemPrototypesSortingData
 	 */
 	public function testPageItemPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=item.prototype.list&context=template&sort='.$data['sort'].
-				'&sortorder=ASC&parent_discoveryid='.self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+				'&sortorder=ASC&parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @dataProvider getItemsButtonLinkData
+	 * @dataProvider getItemPrototypesButtonLinkData
 	 */
 	public function testPageItemPrototypesTemplate_ButtonLink($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getItemsDeleteData
+	 * @dataProvider getItemPrototypesDeleteData
 	 */
 	public function testPageItemPrototypesTemplate_Delete($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
@@ -188,11 +185,10 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 	 * Check that empty values displayed in Trends and Interval columns. SNMP, Zabbix trappers has empty values in trends column.
 	 * Dependent items has empty update interval column.
 	 *
-	 * @dataProvider getItemsNotDisplayedValuesData
+	 * @dataProvider getItemPrototypesNotDisplayedValuesData
 	 */
 	public function testPageItemPrototypesTemplate_NotDisplayedValues($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.
-				self::$host_druleids['Template for prototype check:drule'])->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
 		$this->checkNotDisplayedValues($data);
 	}
 }

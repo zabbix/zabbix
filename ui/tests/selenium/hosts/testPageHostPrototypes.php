@@ -28,7 +28,7 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
  */
 class testPageHostPrototypes extends testPagePrototypes {
 
-	public $page_name = 'host';
+	public $source = 'host';
 	public $tag = '1 Host prototype monitored discovered {#H}';
 
 	protected $link = 'host_prototypes.php?context=host&sort=name&sortorder=ASC&parent_discoveryid=';
@@ -129,7 +129,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	/**
 	 * Sort host prototypes by Name, Create enabled and Discover column.
 	 *
-	 * @dataProvider getHostsSortingData
+	 * @dataProvider getHostPrototypesSortingData
 	 */
 	public function testPageHostPrototypes_Sorting($data) {
 		$this->page->login()->open('host_prototypes.php?context=host&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
@@ -140,7 +140,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	/**
 	 * Check Create enabled/disabled buttons and links from Create enabled and Discover columns.
 	 *
-	 * @dataProvider getHostsButtonLinkData
+	 * @dataProvider getHostPrototypesButtonLinkData
 	 */
 	public function testPageHostPrototypes_ButtonLink($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
@@ -150,7 +150,7 @@ class testPageHostPrototypes extends testPagePrototypes {
 	/**
 	 * Check delete scenarios.
 	 *
-	 * @dataProvider getHostsDeleteData
+	 * @dataProvider getHostPrototypesDeleteData
 	 */
 	public function testPageHostPrototypes_Delete($data) {
 		$this->page->login()->open($this->link.self::$host_druleids['Host for prototype check:drule'])->waitUntilReady();
