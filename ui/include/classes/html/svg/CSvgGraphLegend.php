@@ -59,6 +59,17 @@ class CSvgGraphLegend extends CDiv {
 		return $this;
 	}
 
+	private function getLinesCount(): int {
+		if ($this->lines_mode == SVG_GRAPH_LEGEND_LINES_MODE_FIXED) {
+			return $this->lines_count;
+		}
+
+		return min($this->lines_count, $this->show_statistic
+			? count($this->legend_items)
+			: ceil(count($this->legend_items) / $this->columns_count)
+		);
+	}
+
 	public function setLinesCount(int $lines_count): self {
 		$this->lines_count = $lines_count;
 
@@ -71,20 +82,8 @@ class CSvgGraphLegend extends CDiv {
 		return $this;
 	}
 
-	private function calculateLineCount(): int {
-		$column_count = $this->show_statistic ? 1 : min($this->columns_count, count($this->legend_items));
-
-		$lines_count = $this->lines_mode == SVG_GRAPH_LEGEND_LINES_MODE_VARIABLE
-			? min(ceil(count($this->legend_items) / $column_count), $this->lines_count)
-			: $this->lines_count;
-
-		$lines_count += $this->show_statistic ? 1 : 0;
-
-		return $lines_count;
-	}
-
 	public function getHeight(): int {
-		return $this->calculateLineCount() * self::LINE_HEIGHT;
+		return ($this->getLinesCount() + ($this->show_statistic ? 1 : 0)) * self::LINE_HEIGHT;
 	}
 
 	public function showStatistic(int $show_statistic): self {
@@ -143,10 +142,10 @@ class CSvgGraphLegend extends CDiv {
 		$this
 			->addClass(self::ZBX_STYLE_CLASS)
 			->addClass($this->show_statistic ? self::ZBX_STYLE_GRAPH_LEGEND_STATISTIC : null)
-			->addStyle('--lines: '. $this->calculateLineCount().';');
+			->addStyle('--lines: '.($this->getLinesCount() + ($this->show_statistic ? 1 : 0)).';');
 
 		if (!$this->show_statistic) {
-			$this->addStyle('--columns: '. min($this->columns_count, count($this->legend_items)).';');
+			$this->addStyle('--columns: '.min($this->columns_count, count($this->legend_items)).';');
 		}
 
 		$this->draw();
