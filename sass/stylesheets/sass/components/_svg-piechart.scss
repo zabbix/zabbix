@@ -72,6 +72,7 @@
 
 		.svg-pie-chart-legend-header {
 			grid-column: 2;
+			justify-self: end;
 			color: $font-alt-color;
 		}
 
@@ -82,12 +83,13 @@
 		.svg-pie-chart-legend-value,
 		.svg-pie-chart-legend-value-no-data {
 			grid-column: 2;
+			justify-self: end;
 			white-space: nowrap;
 		}
-	}
 
-	.svg-pie-chart-legend-value-no-data {
-		color: $font-alt-color;
+		.svg-pie-chart-legend-value-no-data {
+			color: $font-alt-color;
+		}
 	}
 }
 

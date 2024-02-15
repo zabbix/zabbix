@@ -3425,6 +3425,7 @@ section {
   overflow: hidden;
   line-height: 18px; }
   .svg-graph-legend .svg-graph-legend-header {
+    justify-self: end;
     color: #333333; }
     .svg-graph-legend .svg-graph-legend-header:first-of-type {
       grid-column: 2; }
@@ -3444,12 +3445,15 @@ section {
       background: var(--color); }
   .svg-graph-legend .svg-graph-legend-no-data {
     grid-column: 2 / -1;
+    justify-self: end;
     color: #333333; }
   .svg-graph-legend.svg-graph-legend-statistic {
     grid-template-columns: auto repeat(3, max-content);
     justify-content: stretch; }
     .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-item {
       grid-column: 1; }
+    .svg-graph-legend.svg-graph-legend-statistic .svg-graph-legend-value {
+      justify-self: end; }
 
 .svg-pie-chart {
   fill: #000000; }
@@ -3502,15 +3506,17 @@ section {
     justify-content: stretch; }
     .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-header {
       grid-column: 2;
+      justify-self: end;
       color: #333333; }
     .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-item {
       grid-column: 1; }
     .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-value,
     .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-value-no-data {
       grid-column: 2;
+      justify-self: end;
       white-space: nowrap; }
-  .svg-pie-chart-legend .svg-pie-chart-legend-value-no-data {
-    color: #333333; }
+    .svg-pie-chart-legend.svg-pie-chart-legend-show-value .svg-pie-chart-legend-value-no-data {
+      color: #333333; }
 
 .svg-pie-chart-hintbox {
   display: flex;
