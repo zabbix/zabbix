@@ -177,7 +177,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['triggerids']);
 
-			$this->assertEquals("badger", $response['result']['triggerids'], $response['result']['triggerids'])
+			$this->assertEquals("badger", $response['result']['triggerids'], $response['result']['triggerids']);
 			/* also create trigger that would have the SAME description across all templates
 			but different expression of course
 			*/
