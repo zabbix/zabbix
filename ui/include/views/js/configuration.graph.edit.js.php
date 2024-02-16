@@ -481,11 +481,11 @@
 			});
 
 			const sortable_items = new CSortable(document.querySelector('#itemsTable tbody'), {
-				selector_freeze: 'tr:last-child',
-				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				freeze_end: 1
 			});
 
-			sortable_items.on(CSortable.EVENT_DRAG_END, this.recalculateSortOrder);
+			sortable_items.on(CSortable.EVENT_SORT, this.recalculateSortOrder);
 
 			!this.graphs.readonly && this.rewriteNameLinks();
 		},
