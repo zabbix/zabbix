@@ -36,7 +36,7 @@ class CSVGHoneycomb {
 	static ID_COUNTER = 0;
 
 	static CELL_WIDTH_MIN = 50;
-	static LABEL_WIDTH_MIN = 65;
+	static LABEL_WIDTH_MIN = 60;
 	static FONT_SIZE_MIN = 12;
 
 	static EVENT_CELL_CLICK = 'cell.click';
@@ -603,6 +603,9 @@ class CSVGHoneycomb {
 				if (this.#config.primary_label.show) {
 					container.append(d => makeLabel(d.labels.primary)
 						.classed(CSVGHoneycomb.ZBX_STYLE_LABEL_PRIMARY, true)
+						.style('color',
+							this.#config.primary_label.color !== '' ? `#${this.#config.primary_label.color}` : null
+						)
 						.node()
 					)
 				}
@@ -611,6 +614,9 @@ class CSVGHoneycomb {
 				if (this.#config.secondary_label.show) {
 					container.append(d => makeLabel(d.labels.secondary)
 						.classed(CSVGHoneycomb.ZBX_STYLE_LABEL_SECONDARY, true)
+						.style('color',
+							this.#config.secondary_label.color !== '' ? `#${this.#config.secondary_label.color}` : null
+						)
 						.node()
 					)
 				}
