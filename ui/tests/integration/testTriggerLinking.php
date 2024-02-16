@@ -220,7 +220,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey(0, $response_2['result']['triggerids']);
 			//array_push(self::$triggerids, $response['result']['triggerids']);
 			self::$triggerids_deps[$response_2['result']['triggerids'][0]] = $response['result']['triggerids'];
-			self::$triggers_same_descr_mapping_to_id[$response_2['result']['triggerids'][0]] = $i
+			self::$triggers_same_descr_mapping_to_id[$response_2['result']['triggerids'][0]] = $i;
 		}
 
 		$this->setupActions();
