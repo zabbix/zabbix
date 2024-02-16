@@ -22,7 +22,6 @@
 #include "comms.h"
 #include "tls.h"
 
-#include "zbxsysinc.h"
 #include "zbxlog.h"
 #include "zbxstr.h"
 #include "zbxcrypto.h"
