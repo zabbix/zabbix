@@ -177,46 +177,26 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			]
 		];
 
-		try {
-			if ($result === false) {
-				throw new ErrorException($server->getError(), 70);
-			}
-
-			if (array_key_exists('error', $result)) {
-				throw new ErrorException($result['error'], 70);
-			}
-
-			if (!array_key_exists('item', $result)) {
-				throw new ErrorException('', 70);
-			}
-
-			if (array_key_exists('error', $result['item'])) {
-				throw new ErrorException($result['item']['error'], 70);
-			}
-
-			$result_item = $result['item'];
-
-			$output += [
-				'prev_value' => $this->getInput('value', ''),
-				'prev_time' => $this->getPrevTime(),
-				'eol' => $result_item['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF,
-				'value' => $result_item['result']
-			];
-
-			if (array_key_exists('truncated', $result_item) && $result_item['truncated']) {
-				$output['value_warning'] = _s('First %1$s of %2$s shown.',
-					convertUnits(['value' => strlen($result_item['result']), 'units' => 'B']),
-					convertUnits(['value' => $result_item['original_size'], 'units' => 'B'])
-				);
-			}
+		if ($result === false) {
+			error($server->getError());
 		}
-		catch (ErrorException $exception) {
-			if ($exception->getCode() != 70) {
-				throw $exception;
-			}
+		elseif (array_key_exists('error', $result)) {
+			error($result['error']);
+		}
+		elseif (array_key_exists('error', $result['item'])) {
+			error($result['item']['error']);
+		}
+		else {
+			$output['prev_value'] = $this->getInput('value', '');
+			$output['prev_time'] = $this->getPrevTime();
+			$output['value'] = $result['item']['result'];
+			$output['eol'] = $result['item']['eol'] === 'CRLF' ? ZBX_EOL_CRLF : ZBX_EOL_LF;
 
-			if ($exception->getMessage() !== '') {
-				error($exception->getMessage());
+			if (array_key_exists('truncated', $result['item']) && $result['item']['truncated']) {
+				$output['value_warning'] = _s('First %1$s of %2$s shown.',
+					convertUnits(['value' => strlen($result['item']['result']), 'units' => 'B']),
+					convertUnits(['value' => $result['item']['original_size'], 'units' => 'B'])
+				);
 			}
 		}
 
