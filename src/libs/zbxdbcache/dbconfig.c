@@ -2708,7 +2708,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_HOST		*host = NULL;
 
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_TRAPITEM		*trapitem;
 	ZBX_DC_DEPENDENTITEM	*depitem;
@@ -2718,7 +2717,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
-	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
@@ -2924,8 +2922,19 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 		{
 			int	trends_sec;
+			int	found_numeric;
 
-			if (0 == found)
+			if (0 == found || (ITEM_VALUE_TYPE_FLOAT != last_value_type &&
+					ITEM_VALUE_TYPE_UINT64 != last_value_type))
+			{
+				found_numeric = 0;
+			}
+			else
+			{
+				found_numeric = 1;
+			}
+
+			if (0 == found_numeric)
 				item->numitem = (ZBX_DC_NUMITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_NUMITEM));
 
 			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
@@ -2937,7 +2946,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item->numitem->trends = (0 != trends_sec);
 			item->numitem->trends_sec = trends_sec;
 
-			DCstrpool_replace(found, &item->numitem->units, row[26]);
+			DCstrpool_replace(found_numeric, &item->numitem->units, row[26]);
 		}
 		else if (1 == found &&
 				(ITEM_VALUE_TYPE_FLOAT == last_value_type || ITEM_VALUE_TYPE_UINT64 == last_value_type))
@@ -2950,13 +2959,39 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item->numitem = NULL;
 		}
 
+		int	found_type = found;
+
+		if (1 == found && last_type != item->type)
+		{
+			if (ITEM_TYPE_SNMP == last_type)
+			{
+				/* remove SNMP parameters for non-SNMP item */
+
+				zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
+
+				__config_mem_free_func(item->itemtype.snmpitem);
+				found_type = 0;
+			}
+			else if (ITEM_TYPE_CALCULATED == last_type)
+			{
+				/* remove calculated item parameters */
+
+				if (NULL != item->itemtype.calcitem->formula_bin)
+					__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+				zbx_strpool_release(item->itemtype.calcitem->params);
+
+				__config_mem_free_func(item->itemtype.calcitem);
+				found_type = 0;
+			}
+		}
+
 		/* SNMP items */
 		if (ITEM_TYPE_SNMP == item->type)
 		{
-			if (0 == found)
+			if (0 == found_type)
 				item->itemtype.snmpitem = (ZBX_DC_SNMPITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_SNMPITEM));
 
-			if (SUCCEED == DCstrpool_replace(found, &item->itemtype.snmpitem->snmp_oid, row[6]))
+			if (SUCCEED == DCstrpool_replace(found_type, &item->itemtype.snmpitem->snmp_oid, row[6]))
 			{
 				if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '{'))
 					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
@@ -2966,12 +3001,21 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
 			}
 		}
-		else if (1 == found && ITEM_TYPE_SNMP == last_type)
-		{
-			/* remove SNMP parameters for non-SNMP item */
 
-			zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
-			__config_mem_free_func(item->itemtype.snmpitem);
+
+		/* calculated items */
+
+		if (ITEM_TYPE_CALCULATED == item->type)
+		{
+			if (0 == found_type)
+				item->itemtype.calcitem = (ZBX_DC_CALCITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_CALCITEM));
+
+			DCstrpool_replace(found_type, &item->itemtype.calcitem->params, row[11]);
+
+			if (1 == found_type && NULL != item->itemtype.calcitem->formula_bin)
+				__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+
+			item->itemtype.calcitem->formula_bin = config_decode_serialized_expression(row[49]);
 		}
 
 		/* IPMI items */
@@ -3167,30 +3211,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			zbx_vector_uint64_append(&interface_snmpitem->itemids, itemid);
 		}
 
-		/* calculated items */
-
-		if (ITEM_TYPE_CALCULATED == item->type)
-		{
-			calcitem = (ZBX_DC_CALCITEM *)DCfind_id(&config->calcitems, itemid, sizeof(ZBX_DC_CALCITEM),
-					&found);
-
-			DCstrpool_replace(found, &calcitem->params, row[11]);
-
-			if (1 == found && NULL != calcitem->formula_bin)
-				__config_mem_free_func((void *)calcitem->formula_bin);
-
-			calcitem->formula_bin = config_decode_serialized_expression(row[49]);
-		}
-		else if (NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid)))
-		{
-			/* remove calculated item parameters */
-
-			if (NULL != calcitem->formula_bin)
-				__config_mem_free_func((void *)calcitem->formula_bin);
-			zbx_strpool_release(calcitem->params);
-			zbx_hashset_remove_direct(&config->calcitems, calcitem);
-		}
-
 		/* HTTP agent items */
 
 		if (ITEM_TYPE_HTTPAGENT == item->type)
@@ -3371,6 +3391,18 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			__config_mem_free_func(item->itemtype.snmpitem);
 		}
 
+		/* calculated items */
+
+		if (ITEM_TYPE_CALCULATED == item->type)
+		{
+			zbx_strpool_release(item->itemtype.calcitem->params);
+
+			if (NULL != item->itemtype.calcitem->formula_bin)
+				__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+
+			__config_mem_free_func(item->itemtype.calcitem);
+		}
+
 		/* IPMI items */
 
 		if (ITEM_TYPE_IPMI == item->type)
@@ -3469,19 +3501,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			zbx_strpool_release(jmxitem->jmx_endpoint);
 
 			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
-		}
-
-		/* calculated items */
-
-		if (ITEM_TYPE_CALCULATED == item->type)
-		{
-			calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems, &itemid);
-			zbx_strpool_release(calcitem->params);
-
-			if (NULL != calcitem->formula_bin)
-				__config_mem_free_func((void *)calcitem->formula_bin);
-
-			zbx_hashset_remove_direct(&config->calcitems, calcitem);
 		}
 
 		/* HTTP agent items */
@@ -6732,8 +6751,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->simpleitems.num_data, config->simpleitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __func__,
 				config->jmxitems.num_data, config->jmxitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() calcitems  : %d (%d slots)", __func__,
-				config->calcitems.num_data, config->calcitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __func__,
 				config->httpitems.num_data, config->httpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() scriptitems  : %d (%d slots)", __func__,
@@ -7215,7 +7232,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->telnetitems, 0);
 	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
-	CREATE_HASHSET(config->calcitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
 	CREATE_HASHSET(config->httpitems, 0);
@@ -8051,8 +8067,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->jmx_endpoint = NULL;
 			break;
 		case ITEM_TYPE_CALCULATED:
-			if (NULL != (calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&config->calcitems,
-					&src_item->itemid)))
+			if (NULL != (calcitem = src_item->itemtype.calcitem))
 			{
 				dst_item->params = zbx_strdup(NULL, calcitem->params);
 				dst_item->formula_bin = dup_serialized_expression(calcitem->formula_bin);

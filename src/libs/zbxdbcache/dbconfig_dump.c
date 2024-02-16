@@ -618,7 +618,6 @@ static void	DCdump_items(void)
 		{&config->telnetitems, (zbx_dc_dump_func_t)DCdump_telnetitem},
 		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
-		{&config->calcitems, (zbx_dc_dump_func_t)DCdump_calcitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
 		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
@@ -658,6 +657,9 @@ static void	DCdump_items(void)
 
 		if (ITEM_TYPE_SNMP == item->type)
 			DCdump_snmpitem(item->itemtype.snmpitem);
+
+		if (ITEM_TYPE_CALCULATED == item->type)
+			DCdump_calcitem(item->itemtype.calcitem);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

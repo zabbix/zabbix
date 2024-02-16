@@ -88,7 +88,6 @@ ZBX_DC_FUNCTION;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
 	const char	*units;
 	unsigned char	trends;
 	int		trends_sec;
@@ -97,15 +96,22 @@ ZBX_DC_NUMITEM;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
 	const char	*snmp_oid;
 	unsigned char	snmp_oid_type;
 }
 ZBX_DC_SNMPITEM;
 
+typedef struct
+{
+	const char		*params;
+	const unsigned char	*formula_bin;
+}
+ZBX_DC_CALCITEM;
+
 typedef union
 {
 	ZBX_DC_SNMPITEM	*snmpitem;
+	ZBX_DC_CALCITEM	*calcitem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -253,14 +259,6 @@ typedef struct
 	const char	*jmx_endpoint;
 }
 ZBX_DC_JMXITEM;
-
-typedef struct
-{
-	zbx_uint64_t		itemid;
-	const char		*params;
-	const unsigned char	*formula_bin;
-}
-ZBX_DC_CALCITEM;
 
 typedef struct
 {
