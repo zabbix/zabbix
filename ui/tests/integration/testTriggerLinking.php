@@ -319,8 +319,8 @@ class testTriggerLinking extends CIntegrationTest {
 			if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
 			{
 				$this->assertEquals($entry['dependencies'][0], self::$triggerids_deps[$entry['triggerid']], $ep);
-				$i = $triggers_same_descr_mapping_to_id
-					//continue;
+				$i = $triggers_same_descr_mapping_to_id;
+				//continue;
 			}
 
 			$this->assertEquals(self::TAG_NAME_PRE . "_" . self::$stringids[$i], $entry['tags'][0]['tag'], $ep);
