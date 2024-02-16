@@ -97,6 +97,20 @@ ZBX_DC_NUMITEM;
 
 typedef struct
 {
+	zbx_uint64_t	itemid;
+	const char	*snmp_oid;
+	unsigned char	snmp_oid_type;
+}
+ZBX_DC_SNMPITEM;
+
+typedef union
+{
+	ZBX_DC_SNMPITEM	*snmpitem;
+}
+ZBX_DC_ITEMTYPE;
+
+typedef struct
+{
 	zbx_uint64_t		itemid;
 	zbx_uint64_t		hostid;
 	zbx_uint64_t		interfaceid;
@@ -106,6 +120,7 @@ typedef struct
 	const char		*port;
 	const char		*error;
 	const char		*delay;
+	ZBX_DC_ITEMTYPE		itemtype;
 	ZBX_DC_TRIGGER		**triggers;
 	ZBX_DC_NUMITEM		*numitem;
 	int			nextcheck;
@@ -161,14 +176,6 @@ typedef struct
 	ZBX_DC_ITEM	*item_ptr;
 }
 ZBX_DC_ITEM_HK;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*snmp_oid;
-	unsigned char	snmp_oid_type;
-}
-ZBX_DC_SNMPITEM;
 
 typedef struct
 {

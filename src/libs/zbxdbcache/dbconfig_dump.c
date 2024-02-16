@@ -610,7 +610,6 @@ static void	DCdump_items(void)
 	void			*ptr;
 	zbx_trace_item_t	trace_items[] =
 	{
-		{&config->snmpitems, (zbx_dc_dump_func_t)DCdump_snmpitem},
 		{&config->ipmiitems, (zbx_dc_dump_func_t)DCdump_ipmiitem},
 		{&config->trapitems, (zbx_dc_dump_func_t)DCdump_trapitem},
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
@@ -653,8 +652,12 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  poller_type:%u location:%u", item->poller_type, item->location);
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
 		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
-		if (NULL != item->numitem)
+
+		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			DCdump_numitem(item->numitem);
+
+		if (ITEM_TYPE_SNMP == item->type)
+			DCdump_snmpitem(item->itemtype.snmpitem);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

@@ -2841,7 +2841,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (0 == found)
 		{
-			item->numitem = NULL;
 			item->triggers = NULL;
 
 			if (NULL != new_items)
@@ -2891,6 +2890,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			dc_interface_update_agent_stats(interface, type, 1);
 		}
 
+		int	last_type, last_value_type;
+
+		if (1 == found)
+		{
+			last_type = item->type;
+			last_value_type = item->value_type;
+		}
+
 		item->type = type;
 		item->status = status;
 		item->value_type = value_type;
@@ -2918,13 +2925,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			int	trends_sec;
 
-			if (NULL == item->numitem)
-			{
+			if (0 == found)
 				item->numitem = (ZBX_DC_NUMITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_NUMITEM));
-				found = 0;
-			}
-			else
-				found = 1;
 
 			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
 				trends_sec = ZBX_HK_PERIOD_MAX;
@@ -2937,7 +2939,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 			DCstrpool_replace(found, &item->numitem->units, row[26]);
 		}
-		else if (NULL != item->numitem)
+		else if (1 == found &&
+				(ITEM_VALUE_TYPE_FLOAT == last_value_type || ITEM_VALUE_TYPE_UINT64 == last_value_type))
 		{
 			/* remove parameters for non-numeric item */
 
@@ -2948,27 +2951,27 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		}
 
 		/* SNMP items */
-
 		if (ITEM_TYPE_SNMP == item->type)
 		{
-			snmpitem = (ZBX_DC_SNMPITEM *)DCfind_id(&config->snmpitems, itemid, sizeof(ZBX_DC_SNMPITEM), &found);
+			if (0 == found)
+				item->itemtype.snmpitem = (ZBX_DC_SNMPITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_SNMPITEM));
 
-			if (SUCCEED == DCstrpool_replace(found, &snmpitem->snmp_oid, row[6]))
+			if (SUCCEED == DCstrpool_replace(found, &item->itemtype.snmpitem->snmp_oid, row[6]))
 			{
-				if (NULL != strchr(snmpitem->snmp_oid, '{'))
-					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
-				else if (NULL != strchr(snmpitem->snmp_oid, '['))
-					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
+				if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '{'))
+					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+				else if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '['))
+					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
 				else
-					snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
+					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
 			}
 		}
-		else if (NULL != (snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid)))
+		else if (1 == found && ITEM_TYPE_SNMP == last_type)
 		{
 			/* remove SNMP parameters for non-SNMP item */
 
-			zbx_strpool_release(snmpitem->snmp_oid);
-			zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
+			zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
+			__config_mem_free_func(item->itemtype.snmpitem);
 		}
 
 		/* IPMI items */
@@ -3358,16 +3361,14 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			zbx_strpool_release(item->numitem->units);
 
 			__config_mem_free_func(item->numitem);
-			item->numitem = NULL;
 		}
 
 		/* SNMP items */
 
 		if (ITEM_TYPE_SNMP == item->type)
 		{
-			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &itemid);
-			zbx_strpool_release(snmpitem->snmp_oid);
-			zbx_hashset_remove_direct(&config->snmpitems, snmpitem);
+			zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
+			__config_mem_free_func(item->itemtype.snmpitem);
 		}
 
 		/* IPMI items */
@@ -6051,7 +6052,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 			{
 				ZBX_DC_NUMITEM	*numitem = item->numitem;
 
-				if (NULL != numitem && 0 != numitem->trends)
+				if (0 != numitem->trends)
 					zbx_vector_uint64_append(&itemids, items->values[i]->itemid);
 			}
 
@@ -6713,8 +6714,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocitems.num_data, config->preprocitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() snmpitems  : %d (%d slots)", __func__,
-				config->snmpitems.num_data, config->snmpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() ipmiitems  : %d (%d slots)", __func__,
 				config->ipmiitems.num_data, config->ipmiitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __func__,
@@ -7005,10 +7004,7 @@ static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 
 	ZBX_RETURN_IF_NOT_EQUAL(f1, f2);
 
-	s1 = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &i1->itemid);
-	s2 = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &i2->itemid);
-
-	ZBX_RETURN_IF_NOT_EQUAL(s1->snmp_oid_type, s2->snmp_oid_type);
+	ZBX_RETURN_IF_NOT_EQUAL(i1->itemtype.snmpitem->snmp_oid_type, i2->itemtype.snmpitem->snmp_oid_type);
 
 	return 0;
 }
@@ -7210,7 +7206,6 @@ int	init_configuration_cache(char **error)
 			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
 	CREATE_HASHSET(config->items, 0);
-	CREATE_HASHSET(config->snmpitems, 0);
 	CREATE_HASHSET(config->ipmiitems, 0);
 	CREATE_HASHSET(config->trapitems, 0);
 	CREATE_HASHSET(config->dependentitems, 0);
@@ -7824,7 +7819,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	switch (src_item->type)
 	{
 		case ITEM_TYPE_SNMP:
-			snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &src_item->itemid);
+			snmpitem = src_item->itemtype.snmpitem;
 			snmp = (ZBX_DC_SNMPINTERFACE *)zbx_hashset_search(&config->interfaces_snmp, &src_item->interfaceid);
 
 			if (NULL != snmpitem && NULL != snmp)
@@ -9520,7 +9515,7 @@ int	DCconfig_get_poller_items(unsigned char poller_type, DC_ITEM **items)
 			{
 				ZBX_DC_SNMPITEM	*snmpitem;
 
-				snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&config->snmpitems, &dc_item->itemid);
+				snmpitem = dc_item->itemtype.snmpitem;
 
 				if (ZBX_SNMP_OID_TYPE_NORMAL == snmpitem->snmp_oid_type ||
 						ZBX_SNMP_OID_TYPE_DYNAMIC == snmpitem->snmp_oid_type)
