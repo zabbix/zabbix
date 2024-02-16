@@ -19,7 +19,21 @@
 **/
 
 
-use Widgets\SvgGraph\Includes\CWidgetFieldDataSet;
+namespace Widgets\SvgGraph\Includes;
+
+use API,
+	CArrayHelper,
+	CHousekeepingHelper,
+	CItemHelper,
+	CMacrosResolverHelper,
+	CMathHelper,
+	CNumberParser,
+	CParser,
+	CSeverityHelper,
+	CSimpleIntervalParser,
+	CSvgGraph,
+	Exception,
+	Manager;
 
 /**
  * Class calculates graph data and makes SVG graph.
@@ -760,7 +774,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getLegend(array $metrics, array $legend_options): ?CSvgGraphLegend {
-		if ($legend_options['show_legend'] != SVG_GRAPH_LEGEND_ON) {
+		if ($legend_options['show_legend'] != WidgetForm::SVG_GRAPH_LEGEND_ON) {
 			return null;
 		}
 

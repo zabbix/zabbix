@@ -18,6 +18,10 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+namespace Widgets\SvgGraph\Includes;
+
+use CDiv,
+	CSpan;
 
 class CSvgGraphLegend extends CDiv {
 
@@ -60,7 +64,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	private function getLinesCount(): int {
-		if ($this->lines_mode == SVG_GRAPH_LEGEND_LINES_MODE_FIXED) {
+		if ($this->lines_mode == WidgetForm::SVG_GRAPH_LEGEND_LINES_MODE_FIXED) {
 			return $this->lines_count;
 		}
 
@@ -87,7 +91,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	public function showStatistic(int $show_statistic): self {
-		$this->show_statistic = ($show_statistic == SVG_GRAPH_LEGEND_STATISTIC_ON);
+		$this->show_statistic = ($show_statistic == WidgetForm::SVG_GRAPH_LEGEND_STATISTIC_ON);
 
 		return $this;
 	}
