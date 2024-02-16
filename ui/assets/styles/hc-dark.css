@@ -4589,10 +4589,10 @@ form.dashboard-widget-svggraph .single-item-table .single-item-table-row td {
 form.dashboard-widget-svggraph .single-item-table th:first-child,
 form.dashboard-widget-svggraph .single-item-table td:first-child {
   padding-left: 5px; }
-form.dashboard-widget-svggraph .single-item-table .single-item-table-row:last-child td {
-  padding-bottom: 0; }
 form.dashboard-widget-svggraph .single-item-table tfoot td {
   padding: 5px 5px 5px 10px; }
+form.dashboard-widget-svggraph .single-item-table tbody:not(:empty) + tfoot td {
+  padding-top: 0; }
 form.dashboard-widget-svggraph .overrides-list {
   position: relative;
   margin: -5px 0 -5px 15px; }
