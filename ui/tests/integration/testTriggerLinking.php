@@ -182,7 +182,7 @@ class testTriggerLinking extends CIntegrationTest {
 			but different expression of course
 			*/
 			$response_2 = $this->call('trigger.create', [
-				'description' => self::TRIGGER_DESCRIPTION_SAME,
+				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
 				'priority' => self::TRIGGER_PRIORITY,
 				'status' => self::TRIGGER_STATUS,
 				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
