@@ -316,7 +316,7 @@ void	process_rule(zbx_dc_drule_t *drule, zbx_hashset_t *tasks, zbx_hashset_t *ch
 			goto next;
 		}
 #ifndef HAVE_IPV6
-		if (ZBX_IPRANGE_V6 == ipr.addr_type)
+		if (ZBX_IPRANGE_V6 == ipr.type)
 		{
 			zabbix_log(LOG_LEVEL_WARNING, "discovery rule \"%s\": encountered IP range \"%s\","
 					" but IPv6 support not compiled in", drule->name, start);
