@@ -25,6 +25,7 @@
 #include "zbxstr.h"
 #include "zbxdbhigh.h"
 #include "zbxtime.h"
+#include "zbxthreads.h"
 
 #ifdef HAVE_LIBCURL
 
@@ -624,7 +625,7 @@ next_attempt:
 		context->body.offset = 0;
 
 		if (0 != attempt_interval && 1 < context->max_attempts)
-			sleep((unsigned int)attempt_interval);
+			zbx_sleep((unsigned int)attempt_interval);
 	}
 	while (0 < --context->max_attempts);
 
