@@ -39,6 +39,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TAG_NAME_PRE = 'strata_tag';
 	const TAG_VALUE_PRE = 'strata_value';
 	const TRIGGER_DESCRIPTION_PRE = 'strata_trigger_description';
+	const TRIGGER_DESCRIPTION_SAME_ALL = 'strata_same_description_on_all_templates';
 
 	const TRIGGER_PRIORITY = 4;
 	const TRIGGER_STATUS = 1;
@@ -175,6 +176,44 @@ class testTriggerLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['triggerids']);
+
+
+			/* also create trigger that would have the SAME description across all templates
+			but different expression of course
+			*/
+			$response_2 = $this->call('trigger.create', [
+				'description' => self::TRIGGER_DESCRIPTION_SAME,
+				'priority' => self::TRIGGER_PRIORITY,
+				'status' => self::TRIGGER_STATUS,
+				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
+				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
+				'type' => self::TRIGGER_TYPE,
+				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
+				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE . "_" . self::$stringids[$i],
+				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
+				'opdata' => self::TRIGGER_OPDATA_PRE . "_" . self::$stringids[$i],
+				'event_name' => self::TRIGGER_EVENT_NAME_PRE . "_" . self::$stringids[$i],
+				'expression' => 'last(/' . self::TEMPLATE_NAME_PRE . "_" . $templ_counter . '/' .
+				self::ITEM_KEY_PRE . "_" . self::$stringids[$i] . ')=2',
+				'recovery_expression' => 'last(/' . self::TEMPLATE_NAME_PRE . "_" . $templ_counter . '/' .
+				self::ITEM_KEY_PRE . "_" . self::$stringids[$i] . ')=3',
+
+				'dependencies' => [
+						['triggerid' => $response['result']['triggerids']]
+						],
+
+				'tags' => [
+					[
+						'tag' => self::TAG_NAME_PRE . "_" . self::$stringids[$i],
+						'value' => self::TAG_VALUE_PRE . "_" . self::$stringids[$i]
+					]
+				]
+			]);
+
+			$this->assertArrayHasKey('triggerids', $response_2['result']);
+			$this->assertArrayHasKey(0, $response_2['result']['triggerids']);
+
 		}
 
 		$this->setupActions();
