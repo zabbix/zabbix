@@ -186,6 +186,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
 				'priority' => self::TRIGGER_PRIORITY,
 				'status' => self::TRIGGER_STATUS,
+
 				'comments' => self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i],
 				'url' => self::TRIGGER_URL_PRE . "_" . self::$stringids[$i],
 				'type' => self::TRIGGER_TYPE,
@@ -296,7 +297,7 @@ class testTriggerLinking extends CIntegrationTest {
 		]
 		);
 
-		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE,
+		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2,
 							count($response['result']));
 
 		$i = 0;
