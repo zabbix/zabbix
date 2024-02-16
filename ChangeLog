@@ -6,6 +6,16 @@ New features:
 .........T [ZBXNEXT-8762] added YugabyteDB by HTTP and YugabyteDB Cluster by HTTP templates (akotsegubov)
 
 Bug fixes:
+.......P.. [ZBX-23124] fixed items with disabled history being sometimes stuck in non-supported state (wiper)
+.........T [ZBX-23586] fixed filter evaluation type of organizations discovery in Cisco Meraki dashboard by HTTP template (drasikhov)
+...G...... [ZBX-23766] update Zabbix agent 2 ceph plugin readme setup instructions (rzvejs)
+.........T [ZBX-24094] fixed network interfaces LLD filtering macro in Linux by Prom template (drasikhov)
+..F....... [ZBX-23202] fixed unused tag value being saved in tag filter (vmurzins)
+.........T [ZBX-22555] updated regexp to case insensitive in Nginx templates (drasikhov)
+........S. [ZBX-23973] fixed trends being retrieved from database for new items and for items with infrequent update interval (vso)
+.........T [ZBX-22745] removed incorrect description of network interfaces administrative status filter macro in SNMP templates (drasikhov)
+.......PS. [ZBX-24015] improved zabbix[queue] internal item not to block history syncers and pollers (vso)
+.........T [ZBX-23509] fixed JSONPath of Keyspace discovery master item in Redis by Zabbix agent 2 template (drasikhov)
 ...G...PS. [ZBX-24059] fixed libmodbus unnecessary linking into all binaries (askolmeisters)
 .........T [ZBX-24055] added missing API port macros in URL of script items in HPE Synergy by HTTP and HPE Primera by HTTP templates (drasikhov)
 ...G...... [ZBX-20525] fixed vfs.dir.size performance issues when walking through directory that has a lot of subdirs/files (dgoloscapov)
