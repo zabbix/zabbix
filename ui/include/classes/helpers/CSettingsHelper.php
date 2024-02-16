@@ -109,9 +109,9 @@ class CSettingsHelper {
 	 *
 	 * @throws Exception
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public static function get(string $field): ?string {
+	public static function get(string $field): string {
 		if (!self::$params) {
 			self::$params = API::Settings()->get([
 				'output' => [
@@ -136,7 +136,7 @@ class CSettingsHelper {
 			}
 		}
 
-		return array_key_exists($field, self::$params) ? self::$params[$field] : null;
+		return self::$params[$field];
 	}
 
 	/**
@@ -144,14 +144,14 @@ class CSettingsHelper {
 	 *
 	 * @param string $field
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public static function getPublic(string $field): ?string {
+	public static function getPublic(string $field): string {
 		if (!self::$params_public) {
 			self::$params_public = CSettings::getPublic();
 		}
 
-		return array_key_exists($field, self::$params_public) ? self::$params_public[$field] : null;
+		return self::$params_public[$field];
 	}
 
 	/**
@@ -159,9 +159,9 @@ class CSettingsHelper {
 	 *
 	 * @param string $field
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public static function getPrivate(string $field): ?string {
+	public static function getPrivate(string $field): string {
 		if (!self::$params_private) {
 			self::$params_private = CSettings::getPrivate();
 		}
@@ -170,7 +170,7 @@ class CSettingsHelper {
 			self::$params_private, array_flip([self::SESSION_KEY, self::SERVER_STATUS])
 		);
 
-		return array_key_exists($field, $supported_params) ? $supported_params[$field] : null;
+		return $supported_params[$field];
 	}
 
 	public static function getDbVersionStatus(): array {
@@ -178,8 +178,6 @@ class CSettingsHelper {
 			self::$params_private = CSettings::getPrivate();
 		}
 
-		return array_key_exists(self::DBVERSION_STATUS, self::$params_private)
-			? self::$params_private[self::DBVERSION_STATUS]
-			: [];
+		return self::$params_private[self::DBVERSION_STATUS];
 	}
 }

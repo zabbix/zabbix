@@ -61,9 +61,9 @@ class CHousekeepingHelper {
 	 *
 	 * @throws Exception
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public static function get(string $field): ?string {
+	public static function get(string $field): string {
 		if (!self::$params) {
 			self::$params = API::Housekeeping()->get([
 				'output' => [
@@ -80,7 +80,7 @@ class CHousekeepingHelper {
 			}
 		}
 
-		return array_key_exists($field, self::$params) ? self::$params[$field] : null;
+		return self::$params[$field];
 	}
 
 	/**

@@ -56,9 +56,9 @@ class CAuthenticationHelper {
 	/**
 	 * @throws Exception
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public static function get(string $field): ?string {
+	public static function get(string $field): string {
 		if (!self::$params) {
 			self::$params = API::Authentication()->get([
 				'output' => [
@@ -74,7 +74,7 @@ class CAuthenticationHelper {
 			}
 		}
 
-		return array_key_exists($field, self::$params) ? self::$params[$field] : null;
+		return self::$params[$field];
 	}
 
 	/**
@@ -82,14 +82,14 @@ class CAuthenticationHelper {
 	 *
 	 * @param string $field
 	 *
-	 * @return string|null
+	 * @return string
 	 */
-	public static function getPublic(string $field): ?string {
+	public static function getPublic(string $field): string {
 		if (!self::$params_public) {
 			self::$params_public = CAuthentication::getPublic();
 		}
 
-		return array_key_exists($field, self::$params_public) ? self::$params_public[$field] : null;
+		return self::$params_public[$field];
 	}
 
 	/**
