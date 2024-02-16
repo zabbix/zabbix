@@ -1875,9 +1875,10 @@ int	zbx_dbsync_compare_items(zbx_dbsync_t *sync)
 				"i.request_method,i.output_format,i.ssl_cert_file,i.ssl_key_file,i.ssl_key_password,"
 				"i.verify_peer,i.verify_host,i.allow_traps,i.templateid,null"
 			" from items i"
+			" inner join hosts h on i.hostid=h.hostid"
 			" join item_rtdata ir on i.itemid=ir.itemid"
-			" where (i.flags=%d or i.flags=%d or i.flags=%d)",
-			ZBX_FLAG_DISCOVERY_NORMAL,
+			" where (h.status=%d or h.status=%d) and (i.flags=%d or i.flags=%d or i.flags=%d)",
+			HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED, ZBX_FLAG_DISCOVERY_NORMAL,
 			ZBX_FLAG_DISCOVERY_RULE, ZBX_FLAG_DISCOVERY_CREATED)))
 
 	{

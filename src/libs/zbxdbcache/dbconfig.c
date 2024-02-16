@@ -6094,7 +6094,7 @@ void	DCsync_configuration(unsigned char mode)
 
 	zbx_hashset_t			trend_queue;
 	zbx_vector_dc_item_ptr_t	new_items, *pnew_items = NULL;
-
+	zabbix_increase_log_level();
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	config->sync_start_ts = time(NULL);
