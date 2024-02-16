@@ -3807,12 +3807,12 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			if (SSL_ERROR_SYSCALL == result_code && 0 != errno)
 			{
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
-						" to %d:%s", result_code, zbx_strerror(errno));
+						" to %d:%s:", result_code, zbx_strerror(errno));
 			}
 			else
 			{
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
-						" to %d", result_code);
+						" to %d:", result_code);
 			}
 		}
 
