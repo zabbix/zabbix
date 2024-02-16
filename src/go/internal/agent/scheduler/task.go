@@ -330,7 +330,7 @@ func (t *directExporterTask) perform(s Scheduler) {
 		var err error
 
 		if now.After(t.expire) {
-			err = errors.New("No data available.")
+			err = errors.New("Timeout while waiting for item in queue.")
 			log.Debugf("direct exporter task expired for key '%s' error: '%s'", itemkey, err.Error())
 		} else {
 			if key, params, err = itemutil.ParseKey(itemkey); err == nil {
