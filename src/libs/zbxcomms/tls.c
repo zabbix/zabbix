@@ -17,6 +17,7 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
+#include "zbxcommon.h"
 #include "zbxcomms.h"
 
 #include "comms.h"
@@ -3803,8 +3804,16 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		}
 		else
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code to %d:",
-					result_code);
+			if (SSL_ERROR_SYSCALL == result_code && 0 != errno)
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
+						" to %d:%s", result_code, zbx_strerror(errno));
+			}
+			else
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
+						" to %d", result_code);
+			}
 		}
 
 		zbx_tls_error_msg(error, &error_alloc, &error_offset);
