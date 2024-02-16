@@ -2951,11 +2951,14 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num, zbx_
 
 	for (i = 0; i < history_num; i++)
 	{
+		zbx_item_diff_t	*diff;
+		ZBX_DC_HISTORY	*h;
+
 		if (SUCCEED != errcodes[i])
 			continue;
 
-		zbx_item_diff_t	*diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
-		ZBX_DC_HISTORY	*h = &history[i];
+		diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
+		h = &history[i];
 
 		diff->itemid = h->itemid;
 		diff->flags = ZBX_FLAGS_ITEM_DIFF_UNSET;
