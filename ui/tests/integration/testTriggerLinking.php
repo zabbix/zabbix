@@ -339,7 +339,11 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['functions'][0]['function'], 'last', $ep);
 			$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
 			$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3", $ep);
-			$i++;
+
+			if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
+			{
+				$i++;
+			}
 		}
 	}
 
