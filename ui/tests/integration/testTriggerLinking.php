@@ -248,7 +248,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		/////////////////////////////////////////////
 		$response = $this->call('item.create', [
-				'hostid' => $templateX_ID,
+				'hostid' => self::$templateX_ID,
 				'name' => "templateX_item_name",
 				'key_' => "templateX_item_key",
 				'type' => ITEM_TYPE_TRAPPER,
