@@ -291,6 +291,16 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertAllVisibleLabels($displaying_options_tab, $expected_labels);
 		$this->assertRangeSliderParameters($form, 'Width', ['min' => '20', 'max' => '50', 'step' => '10']);
 		$form->checkValue(['Space between sectors' => 1, 'Width' => 50]);
+		$expected_values = [
+			'Show total value' => false,
+			'Size' => 'Auto',
+			'Decimal places' => '2',
+			'Units' => false, // "Units" enable checkbox.
+			'id:units' => '', // "Units" input
+			'Bold' => false,
+			'Colour' => null
+		];
+		$form->checkValue($expected_values);
 
 		foreach ($inputs_enabled as $label => $enabled) {
 			$this->assertEquals($enabled, $form->getField($label)->isEnabled());
@@ -1183,23 +1193,15 @@ class testDashboardPieChartWidget extends CWebTest {
 
 			// Check if any of the sectors matches the expected sector.
 			foreach ($sectors as $sector) {
-				$hintbox_html = $sector->getAttribute('data-hintbox-contents');
-
 				// If 'data-hintbox-contents' attribute matches the sector.
-				if (strpos($hintbox_html, $legend_name)) {
-					// Assert hintbox value.
-					$matches = [];
-
+				if (strpos($sector->getAttribute('data-hintbox-contents'), $legend_name)) {
 					// Assert sector fill color.
-					preg_match('/fill: (.*?);/', $sector->getAttribute('style'), $matches);
-					$this->assertEquals($expected_sector['color'], $matches[1]);
+					$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
 
 					// Open the hintbox and assert the value and legend color.
 					$sector->click();
 					$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
-					$this->assertEquals($expected_sector['value'],
-							$hintbox->query('class:svg-pie-chart-hintbox-value')->one()->getText()
-					);
+					$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
 					$this->assertEquals('background-color: '.$expected_sector['color'].';',
 							$hintbox->query('class:svg-pie-chart-hintbox-color')->one()->getAttribute('style')
 					);
