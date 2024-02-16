@@ -2827,7 +2827,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 * @param CFormElement	$form				item, prototype or LLD configuration form
 	 * @param array			$original_steps		preprocessing steps of original item
 	 */
-	private function checkPreprocessingSteps($form, $original_steps) {
+	protected function checkPreprocessingSteps($form, $original_steps) {
 		$form->selectTab('Preprocessing');
 		$this->assertEquals($original_steps, $this->listPreprocessingSteps());
 
@@ -2835,6 +2835,206 @@ abstract class testFormPreprocessing extends CWebTest {
 		foreach (array_keys($this->listPreprocessingSteps()) as $i) {
 			$step = $this->query('id:preprocessing_'.$i.'_type')->one();
 			$this->assertNull($step->getAttribute('readonly'));
+		}
+	}
+
+	/**
+	 * Please note that this data provider consists only from ONE test case with an array of steps.
+	 */
+	public static function getItemsParametersData() {
+		return [
+			[
+				[
+					[
+						'type' => 'Regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern'],
+							['placeholder' => 'output']
+						]
+					],
+					[
+						'type' => 'Replace',
+						'parameters' => [
+							['placeholder' => 'search string'],
+							['placeholder' => 'replacement']
+						]
+					],
+					[
+						'type' => 'Trim',
+						'parameters' => [
+							['placeholder' => 'list of characters']
+						]
+					],
+					[
+						'type' => 'Right trim',
+						'parameters' => [
+							['placeholder' => 'list of characters']
+						]
+					],
+					[
+						'type' => 'Left trim',
+						'parameters' => [
+							['placeholder' => 'list of characters']
+						]
+					],
+					[
+						'type' => 'XML XPath',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'JSONPath',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'CSV to JSON',
+						'parameters' => [
+							['placeholder' => 'delimiter', 'value' => ','],
+							['placeholder' => 'qualifier', 'value' => '"'],
+							['value' => true]
+						]
+					],
+					[
+						'type' => 'XML to JSON'
+					],
+					[
+						'type' => 'Custom multiplier',
+						'parameters' => [
+							['placeholder' => 'number']
+						]
+					],
+					[
+						'type' => 'Simple change'
+					],
+					[
+						'type' => 'Change per second'
+					],
+					[
+						'type' => 'Boolean to decimal'
+					],
+					[
+						'type' => 'Octal to decimal'
+					],
+					[
+						'type' => 'Hexadecimal to decimal'
+					],
+//					[
+//						'type' => 'JavaScript',
+//						'parameters' => [
+//							['placeholder' => 'script']
+//						]
+//					],
+					[
+						'type' => 'In range',
+						'parameters' => [
+							['placeholder' => 'min'],
+							['placeholder' => 'max']
+						]
+					],
+					[
+						'type' => 'Matches regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern']
+						]
+					],
+					[
+						'type' => 'Does not match regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern']
+						]
+					],
+					[
+						'type' => 'Check for error in JSON',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'Check for error in XML',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'Check for error using regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern'],
+							['placeholder' => 'output']
+						]
+					],
+					[
+						'type' => 'Check for not supported value'
+					],
+					[
+						'type' => 'Discard unchanged'
+					],
+					[
+						'type' => 'Discard unchanged with heartbeat',
+						'parameters' => [
+							['placeholder' => 'seconds']
+						]
+					],
+					[
+						'type' => 'Prometheus pattern',
+						'parameters' => [
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>'],
+							['value' => 'value'],
+							['placeholder' => '<label name>'],
+						]
+					],
+					[
+						'type' => 'Prometheus to JSON',
+						'parameters' => [
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>']
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 * Check placeholders and default values in preprocessing parameters.
+	 *
+	 * @param array $data    given preprocessing steps
+	 */
+	protected function checkParameters($data) {
+		$this->page->login()->open($this->link);
+		$this->query('button:'.$this->button)->waitUntilPresent()->one()->click();
+		$form = $this->query('name:itemForm')->waitUntilPresent()->asForm()->one();
+		$form->fill(
+			[
+				'Name' => 'Item for preprocessing parameters check',
+				'Key' => 'preproc-params-check'
+			]
+		);
+
+		$form->selectTab('Preprocessing');
+		$this->query('id:param_add')->one()->click();
+		$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")][1]')->waitUntilPresent()->one();
+		$descriptors = $this->getPreprocessingFieldDescriptors();
+
+		foreach ($data as $step) {
+			$container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one()->fill($step['type']);
+
+			if (array_key_exists('parameters', $step)) {
+				foreach ($step['parameters'] as $i => $parameter) {
+					$field = $this->getPreprocessingField($container, $descriptors['parameter_'.$i + 1]);
+
+					if (array_key_exists('placeholder', $parameter)) {
+						$this->assertEquals($parameter['placeholder'], $field->getAttribute('placeholder'));
+					}
+
+					$parameter['value'] = (array_key_exists('value', $parameter)) ? $parameter['value'] : '';
+					$this->assertEquals($parameter['value'], $field->getValue());
+				}
+			}
+			else {
+				$this->assertFalse($container->query('xpath:.//input[contains(@id, "preprocessing_0_params")]')->exists());
+			}
 		}
 	}
 }

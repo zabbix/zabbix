@@ -338,4 +338,96 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 
 		$this->checkPreprocessingInheritance($data, $host_link, self::IS_LLD);
 	}
+
+	/**
+	 * Please note that this data provider consists only from ONE test case with an array of steps.
+	 */
+	public static function getLLDParametersData() {
+		return [
+			[
+				[
+					[
+						'type' => 'Regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern'],
+							['placeholder' => 'output']
+						]
+					],
+					[
+						'type' => 'Replace',
+						'parameters' => [
+							['placeholder' => 'search string'],
+							['placeholder' => 'replacement']
+						]
+					],
+					[
+						'type' => 'XML XPath',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'JSONPath',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'CSV to JSON',
+						'parameters' => [
+							['placeholder' => 'delimiter', 'value' => ','],
+							['placeholder' => 'qualifier', 'value' => '"'],
+							['value' => true]
+						]
+					],
+					[
+						'type' => 'XML to JSON'
+					],
+//					[
+//						'type' => 'JavaScript',
+//						'parameters' => [
+//							['placeholder' => 'script']
+//						]
+//					],
+					[
+						'type' => 'Does not match regular expression',
+						'parameters' => [
+							['placeholder' => 'pattern']
+						]
+					],
+					[
+						'type' => 'Check for error in JSON',
+						'parameters' => [
+							['placeholder' => '$.path.to.node']
+						]
+					],
+					[
+						'type' => 'Check for error in XML',
+						'parameters' => [
+							['placeholder' => 'XPath']
+						]
+					],
+					[
+						'type' => 'Discard unchanged with heartbeat',
+						'parameters' => [
+							['placeholder' => 'seconds']
+						]
+					],
+					[
+						'type' => 'Prometheus to JSON',
+						'parameters' => [
+							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>']
+						]
+					]
+				]
+			]
+		];
+	}
+
+	/**
+	 *  @dataProvider getLLDParametersData
+	 */
+	public function testFormPreprocessingLowLevelDiscovery_CheckParametersPlaceholders($data) {
+		$this->checkParameters($data);
+	}
 }

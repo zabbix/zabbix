@@ -30,27 +30,27 @@ class CPreprocessingBehavior extends CBehavior {
 	 *
 	 * @return array
 	 */
-	protected static function getPreprocessingFieldDescriptors() {
+	public static function getPreprocessingFieldDescriptors() {
 		return [
-			[
+			'type' => [
 				'name'		=> 'type',
 				'selector'	=> 'xpath:.//z-select[contains(@id, "_type")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
-			[
+			'parameter_1' => [
 				'name'		=> 'parameter_1',
 				'selector'	=> 'xpath:.//input[contains(@id, "_params_0")]|.//div[contains(@id, "_params_0")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
-			[
+			'parameter_2' => [
 				'name'		=> 'parameter_2',
 				'selector'	=> 'xpath:.//input[contains(@id, "_params_1")]|.//z-select[contains(@name, "[params][1]")]',
 				'detect'	=> true,
 				'value'		=> ['getValue']
 			],
-			[
+			'parameter_3' => [
 				'name'		=> 'parameter_3',
 				'selector'	=> 'xpath:.//input[contains(@id, "_params_2")]',
 				'detect'	=> true,
@@ -91,7 +91,19 @@ class CPreprocessingBehavior extends CBehavior {
 			$query->cast($field['class']);
 		}
 
+//		$elements = $query->waitUntilVisible()->all()->filter(CElementFilter::VISIBLE);
+//		if ($elements->count() > 0) {
+//			$element = $elements->first()->highlight();
+//		}
+//		else {
+//			$element = new CNullElement();
+//		}
+
 		$element = $query->one(false);
+		if ($element->isValid() && array_key_exists('detect', $field) && $field['detect']) {
+			$element = $element->detect();
+		}
+
 		if ($element->isValid() && array_key_exists('detect', $field) && $field['detect']) {
 			$element = $element->detect();
 		}
