@@ -295,7 +295,8 @@ class testTriggerLinking extends CIntegrationTest {
 				'recovery_expression'
 			],
 			'selectFunctions' => 'extend',
-			'sortfield' => 'description'
+			'sortfield' => 'description',
+			'selectDependencies' => ['triggerid']
 		]
 		);
 
