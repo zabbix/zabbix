@@ -51,6 +51,8 @@ zbx_hash_t	zbx_default_uint64_pair_hash_func(const void *data);
 #define ZBX_DEFAULT_STRING_HASH_FUNC		zbx_default_string_hash_func
 #define ZBX_DEFAULT_UINT64_PAIR_HASH_FUNC	zbx_default_uint64_pair_hash_func
 
+#define ZBX_UNIQ_ENTRY 1
+
 typedef int (*zbx_compare_func_t)(const void *d1, const void *d2);
 
 int	zbx_default_int_compare_func(const void *d1, const void *d2);
@@ -165,8 +167,7 @@ void	zbx_hashset_destroy(zbx_hashset_t *hs);
 
 int	zbx_hashset_reserve(zbx_hashset_t *hs, int num_slots_req);
 void	*zbx_hashset_insert(zbx_hashset_t *hs, const void *data, size_t size);
-void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset);
-void	*zbx_hashset_insert_ext2(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, size_t len);
+void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, size_t offset, unsigned char uniq);
 void	*zbx_hashset_search(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove(zbx_hashset_t *hs, const void *data);
 void	zbx_hashset_remove_direct(zbx_hashset_t *hs, const void *data);

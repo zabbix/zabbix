@@ -450,11 +450,11 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 	return ptr;
 }
 
-void	*DCfind_id_uniq(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
+void	*DCinsert_id_uniq(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
 	*found = 0;
 
-	return zbx_hashset_insert_ext2(hashset, &id, size, 0, sizeof(id));
+	return zbx_hashset_insert_ext(hashset, &id, size, 0, ZBX_UNIQ_ENTRY);
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
@@ -528,7 +528,7 @@ static const char	*zbx_strpool_intern(const char *str)
 	if (NULL == record)
 	{
 		record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE);
+				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, 0);
 		*(zbx_uint32_t *)record = 0;
 	}
 
@@ -2768,7 +2768,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		}
 
 		if (1 == clean_sync)
-			item = (ZBX_DC_ITEM *)DCfind_id_uniq(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+			item = (ZBX_DC_ITEM *)DCinsert_id_uniq(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 		else
 			item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
@@ -2902,8 +2902,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item_hk_local.hostid = item->hostid;
 			item_hk_local.key = zbx_strpool_acquire(item->key);
 			item_hk_local.item_ptr = item;
-			zbx_hashset_insert_ext2(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK), 0,
-					sizeof(ZBX_DC_ITEM_HK));
+			zbx_hashset_insert_ext(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK), 0,
+					ZBX_UNIQ_ENTRY);
 		}
 
 		/* process item intervals and update item nextcheck */

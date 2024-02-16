@@ -490,7 +490,7 @@ static char	*vmware_strpool_strdup(const char *str, zbx_hashset_t *strpool, zbx_
 		zbx_uint64_t	sz;
 
 		sz = REFCOUNT_FIELD_SIZE + strlen(str) + 1;
-		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE);
+		ptr = zbx_hashset_insert_ext(strpool, str - REFCOUNT_FIELD_SIZE, sz, REFCOUNT_FIELD_SIZE, 0);
 
 		*(zbx_uint32_t *)ptr = 0;
 
