@@ -558,7 +558,10 @@ class CSortable {
 	}
 
 	#getScrollMax() {
-		return this.#target[this.#is_horizontal ? 'scrollWidth' : 'scrollHeight'] - this.#getTargetLoc().dim;
+		const scroll_max =
+			(this.#is_horizontal ? this.#target.scrollWidth : this.#target.scrollHeight) - this.#getTargetLoc().dim;
+
+		return scroll_max >= 0.5 ? scroll_max : 0;
 	}
 
 	#scrollTo(pos) {
