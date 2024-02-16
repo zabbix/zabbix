@@ -39,7 +39,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TAG_NAME_PRE = 'strata_tag';
 	const TAG_VALUE_PRE = 'strata_value';
 	const TRIGGER_DESCRIPTION_PRE = 'strata_trigger_description';
-	const TRIGGER_DESCRIPTION_SAME_ALL = 'strata_same_description_on_all_templates';
+	const TRIGGER_DESCRIPTION_SAME_ALL = 'zstrata_same_description_on_all_templates';
 
 	const TRIGGER_PRIORITY = 4;
 	const TRIGGER_STATUS = 1;
@@ -312,16 +312,17 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('tags', $entry, $ep);
 			$this->assertArrayHasKey(0, $entry['tags'], $ep);
 			$this->assertArrayHasKey('tag', $entry['tags'][0], $ep);
-			$this->assertEquals(self::TAG_NAME_PRE . "_" . self::$stringids[$i], $entry['tags'][0]['tag'], $ep);
 
 			if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
 			{
 				$this->assertEquals($entry['dependencies'][0], self::$triggerids[$i], $ep);
+				$i++;
+				continue;
 			}
-			else
-			{
-				$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . self::$stringids[$i], $ep);
-			}
+
+			$this->assertEquals(self::TAG_NAME_PRE . "_" . self::$stringids[$i], $entry['tags'][0]['tag'], $ep);
+
+			$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . self::$stringids[$i], $ep);
 
 			$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
 			$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
@@ -343,12 +344,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
 			$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3", $ep);
 
-			$i=$i+1;
-			if ($i == $totalExpectedTriggers/2)
-			{
-				$i = 0;
-			}
-			//if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
+			$i++;
 		}
 	}
 
