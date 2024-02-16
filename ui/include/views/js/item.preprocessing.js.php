@@ -76,7 +76,6 @@
 			->addStyle('display: none;')
 	]))
 		->addClass('preprocessing-list-item')
-		->addClass('sortable')
 		->setAttribute('data-step', '#{rowNum}');
 	?>
 </script>
@@ -433,31 +432,18 @@
 			$preprocessing = $(obj.querySelector('#preprocessing'));
 		}
 
-		let step_index = $preprocessing.find('li.sortable').length;
-
-		$preprocessing.sortable({
-			disabled: $preprocessing.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').hasClass('<?= ZBX_STYLE_DISABLED ?>'),
-			items: 'li.sortable',
-			axis: 'y',
-			containment: 'parent',
-			cursor: 'grabbing',
-			handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
-			tolerance: 'pointer',
-			opacity: 0.6,
-			update: function() {
-				let i = 0;
-
-				$(this).find('li.sortable').each(function() {
-					$(this).find('[name*="sortorder"]').val(i++);
-				});
-			}
+		new CSortable($preprocessing[0], {
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			enable_sorting: $preprocessing[0].dataset.readonly == 0,
+			freeze_start: 1,
+			freeze_end: 1
 		});
 
-		const change_event = new CustomEvent('item.preprocessing.change');
+		let step_index = $preprocessing.find('.preprocessing-list-item').length;
 
 		$preprocessing
 			.on('click', '.element-table-add', function() {
-				let sortable_count = $preprocessing.find('li.sortable').length;
+				let sortable_count = $preprocessing.find('.preprocessing-list-item').length;
 				const preproc_row_tmpl = new Template($('#preprocessing-steps-tmpl').html());
 				const $row = $(preproc_row_tmpl.evaluate({
 					rowNum: step_index,
@@ -473,10 +459,6 @@
 
 				if (sortable_count == 1) {
 					$('#preproc_test_all').show();
-					$preprocessing
-						.sortable('disable')
-						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
-						.addClass('<?= ZBX_STYLE_DISABLED ?>');
 
 					if (massupdate_form !== null) {
 						$preprocessing.find('button.btn-link.element-table-remove').attr('disabled', 'disabled');
@@ -484,18 +466,12 @@
 				}
 				else if (sortable_count > 1) {
 					if (massupdate_form !== null) {
-						$preprocessing.find('li.sortable').each(function() {
+						$preprocessing.find('.preprocessing-list-item').each(function() {
 							$(this).find('button.btn-link.element-table-remove').removeAttr('disabled');
-						})
+						});
 					}
-
-					$preprocessing
-						.sortable('enable')
-						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>')
-						.removeClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
-				$preprocessing[0].dispatchEvent(change_event);
 				step_index++;
 			})
 			.on('click', '#preproc_test_all', function() {
@@ -515,9 +491,9 @@
 				openItemTestDialog([num], false, false, this, num);
 			})
 			.on('click', '.element-table-remove', function() {
-				$(this).closest('li.sortable').remove();
+				$(this).closest('.preprocessing-list-item').remove();
 
-				const sortable_count = $preprocessing.find('li.sortable').length;
+				const sortable_count = $preprocessing.find('.preprocessing-list-item').length;
 
 				if (sortable_count == 0) {
 					$('#preproc_test_all').hide();
@@ -527,21 +503,15 @@
 					if (document.getElementById('massupdate-form') !== null) {
 						$preprocessing.find('button.btn-link.element-table-remove').attr('disabled', 'disabled');
 					}
-
-					$preprocessing
-						.sortable('disable')
-						.find('div.<?= ZBX_STYLE_DRAG_ICON ?>').addClass('<?= ZBX_STYLE_DISABLED ?>');
 				}
 
 				if (sortable_count > 0) {
 					let i = 0;
 
-					$preprocessing.find('li.sortable').each(function() {
+					$preprocessing.find('.preprocessing-list-item').each(function() {
 						$(this).find('[name*="sortorder"]').val(i++);
 					});
 				}
-
-				$preprocessing[0].dispatchEvent(change_event);
 			})
 			.on('change', 'z-select[name*="type"]', function() {
 				var $row = $(this).closest('.preprocessing-list-item'),

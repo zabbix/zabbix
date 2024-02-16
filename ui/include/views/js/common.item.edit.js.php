@@ -260,23 +260,19 @@
 
 		$('[data-action="parse_url"]').click(function(e) {
 			const url_node = $(this).siblings('[name="url"]');
-			const table = $('#query_fields_pairs').data('editableTable');
+			const table = $('#query-fields-table').data('dynamicRows');
 			const url = parseUrlString(url_node.val());
 
 			if (typeof url === 'object') {
 				if (url.pairs.length > 0) {
 					table.addRows(url.pairs);
-					table.getTableRows()
-						.map(function() {
-							const empty = $(this).find('input[type="text"]').map(function() {
-								return ($(this).val() === '') ? this : null;
-							});
+					table.removeRows(row =>
+						[...row.querySelectorAll('[name^="query_fields"]')]
+							.filter(field => field.value === '')
+							.length == 2
+					);
 
-							return (empty.length == 2) ? this : null;
-						})
-						.map(function() {
-							table.removeRow(this);
-						});
+					jQuery('#query-fields-table').trigger('tableupdate.dynamicRows');
 				}
 
 				url_node.val(url.url);
