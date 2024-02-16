@@ -64,7 +64,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	private function getLinesCount(): int {
-		if ($this->lines_mode == WidgetForm::SVG_GRAPH_LEGEND_LINES_MODE_FIXED) {
+		if ($this->lines_mode == WidgetForm::LEGEND_LINES_MODE_FIXED) {
 			return $this->lines_count;
 		}
 
@@ -91,7 +91,7 @@ class CSvgGraphLegend extends CDiv {
 	}
 
 	public function showStatistic(int $show_statistic): self {
-		$this->show_statistic = ($show_statistic == WidgetForm::SVG_GRAPH_LEGEND_STATISTIC_ON);
+		$this->show_statistic = ($show_statistic == WidgetForm::LEGEND_STATISTIC_ON);
 
 		return $this;
 	}

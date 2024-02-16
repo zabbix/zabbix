@@ -774,7 +774,7 @@ class CSvgGraphHelper {
 	}
 
 	private static function getLegend(array $metrics, array $legend_options): ?CSvgGraphLegend {
-		if ($legend_options['show_legend'] != WidgetForm::SVG_GRAPH_LEGEND_ON) {
+		if ($legend_options['show_legend'] != WidgetForm::LEGEND_ON) {
 			return null;
 		}
 

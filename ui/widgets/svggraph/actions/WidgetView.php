@@ -26,8 +26,10 @@ use CControllerDashboardWidgetView,
 	CNumberParser,
 	CParser;
 
-use Widgets\SvgGraph\Includes\CSvgGraphHelper;
-use Widgets\SvgGraph\Includes\WidgetForm;
+use Widgets\SvgGraph\Includes\{
+	CSvgGraphHelper,
+	WidgetForm
+};
 
 class WidgetView extends CControllerDashboardWidgetView {
 
@@ -113,12 +115,12 @@ class WidgetView extends CControllerDashboardWidgetView {
 				'show_x_axis' => $this->fields_values['axisx'] == SVG_GRAPH_AXIS_ON
 			],
 			'legend' => [
-				'show_legend' => $this->fields_values['legend'] == WidgetForm::SVG_GRAPH_LEGEND_ON,
+				'show_legend' => $this->fields_values['legend'] == WidgetForm::LEGEND_ON,
 				'legend_columns' => $this->fields_values['legend_columns'],
 				'legend_lines' => $this->fields_values['legend_lines'],
 				'legend_lines_mode' => $this->fields_values['legend_lines_mode'],
 				'legend_statistic' => $this->fields_values['legend_statistic'],
-				'show_aggregation' => $this->fields_values['legend_aggregation'] == WidgetForm::SVG_GRAPH_LEGEND_AGGREGATION_ON
+				'show_aggregation' => $this->fields_values['legend_aggregation'] == WidgetForm::LEGEND_AGGREGATION_ON
 			],
 			'problems' => [
 				'show_problems' => $this->fields_values['show_problems'] == SVG_GRAPH_PROBLEMS_ON,
