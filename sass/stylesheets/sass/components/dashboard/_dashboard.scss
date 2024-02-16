@@ -738,13 +738,13 @@
 .dashboard-grid-iterator.ui-draggable {
 	.dashboard-grid-widget-header,
 	.dashboard-grid-iterator-header {
-		@extend %cursor-drag;
+		cursor: grab;
 	}
 
 	&.ui-draggable-dragging {
 		.dashboard-grid-widget-header,
 		.dashboard-grid-iterator-header {
-			@extend %cursor-dragging;
+			cursor: grabbing;
 		}
 	}
 

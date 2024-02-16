@@ -707,10 +707,6 @@ svg a {
       z-index: 1;
       transition: none; }
 
-.sortable.sortable-disabled .sortable-item .drag-icon {
-  cursor: unset;
-  color: #555555; }
-
 html,
 body {
   height: 100vh; }
@@ -1949,6 +1945,16 @@ button {
       .dashboard-grid-iterator.iterator-alt-content .dashboard-grid-iterator-contents > div .msg-bad {
         margin: 0 10px; }
 
+.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header {
+  cursor: grab; }
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
+.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header {
+  cursor: grabbing; }
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator .dashboard-grid-iterator-header,
 .dashboard-grid-iterator.ui-draggable .dashboard-grid-widget .dashboard-grid-widget-header,
@@ -4398,6 +4404,8 @@ form.dashboard-widget-piechart {
     overflow: visible;
     margin-top: -5px;
     margin-bottom: 5px; }
+    form.dashboard-widget-piechart .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label {
+      cursor: grab; }
   form.dashboard-widget-piechart .list-accordion-item {
     position: relative;
     display: grid;
@@ -4526,6 +4534,8 @@ form.dashboard-widget-svggraph .list-vertical-accordion {
   overflow: visible;
   margin-top: -5px;
   margin-bottom: 5px; }
+  form.dashboard-widget-svggraph .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label {
+    cursor: grab; }
 form.dashboard-widget-svggraph .list-accordion-item {
   position: relative;
   display: grid;
@@ -5471,6 +5481,11 @@ z-select[disabled] .focusable, input[disabled], textarea[disabled], select optio
     margin-right: 4px;
     line-height: 24px;
     vertical-align: top; }
+
+.ui-draggable .dashboard-widget-head {
+  cursor: grab; }
+.ui-draggable.ui-draggable-dragging .dashboard-widget-head {
+  cursor: grabbing; }
 
 .setup-container {
   background-color: #000000;
@@ -6439,18 +6454,7 @@ z-select .list, div.dashboard-widget-item .dashboard-grid-widget-body > div, tex
     background-color: #999999;
     border: 1px solid #4d4d4d; }
 
-.dashboard-grid-widget.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable .dashboard-grid-iterator-header, form.dashboard-widget-piechart .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label, form.dashboard-widget-svggraph .list-vertical-accordion .sortable:not(.sortable-disabled) .list-accordion-item > .drag-icon + label, .ui-draggable .dashboard-widget-head, .drag-icon {
-  cursor: move;
-  cursor: grab; }
-
-.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
-.dashboard-grid-widget.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-widget-header,
-.dashboard-grid-iterator.ui-draggable.ui-draggable-dragging .dashboard-grid-iterator-header, .ui-draggable.ui-draggable-dragging .dashboard-widget-head, .cursor-dragging {
-  cursor: move;
+.cursor-dragging {
   cursor: grabbing; }
 
 .cursor-move {
@@ -6587,13 +6591,17 @@ svg {
 
 .drag-icon {
   width: 12px;
-  height: 1.4em;
-  color: #7d7d7d; }
+  height: 1.4em; }
   .drag-icon::before {
     font-size: 22px; }
-  .drag-icon.disabled {
-    color: #555555;
-    opacity: 1; }
+
+.sortable.sortable-disabled .sortable-item .sortable:not(.sortable-disabled) .sortable-item .drag-icon, .drag-icon {
+  cursor: grab;
+  color: #7d7d7d; }
+
+.sortable.sortable-disabled .sortable-item .drag-icon {
+  cursor: unset;
+  color: #555555; }
 
 .preprocessing-list {
   display: block;

@@ -73,7 +73,7 @@ form.dashboard-widget-piechart {
 		.sortable:not(.sortable-disabled) {
 			.list-accordion-item {
 				> .drag-icon + label {
-					@extend %cursor-drag;
+					cursor: grab;
 				}
 			}
 		}

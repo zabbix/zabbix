@@ -89,7 +89,7 @@ form.dashboard-widget-svggraph {
 		.sortable:not(.sortable-disabled) {
 			.list-accordion-item {
 				> .drag-icon + label {
-					@extend %cursor-drag;
+					cursor: grab;
 				}
 			}
 		}

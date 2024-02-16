@@ -26,8 +26,15 @@
 	&.sortable-disabled {
 		.sortable-item {
 			.drag-icon {
-				cursor: unset;
-				color: $btn-icon-disabled-color;
+				@extend %drag-icon-disabled;
+			}
+
+			.sortable:not(.sortable-disabled) {
+				.sortable-item {
+					.drag-icon {
+						@extend %drag-icon-enabled;
+					}
+				}
 			}
 		}
 	}
