@@ -265,6 +265,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE,
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 				'expression' => 'last(/' . "templateX_ID" . '/' .
 				"templateX_item_key" . ')=2',
