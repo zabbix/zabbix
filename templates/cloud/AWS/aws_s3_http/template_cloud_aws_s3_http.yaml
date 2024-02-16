@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-02T10:41:56Z'
+  date: '2024-02-15T15:17:06Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -777,7 +777,7 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7f0ba96047784510b734c0064d434edc
                   expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
+                  name: 'AWS S3 Alarms: ["{#ALARM_NAME}"] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
@@ -810,7 +810,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: c1b94199b7ac4cc9889ff0e724f7057d
               expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS S3 Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
+              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 

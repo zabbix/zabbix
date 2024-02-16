@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-05T09:44:40Z'
+  date: '2024-02-16T10:04:20Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -18,10 +18,27 @@ zabbix_export:
       groups:
         - name: Templates/Cloud
       items:
-        - uuid: 4bd5c4e139374a60a42eb86a343f315e
-          name: 'AWS ALB: Get alarms check'
+        - uuid: cf1a45ea7ad74602b675d1fbe137c53d
+          name: 'AWS ELB ALB: Active Connection Count'
           type: DEPENDENT
-          key: aws.alb.alarms.check
+          key: aws.elb.alb.active_connection_count
+          delay: '0'
+          history: 7d
+          description: 'The total number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ActiveConnectionCount")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: connections
+        - uuid: 4bd5c4e139374a60a42eb86a343f315e
+          name: 'AWS ELB ALB: Get alarms check'
+          type: DEPENDENT
+          key: aws.elb.alb.alarms.check
           delay: '0'
           history: 7d
           trends: '0'
@@ -36,22 +53,142 @@ zabbix_export:
               parameters:
                 - 3h
           master_item:
-            key: aws.alb.get_alarms
+            key: aws.elb.alb.get_alarms
           tags:
             - tag: component
               value: status
           triggers:
             - uuid: 3fd832d1a2cc4cff955554cbd8c4b3c7
-              expression: 'length(last(/AWS ELB Application Load Balancer by HTTP/aws.alb.alarms.check))>0'
-              name: 'AWS ALB: Failed to get alarms data'
+              expression: 'length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarms.check))>0'
+              name: 'AWS ELB ALB: Failed to get alarms data'
+              event_name: 'AWS ELB ALB: Failed to get CloudWatch alarms for Application Load Balancer'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
               priority: WARNING
+              description: 'Failed to get CloudWatch alarms for Application Load Balancer.'
               tags:
                 - tag: scope
                   value: availability
+        - uuid: 0f966c0ff2f344f58a5c049ea2bc503a
+          name: 'AWS ELB ALB: ELB Auth Error'
+          type: DEPENDENT
+          key: aws.elb.alb.auth_error
+          delay: '0'
+          history: 7d
+          description: 'The number of user authentications that could not be completed because an authenticate action was misconfigured, the load balancer couldn''t establish a connection with the IdP, or the load balancer couldn''t complete the authentication flow due to an internal error.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ELBAuthError")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: authorization
+            - tag: component
+              value: errors
+        - uuid: 5f516687f9364f2f87b7fd1d2cbc8054
+          name: 'AWS ELB ALB: ELB Auth Failure'
+          type: DEPENDENT
+          key: aws.elb.alb.auth_failure
+          delay: '0'
+          history: 7d
+          description: 'The number of user authentications that could not be completed because the IdP denied access to the user or an authorization code was used more than once.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ELBAuthFailure")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: authorization
+            - tag: component
+              value: errors
+        - uuid: bfae078db4a14fd6a31b94e87552e430
+          name: 'AWS ELB ALB: ELB Auth Latency'
+          type: DEPENDENT
+          key: aws.elb.alb.auth_latency
+          delay: '0'
+          history: 7d
+          units: ms
+          description: |
+            The time elapsed, in milliseconds, to query the IdP for the ID token and user info.
+            If one or more of these operations fail, this is the time to failure.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ELBAuthLatency")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: authorization
+        - uuid: 8562bd314951443faed4039c2c36b127
+          name: 'AWS ELB ALB: ELB Auth User Claims Size Exceeded'
+          type: DEPENDENT
+          key: aws.elb.alb.auth_user_claims_size_exceeded
+          delay: '0'
+          history: 7d
+          description: 'The number of times that a configured IdP returned user claims that exceeded 11K bytes in size.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ELBAuthUserClaimsSizeExceeded")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: authorization
+            - tag: component
+              value: errors
+        - uuid: 4f06db3a2da446c28228a20ed04847e1
+          name: 'AWS ELB ALB: Consumed LCUs'
+          type: DEPENDENT
+          key: aws.elb.alb.capacity_units
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          description: |
+            The number of load balancer capacity units (LCU) used by your load balancer.
+            You pay for the number of LCUs that you use per hour.
+            For more information, see Elastic Load Balancing pricing: https://aws.amazon.com/elasticloadbalancing/pricing/.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ConsumedLCUs")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: capacity
+        - uuid: c7e81227b5a648de9413ffcb6b9746ee
+          name: 'AWS ELB ALB: Client TLS Negotiation Error Count'
+          type: DEPENDENT
+          key: aws.elb.alb.client_tls_negotiation_error_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of TLS connections initiated by the client that did not establish a session with the load balancer due to a TLS error.
+            Possible causes include a mismatch of ciphers or protocols or the client failing to verify the server certificate and closing the connection.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ClientTLSNegotiationErrorCount")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: errors
         - uuid: 059b7697baba46b2a7f138a1011a0e0c
-          name: 'AWS CloudWatch: Get ALB alarms data'
+          name: 'AWS CloudWatch: Get ELB ALB alarms data'
           type: SCRIPT
-          key: aws.alb.get_alarms
+          key: aws.elb.alb.get_alarms
           delay: 0s;m/1
           history: '0'
           trends: '0'
@@ -59,6 +196,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -83,13 +221,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -232,7 +370,7 @@ zabbix_export:
             
             		while (payload.NextToken !== '') {
             			var alarms = AWS.getField(AWS.request('GET', AWS.params.region, 'monitoring', AWS.prepareParams(payload)), 'DescribeAlarmsResponse.DescribeAlarmsResult');
-            			payload.NextToken = alarms.nextToken || '';
+            			payload.NextToken = alarms.NextToken || '';
             			alarms_list = AWS.getField(alarms, 'MetricAlarms');
             			regex = /loadbalancer\/(.+)$/;
             
@@ -297,146 +435,10 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: cf1a45ea7ad74602b675d1fbe137c53d
-          name: 'AWS ALB: Active Connection'
-          type: DEPENDENT
-          key: aws.elb.active_connection
-          delay: '0'
-          history: 7d
-          description: 'The total number of concurrent TCP connections active from clients to the load balancer and from the load balancer to targets.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ActiveConnectionCount")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: connections
-        - uuid: 0f966c0ff2f344f58a5c049ea2bc503a
-          name: 'AWS ALB: ELB Auth Error'
-          type: DEPENDENT
-          key: aws.elb.auth_error
-          delay: '0'
-          history: 7d
-          description: |
-            The number of user authentications that could not be completed because an authenticate action was misconfigured,
-            the load balancer couldn't establish a connection with the IdP, or the load balancer couldn't complete the authentication flow due to an internal error.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ELBAuthError")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: authorization
-            - tag: component
-              value: errors
-        - uuid: 5f516687f9364f2f87b7fd1d2cbc8054
-          name: 'AWS ALB: ELB Auth Failure'
-          type: DEPENDENT
-          key: aws.elb.auth_failure
-          delay: '0'
-          history: 7d
-          description: 'The number of user authentications that could not be completed because the IdP denied access to the user or an authorization code was used more than once.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ELBAuthFailure")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: authorization
-            - tag: component
-              value: errors
-        - uuid: bfae078db4a14fd6a31b94e87552e430
-          name: 'AWS ALB: ELB Auth Latency'
-          type: DEPENDENT
-          key: aws.elb.auth_latency
-          delay: '0'
-          history: 7d
-          units: ms
-          description: |
-            The time elapsed, in milliseconds, to query the IdP for the ID token and user info.
-            If one or more of these operations fail, this is the time to failure.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ELBAuthLatency")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: authorization
-        - uuid: 8562bd314951443faed4039c2c36b127
-          name: 'AWS ALB: ELB Auth User Claims Size Exceeded'
-          type: DEPENDENT
-          key: aws.elb.auth_user_claims_size_exceeded
-          delay: '0'
-          history: 7d
-          description: 'The number of times that a configured IdP returned user claims that exceeded 11K bytes in size.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ELBAuthUserClaimsSizeExceeded")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: authorization
-            - tag: component
-              value: errors
-        - uuid: 4f06db3a2da446c28228a20ed04847e1
-          name: 'AWS ALB: Consumed LCUs'
-          type: DEPENDENT
-          key: aws.elb.capacity_units
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          description: |
-            The number of load balancer capacity units (LCU) used by your load balancer.
-            You pay for the number of LCUs that you use per hour.
-            For more information, see Elastic Load Balancing pricing.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ConsumedLCUs")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: capacity
-        - uuid: c7e81227b5a648de9413ffcb6b9746ee
-          name: 'AWS ALB: Client TLS Negotiation Error'
-          type: DEPENDENT
-          key: aws.elb.client_tls_negotiation_error
-          delay: '0'
-          history: 7d
-          description: |
-            The number of TLS connections initiated by the client that did not establish a session with the load balancer due to a TLS error.
-            Possible causes include a mismatch of ciphers or protocols or the client failing to verify the server certificate and closing the connection.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ClientTLSNegotiationErrorCount")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: errors
         - uuid: c7b4e867ff8246058d931ca76d18d4e7
-          name: 'AWS ALB: Get metrics data'
+          name: 'AWS ELB ALB: Get metrics data'
           type: SCRIPT
-          key: aws.elb.get_metrics
+          key: aws.elb.alb.get_metrics
           delay: 0s;m/1
           history: '0'
           trends: '0'
@@ -444,6 +446,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             	request_period: 60,
             
             	getField: function (data, path) {
@@ -469,13 +472,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -603,7 +606,7 @@ zabbix_export:
             
             	request: function (method, region, service, data) {
             		if (typeof data === 'undefined' || data === null) {
-            			data = '';
+            			data = JSON.stringify([]);
             		}
             		else {
             			data = JSON.stringify(data)
@@ -707,432 +710,10 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
-        - uuid: eabcf1ef1514451087d08d739cf55d94
-          name: 'AWS ALB: ELB HTTP 3XX'
-          type: DEPENDENT
-          key: aws.elb.http_3xx
-          delay: '0'
-          history: 7d
-          description: |
-            The number of HTTP 3XX redirection codes that originate from the load balancer.
-            This count does not include response codes generated by targets.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_3XX_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 3xx
-        - uuid: c714c1f2185b4b0b8b86e3ad336d7888
-          name: 'AWS ALB: ELB HTTP 4XX'
-          type: DEPENDENT
-          key: aws.elb.http_4xx
-          delay: '0'
-          history: 7d
-          description: |
-            The number of HTTP 4XX client error codes that originate from the load balancer.
-            This count does not include response codes generated by targets.
-            
-            Client errors are generated when requests are malformed or incomplete.
-            These requests were not received by the target, other than in the case where the load balancer returns an HTTP 460 error code.
-            This count does not include any response codes generated by the targets.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_4XX_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 4xx
-          triggers:
-            - uuid: 922bd3ab505b420984c93dfdfc417a56
-              expression: 'min(/AWS ELB Application Load Balancer by HTTP/aws.elb.http_4xx,5m)>{$AWS.HTTP.4XX.FAIL.MAX.WARN}'
-              name: 'AWS ALB: Too many HTTP 4XX error codes'
-              event_name: 'AWS ALB: Too many HTTP 4XX error codes (over {$AWS.HTTP.4XX.FAIL.MAX.WARN} for 5m)'''
-              priority: WARNING
-              description: '"Too many requests failed with HTTP 4XX code"'
-              tags:
-                - tag: scope
-                  value: availability
-        - uuid: 6395ef49a60546ec8d3ce117867cbb43
-          name: 'AWS ALB: ELB HTTP 5XX'
-          type: DEPENDENT
-          key: aws.elb.http_5xx
-          delay: '0'
-          history: 7d
-          description: |
-            The number of HTTP 5XX server error codes that originate from the load balancer.
-            This count does not include any response codes generated by the targets.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_5XX_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 5xx
-          triggers:
-            - uuid: 883fc396e7da4806943cd70688c057a3
-              expression: 'min(/AWS ELB Application Load Balancer by HTTP/aws.elb.http_5xx,5m)>{$AWS.HTTP.5XX.FAIL.MAX.WARN}'
-              name: 'AWS ALB: Too many HTTP 5XX error codes'
-              event_name: 'AWS ALB: Too many HTTP 5XX error codes (over {$AWS.HTTP.5XX.FAIL.MAX.WARN} for 5m)'''
-              priority: WARNING
-              description: '"Too many requests failed with HTTP 5XX code"'
-              tags:
-                - tag: scope
-                  value: availability
-        - uuid: 7bf9230aa56b4196b386d23358da75ed
-          name: 'AWS ALB: ELB HTTP 500'
-          type: DEPENDENT
-          key: aws.elb.http_500
-          delay: '0'
-          history: 7d
-          description: 'The number of HTTP 500 error codes that originate from the load balancer.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_500_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 5xx
-            - tag: http-code
-              value: '500'
-        - uuid: f89bee8030774615a132d25a6d1b7a2a
-          name: 'AWS ALB: ELB HTTP 502'
-          type: DEPENDENT
-          key: aws.elb.http_502
-          delay: '0'
-          history: 7d
-          description: 'The number of HTTP 502 error codes that originate from the load balancer.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_502_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 5xx
-            - tag: http-code
-              value: '502'
-        - uuid: bca5eaf0b96c496395ed98e8d4705153
-          name: 'AWS ALB: ELB HTTP 503'
-          type: DEPENDENT
-          key: aws.elb.http_503
-          delay: '0'
-          history: 7d
-          description: 'The number of HTTP 503 error codes that originate from the load balancer.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_503_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 5xx
-            - tag: http-code
-              value: '503'
-        - uuid: 5d1c57a6483c4b84b992f9677f6216c1
-          name: 'AWS ALB: ELB HTTP 504'
-          type: DEPENDENT
-          key: aws.elb.http_504
-          delay: '0'
-          history: 7d
-          description: 'The number of HTTP 504 error codes that originate from the load balancer.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTPCode_ELB_504_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-            - tag: http-code
-              value: 5xx
-            - tag: http-code
-              value: '504'
-        - uuid: 115bdaf06c554f9a8b3a486c28d218cd
-          name: 'AWS ALB: HTTP Fixed Response'
-          type: DEPENDENT
-          key: aws.elb.http_fixed_response
-          delay: '0'
-          history: 7d
-          description: 'The number of fixed-response actions that were successful.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTP_Fixed_Response_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: responses
-        - uuid: 4edc1d8d4eb84832996943ac571afb5f
-          name: 'AWS ALB: HTTP Redirect'
-          type: DEPENDENT
-          key: aws.elb.http_redirect
-          delay: '0'
-          history: 7d
-          description: 'The number of redirect actions that were successful.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTP_Redirect_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-        - uuid: fbf24a4f2110416d973a8f11c8770d98
-          name: 'AWS ALB: HTTP Redirect Url Limit Exceeded'
-          type: DEPENDENT
-          key: aws.elb.http_redirect_url_limit_exceeded
-          delay: '0'
-          history: 7d
-          description: 'The number of redirect actions that couldn''t be completed because the URL in the response location header is larger than 8K Bytes.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "HTTP_Redirect_Url_Limit_Exceeded_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: http
-        - uuid: 7fdd931458ba4fa5b3baff1d67e4a32f
-          name: 'AWS ALB: Get metrics check'
-          type: DEPENDENT
-          key: aws.elb.metrics.check
-          delay: '0'
-          history: 7d
-          trends: '0'
-          value_type: CHAR
-          description: 'Check result of the instance metric data has been got correctly.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.error
-              error_handler: CUSTOM_VALUE
-            - type: DISCARD_UNCHANGED_HEARTBEAT
-              parameters:
-                - 3h
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: status
-          triggers:
-            - uuid: 70282eb6c0c442f9a4f4c49b10f54a4d
-              expression: 'length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.metrics.check))>0'
-              name: 'AWS ALB: Failed to get metrics data'
-              priority: WARNING
-              tags:
-                - tag: scope
-                  value: availability
-        - uuid: 740872a3328e4c12827d8fcd16eb43ea
-          name: 'AWS ALB: New Connection'
-          type: DEPENDENT
-          key: aws.elb.new_connection
-          delay: '0'
-          history: 7d
-          description: 'The total number of new TCP connections established from clients to the load balancer and from the load balancer to targets.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "NewConnectionCount§")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: connections
-        - uuid: 4e3cf684607741e39248929e6b917be7
-          name: 'AWS ALB: Desync Mitigation Mode Non Compliant Request'
-          type: DEPENDENT
-          key: aws.elb.non_compliant_request
-          delay: '0'
-          history: 7d
-          description: 'The number of requests that fail to comply with HTTP protocols.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "DesyncMitigationMode_NonCompliant_Request_Count")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: errors
-        - uuid: 32b5fbc67cec4d739bbd95ba1cd77ab9
-          name: 'AWS ALB: Processed Bytes'
-          type: DEPENDENT
-          key: aws.elb.processed_bytes
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: B
-          description: |
-            The total number of bytes processed by the load balancer over IPv4 and IPv6 (HTTP header and HTTP payload).
-            This count includes traffic to and from clients and Lambda functions, and traffic from an Identity Provider (IdP) if user authentication is enabled.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "ProcessedBytes")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: capacity
-        - uuid: ed3c4ebc1faf43ff9be134ae98aac0e9
-          name: 'AWS ALB: Rejected Connection'
-          type: DEPENDENT
-          key: aws.elb.rejected_Connection
-          delay: '0'
-          history: 7d
-          description: |
-            The total number of bytes processed by the load balancer over IPv4 and IPv6 (HTTP header and HTTP payload).
-            This count includes traffic to and from clients and Lambda functions, and traffic from an Identity Provider (IdP) if user authentication is enabled.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "RejectedConnectionCount")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: connections
-        - uuid: 4b5b059c30ef4f8bb4d11a273d071db1
-          name: 'AWS ALB: Requests'
-          type: DEPENDENT
-          key: aws.elb.requests
-          delay: '0'
-          history: 7d
-          description: |
-            The number of requests processed over IPv4 and IPv6.
-            This metric is only incremented for requests where the load balancer node was able to choose a target.
-            Requests that are rejected before a target is chosen are not reflected in this metric.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "RequestCount")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: requests
-        - uuid: b5105b9e48f4482db42ff948f906be6f
-          name: 'AWS ALB: Rule Evaluations'
-          type: DEPENDENT
-          key: aws.elb.rule_evaluations
-          delay: '0'
-          history: 7d
-          description: 'The number of rules processed by the load balancer given a request rate averaged over an hour.'
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "RuleEvaluations")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: requests
-        - uuid: 09cd066b48544eb7ac818bc6171e3e87
-          name: 'AWS ALB: Target Connection Error'
-          type: DEPENDENT
-          key: aws.elb.target_connection_error
-          delay: '0'
-          history: 7d
-          description: |
-            The number of connections that were not successfully established between the load balancer and target.
-            This metric does not apply if the target is a Lambda function.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "TargetConnectionErrorCount")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: errors
-        - uuid: 560c74f7011b4b9c821dfdf7f8d8e93a
-          name: 'AWS ALB: Target Response Time'
-          type: DEPENDENT
-          key: aws.elb.target_response_time
-          delay: '0'
-          history: 7d
-          value_type: FLOAT
-          units: s
-          description: |
-            The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received.
-            This is equivalent to the target_processing_time field in the access logs.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "TargetResponseTime")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: responses
-        - uuid: 66d56d14553d4de69a63745ab02f2611
-          name: 'AWS ALB: Target TLS Negotiation Error'
-          type: DEPENDENT
-          key: aws.elb.target_tls_negotiation_error
-          delay: '0'
-          history: 7d
-          description: |
-            The number of TLS connections initiated by the load balancer that did not establish a session with the target.
-            Possible causes include a mismatch of ciphers or protocols. This metric does not apply if the target is a Lambda function.
-          preprocessing:
-            - type: JSONPATH
-              parameters:
-                - '$.[?(@.Label == "TargetTLSNegotiationErrorCount")].Values.first().first()'
-              error_handler: DISCARD_VALUE
-          master_item:
-            key: aws.elb.get_metrics
-          tags:
-            - tag: component
-              value: errors
         - uuid: 9b118d348b934146bab54e2df582e2b0
-          name: 'AWS ALB: Get target groups'
+          name: 'AWS ELB ALB: Get target groups'
           type: SCRIPT
-          key: aws_elb_get_target_groups
+          key: aws.elb.alb.get_target_groups
           delay: 0s;m/30
           history: '0'
           trends: '0'
@@ -1140,6 +721,7 @@ zabbix_export:
           params: |
             var AWS = {
             	params: {},
+            	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
             
             	getField: function (data, path) {
             		var steps = path.split('.');
@@ -1164,13 +746,13 @@ zabbix_export:
             				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
             					request.setProxy(AWS.params.proxy);
             				}
-            				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+            				var IamRoleName = request.get(AWS.metadata);
             
             				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
             					throw 'Error getting security credentials from instance metadata. Role not found.';
             				}
             
-            				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+            				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
             
             				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
             					throw 'Error getting security credentials from instance metadata.';
@@ -1239,12 +821,9 @@ zabbix_export:
             		return result.join('&');
             	},
             
-            	request: function (method, region, service, params) {
+            	request: function (method, region, service, params, data) {
             		if (typeof data === 'undefined' || data === null) {
-            			data = '';
-            		}
-            		else {
-            			data = JSON.stringify(data)
+            			data = JSON.stringify([]);
             		}
             		var amzdate = (new Date()).toISOString().replace(/\.\d+Z/, 'Z').replace(/[-:]/g, ''),
             			date = amzdate.replace(/T\d+Z/, ''),
@@ -1301,7 +880,7 @@ zabbix_export:
             				'Version': '2015-12-01',
             
             			};
-            		targets = AWS.getField(AWS.request('GET', AWS.params.region, 'elasticloadbalancing', AWS.prepareParams(payload)), 'DescribeTargetGroupsResponse.DescribeTargetGroupsResult.TargetGroups');
+            		targets = AWS.getField(AWS.request('GET', AWS.params.region, 'elasticloadbalancing', AWS.prepareParams(payload), ''), 'DescribeTargetGroupsResponse.DescribeTargetGroupsResult.TargetGroups');
             
             		if (!Array.isArray(targets))
             			targets = [targets]
@@ -1356,11 +935,436 @@ zabbix_export:
           tags:
             - tag: component
               value: raw
+        - uuid: eabcf1ef1514451087d08d739cf55d94
+          name: 'AWS ELB ALB: ELB HTTP 3XX Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_3xx_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of HTTP 3XX redirection codes that originate from the load balancer.
+            This count does not include response codes generated by targets.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_3XX_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 3xx
+        - uuid: c714c1f2185b4b0b8b86e3ad336d7888
+          name: 'AWS ELB ALB: ELB HTTP 4XX Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_4xx_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of HTTP 4XX client error codes that originate from the load balancer.
+            This count does not include response codes generated by targets.
+            
+            Client errors are generated when requests are malformed or incomplete.
+            These requests were not received by the target, other than in the case where the load balancer returns an HTTP 460 error code.
+            This count does not include any response codes generated by the targets.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_4XX_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 4xx
+          triggers:
+            - uuid: 922bd3ab505b420984c93dfdfc417a56
+              expression: 'min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_4xx_count,5m)>{$AWS.HTTP.4XX.FAIL.MAX.WARN}'
+              name: 'AWS ELB ALB: Too many HTTP 4XX error codes'
+              event_name: 'AWS ELB ALB: Too many HTTP 4XX error codes (over {$AWS.HTTP.4XX.FAIL.MAX.WARN} for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Too many requests failed with HTTP 4XX code.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 6395ef49a60546ec8d3ce117867cbb43
+          name: 'AWS ELB ALB: ELB HTTP 5XX Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_5xx_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of HTTP 5XX server error codes that originate from the load balancer.
+            This count does not include any response codes generated by the targets.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_5XX_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 5xx
+          triggers:
+            - uuid: 883fc396e7da4806943cd70688c057a3
+              expression: 'min(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.http_5xx_count,5m)>{$AWS.HTTP.5XX.FAIL.MAX.WARN}'
+              name: 'AWS ELB ALB: Too many HTTP 5XX error codes'
+              event_name: 'AWS ELB ALB: Too many HTTP 5XX error codes (over {$AWS.HTTP.5XX.FAIL.MAX.WARN} for 5m)'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Too many requests failed with HTTP 5XX code.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 7bf9230aa56b4196b386d23358da75ed
+          name: 'AWS ELB ALB: ELB HTTP 500 Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_500_count
+          delay: '0'
+          history: 7d
+          description: 'The number of HTTP 500 error codes that originate from the load balancer.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_500_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 5xx
+            - tag: http-code
+              value: '500'
+        - uuid: f89bee8030774615a132d25a6d1b7a2a
+          name: 'AWS ELB ALB: ELB HTTP 502 Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_502_count
+          delay: '0'
+          history: 7d
+          description: 'The number of HTTP 502 error codes that originate from the load balancer.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_502_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 5xx
+            - tag: http-code
+              value: '502'
+        - uuid: bca5eaf0b96c496395ed98e8d4705153
+          name: 'AWS ELB ALB: ELB HTTP 503 Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_503_count
+          delay: '0'
+          history: 7d
+          description: 'The number of HTTP 503 error codes that originate from the load balancer.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_503_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 5xx
+            - tag: http-code
+              value: '503'
+        - uuid: 5d1c57a6483c4b84b992f9677f6216c1
+          name: 'AWS ELB ALB: ELB HTTP 504 Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_504_count
+          delay: '0'
+          history: 7d
+          description: 'The number of HTTP 504 error codes that originate from the load balancer.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTPCode_ELB_504_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+            - tag: http-code
+              value: 5xx
+            - tag: http-code
+              value: '504'
+        - uuid: 115bdaf06c554f9a8b3a486c28d218cd
+          name: 'AWS ELB ALB: HTTP Fixed Response Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_fixed_response_count
+          delay: '0'
+          history: 7d
+          description: 'The number of fixed-response actions that were successful.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTP_Fixed_Response_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: responses
+        - uuid: 4edc1d8d4eb84832996943ac571afb5f
+          name: 'AWS ELB ALB: HTTP Redirect Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_redirect_count
+          delay: '0'
+          history: 7d
+          description: 'The number of redirect actions that were successful.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTP_Redirect_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+        - uuid: fbf24a4f2110416d973a8f11c8770d98
+          name: 'AWS ELB ALB: HTTP Redirect Url Limit Exceeded Count'
+          type: DEPENDENT
+          key: aws.elb.alb.http_redirect_url_limit_exceeded_count
+          delay: '0'
+          history: 7d
+          description: 'The number of redirect actions that couldn''t be completed because the URL in the response location header is larger than 8K Bytes.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "HTTP_Redirect_Url_Limit_Exceeded_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: http
+        - uuid: 7fdd931458ba4fa5b3baff1d67e4a32f
+          name: 'AWS ELB ALB: Get metrics check'
+          type: DEPENDENT
+          key: aws.elb.alb.metrics.check
+          delay: '0'
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: 'Check result of the Application Load Balancer metric data has been got correctly.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.error
+              error_handler: CUSTOM_VALUE
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 3h
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: status
+          triggers:
+            - uuid: 70282eb6c0c442f9a4f4c49b10f54a4d
+              expression: 'length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.metrics.check))>0'
+              name: 'AWS ELB ALB: Failed to get metrics data'
+              event_name: 'AWS ELB ALB: Failed to get CloudWatch metrics for Application Load Balancer'
+              opdata: 'Current value: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'Failed to get CloudWatch metrics for Application Load Balancer.'
+              tags:
+                - tag: scope
+                  value: availability
+        - uuid: 740872a3328e4c12827d8fcd16eb43ea
+          name: 'AWS ELB ALB: New Connection Count'
+          type: DEPENDENT
+          key: aws.elb.alb.new_connection_count
+          delay: '0'
+          history: 7d
+          description: 'The total number of new TCP connections established from clients to the load balancer and from the load balancer to targets.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "NewConnectionCount§")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: connections
+        - uuid: 4e3cf684607741e39248929e6b917be7
+          name: 'AWS ELB ALB: Desync Mitigation Mode Non Compliant Request Count'
+          type: DEPENDENT
+          key: aws.elb.alb.non_compliant_request_count
+          delay: '0'
+          history: 7d
+          description: 'The number of requests that fail to comply with HTTP protocols.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "DesyncMitigationMode_NonCompliant_Request_Count")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: errors
+        - uuid: 32b5fbc67cec4d739bbd95ba1cd77ab9
+          name: 'AWS ELB ALB: Processed Bytes'
+          type: DEPENDENT
+          key: aws.elb.alb.processed_bytes
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: B
+          description: |
+            The total number of bytes processed by the load balancer over IPv4 and IPv6 (HTTP header and HTTP payload).
+            This count includes traffic to and from clients and Lambda functions, and traffic from an Identity Provider (IdP) if user authentication is enabled.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ProcessedBytes")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: capacity
+        - uuid: ed3c4ebc1faf43ff9be134ae98aac0e9
+          name: 'AWS ELB ALB: Rejected Connection Count'
+          type: DEPENDENT
+          key: aws.elb.alb.rejected_connection_count
+          delay: '0'
+          history: 7d
+          description: 'The number of connections that were rejected because the load balancer had reached its maximum number of connections.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "RejectedConnectionCount")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: connections
+        - uuid: 4b5b059c30ef4f8bb4d11a273d071db1
+          name: 'AWS ELB ALB: Requests Count'
+          type: DEPENDENT
+          key: aws.elb.alb.requests_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of requests processed over IPv4 and IPv6.
+            This metric is only incremented for requests where the load balancer node was able to choose a target.
+            Requests that are rejected before a target is chosen are not reflected in this metric.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "RequestCount")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: requests
+        - uuid: b5105b9e48f4482db42ff948f906be6f
+          name: 'AWS ELB ALB: Rule Evaluations'
+          type: DEPENDENT
+          key: aws.elb.alb.rule_evaluations
+          delay: '0'
+          history: 7d
+          description: 'The number of rules processed by the load balancer given a request rate averaged over an hour.'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "RuleEvaluations")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: requests
+        - uuid: 09cd066b48544eb7ac818bc6171e3e87
+          name: 'AWS ELB ALB: Target Connection Error Count'
+          type: DEPENDENT
+          key: aws.elb.alb.target_connection_error_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of connections that were not successfully established between the load balancer and target.
+            This metric does not apply if the target is a Lambda function.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "TargetConnectionErrorCount")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: errors
+        - uuid: 560c74f7011b4b9c821dfdf7f8d8e93a
+          name: 'AWS ELB ALB: Target Response Time'
+          type: DEPENDENT
+          key: aws.elb.alb.target_response_time
+          delay: '0'
+          history: 7d
+          value_type: FLOAT
+          units: s
+          description: |
+            The time elapsed, in seconds, after the request leaves the load balancer until a response from the target is received.
+            This is equivalent to the target_processing_time field in the access logs.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "TargetResponseTime")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: responses
+        - uuid: 66d56d14553d4de69a63745ab02f2611
+          name: 'AWS ELB ALB: Target TLS Negotiation Error Count'
+          type: DEPENDENT
+          key: aws.elb.alb.target_tls_negotiation_error_count
+          delay: '0'
+          history: 7d
+          description: |
+            The number of TLS connections initiated by the load balancer that did not establish a session with the target.
+            Possible causes include a mismatch of ciphers or protocols. This metric does not apply if the target is a Lambda function.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "TargetTLSNegotiationErrorCount")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: errors
       discovery_rules:
         - uuid: 065ef42ebea5448896db5fcc5baa2f81
-          name: 'ALB alarms discovery'
+          name: 'Load Balancer alarms discovery'
           type: DEPENDENT
-          key: aws.alb.alarms.discovery
+          key: aws.elb.alb.alarms.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -1382,9 +1386,9 @@ zabbix_export:
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: fca522690827426bb63f93e90d98aa54
-              name: 'AWS ALB Alarms: ["{#ALARM_NAME}"]: Get metrics'
+              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"]: Get metrics'
               type: DEPENDENT
-              key: 'aws.alb.alarm.get_metrics["{#ALARM_NAME}"]'
+              key: 'aws.elb.alb.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
               history: '0'
               trends: '0'
@@ -1396,14 +1400,14 @@ zabbix_export:
                     - '$.[?(@.AlarmName == "{#ALARM_NAME}")].first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: aws.alb.get_alarms
+                key: aws.elb.alb.get_alarms
               tags:
                 - tag: component
                   value: raw
             - uuid: 3ef62eb9b0824f8ea3c2c1e8e15ce1fd
-              name: 'AWS ALB Alarms: ["{#ALARM_NAME}"]: State'
+              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"]: State'
               type: DEPENDENT
-              key: 'aws.alb.alarm.state["{#ALARM_NAME}"]'
+              key: 'aws.elb.alb.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
               history: 7d
               description: |
@@ -1425,22 +1429,25 @@ zabbix_export:
                       
                       return state.indexOf(value.trim()) === -1 ? 255 : state.indexOf(value.trim());
               master_item:
-                key: 'aws.alb.alarm.get_metrics["{#ALARM_NAME}"]'
+                key: 'aws.elb.alb.alarm.get_metrics["{#ALARM_NAME}"]'
               tags:
                 - tag: component
                   value: alarms
               trigger_prototypes:
                 - uuid: b8bbc96a20bc4ab393d1fa76a3cf5254
-                  expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.alb.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS ALB Alarms: "{#ALARM_NAME}" has ''Insufficient data'' state'
+                  expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=1'
+                  name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Insufficient data'' state'
+                  event_name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Insufficient data'' state'
+                  opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
+                  description: 'The alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 8839a61a10f7453ebfdcae0ef16eb37c
-              name: 'AWS ALB Alarms: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"]: State reason'
               type: DEPENDENT
-              key: 'aws.alb.alarm.state_reason["{#ALARM_NAME}"]'
+              key: 'aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
               history: 7d
               trends: '0'
@@ -1458,14 +1465,16 @@ zabbix_export:
                   parameters:
                     - 3h
               master_item:
-                key: 'aws.alb.alarm.get_metrics["{#ALARM_NAME}"]'
+                key: 'aws.elb.alb.alarm.get_metrics["{#ALARM_NAME}"]'
               tags:
                 - tag: component
                   value: alarms
           trigger_prototypes:
             - uuid: a1b8587c80dd41ef8b185cf62e563bcb
-              expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.alb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Application Load Balancer by HTTP/aws.alb.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS ALB Alarms: "{#ALARM_NAME}" has ''Alarm'' state'
+              expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]))>0'
+              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Alarm'' state'
+              event_name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
+              opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -1474,7 +1483,7 @@ zabbix_export:
                 - tag: scope
                   value: availability
           master_item:
-            key: aws.alb.get_alarms
+            key: aws.elb.alb.get_alarms
           preprocessing:
             - type: JAVASCRIPT
               parameters:
@@ -1500,7 +1509,7 @@ zabbix_export:
         - uuid: 1002081ffffd40828ff5419c50bc16d5
           name: 'Target groups discovery'
           type: DEPENDENT
-          key: aws.elb.target_groups.discovery
+          key: aws.elb.alb.target_groups.discovery
           delay: '0'
           filter:
             evaltype: AND
@@ -1515,9 +1524,9 @@ zabbix_export:
           description: 'Discovery {$AWS.ELB.TARGET.GROUP.NAME} target groups.'
           item_prototypes:
             - uuid: 21d1830526e14fb99b2288d79747d472
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Anomalous Host'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Anomalous Host Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.anomalous_host["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.anomalous_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of hosts detected with anomalies.'
@@ -1527,7 +1536,7 @@ zabbix_export:
                     - '$.[?(@.Label == "AnomalousHostCount")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: target-groups
@@ -1538,9 +1547,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 306971d2e8fb441d8ae4a658b26304c3
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Get metrics'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Get metrics'
               type: SCRIPT
-              key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: 0s;m/5
               history: '0'
               trends: '0'
@@ -1548,6 +1557,7 @@ zabbix_export:
               params: |
                 var AWS = {
                 	params: {},
+                	metadata: 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
                 	request_period: 60,
                 
                 	getField: function (data, path) {
@@ -1573,13 +1583,13 @@ zabbix_export:
                 				if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
                 					request.setProxy(AWS.params.proxy);
                 				}
-                				var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                				var IamRoleName = request.get(AWS.metadata);
                 
                 				if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                 					throw 'Error getting security credentials from instance metadata. Role not found.';
                 				}
                 
-                				credentials = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' + encodeURI(IamRoleName));
+                				credentials = request.get(AWS.metadata + '/' + encodeURI(IamRoleName));
                 
                 				if (request.getStatus() !== 200 || credentials === null || credentials === '') {
                 					throw 'Error getting security credentials from instance metadata.';
@@ -1609,7 +1619,7 @@ zabbix_export:
                 					AWS.params[field] = params[field];
                 				});
                 		}
-                		['region', 'arn','target_arn'].forEach(function (field) {
+                		['region', 'arn', 'target_arn'].forEach(function (field) {
                 			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
                 				throw 'Required param is not set: "' + field + '".';
                 			}
@@ -1698,7 +1708,7 @@ zabbix_export:
                 
                 	request: function (method, region, service, data) {
                 		if (typeof data === 'undefined' || data === null) {
-                			data = '';
+                			data = JSON.stringify([]);
                 		}
                 		else {
                 			data = JSON.stringify(data)
@@ -1813,9 +1823,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: e4cd95136bb04981b15a508aa73f5723
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.healthy_host["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of targets that are considered healthy.'
@@ -1825,7 +1835,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HealthyHostCount")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: health
@@ -1838,9 +1848,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: b96ad1d2f5064cc99c49eeec3801418e
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of zones that meet the DNS healthy state requirements.'
@@ -1850,7 +1860,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HealthyStateDNS")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: health
@@ -1863,9 +1873,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 030c4fe8b7f44bf3a290b1b5da9319d8
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of zones that meet the routing healthy state requirements.'
@@ -1875,7 +1885,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HealthyStateRouting")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: health
@@ -1888,13 +1898,13 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: fa9da54b4feb4fc79fbf74c491eb23ba
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 2XX'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 2XX Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.http_2xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.http_2xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: |
-                The number of HTTP response codes generated by the targets.
+                The number of HTTP response 2XX codes generated by the targets.
                 This does not include any response codes generated by the load balancer.
               preprocessing:
                 - type: JSONPATH
@@ -1902,7 +1912,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HTTPCode_Target_2XX_Count")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: http
@@ -1917,13 +1927,13 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 50e78304f9e74019b7e06310d6dd2e6f
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 3XX'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 3XX Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.http_3xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.http_3xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: |
-                The number of HTTP response codes generated by the targets.
+                The number of HTTP response 3XX codes generated by the targets.
                 This does not include any response codes generated by the load balancer.
               preprocessing:
                 - type: JSONPATH
@@ -1931,7 +1941,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HTTPCode_Target_3XX_Count")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: http
@@ -1946,13 +1956,13 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: ec7b92c79c6f441cadb8994b906753f4
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 4XX'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 4XX Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.http_4xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.http_4xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: |
-                The number of HTTP response codes generated by the targets.
+                The number of HTTP response 4XX codes generated by the targets.
                 This does not include any response codes generated by the load balancer.
               preprocessing:
                 - type: JSONPATH
@@ -1960,7 +1970,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HTTPCode_Target_4XX_Count")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: http
@@ -1975,13 +1985,13 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: c9e61f9d2f12496d90693a83cb829b66
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 5XX'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 5XX Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.http_5xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.http_5xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: |
-                The number of HTTP response codes generated by the targets.
+                The number of HTTP response 5XX codes generated by the targets.
                 This does not include any response codes generated by the load balancer.
               preprocessing:
                 - type: JSONPATH
@@ -1989,7 +1999,7 @@ zabbix_export:
                     - '$.[?(@.Label == "HTTPCode_Target_5XX_Count")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: http
@@ -2004,9 +2014,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 0ad4d9a933944c7d979da411d24b165e
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Mitigated Host'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Mitigated Host Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.mitigated_host["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.mitigated_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of targets under mitigation.'
@@ -2016,7 +2026,7 @@ zabbix_export:
                     - '$.[?(@.Label == "MitigatedHostCount")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: target-groups
@@ -2027,9 +2037,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 31a579ac8de9402bae3a3668779ec6c5
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Request Count Per Target'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Request Count Per Target'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.request["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.request["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: |
@@ -2041,7 +2051,7 @@ zabbix_export:
                     - '$.[?(@.Label == "RequestCountPerTarget")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: requests
@@ -2054,9 +2064,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: c158172738084d38aec424505a7a86a5
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.unhealthy_host["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of targets that are considered unhealthy.'
@@ -2066,7 +2076,7 @@ zabbix_export:
                     - '$.[?(@.Label == "UnHealthyHostCount")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: health
@@ -2079,9 +2089,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 9fea4b63067445d98d29de566d50b0a4
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Routing Request'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Routing Request Count'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.unhealthy_routing_request["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.unhealthy_routing_request_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The average request count per target, in a target group.'
@@ -2091,7 +2101,7 @@ zabbix_export:
                     - '$.[?(@.Label == "UnhealthyRoutingRequestCount")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: requests
@@ -2104,9 +2114,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: f050e9610eb64251b55e843fc5eb5876
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State DNS'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State DNS'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of zones that do not meet the DNS healthy state requirements and therefore were marked unhealthy in DNS.'
@@ -2116,7 +2126,7 @@ zabbix_export:
                     - '$.[?(@.Label == "UnhealthyStateDNS")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: health
@@ -2129,9 +2139,9 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 2a446451893e4f70a0d4ac4b1bb969fb
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
               type: DEPENDENT
-              key: 'aws.elb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+              key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
               history: 7d
               description: 'The number of zones that do not meet the routing healthy state requirements, and therefore the load balancer distributes traffic to all targets in the zone, including the unhealthy targets.'
@@ -2141,7 +2151,7 @@ zabbix_export:
                     - '$.[?(@.Label == "UnhealthyStateRouting")].Values.first().first()'
                   error_handler: DISCARD_VALUE
               master_item:
-                key: 'aws.elb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               tags:
                 - tag: component
                   value: health
@@ -2155,81 +2165,81 @@ zabbix_export:
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
           graph_prototypes:
             - uuid: f426eff334d449ff9ec0a2ff8f6ee103
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.healthy_host["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: f6f8d317322a420ab4e0025b3b284a98
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: 40922ff1845141c7a2488fe24debeae0
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: a2668f5bf6a240a296b047c1b979f9dc
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: FF0000
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.unhealthy_host["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: 54645b74585c4b45a971c13d1127698d
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]:  Unhealthy State DNS'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]:  Unhealthy State DNS'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: FF0000
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: 8da12e20218e4367968b8fcf0f56991a
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: FF0000
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: ec38c670cabf422ea79f41866c90ee66
-              name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"] HTTP Code Target Group'
+              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"] HTTP Code Target Group'
               graph_items:
                 - drawtype: BOLD_LINE
                   color: 199C0D
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.http_2xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.http_2xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
                 - sortorder: '1'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.http_3xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.http_3xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
                 - sortorder: '2'
                   drawtype: BOLD_LINE
                   color: 00611C
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.http_4xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.http_4xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
                 - sortorder: '3'
                   drawtype: BOLD_LINE
                   color: F7941D
                   item:
                     host: 'AWS ELB Application Load Balancer by HTTP'
-                    key: 'aws.elb.target_groups.http_5xx["{#AWS.ELB.TARGET.GROUP.NAME}"]'
+                    key: 'aws.elb.alb.target_groups.http_5xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
           master_item:
-            key: aws_elb_get_target_groups
+            key: aws.elb.alb.get_target_groups
           lld_macro_paths:
             - lld_macro: '{#AWS.ELB.TARGET.GROUP.ARN}'
               path: $.target_arn
@@ -2298,7 +2308,7 @@ zabbix_export:
         - uuid: 1020fa347dd24a2ba4091528e63639d4
           name: 'Overview AWS ELB Application Load Balancer'
           pages:
-            - name: 'AWS ALB: Metrics'
+            - name: 'AWS ELB ALB: Metrics'
               widgets:
                 - type: GRAPH_CLASSIC
                   width: '24'
@@ -2308,7 +2318,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB: HTTP Code'
+                        name: 'AWS ELB ALB: HTTP Code'
                 - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '24'
@@ -2318,7 +2328,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB: Connection Count'
+                        name: 'AWS ELB ALB: Connection Count'
                 - type: GRAPH_CLASSIC
                   'y': '10'
                   width: '24'
@@ -2328,7 +2338,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB: Requests Count and Response Time'
+                        name: 'AWS ELB ALB: Requests Count and Response Time'
                 - type: GRAPH_CLASSIC
                   'y': '15'
                   width: '24'
@@ -2338,8 +2348,8 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB: Consumed LCUs and Processed Bytes'
-            - name: 'AWS ALB Target Groups: Metrics'
+                        name: 'AWS ELB ALB: Consumed LCUs and Processed Bytes'
+            - name: 'AWS ELB ALB Target Groups: Metrics'
               widgets:
                 - type: GRAPH_PROTOTYPE
                   width: '12'
@@ -2352,7 +2362,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -2365,7 +2375,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -2378,7 +2388,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -2391,7 +2401,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"] HTTP Code Target Group'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"] HTTP Code Target Group'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -2404,7 +2414,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -2418,7 +2428,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -2432,7 +2442,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]:  Unhealthy State DNS'
+                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]:  Unhealthy State DNS'
       valuemaps:
         - uuid: 4bb749152d5d452ead36c5a98c3cac16
           name: 'Alarm state'
@@ -2447,78 +2457,78 @@ zabbix_export:
               newvalue: Unknown
   graphs:
     - uuid: b19f7d65ad1d469d8396b03111d38e52
-      name: 'AWS ALB: Connection Count'
+      name: 'AWS ELB ALB: Connection Count'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.active_connection
+            key: aws.elb.alb.active_connection_count
         - sortorder: '1'
           drawtype: BOLD_LINE
           color: F63100
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.new_connection
+            key: aws.elb.alb.new_connection_count
         - sortorder: '2'
           drawtype: BOLD_LINE
           color: 00611C
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.rejected_Connection
+            key: aws.elb.alb.rejected_connection_count
         - sortorder: '3'
           drawtype: BOLD_LINE
           color: F7941D
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.target_connection_error
+            key: aws.elb.alb.target_connection_error_count
     - uuid: fb034590cbc34b0aa297b77c1f320684
-      name: 'AWS ALB: Consumed LCUs and Processed Bytes'
+      name: 'AWS ELB ALB: Consumed LCUs and Processed Bytes'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.capacity_units
+            key: aws.elb.alb.capacity_units
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: F63100
           yaxisside: RIGHT
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.processed_bytes
+            key: aws.elb.alb.processed_bytes
     - uuid: a711d08edbd04abe890ab2b8cdf6d41b
-      name: 'AWS ALB: HTTP Code'
+      name: 'AWS ELB ALB: HTTP Code'
       graph_items:
         - drawtype: BOLD_LINE
           color: 199C0D
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.http_3xx
+            key: aws.elb.alb.http_3xx_count
         - sortorder: '1'
           drawtype: BOLD_LINE
           color: F63100
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.http_4xx
+            key: aws.elb.alb.http_4xx_count
         - sortorder: '2'
           drawtype: BOLD_LINE
           color: 00611C
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.http_5xx
+            key: aws.elb.alb.http_5xx_count
     - uuid: 4ee7ac4174b74f869e04dab5d76219ab
-      name: 'AWS ALB: Requests Count and Response Time'
+      name: 'AWS ELB ALB: Requests Count and Response Time'
       graph_items:
         - drawtype: GRADIENT_LINE
           color: 199C0D
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.requests
+            key: aws.elb.alb.requests_count
         - sortorder: '1'
           drawtype: GRADIENT_LINE
           color: F63100
           yaxisside: RIGHT
           item:
             host: 'AWS ELB Application Load Balancer by HTTP'
-            key: aws.elb.target_response_time
+            key: aws.elb.alb.target_response_time
