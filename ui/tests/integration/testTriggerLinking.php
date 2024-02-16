@@ -342,7 +342,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
 			$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3", $ep);
 
-			$i=$+2;
+			$i=$i+2;
 			if ($i == $totalExpectedTriggers-1)
 			{
 				$i = 0;
