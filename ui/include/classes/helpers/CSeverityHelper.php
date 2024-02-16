@@ -33,17 +33,17 @@ class CSeverityHelper {
 			case ZBX_SEVERITY_OK:
 				return _('OK');
 			case TRIGGER_SEVERITY_NOT_CLASSIFIED:
-				return _(CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_NAME_0));
+				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_0));
 			case TRIGGER_SEVERITY_INFORMATION:
-				return _(CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_NAME_1));
+				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_1));
 			case TRIGGER_SEVERITY_WARNING:
-				return _(CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_NAME_2));
+				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_2));
 			case TRIGGER_SEVERITY_AVERAGE:
-				return _(CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_NAME_3));
+				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_3));
 			case TRIGGER_SEVERITY_HIGH:
-				return _(CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_NAME_4));
+				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_4));
 			case TRIGGER_SEVERITY_DISASTER:
-				return _(CSettingsHelper::getPublic(CSettingsHelper::SEVERITY_NAME_5));
+				return _(CSettingsHelper::get(CSettingsHelper::SEVERITY_NAME_5));
 			default:
 				return _('Unknown');
 		}
