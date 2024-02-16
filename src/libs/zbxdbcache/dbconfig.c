@@ -450,10 +450,8 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 	return ptr;
 }
 
-void	*DCinsert_id_uniq(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
+void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size)
 {
-	*found = 0;
-
 	return zbx_hashset_insert_ext(hashset, &id, size, 0, ZBX_UNIQ_ENTRY);
 }
 
@@ -2731,7 +2729,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
-	int			found, update_index, ret, i,  old_nextcheck, row_num, clean_sync = 0;
+	int			found, update_index, ret, i,  old_nextcheck, clean_sync = 0;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 
@@ -2743,7 +2741,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	if (0 == config->items.num_slots)
 	{
-		row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_db_get_row_num(sync->dbresult);
 
 		zbx_hashset_reserve(&config->items, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->items_hk, MAX(row_num, 100));
@@ -2768,7 +2766,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		}
 
 		if (1 == clean_sync)
-			item = (ZBX_DC_ITEM *)DCinsert_id_uniq(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+		{
+			found = 0;
+			item = (ZBX_DC_ITEM *)DCinsert_id(&config->items, itemid, sizeof(ZBX_DC_ITEM));
+		}
 		else
 			item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
