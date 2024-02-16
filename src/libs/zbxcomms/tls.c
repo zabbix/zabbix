@@ -17,8 +17,9 @@
 ** Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 **/
 
-#include "zbxcommon.h"
+
 #include "zbxcomms.h"
+#include "zbxcommon.h"
 
 #include "comms.h"
 #include "tls.h"
