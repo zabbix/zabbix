@@ -60,6 +60,7 @@ class testTriggerLinking extends CIntegrationTest {
 	private static $stringids = array();
 	//private static $triggerids_deps = array();
 	//private static $triggers_same_descr_mapping_to_id = array();
+	private static $templateX_ID;
 
 	public function createTemplates() {
 
@@ -77,6 +78,19 @@ class testTriggerLinking extends CIntegrationTest {
 
 			array_push(self::$templateids, $response['result']['templateids'][0]);
 		}
+
+
+		$response = $this->call('template.create', [
+				'host' => "templateX",
+				'groups' => [
+					'groupid' => 1
+				]]);
+			$ep = json_encode($response, JSON_PRETTY_PRINT);
+
+			$this->assertArrayHasKey('templateids', $response['result'], $ep);
+			$this->assertArrayHasKey(0, $response['result']['templateids'], $ep);
+
+			self::$templateX_ID = $response['result']['templateids'][0];
 	}
 
 	public function setupActions()
@@ -113,7 +127,15 @@ class testTriggerLinking extends CIntegrationTest {
 					'optemplate' =>
 					$templateids_for_api_call
 				]
+			],
+			'operations' => [
+				[
+					'operationtype' => 6,
+					'optemplate' =>
+					$templateid_X
+				]
 			]
+
 		]
 		);
 
@@ -222,6 +244,42 @@ class testTriggerLinking extends CIntegrationTest {
 			//self::$triggerids_deps[$response_2['result']['triggerids'][0]] = $response['result']['triggerids'][0];
 			//self::$triggers_same_descr_mapping_to_id[$response_2['result']['triggerids'][0]] = $i;
 		}
+
+
+		/////////////////////////////////////////////
+		$response = $this->call('item.create', [
+				'hostid' => $templateX_ID,
+				'name' => "templateX_item_name",
+				'key_' => "templateX_item_key",
+				'type' => ITEM_TYPE_TRAPPER,
+				'value_type' => ITEM_VALUE_TYPE_UINT64
+			]);
+
+		$this->assertArrayHasKey('itemids', $response['result']);
+		$this->assertEquals(1, count($response['result']['itemids']));
+
+		$response = $this->call('trigger.create', [
+				'description' =>  self::TRIGGER_DESCRIPTION_SAME_ALL,
+				'priority' => self::TRIGGER_PRIORITY,
+				'status' => self::TRIGGER_STATUS,,
+				'type' => self::TRIGGER_TYPE,
+				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
+				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
+				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
+				'expression' => 'last(/' . "templateX_ID" . '/' .
+				"templateX_item_key" . ')=2',
+				'recovery_expression' => 'last(/' . "templateX_ID" . '/' .
+				"templateX_item_key" . ')=3',
+				'tags' => [
+					[
+						'tag' => "templateX_tag",
+						'value' => "templateX_value"
+					]
+				]
+			]);
+
+		$this->assertArrayHasKey('triggerids', $response['result']);
+		$this->assertArrayHasKey(0, $response['result']['triggerids']);
 
 		$this->setupActions();
 
