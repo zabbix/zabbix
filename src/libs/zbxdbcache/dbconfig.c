@@ -2959,31 +2959,38 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item->numitem = NULL;
 		}
 
-		int	found_type = found;
+		int	found_type;
 
-		if (1 == found && last_type != item->type)
+		if (1 == found)
 		{
-			if (ITEM_TYPE_SNMP == last_type)
+			if (last_type != item->type)
 			{
-				/* remove SNMP parameters for non-SNMP item */
-
-				zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
-
-				__config_mem_free_func(item->itemtype.snmpitem);
 				found_type = 0;
-			}
-			else if (ITEM_TYPE_CALCULATED == last_type)
-			{
-				/* remove calculated item parameters */
 
-				if (NULL != item->itemtype.calcitem->formula_bin)
-					__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
-				zbx_strpool_release(item->itemtype.calcitem->params);
+				if (ITEM_TYPE_SNMP == last_type)
+				{
+					/* remove SNMP parameters for non-SNMP item */
 
-				__config_mem_free_func(item->itemtype.calcitem);
-				found_type = 0;
+					zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
+
+					__config_mem_free_func(item->itemtype.snmpitem);
+				}
+				else if (ITEM_TYPE_CALCULATED == last_type)
+				{
+					/* remove calculated item parameters */
+
+					if (NULL != item->itemtype.calcitem->formula_bin)
+						__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+					zbx_strpool_release(item->itemtype.calcitem->params);
+
+					__config_mem_free_func(item->itemtype.calcitem);
+				}
 			}
+			else
+				found_type = 1;
 		}
+		else
+			found_type = 0;
 
 		/* SNMP items */
 		if (ITEM_TYPE_SNMP == item->type)
