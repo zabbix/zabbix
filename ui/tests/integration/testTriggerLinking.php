@@ -261,7 +261,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('trigger.create', [
 				'description' =>  self::TRIGGER_DESCRIPTION_SAME_ALL,
 				'priority' => self::TRIGGER_PRIORITY,
-				'status' => self::TRIGGER_STATUS,,
+				'status' => self::TRIGGER_STATUS,
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
