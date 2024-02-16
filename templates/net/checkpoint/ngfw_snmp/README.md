@@ -31,19 +31,13 @@ Refer to the vendor documentation.
 |{$ICMP_LOSS_WARN}|<p>Threshold of ICMP packets loss for warning trigger in %.</p>|`20`|
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Threshold of average ICMP response time for warning trigger in seconds.</p>|`0.15`|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP availability trigger.</p>|`5m`|
-|{$MEMORY.NAME.MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$MEMORY.NAME.NOT_MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p>|`CHANGE_IF_NEEDED`|
-|{$MEMORY.TYPE.MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level.</p>|`.*(\.2\|hrStorageRam)$`|
-|{$MEMORY.TYPE.NOT_MATCHES}|<p>This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.</p>|`CHANGE_IF_NEEDED`|
 |{$MEMORY.UTIL.MAX}|<p>The warning threshold of the "Physical memory: Memory utilization" item.</p>|`90`|
 |{$VFS.FS.FREE.MIN.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`5G`|
 |{$VFS.FS.FREE.MIN.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`10G`|
 |{$VFS.FS.PUSED.MAX.WARN}|<p>Warning threshold of disk usage for trigger in %.</p>|`80`|
-|{$VFS.FS.PUSED.MAX.CRIT}|<p>Critical threshold of disk disk usage for trigger in %.</p>|`90`|
+|{$VFS.FS.PUSED.MAX.CRIT}|<p>Critical threshold of disk usage for trigger in %.</p>|`90`|
 |{$VFS.FS.FSNAME.MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`.+`|
 |{$VFS.FS.FSNAME.NOT_MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`^(/dev\|/sys\|/run\|/proc\|.+/shm$)`|
-|{$VFS.FS.FSTYPE.MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`.*(\.4\|\.9\|hrStorageFixedDisk\|hrStorageFlashMemory)$`|
-|{$VFS.FS.FSTYPE.NOT_MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$VPN.NAME.MATCHES}|<p>This macro is used in VPN discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$VPN.NAME.NOT_MATCHES}|<p>This macro is used in VPN discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$VPN.STATE.CONTROL}|<p>This macro is used in "Tunnel down" trigger. Can be used with interface name as context.</p>|`1`|
@@ -66,26 +60,42 @@ Refer to the vendor documentation.
 |{$TEMP.VALUE.CRIT}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`75`|
 |{$TEMP.VALUE.WARN}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`65`|
 |{$FW.DROPPED.PACKETS.TH}|<p>This macro is used in Firewall discovery. Can be overridden on the host or linked template level.</p>|`0`|
+|{$SW.NAME.MATCHES}|<p>This macro is used in Software blades discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$SW.NAME.NOT_MATCHES}|<p>This macro is used in Software blades discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$LICENSE.EXPIRY.WARN}|<p>Number of days until the license expires.</p>|`7`|
+|{$LICENSE.CONTROL}|<p>This macro is used in Software blades discovery. Can be used with interface name as context.</p>|`1`|
 
 ### Items
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Check Point: Remote Access users|<p>MIB: CHECKPOINT-MIB</p><p>Number of remote access users.</p>|SNMP agent|remote.users.number[raUsersTable.0]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
-|Check Point: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact[sysContact.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should include the full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|system.descr[sysDescr.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet`, `3rd floor`). If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location[sysLocation.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Check Point: Appliance product name|<p>MIB: CHECKPOINT-MIB</p><p>Appliance Product Name.</p>|SNMP agent|system.hw.model<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Check Point: Appliance serial number|<p>MIB: CHECKPOINT-MIB</p><p>Appliance Serial Number.</p>|SNMP agent|system.hw.serialnumber<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Check Point: Appliance manufacturer|<p>MIB: CHECKPOINT-MIB</p><p>Appliance Manufacturer.</p>|SNMP agent|system.hw.manufacturer<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
+|Check Point: Remote Access users|<p>MIB: CHECKPOINT-MIB</p><p>Number of remote access users.</p>|SNMP agent|remote.users.number<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li></ul>|
+|Check Point: System contact details|<p>MIB: SNMPv2-MIB</p><p>The textual identification of the contact person for this managed node, together with information on how to contact this person. If no contact information is known, the value is the zero-length string.</p>|SNMP agent|system.contact<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Check Point: System description|<p>MIB: SNMPv2-MIB</p><p>A textual description of the entity. This value should include the full name and version identification of the system's hardware type, software operating system, and networking software.</p>|SNMP agent|system.descr<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Check Point: System location|<p>MIB: SNMPv2-MIB</p><p>The physical location of this node (e.g., `telephone closet`, `3rd floor`). If the location is unknown, the value is the zero-length string.</p>|SNMP agent|system.location<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
 |Check Point: System name|<p>MIB: SNMPv2-MIB</p><p>An administratively-assigned name for this managed node. By convention, this is the node's fully-qualified domain name. If the name is unknown, the value is the zero-length string.</p>|SNMP agent|system.name<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</p>|SNMP agent|system.objectid[sysObjectID.0]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
-|Check Point: System uptime|<p>MIB: HOST-RESOURCES-V2-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime[hrSystemUptime.0]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
-|Check Point: Number of CPUs|<p>MIB: HOST-RESOURCES-MIB</p><p>Count the number of CPU cores by counting number of cores. </p>|SNMP agent|system.cpu.num[snmp]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.length()`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
-|Check Point: Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches per second.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Check Point: Interrupts per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of interrupts processed per second.</p>|SNMP agent|system.cpu.intr<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Check Point: System object ID|<p>MIB: SNMPv2-MIB</p><p>The vendor's authoritative identification of the network management subsystem contained in the entity. This value is allocated within the SMI enterprises subtree (1.3.6.1.4.1) and provides an easy and unambiguous means for determining 'what kind of box' is being managed. For example, if vendor 'Flintstones, Inc.' was assigned the subtree 1.3.6.1.4.1.4242, it could assign the identifier 1.3.6.1.4.1.4242.1.1 to its 'Fred Router'.</p>|SNMP agent|system.objectid<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `12h`</p></li></ul>|
+|Check Point: System uptime|<p>MIB: HOST-RESOURCES-V2-MIB</p><p>Time since the network management portion of the system was last re-initialized.</p>|SNMP agent|system.uptime<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `0.01`</p></li></ul>|
+|Check Point: Number of CPUs|<p>MIB: CHECKPOINT-MIB</p><p>Number of processors.</p>|SNMP agent|system.cpu.num<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Check Point: CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU utilization per core in %.</p>|SNMP agent|system.cpu.usage|
 |Check Point: Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The average number of processes being or waiting executed over past 1 minute.</p>|SNMP agent|system.cpu.load.avg1|
 |Check Point: Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The average number of processes being or waiting executed over past 5 minute.</p>|SNMP agent|system.cpu.load.avg5|
 |Check Point: Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The average number of processes being or waiting executed over past 15 minute.</p>|SNMP agent|system.cpu.load.avg15|
-|Check Point: Encrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of encrypted packets per second.</p>|SNMP agent|vpn.packets.encrypted[cpvIpsecEspEncPkts]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
-|Check Point: Decrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of decrypted packets per second.</p>|SNMP agent|vpn.packets.decrypted[cpvIpsecEspDecPkts]<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Check Point: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU has spent running users' processes that are not niced.</p>|SNMP agent|system.cpu.user|
+|Check Point: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
+|Check Point: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
+|Check Point: Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches per second.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Check Point: CPU interrupts per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of interrupts processed per second.</p>|SNMP agent|system.cpu.intr|
+|Check Point: Total memory|<p>MIB: CHECKPOINT-MIB</p><p>Total real memory in bytes. Memory used by applications.</p>|SNMP agent|vm.memory.total|
+|Check Point: Active memory|<p>MIB: CHECKPOINT-MIB</p><p>Active real memory (memory used by applications that is not cached to the disk) in bytes.</p>|SNMP agent|vm.memory.active|
+|Check Point: Free memory|<p>MIB: CHECKPOINT-MIB</p><p>Free memory available for applications in bytes.</p>|SNMP agent|vm.memory.free|
+|Check Point: Used memory|<p>Used real memory calculated by total real memory and free real memory in bytes.</p>|Calculated|vm.memory.used|
+|Check Point: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util|
+|Check Point: Encrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of encrypted packets per second.</p>|SNMP agent|vpn.packets.encrypted<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
+|Check Point: Decrypted packets per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of decrypted packets per second.</p>|SNMP agent|vpn.packets.decrypted<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Check Point: ICMP ping|<p>Host accessibility by ICMP.</p><p>0 - ICMP ping fails.</p><p>1 - ICMP ping successful.</p>|Simple check|icmpping|
 |Check Point: ICMP loss|<p>Percentage of lost packets.</p>|Simple check|icmppingloss|
 |Check Point: ICMP response time|<p>ICMP ping response time (in seconds).</p>|Simple check|icmppingsec|
@@ -97,8 +107,10 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |Check Point: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.name,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.name,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.name))>0`|Info|**Manual close**: Yes|
-|Check Point: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.uptime[hrSystemUptime.0])<10m`|Info|**Manual close**: Yes|
-|Check Point: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num[snmp])>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0 and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0`|Average||
+|Check Point: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
+|Check Point: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.usage,5m)>{$CPU.UTIL.CRIT}`|Warning||
+|Check Point: Load average is too high|<p>The load average per CPU is too high. The system may be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN} and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0 and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0`|Average||
+|Check Point: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Check Point Next Generation Firewall by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}`|Average||
 |Check Point: Unavailable by ICMP ping|<p>Last three attempts returned timeout. Please check device connectivity.</p>|`max(/Check Point Next Generation Firewall by SNMP/icmpping,#3)=0`|High||
 |Check Point: High ICMP ping loss|<p>ICMP packets loss detected.</p>|`min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)>{$ICMP_LOSS_WARN} and min(/Check Point Next Generation Firewall by SNMP/icmppingloss,5m)<100`|Warning|**Depends on**:<br><ul><li>Check Point: Unavailable by ICMP ping</li></ul>|
 |Check Point: High ICMP ping response time|<p>Average ICMP response time is too high.</p>|`avg(/Check Point Next Generation Firewall by SNMP/icmppingsec,5m)>{$ICMP_RESPONSE_TIME_WARN}`|Warning|**Depends on**:<br><ul><li>Check Point: Unavailable by ICMP ping</li><li>Check Point: High ICMP ping loss</li></ul>|
@@ -158,74 +170,43 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |VPN {#VPN.NAME}: Tunnel down|<p>This trigger expression works as follows:<br>1. It can be triggered if the current tunnel state is down.<br>2. {$VPN.STATE.CONTROL:"{#VPN.NAME}"}=1 - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this tunnel is down.</p>|`{$VPN.STATE.CONTROL:"{#VPN.NAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/vpn.tunnel.state[tunnelState.{#SNMPINDEX}])=131`|Average|**Manual close**: Yes|
 
-### LLD rule CPU discovery
+### LLD rule CPU cores discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU discovery|<p>This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That's the only reason why LLD is used.</p>|Dependent item|cpu.discovery<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
+|CPU cores discovery|<p>Discovering CPU cores from CHECKPOINT-MIB.</p>|SNMP agent|cpu.discovery|
 
-### Item prototypes for CPU discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|Check Point: CPU idle time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU system time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU user time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that are not niced.</p>|SNMP agent|system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU steal time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).</p>|SNMP agent|system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU softirq time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been servicing software interrupts.</p>|SNMP agent|system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU nice time|<p>MIB: UCD-SNMP-MIB</p><p>The time the CPU has spent running users' processes that have been niced.</p>|SNMP agent|system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU iowait time|<p>MIB: UCD-SNMP-MIB</p><p>Amount of time the CPU has been waiting for I/O to complete.</p>|SNMP agent|system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU interrupt time|<p>MIB: UCD-SNMP-MIB</p><p>The amount of time the CPU has been servicing hardware interrupts.</p>|SNMP agent|system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU guest time|<p>MIB: UCD-SNMP-MIB</p><p>Guest time (time spent running a virtual CPU for a guest operating system).</p>|SNMP agent|system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU guest nice time|<p>MIB: UCD-SNMP-MIB</p><p>Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).</p>|SNMP agent|system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li>Change per second</li><li><p>JavaScript: `The text is too long. Please see the template.`</p></li></ul>|
-|Check Point: CPU utilization|<p>CPU utilization per core in %.</p>|Dependent item|system.cpu.util[snmp,{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return (100 - value);`</p></li></ul>|
-
-### Trigger prototypes for CPU discovery
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|Check Point: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.util[snmp,{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}`|Warning||
-
-### LLD rule Memory discovery
+### Item prototypes for CPU cores discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Memory discovery|<p>Discovering hrStorage items with memory filter from HOST-RESOURCES-MIB.</p>|SNMP agent|vm.memory.discovery|
-
-### Item prototypes for Memory discovery
-
-|Name|Description|Type|Key and additional info|
-|----|-----------|----|-----------------------|
-|{#MEMNAME}: Total memory|<p>MIB: HOST-RESOURCES-MIB</p><p>The size of the storage represented by this entry, in units of hrStorageAllocationUnits.</p><p>This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.</p><p>For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.</p>|SNMP agent|vm.memory.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `{#ALLOC_UNITS}`</p></li></ul>|
-|{#MEMNAME}: Used memory|<p>MIB: HOST-RESOURCES-MIB</p><p>The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.</p>|SNMP agent|vm.memory.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `{#ALLOC_UNITS}`</p></li></ul>|
-|{#MEMNAME}: Memory utilization|<p>Memory utilization in %.</p>|Calculated|vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]|
-
-### Trigger prototypes for Memory discovery
-
-|Name|Description|Expression|Severity|Dependencies and additional info|
-|----|-----------|----------|--------|--------------------------------|
-|{#MEMNAME}: High memory utilization|<p>The system is running out of free memory.</p>|`min(/Check Point Next Generation Firewall by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}`|Average||
+|CPU Core {#CPU.ID}: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the core has spent running users' processes that are not niced.</p>|SNMP agent|system.core.user[multiProcUserTime.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The time the core has spent running the kernel and its processes.</p>|SNMP agent|system.core.system[multiProcSystemTime.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the core has spent doing nothing.</p>|SNMP agent|system.core.idle[multiProcIdleTime.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU core utilization in %.</p>|SNMP agent|system.core.usage[multiProcUsage.{#CPU.ID}]|
 
 ### LLD rule Storage discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Storage discovery|<p>Discovering hrStorage items with storage filter from HOST-RESOURCES-MIB.</p>|SNMP agent|vfs.fs.discovery|
+|Storage discovery|<p>Discovering storage disks from CHECKPOINT-MIB.</p>|SNMP agent|vfs.fs.discovery|
 
 ### Item prototypes for Storage discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#FSNAME}: Total disk space|<p>Total hard disk capacity.</p>|SNMP agent|vfs.fs.total[hrStorageSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `{#ALLOC_UNITS}`</p></li><li><p>Discard unchanged with heartbeat: `1d`</p></li></ul>|
-|{#FSNAME}: Used disk space|<p>Current hard disk usage.</p>|SNMP agent|vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Custom multiplier: `{#ALLOC_UNITS}`</p></li></ul>|
-|{#FSNAME}: Disk space utilization|<p>The space utilization expressed in % for {#FSNAME}.</p>|Calculated|vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]|
+|{#FSNAME}: Total disk space|<p>MIB: CHECKPOINT-MIB</p><p>Total partition size in bytes.</p>|SNMP agent|vfs.fs.total[multiDiskSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#FSNAME}: Used disk space|<p>MIB: CHECKPOINT-MIB</p><p>Disk used in partition in bytes.</p>|SNMP agent|vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]|
+|{#FSNAME}: Free disk space|<p>MIB: CHECKPOINT-MIB</p><p>Free disk capacity in partition in bytes.</p>|SNMP agent|vfs.fs.free[multiDiskFreeTotalBytes.{#SNMPINDEX}]|
+|{#FSNAME}: Available disk space|<p>MIB: CHECKPOINT-MIB</p><p>Available free disk in partition (not reserved by the OS) in bytes.</p>|SNMP agent|vfs.fs.avail[multiDiskFreeAvailableBytes.{#SNMPINDEX}]|
+|{#FSNAME}: Disk space utilization|<p>The space utilization calculated by free percentage (multiDiskFreeTotalPercent) metric, expressed in %</p>|SNMP agent|vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return 100 - Number(value);`</p></li></ul>|
 
 ### Trigger prototypes for Storage discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FSNAME}: Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.<br></p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)`|Average|**Manual close**: Yes|
-|{#FSNAME}: Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.<br></p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSNAME}: Disk space is critically low</li></ul>|
+|{#FSNAME}: Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)`|Average|**Manual close**: Yes|
+|{#FSNAME}: Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSNAME}: Disk space is critically low</li></ul>|
 
 ### LLD rule Network interfaces discovery
 
@@ -276,20 +257,20 @@ Refer to the vendor documentation.
 |{#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
 |{#SNMPVALUE}: Temperature is too low|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)<{$TEMP.VALUE.LOW:"{#SNMPVALUE}"}`|Average||
 
-### LLD rule FAN Discovery
+### LLD rule FAN discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|FAN Discovery|<p>Discovering FAN sensors from CHECKPOINT-MIB.</p>|SNMP agent|fan.discovery|
+|FAN discovery|<p>Discovering FAN sensors from CHECKPOINT-MIB.</p>|SNMP agent|fan.discovery|
 
-### Item prototypes for FAN Discovery
+### Item prototypes for FAN discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |FAN {#SNMPINDEX}: Fan status|<p>MIB: CHECKPOINT-MIB</p><p>Current status of the Fan tray.</p>|SNMP agent|sensor.fan.status[fanSpeedSensorStatus.{#SNMPINDEX}]|
 |FAN {#SNMPINDEX}: Fan speed|<p>MIB: CHECKPOINT-MIB</p><p>Current speed of the Fan.</p>|SNMP agent|sensor.fan.speed[fanSpeedSensorValue.{#SNMPINDEX}]|
 
-### Trigger prototypes for FAN Discovery
+### Trigger prototypes for FAN discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
@@ -307,23 +288,45 @@ Refer to the vendor documentation.
 |----|-----------|----|-----------------------|
 |{#SNMPVALUE}: Voltage value|<p>MIB: CHECKPOINT-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p>|SNMP agent|sensor.volt.value[voltageSensorValue.{#SNMPINDEX}]|
 
-### LLD rule PSU Discovery
+### LLD rule PSU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|PSU Discovery|<p>Discovering power supply sensors from CHECKPOINT-MIB.</p>|SNMP agent|psu.discovery|
+|PSU discovery|<p>Discovering power supply sensors from CHECKPOINT-MIB.</p>|SNMP agent|psu.discovery|
 
-### Item prototypes for PSU Discovery
+### Item prototypes for PSU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
 |PSU {#SNMPINDEX}: Power supply status|<p>MIB: CHECKPOINT-MIB</p><p>Power supply status.</p>|SNMP agent|sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `The text is too long. Please see the template.`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
-### Trigger prototypes for PSU Discovery
+### Trigger prototypes for PSU discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |PSU {#SNMPINDEX}: Power supply is in down state|<p>Please check the power supply unit for errors.</p>|`count(/Check Point Next Generation Firewall by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq",0)=1`|Average||
+
+### LLD rule Software blades discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|Software blades discovery|<p>Discovering software blades and features from CHECKPOINT-MIB.</p>|SNMP agent|svn.sw.discovery|
+
+### Item prototypes for Software blades discovery
+
+|Name|Description|Type|Key and additional info|
+|----|-----------|----|-----------------------|
+|{#SW.NAME}: License state|<p>MIB: CHECKPOINT-MIB</p><p>Current license state of the "{#SW.NAME}" software blade.</p>|SNMP agent|svn.sw.license.state[licensingState.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#SW.NAME}: License expiration date|<p>MIB: CHECKPOINT-MIB</p><p>Expiration date for the license of the "{#SW.NAME}" software blade.</p><p>(doesn't return value if the license doesn't have an expiration date)</p>|SNMP agent|svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Does not match regular expression: `^0$`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#SW.NAME}: Software blade status|<p>MIB: CHECKPOINT-MIB</p><p>Current "{#SW.NAME}" software blade status.</p>|SNMP agent|svn.sw.status[licensingBladeActive.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|{#SW.NAME}: License total quota|<p>MIB: CHECKPOINT-MIB</p><p>Total quota amount for the license of "{#SW.NAME}" software blade.</p>|SNMP agent|svn.sw.license.quota.total[licensingTotalQuota.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#SW.NAME}: License used quota|<p>MIB: CHECKPOINT-MIB</p><p>Used quota amount for the license of "{#SW.NAME}" software blade.</p>|SNMP agent|svn.sw.license.quota.used[licensingUsedQuota.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+
+### Trigger prototypes for Software blades discovery
+
+|Name|Description|Expression|Severity|Dependencies and additional info|
+|----|-----------|----------|--------|--------------------------------|
+|{#SW.NAME}: License expires soon|<p>This trigger expression works as follows:<br>1. It can be triggered if the license expires soon.<br>2. `{$LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license expires.</p>|`{$LICENSE.CONTROL:"{#SW.NAME}"}=1 and (last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) - now()) / 86400 < {$LICENSE.EXPIRY.WARN:"{#SW.NAME}"} and last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) > now()`|Warning|**Manual close**: Yes|
 
 ## Feedback
 

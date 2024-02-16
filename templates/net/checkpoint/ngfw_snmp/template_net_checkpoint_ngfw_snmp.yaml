@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-05T02:33:03Z'
+  date: '2024-02-16T08:46:15Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -109,7 +109,7 @@ zabbix_export:
           name: 'Check Point: Remote Access users'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.500.9000.1.2]'
-          key: 'remote.users.number[raUsersTable.0]'
+          key: remote.users.number
           history: 7d
           description: |
             MIB: CHECKPOINT-MIB
@@ -137,7 +137,7 @@ zabbix_export:
           name: 'Check Point: System contact details'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.4.0
-          key: 'system.contact[sysContact.0]'
+          key: system.contact
           delay: 15m
           history: 7d
           trends: '0'
@@ -153,20 +153,30 @@ zabbix_export:
           tags:
             - tag: component
               value: system
-        - uuid: 5acef2ff22464f2c816bf1ab5ed8c66f
-          name: 'Check Point: Interrupts per second'
+        - uuid: 07162e1ca0c44dc5979b17c258b34052
+          name: 'Check Point: CPU idle time'
           type: SNMP_AGENT
-          snmp_oid: 1.3.6.1.4.1.2021.11.59.0
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.3.0
+          key: system.cpu.idle
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: CHECKPOINT-MIB
+            The time the CPU has spent doing nothing.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: 5acef2ff22464f2c816bf1ab5ed8c66f
+          name: 'Check Point: CPU interrupts per second'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.6.0
           key: system.cpu.intr
           history: 7d
           value_type: FLOAT
           description: |
-            MIB: UCD-SNMP-MIB
+            MIB: CHECKPOINT-MIB
             Number of interrupts processed per second.
-          preprocessing:
-            - type: CHANGE_PER_SECOND
-              parameters:
-                - ''
           tags:
             - tag: component
               value: cpu
@@ -212,16 +222,13 @@ zabbix_export:
         - uuid: b42cc71d0b5143108b2314ab1fb1ceff
           name: 'Check Point: Number of CPUs'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#CPU.UTIL},1.3.6.1.2.1.25.3.3.1.2]'
-          key: 'system.cpu.num[snmp]'
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.7.0
+          key: system.cpu.num
           history: 7d
           description: |
-            MIB: HOST-RESOURCES-MIB
-            Count the number of CPU cores by counting number of cores. 
+            MIB: CHECKPOINT-MIB
+            Number of processors.
           preprocessing:
-            - type: JSONPATH
-              parameters:
-                - $.length()
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -245,11 +252,64 @@ zabbix_export:
           tags:
             - tag: component
               value: cpu
+        - uuid: bf0a80a981d248bdb2e4567ee8c084b3
+          name: 'Check Point: CPU system time'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.2.0
+          key: system.cpu.system
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: CHECKPOINT-MIB
+            The time the CPU has spent running the kernel and its processes.
+          tags:
+            - tag: component
+              value: cpu
+        - uuid: db554f92ee6a4ab297b75839c019a7fe
+          name: 'Check Point: CPU utilization'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.4.0
+          key: system.cpu.usage
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: CHECKPOINT-MIB
+            CPU utilization per core in %.
+          tags:
+            - tag: component
+              value: cpu
+          triggers:
+            - uuid: b9df7717d21145dc86954380422671a9
+              expression: 'min(/Check Point Next Generation Firewall by SNMP/system.cpu.usage,5m)>{$CPU.UTIL.CRIT}'
+              name: 'Check Point: High CPU utilization'
+              event_name: 'Check Point: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
+              opdata: 'Current utilization: {ITEM.LASTVALUE1}'
+              priority: WARNING
+              description: 'The CPU utilization is too high. The system might be slow to respond.'
+              tags:
+                - tag: scope
+                  value: performance
+        - uuid: 7a8a46d486404a5184a7fdba0832c50f
+          name: 'Check Point: CPU user time'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.2.1.0
+          key: system.cpu.user
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          description: |
+            MIB: CHECKPOINT-MIB
+            The time the CPU has spent running users' processes that are not niced.
+          tags:
+            - tag: component
+              value: cpu
         - uuid: a7ad79b572ab4e678011aa8ee810cd75
           name: 'Check Point: System description'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.1.0
-          key: 'system.descr[sysDescr.0]'
+          key: system.descr
           delay: 15m
           history: 7d
           trends: '0'
@@ -264,11 +324,71 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+        - uuid: 8385b6ee11b340f888676d013531a4d5
+          name: 'Check Point: Appliance manufacturer'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.16.9.0
+          key: system.hw.manufacturer
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CHECKPOINT-MIB
+            Appliance Manufacturer.
+          inventory_link: VENDOR
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: system
+        - uuid: b461939fa04348f19c4f03ce3fd211b8
+          name: 'Check Point: Appliance product name'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.16.7.0
+          key: system.hw.model
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CHECKPOINT-MIB
+            Appliance Product Name.
+          inventory_link: MODEL
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: system
+        - uuid: adb0bce1162a4e8990f4d299d8554d29
+          name: 'Check Point: Appliance serial number'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.16.3.0
+          key: system.hw.serialnumber
+          delay: 1h
+          history: 7d
+          trends: '0'
+          value_type: CHAR
+          description: |
+            MIB: CHECKPOINT-MIB
+            Appliance Serial Number.
+          inventory_link: SERIALNO_A
+          preprocessing:
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
+          tags:
+            - tag: component
+              value: system
         - uuid: df1681db47dc40b987f7be51e640974e
           name: 'Check Point: System location'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.6.0
-          key: 'system.location[sysLocation.0]'
+          key: system.location
           delay: 15m
           history: 7d
           trends: '0'
@@ -321,7 +441,7 @@ zabbix_export:
           name: 'Check Point: System object ID'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.1.2.0
-          key: 'system.objectid[sysObjectID.0]'
+          key: system.objectid
           delay: 15m
           history: 7d
           trends: '0'
@@ -340,7 +460,7 @@ zabbix_export:
           name: 'Check Point: System uptime'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.2.1.25.1.1.0
-          key: 'system.uptime[hrSystemUptime.0]'
+          key: system.uptime
           history: 7d
           units: uptime
           description: |
@@ -355,7 +475,7 @@ zabbix_export:
               value: system
           triggers:
             - uuid: 9c5b6ef7d033486189e045ad62d13991
-              expression: 'last(/Check Point Next Generation Firewall by SNMP/system.uptime[hrSystemUptime.0])<10m'
+              expression: 'last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m'
               name: 'Check Point: Device has been restarted'
               event_name: 'Check Point: {HOST.NAME} has been restarted (uptime < 10m)'
               priority: INFO
@@ -364,11 +484,85 @@ zabbix_export:
               tags:
                 - tag: scope
                   value: notice
+        - uuid: 9c5fbaca93854ad3941cb95e159b0ee1
+          name: 'Check Point: Active memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.4.4.0
+          key: vm.memory.active
+          history: 7d
+          units: B
+          description: |
+            MIB: CHECKPOINT-MIB
+            Active real memory (memory used by applications that is not cached to the disk) in bytes.
+          tags:
+            - tag: component
+              value: memory
+        - uuid: 0a55ee1b84cb490494e27a4543db7691
+          name: 'Check Point: Free memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.4.5.0
+          key: vm.memory.free
+          history: 7d
+          units: B
+          description: |
+            MIB: CHECKPOINT-MIB
+            Free memory available for applications in bytes.
+          tags:
+            - tag: component
+              value: memory
+        - uuid: 517445d996d148bcb34d7898dca55df6
+          name: 'Check Point: Total memory'
+          type: SNMP_AGENT
+          snmp_oid: 1.3.6.1.4.1.2620.1.6.7.4.3.0
+          key: vm.memory.total
+          history: 7d
+          units: B
+          description: |
+            MIB: CHECKPOINT-MIB
+            Total real memory in bytes. Memory used by applications.
+          tags:
+            - tag: component
+              value: memory
+        - uuid: 8846be280ae14ee8a1af1be65bef1996
+          name: 'Check Point: Used memory'
+          type: CALCULATED
+          key: vm.memory.used
+          history: 7d
+          units: B
+          params: 'last(//vm.memory.total) - last(//vm.memory.free)'
+          description: 'Used real memory calculated by total real memory and free real memory in bytes.'
+          tags:
+            - tag: component
+              value: memory
+        - uuid: 6bb39f4c24f14cc6a90db2ce1492dbea
+          name: 'Check Point: Memory utilization'
+          type: CALCULATED
+          key: vm.memory.util
+          history: 7d
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//vm.memory.used)/last(//vm.memory.total)*100'
+          description: 'Memory utilization in %.'
+          tags:
+            - tag: component
+              value: memory
+          triggers:
+            - uuid: e641a3b2e5ce41dabffed001b26c6075
+              expression: 'min(/Check Point Next Generation Firewall by SNMP/vm.memory.util,5m)>{$MEMORY.UTIL.MAX}'
+              name: 'Check Point: High memory utilization'
+              event_name: 'Check Point: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
+              priority: AVERAGE
+              description: 'The system is running out of free memory.'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
         - uuid: 0eac75ac03af43d596b84cee15a8ddb4
           name: 'Check Point: Decrypted packets per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.2.5.4.6.0
-          key: 'vpn.packets.decrypted[cpvIpsecEspDecPkts]'
+          key: vpn.packets.decrypted
           history: 7d
           description: |
             MIB: CHECKPOINT-MIB
@@ -384,7 +578,7 @@ zabbix_export:
           name: 'Check Point: Encrypted packets per second'
           type: SNMP_AGENT
           snmp_oid: 1.3.6.1.4.1.2620.1.2.5.4.5.0
-          key: 'vpn.packets.encrypted[cpvIpsecEspEncPkts]'
+          key: vpn.packets.encrypted
           history: 7d
           description: |
             MIB: CHECKPOINT-MIB
@@ -429,320 +623,91 @@ zabbix_export:
                   value: availability
       discovery_rules:
         - uuid: 2457ecd2b2ad4a2a815c11bf37c3f029
-          name: 'CPU discovery'
-          type: DEPENDENT
+          name: 'CPU cores discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#CPU.ID},1.3.6.1.4.1.2620.1.6.7.5.1.1]'
           key: cpu.discovery
-          delay: '0'
-          description: 'This discovery will create set of per core CPU metrics from UCD-SNMP-MIB, using {#CPU.COUNT} in preprocessing. That''s the only reason why LLD is used.'
+          delay: 1h
+          description: 'Discovering CPU cores from CHECKPOINT-MIB.'
           item_prototypes:
-            - uuid: a9dbce93118d48f4bad47a4dd96f71cd
-              name: 'Check Point: CPU guest time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.65.0
-              key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                Guest time (time spent running a virtual CPU for a guest operating system).
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: 7d7e936e329144ed82dcd4b812832a4e
-              name: 'Check Point: CPU guest nice time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.66.0
-              key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                Time spent running a niced guest (virtual CPU for guest operating systems under the control of the Linux kernel).
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
             - uuid: 0d17d7831b954decada6fba5f14f9265
-              name: 'Check Point: CPU idle time'
+              name: 'CPU Core {#CPU.ID}: CPU idle time'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.53.0
-              key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.5.1.4.{#SNMPINDEX}'
+              key: 'system.core.idle[multiProcIdleTime.{#CPU.ID}]'
               history: 7d
               value_type: FLOAT
               units: '%'
               description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent doing nothing.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: 14d56304e9b94df4bc82567a15fb9017
-              name: 'Check Point: CPU interrupt time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.56.0
-              key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The amount of time the CPU has been servicing hardware interrupts.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: ad6253e405df4c808f190b09793fc7ee
-              name: 'Check Point: CPU iowait time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.54.0
-              key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                Amount of time the CPU has been waiting for I/O to complete.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: 9dcd63a32654415387366f748e7ca685
-              name: 'Check Point: CPU nice time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.51.0
-              key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent running users' processes that have been niced.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: fb0569cc5d8644898a8d1668364f286f
-              name: 'Check Point: CPU softirq time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.61.0
-              key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The amount of time the CPU has been servicing software interrupts.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
-              tags:
-                - tag: component
-                  value: cpu
-            - uuid: 88ee3177ba034a5ebacf221331eedfe5
-              name: 'Check Point: CPU steal time'
-              type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.64.0
-              key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: |
-                MIB: UCD-SNMP-MIB
-                The amount of CPU 'stolen' from this virtual machine by the hypervisor for other tasks (such as running another virtual machine).
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
+                MIB: CHECKPOINT-MIB
+                The time the core has spent doing nothing.
               tags:
                 - tag: component
                   value: cpu
             - uuid: ce72097a6de44bc7b02f21e065f19a7b
-              name: 'Check Point: CPU system time'
+              name: 'CPU Core {#CPU.ID}: CPU system time'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.52.0
-              key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.5.1.3.{#SNMPINDEX}'
+              key: 'system.core.system[multiProcSystemTime.{#CPU.ID}]'
               history: 7d
               value_type: FLOAT
               units: '%'
               description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent running the kernel and its processes.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
+                MIB: CHECKPOINT-MIB
+                The time the core has spent running the kernel and its processes.
+              tags:
+                - tag: component
+                  value: cpu
+            - uuid: 54c95169f93a497c9ba4b83874ec85ea
+              name: 'CPU Core {#CPU.ID}: CPU utilization'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.5.1.5.{#SNMPINDEX}'
+              key: 'system.core.usage[multiProcUsage.{#CPU.ID}]'
+              history: 7d
+              value_type: FLOAT
+              units: '%'
+              description: |
+                MIB: CHECKPOINT-MIB
+                CPU core utilization in %.
               tags:
                 - tag: component
                   value: cpu
             - uuid: a1e8f16be14e4efbb0c6333aded1c761
-              name: 'Check Point: CPU user time'
+              name: 'CPU Core {#CPU.ID}: CPU user time'
               type: SNMP_AGENT
-              snmp_oid: 1.3.6.1.4.1.2021.11.50.0
-              key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.5.1.2.{#SNMPINDEX}'
+              key: 'system.core.user[multiProcUserTime.{#CPU.ID}]'
               history: 7d
               value_type: FLOAT
               units: '%'
               description: |
-                MIB: UCD-SNMP-MIB
-                The time the CPU has spent running users' processes that are not niced.
-              preprocessing:
-                - type: CHANGE_PER_SECOND
-                  parameters:
-                    - ''
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return value/{#CPU.COUNT}'
+                MIB: CHECKPOINT-MIB
+                The time the core has spent running users' processes that are not niced.
               tags:
                 - tag: component
                   value: cpu
-            - uuid: e6578b571b454fce8287a72ab1d2e321
-              name: 'Check Point: CPU utilization'
-              type: DEPENDENT
-              key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
-              delay: '0'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              description: 'CPU utilization per core in %.'
-              preprocessing:
-                - type: JAVASCRIPT
-                  parameters:
-                    - 'return (100 - value);'
-              master_item:
-                key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
-              tags:
-                - tag: component
-                  value: cpu
-              trigger_prototypes:
-                - uuid: 1af11d634c36486b86ca23b5625fd9e0
-                  expression: 'min(/Check Point Next Generation Firewall by SNMP/system.cpu.util[snmp,{#SNMPINDEX}],5m)>{$CPU.UTIL.CRIT}'
-                  name: 'Check Point: High CPU utilization'
-                  event_name: 'Check Point: High CPU utilization (over {$CPU.UTIL.CRIT}% for 5m)'
-                  opdata: 'Current utilization: {ITEM.LASTVALUE1}'
-                  priority: WARNING
-                  description: 'The CPU utilization is too high. The system might be slow to respond.'
-                  tags:
-                    - tag: scope
-                      value: performance
           graph_prototypes:
             - uuid: a28d9820ad3747bebbb4d15ff0b7ce6b
-              name: 'Check Point: CPU usage{#SINGLETON}'
+              name: 'CPU Core {#CPU.ID}: CPU usage'
               ymin_type_1: FIXED
               ymax_type_1: FIXED
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.system[ssCpuRawSystem.{#SNMPINDEX}]'
+                    key: 'system.core.system[multiProcSystemTime.{#CPU.ID}]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.user[ssCpuRawUser.{#SNMPINDEX}]'
+                    key: 'system.core.user[multiProcUserTime.{#CPU.ID}]'
                 - sortorder: '2'
                   color: 00611C
                   item:
                     host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.nice[ssCpuRawNice.{#SNMPINDEX}]'
-                - sortorder: '3'
-                  color: F7941D
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.iowait[ssCpuRawWait.{#SNMPINDEX}]'
-                - sortorder: '4'
-                  color: FC6EA3
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.steal[ssCpuRawSteal.{#SNMPINDEX}]'
-                - sortorder: '5'
-                  color: 6C59DC
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.interrupt[ssCpuRawInterrupt.{#SNMPINDEX}]'
-                - sortorder: '6'
-                  color: C7A72D
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.softirq[ssCpuRawSoftIRQ.{#SNMPINDEX}]'
-                - sortorder: '7'
-                  color: BA2A5D
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.guest[ssCpuRawGuest.{#SNMPINDEX}]'
-                - sortorder: '8'
-                  color: F230E0
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.guest_nice[ssCpuRawGuestNice.{#SNMPINDEX}]'
-            - uuid: f59d8a4901174b9882b28d722378cc1d
-              name: 'Check Point: CPU utilization{#SINGLETON}'
-              ymin_type_1: FIXED
-              ymax_type_1: FIXED
-              graph_items:
-                - color: 199C0D
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'system.cpu.util[snmp,{#SNMPINDEX}]'
-          master_item:
-            key: 'system.cpu.num[snmp]'
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  //count the number of CPU cores
-                  return JSON.stringify([{"{#CPU.COUNT}": value, "{#SNMPINDEX}": 0, "{#SINGLETON}":""}])
+                    key: 'system.core.idle[multiProcIdleTime.{#CPU.ID}]'
         - uuid: 7af85b5904c54687ad9f249cb1a9ad7b
-          name: 'FAN Discovery'
+          name: 'FAN discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.1.6.7.8.2.1.2,{#FAN.UNIT},1.3.6.1.4.1.2620.1.6.7.8.2.1.4]'
           key: fan.discovery
@@ -1482,7 +1447,7 @@ zabbix_export:
               parameters:
                 - 6h
         - uuid: 0b206f11e8644cfa99e61aa79427820d
-          name: 'PSU Discovery'
+          name: 'PSU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.1.6.7.9.1.1.1]'
           key: psu.discovery
@@ -1532,6 +1497,164 @@ zabbix_export:
                       value: availability
                     - tag: scope
                       value: performance
+        - uuid: 0ac2ae2dfe3947e1b753500036dc790d
+          name: 'Software blades discovery'
+          type: SNMP_AGENT
+          snmp_oid: 'discovery[{#SW.NAME},1.3.6.1.4.1.2620.1.6.18.1.1.4]'
+          key: svn.sw.discovery
+          delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#SW.NAME}'
+                value: '{$SW.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#SW.NAME}'
+                value: '{$SW.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
+          description: 'Discovering software blades and features from CHECKPOINT-MIB.'
+          item_prototypes:
+            - uuid: 6024b29ddca34a99a052a4dc8961ca02
+              name: '{#SW.NAME}: License expiration date'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.18.1.1.6.{#SNMPINDEX}'
+              key: 'svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: '0'
+              units: unixtime
+              description: |
+                MIB: CHECKPOINT-MIB
+                Expiration date for the license of the "{#SW.NAME}" software blade.
+                (doesn't return value if the license doesn't have an expiration date)
+              preprocessing:
+                - type: NOT_MATCHES_REGEX
+                  parameters:
+                    - ^0$
+                  error_handler: DISCARD_VALUE
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                - tag: component
+                  value: license
+                - tag: component
+                  value: software
+                - tag: component
+                  value: svn
+                - tag: software
+                  value: '{#SW.NAME}'
+              trigger_prototypes:
+                - uuid: 645bfe77760d49d7a23344d9f910045b
+                  expression: '{$LICENSE.CONTROL:"{#SW.NAME}"}=1 and (last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) - now()) / 86400 < {$LICENSE.EXPIRY.WARN:"{#SW.NAME}"} and last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) > now()'
+                  name: '{#SW.NAME}: License expires soon'
+                  event_name: '{#SW.NAME}: License expires soon (less than {$LICENSE.EXPIRY.WARN:"{#SW.NAME}"} days)'
+                  opdata: 'Current expiration date: {ITEM.LASTVALUE1}'
+                  priority: WARNING
+                  description: |
+                    This trigger expression works as follows:
+                    1. It can be triggered if the license expires soon.
+                    2. `{&#36;LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license expires.
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: notice
+            - uuid: 24c7853fe8c84d0892f81fea4254e6bb
+              name: '{#SW.NAME}: License total quota'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.18.1.1.9.{#SNMPINDEX}'
+              key: 'svn.sw.license.quota.total[licensingTotalQuota.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              value_type: FLOAT
+              description: |
+                MIB: CHECKPOINT-MIB
+                Total quota amount for the license of "{#SW.NAME}" software blade.
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                - tag: component
+                  value: license
+                - tag: component
+                  value: software
+                - tag: component
+                  value: svn
+                - tag: software
+                  value: '{#SW.NAME}'
+            - uuid: 6b4c5c62f0fd4cc990c6c5fc742bcb86
+              name: '{#SW.NAME}: License used quota'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.18.1.1.10.{#SNMPINDEX}'
+              key: 'svn.sw.license.quota.used[licensingUsedQuota.{#SNMPINDEX}]'
+              delay: 10m
+              history: 7d
+              value_type: FLOAT
+              description: |
+                MIB: CHECKPOINT-MIB
+                Used quota amount for the license of "{#SW.NAME}" software blade.
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: component
+                  value: license
+                - tag: component
+                  value: software
+                - tag: component
+                  value: svn
+                - tag: software
+                  value: '{#SW.NAME}'
+            - uuid: d25b27b9d698446dae7a7c2abb12f196
+              name: '{#SW.NAME}: License state'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.18.1.1.5.{#SNMPINDEX}'
+              key: 'svn.sw.license.state[licensingState.{#SNMPINDEX}]'
+              delay: 1h
+              history: 7d
+              trends: '0'
+              value_type: CHAR
+              description: |
+                MIB: CHECKPOINT-MIB
+                Current license state of the "{#SW.NAME}" software blade.
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
+              tags:
+                - tag: component
+                  value: license
+                - tag: component
+                  value: software
+                - tag: component
+                  value: svn
+                - tag: software
+                  value: '{#SW.NAME}'
+            - uuid: 82216d7434834659afa14303a4e7cbcb
+              name: '{#SW.NAME}: Software blade status'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.18.1.1.8.{#SNMPINDEX}'
+              key: 'svn.sw.status[licensingBladeActive.{#SNMPINDEX}]'
+              delay: 10m
+              history: 7d
+              trends: '0'
+              description: |
+                MIB: CHECKPOINT-MIB
+                Current "{#SW.NAME}" software blade status.
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: component
+                  value: software
+                - tag: component
+                  value: svn
+                - tag: software
+                  value: '{#SW.NAME}'
         - uuid: 6f54b4025d4b47ffa1cf11652cd94e63
           name: 'Temperature discovery'
           type: SNMP_AGENT
@@ -1613,7 +1736,7 @@ zabbix_export:
         - uuid: 46d85303a18f48aa81f09278b0d47a35
           name: 'Storage discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.2.1.25.2.3.1.3,{#FSTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
+          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.4.1.2620.1.6.7.6.1.2]'
           key: vfs.fs.discovery
           delay: 1h
           filter:
@@ -1626,24 +1749,51 @@ zabbix_export:
                 value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#FSTYPE}'
-                value: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
-          description: 'Discovering hrStorage items with storage filter from HOST-RESOURCES-MIB.'
+          description: 'Discovering storage disks from CHECKPOINT-MIB.'
           item_prototypes:
+            - uuid: 6a0fded5672b4863a273d39c93962c4e
+              name: '{#FSNAME}: Available disk space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.7.{#SNMPINDEX}'
+              key: 'vfs.fs.avail[multiDiskFreeAvailableBytes.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: CHECKPOINT-MIB
+                Available free disk in partition (not reserved by the OS) in bytes.
+              tags:
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
+            - uuid: 811cb45579d94ea2ae3bbe8ee8fbb727
+              name: '{#FSNAME}: Free disk space'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.5.{#SNMPINDEX}'
+              key: 'vfs.fs.free[multiDiskFreeTotalBytes.{#SNMPINDEX}]'
+              history: 7d
+              units: B
+              description: |
+                MIB: CHECKPOINT-MIB
+                Free disk capacity in partition in bytes.
+              tags:
+                - tag: component
+                  value: storage
+                - tag: filesystem
+                  value: '{#FSNAME}'
             - uuid: 42947b9cf263429397e2d2bfb5b7253d
               name: '{#FSNAME}: Disk space utilization'
-              type: CALCULATED
-              key: 'vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}]'
+              type: SNMP_AGENT
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.6.{#SNMPINDEX}'
+              key: 'vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}]'
               history: 7d
               value_type: FLOAT
               units: '%'
-              params: '(last(//vfs.fs.used[hrStorageUsed.{#SNMPINDEX}])/last(//vfs.fs.total[hrStorageSize.{#SNMPINDEX}]))*100'
-              description: 'The space utilization expressed in % for {#FSNAME}.'
+              description: 'The space utilization calculated by free percentage (multiDiskFreeTotalPercent) metric, expressed in %'
+              preprocessing:
+                - type: JAVASCRIPT
+                  parameters:
+                    - 'return 100 - Number(value);'
               tags:
                 - tag: component
                   value: storage
@@ -1652,18 +1802,18 @@ zabbix_export:
             - uuid: e171f238b9394dbbbc1bf3a80cb1f648
               name: '{#FSNAME}: Total disk space'
               type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
-              key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.3.{#SNMPINDEX}'
+              key: 'vfs.fs.total[multiDiskSize.{#SNMPINDEX}]'
+              delay: 10m
               history: 7d
               units: B
-              description: 'Total hard disk capacity.'
+              description: |
+                MIB: CHECKPOINT-MIB
+                Total partition size in bytes.
               preprocessing:
-                - type: MULTIPLIER
-                  parameters:
-                    - '{#ALLOC_UNITS}'
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
-                    - 1d
+                    - 6h
               tags:
                 - tag: component
                   value: storage
@@ -1672,15 +1822,13 @@ zabbix_export:
             - uuid: d59f1f4f508741f0a33c47d61321afb4
               name: '{#FSNAME}: Used disk space'
               type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
-              key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
+              snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.4.{#SNMPINDEX}'
+              key: 'vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]'
               history: 7d
               units: B
-              description: 'Current hard disk usage.'
-              preprocessing:
-                - type: MULTIPLIER
-                  parameters:
-                    - '{#ALLOC_UNITS}'
+              description: |
+                MIB: CHECKPOINT-MIB
+                Disk used in partition in bytes.
               tags:
                 - tag: component
                   value: storage
@@ -1689,10 +1837,9 @@ zabbix_export:
           trigger_prototypes:
             - uuid: d56142259e9b4a778a90f88fad2f5ca7
               expression: |
-                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or 
-                timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-                
+                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or 
+                timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is critically low'
               event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1703,7 +1850,6 @@ zabbix_export:
                 2. The second condition should be one of the following:
                 - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
                 - the disk will be full in less than 24 hours.
-                
               manual_close: 'YES'
               tags:
                 - tag: scope
@@ -1712,10 +1858,9 @@ zabbix_export:
                   value: performance
             - uuid: edb173121bf94dc99e6626743b9ac3ad
               expression: |
-                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or 
-                timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-                
+                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
+                ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or 
+                timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)
               name: '{#FSNAME}: Disk space is low'
               event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
@@ -1726,15 +1871,13 @@ zabbix_export:
                 2. The second condition should be one of the following:
                 - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
                 - the disk will be full in less than 24 hours.
-                
               manual_close: 'YES'
               dependencies:
                 - name: '{#FSNAME}: Disk space is critically low'
                   expression: |
-                    last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[hrStorageSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or 
-                    timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[storageUsedPercentage.{#SNMPINDEX}],1h,100)<1d)
-                    
+                    last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or 
+                    timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)
               tags:
                 - tag: scope
                   value: capacity
@@ -1747,121 +1890,17 @@ zabbix_export:
                 - color: 199C0D
                   item:
                     host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'vfs.fs.total[hrStorageSize.{#SNMPINDEX}]'
+                    key: 'vfs.fs.total[multiDiskSize.{#SNMPINDEX}]'
                 - sortorder: '1'
                   color: F63100
                   item:
                     host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'vfs.fs.used[hrStorageUsed.{#SNMPINDEX}]'
-        - uuid: cc84cb288b104126aa98c80e1a5a0e9e
-          name: 'Memory discovery'
-          type: SNMP_AGENT
-          snmp_oid: 'discovery[{#MEMNAME},1.3.6.1.2.1.25.2.3.1.3,{#MEMTYPE},1.3.6.1.2.1.25.2.3.1.2,{#ALLOC_UNITS},1.3.6.1.2.1.25.2.3.1.4]'
-          key: vm.memory.discovery
-          delay: 1h
-          filter:
-            evaltype: AND
-            conditions:
-              - macro: '{#MEMNAME}'
-                value: '{$MEMORY.NAME.MATCHES}'
-                formulaid: A
-              - macro: '{#MEMNAME}'
-                value: '{$MEMORY.NAME.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: B
-              - macro: '{#MEMTYPE}'
-                value: '{$MEMORY.TYPE.MATCHES}'
-                formulaid: C
-              - macro: '{#MEMTYPE}'
-                value: '{$MEMORY.TYPE.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
-          description: 'Discovering hrStorage items with memory filter from HOST-RESOURCES-MIB.'
-          item_prototypes:
-            - uuid: 8ae338fa924c46a695e41746867e219f
-              name: '{#MEMNAME}: Total memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.5.{#SNMPINDEX}'
-              key: 'vm.memory.total[hrStorageSize.{#SNMPINDEX}]'
-              history: 7d
-              units: B
-              description: |
-                MIB: HOST-RESOURCES-MIB
-                The size of the storage represented by this entry, in units of hrStorageAllocationUnits.
-                This object is writable to allow remote configuration of the size of the storage area in those cases where such an operation makes sense and is possible on the underlying system.
-                For example, the amount of main memory allocated to a buffer pool might be modified or the amount of disk space allocated to virtual memory might be modified.
-                
-              preprocessing:
-                - type: MULTIPLIER
-                  parameters:
-                    - '{#ALLOC_UNITS}'
-              tags:
-                - tag: component
-                  value: memory
-            - uuid: e69b91a4b2ad485f840e6f7d6da9334d
-              name: '{#MEMNAME}: Used memory'
-              type: SNMP_AGENT
-              snmp_oid: '1.3.6.1.2.1.25.2.3.1.6.{#SNMPINDEX}'
-              key: 'vm.memory.used[hrStorageUsed.{#SNMPINDEX}]'
-              history: 7d
-              units: B
-              description: |
-                MIB: HOST-RESOURCES-MIB
-                The amount of the storage represented by this entry that is allocated, in units of hrStorageAllocationUnits.
-              preprocessing:
-                - type: MULTIPLIER
-                  parameters:
-                    - '{#ALLOC_UNITS}'
-              tags:
-                - tag: component
-                  value: memory
-            - uuid: 3b25c7038d0742df90ae126a4b411cc3
-              name: '{#MEMNAME}: Memory utilization'
-              type: CALCULATED
-              key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
-              history: 7d
-              value_type: FLOAT
-              units: '%'
-              params: 'last(//vm.memory.used[hrStorageUsed.{#SNMPINDEX}])/last(//vm.memory.total[hrStorageSize.{#SNMPINDEX}])*100'
-              description: 'Memory utilization in %.'
-              tags:
-                - tag: component
-                  value: memory
-              trigger_prototypes:
-                - uuid: 02b00ca6e12a44f29e5db13a9853643c
-                  expression: 'min(/Check Point Next Generation Firewall by SNMP/vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}],5m)>{$MEMORY.UTIL.MAX}'
-                  name: '{#MEMNAME}: High memory utilization'
-                  event_name: '{#MEMNAME}: High memory utilization (>{$MEMORY.UTIL.MAX}% for 5m)'
-                  priority: AVERAGE
-                  description: 'The system is running out of free memory.'
-                  tags:
-                    - tag: scope
-                      value: capacity
-                    - tag: scope
-                      value: performance
-          graph_prototypes:
-            - uuid: 76ce3cdeb9dc450391991b5ddad3a057
-              name: '{#MEMNAME}: Memory usage'
-              graph_items:
-                - color: 199C0D
+                    key: 'vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]'
+                - sortorder: '2'
+                  color: 00611C
                   item:
                     host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'vm.memory.total[hrStorageSize.{#SNMPINDEX}]'
-                - sortorder: '1'
-                  color: F63100
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'vm.memory.used[hrStorageUsed.{#SNMPINDEX}]'
-            - uuid: d09ba4a7cda44d69ac1e7a3869dc9457
-              name: '{#MEMNAME}: Memory utilization'
-              ymin_type_1: FIXED
-              ymax_type_1: FIXED
-              graph_items:
-                - drawtype: GRADIENT_LINE
-                  color: 199C0D
-                  item:
-                    host: 'Check Point Next Generation Firewall by SNMP'
-                    key: 'vm.memory.util[memoryUsedPercentage.{#SNMPINDEX}]'
+                    key: 'vfs.fs.avail[multiDiskFreeAvailableBytes.{#SNMPINDEX}]'
         - uuid: 61e3a11989a5424a8d4dd2bf67b97526
           name: 'Voltage discovery'
           type: SNMP_AGENT
@@ -2135,21 +2174,15 @@ zabbix_export:
         - macro: '{$ICMP_RESPONSE_TIME_WARN}'
           value: '0.15'
           description: 'Threshold of average ICMP response time for warning trigger in seconds.'
+        - macro: '{$LICENSE.CONTROL}'
+          value: '1'
+          description: 'This macro is used in Software blades discovery. Can be used with interface name as context.'
+        - macro: '{$LICENSE.EXPIRY.WARN}'
+          value: '7'
+          description: 'Number of days until the license expires.'
         - macro: '{$LOAD_AVG_PER_CPU.MAX.WARN}'
           value: '1.5'
           description: 'Load per CPU considered sustainable. Change if needed.'
-        - macro: '{$MEMORY.NAME.MATCHES}'
-          value: '.*'
-          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$MEMORY.NAME.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.'
-        - macro: '{$MEMORY.TYPE.MATCHES}'
-          value: '.*(\.2|hrStorageRam)$'
-          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$MEMORY.TYPE.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in memory discovery. Can be overridden on the host or linked template level if you need to filter out results.'
         - macro: '{$MEMORY.UTIL.MAX}'
           value: '90'
           description: 'The warning threshold of the "Physical memory: Memory utilization" item.'
@@ -2201,6 +2234,12 @@ zabbix_export:
         - macro: '{$SNMP.TIMEOUT}'
           value: 5m
           description: 'The time interval for SNMP availability trigger.'
+        - macro: '{$SW.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Software blades discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$SW.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Software blades discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.VALUE.CRIT}'
           value: '75'
           description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
@@ -2222,15 +2261,9 @@ zabbix_export:
         - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
           value: ^(/dev|/sys|/run|/proc|.+/shm$)
           description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$VFS.FS.FSTYPE.MATCHES}'
-          value: '.*(\.4|\.9|hrStorageFixedDisk|hrStorageFlashMemory)$'
-          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$VFS.FS.FSTYPE.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
           value: '90'
-          description: 'Critical threshold of disk disk usage for trigger in %.'
+          description: 'Critical threshold of disk usage for trigger in %.'
         - macro: '{$VFS.FS.PUSED.MAX.WARN}'
           value: '80'
           description: 'Warning threshold of disk usage for trigger in %.'
@@ -2250,7 +2283,7 @@ zabbix_export:
             - name: Overview
               widgets:
                 - type: ITEM
-                  name: 'ICMP ping'
+                  name: 'Product name'
                   width: '8'
                   height: '3'
                   fields:
@@ -2258,7 +2291,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        key: icmpping
+                        key: system.hw.model
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -2277,8 +2310,55 @@ zabbix_export:
                       name: show
                       value: '2'
                 - type: ITEM
+                  name: 'ICMP ping'
+                  'y': '6'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Check Point Next Generation Firewall by SNMP'
+                        key: icmpping
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
+                  name: 'Serial number'
+                  x: '8'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Check Point Next Generation Firewall by SNMP'
+                        key: system.hw.serialnumber
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
+                  name: Uptime
+                  x: '8'
+                  'y': '3'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Check Point Next Generation Firewall by SNMP'
+                        key: system.uptime
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                    - type: INTEGER
+                      name: show
+                      value: '4'
+                - type: ITEM
                   name: 'ICMP response time'
                   x: '8'
+                  'y': '6'
                   width: '8'
                   height: '3'
                   fields:
@@ -2294,25 +2374,7 @@ zabbix_export:
                       name: show
                       value: '4'
                 - type: ITEM
-                  name: Uptime
-                  x: '8'
-                  'y': '3'
-                  width: '8'
-                  height: '3'
-                  fields:
-                    - type: ITEM
-                      name: itemid
-                      value:
-                        host: 'Check Point Next Generation Firewall by SNMP'
-                        key: 'system.uptime[hrSystemUptime.0]'
-                    - type: INTEGER
-                      name: show
-                      value: '2'
-                    - type: INTEGER
-                      name: show
-                      value: '4'
-                - type: ITEM
-                  name: 'SNMP State'
+                  name: Manufacturer
                   x: '16'
                   width: '8'
                   height: '3'
@@ -2321,7 +2383,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        key: 'zabbix[host,snmp,available]'
+                        key: system.hw.manufacturer
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -2342,24 +2404,36 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        key: 'system.cpu.num[snmp]'
+                        key: system.cpu.num
+                    - type: INTEGER
+                      name: show
+                      value: '2'
+                - type: ITEM
+                  name: 'SNMP State'
+                  x: '16'
+                  'y': '6'
+                  width: '8'
+                  height: '3'
+                  fields:
+                    - type: ITEM
+                      name: itemid
+                      value:
+                        host: 'Check Point Next Generation Firewall by SNMP'
+                        key: 'zabbix[host,snmp,available]'
                     - type: INTEGER
                       name: show
                       value: '2'
             - name: 'System performance'
               widgets:
-                - type: GRAPH_PROTOTYPE
+                - type: GRAPH_CLASSIC
                   width: '12'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
+                    - type: GRAPH
                       name: graphid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        name: '{#MEMNAME}: Memory usage'
+                        name: 'Check Point: Memory usage'
                 - type: GRAPH_CLASSIC
                   'y': '5'
                   width: '12'
@@ -2369,22 +2443,41 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        name: 'Check Point: CPU jumps'
-                - type: GRAPH_PROTOTYPE
+                        name: 'Check Point: CPU utilization'
+                - type: GRAPH_CLASSIC
                   'y': '10'
                   width: '12'
-                  height: '7'
+                  height: '5'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
+                    - type: GRAPH
                       name: graphid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        name: 'Check Point: CPU usage{#SINGLETON}'
+                        name: 'Check Point: CPU jumps'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Check Point Next Generation Firewall by SNMP'
+                        name: 'Check Point: CPU usage'
+                - type: GRAPH_CLASSIC
+                  x: '12'
+                  'y': '5'
+                  width: '12'
+                  height: '5'
+                  fields:
+                    - type: GRAPH
+                      name: graphid
+                      value:
+                        host: 'Check Point Next Generation Firewall by SNMP'
+                        name: 'Check Point: System load'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
+                  'y': '10'
                   width: '12'
                   height: '5'
                   fields:
@@ -2396,31 +2489,6 @@ zabbix_export:
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
                         name: '{#FSNAME}: Disk usage'
-                - type: GRAPH_PROTOTYPE
-                  x: '12'
-                  'y': '5'
-                  width: '12'
-                  height: '5'
-                  fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '1'
-                    - type: GRAPH_PROTOTYPE
-                      name: graphid
-                      value:
-                        host: 'Check Point Next Generation Firewall by SNMP'
-                        name: 'Check Point: CPU utilization{#SINGLETON}'
-                - type: GRAPH_CLASSIC
-                  x: '12'
-                  'y': '10'
-                  width: '12'
-                  height: '7'
-                  fields:
-                    - type: GRAPH
-                      name: graphid
-                      value:
-                        host: 'Check Point Next Generation Firewall by SNMP'
-                        name: 'Check Point: System load'
             - name: Sensors
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2505,7 +2573,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        key: 'remote.users.number[raUsersTable.0]'
+                        key: remote.users.number
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -2535,7 +2603,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        key: 'vpn.packets.encrypted[cpvIpsecEspEncPkts]'
+                        key: vpn.packets.encrypted
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -2555,7 +2623,7 @@ zabbix_export:
                       name: itemid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        key: 'vpn.packets.decrypted[cpvIpsecEspDecPkts]'
+                        key: vpn.packets.decrypted
                     - type: INTEGER
                       name: show
                       value: '2'
@@ -3273,7 +3341,7 @@ zabbix_export:
   triggers:
     - uuid: dc26681b9d8244799f28c6bda3dded3c
       expression: |
-        min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num[snmp])>{$LOAD_AVG_PER_CPU.MAX.WARN}
+        min(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg1,5m)/last(/Check Point Next Generation Firewall by SNMP/system.cpu.num)>{$LOAD_AVG_PER_CPU.MAX.WARN}
         and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg5)>0
         and last(/Check Point Next Generation Firewall by SNMP/system.cpu.load.avg15)>0
       name: 'Check Point: Load average is too high'
@@ -3299,6 +3367,61 @@ zabbix_export:
           item:
             host: 'Check Point Next Generation Firewall by SNMP'
             key: system.cpu.intr
+    - uuid: d3d422bf223645e5bab85a8c88651160
+      name: 'Check Point: CPU usage'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: system.cpu.system
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: system.cpu.user
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: system.cpu.idle
+    - uuid: 51d21d313a3d4f2bad3ef221affe141c
+      name: 'Check Point: CPU utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: system.cpu.usage
+    - uuid: 0fe8af91daf1483d84650141a28d9748
+      name: 'Check Point: Memory usage'
+      graph_items:
+        - color: 199C0D
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: vm.memory.total
+        - sortorder: '1'
+          color: F63100
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: vm.memory.active
+        - sortorder: '2'
+          color: 00611C
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: vm.memory.used
+    - uuid: d5c5d886667e4bf8b22c526fe6f40f9e
+      name: 'Check Point: Memory utilization'
+      ymin_type_1: FIXED
+      ymax_type_1: FIXED
+      graph_items:
+        - drawtype: GRADIENT_LINE
+          color: 199C0D
+          item:
+            host: 'Check Point Next Generation Firewall by SNMP'
+            key: vm.memory.util
     - uuid: f8957207dcd04c78a1a040d720634881
       name: 'Check Point: System load'
       ymin_type_1: FIXED
@@ -3322,7 +3445,7 @@ zabbix_export:
           yaxisside: RIGHT
           item:
             host: 'Check Point Next Generation Firewall by SNMP'
-            key: 'system.cpu.num[snmp]'
+            key: system.cpu.num
     - uuid: 349bd025bfde428d977739556e527698
       name: 'Check Point: VPN packets processed'
       ymin_type_1: FIXED
@@ -3330,9 +3453,9 @@ zabbix_export:
         - color: 199C0D
           item:
             host: 'Check Point Next Generation Firewall by SNMP'
-            key: 'vpn.packets.encrypted[cpvIpsecEspEncPkts]'
+            key: vpn.packets.encrypted
         - sortorder: '1'
           color: F63100
           item:
             host: 'Check Point Next Generation Firewall by SNMP'
-            key: 'vpn.packets.decrypted[cpvIpsecEspDecPkts]'
+            key: vpn.packets.decrypted
