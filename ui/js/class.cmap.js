@@ -885,7 +885,7 @@ ZABBIX.apps.map = (function($) {
 					selector_handle: 'div.drag-icon'
 				});
 
-				sortable_triggers.on(CSortable.EVENT_DRAG_END, SelementForm.prototype.recalculateTriggerSortOrder);
+				sortable_triggers.on(CSortable.EVENT_SORT, SelementForm.prototype.recalculateTriggerSortOrder);
 
 				// Init tag fields.
 				$('#selement-tags')
