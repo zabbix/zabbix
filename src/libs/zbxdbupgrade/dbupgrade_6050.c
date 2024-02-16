@@ -3218,6 +3218,195 @@ static int	DBpatch_6050209(void)
 
 	return DBadd_field("config", &field);
 }
+
+static int	DBpatch_6050210(void)
+{
+	const zbx_db_field_t	field = {"lifetime_type", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6050211(void)
+{
+	const zbx_db_field_t	field = {"enabled_lifetime", "1h", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6050212(void)
+{
+	const zbx_db_field_t	field = {"enabled_lifetime_type", "2", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("items", &field);
+}
+
+static int	DBpatch_6050213(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_discovery", &field);
+}
+
+static int	DBpatch_6050214(void)
+{
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_discovery", &field);
+}
+
+static int	DBpatch_6050215(void)
+{
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("host_discovery", &field);
+}
+
+static int	DBpatch_6050216(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_6050217(void)
+{
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_6050218(void)
+{
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("item_discovery", &field);
+}
+
+static int	DBpatch_6050219(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_discovery", &field);
+}
+
+static int	DBpatch_6050220(void)
+{
+	const zbx_db_field_t	field = {"disable_source", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_discovery", &field);
+}
+
+static int	DBpatch_6050221(void)
+{
+	const zbx_db_field_t	field = {"ts_disable", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("trigger_discovery", &field);
+}
+
+static int	DBpatch_6050222(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("graph_discovery", &field);
+}
+
+static int	DBpatch_6050223(void)
+{
+	const zbx_db_field_t	field = {"status", "0", NULL, NULL, 0, ZBX_TYPE_INT, ZBX_NOTNULL, 0};
+
+	return DBadd_field("group_discovery", &field);
+}
+
+static int	DBpatch_6050224(void)
+{
+	const zbx_db_field_t	field = {"lifetime", "7d", NULL, NULL, 255, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
+
+	return DBset_default("items", &field);
+}
+
+static int	DBpatch_6050225(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* update default value for items and item prototypes */
+	if (ZBX_DB_OK > zbx_db_execute("update items set lifetime='7d' where flags<>1"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050226(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set LIFETIME_TYPE_IMMEDIATELY for LLD rules with 0 lifetime */
+	if (ZBX_DB_OK > zbx_db_execute("update items set lifetime_type=2 where flags=1 and lifetime like '0%%'"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050227(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update host_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050228(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update item_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050229(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update trigger_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050230(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update graph_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
+
+static int	DBpatch_6050231(void)
+{
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	/* set DISCOVERY_STATUS_LOST */
+	if (ZBX_DB_OK > zbx_db_execute("update group_discovery set status=1 where ts_delete<>0"))
+		return FAIL;
+
+	return SUCCEED;
+}
 #endif
 
 DBPATCH_START(6050)
@@ -3432,5 +3621,27 @@ DBPATCH_ADD(6050206, 0, 1)
 DBPATCH_ADD(6050207, 0, 1)
 DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
+DBPATCH_ADD(6050210, 0, 1)
+DBPATCH_ADD(6050211, 0, 1)
+DBPATCH_ADD(6050212, 0, 1)
+DBPATCH_ADD(6050213, 0, 1)
+DBPATCH_ADD(6050214, 0, 1)
+DBPATCH_ADD(6050215, 0, 1)
+DBPATCH_ADD(6050216, 0, 1)
+DBPATCH_ADD(6050217, 0, 1)
+DBPATCH_ADD(6050218, 0, 1)
+DBPATCH_ADD(6050219, 0, 1)
+DBPATCH_ADD(6050220, 0, 1)
+DBPATCH_ADD(6050221, 0, 1)
+DBPATCH_ADD(6050222, 0, 1)
+DBPATCH_ADD(6050223, 0, 1)
+DBPATCH_ADD(6050224, 0, 1)
+DBPATCH_ADD(6050225, 0, 1)
+DBPATCH_ADD(6050226, 0, 1)
+DBPATCH_ADD(6050227, 0, 1)
+DBPATCH_ADD(6050228, 0, 1)
+DBPATCH_ADD(6050229, 0, 1)
+DBPATCH_ADD(6050230, 0, 1)
+DBPATCH_ADD(6050231, 0, 1)
 
 DBPATCH_END()
