@@ -25,7 +25,8 @@ class CWidgetPieChart extends CWidget {
 
 	// Legend single line height is 18px. Value should be synchronized with $svg-legend-line-height in scss.
 	static LEGEND_LINE_HEIGHT = 18;
-	static LEGEND_LINES_MODE_FIXED = 0;
+
+	static LEGEND_LINES_MODE_VARIABLE = 1;
 
 	/**
 	 * @type {CSVGPie|null}
@@ -133,9 +134,9 @@ class CWidgetPieChart extends CWidget {
 				this._body.append(container);
 			}
 
-			container.style.setProperty('--lines', legend.lines_mode === CWidgetPieChart.LEGEND_LINES_MODE_FIXED
-				? legend.lines
-				: Math.min(Math.ceil(legend.data.length / legend.columns), legend.lines)
+			container.style.setProperty('--lines', legend.lines_mode === CWidgetPieChart.LEGEND_LINES_MODE_VARIABLE
+				? Math.min(Math.ceil(legend.data.length / legend.columns), legend.lines)
+				: legend.lines
 			);
 
 			container.style.setProperty('--columns', legend.columns);
