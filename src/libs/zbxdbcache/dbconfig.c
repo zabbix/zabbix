@@ -2707,7 +2707,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 
-	ZBX_DC_HOST		*host;
+	ZBX_DC_HOST		*host = NULL;
 
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_SNMPITEM		*snmpitem;
@@ -2727,7 +2727,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_HTTPITEM		*httpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 	ZBX_DC_ITEM_HK		*item_hk, item_hk_local;
-	ZBX_DC_INTERFACE	*interface;
+	ZBX_DC_INTERFACE	*interface = NULL;
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
@@ -2761,8 +2761,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		ZBX_STR2UCHAR(status, row[2]);
 		ZBX_STR2UCHAR(type, row[3]);
 
-		if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
-			continue;
+		if (NULL == host || host->hostid != hostid)
+		{
+			if (NULL == (host = (ZBX_DC_HOST *)zbx_hashset_search(&config->hosts, &hostid)))
+				continue;
+		}
 
 		if (1 == clean_sync)
 			item = (ZBX_DC_ITEM *)DCfind_id_uniq(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
@@ -2882,7 +2885,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (ITEM_STATUS_ACTIVE == status)
 		{
-			interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
+			if (NULL == interface || interface->interfaceid != interfaceid)
+				interface = (ZBX_DC_INTERFACE *)zbx_hashset_search(&config->interfaces, &interfaceid);
 			dc_interface_update_agent_stats(interface, type, 1);
 		}
 
