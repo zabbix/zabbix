@@ -54,9 +54,6 @@
 		/** @type {HTMLTableElement} */
 		#steps;
 
-		/** @type {boolean} */
-		#steps_initialized = false;
-
 		constructor() {
 			this.#registerEvents();
 		}
@@ -83,22 +80,15 @@
 			jQuery('#tabs').on('tabscreate tabsactivate', (e, ui) => {
 				const panel = e.type === 'tabscreate' ? ui.panel : ui.newPanel;
 
-				if (panel.attr('id') === 'scenario-tab') {
-					if (!this.#variables_headers_initialized) {
-						this.#initVariables(variables);
-						this.#initHeaders(headers);
+				if (panel.attr('id') === 'scenario-tab' && !this.#variables_headers_initialized) {
+					this.#initVariables(variables);
+					this.#initHeaders(headers);
 
-						this.#variables_headers_initialized = true;
-					}
-				}
-				else if (panel.attr('id') === 'steps-tab') {
-					if (!this.#steps_initialized) {
-						this.#initSteps(steps);
-
-						this.#steps_initialized = true;
-					}
+					this.#variables_headers_initialized = true;
 				}
 			});
+
+			this.#initSteps(steps);
 
 			for (const id of ['agent', 'authentication']) {
 				document.getElementById(id).addEventListener('change', () => this.#updateForm());
@@ -127,17 +117,26 @@
 		#initHeaders(headers) {
 			const $headers = jQuery(this.#headers);
 
-			$headers.dynamicRows({
-				template: '#header-row-tmpl',
-				rows: headers
-			});
+			$headers
+				.dynamicRows({
+					template: '#header-row-tmpl',
+					rows: headers,
+					sortable: true,
+					sortable_options: {
+						target: 'tbody',
+						selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+						freeze_end: 1
+					}
+				})
+				.on('tableupdate.dynamicRows', (e) => {
+					e.target.querySelectorAll('.form_row').forEach((row, index) => {
+						for (const field of row.querySelectorAll('[name^="headers["]')) {
+							field.name = field.name.replace(/\[\d+]/g, `[${index}]`);
+						}
+					});
+				});
 
 			this.#initTextareaFlexible($headers);
-
-			new CSortable(this.#headers.querySelector('tbody'), {
-				selector_freeze: 'tr:last-child',
-				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
-			});
 		}
 
 		#initTextareaFlexible($element) {
@@ -167,11 +166,10 @@
 				}
 			});
 
-			if (!this.#is_templated) {
-				new CSortable(this.#steps.querySelector('tbody'), {
-					selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
-				});
-			}
+			new CSortable(this.#steps.querySelector('tbody'), {
+				selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+				enable_sorting: !this.#is_templated
+			});
 		}
 
 		#prepareStepRow(step) {
