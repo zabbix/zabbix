@@ -303,7 +303,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$totalExpectedTriggers = self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2;
 		$this->assertEquals($totalExpectedTriggers, count($response['result']));
 
-		//$this->assertEquals( json_encode($response, JSON_PRETTY_PRINT), "badger",  json_encode($response, JSON_PRETTY_PRINT));
+		$this->assertEquals( json_encode($response, JSON_PRETTY_PRINT), "badger",  json_encode($response, JSON_PRETTY_PRINT));
 
 		$i = 0;
 		foreach ($response['result'] as $entry) {
