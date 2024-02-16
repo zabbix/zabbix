@@ -1469,11 +1469,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_str(dbrow[8], item->delay))
 		return FAIL;
 
-	numitem = item->numitem;
 	if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 	{
-		if (NULL == numitem)
-			return FAIL;
+		numitem = item->numitem;
 
 		if (SUCCEED != is_time_suffix(dbrow[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
 			trends_sec = ZBX_HK_PERIOD_MAX;
@@ -1490,20 +1488,14 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[26], numitem->units))
 			return FAIL;
 	}
-	else if (NULL != numitem)
-		return FAIL;
 
-	snmpitem = (ZBX_DC_SNMPITEM *)zbx_hashset_search(&dbsync_env.cache->snmpitems, &item->itemid);
 	if (ITEM_TYPE_SNMP == type)
 	{
-		if (NULL == snmpitem)
-			return FAIL;
+		snmpitem = item->itemtype.snmpitem;
 
 		if (FAIL == dbsync_compare_str(dbrow[6], snmpitem->snmp_oid))
 			return FAIL;
 	}
-	else if (NULL != snmpitem)
-		return FAIL;
 
 	ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&dbsync_env.cache->ipmiitems, &item->itemid);
 	if (ITEM_TYPE_IPMI == item->type)
