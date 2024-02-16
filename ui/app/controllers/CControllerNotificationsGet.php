@@ -53,20 +53,6 @@ class CControllerNotificationsGet extends CController {
 		parent::init();
 
 		$this->disableCsrfValidation();
-		$this->notifications = [];
-		$this->settings = getMessageSettings();
-		$ok_timeout = (int) timeUnitToSeconds(CSettingsHelper::getPublic(CSettingsHelper::OK_PERIOD));
-		$timeout = (int) timeUnitToSeconds($this->settings['timeout']);
-		$this->settings['timeout'] = $timeout;
-		$this->settings['ok_timeout'] = min([$timeout, $ok_timeout]);
-		$this->settings['show_recovered'] = (bool) $this->settings['triggers.recovery'];
-		$this->settings['show_suppressed'] = (bool) $this->settings['show_suppressed'];
-		if (!$this->settings['triggers.severities']) {
-			$this->settings['enabled'] = true;
-		}
-
-		$this->timeout_time = time() - $this->settings['timeout'];
-		$this->time_from = max([$this->settings['last.clock'], $this->timeout_time]);
 	}
 
 	protected function checkInput(): bool {
@@ -94,6 +80,21 @@ class CControllerNotificationsGet extends CController {
 	}
 
 	protected function doAction(): void {
+		$this->notifications = [];
+		$this->settings = getMessageSettings();
+		$ok_timeout = (int) timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::OK_PERIOD));
+		$timeout = (int) timeUnitToSeconds($this->settings['timeout']);
+		$this->settings['timeout'] = $timeout;
+		$this->settings['ok_timeout'] = min([$timeout, $ok_timeout]);
+		$this->settings['show_recovered'] = (bool) $this->settings['triggers.recovery'];
+		$this->settings['show_suppressed'] = (bool) $this->settings['show_suppressed'];
+		if (!$this->settings['triggers.severities']) {
+			$this->settings['enabled'] = true;
+		}
+
+		$this->timeout_time = time() - $this->settings['timeout'];
+		$this->time_from = max([$this->settings['last.clock'], $this->timeout_time]);
+
 		if (!$this->settings['enabled']) {
 			$this->setResponse(new CControllerResponseData(['main_block' => $this->makeResponseData()]));
 			return;
