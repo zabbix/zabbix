@@ -8562,6 +8562,11 @@ msgstr "Frontend prístup"
 msgid "Frontend messaging"
 msgstr "Povoliť frontend správy"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -13495,6 +13500,11 @@ msgstr "Viacnásobné PROBLÉMOVÉ udalosti"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "Stlmiť"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -18659,6 +18669,11 @@ msgstr "Slovensky (sk_SK)"
 msgid "Snooze"
 msgstr "Odložiť"
 
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr ""
+
 #: include/hosts.inc.php:174
 msgid "Software"
 msgstr "Softvér"
@@ -21053,6 +21068,11 @@ msgstr ""
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "Povoliť zvuky"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr ""
 
 #: app/partials/administration.system.info.php:161
 #, c-format

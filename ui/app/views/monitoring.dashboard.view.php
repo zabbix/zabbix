@@ -30,7 +30,7 @@ if (array_key_exists('error', $data)) {
 	return;
 }
 
-$this->addJsFile('d3.v7.min.js');
+$this->addJsFile('d3.js');
 $this->addJsFile('flickerfreescreen.js');
 $this->addJsFile('gtlc.js');
 $this->addJsFile('leaflet.js');
@@ -66,7 +66,7 @@ $this->addJsFile('multilineinput.js');
 
 $this->includeJsFile('monitoring.dashboard.view.js.php');
 
-$this->addCssFile('assets/styles/vendors/Leaflet/Leaflet/leaflet.css');
+$this->addCssFile('assets/styles/vendors/Leaflet/leaflet.css');
 
 $this->enableLayoutModes();
 $web_layout_mode = $this->getLayoutMode();
