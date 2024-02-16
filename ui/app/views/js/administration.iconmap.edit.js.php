@@ -81,8 +81,8 @@
 			addMappingButton = $('#addMapping');
 
 		new CSortable(iconMapTable[0].querySelector('tbody'), {
-			selector_freeze: '#iconMapListFooter, tr:last-child',
-			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>'
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
+			freeze_end: 2
 		});
 
 		iconMapTable.find('tbody')
