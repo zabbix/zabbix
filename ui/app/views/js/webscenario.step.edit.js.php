@@ -40,9 +40,6 @@ window.webscenario_step_edit_popup = new class {
 	/** @type {HTMLTableElement} */
 	#headers;
 
-	/** @type {CSortable} */
-	#sortable_post_fields;
-
 	init({query_fields, post_fields, variables, headers}) {
 		this.#overlay = overlays_stack.getById('webscenario-step-edit');
 		this.#dialogue = this.#overlay.$dialogue[0];
@@ -202,24 +199,9 @@ window.webscenario_step_edit_popup = new class {
 			}
 
 			const $table = jQuery(this.#post_fields);
-			const last_row = this.#post_fields.querySelector('tbody tr:last-of-type');
-			const row_template = new Template(document.getElementById('step-post-field-row-tmpl').innerHTML);
-			const template = document.createElement('template');
 
-			$table.data('dynamicRows').counter = 0;
-
-			for (const pair of pairs) {
-				const data = {
-					name: pair.name,
-					value: pair.value,
-					rowNum: $table.data('dynamicRows').counter++
-				};
-				template.innerHTML = row_template.evaluate(data);
-
-				last_row.before(template.content.firstChild);
-			}
-
-			$table.trigger('afteradd.dynamicRows');
+			$table.data('dynamicRows').addRows(pairs);
+			$table.trigger('tableupdate.dynamicRows');
 		}
 		else {
 			for (const row of this.#post_fields.querySelectorAll('tbody .form_row')) {
