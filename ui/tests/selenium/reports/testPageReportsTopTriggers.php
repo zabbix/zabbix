@@ -1204,6 +1204,7 @@ class testPageReportsTopTriggers extends CWebTest {
 	 */
 	public function testPageReportsTopTriggers_Filter($data) {
 		$this->page->login()->open(self::LINK)->waitUntilReady();
+		$table = $this->getTable();
 
 		$filter = CFilterElement::find()->one();
 		if ($filter->getSelectedTabName() !== 'Filter' && !array_key_exists('date', $data)) {
@@ -1243,6 +1244,7 @@ class testPageReportsTopTriggers extends CWebTest {
 		}
 
 		$this->page->waitUntilReady();
+		$table->waitUntilReloaded();
 
 		if (array_key_exists('background_colors', $data)) {
 			foreach ($data['background_colors'] as $trigger => $color) {
