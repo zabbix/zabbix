@@ -787,7 +787,7 @@ zabbix_export:
                   value: '{#TENANT_NAME}'
               trigger_prototypes:
                 - uuid: 6a2c53a89d7748f89956464849d0b7de
-                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < now()'
+                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.backup.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.BACKUP})'
                   name: 'Device [{#NAME}]:[{#ID}]: Scheduled machine backup failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -951,7 +951,7 @@ zabbix_export:
                   value: '{#TENANT_NAME}'
               trigger_prototypes:
                 - uuid: 7f82e95335b746c1a061b0ae811165a7
-                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.next[{#NAME}]) < now()'
+                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.patch.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.PATCH})'
                   name: 'Device [{#NAME}]:[{#ID}]: Scheduled patch management failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1081,11 +1081,11 @@ zabbix_export:
                   value: '{#TENANT_NAME}'
               trigger_prototypes:
                 - uuid: 75156ffdb1ed4b90b594e50bce8752e5
-                  expression: 'max(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.next[{#NAME}],3m) < now()'
+                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.protection.scan.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE})'
                   name: 'Device [{#NAME}]:[{#ID}]: Scheduled antimalware scan failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
-                  description: 'Scheduled antimalware scan failed to run for at least 3 minutes.'
+                  description: 'Scheduled antimalware scan failed to run.'
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1268,7 +1268,7 @@ zabbix_export:
                   value: '{#TENANT_NAME}'
               trigger_prototypes:
                 - uuid: b71001b751594fc5b4b9b38673133171
-                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < now()'
+                  expression: 'last(/Acronis Cyber Protect Cloud MSP by HTTP/acronis.cpc.device.vuln.next[{#NAME}]) < (now() + {$ACRONIS.CPC.OFFSET.SCHEDULED.VULNERABILITY})'
                   name: 'Device [{#NAME}]:[{#ID}]: Scheduled vulnerability assessment failed to run'
                   opdata: 'Scheduled: {ITEM.LASTVALUE1}'
                   priority: WARNING
@@ -1458,6 +1458,18 @@ zabbix_export:
           description: 'Sets the HTTP proxy for the authorization item. Host prototypes will also use this value for HTTP proxy. If this parameter is empty, then no proxy is used.'
         - macro: '{$ACRONIS.CPC.MSP.TENANT.UUID}'
           description: 'UUID for MSP.'
+        - macro: '{$ACRONIS.CPC.OFFSET.SCHEDULED.ANTIMALWARE}'
+          value: '-180'
+          description: 'Offset time in seconds for scheduled antimalware scan trigger check.'
+        - macro: '{$ACRONIS.CPC.OFFSET.SCHEDULED.BACKUP}'
+          value: '-180'
+          description: 'Offset time in seconds for scheduled backup run trigger check.'
+        - macro: '{$ACRONIS.CPC.OFFSET.SCHEDULED.PATCH}'
+          value: '-180'
+          description: 'Offset time in seconds for scheduled patch management run trigger check.'
+        - macro: '{$ACRONIS.CPC.OFFSET.SCHEDULED.VULNERABILITY}'
+          value: '-180'
+          description: 'Offset time in seconds for scheduled vulnerability assessment run trigger check.'
         - macro: '{$ACRONIS.CPC.PATH.ACCOUNT.MANAGEMENT}'
           value: /api/2
           description: 'Sub-path for the Account Management API.'

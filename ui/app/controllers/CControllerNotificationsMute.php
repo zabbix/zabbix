@@ -21,11 +21,11 @@
 
 class CControllerNotificationsMute extends CController {
 
-	public function init() {
+	protected function init(): void {
 		$this->disableCsrfValidation();
 	}
 
-	protected function checkInput() {
+	protected function checkInput(): bool {
 		$fields = [
 			'muted' => 'required|in 0,1'
 		];
@@ -45,11 +45,11 @@ class CControllerNotificationsMute extends CController {
 		return $ret;
 	}
 
-	protected function checkPermissions() {
+	protected function checkPermissions(): bool {
 		return (!CWebUser::isGuest() && $this->getUserType() >= USER_TYPE_ZABBIX_USER);
 	}
 
-	protected function doAction() {
+	protected function doAction(): void {
 		$msg_settings = getMessageSettings();
 		$msg_settings['sounds.mute'] = $this->input['muted'];
 
