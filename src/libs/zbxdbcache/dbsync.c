@@ -1469,7 +1469,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	if (FAIL == dbsync_compare_str(dbrow[8], item->delay))
 		return FAIL;
 
-	numitem = (ZBX_DC_NUMITEM *)zbx_hashset_search(&dbsync_env.cache->numitems, &item->itemid);
+	numitem = item->numitem;
 	if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 	{
 		if (NULL == numitem)
