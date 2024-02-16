@@ -166,17 +166,20 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 
 		$this->prepareTestData($data);
 
-		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
-			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
-		);
-		$result = $server->testItem(self::adjustFieldTypes($data), CSessionHelper::getId());
 		$output = [
 			'user' => [
 				'debug_mode' => $this->getDebugMode()
 			]
 		];
 
+		// Send test to be executed on Zabbix server.
+		$server = new CZabbixServer($ZBX_SERVER, $ZBX_SERVER_PORT,
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
+			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
+		);
+		$result = $server->testItem(self::adjustFieldTypes($data), CSessionHelper::getId());
+
+		// Handle the response.
 		if ($result === false) {
 			error($server->getError());
 		}
