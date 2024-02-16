@@ -27,17 +27,9 @@
  * @return string
  */
 function getUserTheme($userData) {
-	if (CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_THEME) !== null) {
-		$css = CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_THEME);
-	}
-	if (isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT) {
-		$css = $userData['theme'];
-	}
-	if (!isset($css)) {
-		$css = ZBX_DEFAULT_THEME;
-	}
-
-	return $css;
+	return isset($userData['theme']) && $userData['theme'] != THEME_DEFAULT
+		? $userData['theme']
+		: CSettingsHelper::getPublic(CSettingsHelper::DEFAULT_THEME);
 }
 
 /**
