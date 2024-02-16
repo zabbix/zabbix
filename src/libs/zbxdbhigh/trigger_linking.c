@@ -765,8 +765,9 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		zbx_trigger_descriptions_entry_t	*found, temp_t;
 
 		target_host_trigger_entry.update_flags = ZBX_FLAG_LINK_TRIGGER_UNSET;
-
 		ZBX_STR2UINT64(target_host_trigger_entry.triggerid, row[0]);
+
+		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER TARGET HOST TRIGGER: %lu", target_host_trigger_entry.triggerid);
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);
@@ -1612,9 +1613,27 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 				&new_triggerids, &funcs_insert_count, error);
 	}
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA1, temp_host_triggerids");
+	/* temp_host_triggerids - list of host triggerids that have DESCRIPTION! only matches with triggers from templates
+	not FULL matches
+	*/
+	for (int u = 0; u < temp_host_triggerids.values_num; u++)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA1 NEXT: %lu", temp_host_triggerids.values[u]);
+	}
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "STRATA2, cur_triggerids");
+	for (int u = 0; u < cur_triggerids.values_num; u++)
+	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "STRATA2 NEXT: %lu", cur_triggerids.values[u]);
+	}
+
 	if (SUCCEED == res)
 	{
-		res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids,
+		/*this should be not temp_host_triggersids - it contains the list of descriptions matches, I need full matches*/
+		/* res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids, */
+		/* 		TRIGGER_DEP_SYNC_UPDATE_OP); */
+		res = DBsync_template_dependencies_for_triggers(hostid, &cur_triggerids,
 				TRIGGER_DEP_SYNC_UPDATE_OP);
 	}
 
