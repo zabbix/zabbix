@@ -304,7 +304,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		//$this->assertEquals( json_encode($response, JSON_PRETTY_PRINT), "badger",  json_encode($response, JSON_PRETTY_PRINT));
 
-		$i = 1;
+		$i = 0;
 		foreach ($response['result'] as $entry) {
 			$ep = json_encode($entry, JSON_PRETTY_PRINT);
 
@@ -342,8 +342,8 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
 			$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3", $ep);
 
-			$i=$i+2;
-			if ($i == $totalExpectedTriggers-1)
+			$i=$i+1;
+			if ($i == $totalExpectedTriggers/2)
 			{
 				$i = 0;
 			}
