@@ -689,14 +689,14 @@ window.widget_pie_chart_form = new class {
 		jQuery('#legend_columns').rangeControl(is_legend_visible ? 'enable' : 'disable');
 		document.getElementById('legend_aggregation').disabled = !is_legend_visible;
 
-		for (const input of document.getElementById('legend_lines_mode').querySelectorAll('input')) {
+		for (const input of this.#form.querySelectorAll('[name=legend_lines_mode]')) {
 			input.disabled = !is_legend_visible;
 		}
 
-		const legend_lines_mode_value = document.getElementById('legend_lines_mode').querySelector(':checked').value;
+		const legend_lines_mode = this.#form.querySelector('[name=legend_lines_mode]:checked').value;
 
-		document.querySelector('[for=legend_lines]')
-			.innerHTML = legend_lines_mode_value == <?= WidgetForm::LEGEND_LINES_MODE_VARIABLE ?>
+		this.#form.querySelector('[for=legend_lines]')
+			.textContent = legend_lines_mode == <?= WidgetForm::LEGEND_LINES_MODE_VARIABLE ?>
 				? '<?= _('Maximum number of rows') ?>'
 				: '<?= _('Number of rows') ?>';
 
