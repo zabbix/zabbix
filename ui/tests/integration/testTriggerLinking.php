@@ -299,8 +299,8 @@ class testTriggerLinking extends CIntegrationTest {
 		]
 		);
 
-		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2,
-							count($response['result']));
+		$totalExpectedTriggers = self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2;
+		$this->assertEquals($totalExpectedTriggers, count($response['result']));
 
 		$i = 0;
 		foreach ($response['result'] as $entry) {
@@ -340,10 +340,12 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
 			$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3", $ep);
 
-			if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
+			$i++;
+			if ($i == $totalExpectedTriggers/2)
 			{
-				$i++;
+				$i = 0;
 			}
+			//if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
 		}
 	}
 
