@@ -30,7 +30,7 @@ class CControllerMfaCheck extends CController {
 		$fields = [
 			'mfaid' =>			'db mfa.mfaid',
 			'type' =>			'in '.MFA_TYPE_TOTP.','.MFA_TYPE_DUO,
-			'name' =>			'db mfa.name',
+			'name' =>			'required|db mfa.name',
 			'hash_function' =>	'in '.TOTP_HASH_SHA1.','.TOTP_HASH_SHA256.','.TOTP_HASH_SHA512,
 			'code_length' =>	'in '.TOTP_CODE_LENGTH_6.','.TOTP_CODE_LENGTH_8,
 			'api_hostname' =>	'db mfa.api_hostname',
@@ -40,6 +40,10 @@ class CControllerMfaCheck extends CController {
 		];
 
 		$ret = $this->validateInput($fields);
+
+		if ($ret && $this->getInput('type', MFA_TYPE_TOTP) == MFA_TYPE_DUO) {
+			$ret = $this->validateTypeDuoFields();
+		}
 
 		if (!$ret) {
 			$this->setResponse(
@@ -99,5 +103,26 @@ class CControllerMfaCheck extends CController {
 		}
 
 		$this->setResponse(new CControllerResponseData(['main_block' => json_encode($data)]));
+	}
+
+	private function validateTypeDuoFields(): bool {
+		$data = [
+			'api_hostname' => '',
+			'clientid' => ''
+		];
+		$this->getInputs($data, array_keys($data));
+
+		if ($this->getInput('add_mfa_method', 0) == 1) {
+			$data['client_secret'] = $this->getInput('client_secret', '');
+		}
+
+		foreach ($data as $key => $field) {
+			if ($field === '') {
+				error(_s('Incorrect value for field "%1$s": %2$s.', $key, _('cannot be empty')));
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

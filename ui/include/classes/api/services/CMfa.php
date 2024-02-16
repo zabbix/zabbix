@@ -213,23 +213,23 @@ class CMfa extends CApiService {
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
 			'hash_function' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512])],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512])],
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'hash_function')]
 			]],
 			'code_length' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'flags' => API_REQUIRED, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])],
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'code_length')]
 			]],
 			'api_hostname' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'api_hostname')]
 			]],
 			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'clientid')]
 			]],
 			'client_secret' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'client_secret')]
 			]]
 		]];

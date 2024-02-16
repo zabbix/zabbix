@@ -35,6 +35,10 @@ if (array_key_exists('mfaid', $data)) {
 	$form->addVar('mfaid', $data['mfaid']);
 }
 
+if (array_key_exists('add_mfa_method', $data)) {
+	$form->addVar('add_mfa_method', $data['add_mfa_method']);
+}
+
 // Enable form submitting on Enter.
 $form->addItem((new CSubmitButton())->addClass(ZBX_STYLE_FORM_SUBMIT_HIDDEN));
 $curl_warning = $data['curl_error']
@@ -92,21 +96,21 @@ $form
 			))->setId('code_length')
 		])
 		->addItem([
-			(new CLabel(_('API hostname'), 'api_hostname')),
+			(new CLabel(_('API hostname'), 'api_hostname'))->setAsteriskMark(),
 			(new CFormField(
 				(new CTextBox('api_hostname', $data['api_hostname'], false, DB::getFieldLength('mfa', 'api_hostname')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			))->setId('api_hostname')
 		])
 		->addItem([
-			(new CLabel(_('Client ID'), 'clientid')),
+			(new CLabel(_('Client ID'), 'clientid'))->setAsteriskMark(),
 			(new CFormField(
 				(new CTextBox('clientid', $data['clientid'], false, DB::getFieldLength('mfa', 'clientid')))
 					->setWidth(ZBX_TEXTAREA_MEDIUM_WIDTH)
 			))->setId('clientid')
 		])
 		->addItem([
-			(new CLabel(_('Client secret'), 'client_secret')),
+			(new CLabel(_('Client secret'), 'client_secret'))->setAsteriskMark(),
 			(new CFormField($data['add_mfa_method'] == 0 && $data['type'] == MFA_TYPE_DUO
 				? [
 					array_key_exists('client_secret', $data)
