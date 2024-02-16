@@ -58,6 +58,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 	private static $templateids = array();
 	private static $stringids = array();
+	private static $triggerids = array();
 
 	public function createTemplates() {
 
@@ -176,6 +177,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['triggerids']);
+			array_push(self::$triggerids, $response['result']['triggerids']);
 
 			//$this->assertEquals("badger", $response['result']['triggerids'][0], $response['result']['triggerids'][0]);
 
@@ -309,8 +311,15 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('tag', $entry['tags'][0], $ep);
 			$this->assertEquals(self::TAG_NAME_PRE . "_" . self::$stringids[$i], $entry['tags'][0]['tag'], $ep);
 
-			$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . self::$stringids[$i],
-					$ep);
+			if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
+			{
+				$this->assertEquals($entry['dependencies'][0], self::$triggerids[$i], $ep);
+			}
+			else
+			{
+				$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_PRE . "_" . self::$stringids[$i], $ep);
+			}
+
 			$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
 			$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
 			$this->assertEquals($entry['comments'],    self::TRIGGER_COMMENTS_PRE . "_" . self::$stringids[$i], $ep);
