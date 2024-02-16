@@ -323,7 +323,7 @@ class testTriggerLinking extends CIntegrationTest {
 				// $i = $triggers_same_descr_mapping_to_id;
 				//continue;
 
-				$this->assertArrayHasKey($entry['dependencies'][0]);
+				$this->assertArrayHasKey(0, $entry['dependencies']);
 				continue;
 			}
 
