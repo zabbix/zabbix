@@ -2,7 +2,7 @@
 	--color: #{$honeycomb-label-color};
 	--fill: #{$honeycomb-cell-color};
 	--stroke: #{$honeycomb-cell-color};
-	--stroke-hover: #{darken($honeycomb-cell-color, 6%)};
+	--stroke-hover: #{darken($honeycomb-cell-color, 12%)};
 	--no-data-color: #{$honeycomb-no-data-label-color};
 	--no-data-fill: #{$honeycomb-no-data-cell-color};
 	--no-data-stroke: #{$honeycomb-no-data-cell-color};

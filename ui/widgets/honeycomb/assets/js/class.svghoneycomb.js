@@ -528,7 +528,7 @@ class CSVGHoneycomb {
 		cell
 			.style('--dx', `${scaled_position.dx}px`)
 			.style('--dy', `${scaled_position.dy}px`)
-			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.3).formatHex())
+			.style('--stroke', d => d3.color(this.#getFillColor(d))?.darker(.5).formatHex())
 			.style('--stroke-width', 2 / this.#container_params.scale / cell_scale)
 			.style('--scale', cell_scale)
 			.select('path')
@@ -658,53 +658,73 @@ class CSVGHoneycomb {
 			};
 		}
 
-		if (!data.length) {
+		if (!data.length || (!this.#config.primary_label.show && !this.#config.secondary_label.show)) {
 			return;
 		}
 
 		for (const d of data) {
-			d.labels = {
-				primary: calculate(cell_width, d.primary_label, this.#config.primary_label.is_bold ? 'bold' : ''),
-				secondary: calculate(cell_width, d.secondary_label, this.#config.secondary_label.is_bold ? 'bold' : '')
-			};
+			d.labels = {primary: null, secondary: null};
 		}
 
-		const primary_thresholds = new Map();
-		const secondary_thresholds = new Map();
+		const p_thresholds = new Map();
 
-		for (const d of data) {
-			const primary_step = d.labels.primary.line_max_length;
+		if (this.#config.primary_label.show) {
+			for (const d of data) {
+				d.labels.primary = calculate(cell_width, d.primary_label,
+					this.#config.primary_label.is_bold ? 'bold' : ''
+				);
+			}
 
-			primary_thresholds.set(primary_step, primary_thresholds.has(primary_step)
-				? Math.min(primary_thresholds.get(primary_step), d.labels.primary.font_size)
-				: d.labels.primary.font_size
-			);
+			for (const d of data) {
+				const step = d.labels.primary.line_max_length;
 
-			const secondary_step = d.labels.secondary.line_max_length;
+				p_thresholds.set(step, p_thresholds.has(step)
+					? Math.min(p_thresholds.get(step), d.labels.primary.font_size)
+					: d.labels.primary.font_size
+				);
+			}
+		}
 
-			secondary_thresholds.set(secondary_step, secondary_thresholds.has(secondary_step)
-				? Math.min(secondary_thresholds.get(secondary_step), d.labels.secondary.font_size)
-				: d.labels.secondary.font_size
-			);
+		const s_thresholds = new Map();
+
+		if (this.#config.secondary_label.show) {
+			for (const d of data) {
+				d.labels.secondary = calculate(cell_width, d.secondary_label,
+					this.#config.secondary_label.is_bold ? 'bold' : ''
+				);
+			}
+
+			for (const d of data) {
+				const step = d.labels.secondary.line_max_length;
+
+				s_thresholds.set(step, s_thresholds.has(step)
+					? Math.min(s_thresholds.get(step), d.labels.secondary.font_size)
+					: d.labels.secondary.font_size
+				);
+			}
 		}
 
 		for (const d of data) {
-			const p_font_size = primary_thresholds.get(d.labels.primary.line_max_length);
-			const s_font_size = secondary_thresholds.get(d.labels.secondary.line_max_length);
+			const p_font_size = d.labels.primary !== null ? p_thresholds.get(d.labels.primary.line_max_length) : 0;
+			const s_font_size = d.labels.secondary !== null ? s_thresholds.get(d.labels.secondary.line_max_length) : 0;
 
-			d.labels.secondary = {
-				...d.labels.secondary,
-				font_size: s_font_size,
-				lines_max_count: Math.floor(container_height / (p_font_size + s_font_size))
-			};
+			if (d.labels.secondary !== null) {
+				d.labels.secondary = {
+					...d.labels.secondary,
+					font_size: s_font_size,
+					lines_max_count: Math.floor(container_height / (p_font_size + s_font_size))
+				};
+			}
 
-			d.labels.primary = {
-				...d.labels.primary,
-				font_size: p_font_size,
-				lines_max_count: Math.floor(
-					(container_height + s_font_size) / p_font_size - d.labels.secondary.lines_max_count
-				)
-			};
+			if (d.labels.primary !== null) {
+				d.labels.primary = {
+					...d.labels.primary,
+					font_size: p_font_size,
+					lines_max_count: Math.floor(
+						(container_height + s_font_size) / p_font_size - d.labels.secondary.lines_max_count
+					)
+				};
+			}
 		}
 	}
 
