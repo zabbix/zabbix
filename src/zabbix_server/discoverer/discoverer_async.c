@@ -87,6 +87,7 @@ static void	discovery_async_poller_init(zbx_discoverer_manager_t *dmanager,
 	zabbix_log(LOG_LEVEL_DEBUG, "[%d] End of %s()", log_worker_id, __func__);
 }
 
+#ifdef HAVE_NETSNMP
 static void	process_snmp_result(void *data)
 {
 	discovery_async_result_t	*async_result = zbx_async_check_snmp_get_arg(data);
@@ -210,6 +211,7 @@ static int	discovery_snmp(discovery_poller_config_t *poller_config, const zbx_dc
 			ip, port, item.key_orig, ret);
 	return ret;
 }
+#endif
 
 static void	process_agent_result(void *data)
 {
