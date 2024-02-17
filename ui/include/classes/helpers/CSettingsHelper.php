@@ -126,8 +126,11 @@ class CSettingsHelper {
 					'validate_uri_schemes', 'uri_valid_schemes', 'x_frame_options', 'iframe_sandboxing_enabled',
 					'iframe_sandboxing_exceptions', 'max_overview_table_size', 'connect_timeout', 'socket_timeout',
 					'media_type_test_timeout', 'script_timeout', 'item_test_timeout', 'url', 'report_test_timeout',
-					'auditlog_enabled', 'ha_failover_delay', 'geomaps_tile_provider', 'geomaps_tile_url',
-					'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider'
+					'auditlog_enabled', 'auditlog_mode', 'ha_failover_delay', 'geomaps_tile_provider',
+					'geomaps_tile_url', 'geomaps_max_zoom', 'geomaps_attribution', 'vault_provider',
+					'timeout_zabbix_agent', 'timeout_simple_check', 'timeout_snmp_agent', 'timeout_external_check',
+					'timeout_db_monitor', 'timeout_http_agent', 'timeout_ssh_agent', 'timeout_telnet_agent',
+					'timeout_script'
 				]
 			]);
 
