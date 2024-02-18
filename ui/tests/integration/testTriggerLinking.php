@@ -143,8 +143,10 @@ class testTriggerLinking extends CIntegrationTest {
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 		$this->assertEquals(1, count($response['result']), $ep);
 
+		$this->reloadConfigurationCache();
+
 		$response = $this->call('action.create', [
-			'name' => 'create_host',
+			'name' => 'create_host2',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
 			'status' => 0,
 			'operations' => [
