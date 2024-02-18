@@ -141,7 +141,7 @@ class testTriggerLinking extends CIntegrationTest {
 	{
 		$response = $this->call('action.delete', [self::$firstActionID]);
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
-		$this->assertEquals(1, $response['result'], $ep);
+		$this->assertEquals(1, count($response['result']), $ep);
 
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
