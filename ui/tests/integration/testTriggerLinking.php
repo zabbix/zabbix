@@ -146,6 +146,47 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']['actionids']));
 	}
 
+	public function setupActions2()
+	{
+		$response = $this->call('action.create', [
+			'name' => 'create_host',
+			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
+			'status' => 0,
+			'operations' => [
+				[
+					'operationtype' => 2
+				]
+			]
+		]
+		);
+
+		$ep = json_encode($response, JSON_PRETTY_PRINT);
+
+		$this->assertArrayHasKey('actionids', $response['result'], $ep);
+		$this->assertEquals(1, count($response['result']['actionids']), $ep);
+
+		$templateids_for_api_call_collision_description = [];
+		array_push($templateids_for_api_call_collision_description, ['templateid' => self::$templateX_ID]);
+
+		$response = $this->call('action.create', [
+			'name' => 'link_templates',
+			'eventsource' => 2,
+			'status' => 0,
+			'operations' => [
+				[
+					'operationtype' => 6,
+					'optemplate' =>
+					$templateids_for_api_call_collision_description
+				]
+			]
+
+		]
+		);
+
+		$this->assertArrayHasKey('actionids', $response['result']);
+		$this->assertEquals(1, count($response['result']['actionids']));
+	}
+
 	/**
 	* @inheritdoc
 	*/
@@ -322,7 +363,19 @@ class testTriggerLinking extends CIntegrationTest {
 				'DebugLevel'    => 4,
 				'LogFileSize'   => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid'
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'HostMetadata' => 'first'
+			],
+
+			self::COMPONENT_AGENT_NEW_METADATA => [
+				'Hostname'		=>  self::HOST_NAME,
+				'ServerActive'	=>
+						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
+				'DebugLevel'    => 4,
+				'LogFileSize'   => 0,
+				'LogFile' => self::getLogPath(self::COMPONENT_AGENT),
+				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
+				'HostMetadata' => 'second'
 			]
 		];
 	}
@@ -424,9 +477,17 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @required-components server, agent
 	 */
 	public function testTriggerLinking_checkMe() {
+		$this->stopComponent(self::COMPONENT_AGENT_NEW_METADATA);
+
 		$this->reloadConfigurationCache();
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->checkTriggersCreate();
+
+		$this->setupAction2();
+		$this->stopComponent(self::COMPONENT_AGENT);
+		$this->reloadConfigurationCache();
+		sleep(10);
+		$this->startComponent(self::COMPONENT_AGENT_NEW_METADATA);
 	}
 }
