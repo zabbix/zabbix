@@ -267,9 +267,9 @@ class testTriggerLinking extends CIntegrationTest {
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
 				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE,
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-				'expression' => 'last(/' . "templateX_ID" . '/' .
+				'expression' => 'last(/' . "templateX" . '/' .
 				"templateX_item_key" . ')=2',
-				'recovery_expression' => 'last(/' . "templateX_ID" . '/' .
+				'recovery_expression' => 'last(/' . "templateX" . '/' .
 				"templateX_item_key" . ')=3',
 				'tags' => [
 					[
