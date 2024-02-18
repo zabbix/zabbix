@@ -61,6 +61,7 @@ class testTriggerLinking extends CIntegrationTest {
 	//private static $triggerids_deps = array();
 	//private static $triggers_same_descr_mapping_to_id = array();
 	private static $templateX_ID;
+	private static $firstActionID;
 
 	public function createTemplates() {
 
@@ -133,10 +134,15 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
+		self::$firstActionID = $response['result']['actionids'][0];
 	}
 
 	public function setupActions2()
 	{
+		$response = $this->call('action.delete', [self::firstActionID]);
+		$ep = json_encode($response, JSON_PRETTY_PRINT);
+		$this->assertEquals(1, $response['result'], $ep);
+
 		$response = $this->call('action.create', [
 			'name' => 'create_host',
 			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
@@ -146,8 +152,7 @@ class testTriggerLinking extends CIntegrationTest {
 					'operationtype' => 2
 				]
 			]
-		]
-		);
+		]);
 
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
