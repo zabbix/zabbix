@@ -35,16 +35,16 @@ class testDashboardViewMode extends CLegacyWebTest {
 		$users = ['super-admin', 'admin', 'user', 'guest'];
 		foreach ($users as $user) {
 			switch ($user) {
-				case 'super-admin' :
+				case 'super-admin':
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
 					break;
-				case 'admin' :
+				case 'admin':
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
 					break;
-				case 'user';
+				case 'user':
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
 					break;
-				case 'guest';
+				case 'guest':
 					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
 					break;
 			}
