@@ -112,6 +112,9 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('actionids', $response['result'], $ep);
 		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 
+		$templateids_for_api_call_collision_description = [];
+		array_push($templateids_for_api_call_collision_description, ['templateid' => self::$templateX_ID]);
+
 		$templateids_for_api_call = [];
 		foreach (self::$templateids as $entry) {
 			$t = ['templateid' => $entry];
@@ -132,7 +135,7 @@ class testTriggerLinking extends CIntegrationTest {
 				[
 					'operationtype' => 6,
 					'optemplate' =>
-					self::$templateX_ID
+					$templateids_for_api_call_collision_description
 				]
 			]
 
