@@ -2973,10 +2973,15 @@ static int	dbupgrade_groupsets_make(zbx_vector_uint64_t *ids, const char *fld_na
 		}
 		zbx_db_free_result(result);
 
-		if (0 == allow_empty_groups && 0 == groupids.values_num)
+		if (0 == groupids.values_num)
 		{
-			ret = FAIL;
-			break;
+			if (0 == allow_empty_groups)
+			{
+				zabbix_log(LOG_LEVEL_WARNING, "host or template [hostid=" ZBX_FS_UI64 "] is not"
+						" assigned to any group, permissions not granted", ids->values[i]);
+			}
+
+			continue;
 		}
 
 		zbx_sha256_finish(&ctx, hash);
@@ -3011,6 +3016,9 @@ static int	dbupgrade_groupsets_insert(const char *tbl_name, zbx_hashset_t *group
 	zbx_uint64_t		gsetid;
 	zbx_hashset_iter_t	iter;
 	zbx_dbu_group_set_t	*gset_ptr;
+
+	if (0 == group_sets->num_data)
+		return SUCCEED;
 
 	gsetid = zbx_db_get_maxid_num(tbl_name, group_sets->num_data);
 
@@ -3221,12 +3229,41 @@ static int	DBpatch_6050209(void)
 
 static int	DBpatch_6050210(void)
 {
+	int		ret = SUCCEED;
+	zbx_uint64_t	ugsetid;
+	zbx_db_result_t	result;
+	zbx_db_row_t	row;
+
+	if (0 == (DBget_program_type() & ZBX_PROGRAM_TYPE_SERVER))
+		return SUCCEED;
+
+	result = zbx_db_select_n("select ugsetid from ugset where ugsetid not in (select ugsetid from ugset_group)", 1);
+
+	if (NULL == (row = zbx_db_fetch(result)))
+		goto out;
+
+	ZBX_STR2UINT64(ugsetid, row[0]);
+
+	if (ZBX_DB_OK > zbx_db_execute("delete from user_ugset where ugsetid=" ZBX_FS_UI64, ugsetid) ||
+			ZBX_DB_OK > zbx_db_execute("delete from ugset where ugsetid=" ZBX_FS_UI64, ugsetid))
+	{
+		ret = FAIL;
+		goto out;
+	}
+out:
+	zbx_db_free_result(result);
+
+	return ret;
+}
+
+static int	DBpatch_6050211(void)
+{
 	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
 	return DBadd_field("drules", &field);
 }
 
-static int	DBpatch_6050211(void)
+static int	DBpatch_6050212(void)
 {
 	const zbx_db_field_t	field = {"error", "", NULL, NULL, 2048, ZBX_TYPE_CHAR, ZBX_NOTNULL, 0};
 
@@ -3448,5 +3485,6 @@ DBPATCH_ADD(6050208, 0, 1)
 DBPATCH_ADD(6050209, 0, 1)
 DBPATCH_ADD(6050210, 0, 1)
 DBPATCH_ADD(6050211, 0, 1)
+DBPATCH_ADD(6050212, 0, 1)
 
 DBPATCH_END()
