@@ -145,21 +145,6 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->reloadConfigurationCache();
 
-		$response = $this->call('action.create', [
-			'name' => 'create_host2',
-			'eventsource' => EVENT_SOURCE_AUTOREGISTRATION,
-			'status' => 0,
-			'operations' => [
-				[
-					'operationtype' => 2
-				]
-			]
-		]);
-
-		$ep = json_encode($response, JSON_PRETTY_PRINT);
-
-		$this->assertArrayHasKey('actionids', $response['result'], $ep);
-		$this->assertEquals(1, count($response['result']['actionids']), $ep);
 
 		$templateids_for_api_call_collision_description = [];
 		array_push($templateids_for_api_call_collision_description, ['templateid' => self::$templateX_ID]);
