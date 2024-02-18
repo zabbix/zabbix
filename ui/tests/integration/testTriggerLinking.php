@@ -132,7 +132,7 @@ class testTriggerLinking extends CIntegrationTest {
 				[
 					'operationtype' => 6,
 					'optemplate' =>
-					$templateid_X
+					self::$templateX_ID
 				]
 			]
 
