@@ -363,7 +363,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'HostMetadata' => 'first'
 			],
 
-			self::COMPONENT_AGENT_NEW_METADATA => [
+			self::COMPONENT_AGENT2 => [
 				'Hostname'		=>  self::HOST_NAME,
 				'ServerActive'	=>
 						'127.0.0.1:'.self::getConfigurationValue(self::COMPONENT_SERVER, 'ListenPort', 10051),
@@ -470,10 +470,10 @@ class testTriggerLinking extends CIntegrationTest {
 	 * Test trigger linking cases.
 	 *
 	 * @configurationDataProvider agentConfigurationProvider
-	 * @required-components server, agent
+	 * @required-components server, agent, agent2
 	 */
 	public function testTriggerLinking_checkMe() {
-		$this->stopComponent(self::COMPONENT_AGENT_NEW_METADATA);
+		$this->stopComponent(self::COMPONENT_AGENT2);
 
 		$this->reloadConfigurationCache();
 
@@ -484,6 +484,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->reloadConfigurationCache();
 		sleep(10);
-		$this->startComponent(self::COMPONENT_AGENT_NEW_METADATA);
+		$this->startComponent(self::COMPONENT_AGENT2);
 	}
 }
