@@ -360,6 +360,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'macros_values' => $this->getSupportedMacros($inputs['item']
 				+ CArrayHelper::getByKeys($inputs['host'], ['interfaceid'])
+				+ ['interfaceid' => $this->getInput('interfaceid', 0)]
 			)
 		]);
 
