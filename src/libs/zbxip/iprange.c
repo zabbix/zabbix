@@ -353,7 +353,6 @@ check_fill:
  ******************************************************************************/
 int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip, const size_t len)
 {
-#ifdef HAVE_IPV6
 	if (ZBX_IPRANGE_V6 == type)
 	{
 		zbx_snprintf(ip, len, "%x:%x:%x:%x:%x:%x:%x:%x", (unsigned int)ipaddress[0],
@@ -363,7 +362,6 @@ int	zbx_iprange_ip2str(const unsigned char type, const int *ipaddress, char *ip,
 				(unsigned int)ipaddress[7]);
 	}
 	else
-#endif
 	{
 		zbx_snprintf(ip, len, "%u.%u.%u.%u", (unsigned int)ipaddress[0], (unsigned int)ipaddress[1],
 				(unsigned int)ipaddress[2], (unsigned int)ipaddress[3]);
