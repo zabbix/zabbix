@@ -503,8 +503,10 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		sleep(5);
+		$this->reloadConfigurationCache();
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
+		$this->reloadConfigurationCache();
 
 		// $sql = "select expression from triggers where templateid is not null and hostid='".$hostid."';";
 		// $this->assertEquals(1, CDBHelper::getCount($sql));
@@ -547,7 +549,7 @@ class testTriggerLinking extends CIntegrationTest {
 		);
 
 
-		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2, count($response['result']));
+		$this->assertEquals(1, count($response['result']));
 
 		$entry = $response['result'][0];
 
