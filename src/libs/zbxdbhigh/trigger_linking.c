@@ -765,8 +765,8 @@ static int	get_target_host_main_data(zbx_uint64_t hostid, zbx_vector_str_t *temp
 		zbx_trigger_descriptions_entry_t	*found, temp_t;
 
 		target_host_trigger_entry.update_flags = ZBX_FLAG_LINK_TRIGGER_UNSET;
-		ZBX_STR2UINT64(target_host_trigger_entry.triggerid, row[0]);
 
+		ZBX_STR2UINT64(target_host_trigger_entry.triggerid, row[0]);
 		target_host_trigger_entry.description = zbx_strdup(NULL, row[1]);
 		target_host_trigger_entry.expression = zbx_strdup(NULL, row[2]);
 		target_host_trigger_entry.recovery_expression = zbx_strdup(NULL, row[3]);

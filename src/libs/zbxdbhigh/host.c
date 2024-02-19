@@ -5255,9 +5255,7 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 			zbx_vector_uint64_remove(lnk_templateids, i--);
 		}
 		else
-		{
 			zbx_vector_uint64_append(&templateids, lnk_templateids->values[i]);
-		}
 	}
 
 	/* all templates already linked */
