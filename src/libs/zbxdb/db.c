@@ -1953,56 +1953,6 @@ DB_RESULT	zbx_db_select_n(const char *query, int n)
 #endif
 }
 
-#ifdef HAVE_POSTGRESQL
-/******************************************************************************
- *                                                                            *
- * Purpose: converts the null terminated string into binary buffer            *
- *                                                                            *
- * Transformations:                                                           *
- *      \ooo == a byte whose value = ooo (ooo is an octal number)             *
- *      \\   == \                                                             *
- *                                                                            *
- * Parameters:                                                                *
- *      io - [IN/OUT] null terminated string / binary data                    *
- *                                                                            *
- * Return value: length of the binary buffer                                  *
- *                                                                            *
- ******************************************************************************/
-static size_t	zbx_db_bytea_unescape(u_char *io)
-{
-	const u_char	*i = io;
-	u_char		*o = io;
-
-	while ('\0' != *i)
-	{
-		switch (*i)
-		{
-			case '\\':
-				i++;
-				if ('\\' == *i)
-				{
-					*o++ = *i++;
-				}
-				else
-				{
-					if (0 != isdigit(i[0]) && 0 != isdigit(i[1]) && 0 != isdigit(i[2]))
-					{
-						*o = (*i++ - 0x30) << 6;
-						*o += (*i++ - 0x30) << 3;
-						*o++ += *i++ - 0x30;
-					}
-				}
-				break;
-
-			default:
-				*o++ = *i++;
-		}
-	}
-
-	return o - io;
-}
-#endif
-
 DB_ROW	zbx_db_fetch(DB_RESULT result)
 {
 #if defined(HAVE_ORACLE)
