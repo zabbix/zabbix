@@ -492,9 +492,12 @@ class testTriggerLinking extends CIntegrationTest {
 			'templates' => []
 		]);
 
+		$this->reloadConfigurationCache();
+		sleep(5);
+
 		$this->startComponent(self::COMPONENT_AGENT2);
 		sleep(5);
-		$x = self::getLogPath(self::COMPONENT_SERVER);
-		$this->assertEquals('a', 'b',  $x);
+		//$x = self::getLogPath(self::COMPONENT_SERVER);
+		//$this->assertEquals('a', 'b',  $x);
 	}
 }
