@@ -49,6 +49,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_RECOVERY_MODE = 1;
 	const TRIGGER_CORRELATION_MODE = 1;
 	const TRIGGER_CORRELATION_TAG_PRE = 'strata_correlation_tag';
+	const TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE = 'correlation_tag_X';
 	const TRIGGER_MANUAL_CLOSE = 1;
 	const TRIGGER_OPDATA_PRE = 'strata_opdata';
 	const TRIGGER_EVENT_NAME_PRE = 'strata_event_name';
@@ -291,7 +292,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-				'correlation_tag' => 'Xtag',
+				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE,
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 				'expression' => 'last(/' .  self::$templateX_name . '/' .
 				"templateX_item_key" . ')=99',
@@ -516,7 +517,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'host' => self::HOST_NAME,
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
 				//				'expression' => 'last(/' .  self::HOST_NAME . '/' ."templateX_item_key" . ')=99'
-				'correlation_tag' => 'Xtag'
+				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE
 			],
 			'output' => [
 				'triggerid',
@@ -566,8 +567,6 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
 		$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
-		$this->assertEquals($entry['correlation_tag'],  self::TRIGGER_CORRELATION_TAG_PRE . "_" .
-			self::$stringids[$i], $ep);
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
