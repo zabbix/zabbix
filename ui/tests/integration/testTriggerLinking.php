@@ -508,7 +508,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$sql = "select experssion from triggers where templateid is not null and hostid='".$hostid."';";
 		$this->assertEquals(1, CDBHelper::getCount($sql));
 		$row = DBfetch(DBselect($sql));
-		$this->assertEquals('badger', 'a',json_encode($entry, JSON_PRETTY_PRINT);
+		$this->assertEquals('badger', 'a', json_encode($entry, JSON_PRETTY_PRINT));
 
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
