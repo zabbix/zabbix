@@ -468,8 +468,28 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->setupActions2();
 		$this->stopComponent(self::COMPONENT_AGENT);
+
+
 		$this->reloadConfigurationCache();
 		sleep(10);
+
+		$response = $this->call('host.get', [
+			'output' => ['hostid'],
+			"filter": {
+				"host": [
+					self::HOST_NAME
+				]
+			}
+		]);
+
+		$this->assertArrayHasKey('host', $response['result']['hostids']);
+		$hostid =  $response['result']['hostids'][0];
+
+		CDataHelper::call('host.update', [
+			'hostid' => $hostid,
+			'templates' => []
+		]);
+
 		$this->startComponent(self::COMPONENT_AGENT2);
 		sleep(5);
 		$x = self::getLogPath(self::COMPONENT_SERVER);
