@@ -5239,7 +5239,6 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
-
 	if (0 == config->item_tags.num_slots)
 	{
 		int	row_num = zbx_db_get_row_num(sync->dbresult);
@@ -5469,7 +5468,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 	zbx_uint64_t		item_preprocid, itemid;
-	int			found, ret, i, index;
+	int			found, ret, i, index, clean_sync = 0;
 	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
@@ -5477,6 +5476,15 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	zbx_vector_ptr_create(&items);
+
+	if (0 == config->preprocitems.num_slots)
+	{
+		int	row_num = zbx_db_get_row_num(sync->dbresult);
+
+		zbx_hashset_reserve(&config->preprocitems, MAX(row_num, 100));
+		zbx_hashset_reserve(&config->preprocops, MAX(row_num, 100));
+		clean_sync = 1;
+	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -5494,8 +5502,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 				preprocitem_local.itemid = itemid;
 
-				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert(&config->preprocitems, &preprocitem_local,
-						sizeof(preprocitem_local));
+				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert_ext(&config->preprocitems,
+						&preprocitem_local, sizeof(preprocitem_local), 0, ZBX_UNIQ_ENTRY);
 
 				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
@@ -5506,7 +5514,17 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
-		op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid, sizeof(zbx_dc_preproc_op_t), &found);
+		if (1 == clean_sync)
+		{
+			found = 0;
+			op = (zbx_dc_preproc_op_t *)DCinsert_id(&config->preprocops, item_preprocid,
+					sizeof(zbx_dc_preproc_op_t));
+		}
+		else
+		{
+			op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid,
+					sizeof(zbx_dc_preproc_op_t), &found);
+		}
 
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
@@ -7041,9 +7059,6 @@ static int	__config_interface_addr_compare(const void *d1, const void *d2)
 
 static int	__config_snmp_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *i2)
 {
-	const ZBX_DC_SNMPITEM	*s1;
-	const ZBX_DC_SNMPITEM	*s2;
-
 	unsigned char		f1;
 	unsigned char		f2;
 
