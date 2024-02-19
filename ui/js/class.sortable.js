@@ -653,7 +653,7 @@ class CSortable {
 			if (this.#drag_overtake !== this.#drag_index) {
 				this.#fire(CSortable.EVENT_SORT, {
 					index: this.#drag_index,
-					index_to: this.#drag_index
+					index_to: this.#drag_overtake
 				});
 			}
 		}
@@ -770,7 +770,6 @@ class CSortable {
 						subtree: true,
 						childList: true,
 						attributes: true,
-						attributeFilter: ['class'],
 						characterData: true
 					});
 				}
@@ -982,7 +981,8 @@ class CSortable {
 			const index = this.#items.indexOf(item);
 			const index_to = index + direction;
 
-			if (index_to < this.#freeze_start || index_to > this.#items.length - 1 - this.#freeze_end) {
+			if (Math.min(index, index_to) < this.#freeze_start
+					|| Math.max(index, index_to) > this.#items.length - 1 - this.#freeze_end) {
 				return;
 			}
 
@@ -1046,13 +1046,15 @@ class CSortable {
 			this.#listeners.transitionEnd(e);
 		},
 
-		mutation: () => {
-			this.#update();
+		mutation: (records) => {
+			if (records.some(record => record.type !== 'attributes' || record.attributeName !== 'style')) {
+				this.#update();
 
-			const item = this.#matchItem(document.activeElement);
+				const item = this.#matchItem(document.activeElement);
 
-			if (item !== null) {
-				this.#revealItem(item);
+				if (item !== null) {
+					this.#revealItem(item);
+				}
 			}
 		},
 

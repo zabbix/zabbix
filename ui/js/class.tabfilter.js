@@ -471,20 +471,8 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * UI sortable update event handler. Updates tab sorting in profile.
 			 */
-			tabSortChanged: (ev, ui) => {
-				// Update order of this._items array.
-				let from,
-					to,
-					item_moved;
-				const target = ui.item[0].querySelector('[data-target] .tabfilter-item-link');
-
-				this._items.forEach((item, index) => from = (item._target === target) ? index : from);
-				this._target.querySelectorAll('nav [data-target] .tabfilter-item-link')
-					.forEach((elm, index) => to = (elm === target) ? index : to);
-
-				item_moved = this._items[from];
-				this._items.splice(from, 1);
-				this._items.splice(to, 0, item_moved);
+			tabSortChanged: (e) => {
+				this._items.splice(e.detail.index_to, 0, ...this._items.splice(e.detail.index, 1));
 
 				// Tab order changed, update changes via ajax.
 				let value_str = this._items.map((item) => item._index).join(',');
@@ -730,30 +718,11 @@ class CTabFilter extends CBaseComponent {
 				.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 		}
 
-		$('.ui-sortable-container', this._target).sortable({
-			items: '.tabfilter-item-label:not(:first-child)',
-			update: this._events.tabSortChanged,
-			stop: (_, ui) => {
-				const $item = ui.item;
-
-				ui.item[0].classList.remove(TABFILTERITEM_STYLE_FOCUSED);
-
-				/**
-				 * Remove inline style position, left and top that stay after sortable.
-				 * This styles broken tabs layout.
-				 */
-				if ($item.css('position') === 'relative') {
-					$item.css({
-						'position': '',
-						'left': '',
-						'top': ''
-					});
-				}
-			},
-			axis: 'x',
-			containment: 'parent',
-			helper : 'clone'
-		});
+		new CSortable(this._target.querySelector('.ui-sortable-container'), {
+			is_horizontal: true,
+			freeze_start: 1
+		})
+			.on(CSortable.EVENT_SORT, this._events.tabSortChanged);
 
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;
 
