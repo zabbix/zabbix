@@ -475,11 +475,11 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
-			"filter": {
-				"host": [
+			'filter' => [
+				'host' => [
 					self::HOST_NAME
 				]
-			}
+			]
 		]);
 
 		$this->assertArrayHasKey('host', $response['result']['hostids']);
