@@ -54,7 +54,7 @@ static char	telnet_lastchar(const char *buf, int offset)
 	return '\0';
 }
 
-static int	async_telnet_recv(zbx_telnet_context_t *telnet_context, short *events)
+static zbx_telnet_protocol_step_t	async_telnet_recv(zbx_telnet_context_t *telnet_context, short *events)
 {
 #define CMD_IAC		255
 #define CMD_WILL	251
