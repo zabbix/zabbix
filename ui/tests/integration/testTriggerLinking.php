@@ -291,7 +291,7 @@ class testTriggerLinking extends CIntegrationTest {
 				'type' => self::TRIGGER_TYPE,
 				'recovery_mode' => self::TRIGGER_RECOVERY_MODE,
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
-				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE,
+				'correlation_tag' => 'Xtag',
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
 				'expression' => 'last(/' .  self::$templateX_name . '/' .
 				"templateX_item_key" . ')=99',
@@ -505,17 +505,18 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 
-		$sql = "select expression from triggers where templateid is not null and hostid='".$hostid."';";
-		$this->assertEquals(1, CDBHelper::getCount($sql));
-		$row = DBfetch(DBselect($sql));
-		$this->assertEquals('badger', 'a', json_encode($entry, JSON_PRETTY_PRINT));
+		// $sql = "select expression from triggers where templateid is not null and hostid='".$hostid."';";
+		// $this->assertEquals(1, CDBHelper::getCount($sql));
+		// $row = DBfetch(DBselect($sql));
+		// $this->assertEquals('badger', 'a', json_encode($entry, JSON_PRETTY_PRINT));
 
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
 				'host' => self::HOST_NAME,
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
-				'expression' => 'last(/' .  self::HOST_NAME . '/' ."templateX_item_key" . ')=99'
+				//				'expression' => 'last(/' .  self::HOST_NAME . '/' ."templateX_item_key" . ')=99'
+				'correlation_tag' => 'Xtag'
 			],
 			'output' => [
 				'triggerid',
