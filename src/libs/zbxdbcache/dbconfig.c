@@ -3058,8 +3058,17 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
 		{
-			depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
-					sizeof(ZBX_DC_DEPENDENTITEM), &found);
+			if (1 == clean_sync)
+			{
+				found = 0;
+				depitem = (ZBX_DC_DEPENDENTITEM *)DCinsert_id(&config->dependentitems, itemid,
+						sizeof(ZBX_DC_DEPENDENTITEM));
+			}
+			else
+			{
+				depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
+						sizeof(ZBX_DC_DEPENDENTITEM), &found);
+			}
 
 			if (1 == found)
 				depitem->last_master_itemid = depitem->master_itemid;
@@ -5223,12 +5232,21 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	int			found, ret, index;
+	int			found, ret, index, clean_sync = 0;
 	zbx_uint64_t		itemid, itemtagid;
 	ZBX_DC_ITEM		*item;
 	zbx_dc_item_tag_t	*item_tag;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+
+	if (0 == config->item_tags.num_slots)
+	{
+		int	row_num = zbx_db_get_row_num(sync->dbresult);
+
+		zbx_hashset_reserve(&config->item_tags, MAX(row_num, 100));
+		clean_sync = 1;
+	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -5243,8 +5261,17 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(itemtagid, row[0]);
 
-		item_tag = (zbx_dc_item_tag_t *)DCfind_id(&config->item_tags, itemtagid, sizeof(zbx_dc_item_tag_t),
-				&found);
+		if (1 == clean_sync)
+		{
+			found = 0;
+			item_tag = (zbx_dc_item_tag_t *)DCinsert_id(&config->item_tags, itemtagid,
+					sizeof(zbx_dc_item_tag_t));
+		}
+		else
+		{
+			item_tag = (zbx_dc_item_tag_t *)DCfind_id(&config->item_tags, itemtagid,
+					sizeof(zbx_dc_item_tag_t), &found);
+		}
 		DCstrpool_replace(found, &item_tag->tag, row[2]);
 		DCstrpool_replace(found, &item_tag->value, row[3]);
 
