@@ -482,6 +482,8 @@ class testTriggerLinking extends CIntegrationTest {
 			]
 		]);
 
+		$this->assertArrayHasKey('hostids', self::$response['result'], json_encode(self::$response['result']));
+
 		$this->assertArrayHasKey('host', $response['result']['hostids']);
 		$hostid =  $response['result']['hostids'][0];
 
