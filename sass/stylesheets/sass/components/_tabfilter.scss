@@ -162,7 +162,7 @@
 			pointer-events: none;
 		}
 
-		&.ui-sortable-helper {
+		&.sortable-item-dragging {
 			background-color: $tab-label-expanded-bg-color;
 		}
 
@@ -194,7 +194,7 @@
 
 	.ui-sortable-container {
 		// Tab sortable handle left border is visible when handle is not selected, do not have selected sibling before and is not dragged.
-		.tabfilter-item-label.ui-sortable-helper,
+		.tabfilter-item-label.sortable-item-dragging,
 		.tabfilter-item-label:not(.selected) {
 			& + .tabfilter-item-label.ui-sortable-handle:not(.selected,.ui-sortable-helper) {
 				.tabfilter-item-link::before {
@@ -288,4 +288,3 @@
 		padding-right: 35px;
 	}
 }
-
