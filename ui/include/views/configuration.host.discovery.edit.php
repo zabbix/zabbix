@@ -929,6 +929,7 @@ $lld_macro_tab->addItem([
 // Overrides tab.
 $overrides_tab = new CFormGrid();
 $overrides_list = (new CTable())
+	->setId('lld-overrides-table')
 	->addClass('lld-overrides-table')
 	->setHeader([
 		new CColHeader(),
