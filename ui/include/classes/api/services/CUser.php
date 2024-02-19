@@ -1674,9 +1674,7 @@ class CUser extends CApiService {
 		if (self::$userData !== null && (array_key_exists($auth_method, self::$userData)
 				&& self::$userData[$auth_method] === $session[$auth_method]
 		)) {
-			unset(self::$userData['token']);
-
-			return self::$userData;
+			return array_diff_key(self::$userData, array_flip(['token']));
 		}
 
 		if ($session['sessionid'] !== null) {
