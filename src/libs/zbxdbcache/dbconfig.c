@@ -3037,7 +3037,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		/* dependent items */
 
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
+		if (ITEM_TYPE_DEPENDENT == item->type)
 		{
 			if (0 == found_type)
 			{
@@ -3053,7 +3053,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 				item->itemtype.depitem->last_master_itemid = 0;
 
 			item->itemtype.depitem->flags = item->flags;
-			ZBX_STR2UINT64(item->itemtype.depitem->master_itemid, row[29]);
+			ZBX_DBROW2UINT64(item->itemtype.depitem->master_itemid, row[29]);
 
 			if (item->itemtype.depitem->last_master_itemid != item->itemtype.depitem->master_itemid)
 				zbx_vector_ptr_append(&dep_items, item->itemtype.depitem);
