@@ -492,10 +492,13 @@ class testTriggerLinking extends CIntegrationTest {
 			'templates' => []
 		]);
 
-		$this->assertEquals( json_encode($response, JSON_PRETTY_PRINT), "badger",  json_encode($response, JSON_PRETTY_PRINT));
-
 		$this->reloadConfigurationCache();
 		sleep(5);
+
+		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
+		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$row = DBfetch(DBselect($sql));
+
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		sleep(5);
