@@ -572,6 +572,8 @@ int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vec
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
+	zabbix_log(LOG_LEVEL_INFORMATION, "OMEGA TRIDS: %d", trids->values_num);
+
 	if (0 == trids->values_num)
 		goto out;
 
@@ -583,13 +585,19 @@ int	DBsync_template_dependencies_for_triggers(zbx_uint64_t hostid, const zbx_vec
 	if (FAIL == (res = DBresolve_template_trigger_dependencies(hostid, trids, &links, &triggers_flags)))
 		goto clean;
 
+
+	zabbix_log(LOG_LEVEL_INFORMATION, "666666");
 	if (TRIGGER_DEP_SYNC_INSERT_OP == is_update)
 	{
+			zabbix_log(LOG_LEVEL_INFORMATION, "555555");
+
 		if (FAIL == (res = DBadd_trigger_dependencies(&links, &triggers_flags)))
 			goto clean;
 	}
 	else if (TRIGGER_DEP_SYNC_UPDATE_OP == is_update)
 	{
+					zabbix_log(LOG_LEVEL_INFORMATION, "444444");
+
 		res = DBadd_and_remove_trigger_dependencies(&links, trids, &triggers_flags);
 	}
 clean:
