@@ -5251,13 +5251,18 @@ int	DBcopy_template_elements(zbx_uint64_t hostid, zbx_vector_uint64_t *lnk_templ
 		if (FAIL != zbx_vector_uint64_search(&templateids, lnk_templateids->values[i],
 				ZBX_DEFAULT_UINT64_COMPARE_FUNC))
 		{
+			zabbix_log(LOG_LEVEL_INFORMATION, "TOYOTA, already linked");
 			/* template already linked */
 			zbx_vector_uint64_remove(lnk_templateids, i--);
 		}
 		else
+		{
 			zbx_vector_uint64_append(&templateids, lnk_templateids->values[i]);
-	}
+			zabbix_log(LOG_LEVEL_INFORMATION, "TOYOTA, NOT already linked: %lu", lnk_templateids->values[i]);
 
+		}
+	}
+	zabbix_log(LOG_LEVEL_INFORMATION, "TOYOTA already linked: %d",  lnk_templateids->values_num);
 	/* all templates already linked */
 	if (0 == lnk_templateids->values_num)
 		goto clean;
