@@ -6,7 +6,7 @@
 	"namespace": "HostNavigator",
 	"version": "1.0",
 	"author": "Zabbix",
-	"description": "Displays hosts and their problem count in hierarchical manner and allows to control other widgets to display information based on selected host.",
+	"description": "Displays host hierarchy with ability to control other widgets based on selected host.",
 	"url": "https://www.zabbix.com/documentation/7.0/en/manual/web_interface/frontend_sections/dashboards/widgets/host_navigator",
 	"widget": {
 		"size": {
