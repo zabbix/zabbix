@@ -3607,8 +3607,8 @@ section {
     border: 1px transparent; }
   .filter-container.tabfilter-container .tabfilter-edit {
     margin: -1px 2px -1px -6px; }
-  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label.sortable-item-dragging + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before,
-  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(.selected) + .tabfilter-item-label.ui-sortable-handle:not(.selected, .ui-sortable-helper) .tabfilter-item-link::before {
+  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label.sortable-item-dragging + .tabfilter-item-label.ui-sortable-handle:not(.selected, .sortable-item-dragging) .tabfilter-item-link::before,
+  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(.selected) + .tabfilter-item-label.ui-sortable-handle:not(.selected, .sortable-item-dragging) .tabfilter-item-link::before {
     content: ' ';
     position: absolute;
     top: 1px;
