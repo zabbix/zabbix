@@ -3714,10 +3714,18 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 	ZBX_DC_TRIGGER	*trigger;
 
-	int		found, ret;
+	int		found, ret, clean_sync = 0;
 	zbx_uint64_t	triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 == config->preprocitems.num_slots)
+	{
+		int	row_num = zbx_db_get_row_num(sync->dbresult);
+
+		zbx_hashset_reserve(&config->triggers, MAX(row_num, 100));
+		clean_sync = 1;
+	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3727,7 +3735,16 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		trigger = (ZBX_DC_TRIGGER *)DCfind_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER), &found);
+		if (1 == clean_sync)
+		{
+			found = 0;
+			trigger = (ZBX_DC_TRIGGER *)DCinsert_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER));
+		}
+		else
+		{
+			trigger = (ZBX_DC_TRIGGER *)DCfind_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER),
+					&found);
+		}
 
 		/* store new information in trigger structure */
 
