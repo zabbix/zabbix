@@ -648,7 +648,10 @@ class CSortable {
 				}
 			}
 
-			this.#fire(CSortable.EVENT_DRAG_END, {index: this.#drag_index});
+			this.#fire(CSortable.EVENT_DRAG_END, {
+				index: this.#drag_index,
+				index_to: this.#drag_overtake
+			});
 
 			if (this.#drag_overtake !== this.#drag_index) {
 				this.#fire(CSortable.EVENT_SORT, {

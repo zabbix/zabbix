@@ -722,6 +722,10 @@ class CTabFilter extends CBaseComponent {
 			is_horizontal: true,
 			freeze_start: 1
 		})
+			.on(CSortable.EVENT_DRAG_END, (e) => {
+				this._items[e.detail.index]._target.closest('.tabfilter-item-label').classList
+					.remove(TABFILTERITEM_STYLE_FOCUSED);
+			})
 			.on(CSortable.EVENT_SORT, this._events.tabSortChanged);
 
 		const container = this._target.querySelector('.ui-sortable-container').parentNode;
