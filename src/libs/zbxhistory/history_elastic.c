@@ -994,7 +994,7 @@ int	zbx_history_elastic_init(zbx_history_iface_t *hist, unsigned char value_type
 {
 	zbx_elastic_data_t	*data;
 
-	if (SUCCEED != zbx_curl_has_multi_wait(error))
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(error))
 		return FAIL;
 
 	if (0 != curl_global_init(CURL_GLOBAL_ALL))
@@ -1047,7 +1047,7 @@ void	zbx_elastic_version_extract(struct zbx_json *json, int *result, int config_
 
 	memset(&page, 0, sizeof(zbx_httppage_t));
 
-	if (SUCCEED != zbx_curl_has_multi_wait(&error))
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(&error))
 	{
 		zabbix_log(LOG_LEVEL_WARNING, error);
 		goto out;
@@ -1186,7 +1186,7 @@ out:
 
 zbx_uint32_t	zbx_elastic_version_get(void)
 {
-	if (SUCCEED != zbx_curl_has_multi_wait(NULL))
+	if (SUCCEED != zbx_curl_good_for_elasticsearch(NULL))
 		return ZBX_DBVERSION_UNDEFINED;
 
 	return ZBX_ELASTIC_SVERSION;

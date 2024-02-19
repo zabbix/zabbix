@@ -84,7 +84,7 @@ int	zbx_curl_setopt_https(CURL *easyhandle, char **error);
 int	zbx_curl_setopt_smtps(CURL *easyhandle, char **error);
 int	zbx_curl_has_ssl(char **error);
 int	zbx_curl_has_bearer(char **error);
-int	zbx_curl_has_multi_wait(char **error);
+int	zbx_curl_good_for_elasticsearch(char **error);
 int	zbx_curl_has_smtp_auth(char **error);
 
 #endif /* HAVE_LIBCURL */

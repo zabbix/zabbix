@@ -52,7 +52,7 @@ int	zbx_curl_protocol(const char *protocol, char **error)
 
 	if (NULL != error)
 	{
-		*error = zbx_dsprintf(*error, "the cURL library does not support \"%s\" protocol (using version %s)",
+		*error = zbx_dsprintf(*error, "cURL library does not support \"%s\" protocol (using version %s)",
 				protocol, libcurl_version_str());
 	}
 
@@ -61,7 +61,7 @@ int	zbx_curl_protocol(const char *protocol, char **error)
 
 static void	setopt_error(const char *option, CURLcode err, char **error)
 {
-	*error = zbx_dsprintf(*error, "the cURL library returned error when enabling %s: %s (using version %s)",
+	*error = zbx_dsprintf(*error, "cURL library returned error when enabling %s: %s (using version %s)",
 			option, curl_easy_strerror(err), libcurl_version_str());
 }
 
@@ -134,7 +134,7 @@ int	zbx_curl_has_bearer(char **error)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "the cURL library version %s does not support HTTP Bearer token"
+			*error = zbx_dsprintf(*error, "cURL library version %s does not support HTTP Bearer token"
 					" authentication, 7.61.0 or newer is required", libcurl_version_str());
 		}
 
@@ -144,14 +144,14 @@ int	zbx_curl_has_bearer(char **error)
 	return SUCCEED;
 }
 
-int	zbx_curl_has_multi_wait(char **error)
+int	zbx_curl_good_for_elasticsearch(char **error)
 {
 	/* curl_multi_wait() is supported starting with version 7.28.0 (0x071c00) */
 	if (libcurl_version_num() < 0x071c00)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "the cURL library version %s is too old for Elasticsearch history"
+			*error = zbx_dsprintf(*error, "cURL library version %s is too old for Elasticsearch history"
 					" backend, 7.28.0 or newer is required", libcurl_version_str());
 		}
 
@@ -167,7 +167,7 @@ int	zbx_curl_has_ssl(char **error)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "the cURL library does not support SSL/TLS (using version %s)",
+			*error = zbx_dsprintf(*error, "cURL library does not support SSL/TLS (using version %s)",
 					libcurl_version_str());
 		}
 
@@ -184,7 +184,7 @@ int	zbx_curl_has_smtp_auth(char **error)
 	{
 		if (NULL != error)
 		{
-			*error = zbx_dsprintf(*error, "the cURL library version %s does not support SMTP authentication,"
+			*error = zbx_dsprintf(*error, "cURL library version %s does not support SMTP authentication,"
 					" 7.20.0 or newer is required", libcurl_version_str());
 		}
 
