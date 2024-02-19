@@ -508,7 +508,8 @@ class testTriggerLinking extends CIntegrationTest {
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
-				'host' => self::HOST_NAME
+				'host' => self::HOST_NAME,
+				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL
 			],
 			'output' => [
 				'triggerid',
