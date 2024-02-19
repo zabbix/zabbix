@@ -34,7 +34,7 @@ Refer to the vendor documentation.
 |{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default</p>|`Macro too long. Please see the template.`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}||`^.*$`|
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>Ignore notPresent(6)</p>|`^6$`|
-|{$NET.IF.IFADMINSTATUS.MATCHES}|<p>Ignore notPresent(6)</p>|`^.*`|
+|{$NET.IF.IFADMINSTATUS.MATCHES}||`^.*`|
 |{$NET.IF.IFADMINSTATUS.NOT_MATCHES}|<p>Ignore down(2) administrative status</p>|`^2$`|
 |{$NET.IF.IFDESCR.MATCHES}||`.*`|
 |{$NET.IF.IFDESCR.NOT_MATCHES}||`CHANGE_IF_NEEDED`|

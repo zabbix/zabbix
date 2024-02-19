@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-22T16:06:39Z'
+  date: '2024-02-08T15:05:16Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -232,7 +232,7 @@ zabbix_export:
           timeout: '{$HPE.PRIMERA.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}'
+              value: '{$HPE.PRIMERA.API.SCHEME}://{HOST.CONN}:{$HPE.PRIMERA.API.PORT}'
             - name: password
               value: '{$HPE.PRIMERA.API.PASSWORD}'
             - name: username
