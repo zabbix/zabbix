@@ -3807,7 +3807,7 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 			if (SSL_ERROR_SYSCALL == result_code && 0 != errno)
 			{
 				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
-						" to %d:%s:", result_code, zbx_strerror(errno));
+						" to %d (SSL_ERROR_SYSCALL):%s:", result_code, zbx_strerror(errno));
 			}
 			else
 			{
@@ -4122,8 +4122,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 					if (SSL_ERROR_SYSCALL == result_code && 0 != errno)
 					{
 						zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s set result code"
-								" to %d:%s%s%s", s->peer, result_code,
-								ZBX_NULL2EMPTY_STR(error), info_buf,
+								" to %d (SSL_ERROR_SYSCALL):%s%s%s", s->peer,
+								result_code, ZBX_NULL2EMPTY_STR(error), info_buf,
 								zbx_strerror(errno));
 					}
 					else
