@@ -2699,6 +2699,34 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
+static void	dc_item_free(ZBX_DC_ITEM *item, unsigned char type)
+{
+	if (ITEM_TYPE_SNMP == type)
+	{
+		/* remove SNMP parameters for non-SNMP item */
+
+		zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
+
+		__config_mem_free_func(item->itemtype.snmpitem);
+	}
+	else if (ITEM_TYPE_CALCULATED == type)
+	{
+		/* remove calculated item parameters */
+
+		if (NULL != item->itemtype.calcitem->formula_bin)
+			__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+		zbx_strpool_release(item->itemtype.calcitem->params);
+
+		__config_mem_free_func(item->itemtype.calcitem);
+	}
+	else if (ITEM_TYPE_DEPENDENT == type)
+	{
+		dc_masteritem_remove_depitem(item->itemtype.depitem->master_itemid, item->itemid);
+
+		__config_mem_free_func(item->itemtype.depitem);
+	}
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
@@ -2710,7 +2738,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_TRAPITEM		*trapitem;
-	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_LOGITEM		*logitem;
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
@@ -2967,24 +2994,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			{
 				found_type = 0;
 
-				if (ITEM_TYPE_SNMP == last_type)
-				{
-					/* remove SNMP parameters for non-SNMP item */
-
-					zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
-
-					__config_mem_free_func(item->itemtype.snmpitem);
-				}
-				else if (ITEM_TYPE_CALCULATED == last_type)
-				{
-					/* remove calculated item parameters */
-
-					if (NULL != item->itemtype.calcitem->formula_bin)
-						__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
-					zbx_strpool_release(item->itemtype.calcitem->params);
-
-					__config_mem_free_func(item->itemtype.calcitem);
-				}
+				dc_item_free(item, last_type);
 			}
 			else
 				found_type = 1;
@@ -3025,6 +3035,30 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item->itemtype.calcitem->formula_bin = config_decode_serialized_expression(row[49]);
 		}
 
+		/* dependent items */
+
+		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
+		{
+			if (0 == found_type)
+			{
+				item->itemtype.depitem = (ZBX_DC_DEPENDENTITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_DEPENDENTITEM));
+			}
+
+			item->itemtype.depitem->itemid = item->itemid;
+
+			if (1 == found_type)
+				item->itemtype.depitem->last_master_itemid = item->itemtype.depitem->master_itemid;
+			else
+				item->itemtype.depitem->last_master_itemid = 0;
+
+			item->itemtype.depitem->flags = item->flags;
+			ZBX_STR2UINT64(item->itemtype.depitem->master_itemid, row[29]);
+
+			if (item->itemtype.depitem->last_master_itemid != item->itemtype.depitem->master_itemid)
+				zbx_vector_ptr_append(&dep_items, item->itemtype.depitem);
+		}
+
 		/* IPMI items */
 
 		if (ITEM_TYPE_IPMI == item->type)
@@ -3052,39 +3086,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			/* remove trapper_hosts parameter */
 			zbx_strpool_release(trapitem->trapper_hosts);
 			zbx_hashset_remove_direct(&config->trapitems, trapitem);
-		}
-
-		/* dependent items */
-
-		if (ITEM_TYPE_DEPENDENT == item->type && SUCCEED != DBis_null(row[29]))
-		{
-			if (1 == clean_sync)
-			{
-				found = 0;
-				depitem = (ZBX_DC_DEPENDENTITEM *)DCinsert_id(&config->dependentitems, itemid,
-						sizeof(ZBX_DC_DEPENDENTITEM));
-			}
-			else
-			{
-				depitem = (ZBX_DC_DEPENDENTITEM *)DCfind_id(&config->dependentitems, itemid,
-						sizeof(ZBX_DC_DEPENDENTITEM), &found);
-			}
-
-			if (1 == found)
-				depitem->last_master_itemid = depitem->master_itemid;
-			else
-				depitem->last_master_itemid = 0;
-
-			depitem->flags = item->flags;
-			ZBX_STR2UINT64(depitem->master_itemid, row[29]);
-
-			if (depitem->last_master_itemid != depitem->master_itemid)
-				zbx_vector_ptr_append(&dep_items, depitem);
-		}
-		else if (NULL != (depitem = (ZBX_DC_DEPENDENTITEM *)zbx_hashset_search(&config->dependentitems, &itemid)))
-		{
-			dc_masteritem_remove_depitem(depitem->master_itemid, itemid);
-			zbx_hashset_remove_direct(&config->dependentitems, depitem);
 		}
 
 		/* log items */
@@ -3350,6 +3351,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	for (i = 0; i < dep_items.values_num; i++)
 	{
 		zbx_uint64_pair_t	pair;
+		ZBX_DC_DEPENDENTITEM	*depitem;
 
 		depitem = (ZBX_DC_DEPENDENTITEM *)dep_items.values[i];
 		dc_masteritem_remove_depitem(depitem->last_master_itemid, depitem->itemid);
@@ -3399,25 +3401,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			__config_mem_free_func(item->numitem);
 		}
 
-		/* SNMP items */
-
-		if (ITEM_TYPE_SNMP == item->type)
-		{
-			zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
-			__config_mem_free_func(item->itemtype.snmpitem);
-		}
-
-		/* calculated items */
-
-		if (ITEM_TYPE_CALCULATED == item->type)
-		{
-			zbx_strpool_release(item->itemtype.calcitem->params);
-
-			if (NULL != item->itemtype.calcitem->formula_bin)
-				__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
-
-			__config_mem_free_func(item->itemtype.calcitem);
-		}
+		dc_item_free(item, item->type);
 
 		/* IPMI items */
 
@@ -3435,14 +3419,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			zbx_strpool_release(trapitem->trapper_hosts);
 			zbx_hashset_remove_direct(&config->trapitems, trapitem);
-		}
-
-		/* dependent items */
-
-		if (NULL != (depitem = (ZBX_DC_DEPENDENTITEM *)zbx_hashset_search(&config->dependentitems, &itemid)))
-		{
-			dc_masteritem_remove_depitem(depitem->master_itemid, itemid);
-			zbx_hashset_remove_direct(&config->dependentitems, depitem);
 		}
 
 		/* log items */
@@ -6824,8 +6800,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->ipmiitems.num_data, config->ipmiitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() trapitems  : %d (%d slots)", __func__,
 				config->trapitems.num_data, config->trapitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() dependentitems  : %d (%d slots)", __func__,
-				config->dependentitems.num_data, config->dependentitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __func__,
@@ -7309,7 +7283,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->items, 0);
 	CREATE_HASHSET(config->ipmiitems, 0);
 	CREATE_HASHSET(config->trapitems, 0);
-	CREATE_HASHSET(config->dependentitems, 0);
 	CREATE_HASHSET(config->logitems, 0);
 	CREATE_HASHSET(config->dbitems, 0);
 	CREATE_HASHSET(config->sshitems, 0);

@@ -108,10 +108,20 @@ typedef struct
 }
 ZBX_DC_CALCITEM;
 
+typedef struct
+{
+	zbx_uint64_t	itemid;
+	zbx_uint64_t	master_itemid;
+	zbx_uint64_t	last_master_itemid;
+	unsigned char	flags;
+}
+ZBX_DC_DEPENDENTITEM;
+
 typedef union
 {
-	ZBX_DC_SNMPITEM	*snmpitem;
-	ZBX_DC_CALCITEM	*calcitem;
+	ZBX_DC_SNMPITEM		*snmpitem;
+	ZBX_DC_CALCITEM		*calcitem;
+	ZBX_DC_DEPENDENTITEM	*depitem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -196,15 +206,6 @@ typedef struct
 	const char	*trapper_hosts;
 }
 ZBX_DC_TRAPITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	zbx_uint64_t	master_itemid;
-	zbx_uint64_t	last_master_itemid;
-	unsigned char	flags;
-}
-ZBX_DC_DEPENDENTITEM;
 
 typedef struct
 {
@@ -842,7 +843,6 @@ typedef struct
 	zbx_hashset_t		telnetitems;
 	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
-	zbx_hashset_t		calcitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
 	zbx_hashset_t		httpitems;

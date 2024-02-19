@@ -1646,32 +1646,22 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	else if (NULL != jmxitem)
 		return FAIL;
 
-	calcitem = (ZBX_DC_CALCITEM *)zbx_hashset_search(&dbsync_env.cache->calcitems, &item->itemid);
+	calcitem = item->itemtype.calcitem;
 	if (ITEM_TYPE_CALCULATED == item->type)
 	{
-		if (NULL == calcitem)
-			return FAIL;
-
 		if (FAIL == dbsync_compare_str(dbrow[11], calcitem->params))
 			return FAIL;
 
 		if (FAIL == dbsync_compare_serialized_expression(dbrow[49], calcitem->formula_bin))
 			return FAIL;
 	}
-	else if (NULL != calcitem)
-		return FAIL;
 
-	depitem = (ZBX_DC_DEPENDENTITEM *)zbx_hashset_search(&dbsync_env.cache->dependentitems, &item->itemid);
+	depitem = item->itemtype.depitem;
 	if (ITEM_TYPE_DEPENDENT == item->type)
 	{
-		if (NULL == depitem)
-			return FAIL;
-
 		if (FAIL == dbsync_compare_uint64(dbrow[29], depitem->master_itemid))
 			return FAIL;
 	}
-	else if (NULL != depitem)
-		return FAIL;
 
 	httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&dbsync_env.cache->httpitems, &item->itemid);
 	if (ITEM_TYPE_HTTPAGENT == item->type)
