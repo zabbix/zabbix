@@ -487,10 +487,12 @@ class testTriggerLinking extends CIntegrationTest {
 		//	$this->assertArrayHasKey('host', $response['result']['hostid']);
 		$hostid =  $response['result'][0]['hostid'];
 
-		CDataHelper::call('host.update', [
+		$response = CDataHelper::call('host.update', [
 			'hostid' => $hostid,
 			'templates' => []
 		]);
+
+		$this->assertEquals( json_encode($response, JSON_PRETTY_PRINT), "badger",  json_encode($response, JSON_PRETTY_PRINT));
 
 		$this->reloadConfigurationCache();
 		sleep(5);
@@ -499,5 +501,7 @@ class testTriggerLinking extends CIntegrationTest {
 		sleep(5);
 		$x = self::getLogPath(self::COMPONENT_SERVER);
 		$this->assertEquals('a', 'b',  $x);
+
+
 	}
 }
