@@ -482,10 +482,10 @@ class testTriggerLinking extends CIntegrationTest {
 			]
 		]);
 
-		$this->assertArrayHasKey('hostids', $response['result'], json_encode($response['result']));
+		$this->assertArrayHasKey('hostid', $response['result'], json_encode($response['result']));
 
-		$this->assertArrayHasKey('host', $response['result']['hostids']);
-		$hostid =  $response['result']['hostids'][0];
+		//	$this->assertArrayHasKey('host', $response['result']['hostid']);
+		$hostid =  $response['result']['hostid'];
 
 		CDataHelper::call('host.update', [
 			'hostid' => $hostid,
