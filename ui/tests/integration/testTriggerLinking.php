@@ -321,7 +321,7 @@ class testTriggerLinking extends CIntegrationTest {
 	public function serverConfigurationProvider() {
 		return [
 			self::COMPONENT_SERVER => [
-				'DebugLevel' => 4,
+				'DebugLevel' => 5,
 				'LogFileSize' => 0,
 				'LogFile' => self::getLogPath(self::COMPONENT_SERVER),
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
@@ -471,5 +471,8 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->reloadConfigurationCache();
 		sleep(10);
 		$this->startComponent(self::COMPONENT_AGENT2);
+		sleep(5);
+		$x = self::getLogPath(self::COMPONENT_SERVER);
+		$this->assertEquals('a', 'b',  $x);
 	}
 }
