@@ -2234,9 +2234,8 @@ void	zbx_tls_close(zbx_socket_t *s)
 		{
 			while (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
 			{
-				int	err;
+				int	err = SSL_get_error(s->tls_ctx->ctx, res);
 
-				err =(size_t)SSL_get_error(s->tls_ctx->ctx, (int)res);
 				if (SUCCEED != tls_is_nonblocking_error(err))
 				{
 					int	result_code;
