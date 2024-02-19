@@ -696,16 +696,14 @@ svg a {
       width: 8px;
       opacity: 1; }
 
-.sortable {
-  overflow: hidden; }
-  .sortable .sortable-item {
-    position: relative; }
-  .sortable.sortable-dragging {
-    isolation: isolate; }
-    .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
-      opacity: 0.6;
-      z-index: 1;
-      transition: none; }
+.sortable .sortable-item {
+  position: relative; }
+.sortable.sortable-dragging {
+  isolation: isolate; }
+  .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
+    opacity: 0.6;
+    z-index: 1;
+    transition: none; }
 
 html,
 body {
@@ -4599,11 +4597,10 @@ form.dashboard-widget-svggraph .overrides-list-item {
   grid-template-columns: 1fr 1fr 24px;
   grid-gap: 5px 10px;
   align-items: start;
-  padding: 5px 0; }
-  form.dashboard-widget-svggraph .overrides-list-item.sortable {
-    overflow: visible;
-    margin-top: -5px;
-    margin-bottom: -5px; }
+  padding: 5px 0;
+  overflow: visible;
+  margin-top: -5px;
+  margin-bottom: -5px; }
   form.dashboard-widget-svggraph .overrides-list-item .drag-icon {
     position: absolute;
     top: 5px;

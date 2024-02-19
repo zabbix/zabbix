@@ -102,6 +102,36 @@ window.widget_svggraph_form = new class {
 							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
 						);
 					});
+
+				jQuery(`[name^="${var_prefix}["]`, this)
+					.filter(function () {
+						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
+					})
+					.each(function () {
+						jQuery(this).attr('name',
+							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
+						);
+					});
+
+				jQuery(`[id^="${var_prefix}_"]`, this)
+					.filter(function () {
+						return jQuery(this).attr('id').match(/[a-z]+_\d+_[a-z_]+/);
+					})
+					.each(function () {
+						jQuery(this).attr('id',
+							jQuery(this).attr('id').replace(/([a-z]+_)\d+(_[a-z_]+)/, `$1${k + i}$2`)
+						);
+					});
+
+				jQuery(`[id^="lbl_${var_prefix}_"]`, this)
+					.filter(function () {
+						return jQuery(this).attr('id').match(/lbl_[a-z]+_\d+_[a-z_]+/);
+					})
+					.each(function () {
+						jQuery(this).attr('id',
+							jQuery(this).attr('id').replace(/(lbl_[a-z]+_)\d+(_[a-z_]+)/, `$1${k + i}$2`)
+						);
+					});
 			});
 		}
 	}

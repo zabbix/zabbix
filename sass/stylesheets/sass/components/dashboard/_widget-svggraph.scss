@@ -201,12 +201,9 @@ form.dashboard-widget-svggraph {
 		grid-gap: 5px 10px;
 		align-items: start;
 		padding: 5px 0;
-
-		&.sortable {
-			overflow: visible;
-			margin-top: -5px;
-			margin-bottom: -5px;
-		}
+		overflow: visible;
+		margin-top: -5px;
+		margin-bottom: -5px;
 
 		.drag-icon {
 			position: absolute;
