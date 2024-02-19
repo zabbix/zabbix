@@ -103,16 +103,6 @@ window.widget_svggraph_form = new class {
 						);
 					});
 
-				jQuery(`[name^="${var_prefix}["]`, this)
-					.filter(function () {
-						return jQuery(this).attr('name').match(/[a-z]+\[\d+]\[[a-z_]+]/);
-					})
-					.each(function () {
-						jQuery(this).attr('name',
-							jQuery(this).attr('name').replace(/([a-z]+\[)\d+(]\[[a-z_]+])/, `$1${k + i}$2`)
-						);
-					});
-
 				jQuery(`[id^="${var_prefix}_"]`, this)
 					.filter(function () {
 						return jQuery(this).attr('id').match(/[a-z]+_\d+_[a-z_]+/);
