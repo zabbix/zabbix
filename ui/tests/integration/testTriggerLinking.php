@@ -511,7 +511,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'filter' => [
 				'host' => self::HOST_NAME,
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
-				'expression' => 'last(/' .  self::$templateX_name . '/' ."templateX_item_key" . ')=99'
+				'expression' => 'last(/' .  self::HOST_NAME . '/' ."templateX_item_key" . ')=99'
 			],
 			'output' => [
 				'triggerid',
