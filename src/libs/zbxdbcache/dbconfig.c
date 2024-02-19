@@ -4286,10 +4286,18 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 	ZBX_DC_ITEM	*item;
 	ZBX_DC_FUNCTION	*function;
 
-	int		found, ret;
+	int		found, ret, clean_sync = 0;
 	zbx_uint64_t	itemid, functionid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 == config->functions.num_slots)
+	{
+		int	row_num = zbx_db_get_row_num(sync->dbresult);
+
+		zbx_hashset_reserve(&config->functions, MAX(row_num, 100));
+		clean_sync = 1;
+	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -4314,7 +4322,17 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 		/* process function information */
 
-		function = (ZBX_DC_FUNCTION *)DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION), &found);
+		if (1 == clean_sync)
+		{
+			found = 0;
+			function = (ZBX_DC_FUNCTION *)DCinsert_id(&config->functions, functionid,
+					sizeof(ZBX_DC_FUNCTION));
+		}
+		else
+		{
+			function = (ZBX_DC_FUNCTION *)DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION),
+					&found);
+		}
 
 		if (1 == found)
 		{
@@ -7306,7 +7324,7 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->template_items, 0);
 	CREATE_HASHSET(config->item_discovery, 0);
 	CREATE_HASHSET(config->prototype_items, 0);
-	CREATE_HASHSET(config->functions, 100);
+	CREATE_HASHSET(config->functions, 0);
 	CREATE_HASHSET(config->triggers, 100);
 	CREATE_HASHSET(config->trigdeps, 0);
 	CREATE_HASHSET(config->hosts, 10);
