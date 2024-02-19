@@ -538,7 +538,7 @@ class testTriggerLinking extends CIntegrationTest {
 		);
 
 
-		$this->assertEquals(1, count($response['result']));
+		$this->assertEquals(self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2, count($response['result']));
 
 		$entry = $response['result'][0];
 
