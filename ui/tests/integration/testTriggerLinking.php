@@ -502,9 +502,70 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		sleep(5);
+
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
+
+		$response = $this->call('trigger.get', [
+			'selectTags' => 'extend',
+			'filter' => [
+				'host' => self::HOST_NAME
+			],
+			'output' => [
+				'triggerid',
+				'description',
+				'priority',
+				'status',
+				'templateid',
+				'comments',
+				'url',
+				'type',
+				'flags',
+				'recovery_mode',
+				'correlation_mode',
+				'correlation_tag',
+				'manual_close',
+				'opdata',
+				'discover',
+				'event_name',
+				'functions',
+				'expression',
+				'recovery_expression'
+			],
+			'selectFunctions' => 'extend',
+			'sortfield' => 'description',
+			'selectDependencies' => ['triggerid']
+		]
+		);
+
+
+		$this->assertEquals(1, count($response['result']));
+
+		$entry = $response['result'][0]
+
+		$ep = json_encode($entry, JSON_PRETTY_PRINT);
+
+		$this->assertArrayHasKey('tags', $entry, $ep);
+		$this->assertArrayHasKey(0, $entry['tags'], $ep);
+		$this->assertArrayHasKey('tag', $entry['tags'][0], $ep);
+
+		$this->assertEquals('templateX_tag', $entry['tags'][0]['tag'], $ep);
+
+		$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_SAME_ALL, $ep);
+
+		$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
+		$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
+		$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
+
+		$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
+		$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
+		$this->assertEquals($entry['correlation_tag'],  self::TRIGGER_CORRELATION_TAG_PRE . "_" .
+			self::$stringids[$i], $ep);
+		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
+
+		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=2", $ep);
+		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=3", $ep);
+
 		$x = self::getLogPath(self::COMPONENT_SERVER);
 		$this->assertEquals('a', 'b',  $x);
-
-
 	}
 }
