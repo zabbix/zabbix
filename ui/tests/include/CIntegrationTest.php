@@ -45,7 +45,6 @@ class CIntegrationTest extends CAPITest {
 	const COMPONENT_PROXY			= 'proxy';
 	const COMPONENT_AGENT			= 'agentd';
 	const COMPONENT_AGENT2			= 'agent2';
-	const COMPONENT_AGENT_NEW_METADATA	= 'agentd_new_metadata';
 
 	// Zabbix component port constants.
 	const AGENT_PORT_SUFFIX = '50';
@@ -308,7 +307,7 @@ class CIntegrationTest extends CAPITest {
 	private static function getComponents() {
 		return [
 			self::COMPONENT_SERVER, self::COMPONENT_PROXY, self::COMPONENT_AGENT, self::COMPONENT_AGENT2,
-			self::COMPONENT_SERVER_HANODE1, self::COMPONENT_AGENT_NEW_METADATA
+			self::COMPONENT_SERVER_HANODE1
 		];
 	}
 	/**
@@ -349,7 +348,6 @@ class CIntegrationTest extends CAPITest {
 						self::waitForLogLineToBePresent($component, $line, false, 5, 1);
 						break;
 					case self::COMPONENT_AGENT:
-					case self::COMPONENT_AGENT_NEW_METADATA:
 						self::waitForLogLineToBePresent($component, 'started [listener #1]', false, 5, 1);
 						break;
 
@@ -511,12 +509,7 @@ class CIntegrationTest extends CAPITest {
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.pid',
 				'ControlSocket' => PHPUNIT_COMPONENT_DIR.'zabbix_agent2.sock',
 				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT2_PORT_SUFFIX
-			],
-			self::COMPONENT_AGENT_NEW_METADATA => [
-				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent_new_metadata.log',
-				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.pid',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::AGENT_PORT_SUFFIX
-			],
+			]
 		];
 
 		$configuration[self::COMPONENT_PROXY]['DBName'] .= '_proxy';
@@ -673,7 +666,7 @@ class CIntegrationTest extends CAPITest {
 	protected function getActiveComponent() {
 		$components = [];
 		foreach (array_merge(self::$suite_components, $this->case_components) as $component) {
-			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2 && $component !== self::COMPONENT_AGENT_NEW_METADATA) {
+			if ($component !== self::COMPONENT_AGENT && $component !== self::COMPONENT_AGENT2) {
 				$components[] = $component;
 			}
 		}
