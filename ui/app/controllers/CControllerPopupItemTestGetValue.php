@@ -177,7 +177,7 @@ class CControllerPopupItemTestGetValue extends CControllerPopupItemTest {
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::CONNECT_TIMEOUT)),
 			timeUnitToSeconds(CSettingsHelper::get(CSettingsHelper::ITEM_TEST_TIMEOUT)), ZBX_SOCKET_BYTES_LIMIT
 		);
-		$result = $server->testItem(self::adjustFieldTypes($data), CSessionHelper::getId());
+		$result = $server->testItem($data, CSessionHelper::getId());
 
 		// Handle the response.
 		if ($result === false) {

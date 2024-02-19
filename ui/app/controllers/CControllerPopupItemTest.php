@@ -366,7 +366,7 @@ abstract class CControllerPopupItemTest extends CController {
 		];
 
 		if (!$this->is_item_testable) {
-			return ['item' => $data_item];
+			return ['item' => $data_item, 'host' => []];
 		}
 
 		$data_item['type'] = $this->item_type;
@@ -381,8 +381,9 @@ abstract class CControllerPopupItemTest extends CController {
 				$data_host += $this->getInterface($input, ['useip', 'interfaceid', 'ip', 'dns']);
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
-					$data_host +=
-						CArrayHelper::getByKeysStrict($this->host, ['tls_issuer', 'tls_connect', 'tls_subject']);
+					$data_host += CArrayHelper::getByKeysStrict($this->host,
+						['tls_issuer', 'tls_connect', 'tls_subject']
+					);
 
 					if ($for_server && $this->host['tls_connect'] == HOST_ENCRYPTION_PSK) {
 						$hosts = API::Host()->get([
@@ -434,8 +435,9 @@ abstract class CControllerPopupItemTest extends CController {
 				$data_host['hostid'] = $this->host['hostid'];
 
 				if ($this->host['status'] != HOST_STATUS_TEMPLATE) {
-					$data_host +=
-						CArrayHelper::getByKeysStrict($this->host, ['maintenance_status', 'maintenance_type']);
+					$data_host += CArrayHelper::getByKeysStrict($this->host,
+						['maintenance_status', 'maintenance_type']
+					);
 				}
 				break;
 
@@ -449,9 +451,9 @@ abstract class CControllerPopupItemTest extends CController {
 
 			case ITEM_TYPE_HTTPAGENT:
 				$data_item += CArrayHelper::getByKeys($input, ['key', 'http_authtype', 'follow_redirects', 'headers',
-					'http_proxy', 'posts', 'post_type', 'query_fields', 'request_method', 'retrieve_mode',
-					'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'status_codes', 'timeout', 'url',
-					'verify_host', 'verify_peer'
+					'http_proxy', 'output_format', 'posts', 'post_type', 'query_fields', 'request_method',
+					'retrieve_mode', 'ssl_cert_file', 'ssl_key_file', 'ssl_key_password', 'status_codes', 'timeout',
+					'url', 'verify_host', 'verify_peer'
 				]) + [
 					'http_authtype' => ZBX_HTTP_AUTH_NONE,
 					'follow_redirects' => HTTPTEST_STEP_FOLLOW_REDIRECTS_OFF,
@@ -519,21 +521,16 @@ abstract class CControllerPopupItemTest extends CController {
 		}
 
 		if (in_array($this->item_type, $this->items_support_proxy)) {
-			if (array_key_exists('data', $input) && array_key_exists('proxyid', $input['data'])) {
-				$data_host['proxyid'] = $input['data']['proxyid'];
+			if (array_key_exists('data', $input)) {
+				$data_host += CArrayHelper::getByKeys($input['data'], ['proxyid']);
 			}
-			elseif (array_key_exists('proxyid', $input)) {
-				$data_host['proxyid'] = $input['proxyid'];
-			}
-			elseif (array_key_exists('proxyid', $this->host)) {
-				$data_host['proxyid'] = $this->host['proxyid'];
-			}
-			else {
-				$data_host['proxyid'] = '0';
-			}
+
+			$data_host += CArrayHelper::getByKeys($input, ['proxyid'])
+				+ CArrayHelper::getByKeys($this->host, ['proxyid'])
+				+ ['proxyid' => '0'];
 		}
 
-		return ['item' => $data_item] + ($data_host ? ['host' => $data_host] : []);
+		return ['item' => $data_item, 'host' => $data_host];
 	}
 
 	private function getInterface(array $input, array $exclude_keys = []): array {
@@ -541,16 +538,16 @@ abstract class CControllerPopupItemTest extends CController {
 
 		if (array_key_exists('data', $input)) {
 			$input['data'] = CArrayHelper::renameKeys($input['data'], ['interface_details' => 'details']);
-			$interface_input += array_intersect_key($input['data'], array_flip(['port', 'address', 'details']));
+			$interface_input += CArrayHelper::getByKeys($input['data'], ['port', 'address', 'details']);
 		}
 
 		if (array_key_exists('interface', $input)) {
-			$interface_input += array_intersect_key($input['interface'], array_flip(['interfaceid', 'useip', 'port',
-				'address', 'details'
-			]));
+			$interface_input += CArrayHelper::getByKeys($input['interface'],
+				['interfaceid', 'useip', 'port', 'address', 'details']
+			);
 		}
 
-		$interface_input += array_intersect_key($input, array_flip(['interfaceid', 'address'])) + ['interfaceid' => 0];
+		$interface_input += CArrayHelper::getByKeys($input, ['interfaceid', 'address']) + ['interfaceid' => 0];
 
 		return ['interface' => array_diff_key($this->getHostInterface($interface_input), array_flip($exclude_keys))];
 	}
@@ -1228,82 +1225,6 @@ abstract class CControllerPopupItemTest extends CController {
 			unset($header);
 
 			$item['headers'] = implode("\r\n", $item['headers']);
-		}
-	}
-
-	/**
-	 * Converts the types of given properties in test data item and host parameters according to table schema.
-	 *
-	 * @param array $data
-	 * @param array $mapping  (optional) Nested list of properties and tables to use for type conversion.
-	 *
-	 * @return array
-	 */
-	protected static function adjustFieldTypes(array $data, ?array $mapping = []): array {
-		if (!$mapping) {
-			$mapping = [
-				'item' => [
-					'table' => 'items',
-					'fields' => [
-						'steps' => ['table' => 'item_preproc']
-					]
-				],
-				'host' => [
-					'table' => 'hosts',
-					'fields' => [
-						'interface' => [
-							'table' => 'interface',
-							'fields' => ['details' => 'interface_snmp']
-						]
-					]
-				]
-			];
-		}
-
-		foreach ($mapping as $field => $options) {
-			if (!array_key_exists($field, $data)) {
-				continue;
-			}
-
-			$schema_fields = DB::getSchema($options['table'])['fields'];
-
-			if (is_array($data[$field]) && key($data[$field]) == 0) {
-				foreach ($data[$field] as &$object) {
-					self::convertFieldTypes($object, $schema_fields);
-				}
-				unset($object);
-			}
-			else {
-				self::convertFieldTypes($data[$field], $schema_fields);
-			}
-
-			if (array_key_exists('fields', $options)) {
-				$data[$field] = self::adjustFieldTypes($data[$field], $options['fields']);
-			}
-		}
-
-		return $data;
-	}
-
-	private static function convertFieldTypes(array &$fields, array $schema_fields): void {
-		foreach ($schema_fields as $schema_field => $field_options) {
-			if (!array_key_exists($schema_field, $fields)) {
-				continue;
-			}
-
-			switch ($field_options['type']) {
-				case DB::FIELD_TYPE_INT:
-				case DB::FIELD_TYPE_UINT:
-					$fields[$schema_field] = (int) $fields[$schema_field];
-					break;
-
-				case DB::FIELD_TYPE_FLOAT:
-					$fields[$schema_field] = (float) $fields[$schema_field];
-					break;
-
-				default:
-					$fields[$schema_field] = (string) $fields[$schema_field];
-			}
 		}
 	}
 }

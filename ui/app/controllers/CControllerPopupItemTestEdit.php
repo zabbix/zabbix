@@ -84,100 +84,14 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			unset($_REQUEST['interfaceid']);
 		}
 
-		try {
-			$result = $this->validateInput($fields);
-
-			if (!$result) {
-				throw new ErrorException('', 70);
-			}
-
-			$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
-			$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
-			$this->test_type = (int) $this->getInput('test_type');
-			$this->is_item_testable = in_array($this->item_type, $testable_item_types);
-
-			// Check if key is valid for item types it's mandatory.
-			if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
-				$item_key_parser = new CItemKey();
-
-				if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
-					throw new ErrorException(
-						_s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError()), 70
-					);
-				}
-			}
-
-			/*
-			* Either the item must be testable or at least one preprocessing test must be passed ("Test" button should
-			* be disabled otherwise).
-			*/
-			$steps = (array) $this->getInput('steps', []);
-
-			if ($steps) {
-				$steps = normalizeItemPreprocessingSteps($steps);
-
-				switch ($this->test_type) {
-					case self::ZBX_TEST_TYPE_ITEM:
-						$api_input_rules = CItem::getPreprocessingValidationRules();
-						break;
-
-					case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
-						$api_input_rules = CItemPrototype::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
-						break;
-
-					case self::ZBX_TEST_TYPE_LLD:
-						$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
-						break;
-				}
-
-				if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
-					throw new ErrorException($error, 70);
-				}
-
-				if ($this->test_type != self::ZBX_TEST_TYPE_LLD) {
-					$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
-						'type' =>	['type' => API_ANY],
-						'params' =>	['type' => API_ANY]
-					]];
-					$_steps = [];
-
-					foreach ($steps as $i => $step) {
-						if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
-							[$match_type] = explode("\n", $step['params']);
-
-							if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
-								$_steps[$i] = [
-									'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
-									'params' => ZBX_PREPROC_MATCH_ERROR_ANY
-								];
-							}
-						}
-					}
-
-					if (!CApiInputValidator::validateUniqueness($api_input_rules, $_steps, '', $error)) {
-						throw new ErrorException($error);
-					}
-				}
-			}
-			elseif (!$this->is_item_testable) {
-				throw new ErrorException(
-					_s('Test of "%1$s" items is not supported.', item_type2str($this->item_type)), 70
-				);
-			}
-		}
-		catch (ErrorException $exception) {
-			$result = false;
-
-			if ($exception->getCode() != 70) {
-				throw $exception;
-			}
-
-			if ($exception->getMessage() !== '') {
-				error($exception->getMessage());
-			}
-		}
+		$error = '';
+		$result = $this->validateInput($fields) && $this->checkTestInputs($error);
 
 		if (!$result) {
+			if ($error !== '') {
+				error($error);
+			}
+
 			$output = [];
 
 			if ($messages = get_and_clear_messages()) {
@@ -190,6 +104,84 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		return $result;
 	}
 
+	private function checkTestInputs(string &$error = ''): bool {
+		$testable_item_types = self::getTestableItemTypes((string) $this->getInput('hostid', '0'));
+		$this->item_type = $this->hasInput('item_type') ? (int) $this->getInput('item_type') : -1;
+		$this->test_type = (int) $this->getInput('test_type');
+		$this->is_item_testable = in_array($this->item_type, $testable_item_types);
+
+		// Check if key is valid for item types it's mandatory.
+		if (in_array($this->item_type, $this->item_types_has_key_mandatory)) {
+			$item_key_parser = new CItemKey();
+
+			if ($item_key_parser->parse($this->getInput('key', '')) != CParser::PARSE_SUCCESS) {
+				$error = _s('Incorrect value for field "%1$s": %2$s.', 'key_', $item_key_parser->getError());
+
+				return false;
+			}
+		}
+
+		/*
+		* Either the item must be testable or at least one preprocessing test must be passed ("Test" button should
+		* be disabled otherwise).
+		*/
+		$steps = $this->getInput('steps', []);
+
+		if ($steps) {
+			$steps = normalizeItemPreprocessingSteps($steps);
+
+			switch ($this->test_type) {
+				case self::ZBX_TEST_TYPE_ITEM:
+					$api_input_rules = CItem::getPreprocessingValidationRules();
+					break;
+
+				case self::ZBX_TEST_TYPE_ITEM_PROTOTYPE:
+					$api_input_rules = CItemPrototype::getPreprocessingValidationRules(API_ALLOW_LLD_MACRO);
+					break;
+
+				case self::ZBX_TEST_TYPE_LLD:
+					$api_input_rules = CDiscoveryRule::getPreprocessingValidationRules();
+					break;
+			}
+
+			if (!CApiInputValidator::validate($api_input_rules, $steps, '/', $error)) {
+				return false;
+			}
+
+			if ($this->test_type != self::ZBX_TEST_TYPE_LLD) {
+				$api_input_rules = ['type' => API_OBJECTS, 'uniq' => [['type', 'params']], 'fields' => [
+					'type' =>	['type' => API_ANY],
+					'params' =>	['type' => API_ANY]
+				]];
+				$_steps = [];
+
+				foreach ($steps as $i => $step) {
+					if ($step['type'] == ZBX_PREPROC_VALIDATE_NOT_SUPPORTED) {
+						[$match_type] = explode("\n", $step['params']);
+
+						if ($match_type == ZBX_PREPROC_MATCH_ERROR_ANY) {
+							$_steps[$i] = [
+								'type' => ZBX_PREPROC_VALIDATE_NOT_SUPPORTED,
+								'params' => ZBX_PREPROC_MATCH_ERROR_ANY
+							];
+						}
+					}
+				}
+
+				if (!CApiInputValidator::validateUniqueness($api_input_rules, $_steps, '', $error)) {
+					return false;
+				}
+			}
+		}
+		elseif (!$this->is_item_testable) {
+			$error = _s('Test of "%1$s" items is not supported.', item_type2str($this->item_type));
+
+			return false;
+		}
+
+		return true;
+	}
+
 	protected function doAction() {
 		// VMware and icmpping simple checks are not supported.
 		$key = $this->hasInput('key') ? $this->getInput('key') : '';
@@ -199,11 +191,11 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 		}
 
 		// Get item and host properties and values from cache.
-		$data = (array) $this->getInput('data', []);
-		$inputs = $this->getItemTestProperties($this->getInputAll()) + ['host' => []];
+		$data = $this->getInput('data', []);
+		$inputs = $this->getItemTestProperties($this->getInputAll());
 
 		// Work with preprocessing steps.
-		$preprocessing_steps = CItemGeneralHelper::sortPreprocessingSteps((array) $this->getInput('steps', []));
+		$preprocessing_steps = CItemGeneralHelper::sortPreprocessingSteps($this->getInput('steps', []));
 		$preprocessing_steps = normalizeItemPreprocessingSteps($preprocessing_steps);
 		$preprocessing_types = array_column($preprocessing_steps, 'type');
 		$preprocessing_names = get_preprocessing_types(null, false, $preprocessing_types);
@@ -367,7 +359,7 @@ class CControllerPopupItemTestEdit extends CControllerPopupItemTest {
 			'texts_support_lld_macros' => $texts_support_lld_macros,
 			'hostid' => $this->host ? $this->host['hostid'] : 0,
 			'macros_values' => $this->getSupportedMacros($inputs['item']
-				+ ['interfaceid' => $this->getInput('interfaceid', 0)]
+				+ CArrayHelper::getByKeys($inputs['host'], ['interfaceid'])
 			)
 		]);
 
