@@ -116,8 +116,10 @@ class CCheckBox extends CInput {
 		return $this;
 	}
 
-	public function setLabelTitle(string $label_title) {
+	public function setLabelTitle(string $label_title): self {
 		$this->label_title = $label_title;
+
+		return $this;
 	}
 
 	/**
