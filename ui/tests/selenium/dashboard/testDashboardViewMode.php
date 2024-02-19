@@ -27,60 +27,72 @@ use Facebook\WebDriver\WebDriverBy;
  */
 class testDashboardViewMode extends CLegacyWebTest {
 
+	public static function getCheckLayoutForDifferentUsersData() {
+		return [
+			[
+				[
+					'username' => 'super-admin',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55b',
+					'userid' => 1
+				]
+			],
+			[
+				[
+					'username' => 'admin',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55c',
+					'userid' => 4
+				]
+			],
+			[
+				[
+					'username' => 'user',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55d',
+					'userid' => 5
+				]
+			],
+			[
+				[
+					'username' => 'guest',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55e',
+					'userid' => 2
+				]
+			]
+		];
+	}
+
 	/**
+	 * @dataProvider getCheckLayoutForDifferentUsersData
+	 *
 	 * @onBefore removeGuestFromDisabledGroup
 	 * @onAfter addGuestToDisabledGroup
 	 */
-	public function testDashboardViewMode_CheckLayoutForDifferentUsers() {
-		$users = ['super-admin', 'admin', 'user', 'guest'];
-		foreach ($users as $user) {
-			switch ($user) {
-				case 'super-admin':
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55b', 1);
-					break;
-				case 'admin':
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55c', 4);
-					break;
-				case 'user':
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55d', 5);
-					break;
-				case 'guest':
-					$this->authenticateUser('09e7d4286dfdca4ba7be15e0f3b2b55e', 2);
-					break;
-			}
-			$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+	public function testDashboardViewMode_CheckLayoutForDifferentUsers($data) {
+		$this->authenticateUser($data['sessionid'], $data['userid']);
+		$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+		$this->zbxTestCheckTitle('Dashboard');
+		$this->zbxTestCheckHeader('Global view');
 
-			if ($user === 'guest') {
-				$this->page->waitUntilReady();
-				$this->query('button:Login')->one()->click();
-				$this->page->waitUntilReady();
-				$this->query('link:sign in as guest')->one()->click();
-				$this->page->waitUntilReady();
-			}
-
-			$this->zbxTestCheckTitle('Dashboard');
-			$this->zbxTestCheckHeader('Global view');
-			if ($user !== 'super-admin') {
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
-				$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
-			}
-			else {
-				$this->zbxTestCheckNoRealHostnames();
-			}
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
-			$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
-			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
-
-			// Logout.
-			$this->zbxTestLogout();
-			$this->zbxTestWaitForPageToLoad();
-			$this->webDriver->manage()->deleteAllCookies();
+		if ($data['username'] !== 'super-admin') {
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//tr[@class='nothing-to-show']/td", 'No graphs added.');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//tr[@class='nothing-to-show']/td", 'No maps added.');
+			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//tr[@class='nothing-to-show']/td", 'No data found.');
 		}
+		else {
+			$this->zbxTestCheckNoRealHostnames();
+		}
+
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[8]//h4", 'Favorite graphs');
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[7]//h4", 'Favorite maps');
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[6]//h4", 'Problems');
+		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[5]//h4[text()='Problems by severity']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[4]//h4[text()='Local']");
+		$this->zbxTestAssertElementPresentXpath("//div[@class='dashboard-grid']/div[3]//h4[text()='Host availability']");
+		$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//h4", 'System information');
+
+		// Logout.
+		$this->zbxTestLogout();
+		$this->zbxTestWaitForPageToLoad();
+		$this->webDriver->manage()->deleteAllCookies();
 	}
 
 	public function testDashboardViewMode_KioskMode() {
