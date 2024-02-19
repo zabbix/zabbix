@@ -540,7 +540,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->assertEquals(1, count($response['result']));
 
-		$entry = $response['result'][0]
+		$entry = $response['result'][0];
 
 		$ep = json_encode($entry, JSON_PRETTY_PRINT);
 
