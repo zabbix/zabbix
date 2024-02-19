@@ -49,6 +49,15 @@ class testDashboardViewMode extends CLegacyWebTest {
 					break;
 			}
 			$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
+
+			if ($user === 'guest') {
+				$this->page->waitUntilReady();
+				$this->query('button:Login')->one()->click();
+				$this->page->waitUntilReady();
+				$this->query('link:sign in as guest')->one()->click();
+				$this->page->waitUntilReady();
+			}
+
 			$this->zbxTestCheckTitle('Dashboard');
 			$this->zbxTestCheckHeader('Global view');
 			if ($user !== 'super-admin') {
