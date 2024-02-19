@@ -224,6 +224,7 @@ require_once dirname(__FILE__).'/roles/testUserRolesPermissions.php';
 
 // Scripts.
 require_once dirname(__FILE__).'/scripts/testFormAlertsScripts.php';
+require_once dirname(__FILE__).'/scripts/testManualActionScripts.php';
 require_once dirname(__FILE__).'/scripts/testPageAlertsScripts.php';
 
 // Services.
@@ -536,6 +537,7 @@ class SeleniumTests {
 
 		// Scripts.
 		$suite->addTestSuite('testFormAlertsScripts');
+		$suite->addTestSuite('testManualActionScripts');
 		$suite->addTestSuite('testPageAlertsScripts');
 
 		// Services.

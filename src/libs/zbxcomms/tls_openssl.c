@@ -2022,8 +2022,16 @@ int	zbx_tls_accept(zbx_socket_t *s, unsigned int tls_accept, char **error)
 		}
 		else
 		{
-			zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code to %d:",
-					result_code);
+			if (SSL_ERROR_SYSCALL == result_code && 0 != errno)
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
+						" to %d (SSL_ERROR_SYSCALL):%s:", result_code, zbx_strerror(errno));
+			}
+			else
+			{
+				zbx_snprintf_alloc(error, &error_alloc, &error_offset, "TLS handshake set result code"
+						" to %d:", result_code);
+			}
 		}
 
 		zbx_tls_error_msg(error, &error_alloc, &error_offset);
@@ -2222,36 +2230,51 @@ void	zbx_tls_close(zbx_socket_t *s)
 
 		/* After TLS shutdown the TCP connection will be closed. So, there is no need to do a bidirectional */
 		/* TLS shutdown - unidirectional shutdown is ok. */
-		while (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
+		if (0 == SSL_in_init(s->tls_ctx->ctx))
 		{
-			int	err;
-
-			err = (size_t)SSL_get_error(s->tls_ctx->ctx, (int)res);
-			if (SUCCEED != tls_is_nonblocking_error(err))
+			while (0 > (res = SSL_shutdown(s->tls_ctx->ctx)))
 			{
-				int	result_code;
-				char	*error = NULL;
-				size_t	error_alloc = 0, error_offset = 0;
+				int	err;
 
-				result_code = SSL_get_error(s->tls_ctx->ctx, res);
-				zbx_tls_error_msg(&error, &error_alloc, &error_offset);
-				zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s set result code to %d:%s%s",
-						s->peer, result_code, ZBX_NULL2EMPTY_STR(error), info_buf);
-				zbx_free(error);
-				break;
-			}
+				err =(size_t)SSL_get_error(s->tls_ctx->ctx, (int)res);
+				if (SUCCEED != tls_is_nonblocking_error(err))
+				{
+					int	result_code;
+					char	*error = NULL;
+					size_t	error_alloc = 0, error_offset = 0;
 
-			if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
-			{
-				zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
-						zbx_strerror_from_system(zbx_socket_last_error()));
-				break;
-			}
+					result_code = SSL_get_error(s->tls_ctx->ctx, res);
+					zbx_tls_error_msg(&error, &error_alloc, &error_offset);
 
-			if (SUCCEED != zbx_socket_check_deadline(s))
-			{
-				zabbix_log(LOG_LEVEL_DEBUG, "timeout while closing tls connection");
-				break;
+					if (SSL_ERROR_SYSCALL == result_code && 0 != errno)
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s set result code"
+								" to %d (SSL_ERROR_SYSCALL):%s%s%s", s->peer,
+								result_code, ZBX_NULL2EMPTY_STR(error), info_buf,
+								zbx_strerror(errno));
+					}
+					else
+					{
+						zabbix_log(LOG_LEVEL_WARNING, "SSL_shutdown() with %s set result code"
+								" to %d:%s%s", s->peer, result_code,
+								ZBX_NULL2EMPTY_STR(error), info_buf);
+					}
+					zbx_free(error);
+					break;
+				}
+
+				if (FAIL == tls_socket_wait(s->socket, s->tls_ctx->ctx, err))
+				{
+					zabbix_log(LOG_LEVEL_WARNING, "cannot wait socket: %s",
+							zbx_strerror_from_system(zbx_socket_last_error()));
+					break;
+				}
+
+				if (SUCCEED != zbx_socket_check_deadline(s))
+				{
+					zabbix_log(LOG_LEVEL_DEBUG, "timeout while closing tls connection");
+					break;
+				}
 			}
 		}
 
