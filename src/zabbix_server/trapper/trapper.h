@@ -25,6 +25,7 @@
 #include "zbxdbhigh.h"
 #include "zbxcomms.h"
 #include "zbxvault.h"
+#include "zbxpoller.h"
 
 #define ZBX_IPC_SERVICE_TRAPPER	"trapper"
 
@@ -45,6 +46,7 @@ typedef struct
 	const char			*config_java_gateway;
 	int				config_java_gateway_port;
 	const char			*config_externalscripts;
+	zbx_get_value_internal_ext_f	zbx_get_value_internal_ext_cb;
 }
 zbx_thread_trapper_args;
 

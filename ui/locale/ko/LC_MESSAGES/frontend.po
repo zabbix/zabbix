@@ -8335,6 +8335,11 @@ msgstr "Web 인터페이스에 액세스"
 msgid "Frontend messaging"
 msgstr "Web 인터페이스 알림 표시"
 
+#: app/views/administration.user.edit.php:731
+#: app/views/administration.user.edit.php:826
+msgid "Frontend notifications"
+msgstr ""
+
 #: app/partials/monitoring.latest.filter.php:158
 #: app/partials/monitoring.problem.filter.php:262
 #: tests/selenium/modules/clock32/includes/WidgetForm.php:136
@@ -13196,6 +13201,11 @@ msgstr "장애이벤트를 계속해서 생성"
 #: jsLoader.php:284
 msgid "Mute"
 msgstr "음소거"
+
+#: jsLoader.php:286
+#, c-format
+msgid "Mute for %1$s"
+msgstr ""
 
 #: app/views/monitoring.dashboard.list.php:95
 msgid "My"
@@ -18337,6 +18347,11 @@ msgstr "슬로바키아어 (sk_SK)"
 msgid "Snooze"
 msgstr "스누즈"
 
+#: jsLoader.php:291
+#, c-format
+msgid "Snooze for %1$s"
+msgstr ""
+
 #: include/hosts.inc.php:174
 msgid "Software"
 msgstr "소프트웨어"
@@ -20707,6 +20722,11 @@ msgstr ""
 #: jsLoader.php:286
 msgid "Unmute"
 msgstr "음소거 해제"
+
+#: jsLoader.php:293
+#, c-format
+msgid "Unmute for %1$s"
+msgstr ""
 
 #: app/partials/administration.system.info.php:161
 #, c-format
