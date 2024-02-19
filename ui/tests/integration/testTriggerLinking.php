@@ -49,7 +49,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_RECOVERY_MODE = 1;
 	const TRIGGER_CORRELATION_MODE = 1;
 	const TRIGGER_CORRELATION_TAG_PRE = 'strata_correlation_tag';
-	const TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE = 'correlation_tag_X';
+	const TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE = 'Xtag';
 	const TRIGGER_MANUAL_CLOSE = 1;
 	const TRIGGER_OPDATA_PRE = 'strata_opdata';
 	const TRIGGER_EVENT_NAME_PRE = 'strata_event_name';
