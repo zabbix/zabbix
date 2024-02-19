@@ -432,11 +432,17 @@
 			$preprocessing = $(obj.querySelector('#preprocessing'));
 		}
 
-		new CSortable($preprocessing[0], {
+		const sortable_preprocessing = new CSortable($preprocessing[0], {
 			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			enable_sorting: $preprocessing[0].dataset.readonly == 0,
 			freeze_start: 1,
 			freeze_end: 1
+		});
+
+		sortable_preprocessing.on(CSortable.EVENT_SORT, () => {
+			$preprocessing[0].querySelectorAll('.preprocessing-list-item').forEach((list_item, index) => {
+				list_item.querySelector('[name*="sortorder"]').value = index;
+			});
 		});
 
 		let step_index = $preprocessing.find('.preprocessing-list-item').length;
