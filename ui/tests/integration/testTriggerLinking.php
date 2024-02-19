@@ -62,6 +62,7 @@ class testTriggerLinking extends CIntegrationTest {
 	//private static $triggers_same_descr_mapping_to_id = array();
 	private static $templateX_ID;
 	private static $firstActionID;
+	private static $templateX_name = 'templateX';
 
 	public function createTemplates() {
 
@@ -82,7 +83,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 
 		$response = $this->call('template.create', [
-				'host' => "templateX",
+			'host' =>  self::$templateX_name,
 				'groups' => [
 					'groupid' => 1
 				]]);
@@ -292,10 +293,10 @@ class testTriggerLinking extends CIntegrationTest {
 				'correlation_mode' => self::TRIGGER_CORRELATION_MODE,
 				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_PRE,
 				'manual_close' => self::TRIGGER_MANUAL_CLOSE,
-				'expression' => 'last(/' . "templateX" . '/' .
-				"templateX_item_key" . ')=2',
-				'recovery_expression' => 'last(/' . "templateX" . '/' .
-				"templateX_item_key" . ')=3',
+				'expression' => 'last(/' .  self::$templateX_name . '/' .
+				"templateX_item_key" . ')=99',
+				'recovery_expression' => 'last(/' .  self::$templateX_name . '/' .
+				"templateX_item_key" . ')=999',
 				'tags' => [
 					[
 						'tag' => "templateX_tag",
