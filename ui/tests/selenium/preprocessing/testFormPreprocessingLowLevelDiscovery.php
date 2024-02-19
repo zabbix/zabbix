@@ -383,12 +383,15 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 					[
 						'type' => 'XML to JSON'
 					],
-//					[
-//						'type' => 'JavaScript',
-//						'parameters' => [
-//							['placeholder' => 'script']
-//						]
-//					],
+					[
+						'type' => 'JavaScript',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'placeholder' => 'script'
+							]
+						]
+					],
 					[
 						'type' => 'Does not match regular expression',
 						'parameters' => [

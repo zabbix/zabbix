@@ -2921,12 +2921,15 @@ abstract class testFormPreprocessing extends CWebTest {
 					[
 						'type' => 'Hexadecimal to decimal'
 					],
-//					[
-//						'type' => 'JavaScript',
-//						'parameters' => [
-//							['placeholder' => 'script']
-//						]
-//					],
+					[
+						'type' => 'JavaScript',
+						'parameters' => [
+							[
+								'selector' => 'xpath:.//div[@class="multilineinput-control"]/input[@type="text"]',
+								'placeholder' => 'script'
+							]
+						]
+					],
 					[
 						'type' => 'In range',
 						'parameters' => [
@@ -2981,7 +2984,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'type' => 'Prometheus pattern',
 						'parameters' => [
 							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>'],
-							['value' => 'value'],
+							['selector' => 'xpath:.//z-select[contains(@class, "preproc-param")]', 'value' => 'value'],
 							['placeholder' => '<label name>'],
 						]
 					],
@@ -3015,21 +3018,22 @@ abstract class testFormPreprocessing extends CWebTest {
 		$form->selectTab('Preprocessing');
 		$this->query('id:param_add')->one()->click();
 		$container = $this->query('xpath://li[contains(@class, "preprocessing-list-item")][1]')->waitUntilPresent()->one();
-		$descriptors = $this->getPreprocessingFieldDescriptors();
 
 		foreach ($data as $step) {
 			$container->query('xpath:.//z-select[contains(@id, "_type")]')->asDropdown()->one()->fill($step['type']);
 
 			if (array_key_exists('parameters', $step)) {
 				foreach ($step['parameters'] as $i => $parameter) {
-					$field = $this->getPreprocessingField($container, $descriptors['parameter_'.$i + 1]);
+					$parameter['selector'] = CTestArrayHelper::get($parameter, 'selector',
+							'xpath:.//input[@id="preprocessing_0_params_'.$i.'"]'
+					);
+					$field = $container->query($parameter['selector'])->waitUntilPresent()->one();
 
 					if (array_key_exists('placeholder', $parameter)) {
 						$this->assertEquals($parameter['placeholder'], $field->getAttribute('placeholder'));
 					}
 
-					$parameter['value'] = (array_key_exists('value', $parameter)) ? $parameter['value'] : '';
-					$this->assertEquals($parameter['value'], $field->getValue());
+					$this->assertEquals(CTestArrayHelper::get($parameter, 'value', ''), $field->getValue());
 				}
 			}
 			else {
