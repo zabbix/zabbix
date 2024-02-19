@@ -276,9 +276,11 @@ clean:
  *          the list of the trigger dependencies (trigger_dep_ids_del) that need to be deleted on the     *
  *          target host, since they are not present on the template trigger.                              *
  *                                                                                                        *
- * Parameters: trids               - [IN] vector of trigger identifiers from database                     *
- *             links               - [OUT] pairs of template trigger dependencies, list of links_up and links_down *
- *                                         links that we want to be present on the target host            *
+ * Parameters:                                                                                            *
+ *             trids               - [IN] vector of host trigger ids, which descriptions match at least   *
+ *                                        one of the triggers from templates                              *
+ *             links               - [OUT] pairs of template trigger dependencies, list of links_up and   *
+ *                                         links_down, links that we want to be present on target host    *
  *             links_processed     - [OUT] processed links with entries that are already present excluded *
  *             trigger_dep_ids_del - [OUT] list of triggers dependencies that need to be deleted          *
  *                                                                                                        *
@@ -316,12 +318,6 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		goto clean;
 	}
 
-	zabbix_log(LOG_LEVEL_INFORMATION, "BAGDER 000");
-	for (i = 0; i < trids->values_num; i++)
-	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "BAGDER 000 trids next: %lu", trids->values[i]);
-	}
-
 	/* create a list of target host trigger dependencies*/
 	while (NULL != (row = DBfetch(result)))
 	{
@@ -343,8 +339,6 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		s->trigger_up_id = trigger_id_up;
 		s->status = 0;
 		s->flags = flags;
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 000 appending: down: %lu, up: %lu, dep: %lu", trigger_id_down,
-				trigger_id_up, trigger_dep_id);
 
 		if (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_search(&h, &temp_t)))
 		{
@@ -360,11 +354,8 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			zbx_hashset_insert(&h, &local_temp_t, sizeof(local_temp_t));
 		}
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 000 COMPLETE");
 
 	DBfree_result(result);
-
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 111 ");
 
 	/* go through the list of template trigger dependencies and if there is match between host triggers up and down
 	*- then mark host pair dependency with "preserve status"
@@ -376,7 +367,6 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		zbx_trigger_dep_entry_t	temp_t;
 
 		temp_t.trigger_down_id = links->values[i].first;
-		zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 111 down id: %lu", temp_t.trigger_down_id);
 
 		if (NULL != (found = (zbx_trigger_dep_entry_t *) zbx_hashset_search(&h, &temp_t)))
 		{
@@ -385,8 +375,6 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 
 			for (j = 0; j < found->v.values_num; j++)
 			{
-				zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 111 comparing links %lu with target host %lu",
-						links->values[i].second , found->v.values[j]->trigger_up_id );
 				/* trigger_up are equal */
 				if (links->values[i].second == found->v.values[j]->trigger_up_id)
 				{
@@ -415,15 +403,6 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 			zbx_vector_uint64_pair_append(links_processed, x);
 		}
 	}
-	zabbix_log(LOG_LEVEL_INFORMATION, "BADGER 111 COMPLETE");
-
-
-	/* go over the list of host trigger dependencies that were not marked and delete them
-	*   list of target host trigger dependencies does not contain any match from templates
-	* apparently we have an issue here ?
-	* we delete dependencies assumting the trids in h is a "match",
-	* but it is not a complete match - it is only a match by description, not by expression...
-	*/
 
 	zbx_hashset_iter_reset(&h, &iter);
 	while (NULL != (found = (zbx_trigger_dep_entry_t *)zbx_hashset_iter_next(&iter)))
@@ -551,7 +530,8 @@ clean:
  * Purpose: update trigger dependencies for specified host                      *
  *                                                                              *
  * Parameters: hostid    - [IN] host identifier from database                   *
- *             trids     - [IN] vector of host trigger identifiers from database*
+ *             trids     - [IN] vector of host trigger ids, which descriptions  *
+ *                              match at least one of triggers from templates   *
  *             is_update - [IN] flag. Values:                                   *
  *                              TRIGGER_DEP_SYNC_INSERT_OP - 'trids' contains   *
  *                               identifiers of new triggers,                   *
