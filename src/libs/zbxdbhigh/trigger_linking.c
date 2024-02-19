@@ -1635,6 +1635,8 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 		res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids,
 				TRIGGER_DEP_SYNC_UPDATE_OP);
 
+		zabbix_log(LOG_LEVEL_INFORMATION, "OMEGA XXX: %d", res);
+
 		/* FIX */
 		/* res = DBsync_template_dependencies_for_triggers(hostid, &cur_triggerids, */
 		/* 		TRIGGER_DEP_SYNC_UPDATE_OP); */
