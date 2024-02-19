@@ -57,18 +57,25 @@ class testTriggerLinking extends CIntegrationTest {
 	const NUMBER_OF_TEMPLATES = 10;
 	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 10;
 
+	/* when resolving conflicts during linking - trigger is considered unique, if its description and expression match
+		every template contains a set of triggers with:
+		1) unique description and unique expression
+		2) same description and unique expression */
+
 	private static $templateids = array();
 	private static $stringids = array();
-	//private static $triggerids_deps = array();
-	//private static $triggers_same_descr_mapping_to_id = array();
+
+	/* template X will be linked after the initial set of templates get linked and then unliked (without clear) */
 	private static $templateX_ID;
-	private static $firstActionID;
 	private static $templateX_name = 'templateX';
+
+	/* linking initial set of templates, need an ID to delete this, as during the second linking
+		only templateX will be linked */
+	private static $firstActionID;
 
 	public function createTemplates() {
 
 		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES; $i++) {
-
 			$response = $this->call('template.create', [
 				'host' => self::TEMPLATE_NAME_PRE . "_" . $i,
 				'groups' => [
@@ -81,7 +88,6 @@ class testTriggerLinking extends CIntegrationTest {
 
 			array_push(self::$templateids, $response['result']['templateids'][0]);
 		}
-
 
 		$response = $this->call('template.create', [
 			'host' =>  self::$templateX_name,
@@ -107,8 +113,7 @@ class testTriggerLinking extends CIntegrationTest {
 					'operationtype' => 2
 				]
 			]
-		]
-		);
+		]);
 
 		$ep = json_encode($response, JSON_PRETTY_PRINT);
 
@@ -120,6 +125,7 @@ class testTriggerLinking extends CIntegrationTest {
 			$t = ['templateid' => $entry];
 			array_push($templateids_for_api_call, $t);
 		}
+
 		$response = $this->call('action.create', [
 			'name' => 'link_templates',
 			'eventsource' => 2,
@@ -131,8 +137,7 @@ class testTriggerLinking extends CIntegrationTest {
 					$templateids_for_api_call
 				]
 			]
-		]
-		);
+		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
@@ -146,7 +151,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals(1, count($response['result']), $ep);
 
 		$this->reloadConfigurationCache();
-
 
 		$templateids_for_api_call_collision_description = [];
 		array_push($templateids_for_api_call_collision_description, ['templateid' => self::$templateX_ID]);
@@ -162,9 +166,7 @@ class testTriggerLinking extends CIntegrationTest {
 					$templateids_for_api_call_collision_description
 				]
 			]
-
-		]
-		);
+		]);
 
 		$this->assertArrayHasKey('actionids', $response['result']);
 		$this->assertEquals(1, count($response['result']['actionids']));
@@ -227,13 +229,10 @@ class testTriggerLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['triggerids']);
-			//array_push(self::$triggerids, $response['result']['triggerids']);
-
-			//$this->assertEquals("badger", $response['result']['triggerids'][0], $response['result']['triggerids'][0]);
 
 			/* also create trigger that would have the SAME description across all templates
-			but different expression of course
-			*/
+				(but different expression, otherwise templates will not be able to exist on host
+				at the same time due to conflict) */
 			$response_2 = $this->call('trigger.create', [
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
 				'priority' => self::TRIGGER_PRIORITY,
@@ -267,13 +266,8 @@ class testTriggerLinking extends CIntegrationTest {
 
 			$this->assertArrayHasKey('triggerids', $response_2['result']);
 			$this->assertArrayHasKey(0, $response_2['result']['triggerids']);
-			//array_push(self::$triggerids, $response['result']['triggerids']);
-			//self::$triggerids_deps[$response_2['result']['triggerids'][0]] = $response['result']['triggerids'][0];
-			//self::$triggers_same_descr_mapping_to_id[$response_2['result']['triggerids'][0]] = $i;
 		}
 
-
-		/////////////////////////////////////////////
 		$response = $this->call('item.create', [
 				'hostid' => self::$templateX_ID,
 				'name' => "templateX_item_name",
@@ -398,13 +392,10 @@ class testTriggerLinking extends CIntegrationTest {
 			'selectFunctions' => 'extend',
 			'sortfield' => 'description',
 			'selectDependencies' => ['triggerid']
-		]
-		);
+		]);
 
 		$totalExpectedTriggers = self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2;
 		$this->assertEquals($totalExpectedTriggers, count($response['result']));
-
-		//$this->assertEquals( json_encode($response, JSON_PRETTY_PRINT), "badger",  json_encode($response, JSON_PRETTY_PRINT));
 
 		$i = 0;
 		foreach ($response['result'] as $entry) {
@@ -416,11 +407,6 @@ class testTriggerLinking extends CIntegrationTest {
 
 			if ($entry['description'] == self::TRIGGER_DESCRIPTION_SAME_ALL)
 			{
-				// $this->assertArrayHasKey($entry['triggerid'], self::$triggerids_deps, json_encode(self::$triggerids_deps)."------".json_encode($response['result']));
-				// $this->assertEquals($entry['dependencies'][0], self::$triggerids_deps[$entry['triggerid']], $ep);
-				// $i = $triggers_same_descr_mapping_to_id;
-				//continue;
-
 				$this->assertArrayHasKey(0, $entry['dependencies']);
 				continue;
 			}
@@ -471,7 +457,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->setupActions2();
 		$this->stopComponent(self::COMPONENT_AGENT);
 
-
 		$this->reloadConfigurationCache();
 		sleep(10);
 
@@ -486,7 +471,6 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->assertArrayHasKey('hostid', $response['result'][0], json_encode($response['result']));
 
-		//	$this->assertArrayHasKey('host', $response['result']['hostid']);
 		$hostid =  $response['result'][0]['hostid'];
 
 		$response = CDataHelper::call('host.update', [
@@ -500,7 +484,6 @@ class testTriggerLinking extends CIntegrationTest {
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 
-
 		$this->startComponent(self::COMPONENT_AGENT2);
 		sleep(5);
 		$this->reloadConfigurationCache();
@@ -508,17 +491,11 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
 
-		// $sql = "select expression from triggers where templateid is not null and hostid='".$hostid."';";
-		// $this->assertEquals(1, CDBHelper::getCount($sql));
-		// $row = DBfetch(DBselect($sql));
-		// $this->assertEquals('badger', 'a', json_encode($entry, JSON_PRETTY_PRINT));
-
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
 				'host' => self::HOST_NAME,
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
-				//				'expression' => 'last(/' .  self::HOST_NAME . '/' ."templateX_item_key" . ')=99'
 				'correlation_tag' => self::TRIGGER_CORRELATION_TAG_FOR_NEW_TEMPLATE
 			],
 			'output' => [
@@ -545,9 +522,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'selectFunctions' => 'extend',
 			'sortfield' => 'description',
 			'selectDependencies' => ['triggerid']
-		]
-		);
-
+		]);
 
 		$this->assertEquals(1, count($response['result']));
 
@@ -558,23 +533,15 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertArrayHasKey('tags', $entry, $ep);
 		$this->assertArrayHasKey(0, $entry['tags'], $ep);
 		$this->assertArrayHasKey('tag', $entry['tags'][0], $ep);
-
 		$this->assertEquals('templateX_tag', $entry['tags'][0]['tag'], $ep);
-
 		$this->assertEquals($entry['description'], self::TRIGGER_DESCRIPTION_SAME_ALL, $ep);
-
 		$this->assertEquals($entry['priority'],    self::TRIGGER_PRIORITY, $ep);
 		$this->assertEquals($entry['status'],      self::TRIGGER_STATUS, $ep);
 		$this->assertEquals($entry['type'],        self::TRIGGER_TYPE, $ep);
-
 		$this->assertEquals($entry['recovery_mode'],    self::TRIGGER_RECOVERY_MODE, $ep);
 		$this->assertEquals($entry['correlation_mode'], self::TRIGGER_CORRELATION_MODE, $ep);
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
-
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
-
-		// $x = self::getLogPath(self::COMPONENT_SERVER);
-		// $this->assertEquals('a', 'b',  $x);
 	}
 }
