@@ -175,13 +175,6 @@ class CMfa extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array $mfas
-	 *
-	 * @throws APIException
-	 *
-	 * @return array
-	 */
 	public function create(array $mfas): array {
 		$this->validateCreate($mfas);
 
@@ -203,11 +196,6 @@ class CMfa extends CApiService {
 		return ['mfaids' => $mfaids];
 	}
 
-	/**
-	 * @param array $mfas
-	 *
-	 * @throws APIException
-	 */
 	private function validateCreate(array &$mfas): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'type' =>			['type' => API_INT32, 'flags' => API_REQUIRED | API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
@@ -221,15 +209,15 @@ class CMfa extends CApiService {
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'code_length')]
 			]],
 			'api_hostname' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'api_hostname')]
 			]],
 			'clientid' =>		['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'clientid')]
 			]],
 			'client_secret' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY | API_REQUIRED],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_DUO], 'type' => API_STRING_UTF8, 'flags' => API_REQUIRED | API_NOT_EMPTY],
 									['else' => true, 'type' => API_STRING_UTF8, 'in' => DB::getDefault('mfa', 'client_secret')]
 			]]
 		]];
@@ -276,28 +264,18 @@ class CMfa extends CApiService {
 		}
 	}
 
-	/**
-	 * @param array $mfas
-	 *
-	 * @throws APIException
-	 *
-	 * @return array
-	 */
 	public function update(array $mfas): array {
 		$this->validateUpdate($mfas, $db_mfas);
 
 		$upd_mfas = [];
 
-		foreach ($mfas as $mfaid => $mfa) {
-			$upd_mfa = DB::getUpdatedValues('mfa',
-				array_intersect_key($mfa, array_flip(self::OUTPUT_FIELDS) + ['client_secret' => '']),
-				$db_mfas[$mfaid]
-			);
+		foreach ($mfas as $mfa) {
+			$upd_mfa = DB::getUpdatedValues('mfa', $mfa, $db_mfas[$mfa['mfaid']]);
 
 			if ($upd_mfa) {
 				$upd_mfas[] = [
 					'values' => $upd_mfa,
-					'where' => ['mfaid' => $mfaid]
+					'where' => ['mfaid' => $mfa['mfaid']]
 				];
 			}
 		}
@@ -308,12 +286,6 @@ class CMfa extends CApiService {
 		return ['mfaids' => array_column($mfas, 'mfaid')];
 	}
 
-	/**
-	 * @param array $mfas
-	 * @param array|null $db_mfas
-	 * @return void
-	 * @throws APIException
-	 */
 	private function validateUpdate(array &$mfas, ?array &$db_mfas): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['mfaid']], 'fields' => [
 			'mfaid' => ['type' => API_ID, 'flags' => API_REQUIRED]
@@ -323,8 +295,8 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_mfas = $this->get([
-			'output' => API_OUTPUT_EXTEND,
+		$db_mfas = DB::select('mfa', [
+			'output' => array_merge(self::OUTPUT_FIELDS, ['client_secret']),
 			'mfaids' => array_column($mfas, 'mfaid'),
 			'preservekeys' => true
 		]);
@@ -333,13 +305,7 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		foreach ($mfas as &$mfa) {
-			if (!array_key_exists('type', $mfa)) {
-				$db_mfa = $db_mfas[$mfa['mfaid']];
-				$mfa += ['type' => $db_mfa['type']];
-			}
-		}
-		unset($mfa);
+		$mfas = $this->extendObjectsByKey($mfas, $db_mfas, 'mfaid', ['type']);
 
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'mfaid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
@@ -371,18 +337,9 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$mfas = array_column($mfas, null, 'mfaid');
-
 		self::checkDuplicates($mfas, $db_mfas);
 	}
 
-	/**
-	 * @param array $mfaids
-	 *
-	 * @throws APIException
-	 *
-	 * @return array
-	 */
 	public function delete(array $mfaids): array {
 		self::validateDelete($mfaids, $db_mfaids);
 
@@ -393,12 +350,6 @@ class CMfa extends CApiService {
 		return ['mfaids' => $mfaids];
 	}
 
-	/**
-	 * @param array      $mfaids
-	 * @param array|null $db_mfaids
-	 *
-	 * @throws APIException
-	 */
 	private static function validateDelete(array $mfaids, ?array &$db_mfas): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
@@ -406,8 +357,8 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PARAMETERS, $error);
 		}
 
-		$db_mfas = API::Mfa()->get([
-			'output' => ['mfaid', 'type', 'name'],
+		$db_mfas = DB::select('mfa', [
+			'output' => ['mfaid', 'name'],
 			'mfaids' => $mfaids,
 			'preservekeys' => true
 		]);
@@ -416,21 +367,20 @@ class CMfa extends CApiService {
 			self::exception(ZBX_API_ERROR_PERMISSIONS, _('No permissions to referred object or it does not exist!'));
 		}
 
-		$mfas_left = API::Mfa()->get(['countOutput' => true]);
-		$mfas_left -= count($db_mfas);
+		$mfas_left = DBfetch(DBselect(
+			'SELECT m.mfaid'.
+			' FROM mfa m'.
+			' WHERE '.dbConditionId('m.mfaid', array_keys($db_mfas), true),
+			1
+		));
 
 		$auth = API::Authentication()->get([
 			'output' => ['mfa_status', 'mfaid']
 		]);
 
-		// Default MFA method cannot be removed if there are remaining MFA methods.
+		// Default MFA method cannot be removed if there are no remaining MFA methods.
 		if (in_array($auth['mfaid'], $mfaids)
-			&& ($auth['mfa_status'] == MFA_ENABLED || $mfas_left > 0)) {
-			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
-		}
-
-		// Cannot remove the last remaining MFA method if MFA authentication is enabled.
-		if ($auth['mfa_status'] == MFA_ENABLED && $mfas_left == 0) {
+				&& ($auth['mfa_status'] == MFA_ENABLED || $mfas_left)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
 		}
 
