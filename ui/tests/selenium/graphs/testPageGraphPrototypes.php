@@ -82,7 +82,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 
 		CDataHelper::call('graphprototype.create', [
 			[
-				'name' => '1 Graph prototype discovered_{#KEY}',
+				'name' => '2a Graph prototype discovered_{#KEY}',
 				'width' => 100,
 				'height' => 100,
 				'graphtype' => 0,
@@ -94,7 +94,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			],
 			[
-				'name' => '2 Graph prototype not discovered_{#KEY}',
+				'name' => '33b4 Graph prototype not discovered_{#KEY}',
 				'width' => 200,
 				'height' => 200,
 				'graphtype' => 1,
@@ -107,7 +107,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			],
 			[
-				'name' => 'a Graph prototype pie discovered_{#KEY}',
+				'name' => 'a3 Graph prototype pie discovered_{#KEY}',
 				'width' => 300,
 				'height' => 300,
 				'graphtype' => 2,
@@ -119,7 +119,7 @@ class testPageGraphPrototypes extends testPagePrototypes {
 				]
 			],
 			[
-				'name' => 'y Graph prototype exploded not discovered_{#KEY}',
+				'name' => 'Yw Graph prototype exploded not discovered_{#KEY}',
 				'width' => 400,
 				'height' => 400,
 				'graphtype' => 3,

@@ -29,7 +29,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 class testPageItemPrototypesTemplate extends testPagePrototypes {
 
 	public $source = 'item';
-	public $tag = 'y Item prototype trapper with text type';
+	public $tag = 'Yw Item prototype trapper with text type';
 
 	protected $link = 'zabbix.php?action=item.prototype.list&context=template&sort=name&sortorder=ASC&';
 	protected static $prototype_itemids;
@@ -64,58 +64,58 @@ class testPageItemPrototypesTemplate extends testPagePrototypes {
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
-				'name' => '1 Item prototype monitored discovered',
-				'key_' => '1_key[{#KEY}]',
+				'name' => '3a Item prototype monitored discovered',
+				'key_' => '3a_key[{#KEY}]',
 				'hostid' => $template_id,
 				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_ZABBIX_ACTIVE,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 15,
+				'delay' => '15',
 				'history' => '1h',
 				'trends' => '24h'
 			],
 			[
-				'name' => '2 Item prototype not monitored discovered',
-				'key_' => '2_key[{#KEY}]',
+				'name' => '15 Item prototype not monitored discovered',
+				'key_' => '15_key[{#KEY}]',
 				'hostid' => $template_id,
 				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_INTERNAL,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 30,
+				'delay' => '33m',
 				'status' => ITEM_STATUS_DISABLED,
 				'history' => '61m',
 				'trends' => '86450s'
 			],
 			[
-				'name' => '3 Item prototype not monitored not discovered',
-				'key_' => '3_key[{#KEY}]',
+				'name' => '33b4 Item prototype not monitored not discovered',
+				'key_' => '33b4_key[{#KEY}]',
 				'hostid' => $template_id,
 				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_HTTPAGENT,
 				'url' => 'test',
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 45,
+				'delay' => '15h',
 				'status' => ITEM_STATUS_DISABLED,
 				'discover' => ITEM_NO_DISCOVER,
 				'history' => '2d',
 				'trends' => '2d'
 			],
 			[
-				'name' => 'a Item prototype monitored not discovered',
-				'key_' => 'a_key[{#KEY}]',
+				'name' => 'a3 Item prototype monitored not discovered',
+				'key_' => 'a3_key[{#KEY}]',
 				'hostid' => $template_id,
 				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_CALCULATED,
 				'params' => '1+1',
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
-				'delay' => 60,
+				'delay' => '1d',
 				'discover' => ITEM_NO_DISCOVER,
 				'history' => '1w',
 				'trends' => '1w'
 			],
 			[
-				'name' => 'y Item prototype trapper with text type',
-				'key_' => 'y_key[{#KEY}]',
+				'name' => 'Yw Item prototype trapper with text type',
+				'key_' => 'Yw_key[{#KEY}]',
 				'hostid' => $template_id,
 				'ruleid' => self::$host_druleids,
 				'type' => ITEM_TYPE_TRAPPER,

@@ -29,7 +29,7 @@ require_once dirname(__FILE__).'/../common/testPagePrototypes.php';
 class testPageTriggerPrototypes extends testPagePrototypes {
 
 	public $source = 'trigger';
-	public $tag = 'a Trigger prototype monitored not discovered_{#KEY}';
+	public $tag = 'a3 Trigger prototype monitored not discovered_{#KEY}';
 
 	protected $link = 'zabbix.php?action=trigger.prototype.list&context=host&sort=description&sortorder=ASC&';
 	protected static $prototype_triggerids;
@@ -82,20 +82,20 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 
 		CDataHelper::call('triggerprototype.create', [
 			[
-				'description' => '1 Trigger prototype monitored discovered_{#KEY}',
+				'description' => '3a Trigger prototype monitored discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '12345',
 				'priority' => TRIGGER_SEVERITY_NOT_CLASSIFIED
 			],
 			[
-				'description' => '2 Trigger prototype not monitored discovered_{#KEY}',
+				'description' => '15 Trigger prototype not monitored discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'status' => TRIGGER_STATUS_DISABLED,
 				'opdata' => '{#PROT_MAC}',
 				'priority' => TRIGGER_SEVERITY_INFORMATION
 			],
 			[
-				'description' => '3 Trigger prototype not monitored not discovered_{#KEY}',
+				'description' => '33b4 Trigger prototype not monitored not discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'status' => TRIGGER_STATUS_DISABLED,
 				'discover' => TRIGGER_NO_DISCOVER,
@@ -103,7 +103,7 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				'priority' => TRIGGER_SEVERITY_WARNING
 			],
 			[
-				'description' => 'a Trigger prototype monitored not discovered_{#KEY}',
+				'description' => 'a3 Trigger prototype monitored not discovered_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'discover' => TRIGGER_NO_DISCOVER,
 				'tags' => [
@@ -120,13 +120,13 @@ class testPageTriggerPrototypes extends testPagePrototypes {
 				'priority' => TRIGGER_SEVERITY_AVERAGE
 			],
 			[
-				'description' => 'o Trigger prototype for high severity_{#KEY}',
+				'description' => 'oO75 Trigger prototype for high severity_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '{$TEST}',
 				'priority' => TRIGGER_SEVERITY_HIGH
 			],
 			[
-				'description' => 'y Trigger prototype for disaster severity_{#KEY}',
+				'description' => 'Yw Trigger prototype for disaster severity_{#KEY}',
 				'expression' => 'last(/Host for prototype check/1_key[{#KEY}])=0',
 				'opdata' => '🙂🙃',
 				'priority' => TRIGGER_SEVERITY_DISASTER

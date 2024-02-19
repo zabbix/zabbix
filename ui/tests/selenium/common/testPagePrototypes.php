@@ -171,7 +171,7 @@ class testPagePrototypes extends CWebTest {
 
 			case 'host':
 				// Check Template column for host prototype page.
-				$template_row = $table->findRow('Name', 'y Host prototype monitored not discovered {#H}');
+				$template_row = $table->findRow('Name', 'Yw Host prototype monitored not discovered {#H}');
 				$template_row->assertValues(['Templates' => 'Template for host prototype']);
 				$this->assertTrue($template_row->getColumn('Templates')->isClickable());
 				break;
@@ -191,8 +191,8 @@ class testPagePrototypes extends CWebTest {
 
 				$expression = ($template) ? 'Template' : 'Host';
 
-				$this->assertEquals('last(/'.$expression.' for prototype check/1_key[{#KEY}])=0',
-					$trigger_row->getColumn('Expression')->getText()
+				$this->assertEquals('last(/'.$expression.' for prototype check/3a_key[{#KEY}])=0',
+						$trigger_row->getColumn('Expression')->getText()
 				);
 				$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
 				break;
@@ -228,10 +228,10 @@ class testPagePrototypes extends CWebTest {
 					'sort_by' => 'Name',
 					'sort' => 'name',
 					'result' => [
-						'1 Host prototype monitored discovered {#H}',
-						'2 Host prototype not monitored discovered {#H}',
-						'a Host prototype not monitored not discovered {#H}',
-						'y Host prototype monitored not discovered {#H}'
+						'3a Host prototype monitored discovered {#H}',
+						'21 Host prototype not monitored discovered {#H}',
+						'a3 Host prototype not monitored not discovered {#H}',
+						'Yw Host prototype monitored not discovered {#H}'
 					]
 				]
 			],
@@ -275,11 +275,11 @@ class testPagePrototypes extends CWebTest {
 					'sort_by' => 'Name',
 					'sort' => 'name',
 					'result' => [
-						'1 Item prototype monitored discovered',
-						'2 Item prototype not monitored discovered',
-						'3 Item prototype not monitored not discovered',
-						'a Item prototype monitored not discovered',
-						'y Item prototype trapper with text type'
+						'3a Item prototype monitored discovered',
+						'15 Item prototype not monitored discovered',
+						'33b4 Item prototype not monitored not discovered',
+						'a3 Item prototype monitored not discovered',
+						'Yw Item prototype trapper with text type'
 					]
 				]
 			],
@@ -289,11 +289,11 @@ class testPagePrototypes extends CWebTest {
 					'sort_by' => 'Key',
 					'sort' => 'key_',
 					'result' => [
-						'1_key[{#KEY}]',
-						'2_key[{#KEY}]',
-						'3_key[{#KEY}]',
-						'a_key[{#KEY}]',
-						'y_key[{#KEY}]'
+						'3a_key[{#KEY}]',
+						'15_key[{#KEY}]',
+						'33b4_key[{#KEY}]',
+						'a3_key[{#KEY}]',
+						'Yw_key[{#KEY}]'
 					]
 				]
 			],
@@ -304,10 +304,10 @@ class testPagePrototypes extends CWebTest {
 					'sort' => 'delay',
 					'result' => [
 						'',
-						15,
-						30,
-						45,
-						60
+						'15',
+						'33m',
+						'15h',
+						'1d'
 					]
 				]
 			],
@@ -410,12 +410,12 @@ class testPagePrototypes extends CWebTest {
 					'sort_by' => 'Name',
 					'sort' => 'description',
 					'result' => [
-						'1 Trigger prototype monitored discovered_{#KEY}',
-						'2 Trigger prototype not monitored discovered_{#KEY}',
-						'3 Trigger prototype not monitored not discovered_{#KEY}',
-						'a Trigger prototype monitored not discovered_{#KEY}',
-						'o Trigger prototype for high severity_{#KEY}',
-						'y Trigger prototype for disaster severity_{#KEY}'
+						'3a Trigger prototype monitored discovered_{#KEY}',
+						'15 Trigger prototype not monitored discovered_{#KEY}',
+						'33b4 Trigger prototype not monitored not discovered_{#KEY}',
+						'a3 Trigger prototype monitored not discovered_{#KEY}',
+						'oO75 Trigger prototype for high severity_{#KEY}',
+						'Yw Trigger prototype for disaster severity_{#KEY}'
 					]
 				]
 			],
@@ -463,10 +463,10 @@ class testPagePrototypes extends CWebTest {
 					'sort_by' => 'Name',
 					'sort' => 'name',
 					'result' => [
-						'1 Graph prototype discovered_{#KEY}',
-						'2 Graph prototype not discovered_{#KEY}',
-						'a Graph prototype pie discovered_{#KEY}',
-						'y Graph prototype exploded not discovered_{#KEY}'
+						'2a Graph prototype discovered_{#KEY}',
+						'33b4 Graph prototype not discovered_{#KEY}',
+						'a3 Graph prototype pie discovered_{#KEY}',
+						'Yw Graph prototype exploded not discovered_{#KEY}'
 					]
 				]
 			],
@@ -521,7 +521,7 @@ class testPagePrototypes extends CWebTest {
 			// #0 Click on Create disabled button.
 			[
 				[
-					'name' => '1 Host prototype monitored discovered {#H}',
+					'name' => '3a Host prototype monitored discovered {#H}',
 					'button' => 'Create disabled',
 					'column_check' => 'Create enabled',
 					'before' => 'Yes',
@@ -531,7 +531,7 @@ class testPagePrototypes extends CWebTest {
 			// #1 Click on Create enabled button.
 			[
 				[
-					'name' => '2 Host prototype not monitored discovered {#H}',
+					'name' => '21 Host prototype not monitored discovered {#H}',
 					'button' => 'Create enabled',
 					'column_check' => 'Create enabled',
 					'before' => 'No',
@@ -541,7 +541,7 @@ class testPagePrototypes extends CWebTest {
 			// #2 Enabled clicking on link in Create enabled column.
 			[
 				[
-					'name' => 'a Host prototype not monitored not discovered {#H}',
+					'name' => 'a3 Host prototype not monitored not discovered {#H}',
 					'column_check' => 'Create enabled',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -550,7 +550,7 @@ class testPagePrototypes extends CWebTest {
 			// #3 Disabled clicking on link in Create enabled column.
 			[
 				[
-					'name' => 'y Host prototype monitored not discovered {#H}',
+					'name' => 'Yw Host prototype monitored not discovered {#H}',
 					'column_check' => 'Create enabled',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -559,7 +559,7 @@ class testPagePrototypes extends CWebTest {
 			// #4 Enable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => 'a Host prototype not monitored not discovered {#H}',
+					'name' => 'a3 Host prototype not monitored not discovered {#H}',
 					'column_check' => 'Discover',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -568,7 +568,7 @@ class testPagePrototypes extends CWebTest {
 			// #5 Disable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '2 Host prototype not monitored discovered {#H}',
+					'name' => '21 Host prototype not monitored discovered {#H}',
 					'column_check' => 'Discover',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -601,7 +601,7 @@ class testPagePrototypes extends CWebTest {
 			// #0 Click on Create disabled button.
 			[
 				[
-					'name' => '1 Item prototype monitored discovered',
+					'name' => '3a Item prototype monitored discovered',
 					'button' => 'Create disabled',
 					'column_check' => 'Create enabled',
 					'before' => 'Yes',
@@ -611,7 +611,7 @@ class testPagePrototypes extends CWebTest {
 			// #1 Click on Create enabled button.
 			[
 				[
-					'name' => '2 Item prototype not monitored discovered',
+					'name' => '15 Item prototype not monitored discovered',
 					'button' => 'Create enabled',
 					'column_check' => 'Create enabled',
 					'before' => 'No',
@@ -621,7 +621,7 @@ class testPagePrototypes extends CWebTest {
 			// #2 Enabled clicking on link in Create enabled column.
 			[
 				[
-					'name' => '3 Item prototype not monitored not discovered',
+					'name' => '33b4 Item prototype not monitored not discovered',
 					'column_check' => 'Create enabled',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -630,7 +630,7 @@ class testPagePrototypes extends CWebTest {
 			// #3 Disabled clicking on link in Create enabled column.
 			[
 				[
-					'name' => 'a Item prototype monitored not discovered',
+					'name' => 'a3 Item prototype monitored not discovered',
 					'column_check' => 'Create enabled',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -639,7 +639,7 @@ class testPagePrototypes extends CWebTest {
 			// #4 Enable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '3 Item prototype not monitored not discovered',
+					'name' => '33b4 Item prototype not monitored not discovered',
 					'column_check' => 'Discover',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -648,7 +648,7 @@ class testPagePrototypes extends CWebTest {
 			// #5 Disable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '2 Item prototype not monitored discovered',
+					'name' => '15 Item prototype not monitored discovered',
 					'column_check' => 'Discover',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -681,7 +681,7 @@ class testPagePrototypes extends CWebTest {
 			// #0 Click on Create disabled button.
 			[
 				[
-					'name' => '1 Trigger prototype monitored discovered_{#KEY}',
+					'name' => '3a Trigger prototype monitored discovered_{#KEY}',
 					'button' => 'Create disabled',
 					'column_check' => 'Create enabled',
 					'before' => 'Yes',
@@ -691,7 +691,7 @@ class testPagePrototypes extends CWebTest {
 			// #1 Click on Create enabled button.
 			[
 				[
-					'name' => '2 Trigger prototype not monitored discovered_{#KEY}',
+					'name' => '15 Trigger prototype not monitored discovered_{#KEY}',
 					'button' => 'Create enabled',
 					'column_check' => 'Create enabled',
 					'before' => 'No',
@@ -701,7 +701,7 @@ class testPagePrototypes extends CWebTest {
 			// #2 Enabled clicking on link in Create enabled column.
 			[
 				[
-					'name' => '3 Trigger prototype not monitored not discovered_{#KEY}',
+					'name' => '33b4 Trigger prototype not monitored not discovered_{#KEY}',
 					'column_check' => 'Create enabled',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -710,7 +710,7 @@ class testPagePrototypes extends CWebTest {
 			// #3 Disabled clicking on link in Create enabled column.
 			[
 				[
-					'name' => 'a Trigger prototype monitored not discovered_{#KEY}',
+					'name' => 'a3 Trigger prototype monitored not discovered_{#KEY}',
 					'column_check' => 'Create enabled',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -719,7 +719,7 @@ class testPagePrototypes extends CWebTest {
 			// #4 Enable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '3 Trigger prototype not monitored not discovered_{#KEY}',
+					'name' => '33b4 Trigger prototype not monitored not discovered_{#KEY}',
 					'column_check' => 'Discover',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -728,7 +728,7 @@ class testPagePrototypes extends CWebTest {
 			// #5 Disable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '2 Trigger prototype not monitored discovered_{#KEY}',
+					'name' => '15 Trigger prototype not monitored discovered_{#KEY}',
 					'column_check' => 'Discover',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -761,7 +761,7 @@ class testPagePrototypes extends CWebTest {
 			// #0 Enable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '2 Graph prototype not discovered_{#KEY}',
+					'name' => '33b4 Graph prototype not discovered_{#KEY}',
 					'column_check' => 'Discover',
 					'before' => 'No',
 					'after' => 'Yes'
@@ -770,7 +770,7 @@ class testPagePrototypes extends CWebTest {
 			// #1 Disable discovering clicking on link in Discover column.
 			[
 				[
-					'name' => '1 Graph prototype discovered_{#KEY}',
+					'name' => '2a Graph prototype discovered_{#KEY}',
 					'column_check' => 'Discover',
 					'before' => 'Yes',
 					'after' => 'No'
@@ -827,14 +827,14 @@ class testPagePrototypes extends CWebTest {
 			// #0 Cancel delete.
 			[
 				[
-					'name' => ['1 Host prototype monitored discovered {#H}'],
+					'name' => ['3a Host prototype monitored discovered {#H}'],
 					'cancel' => true
 				]
 			],
 			// #1 Delete one.
 			[
 				[
-					'name' => ['2 Host prototype not monitored discovered {#H}'],
+					'name' => ['21 Host prototype not monitored discovered {#H}'],
 					'message' => 'Host prototype deleted'
 				]
 			],
@@ -842,8 +842,8 @@ class testPagePrototypes extends CWebTest {
 			[
 				[
 					'name' => [
-						'a Host prototype not monitored not discovered {#H}',
-						'y Host prototype monitored not discovered {#H}'
+						'a3 Host prototype not monitored not discovered {#H}',
+						'Yw Host prototype monitored not discovered {#H}'
 					],
 					'message' => 'Host prototypes deleted'
 				]
@@ -859,14 +859,14 @@ class testPagePrototypes extends CWebTest {
 			// #0 Cancel delete.
 			[
 				[
-					'name' => ['1 Item prototype monitored discovered'],
+					'name' => ['3a Item prototype monitored discovered'],
 					'cancel' => true
 				]
 			],
 			// #1 Delete one.
 			[
 				[
-					'name' => ['2 Item prototype not monitored discovered'],
+					'name' => ['15 Item prototype not monitored discovered'],
 					'message' => 'Item prototype deleted'
 				]
 			],
@@ -874,8 +874,8 @@ class testPagePrototypes extends CWebTest {
 			[
 				[
 					'name' => [
-						'3 Item prototype not monitored not discovered',
-						'a Item prototype monitored not discovered'
+						'33b4 Item prototype not monitored not discovered',
+						'a3 Item prototype monitored not discovered'
 					],
 					'message' => 'Item prototypes deleted'
 				]
@@ -891,14 +891,14 @@ class testPagePrototypes extends CWebTest {
 			// #0 Cancel delete.
 			[
 				[
-					'name' => ['1 Trigger prototype monitored discovered_{#KEY}'],
+					'name' => ['3a Trigger prototype monitored discovered_{#KEY}'],
 					'cancel' => true
 				]
 			],
 			// #1 Delete one.
 			[
 				[
-					'name' => ['2 Trigger prototype not monitored discovered_{#KEY}'],
+					'name' => ['15 Trigger prototype not monitored discovered_{#KEY}'],
 					'message' => 'Trigger prototype deleted'
 				]
 			],
@@ -906,8 +906,8 @@ class testPagePrototypes extends CWebTest {
 			[
 				[
 					'name' => [
-						'3 Trigger prototype not monitored not discovered_{#KEY}',
-						'a Trigger prototype monitored not discovered_{#KEY}'
+						'33b4 Trigger prototype not monitored not discovered_{#KEY}',
+						'a3 Trigger prototype monitored not discovered_{#KEY}'
 					],
 					'message' => 'Trigger prototypes deleted'
 				]
@@ -923,14 +923,14 @@ class testPagePrototypes extends CWebTest {
 			// #0 Cancel delete.
 			[
 				[
-					'name' => ['1 Graph prototype discovered_{#KEY}'],
+					'name' => ['2a Graph prototype discovered_{#KEY}'],
 					'cancel' => true
 				]
 			],
 			// #1 Delete one.
 			[
 				[
-					'name' => ['2 Graph prototype not discovered_{#KEY}'],
+					'name' => ['33b4 Graph prototype not discovered_{#KEY}'],
 					'message' => 'Graph prototype deleted'
 				]
 			],
@@ -938,8 +938,8 @@ class testPagePrototypes extends CWebTest {
 			[
 				[
 					'name' => [
-						'a Graph prototype pie discovered_{#KEY}',
-						'y Graph prototype exploded not discovered_{#KEY}'
+						'a3 Graph prototype pie discovered_{#KEY}',
+						'Yw Graph prototype exploded not discovered_{#KEY}'
 					],
 					'message' => 'Graph prototypes deleted'
 				]

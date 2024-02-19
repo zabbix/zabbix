@@ -29,7 +29,7 @@ require_once dirname(__FILE__) . '/../common/testPagePrototypes.php';
 class testPageHostPrototypesTemplate extends testPagePrototypes {
 
 	public $source = 'host';
-	public $tag = '1 Host prototype monitored discovered {#H}';
+	public $tag = '3a Host prototype monitored discovered {#H}';
 
 	protected $link = 'host_prototypes.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_hostids;
@@ -61,7 +61,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 
 		CDataHelper::call('hostprototype.create', [
 			[
-				'host' => '1 Host prototype monitored discovered {#H}',
+				'host' => '3a Host prototype monitored discovered {#H}',
 				'ruleid' => self::$host_druleids,
 				'groupLinks' => [
 					[
@@ -80,7 +80,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 				]
 			],
 			[
-				'host' => '2 Host prototype not monitored discovered {#H}',
+				'host' => '21 Host prototype not monitored discovered {#H}',
 				'ruleid' => self::$host_druleids,
 				'groupLinks' => [
 					[
@@ -90,7 +90,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 				'status' => HOST_STATUS_NOT_MONITORED
 			],
 			[
-				'host' => 'a Host prototype not monitored not discovered {#H}',
+				'host' => 'a3 Host prototype not monitored not discovered {#H}',
 				'ruleid' => self::$host_druleids,
 				'groupLinks' => [
 					[
@@ -101,7 +101,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 				'discover' => HOST_NO_DISCOVER
 			],
 			[
-				'host' => 'y Host prototype monitored not discovered {#H}',
+				'host' => 'Yw Host prototype monitored not discovered {#H}',
 				'ruleid' => self::$host_druleids,
 				'groupLinks' => [
 					[
