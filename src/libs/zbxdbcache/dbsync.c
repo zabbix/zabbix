@@ -1509,19 +1509,23 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	else if (NULL != ipmiitem)
 		return FAIL;
 
-	trapitem = (ZBX_DC_TRAPITEM *)zbx_hashset_search(&dbsync_env.cache->trapitems, &item->itemid);
-	if (ITEM_TYPE_TRAPPER == item->type && '\0' != *dbrow[9])
+	if (ITEM_TYPE_TRAPPER == item->type)
 	{
-		zbx_trim_str_list(dbrow[9], ',');
+		trapitem = item->itemtype.trapitem;
 
-		if (NULL == trapitem)
-			return FAIL;
+		if ('\0' != *dbrow[9])
+		{
+			zbx_trim_str_list(dbrow[9], ',');
 
-		if (FAIL == dbsync_compare_str(dbrow[9], trapitem->trapper_hosts))
+			if (NULL == trapitem)
+				return FAIL;
+
+			if (FAIL == dbsync_compare_str(dbrow[9], trapitem->trapper_hosts))
+				return FAIL;
+		}
+		else if (NULL != trapitem)
 			return FAIL;
 	}
-	else if (NULL != trapitem)
-		return FAIL;
 
 	logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&dbsync_env.cache->logitems, &item->itemid);
 	if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *dbrow[10])

@@ -610,8 +610,6 @@ static void	DCdump_items(void)
 	void			*ptr;
 	zbx_trace_item_t	trace_items[] =
 	{
-		{&config->ipmiitems, (zbx_dc_dump_func_t)DCdump_ipmiitem},
-		{&config->trapitems, (zbx_dc_dump_func_t)DCdump_trapitem},
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
 		{&config->dbitems, (zbx_dc_dump_func_t)DCdump_dbitem},
 		{&config->sshitems, (zbx_dc_dump_func_t)DCdump_sshitem},
@@ -660,6 +658,12 @@ static void	DCdump_items(void)
 
 		if (ITEM_TYPE_CALCULATED == item->type)
 			DCdump_calcitem(item->itemtype.calcitem);
+
+		if (ITEM_TYPE_IPMI == item->type)
+			DCdump_ipmiitem(item->itemtype.ipmiitem);
+
+		if (ITEM_TYPE_TRAPPER == item->type)
+			DCdump_trapitem(item->itemtype.trapitem);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

@@ -117,11 +117,25 @@ typedef struct
 }
 ZBX_DC_DEPENDENTITEM;
 
+typedef struct
+{
+	const char	*ipmi_sensor;
+}
+ZBX_DC_IPMIITEM;
+
+typedef struct
+{
+	const char	*trapper_hosts;
+}
+ZBX_DC_TRAPITEM;
+
 typedef union
 {
 	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_DEPENDENTITEM	*depitem;
+	ZBX_DC_IPMIITEM		*ipmiitem;
+	ZBX_DC_TRAPITEM		*trapitem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -192,20 +206,6 @@ typedef struct
 	ZBX_DC_ITEM	*item_ptr;
 }
 ZBX_DC_ITEM_HK;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*ipmi_sensor;
-}
-ZBX_DC_IPMIITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*trapper_hosts;
-}
-ZBX_DC_TRAPITEM;
 
 typedef struct
 {
@@ -835,7 +835,6 @@ typedef struct
 	zbx_hashset_t		template_items;		/* template items selected from items table */
 	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
 	zbx_hashset_t		ipmiitems;
-	zbx_hashset_t		trapitems;
 	zbx_hashset_t		dependentitems;
 	zbx_hashset_t		logitems;
 	zbx_hashset_t		dbitems;
