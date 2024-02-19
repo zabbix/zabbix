@@ -29,32 +29,32 @@ class testDashboardViewMode extends CLegacyWebTest {
 
 	public static function getCheckLayoutForDifferentUsersData() {
 		return [
+			// #0 Super admin.
 			[
 				[
-					'username' => 'super-admin',
-					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55b',
-					'userid' => 1
+					'username' => 'Admin',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55b'
 				]
 			],
+			// #1 Admin.
 			[
 				[
-					'username' => 'admin',
-					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55c',
-					'userid' => 40
+					'username' => 'admin-zabbix',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55c'
 				]
 			],
+			//#2 User.
 			[
 				[
-					'username' => 'user',
-					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55d',
-					'userid' => 50
+					'username' => 'user-zabbix',
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55d'
 				]
 			],
+			// #3 Guest.
 			[
 				[
 					'username' => 'guest',
-					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55e',
-					'userid' => 2
+					'sessionid' => '09e7d4286dfdca4ba7be15e0f3b2b55e'
 				]
 			]
 		];
@@ -67,11 +67,12 @@ class testDashboardViewMode extends CLegacyWebTest {
 	 * @onAfter addGuestToDisabledGroup
 	 */
 	public function testDashboardViewMode_CheckLayoutForDifferentUsers($data) {
-		$this->authenticateUser($data['sessionid'], $data['userid']);
+		$userid = CDBHelper::getValue('SELECT userid FROM users WHERE username='.zbx_dbstr($data['username']));
+		$this->authenticateUser($data['sessionid'], $userid);
 		$this->zbxTestOpen('zabbix.php?action=dashboard.view&dashboardid=1');
 		$this->zbxTestCheckTitle('Dashboard');
 		$this->zbxTestCheckHeader('Global view');
-		if ($data['username'] !== 'super-admin') {
+		if ($data['username'] !== 'Admin') {
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[2]//tr[@class='nothing-to-show']/td",
 					'No data found.');
 			$this->zbxTestAssertElementText("//div[@class='dashboard-grid']/div[3]//tr[@class='nothing-to-show']/td",
