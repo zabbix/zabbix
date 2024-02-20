@@ -34,14 +34,15 @@
 
 #include "zbxnix.h"
 #include "zbxself.h"
-
+#include "zbxpoller.h"
 #include "zbxvmware.h"
 #include "zbxdbsyncer.h"
+
 #include "../zabbix_server/discoverer/discoverer.h"
 #include "../zabbix_server/httppoller/httppoller.h"
 #include "housekeeper/housekeeper.h"
 #include "../zabbix_server/pinger/pinger.h"
-#include "../zabbix_server/poller/poller.h"
+#include "poller/poller_proxy.h"
 #include "../zabbix_server/trapper/trapper.h"
 #include "../zabbix_server/trapper/trapper_request.h"
 #include "proxyconfig/proxyconfig.h"
@@ -272,8 +273,8 @@ static int	config_max_concurrent_checks_per_poller	= 1000;
 
 static int	config_log_level		= LOG_LEVEL_WARNING;
 
-char	*config_externalscripts	= NULL;
-int	CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS = 0;
+static char	*config_externalscripts		= NULL;
+static int	config_allow_unsupported_db_versions = 0;
 
 ZBX_GET_CONFIG_VAR(int, zbx_config_enable_remote_commands, 0)
 ZBX_GET_CONFIG_VAR(int, zbx_config_log_remote_commands, 0)
@@ -284,10 +285,10 @@ static int	config_server_port;
 static char	*config_hostname	= NULL;
 static char	*config_hostname_item	= NULL;
 
-char	*zbx_config_snmptrap_file	= NULL;
+static char	*zbx_config_snmptrap_file	= NULL;
 
-char	*config_java_gateway		= NULL;
-int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
+static char	*config_java_gateway	= NULL;
+static int	config_java_gateway_port	= ZBX_DEFAULT_GATEWAY_PORT;
 
 char	*CONFIG_SSH_KEY_LOCATION	= NULL;
 
@@ -949,7 +950,7 @@ static void	zbx_load_config(ZBX_TASK_EX *task)
 			PARM_OPT,	0,			0},
 		{"DBPort",			&(zbx_config_dbhigh->config_dbport),	TYPE_INT,
 			PARM_OPT,	1024,			65535},
-		{"AllowUnsupportedDBVersions",	&CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS,	TYPE_INT,
+		{"AllowUnsupportedDBVersions",	&config_allow_unsupported_db_versions,	TYPE_INT,
 			PARM_OPT,	0,			1},
 		{"DBTLSConnect",		&(zbx_config_dbhigh->config_db_tls_connect),	TYPE_STRING,
 			PARM_OPT,	0,			0},
@@ -1319,7 +1320,7 @@ static void	zbx_check_db(void)
 {
 	struct zbx_db_version_info_t	db_version_info;
 
-	if (FAIL == zbx_db_check_version_info(&db_version_info, CONFIG_ALLOW_UNSUPPORTED_DB_VERSIONS, zbx_program_type))
+	if (FAIL == zbx_db_check_version_info(&db_version_info, config_allow_unsupported_db_versions, zbx_program_type))
 	{
 		zbx_free(db_version_info.friendly_current_version);
 		exit(EXIT_FAILURE);
@@ -1332,9 +1333,6 @@ static void	proxy_db_init(void)
 {
 	char		*error = NULL;
 	int		db_type, version_check;
-#ifdef HAVE_SQLITE3
-	zbx_stat_t	db_stat;
-#endif
 
 	if (SUCCEED != zbx_db_init(zbx_dc_get_nextid, config_log_slow_queries, &error))
 	{
@@ -1412,7 +1410,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_unreachable_delay,
 								config_max_concurrent_checks_per_poller,
 								get_config_forks, config_java_gateway,
-								config_java_gateway_port, config_externalscripts};
+								config_java_gateway_port, config_externalscripts,
+								zbx_get_value_internal_ext_proxy};
 	zbx_thread_proxyconfig_args		proxyconfig_args = {zbx_config_tls, &zbx_config_vault,
 								get_zbx_program_type, zbx_config_timeout,
 								&config_server_addrs, config_hostname,
@@ -1439,7 +1438,8 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 								config_startup_time, config_proxydata_frequency,
 								get_config_forks, config_stats_allowed_ip,
 								config_java_gateway, config_java_gateway_port,
-								config_externalscripts};
+								config_externalscripts,
+								zbx_get_value_internal_ext_proxy};
 	zbx_thread_proxy_housekeeper_args	housekeeper_args = {zbx_config_timeout, config_housekeeping_frequency,
 								config_proxy_local_buffer, config_proxy_offline_buffer};
 	zbx_thread_pinger_args			pinger_args = {zbx_config_timeout};
