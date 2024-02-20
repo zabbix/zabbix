@@ -347,6 +347,24 @@ static ZBX_DC_TREND	*DCget_trend(zbx_uint64_t itemid)
 	return (ZBX_DC_TREND *)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
 }
 
+void	zbx_trend_add_new_items(const zbx_vector_uint64_t *itemids)
+{
+	int	i, hour, now = time(NULL);
+
+	hour = now - now % SEC_PER_HOUR;
+
+	LOCK_TRENDS;
+
+	for (i = 0; i < itemids->values_num; i++)
+	{
+		ZBX_DC_TREND	trend = {.itemid = itemids->values[i], .disable_from = hour};
+
+		(void)zbx_hashset_insert(&cache->trends, &trend, sizeof(ZBX_DC_TREND));
+	}
+
+	UNLOCK_TRENDS;
+}
+
 /******************************************************************************
  *                                                                            *
  * Purpose: apply disable_from changes to cache                               *
@@ -876,7 +894,7 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 				continue;
 
 			/* discard trend items that are older than compression age */
-			if (0 != compression_age && trend->clock < compression_age)
+			if (0 != compression_age && trend->clock < compression_age && 0 != trend->clock)
 			{
 				if (SEC_PER_HOUR < (ts.sec - last_trend_discard)) /* log once per hour */
 				{
@@ -885,14 +903,20 @@ static void	DCmass_update_trends(const ZBX_DC_HISTORY *history, int history_num,
 					last_trend_discard = ts.sec;
 				}
 
-				zbx_hashset_iter_remove(&iter);
+				trend->clock = 0;
+				trend->num = 0;
+				memset(&trend->value_min, 0, sizeof(history_value_t));
+				memset(&trend->value_avg, 0, sizeof(value_avg_t));
+				memset(&trend->value_max, 0, sizeof(history_value_t));
 			}
 			else
 			{
 				if (SUCCEED == zbx_history_requires_trends(trend->value_type) && 0 != trend->num)
 					DCflush_trend(trend, trends, &trends_alloc, trends_num);
 
-				zbx_vector_uint64_append(&del_itemids, trend->itemid);
+				/* trend is missing an hour, check if it should be cleared from cache */
+				if (0 != trend->disable_from && trend->disable_from < hour - SEC_PER_HOUR)
+					zbx_vector_uint64_append(&del_itemids, trend->itemid);
 			}
 		}
 
@@ -2079,44 +2103,6 @@ static void	DBmass_update_items(const zbx_vector_ptr_t *item_diff, const zbx_vec
 
 /******************************************************************************
  *                                                                            *
- * Purpose: prepare itemdiff after receiving new values                       *
- *                                                                            *
- * Parameters: history     - array of history data                            *
- *             history_num - number of history structures                     *
- *             item_diff   - vector to store prepared diff                    *
- *                                                                            *
- ******************************************************************************/
-static void	DCmass_proxy_prepare_itemdiff(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
-{
-	int	i;
-
-	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
-
-	zbx_vector_ptr_reserve(item_diff, history_num);
-
-	for (i = 0; i < history_num; i++)
-	{
-		zbx_item_diff_t	*diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
-
-		diff->itemid = history[i].itemid;
-		diff->state = history[i].state;
-		diff->flags = ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE;
-
-		if (0 != (ZBX_DC_FLAG_META & history[i].flags))
-		{
-			diff->lastlogsize = history[i].lastlogsize;
-			diff->mtime = history[i].mtime;
-			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME;
-		}
-
-		zbx_vector_ptr_append(item_diff, diff);
-	}
-
-	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
-}
-
-/******************************************************************************
- *                                                                            *
  * Purpose: update items info after new value is received                     *
  *                                                                            *
  * Parameters: item_diff - diff of items to be updated                        *
@@ -2133,10 +2119,7 @@ static void	DBmass_proxy_update_items(zbx_vector_ptr_t *item_diff)
 		zbx_vector_ptr_sort(item_diff, ZBX_DEFAULT_UINT64_PTR_COMPARE_FUNC);
 
 		DBbegin_multiple_update(&sql, &sql_alloc, &sql_offset);
-
-		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff,
-				ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME);
-
+		zbx_db_save_item_changes(&sql, &sql_alloc, &sql_offset, item_diff, ZBX_FLAGS_ITEM_DIFF_UPDATE_DB);
 		DBend_multiple_update(&sql, &sql_alloc, &sql_offset);
 
 		if (sql_offset > 16)	/* In ORACLE always present begin..end; */
@@ -2943,13 +2926,16 @@ static void	DCmodule_sync_history(int history_float_num, int history_integer_num
  *                                                                            *
  * Parameters: history     - [IN/OUT] the history values                      *
  *             history_num - [IN] the number of history values                *
+ *             item_diff   - vector to store prepared diff                    *
  *                                                                            *
  ******************************************************************************/
-static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
+static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num, zbx_vector_ptr_t *item_diff)
 {
 	int			i, *errcodes;
 	zbx_history_sync_item_t	*items;
 	zbx_vector_uint64_t	itemids;
+
+	zbx_vector_ptr_reserve(item_diff, history_num);
 
 	zbx_vector_uint64_create(&itemids);
 	zbx_vector_uint64_reserve(&itemids, history_num);
@@ -2965,8 +2951,39 @@ static void	proxy_prepare_history(ZBX_DC_HISTORY *history, int history_num)
 
 	for (i = 0; i < history_num; i++)
 	{
+		zbx_item_diff_t	*diff;
+		ZBX_DC_HISTORY	*h;
+
 		if (SUCCEED != errcodes[i])
 			continue;
+
+		diff = (zbx_item_diff_t *)zbx_malloc(NULL, sizeof(zbx_item_diff_t));
+		h = &history[i];
+
+		diff->itemid = h->itemid;
+		diff->flags = ZBX_FLAGS_ITEM_DIFF_UNSET;
+
+		if (items[i].state != h->state)
+		{
+			diff->state = h->state;
+			diff->error = (ITEM_STATE_NOTSUPPORTED == h->state ? h->value.err : "");
+			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_STATE | ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		}
+		else if (ITEM_STATE_NOTSUPPORTED == h->state &&
+				0 != strcmp(ZBX_NULL2EMPTY_STR(items[i].error), h->value.err))
+		{
+			diff->error = h->value.err;
+			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_ERROR;
+		}
+
+		if (0 != (ZBX_DC_FLAG_META & history[i].flags))
+		{
+			diff->lastlogsize = history[i].lastlogsize;
+			diff->mtime = history[i].mtime;
+			diff->flags |= ZBX_FLAGS_ITEM_DIFF_UPDATE_LASTLOGSIZE | ZBX_FLAGS_ITEM_DIFF_UPDATE_MTIME;
+		}
+
+		zbx_vector_ptr_append(item_diff, diff);
 
 		/* store items with enabled history  */
 		if (0 != items[i].history)
@@ -3029,9 +3046,7 @@ static void	sync_proxy_history(int *total_num, int *more)
 			break;
 
 		hc_get_item_values(history, &history_items);	/* copy item data from history cache */
-		proxy_prepare_history(history, history_items.values_num);
-
-		DCmass_proxy_prepare_itemdiff(history, history_num, &item_diff);
+		proxy_prepare_history(history, history_items.values_num, &item_diff);
 
 		do
 		{
