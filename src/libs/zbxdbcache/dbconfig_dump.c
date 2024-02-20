@@ -648,7 +648,7 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
 		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
 
-		switch (item->value_type)
+		switch ((zbx_item_value_type_t)item->value_type)
 		{
 			case ITEM_VALUE_TYPE_FLOAT:
 			case ITEM_VALUE_TYPE_UINT64:
@@ -657,6 +657,11 @@ static void	DCdump_items(void)
 			case ITEM_VALUE_TYPE_LOG:
 				if (NULL != item->itemvaluetype.logitem)
 					DCdump_logitem(item->itemvaluetype.logitem);
+				break;
+			case ITEM_VALUE_TYPE_STR:
+			case ITEM_VALUE_TYPE_TEXT:
+			case ITEM_VALUE_TYPE_MAX:
+			case ITEM_VALUE_TYPE_NONE:
 				break;
 		}
 
