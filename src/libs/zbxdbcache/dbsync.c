@@ -1497,17 +1497,16 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	ipmiitem = (ZBX_DC_IPMIITEM *)zbx_hashset_search(&dbsync_env.cache->ipmiitems, &item->itemid);
+
 	if (ITEM_TYPE_IPMI == item->type)
 	{
+		ipmiitem = item->itemtype.ipmiitem;
 		if (NULL == ipmiitem)
 			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[7], ipmiitem->ipmi_sensor))
 			return FAIL;
 	}
-	else if (NULL != ipmiitem)
-		return FAIL;
 
 	if (ITEM_TYPE_TRAPPER == item->type)
 	{
@@ -1634,9 +1633,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&dbsync_env.cache->jmxitems, &item->itemid);
 	if (ITEM_TYPE_JMX == item->type)
 	{
+		jmxitem = item->itemtype.jmxitem;
+
 		if (NULL == jmxitem)
 			return FAIL;
 
@@ -1649,8 +1649,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[28], jmxitem->jmx_endpoint))
 			return FAIL;
 	}
-	else if (NULL != jmxitem)
-		return FAIL;
 
 	calcitem = item->itemtype.calcitem;
 	if (ITEM_TYPE_CALCULATED == item->type)
@@ -1669,10 +1667,11 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&dbsync_env.cache->httpitems, &item->itemid);
 	if (ITEM_TYPE_HTTPAGENT == item->type)
 	{
 		zbx_trim_str_list(dbrow[9], ',');
+
+		httpitem = item->itemtype.httpitem;
 
 		if (NULL == httpitem)
 			return FAIL;
@@ -1743,8 +1742,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[10], httpitem->trapper_hosts))
 			return FAIL;
 	}
-	else if (NULL != httpitem)
-		return FAIL;
 
 	return SUCCEED;
 }

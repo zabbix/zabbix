@@ -611,10 +611,8 @@ static void	DCdump_items(void)
 	zbx_trace_item_t	trace_items[] =
 	{
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
-		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
-		{&config->httpitems, (zbx_dc_dump_func_t)DCdump_httpitem},
 		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
 	};
 
@@ -674,6 +672,12 @@ static void	DCdump_items(void)
 				break;
 			case ITEM_TYPE_SIMPLE:
 				DCdump_simpleitem(item->itemtype.simpleitem);
+				break;
+			case ITEM_TYPE_JMX:
+				DCdump_jmxitem(item->itemtype.jmxitem);
+				break;
+			case ITEM_TYPE_HTTPAGENT:
+				DCdump_httpitem(item->itemtype.httpitem);
 				break;
 		}
 

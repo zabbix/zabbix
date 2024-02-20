@@ -2769,6 +2769,30 @@ static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 
 			__config_mem_free_func(item->itemtype.simpleitem);
 			break;
+		case ITEM_TYPE_JMX:
+			zbx_strpool_release(item->itemtype.jmxitem->username);
+			zbx_strpool_release(item->itemtype.jmxitem->password);
+			zbx_strpool_release(item->itemtype.jmxitem->jmx_endpoint);
+
+			__config_mem_free_func(item->itemtype.jmxitem);
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			zbx_strpool_release(item->itemtype.httpitem->timeout);
+			zbx_strpool_release(item->itemtype.httpitem->url);
+			zbx_strpool_release(item->itemtype.httpitem->query_fields);
+			zbx_strpool_release(item->itemtype.httpitem->posts);
+			zbx_strpool_release(item->itemtype.httpitem->status_codes);
+			zbx_strpool_release(item->itemtype.httpitem->http_proxy);
+			zbx_strpool_release(item->itemtype.httpitem->headers);
+			zbx_strpool_release(item->itemtype.httpitem->ssl_cert_file);
+			zbx_strpool_release(item->itemtype.httpitem->ssl_key_file);
+			zbx_strpool_release(item->itemtype.httpitem->ssl_key_password);
+			zbx_strpool_release(item->itemtype.httpitem->username);
+			zbx_strpool_release(item->itemtype.httpitem->password);
+			zbx_strpool_release(item->itemtype.httpitem->trapper_hosts);
+
+			__config_mem_free_func(item->itemtype.httpitem);
+			break;
 	}
 }
 
@@ -2922,6 +2946,48 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *l
 			DCstrpool_replace(found, &item->itemtype.simpleitem->username, row[14]);
 			DCstrpool_replace(found, &item->itemtype.simpleitem->password, row[15]);
 			break;
+		case ITEM_TYPE_JMX:
+			if (0 == found)
+			{
+				item->itemtype.jmxitem = (ZBX_DC_JMXITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_JMXITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.jmxitem->username, row[14]);
+			DCstrpool_replace(found, &item->itemtype.jmxitem->password, row[15]);
+			DCstrpool_replace(found, &item->itemtype.jmxitem->jmx_endpoint, row[28]);
+			break;
+		case ITEM_TYPE_HTTPAGENT:
+			if (0 == found)
+			{
+				item->itemtype.httpitem = (ZBX_DC_HTTPITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_HTTPITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.httpitem->timeout, row[30]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->url, row[31]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->query_fields, row[32]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->posts, row[33]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->status_codes, row[34]);
+			item->itemtype.httpitem->follow_redirects = (unsigned char)atoi(row[35]);
+			item->itemtype.httpitem->post_type = (unsigned char)atoi(row[36]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->http_proxy, row[37]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->headers, row[38]);
+			item->itemtype.httpitem->retrieve_mode = (unsigned char)atoi(row[39]);
+			item->itemtype.httpitem->request_method = (unsigned char)atoi(row[40]);
+			item->itemtype.httpitem->output_format = (unsigned char)atoi(row[41]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->ssl_cert_file, row[42]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->ssl_key_file, row[43]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->ssl_key_password, row[44]);
+			item->itemtype.httpitem->verify_peer = (unsigned char)atoi(row[45]);
+			item->itemtype.httpitem->verify_host = (unsigned char)atoi(row[46]);
+			item->itemtype.httpitem->allow_traps = (unsigned char)atoi(row[47]);
+
+			item->itemtype.httpitem->authtype = (unsigned char)atoi(row[13]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->username, row[14]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->password, row[15]);
+			DCstrpool_replace(found, &item->itemtype.httpitem->trapper_hosts, row[9]);
+			break;
 	}
 }
 
@@ -2935,7 +3001,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_LOGITEM		*logitem;
-	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
@@ -3195,27 +3260,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		dc_item_add(found, item, &last_type, &dep_items, row);
 
-		/* JMX items */
-
-		if (ITEM_TYPE_JMX == item->type)
-		{
-			jmxitem = (ZBX_DC_JMXITEM *)DCfind_id(&config->jmxitems, itemid, sizeof(ZBX_DC_JMXITEM), &found);
-
-			DCstrpool_replace(found, &jmxitem->username, row[14]);
-			DCstrpool_replace(found, &jmxitem->password, row[15]);
-			DCstrpool_replace(found, &jmxitem->jmx_endpoint, row[28]);
-		}
-		else if (NULL != (jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &itemid)))
-		{
-			/* remove JMX item parameters */
-
-			zbx_strpool_release(jmxitem->username);
-			zbx_strpool_release(jmxitem->password);
-			zbx_strpool_release(jmxitem->jmx_endpoint);
-
-			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
-		}
-
 		/* SNMP trap items for current server/proxy */
 
 		if (ITEM_TYPE_SNMPTRAP == item->type && 0 == host->proxy_hostid)
@@ -3232,56 +3276,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			}
 
 			zbx_vector_uint64_append(&interface_snmpitem->itemids, itemid);
-		}
-
-		/* HTTP agent items */
-
-		if (ITEM_TYPE_HTTPAGENT == item->type)
-		{
-			httpitem = (ZBX_DC_HTTPITEM *)DCfind_id(&config->httpitems, itemid, sizeof(ZBX_DC_HTTPITEM),
-					&found);
-
-			DCstrpool_replace(found, &httpitem->timeout, row[30]);
-			DCstrpool_replace(found, &httpitem->url, row[31]);
-			DCstrpool_replace(found, &httpitem->query_fields, row[32]);
-			DCstrpool_replace(found, &httpitem->posts, row[33]);
-			DCstrpool_replace(found, &httpitem->status_codes, row[34]);
-			httpitem->follow_redirects = (unsigned char)atoi(row[35]);
-			httpitem->post_type = (unsigned char)atoi(row[36]);
-			DCstrpool_replace(found, &httpitem->http_proxy, row[37]);
-			DCstrpool_replace(found, &httpitem->headers, row[38]);
-			httpitem->retrieve_mode = (unsigned char)atoi(row[39]);
-			httpitem->request_method = (unsigned char)atoi(row[40]);
-			httpitem->output_format = (unsigned char)atoi(row[41]);
-			DCstrpool_replace(found, &httpitem->ssl_cert_file, row[42]);
-			DCstrpool_replace(found, &httpitem->ssl_key_file, row[43]);
-			DCstrpool_replace(found, &httpitem->ssl_key_password, row[44]);
-			httpitem->verify_peer = (unsigned char)atoi(row[45]);
-			httpitem->verify_host = (unsigned char)atoi(row[46]);
-			httpitem->allow_traps = (unsigned char)atoi(row[47]);
-
-			httpitem->authtype = (unsigned char)atoi(row[13]);
-			DCstrpool_replace(found, &httpitem->username, row[14]);
-			DCstrpool_replace(found, &httpitem->password, row[15]);
-			DCstrpool_replace(found, &httpitem->trapper_hosts, row[9]);
-		}
-		else if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid)))
-		{
-			zbx_strpool_release(httpitem->timeout);
-			zbx_strpool_release(httpitem->url);
-			zbx_strpool_release(httpitem->query_fields);
-			zbx_strpool_release(httpitem->posts);
-			zbx_strpool_release(httpitem->status_codes);
-			zbx_strpool_release(httpitem->http_proxy);
-			zbx_strpool_release(httpitem->headers);
-			zbx_strpool_release(httpitem->ssl_cert_file);
-			zbx_strpool_release(httpitem->ssl_key_file);
-			zbx_strpool_release(httpitem->ssl_key_password);
-			zbx_strpool_release(httpitem->username);
-			zbx_strpool_release(httpitem->password);
-			zbx_strpool_release(httpitem->trapper_hosts);
-
-			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
 
 		/* Script items */
@@ -3416,42 +3410,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			zbx_strpool_release(logitem->logtimefmt);
 			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
-
-		/* JMX items */
-
-		if (ITEM_TYPE_JMX == item->type)
-		{
-			jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &itemid);
-
-			zbx_strpool_release(jmxitem->username);
-			zbx_strpool_release(jmxitem->password);
-			zbx_strpool_release(jmxitem->jmx_endpoint);
-
-			zbx_hashset_remove_direct(&config->jmxitems, jmxitem);
-		}
-
-		/* HTTP agent items */
-
-		if (ITEM_TYPE_HTTPAGENT == item->type)
-		{
-			httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &itemid);
-
-			zbx_strpool_release(httpitem->timeout);
-			zbx_strpool_release(httpitem->url);
-			zbx_strpool_release(httpitem->query_fields);
-			zbx_strpool_release(httpitem->posts);
-			zbx_strpool_release(httpitem->status_codes);
-			zbx_strpool_release(httpitem->http_proxy);
-			zbx_strpool_release(httpitem->headers);
-			zbx_strpool_release(httpitem->ssl_cert_file);
-			zbx_strpool_release(httpitem->ssl_key_file);
-			zbx_strpool_release(httpitem->ssl_key_password);
-			zbx_strpool_release(httpitem->username);
-			zbx_strpool_release(httpitem->password);
-			zbx_strpool_release(httpitem->trapper_hosts);
-
-			zbx_hashset_remove_direct(&config->httpitems, httpitem);
 		}
 
 		/* Script items */
@@ -6734,10 +6692,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __func__,
-				config->jmxitems.num_data, config->jmxitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __func__,
-				config->httpitems.num_data, config->httpitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() scriptitems  : %d (%d slots)", __func__,
 				config->scriptitems.num_data, config->scriptitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
@@ -7057,8 +7011,8 @@ static int	__config_java_item_compare(const ZBX_DC_ITEM *i1, const ZBX_DC_ITEM *
 
 	ZBX_RETURN_IF_NOT_EQUAL(i1->interfaceid, i2->interfaceid);
 
-	j1 = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &i1->itemid);
-	j2 = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &i2->itemid);
+	j1 = i1->itemtype.jmxitem;
+	j2 = i2->itemtype.jmxitem;
 
 	ZBX_RETURN_IF_NOT_EQUAL(j1->username, j2->username);
 	ZBX_RETURN_IF_NOT_EQUAL(j1->password, j2->password);
@@ -7206,10 +7160,8 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET(config->items, 0);
 	CREATE_HASHSET(config->logitems, 0);
-	CREATE_HASHSET(config->jmxitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
-	CREATE_HASHSET(config->httpitems, 0);
 	CREATE_HASHSET(config->scriptitems, 0);
 	CREATE_HASHSET(config->itemscript_params, 0);
 	CREATE_HASHSET(config->template_items, 0);
@@ -7901,7 +7853,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_HTTPAGENT:
-			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems, &src_item->itemid)))
+			if (NULL != (httpitem = src_item->itemtype.httpitem))
 			{
 				strscpy(dst_item->timeout_orig, httpitem->timeout);
 				strscpy(dst_item->url_orig, httpitem->url);
@@ -8025,7 +7977,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_JMX:
-			if (NULL != (jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&config->jmxitems, &src_item->itemid)))
+			if (NULL != (jmxitem = src_item->itemtype.jmxitem))
 			{
 				strscpy(dst_item->username_orig, jmxitem->username);
 				strscpy(dst_item->password_orig, jmxitem->password);

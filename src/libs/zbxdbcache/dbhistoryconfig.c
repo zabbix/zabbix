@@ -516,8 +516,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 				*dst_item->trapper_hosts = '\0';
 			break;
 		case ITEM_TYPE_HTTPAGENT:
-			if (NULL != (httpitem = (ZBX_DC_HTTPITEM *)zbx_hashset_search(&config->httpitems,
-					&src_item->itemid)))
+			if (NULL != (httpitem = src_item->itemtype.httpitem))
 			{
 				dst_item->allow_traps = httpitem->allow_traps;
 				strscpy(dst_item->trapper_hosts, httpitem->trapper_hosts);

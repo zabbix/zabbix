@@ -163,6 +163,41 @@ typedef struct
 }
 ZBX_DC_SIMPLEITEM;
 
+typedef struct
+{
+	const char	*username;
+	const char	*password;
+	const char	*jmx_endpoint;
+}
+ZBX_DC_JMXITEM;
+
+typedef struct
+{
+	const char	*timeout;
+	const char	*url;
+	const char	*query_fields;
+	const char	*status_codes;
+	const char	*http_proxy;
+	const char	*headers;
+	const char	*username;
+	const char	*ssl_cert_file;
+	const char	*ssl_key_file;
+	const char	*ssl_key_password;
+	const char	*password;
+	const char	*posts;
+	const char	*trapper_hosts;
+	unsigned char	authtype;
+	unsigned char	follow_redirects;
+	unsigned char	post_type;
+	unsigned char	retrieve_mode;
+	unsigned char	request_method;
+	unsigned char	output_format;
+	unsigned char	verify_peer;
+	unsigned char	verify_host;
+	unsigned char	allow_traps;
+}
+ZBX_DC_HTTPITEM;
+
 typedef union
 {
 	ZBX_DC_SNMPITEM		*snmpitem;
@@ -174,6 +209,8 @@ typedef union
 	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_SIMPLEITEM	*simpleitem;
+	ZBX_DC_JMXITEM		*jmxitem;
+	ZBX_DC_HTTPITEM		*httpitem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -254,15 +291,6 @@ ZBX_DC_LOGITEM;
 
 typedef struct
 {
-	zbx_uint64_t	itemid;
-	const char	*username;
-	const char	*password;
-	const char	*jmx_endpoint;
-}
-ZBX_DC_JMXITEM;
-
-typedef struct
-{
 	zbx_uint64_t			itemid;
 	zbx_vector_uint64_pair_t	dep_itemids;
 }
@@ -275,34 +303,6 @@ typedef struct
 	zbx_vector_ptr_t	preproc_ops;
 }
 ZBX_DC_PREPROCITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*timeout;
-	const char	*url;
-	const char	*query_fields;
-	const char	*status_codes;
-	const char	*http_proxy;
-	const char	*headers;
-	const char	*username;
-	const char	*ssl_cert_file;
-	const char	*ssl_key_file;
-	const char	*ssl_key_password;
-	const char	*password;
-	const char	*posts;
-	const char	*trapper_hosts;
-	unsigned char	authtype;
-	unsigned char	follow_redirects;
-	unsigned char	post_type;
-	unsigned char	retrieve_mode;
-	unsigned char	request_method;
-	unsigned char	output_format;
-	unsigned char	verify_peer;
-	unsigned char	verify_host;
-	unsigned char	allow_traps;
-}
-ZBX_DC_HTTPITEM;
 
 typedef struct
 {
@@ -834,13 +834,10 @@ typedef struct
 	zbx_hashset_t		item_discovery;
 	zbx_hashset_t		template_items;		/* template items selected from items table */
 	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
-	zbx_hashset_t		ipmiitems;
 	zbx_hashset_t		dependentitems;
 	zbx_hashset_t		logitems;
-	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
-	zbx_hashset_t		httpitems;
 	zbx_hashset_t		scriptitems;
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
