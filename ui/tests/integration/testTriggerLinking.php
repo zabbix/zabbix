@@ -554,7 +554,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
 
-		// $x = self::getLogPath(self::COMPONENT_SERVER);
-		// $this->assertEquals('a', 'b',  $x);
+		$x = self::getLogPath(self::COMPONENT_SERVER);
+		$this->assertEquals('a', 'b',  $x);
 	}
 }
