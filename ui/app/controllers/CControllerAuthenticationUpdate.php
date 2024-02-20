@@ -523,7 +523,6 @@ class CControllerAuthenticationUpdate extends CController {
 		}
 
 		return $mfaid_map;
-
 	}
 
 	/**

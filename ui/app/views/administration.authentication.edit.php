@@ -32,6 +32,7 @@ $form = (new CForm())
 	->addItem((new CVar(CCsrfTokenHelper::CSRF_TOKEN_NAME, CCsrfTokenHelper::get('authentication')))->removeId())
 	->addVar('action', $data['action_submit'])
 	->addVar('ldap_removed_userdirectoryids', $data['ldap_removed_userdirectoryids'])
+	->addVar('mfa_removed_mfaids', $data['mfa_removed_mfaids'])
 	->setId('authentication-form')
 	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
 	->disablePasswordAutofill();

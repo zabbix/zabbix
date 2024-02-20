@@ -262,6 +262,7 @@ class CControllerAuthenticationEdit extends CController {
 			$data['mfa_default_row_index'] = (int) array_search($data[CAuthenticationHelper::MFAID],
 				array_column($data['mfa_methods'], 'mfaid')
 			);
+			$data['mfa_removed_mfaids'] = [];
 		}
 
 		unset($data[CAuthenticationHelper::LDAP_USERDIRECTORYID]);
