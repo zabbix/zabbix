@@ -96,6 +96,19 @@ ZBX_DC_NUMITEM;
 
 typedef struct
 {
+	const char	*logtimefmt;
+}
+ZBX_DC_LOGITEM;
+
+typedef union
+{
+	ZBX_DC_NUMITEM		*numitem;
+	ZBX_DC_LOGITEM		*logitem;
+}
+ZBX_DC_ITEMVALUETYPE;
+
+typedef struct
+{
 	const char	*snmp_oid;
 	unsigned char	snmp_oid_type;
 }
@@ -235,8 +248,8 @@ typedef struct
 	const char		*error;
 	const char		*delay;
 	ZBX_DC_ITEMTYPE		itemtype;
+	ZBX_DC_ITEMVALUETYPE	itemvaluetype;
 	ZBX_DC_TRIGGER		**triggers;
-	ZBX_DC_NUMITEM		*numitem;
 	int			nextcheck;
 	int			mtime;
 	int			data_expected_from;
@@ -290,13 +303,6 @@ typedef struct
 	ZBX_DC_ITEM	*item_ptr;
 }
 ZBX_DC_ITEM_HK;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*logtimefmt;
-}
-ZBX_DC_LOGITEM;
 
 typedef struct
 {
@@ -835,7 +841,6 @@ typedef struct
 	zbx_hashset_t		template_items;		/* template items selected from items table */
 	zbx_hashset_t		prototype_items;	/* item prototypes selected from items table */
 	zbx_hashset_t		dependentitems;
-	zbx_hashset_t		logitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
 	zbx_hashset_t		functions;

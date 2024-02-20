@@ -616,7 +616,6 @@ static void	DCdump_items(void)
 	void			*ptr;
 	zbx_trace_item_t	trace_items[] =
 	{
-		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
 	};
@@ -649,8 +648,17 @@ static void	DCdump_items(void)
 		zabbix_log(LOG_LEVEL_TRACE, "  inventory_link:%u", item->inventory_link);
 		zabbix_log(LOG_LEVEL_TRACE, "  priority:%u schedulable:%u", item->queue_priority, item->schedulable);
 
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
-			DCdump_numitem(item->numitem);
+		switch (item->value_type)
+		{
+			case ITEM_VALUE_TYPE_FLOAT:
+			case ITEM_VALUE_TYPE_UINT64:
+				DCdump_numitem(item->itemvaluetype.numitem);
+				break;
+			case ITEM_VALUE_TYPE_LOG:
+				if (NULL != item->itemvaluetype.logitem)
+					DCdump_logitem(item->itemvaluetype.logitem);
+				break;
+		}
 
 		switch ((zbx_item_type_t)item->type)
 		{

@@ -3035,6 +3035,92 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *o
 	}
 }
 
+static void	dc_item_value_type_free(ZBX_DC_ITEM *item, zbx_item_value_type_t type)
+{
+	switch (type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			zbx_strpool_release(item->itemvaluetype.numitem->units);
+
+			__config_mem_free_func(item->itemvaluetype.numitem);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if (NULL != item->itemvaluetype.logitem)
+			{
+				zbx_strpool_release(item->itemvaluetype.logitem->logtimefmt);
+				__config_mem_free_func(item->itemvaluetype.logitem);
+			}
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_MAX:
+		case ITEM_VALUE_TYPE_NONE:
+			break;
+	}
+}
+
+static void	dc_item_value_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_value_type_t *old_value_type,
+		char **row)
+{
+	int	trends_sec;
+
+	if (1 == found && *old_value_type != item->value_type)
+	{
+		dc_item_value_type_free(item, *old_value_type);
+		found = 0;
+	}
+
+	switch ((zbx_item_value_type_t)item->value_type)
+	{
+		case ITEM_VALUE_TYPE_FLOAT:
+		case ITEM_VALUE_TYPE_UINT64:
+			if (0 == found)
+			{
+				item->itemvaluetype.numitem = (ZBX_DC_NUMITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_NUMITEM));
+			}
+
+			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
+				trends_sec = ZBX_HK_PERIOD_MAX;
+
+			if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
+				trends_sec = config->config->hk.trends;
+
+			item->itemvaluetype.numitem->trends = (0 != trends_sec);
+			item->itemvaluetype.numitem->trends_sec = trends_sec;
+
+			DCstrpool_replace(found, &item->itemvaluetype.numitem->units, row[26]);
+			break;
+		case ITEM_VALUE_TYPE_LOG:
+			if ('\0' == *row[10])
+			{
+				if (1 == found)
+					dc_item_value_type_free(item, item->type);
+
+				item->itemvaluetype.logitem = NULL;
+				break;
+			}
+
+			if (1 == found && NULL == item->itemvaluetype.logitem)
+				found = 0;
+
+			if (0 == found)
+			{
+				item->itemvaluetype.logitem = (ZBX_DC_LOGITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_LOGITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemvaluetype.logitem->logtimefmt, row[10]);
+			break;
+		case ITEM_VALUE_TYPE_STR:
+		case ITEM_VALUE_TYPE_TEXT:
+		case ITEM_VALUE_TYPE_MAX:
+		case ITEM_VALUE_TYPE_NONE:
+			break;
+	}
+}
+
 static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t *new_items)
 {
 	char			**row;
@@ -3044,7 +3130,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_HOST		*host = NULL;
 
 	ZBX_DC_ITEM		*item;
-	ZBX_DC_LOGITEM		*logitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_MASTERITEM	*master;
 	ZBX_DC_PREPROCITEM	*preprocitem;
@@ -3052,10 +3137,11 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_INTERFACE	*interface = NULL;
 
 	time_t			now;
-	unsigned char		status, type, value_type, old_poller_type, old_type, old_value_type;
+	unsigned char		status, type, value_type, old_poller_type, old_type;
 	int			found, update_index, ret, i,  old_nextcheck, clean_sync = 0;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
+	zbx_item_value_type_t	old_value_type;
 
 	zbx_vector_ptr_create(&dep_items);
 
@@ -3241,62 +3327,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		if (SUCCEED == DCstrpool_replace(found, &item->delay, row[8]))
 			flags |= ZBX_ITEM_DELAY_CHANGED;
 
-		/* numeric items */
-
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		{
-			int	trends_sec;
-			int	found_numeric;
-
-			if (0 == found || (ITEM_VALUE_TYPE_FLOAT != old_value_type &&
-					ITEM_VALUE_TYPE_UINT64 != old_value_type))
-			{
-				found_numeric = 0;
-			}
-			else
-			{
-				found_numeric = 1;
-			}
-
-			if (0 == found_numeric)
-				item->numitem = (ZBX_DC_NUMITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_NUMITEM));
-
-			if (SUCCEED != is_time_suffix(row[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
-				trends_sec = ZBX_HK_PERIOD_MAX;
-
-			if (0 != trends_sec && ZBX_HK_OPTION_ENABLED == config->config->hk.trends_global)
-				trends_sec = config->config->hk.trends;
-
-			item->numitem->trends = (0 != trends_sec);
-			item->numitem->trends_sec = trends_sec;
-
-			DCstrpool_replace(found_numeric, &item->numitem->units, row[26]);
-		}
-		else if (1 == found &&
-				(ITEM_VALUE_TYPE_FLOAT == old_value_type || ITEM_VALUE_TYPE_UINT64 == old_value_type))
-		{
-			/* remove parameters for non-numeric item */
-
-			zbx_strpool_release(item->numitem->units);
-
-			__config_mem_free_func(item->numitem);
-			item->numitem = NULL;
-		}
-
-		/* log items */
-
-		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[10])
-		{
-			logitem = (ZBX_DC_LOGITEM *)DCfind_id(&config->logitems, itemid, sizeof(ZBX_DC_LOGITEM), &found);
-
-			DCstrpool_replace(found, &logitem->logtimefmt, row[10]);
-		}
-		else if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &itemid)))
-		{
-			/* remove logtimefmt parameter */
-			zbx_strpool_release(logitem->logtimefmt);
-			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
+		dc_item_value_type_add(found, item, &old_value_type, row);
 
 		dc_item_add(found, item, &old_type, &dep_items, row);
 
@@ -3407,25 +3438,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		if (ITEM_TYPE_SNMPTRAP == item->type)
 			dc_interface_snmpitems_remove(item);
 
-		/* numeric items */
-
-		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
-		{
-			zbx_strpool_release(item->numitem->units);
-
-			__config_mem_free_func(item->numitem);
-		}
-
+		dc_item_value_type_free(item, item->value_type);
 		dc_item_free(item, item->type);
-
-		/* log items */
-
-		if (ITEM_VALUE_TYPE_LOG == item->value_type &&
-				NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems, &itemid)))
-		{
-			zbx_strpool_release(logitem->logtimefmt);
-			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
 
 		/* items */
 
@@ -6033,7 +6047,7 @@ static void	dc_add_new_items_to_trends(const zbx_vector_dc_item_ptr_t *items)
 
 			if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			{
-				ZBX_DC_NUMITEM	*numitem = item->numitem;
+				ZBX_DC_NUMITEM	*numitem = item->itemvaluetype.numitem;
 
 				if (0 != numitem->trends)
 					zbx_vector_uint64_append(&itemids, items->values[i]->itemid);
@@ -6697,8 +6711,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocitems.num_data, config->preprocitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() preprocops : %d (%d slots)", __func__,
 				config->preprocops.num_data, config->preprocops.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
-				config->logitems.num_data, config->logitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
@@ -7164,7 +7176,6 @@ int	init_configuration_cache(char **error)
 			__config_mem_malloc_func, __config_mem_realloc_func, __config_mem_free_func)
 
 	CREATE_HASHSET(config->items, 0);
-	CREATE_HASHSET(config->logitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
 	CREATE_HASHSET(config->itemscript_params, 0);
@@ -7749,8 +7760,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 	switch (src_item->value_type)
 	{
 		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
-					&src_item->itemid)))
+			if (NULL != (logitem = src_item->itemvaluetype.logitem))
 			{
 				strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 			}

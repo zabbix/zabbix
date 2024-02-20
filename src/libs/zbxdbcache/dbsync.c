@@ -1471,7 +1471,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 
 	if (ITEM_VALUE_TYPE_FLOAT == value_type || ITEM_VALUE_TYPE_UINT64 == value_type)
 	{
-		numitem = item->numitem;
+		numitem = item->itemvaluetype.numitem;
 
 		if (SUCCEED != is_time_suffix(dbrow[23], &trends_sec, ZBX_LENGTH_UNLIMITED))
 			trends_sec = ZBX_HK_PERIOD_MAX;
@@ -1526,18 +1526,20 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&dbsync_env.cache->logitems, &item->itemid);
-	if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *dbrow[10])
+	if (ITEM_VALUE_TYPE_LOG == item->value_type)
 	{
-		if (NULL == logitem)
-			return FAIL;
+		logitem = item->itemvaluetype.logitem;
+		if ('\0' != *dbrow[10])
+		{
+			if (NULL == logitem)
+				return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[10], logitem->logtimefmt))
+			if (FAIL == dbsync_compare_str(dbrow[10], logitem->logtimefmt))
+				return FAIL;
+		}
+		else if (NULL != logitem)
 			return FAIL;
 	}
-	else if (NULL != logitem)
-		return FAIL;
-
 
 	if (ITEM_TYPE_DB_MONITOR == item->type)
 	{

@@ -78,7 +78,7 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 	{
 		case ITEM_VALUE_TYPE_FLOAT:
 		case ITEM_VALUE_TYPE_UINT64:
-			numitem = src_item->numitem;
+			numitem = src_item->itemvaluetype.numitem;
 
 			dst_item->trends = numitem->trends;
 			dst_item->trends_sec = numitem->trends_sec;
@@ -483,8 +483,7 @@ static void	dc_get_history_recv_item(zbx_history_recv_item_t *dst_item, const ZB
 	switch (src_item->value_type)
 	{
 		case ITEM_VALUE_TYPE_LOG:
-			if (NULL != (logitem = (ZBX_DC_LOGITEM *)zbx_hashset_search(&config->logitems,
-					&src_item->itemid)))
+			if (NULL != (logitem = src_item->itemvaluetype.logitem))
 			{
 				strscpy(dst_item->logtimefmt, logitem->logtimefmt);
 			}
