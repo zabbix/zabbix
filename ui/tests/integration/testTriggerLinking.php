@@ -55,7 +55,7 @@ class testTriggerLinking extends CIntegrationTest {
 	const TRIGGER_EVENT_NAME_PRE = 'strata_event_name';
 
 	const NUMBER_OF_TEMPLATES = 10;
-	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 10;
+	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 20;
 
 	/* When resolving conflicts during linking - trigger is considered unique if its description and expression match
 		every template contains a set of triggers with:
@@ -65,12 +65,12 @@ class testTriggerLinking extends CIntegrationTest {
 	private static $templateids = array();
 	private static $stringids = array();
 
-	/* template X will be linked after the initial set of templates get linked and then unliked (without clear) */
+	/* Template X will be linked after the initial set of templates get linked and then unliked (without clear). */
 	private static $templateX_ID;
 	private static $templateX_name = 'templateX';
 
-	/* linking initial set of templates, need an ID to delete this, as during the second linking
-		only templateX will be linked */
+	/* Linking initial set of templates, need an ID to delete this, as during the second linking
+		only templateX will be linked. */
 	private static $firstActionID;
 
 	public function createTemplates() {
@@ -89,6 +89,10 @@ class testTriggerLinking extends CIntegrationTest {
 			array_push(self::$templateids, $response['result']['templateids'][0]);
 		}
 
+
+		/* Create special template X, that will have trigger description (but not expression) conflict
+			with triggers from the first template. It will be linked in the separation action from
+			all other templates. (when agent2 with new host metadata starts). */
 		$response = $this->call('template.create', [
 			'host' =>  self::$templateX_name,
 				'groups' => [
@@ -178,7 +182,8 @@ class testTriggerLinking extends CIntegrationTest {
 	public function prepareData() {
 
 		$z = 'a';
-		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE; $i++)
+		/* There is divide by 2, since we create 2 triggers in every stage*/
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE / 2; $i++)
 		{
 			array_push(self::$stringids, $z);
 			$z++;
@@ -187,7 +192,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->createTemplates();
 
-		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE; $i++) {
+		for ($i = 0; $i < self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE / 2; $i++) {
 
 			$templ_counter = floor($i / self::NUMBER_OF_TEMPLATES);
 			$templateid_loc = self::$templateids[$templ_counter];
@@ -394,7 +399,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'selectDependencies' => ['triggerid']
 		]);
 
-		$totalExpectedTriggers = self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE * 2;
+		$totalExpectedTriggers = self::NUMBER_OF_TEMPLATES * self::NUMBER_OF_TRIGGERS_PER_TEMPLATE;
 		$this->assertEquals($totalExpectedTriggers, count($response['result']));
 
 		$i = 0;
@@ -446,6 +451,10 @@ class testTriggerLinking extends CIntegrationTest {
 	 * @required-components server, agent, agent2
 	 */
 	public function testTriggerLinking_checkMe() {
+
+		/* We need agent 2 only because it will have the different host metadata from the agent 1.
+			This would retrigger the autoregistration with linking. Stop this for now.
+			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
 		$this->stopComponent(self::COMPONENT_AGENT2);
 
 		$this->reloadConfigurationCache();
