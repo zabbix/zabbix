@@ -497,7 +497,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
-		sleep(10);
+		sleep(20);
 
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
