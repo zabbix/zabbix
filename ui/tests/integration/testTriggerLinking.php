@@ -491,6 +491,8 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
+		$this->reloadConfigurationCache();
+		sleep(5);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		//sleep(5);
