@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-16T10:04:20Z'
+  date: '2024-02-20T15:23:41Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -112,6 +112,7 @@ zabbix_export:
           key: aws.elb.alb.auth_latency
           delay: '0'
           history: 7d
+          value_type: FLOAT
           units: ms
           description: |
             The time elapsed, in milliseconds, to query the IdP for the ID token and user info.
@@ -120,6 +121,25 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - '$.[?(@.Label == "ELBAuthLatency")].Values.first().first()'
+              error_handler: DISCARD_VALUE
+          master_item:
+            key: aws.elb.alb.get_metrics
+          tags:
+            - tag: component
+              value: authorization
+        - uuid: 3eed720ae5f948b287cf6ee0bdda41f1
+          name: 'AWS ELB ALB: ELB Auth Success'
+          type: DEPENDENT
+          key: aws.elb.alb.auth_success
+          delay: '0'
+          history: 7d
+          description: |
+            The number of authenticate actions that were successful.
+            This metric is incremented at the end of the authentication workflow, after the load balancer has retrieved the user claims from the IdP.
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.[?(@.Label == "ELBAuthSuccess")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.elb.alb.get_metrics
@@ -400,7 +420,7 @@ zabbix_export:
             
             		return result;
             	}
-            }
+            };
             
             try {
             	AWS.setParams(JSON.parse(value));
@@ -514,7 +534,6 @@ zabbix_export:
             			}
             			AWS.params[field] = params[field];
             		});
-            
             	},
             
             	sign: function (key, message) {
@@ -587,21 +606,6 @@ zabbix_export:
             		});
             
             		return metric_payload;
-            
-            	},
-            	prepareParams: function (params) {
-            		var result = [];
-            
-            		Object.keys(params).sort().forEach(function (key) {
-            			if (typeof params[key] !== 'object') {
-            				result.push(key + '=' + encodeURIComponent(params[key]));
-            			}
-            			else {
-            				result.push(prepareObject(key, params[key]));
-            			}
-            		});
-            
-            		return result.join('&');
             	},
             
             	request: function (method, region, service, data) {
@@ -624,8 +628,8 @@ zabbix_export:
             				signed_headers = 'content-encoding;host;x-amz-date';
             		}
             
-            		canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-            			url = 'https://' + host + canonical_uri;
+            		canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data);
+            		url = 'https://' + host + canonical_uri;
             
             		var credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
@@ -650,8 +654,6 @@ zabbix_export:
             		if (AWS.params.auth_type === 'role_base')
             			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
             
-            
-            		url = 'https://' + host + '/';
             		Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
             		response = request.post(url, data);
             		Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -669,11 +671,11 @@ zabbix_export:
             			'StartTime': start_time,
             			'EndTime': end_time,
             			'ScanBy': 'TimestampDescending',
-            			'MetricDataQueries': AWS.renderMetricQuery(AWS.request_period, AWS.params.arn),
-            		}
+            			'MetricDataQueries': AWS.renderMetricQuery(AWS.request_period, AWS.params.arn)
+            		};
+            
             		return AWS.getField(AWS.request('POST', AWS.params.region, 'monitoring', payload), 'MetricDataResults');
             	}
-            
             };
             
             try {
@@ -788,7 +790,6 @@ zabbix_export:
             			}
             			AWS.params[field] = params[field];
             		});
-            
             	},
             
             	sign: function (key, message) {
@@ -837,8 +838,8 @@ zabbix_export:
             			var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n',
             				signed_headers = 'content-encoding;host;x-amz-date';
             		}
-            		canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-            			url = 'https://' + host + canonical_uri + '?' + params;
+            		canonical_request = method + '\n' + canonical_uri + '\n' + params + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data);
+            		url = 'https://' + host + canonical_uri + '?' + params;
             		var credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
             			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
             			key = AWS.sign('AWS4' + AWS.params.SecretAccessKey, date);
@@ -866,8 +867,8 @@ zabbix_export:
             		Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
             		if (request.getStatus() !== 200) {
             			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-            
             		}
+            
             		return JSON.parse(response);
             	},
             
@@ -877,8 +878,7 @@ zabbix_export:
             			payload = {
             				'Action': 'DescribeTargetGroups',
             				'LoadBalancerArn': AWS.params.arn,
-            				'Version': '2015-12-01',
-            
+            				'Version': '2015-12-01'
             			};
             		targets = AWS.getField(AWS.request('GET', AWS.params.region, 'elasticloadbalancing', AWS.prepareParams(payload), ''), 'DescribeTargetGroupsResponse.DescribeTargetGroupsResult.TargetGroups');
             
@@ -891,8 +891,7 @@ zabbix_export:
             					target_name: AWS.getField(targets, 'TargetGroupName'),
             					target_arn: AWS.getField(targets, 'TargetGroupArn').match(regex)[0],
             					type: AWS.getField(targets, 'TargetType'),
-            					protocol: AWS.getField(targets, 'Protocol'),
-            					region: AWS.params.region
+            					protocol: AWS.getField(targets, 'Protocol')
             				}
             			)
             		});
@@ -1202,7 +1201,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.[?(@.Label == "NewConnectionCount§")].Values.first().first()'
+                - '$.[?(@.Label == "NewConnectionCount")].Values.first().first()'
               error_handler: DISCARD_VALUE
           master_item:
             key: aws.elb.alb.get_metrics
@@ -1386,7 +1385,7 @@ zabbix_export:
           description: 'Discovery instance alarms.'
           item_prototypes:
             - uuid: fca522690827426bb63f93e90d98aa54
-              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"]: Get metrics'
+              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: Get metrics'
               type: DEPENDENT
               key: 'aws.elb.alb.alarm.get_metrics["{#ALARM_NAME}"]'
               delay: '0'
@@ -1405,7 +1404,7 @@ zabbix_export:
                 - tag: component
                   value: raw
             - uuid: 3ef62eb9b0824f8ea3c2c1e8e15ce1fd
-              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"]: State'
+              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.elb.alb.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -1436,8 +1435,8 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: b8bbc96a20bc4ab393d1fa76a3cf5254
                   expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Insufficient data'' state'
-                  event_name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Insufficient data'' state'
+                  name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
+                  event_name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: INFO
                   description: 'The alarm has just started, the metric is not available, or not enough data is available for the metric to determine the alarm state.'
@@ -1445,7 +1444,7 @@ zabbix_export:
                     - tag: scope
                       value: notice
             - uuid: 8839a61a10f7453ebfdcae0ef16eb37c
-              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -1472,8 +1471,8 @@ zabbix_export:
           trigger_prototypes:
             - uuid: a1b8587c80dd41ef8b185cf62e563bcb
               expression: 'last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS ELB Application Load Balancer by HTTP/aws.elb.alb.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Alarm'' state'
-              event_name: 'AWS ELB ALB Alarms: ["{#ALARM_NAME}"] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
+              name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
+              event_name: 'AWS ELB ALB Alarms: [{#ALARM_NAME}] has ''Alarm'' state (reason: {ITEM.LASTVALUE2})'
               opdata: 'Reason: {ITEM.LASTVALUE2}'
               priority: AVERAGE
               description: |
@@ -1524,7 +1523,7 @@ zabbix_export:
           description: 'Discovery {$AWS.ELB.TARGET.GROUP.NAME} target groups.'
           item_prototypes:
             - uuid: 21d1830526e14fb99b2288d79747d472
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Anomalous Host Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Anomalous Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.anomalous_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1547,7 +1546,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 306971d2e8fb441d8ae4a658b26304c3
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Get metrics'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Get metrics'
               type: SCRIPT
               key: 'aws.elb.alb.target_groups.get_metrics["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: 0s;m/5
@@ -1625,7 +1624,6 @@ zabbix_export:
                 			}
                 			AWS.params[field] = params[field];
                 		});
-                
                 	},
                 
                 	sign: function (key, message) {
@@ -1689,21 +1687,6 @@ zabbix_export:
                 		});
                 
                 		return metric_payload;
-                
-                	},
-                	prepareParams: function (params) {
-                		var result = [];
-                
-                		Object.keys(params).sort().forEach(function (key) {
-                			if (typeof params[key] !== 'object') {
-                				result.push(key + '=' + encodeURIComponent(params[key]));
-                			}
-                			else {
-                				result.push(prepareObject(key, params[key]));
-                			}
-                		});
-                
-                		return result.join('&');
                 	},
                 
                 	request: function (method, region, service, data) {
@@ -1726,8 +1709,8 @@ zabbix_export:
                 				signed_headers = 'content-encoding;host;x-amz-date';
                 		}
                 
-                		canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data),
-                			url = 'https://' + host + canonical_uri;
+                		canonical_request = method + '\n' + canonical_uri + '\n' + '\n' + canonical_headers + '\n' + signed_headers + '\n' + sha256(data);
+                		url = 'https://' + host + canonical_uri;
                 
                 		var credential_scope = date + '/' + region + '/' + service + '/' + 'aws4_request',
                 			request_string = 'AWS4-HMAC-SHA256' + '\n' + amzdate + '\n' + credential_scope + '\n' + sha256(canonical_request),
@@ -1752,8 +1735,6 @@ zabbix_export:
                 		if (AWS.params.auth_type === 'role_base')
                 			request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
                 
-                
-                		url = 'https://' + host + '/';
                 		Zabbix.log(4, '[ AWS ELB ] Sending request: ' + url);
                 		response = request.post(url, data);
                 		Zabbix.log(4, '[ AWS ELB ] Received response with status code ' + request.getStatus() + ': ' + response);
@@ -1771,11 +1752,11 @@ zabbix_export:
                 			'StartTime': start_time,
                 			'EndTime': end_time,
                 			'ScanBy': 'TimestampDescending',
-                			'MetricDataQueries': AWS.renderMetricQuery(AWS.request_period, AWS.params.arn, AWS.params.target_arn),
-                		}
+                			'MetricDataQueries': AWS.renderMetricQuery(AWS.request_period, AWS.params.arn, AWS.params.target_arn)
+                		};
+                
                 		return AWS.getField(AWS.request('POST', AWS.params.region, 'monitoring', payload), 'MetricDataResults');
                 	}
-                
                 };
                 
                 try {
@@ -1789,7 +1770,7 @@ zabbix_export:
                 	return JSON.stringify({ 'error': error });
                 }
               description: |
-                Get metrics of ELB ["{#AWS.ELB.TARGET.GROUP.NAME}"] target group.
+                Get metrics of ELB [{#AWS.ELB.TARGET.GROUP.NAME}] target group.
                 Full metrics list related to AWS ELB: https://docs.aws.amazon.com/elasticloadbalancing/latest/application/load-balancer-cloudwatch-metrics.html#user-authentication-metric-table
               preprocessing:
                 - type: CHECK_NOT_SUPPORTED
@@ -1823,7 +1804,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: e4cd95136bb04981b15a508aa73f5723
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1848,7 +1829,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: b96ad1d2f5064cc99c49eeec3801418e
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State DNS'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1873,7 +1854,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 030c4fe8b7f44bf3a290b1b5da9319d8
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State Routing'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1898,7 +1879,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: fa9da54b4feb4fc79fbf74c491eb23ba
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 2XX Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 2XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_2xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1927,7 +1908,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 50e78304f9e74019b7e06310d6dd2e6f
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 3XX Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 3XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_3xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1956,7 +1937,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: ec7b92c79c6f441cadb8994b906753f4
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 4XX Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 4XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_4xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -1985,7 +1966,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: c9e61f9d2f12496d90693a83cb829b66
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: HTTP Code Target 5XX Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: HTTP Code Target 5XX Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.http_5xx_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2014,7 +1995,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 0ad4d9a933944c7d979da411d24b165e
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Mitigated Host Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Mitigated Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.mitigated_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2037,7 +2018,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 31a579ac8de9402bae3a3668779ec6c5
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Request Count Per Target'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Request Count Per Target'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.request["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2064,7 +2045,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: c158172738084d38aec424505a7a86a5
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2089,7 +2070,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 9fea4b63067445d98d29de566d50b0a4
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Routing Request Count'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Routing Request Count'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_routing_request_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2114,7 +2095,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: f050e9610eb64251b55e843fc5eb5876
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State DNS'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2139,7 +2120,7 @@ zabbix_export:
                 - tag: type
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
             - uuid: 2a446451893e4f70a0d4ac4b1bb969fb
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
               type: DEPENDENT
               key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
               delay: '0'
@@ -2165,7 +2146,7 @@ zabbix_export:
                   value: '{#AWS.ELB.TARGET.GROUP.TYPE}'
           graph_prototypes:
             - uuid: f426eff334d449ff9ec0a2ff8f6ee103
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -2173,7 +2154,7 @@ zabbix_export:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.healthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: f6f8d317322a420ab4e0025b3b284a98
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State DNS'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -2181,7 +2162,7 @@ zabbix_export:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.healthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: 40922ff1845141c7a2488fe24debeae0
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State Routing'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: 199C0D
@@ -2189,7 +2170,7 @@ zabbix_export:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.healthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: a2668f5bf6a240a296b047c1b979f9dc
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: FF0000
@@ -2197,7 +2178,7 @@ zabbix_export:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.unhealthy_host_count["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: 54645b74585c4b45a971c13d1127698d
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]:  Unhealthy State DNS'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: FF0000
@@ -2205,7 +2186,7 @@ zabbix_export:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.unhealthy_state_dns["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: 8da12e20218e4367968b8fcf0f56991a
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
               graph_items:
                 - drawtype: GRADIENT_LINE
                   color: FF0000
@@ -2213,7 +2194,7 @@ zabbix_export:
                     host: 'AWS ELB Application Load Balancer by HTTP'
                     key: 'aws.elb.alb.target_groups.unhealthy_state_routing["{#AWS.ELB.TARGET.GROUP.NAME}"]'
             - uuid: ec38c670cabf422ea79f41866c90ee66
-              name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"] HTTP Code Target Group'
+              name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}] HTTP Code Target Group'
               graph_items:
                 - drawtype: BOLD_LINE
                   color: 199C0D
@@ -2362,7 +2343,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy Host'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy Host'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -2375,7 +2356,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State Routing'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State Routing'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -2388,7 +2369,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Healthy State DNS'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Healthy State DNS'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -2401,7 +2382,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"] HTTP Code Target Group'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}] HTTP Code Target Group'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -2414,7 +2395,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy Host'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy Host'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -2428,7 +2409,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]: Unhealthy State Routing'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State Routing'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -2442,7 +2423,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'AWS ELB Application Load Balancer by HTTP'
-                        name: 'AWS ELB ALB Target Groups: ["{#AWS.ELB.TARGET.GROUP.NAME}"]:  Unhealthy State DNS'
+                        name: 'AWS ELB ALB Target Groups: [{#AWS.ELB.TARGET.GROUP.NAME}]: Unhealthy State DNS'
       valuemaps:
         - uuid: 4bb749152d5d452ead36c5a98c3cac16
           name: 'Alarm state'

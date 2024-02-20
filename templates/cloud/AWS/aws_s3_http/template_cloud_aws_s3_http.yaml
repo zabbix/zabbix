@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-15T15:17:06Z'
+  date: '2024-02-20T15:23:06Z'
   groups:
     - uuid: c2c162144c2d4c5491c8801193af4945
       name: Templates/Cloud
@@ -746,7 +746,7 @@ zabbix_export:
           description: 'Discovery of bucket alarms.'
           item_prototypes:
             - uuid: b38bd6e4566445acb52e8ecce4014f0f
-              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State'
+              name: 'AWS S3 Alarms: [{#ALARM_NAME}]: State'
               type: DEPENDENT
               key: 'aws.s3.alarm.state["{#ALARM_NAME}"]'
               delay: '0'
@@ -777,13 +777,13 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 7f0ba96047784510b734c0064d434edc
                   expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=1'
-                  name: 'AWS S3 Alarms: ["{#ALARM_NAME}"] has ''Insufficient data'' state'
+                  name: 'AWS S3 Alarms: [{#ALARM_NAME}] has ''Insufficient data'' state'
                   priority: INFO
                   tags:
                     - tag: scope
                       value: notice
             - uuid: 7e536a43faf742058d303ffe21cd9a8c
-              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"]: State reason'
+              name: 'AWS S3 Alarms: [{#ALARM_NAME}]: State reason'
               type: DEPENDENT
               key: 'aws.s3.alarm.state_reason["{#ALARM_NAME}"]'
               delay: '0'
@@ -810,7 +810,7 @@ zabbix_export:
           trigger_prototypes:
             - uuid: c1b94199b7ac4cc9889ff0e724f7057d
               expression: 'last(/AWS S3 bucket by HTTP/aws.s3.alarm.state["{#ALARM_NAME}"])=2 and length(last(/AWS S3 bucket by HTTP/aws.s3.alarm.state_reason["{#ALARM_NAME}"]))>0'
-              name: 'AWS S3 Alarms: ["{#ALARM_NAME}"] has ''Alarm'' state'
+              name: 'AWS S3 Alarms: [{#ALARM_NAME}] has ''Alarm'' state'
               priority: AVERAGE
               description: |
                 Alarm "{#ALARM_NAME}" has 'Alarm' state. 
@@ -1068,7 +1068,7 @@ zabbix_export:
                 - tag: filter-id
                   value: '{#AWS.S3.FILTER.ID.NAME}'
             - uuid: eabbd51547cb4a0484182d42601728c3
-              name: 'AWS S3: Filter ["{#AWS.S3.FILTER.ID.NAME}"]: Get request metrics'
+              name: 'AWS S3: Filter [{#AWS.S3.FILTER.ID.NAME}]: Get request metrics'
               type: SCRIPT
               key: 'aws.s3.get_metrics["{#AWS.S3.FILTER.ID.NAME}"]'
               delay: '{$AWS.S3.UPDATE.INTERVAL}'
