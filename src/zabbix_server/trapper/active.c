@@ -205,6 +205,9 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #endif
 	if (NULL != (row = DBfetch(result)))
 	{
+		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO_Z: %lu", row[0]);
+		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO_Z2: %lu", row[1]);
+
 		if (0 == ((unsigned int)atoi(row[2]) & sock->connection_type))
 		{
 			zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
