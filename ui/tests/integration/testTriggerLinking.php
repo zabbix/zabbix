@@ -462,17 +462,17 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->checkTriggersCreate();
-		$this->stopComponent(self::COMPONENT_SERVER);
-		sleep(10);
 
 		$this->setupActions2();
-		sleep(20);
+		//sleep(10);
+		$this->stopComponent(self::COMPONENT_SERVER);
+		//sleep(10);
 
 		$this->stopComponent(self::COMPONENT_AGENT);
 
-		sleep(10);
-		$this->reloadConfigurationCache();
-		sleep(10);
+		//sleep(10);
+		//$this->reloadConfigurationCache();
+		//sleep(10);
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
@@ -498,8 +498,8 @@ class testTriggerLinking extends CIntegrationTest {
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 		//$this->reloadConfigurationCache();
-		$this->stopComponent(self::COMPONENT_SERVER);
-		sleep(10);
+		//$this->stopComponent(self::COMPONENT_SERVER);
+		//sleep(10);
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(10);
 
