@@ -485,15 +485,17 @@ class testTriggerLinking extends CIntegrationTest {
 			'hostid' => $hostid,
 			'templates' => []
 		]);
-
+		sleep(5);
 		$this->reloadConfigurationCache();
+		sleep(5);
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		sleep(5);
-		$this->reloadConfigurationCache();
+		//sleep(5);
+		//$this->reloadConfigurationCache();
+		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'query [txnlev:1] [insert into triggers', true, 120);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
