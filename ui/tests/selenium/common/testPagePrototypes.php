@@ -133,7 +133,7 @@ class testPagePrototypes extends CWebTest {
 
 		// Check displayed buttons and their default status after opening prototype page.
 		foreach ($this->layout_data[$this->source]['buttons'] as $button => $status) {
-			$button_element = $this->assertTrue($this->query('button', $button)->one();
+			$button_element = $this->query('button', $button)->one();
 			$this->assertTrue($button_element->isEnabled($status));
 			$this->assertTrue($button_element->isDisplayed());
 		}
@@ -191,7 +191,7 @@ class testPagePrototypes extends CWebTest {
 
 				$expression = ($template) ? 'Template' : 'Host';
 
-				$this->assertEquals('last(/'.$expression.' for prototype check/3a_key[{#KEY}])=0',
+				$this->assertEquals('last(/'.$expression.' for prototype check/1_key[{#KEY}])=0',
 						$trigger_row->getColumn('Expression')->getText()
 				);
 				$this->assertTrue($trigger_row->getColumn('Expression')->isClickable());
