@@ -462,10 +462,8 @@ class testTriggerLinking extends CIntegrationTest {
 		//DBexecute("DELETE from autoreg_host");
 		$this->prepareDataX();
 		$this->startComponent(self::COMPONENT_SERVER);
-		sleep(10);
+		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
-
-		//$this->reloadConfigurationCache();
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
@@ -499,9 +497,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'hostid' => $hostid,
 			'templates' => []
 		]);
-		//sleep(20);
-		//$this->reloadConfigurationCache();
-		sleep(5);
+		sleep(1);
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -509,7 +505,7 @@ class testTriggerLinking extends CIntegrationTest {
 		//$this->stopComponent(self::COMPONENT_SERVER);
 		//sleep(10);
 		$this->startComponent(self::COMPONENT_SERVER);
-		sleep(10);
+		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		//sleep(5);
@@ -522,7 +518,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
-		sleep(5);
+		sleep(1);
 
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
