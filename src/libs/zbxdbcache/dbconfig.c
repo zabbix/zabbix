@@ -2812,12 +2812,12 @@ static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 	}
 }
 
-static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *last_type,
+static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *old_type,
 		zbx_vector_ptr_t *dep_items, char **row)
 {
-	if (1 == found && *last_type != item->type)
+	if (1 == found && *old_type != item->type)
 	{
-		dc_item_free(item, *last_type);
+		dc_item_free(item, *old_type);
 		found = 0;
 	}
 
@@ -3052,7 +3052,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_INTERFACE	*interface = NULL;
 
 	time_t			now;
-	unsigned char		status, type, value_type, old_poller_type;
+	unsigned char		status, type, value_type, old_poller_type, old_type, old_value_type;
 	int			found, update_index, ret, i,  old_nextcheck, clean_sync = 0;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
@@ -3214,12 +3214,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			dc_interface_update_agent_stats(interface, type, 1);
 		}
 
-		unsigned char	last_type, last_value_type;
-
 		if (1 == found)
 		{
-			last_type = item->type;
-			last_value_type = item->value_type;
+			old_type = item->type;
+			old_value_type = item->value_type;
 		}
 
 		item->type = type;
@@ -3250,8 +3248,8 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			int	trends_sec;
 			int	found_numeric;
 
-			if (0 == found || (ITEM_VALUE_TYPE_FLOAT != last_value_type &&
-					ITEM_VALUE_TYPE_UINT64 != last_value_type))
+			if (0 == found || (ITEM_VALUE_TYPE_FLOAT != old_value_type &&
+					ITEM_VALUE_TYPE_UINT64 != old_value_type))
 			{
 				found_numeric = 0;
 			}
@@ -3275,7 +3273,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			DCstrpool_replace(found_numeric, &item->numitem->units, row[26]);
 		}
 		else if (1 == found &&
-				(ITEM_VALUE_TYPE_FLOAT == last_value_type || ITEM_VALUE_TYPE_UINT64 == last_value_type))
+				(ITEM_VALUE_TYPE_FLOAT == old_value_type || ITEM_VALUE_TYPE_UINT64 == old_value_type))
 		{
 			/* remove parameters for non-numeric item */
 
@@ -3300,7 +3298,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			zbx_hashset_remove_direct(&config->logitems, logitem);
 		}
 
-		dc_item_add(found, item, &last_type, &dep_items, row);
+		dc_item_add(found, item, &old_type, &dep_items, row);
 
 		/* SNMP trap items for current server/proxy */
 
