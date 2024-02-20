@@ -2812,7 +2812,7 @@ static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 	}
 }
 
-static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *old_type,
+static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
 		zbx_vector_ptr_t *dep_items, char **row)
 {
 	if (1 == found && *old_type != item->type)
@@ -3137,11 +3137,12 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 	ZBX_DC_INTERFACE	*interface = NULL;
 
 	time_t			now;
-	unsigned char		status, type, value_type, old_poller_type, old_type;
+	unsigned char		status, type, value_type, old_poller_type;
 	int			found, update_index, ret, i,  old_nextcheck, clean_sync = 0;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 	zbx_item_value_type_t	old_value_type;
+	zbx_item_type_t		old_type;
 
 	zbx_vector_ptr_create(&dep_items);
 
@@ -3311,6 +3312,9 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		item->value_type = value_type;
 		item->interfaceid = interfaceid;
 
+		dc_item_value_type_add(found, item, &old_value_type, row);
+		dc_item_add(found, item, &old_type, &dep_items, row);
+
 		/* update items_hk index using new data, if not done already */
 
 		if (1 == update_index)
@@ -3326,10 +3330,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		if (SUCCEED == DCstrpool_replace(found, &item->delay, row[8]))
 			flags |= ZBX_ITEM_DELAY_CHANGED;
-
-		dc_item_value_type_add(found, item, &old_value_type, row);
-
-		dc_item_add(found, item, &old_type, &dep_items, row);
 
 		/* SNMP trap items for current server/proxy */
 
