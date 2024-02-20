@@ -22,6 +22,8 @@
 require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
+ * @onBefore prepareUserMediaData
+ *
  * @dataSource LoginUsers
  */
 class testPageUsers extends CLegacyWebTest {
@@ -29,6 +31,30 @@ class testPageUsers extends CLegacyWebTest {
 	public $userName = 'Zabbix';
 	public $userSurname = 'Administrator';
 	public $userRole = 'Super admin role';
+
+	public function prepareUserMediaData() {
+		CDataHelper::call('user.update', [
+			[
+				'userid' => 1,
+				'medias' => [
+					[
+						'mediatypeid' => 10,
+						'sendto' => 'test@jabber.com',
+						'active' => 0,
+						'severity' => 16,
+						'period' => '1-7,00:00-24:00'
+					],
+					[
+						'mediatypeid' => 12,
+						'sendto' => 'test_account',
+						'active' => 0,
+						'severity' => 63,
+						'period' => '6-7,09:00-18:00'
+					]
+				]
+			]
+		]);
+	}
 
 	public static function allUsers() {
 		return CDBHelper::getDataProvider('select * from users');

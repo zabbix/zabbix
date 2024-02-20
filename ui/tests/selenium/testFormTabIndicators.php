@@ -43,7 +43,7 @@ class testFormTabIndicators extends CWebTest {
 
 	public function getTabData() {
 		return [
-			// Template configuration form tab data.
+			// #0 Template configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=template.list',
@@ -97,7 +97,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Host configuration form tab data.
+			// #1 Host configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=host.edit',
@@ -175,7 +175,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Host prototype configuration form tab data.
+			// #2 Host prototype configuration form tab data.
 			[
 				[
 					'url' => 'host_prototypes.php?form=create&parent_discoveryid=42275&context=host',
@@ -222,7 +222,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Item configuration form tab data.
+			// #3 Item configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=item.list&filter_set=1&context=host&filter_hostids[0]=10084',
@@ -250,7 +250,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Item prototype configuration form tab data.
+			// #4 Item prototype configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=item.prototype.list&parent_discoveryid=42275&context=host',
@@ -278,7 +278,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Trigger configuration form tab data.
+			// #5 Trigger configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=trigger.list&filter_set=1&filter_hostids%5B0%5D=40001&context=host',
@@ -313,7 +313,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Trigger prototype configuration form tab data.
+			// #6 Trigger prototype configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=trigger.prototype.list&parent_discoveryid=133800&context=host',
@@ -351,7 +351,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// LLD rule configuration form tab data.
+			// #7 LLD rule configuration form tab data.
 			[
 				[
 					'url' => 'host_discovery.php?form=create&context=host&hostid=10084',
@@ -419,7 +419,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Web scenarios configuration form tab data.
+			// #8 Web scenarios configuration form tab data.
 			[
 				[
 					'url' => 'httpconf.php?form=create&context=host&hostid=10084',
@@ -450,7 +450,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Proxy configuration form tab data.
+			// #9 Proxy configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=proxy.list',
@@ -469,7 +469,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Authentication configuration form tab data.
+			// #10 Authentication configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=authentication.edit',
@@ -505,7 +505,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// User configuration form tab data.
+			// #11 User configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=user.edit',
@@ -527,7 +527,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Media type configuration form tab data.
+			// #12 Media type configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=mediatype.list',
@@ -554,7 +554,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Graph widget configuration form tab data.
+			// #13 Graph widget configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=dashboard.view',
@@ -615,7 +615,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// Map configuration form tab data.
+			// #14 Map configuration form tab data.
 			[
 				[
 					'url' => 'sysmaps.php?form=Create+map',
@@ -633,7 +633,7 @@ class testFormTabIndicators extends CWebTest {
 					]
 				]
 			],
-			// User profile configuration form tab data.
+			// #15 User profile configuration form tab data.
 			[
 				[
 					'url' => 'zabbix.php?action=userprofile.edit',
@@ -651,8 +651,8 @@ class testFormTabIndicators extends CWebTest {
 								]
 							],
 							'field_type' => 'overlay_dialogue',
-							'initial_count' => 5,
-							'count' => 7
+							'initial_count' => 2,
+							'count' => 4
 						],
 						[
 							'name' => 'Frontend notifications',
