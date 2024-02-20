@@ -458,27 +458,16 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
-		//DBexecute("DELETE from hosts");
-		//DBexecute("DELETE from autoreg_host");
 		$this->prepareDataX();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 		$this->startComponent(self::COMPONENT_AGENT);
-
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->checkTriggersCreate();
-
 		$this->setupActions2();
-		//sleep(10);
 		$this->stopComponent(self::COMPONENT_SERVER);
-		//sleep(10);
-
 		$this->stopComponent(self::COMPONENT_AGENT);
-
-		//sleep(10);
-		//$this->reloadConfigurationCache();
-		//sleep(10);
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
@@ -501,21 +490,11 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-		//$this->reloadConfigurationCache();
-		//$this->stopComponent(self::COMPONENT_SERVER);
-		//sleep(10);
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(1);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
-		//sleep(5);
-		//$this->reloadConfigurationCache();
-		//sleep(5);
-		//$sql = "select hostid from hosts where host='".self::HOST_NAME. "';";
-		//$res = DBfetch(DBselect($sql));
-		//$this->assertArrayHasKey('hostidZZZZ', $response, "Res: ".json_encode($res)." and hostid from API: ".$hostid);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'query [txnlev:1] [insert into triggers', true, 120);
-
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
 		sleep(1);
@@ -573,7 +552,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
 
-		$x = self::getLogPath(self::COMPONENT_SERVER);
-		$this->assertEquals('a', 'b',  $x);
+		// $x = self::getLogPath(self::COMPONENT_SERVER);
+		// $this->assertEquals('a', 'b',  $x);
 	}
 }
