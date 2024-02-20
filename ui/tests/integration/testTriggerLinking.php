@@ -457,22 +457,22 @@ class testTriggerLinking extends CIntegrationTest {
 			If I knew how to change host metadata of agent 1 in integration test - I would not need agent2. */
 		$this->stopComponent(self::COMPONENT_AGENT2);
 
-		$this->reloadConfigurationCache();
+		//$this->reloadConfigurationCache();
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, ['End of DBregister_host_active():SUCCEED']);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->checkTriggersCreate();
-		sleep(20);
+		$this->stopComponent(self::COMPONENT_SERVER);
+		sleep(10);
 
 		$this->setupActions2();
 		sleep(20);
 
 		$this->stopComponent(self::COMPONENT_AGENT);
 
-		sleep(20);
-
+		sleep(10);
 		$this->reloadConfigurationCache();
-		sleep(20);
+		sleep(10);
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
@@ -497,8 +497,11 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-		$this->reloadConfigurationCache();
-		sleep(20);
+		//$this->reloadConfigurationCache();
+		$this->stopComponent(self::COMPONENT_SERVER);
+		sleep(10);
+		$this->startComponent(self::COMPONENT_SERVER);
+		sleep(10);
 
 		$this->startComponent(self::COMPONENT_AGENT2);
 		//sleep(5);
@@ -507,7 +510,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$sql = "select hostid from hosts where host='".self::HOST_NAME. "';";
 		//$this->assertEquals(1, CDBHelper::getCount($sql));
 $res = DBfetch(DBselect($sql));
-$this->assertArrayHasKey('hostidZZZZ', $response['result'][0], "Res: ".$res." and hostid from API: ".$hostid);
+$this->assertArrayHasKey('hostidZZZZ', $response, "Res: ".$res." and hostid from API: ".$hostid);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'query [txnlev:1] [insert into triggers', true, 120);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
