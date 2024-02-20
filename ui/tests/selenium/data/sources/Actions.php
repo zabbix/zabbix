@@ -24,7 +24,6 @@ class Actions {
 	const ZABBIX_ADMIN_GROUPID = 7;
 	const ADMIN_USERID = 1;
 	const EMAIL_MEDIATYPEID = 1;
-	const REBOOT_SCRIPTID = 4;
 	const CURRENT_HOST = 0;
 
 	/**
@@ -33,7 +32,20 @@ class Actions {
 	 * @return array
 	 */
 	public static function load() {
-		CDataHelper::call('action.create', [
+		$scripts = CDataHelper::call('script.create', [
+			[
+				'name' => 'Reboot',
+				'type' => ZBX_SCRIPT_TYPE_CUSTOM_SCRIPT,
+				'scope' => ZBX_SCRIPT_SCOPE_ACTION,
+				'command' => '/sbin/shutdown -r',
+				'groupid' => 4, // Zabbix servers.
+				'description' => 'This command reboots server.'
+			]
+		]);
+		$reboot_scriptid = $scripts['scriptids'][0];
+
+
+			CDataHelper::call('action.create', [
 			// Service action.
 			[
 				'name' => 'Service action',
@@ -91,7 +103,7 @@ class Actions {
 				'operations' => [
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand' => ['scriptid' => $reboot_scriptid],
 						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					]
 				]
@@ -301,7 +313,7 @@ class Actions {
 					],
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand' => ['scriptid' => $reboot_scriptid],
 						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					],
 					[
@@ -361,7 +373,7 @@ class Actions {
 					],
 					[
 						'operationtype' => OPERATION_TYPE_COMMAND,
-						'opcommand' => ['scriptid' => self::REBOOT_SCRIPTID],
+						'opcommand' => ['scriptid' => $reboot_scriptid],
 						'opcommand_hst' => [['hostid' => self::CURRENT_HOST]]
 					]
 				]
