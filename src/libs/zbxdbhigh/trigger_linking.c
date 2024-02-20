@@ -1616,10 +1616,8 @@ int	DBcopy_template_triggers(zbx_uint64_t hostid, const zbx_vector_uint64_t *tem
 
 	if (SUCCEED == res)
 	{
-		res = DBsync_template_dependencies_for_triggers(hostid, &temp_host_triggerids,
+		res = DBsync_template_dependencies_for_triggers(hostid, &cur_triggerids,
 				TRIGGER_DEP_SYNC_UPDATE_OP);
-		/* res = DBsync_template_dependencies_for_triggers(hostid, &cur_triggerids, */
-		/* 		TRIGGER_DEP_SYNC_UPDATE_OP); */
 	}
 
 	if (SUCCEED == res)

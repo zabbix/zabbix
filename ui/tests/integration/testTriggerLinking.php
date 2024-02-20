@@ -235,9 +235,9 @@ class testTriggerLinking extends CIntegrationTest {
 			$this->assertArrayHasKey('triggerids', $response['result']);
 			$this->assertArrayHasKey(0, $response['result']['triggerids']);
 
-			/* also create trigger that would have the SAME description across all templates
+			/* Also create trigger that would have the SAME description across all templates
 				(but different expression, otherwise templates will not be able to exist on host
-				at the same time due to conflict) */
+				at the same time due to conflict). */
 			$response_2 = $this->call('trigger.create', [
 				'description' => self::TRIGGER_DESCRIPTION_SAME_ALL,
 				'priority' => self::TRIGGER_PRIORITY,
@@ -551,8 +551,5 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
-
-		// $x = self::getLogPath(self::COMPONENT_SERVER);
-		// $this->assertEquals('a', 'b',  $x);
 	}
 }

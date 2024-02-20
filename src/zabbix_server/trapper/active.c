@@ -205,9 +205,6 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 #endif
 	if (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO_Z: %d", atoi(row[0]));
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO_Z2: %d", atoi(row[1]));
-
 		if (0 == ((unsigned int)atoi(row[2]) & sock->connection_type))
 		{
 			zbx_snprintf(error, MAX_STRING_LEN, "connection of type \"%s\" is not allowed for host"
@@ -277,19 +274,12 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
 		old_flag_v = (zbx_conn_flags_t)(SUCCEED == DBis_null(old_flag)) ? ZBX_CONN_DEFAULT : atoi(old_flag);
 		/* metadata is available only on Zabbix server */
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO OLD METADATA: ->%s<- HOST METADATA: ->%s<-", old_metadata, host_metadata);
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO REGISTER ME!!: %d",  DBis_null(old_flag));
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO REGISTER ME!!: %d",  strcmp(old_metadata, host_metadata));
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO REGISTER ME!!: %d", 	(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)));
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO REGISTER ME!!: %d", (ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)));
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO REGISTER ME!!: %d", (old_flag_v != flag));
 
 		if (SUCCEED == DBis_null(old_flag) || 0 != strcmp(old_metadata, host_metadata) ||
 				(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
 				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
 				(old_flag_v != flag))
 		{
-			zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO J REGISTER ME!!");
 			db_register_host(host, ip, port, sock->connection_type, host_metadata, flag, interface);
 		}
 

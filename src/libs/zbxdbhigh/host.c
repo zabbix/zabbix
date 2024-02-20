@@ -1768,7 +1768,6 @@ static void	get_templates_by_hostid(zbx_uint64_t hostid, zbx_vector_uint64_t *te
 
 	while (NULL != (row = DBfetch(result)))
 	{
-		zabbix_log(LOG_LEVEL_INFORMATION, "TORNADO_X: %lu", row[0]);
 		ZBX_STR2UINT64(templateid, row[0]);
 		zbx_vector_uint64_append(templateids, templateid);
 	}
