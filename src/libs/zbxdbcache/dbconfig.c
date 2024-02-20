@@ -452,7 +452,11 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 
 void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size)
 {
-	return zbx_hashset_insert_ext(hashset, &id, size, 0, ZBX_UNIQ_ENTRY);
+	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
+
+	buffer[0] = id;
+
+	return zbx_hashset_insert_ext(hashset, buffer, size, 0, ZBX_UNIQ_ENTRY);
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
