@@ -463,7 +463,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->prepareDataX();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(10);
-		$this->killComponent(self::COMPONENT_AGENT);
+		$this->startComponent(self::COMPONENT_AGENT);
 
 		//$this->reloadConfigurationCache();
 
