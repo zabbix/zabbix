@@ -179,7 +179,7 @@ class testTriggerLinking extends CIntegrationTest {
 	/**
 	* @inheritdoc
 	*/
-	public function prepareData() {
+	public function prepareDataX() {
 
 		$z = 'a';
 		/* There is divide by 2, since we create 2 triggers in every stage*/
@@ -458,9 +458,9 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_AGENT2);
 		$this->killComponent(self::COMPONENT_AGENT);
 		$this->killComponent(self::COMPONENT_SERVER);
-		DBexecute("DELETE from hosts");
-		DBexecute("DELETE from autoreg_host");
-
+		//DBexecute("DELETE from hosts");
+		//DBexecute("DELETE from autoreg_host");
+		prepareDataX();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(10);
 		$this->killComponent(self::COMPONENT_AGENT);
