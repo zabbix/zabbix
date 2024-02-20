@@ -504,7 +504,7 @@ class testTriggerLinking extends CIntegrationTest {
 		//sleep(5);
 		//$this->reloadConfigurationCache();
 		sleep(5);
-		$sql = "select hostid from hosts where host='" self::HOST_NAME "';";
+		$sql = "select hostid from hosts where host='".self::HOST_NAME. "';";
 		//$this->assertEquals(1, CDBHelper::getCount($sql));
 $res = DBfetch(DBselect($sql));
 $this->assertArrayHasKey('hostidZZZZ', $response['result'][0], "Res: ".$res." and hostid from API: ".$hostid);
