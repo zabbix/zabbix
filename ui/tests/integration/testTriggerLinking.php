@@ -497,7 +497,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
-		sleep(20);
+		sleep(5);
 
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
@@ -551,5 +551,8 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->assertEquals($entry['manual_close'],     self::TRIGGER_MANUAL_CLOSE, $ep);
 		$this->assertEquals($entry['expression'],  "{{$entry['functions'][0]['functionid']}}=99", $ep);
 		$this->assertEquals($entry['recovery_expression'],  "{{$entry['functions'][0]['functionid']}}=999", $ep);
+
+		$x = self::getLogPath(self::COMPONENT_SERVER);
+		$this->assertEquals('a', 'b',  $x);
 	}
 }
