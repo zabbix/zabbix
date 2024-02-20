@@ -38,8 +38,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	const HOST_NAME_SCREENSHOTS = 'pie-chart-';
 
 	/**
-	 * SQL query to get widget and widget_field tables to compare hash values, but without widget_fieldid
-	 * because it can change.
+	 * Gets widget and widget_field tables to compare hash values, excludes widget_fieldid because it can change.
 	 */
 	private $hash_sql = 'SELECT wf.widgetid, wf.type, wf.name, wf.value_int, wf.value_str, wf.value_groupid, wf.value_hostid,'.
 			' wf.value_itemid, wf.value_graphid, wf.value_sysmapid, w.widgetid, w.dashboard_pageid, w.type, w.name, w.x, w.y,'.
@@ -83,10 +82,10 @@ class testDashboardPieChartWidget extends CWebTest {
 		self::$dashboard_id = $dashboards['dashboardids'][0];
 
 		// Create a host for Pie chart testing.
-		$response = CDataHelper::createHosts([
+		CDataHelper::createHosts([
 			[
 				'host' => self::HOST_NAME_ITEM_LIST,
-				'groups' => [['groupid' => 6]], // Virtual machines.
+				'groups' => [['groupid' => 6]], // "Virtual machines"
 				'items' => [
 					[
 						'name' => 'item-1',
@@ -101,39 +100,8 @@ class testDashboardPieChartWidget extends CWebTest {
 						'value_type' => ITEM_VALUE_TYPE_UINT64
 					]
 				]
-			]/*,
-			[
-				'host' => self::HOST_NAME_SCREENSHOTS,
-				'groups' => [['groupid' => 6]], // Virtual machines.
-				'items' => [
-					[
-						'name' => 'item-1',
-						'key_' => 'item-1',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'item-2',
-						'key_' => 'item-2',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_UINT64
-					],
-					[
-						'name' => 'item-3',
-						'key_' => 'item-3',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_FLOAT
-					],
-					[
-						'name' => 'item-4',
-						'key_' => 'item-4',
-						'type' => ITEM_TYPE_TRAPPER,
-						'value_type' => ITEM_VALUE_TYPE_FLOAT
-					]
-				]
-			]*/
+			]
 		]);
-		//self::$item_ids = $response['itemids'];
 	}
 
 	/**
@@ -268,7 +236,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		$this->assertRangeSliderParameters($form, 'Space between sectors', ['min' => '0', 'max' => '10', 'step' => '1']);
 
-		// Check the checkbox and input elements of the 'Merge sectors smaller than' field, when it is disabled and enabled.
+		// Check states of the checkbox and input elements for 'Merge sectors smaller than' field.
 		foreach ([false, true] as $state) {
 			$form->fill(['id:merge' => $state]);
 			$form->invalidate();
@@ -296,7 +264,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			'Show total value' => false,
 			'Size' => 'Auto',
 			'Decimal places' => '2',
-			'Units' => false, // "Units" enable checkbox.
+			'Units' => false, // "Units" enable checkbox
 			'id:units' => '', // "Units" input
 			'Bold' => false,
 			'Colour' => null
@@ -744,31 +712,34 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Test opening Pie chart form and saving with no changes made.
-	 */
-	public  function testDashboardPieChartWidget_SimpleUpdate() {
-		$widget_name = 'Simple update pie chart';
-		$this->createCleanWidget($widget_name);
-		$old_hash = CDBHelper::getHash($this->hash_sql);
-
-		$dashboard = $this->openDashboard();
-		$old_widget_count = $dashboard->getWidgets()->count();
-		$form = $dashboard->edit()->getWidget($widget_name)->edit();
-		$form->submit();
-		$dashboard->save();
-
-		$dashboard = $this->openDashboard(false);
-		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
-		$this->assertEquals($old_hash, CDBHelper::getHash($this->hash_sql));
-	}
-
-	/**
 	 * Test updating of Pie chart.
 	 *
 	 * @dataProvider getPieChartData
 	 */
 	public function testDashboardPieChartWidget_Update($data){
 		$this->createUpdatePieChart($data, 'Edit widget');
+	}
+
+	/**
+	 * Test opening Pie chart form and saving with no changes made.
+	 */
+	public  function testDashboardPieChartWidget_SimpleUpdate() {
+		// Create base widget.
+		$widget_name = 'Simple update pie chart';
+		$this->createCleanWidget($widget_name);
+		$old_hash = CDBHelper::getHash($this->hash_sql);
+
+		// Open and do a simple update.
+		$dashboard = $this->openDashboard();
+		$old_widget_count = $dashboard->getWidgets()->count();
+		$form = $dashboard->edit()->getWidget($widget_name)->edit();
+		$form->submit();
+		$dashboard->save();
+
+		// Assert that nothing changed.
+		$dashboard = $this->openDashboard(false);
+		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
+		$this->assertEquals($old_hash, CDBHelper::getHash($this->hash_sql));
 	}
 
 	/**
@@ -819,7 +790,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->fillForm($form, $fields);
 		$form->submit();
 
-		// Transform the cloned data. The colors are expected to change.
+		// Transform input data to expected data. The colors are expected to change.
 		$fields['Data set'][1] = $fields['Data set'][0];
 		$fields['Data set'][1]['color'] = 'FF465C';
 		$fields['Data set'][3] = $fields['Data set'][2];
@@ -831,21 +802,21 @@ class testDashboardPieChartWidget extends CWebTest {
 
 	public function getCancelData() {
 		return [
-			// Cancel creating the widget.
+			// Cancel creation, save dashboard.
 			[
 				[
 					'save_widget' => false,
 					'save_dashboard' => true
 				]
 			],
-			// Cancel saving the dashboard after creating the widget.
+			// Create the widget, cancel saving the dashboard.
 			[
 				[
 					'save_widget' => true,
 					'save_dashboard' => false
 				]
 			],
-			// Cancel updating the widget.
+			// Cancel update, save dashboard.
 			[
 				[
 					'update' => true,
@@ -853,7 +824,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					'save_dashboard' => true
 				]
 			],
-			// Cancel saving the dashboard after updating the widget.
+			// Update but cancel saving the dashboard.
 			[
 				[
 					'update' => true,
@@ -865,25 +836,28 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Test cancel update and cancel create scenarios.
+	 * Test cancelling Pie chart creation and update.
 	 *
 	 * @dataProvider getCancelData
 	 */
 	public  function testDashboardPieChartWidget_Cancel($data) {
 		$update = CTestArrayHelper::get($data, 'update', false);
 		$widget_name = md5(serialize($data));
+
+		// Create a widget for updating.
 		if ($update) {
 			$this->createCleanWidget($widget_name);
 		}
-		$old_hash = CDBHelper::getHash($this->hash_sql);
 
+		// Get DB hash and widget count.
+		$old_hash = CDBHelper::getHash($this->hash_sql);
 		$dashboard = $this->openDashboard();
 		$old_widget_count = $dashboard->getWidgets()->count();
 
+		// Edit data in widget's form.
 		$form = $update
 			? $dashboard->edit()->getWidget($widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
-
 		$fields = [
 			'main_fields' => [
 				'Name' => 'This name should not be saved',
@@ -902,12 +876,9 @@ class testDashboardPieChartWidget extends CWebTest {
 				'Draw' => 'Doughnut'
 			]
 		];
-
-		// Change data before the cancel to make sure nothing was saved.
 		$this->fillForm($form, $fields);
 
-
-		// Save the widget or cancel.
+		// Save the widget OR cancel.
 		if (CTestArrayHelper::get($data, 'save_widget')) {
 			$form->submit();
 		}
@@ -920,60 +891,60 @@ class testDashboardPieChartWidget extends CWebTest {
 			$dashboard->save();
 		}
 
-		// Assert that the count of widgets and DB hash has not changed.
+		// Assert that widget count and DB data has not changed.
 		$dashboard = $this->openDashboard(false);
 		$this->assertEquals($old_widget_count, $dashboard->getWidgets()->count());
 		$this->assertEquals($old_hash, CDBHelper::getHash($this->hash_sql));
 	}
 
 	/**
-	 * Test deleting a Pie chart widget.
+	 * Test the deletion of the Pie chart widget.
 	 */
 	public function testDashboardPieChartWidget_Delete(){
-		$name = 'Pie chart for deletion';
-		$this->createCleanWidget($name);
-		$widget_id = CDBHelper::getValue('SELECT widgetid FROM widget WHERE name='.zbx_dbstr($name));
+		$widget_name = 'Pie chart for deletion';
+		$this->createCleanWidget($widget_name);
+		$widget_id = CDBHelper::getValue('SELECT widgetid FROM widget WHERE name='.zbx_dbstr($widget_name));
 
-		// Delete the widget and save dashboard.
+		// Delete the widget and save the dashboard.
 		$dashboard = $this->openDashboard();
 		$old_widget_count = $dashboard->getWidgets()->count();
-		$dashboard->edit()->deleteWidget($name)->save();
+		$dashboard->edit()->deleteWidget($widget_name)->save();
 		$this->page->waitUntilReady();
 		$this->assertMessage(TEST_GOOD, 'Dashboard updated');
 
 		// Assert that the widget has been deleted.
 		$this->assertEquals($old_widget_count - 1, $dashboard->getWidgets()->count());
-		$this->assertFalse($dashboard->getWidget($name, false)->isValid());
+		$this->assertFalse($dashboard->getWidget($widget_name, false)->isValid());
 
-		// Check both - widget and widget_field DB tables.
+		// Check DB tables widget and widget_field.
 		$sql = 'SELECT NULL FROM widget w CROSS JOIN widget_field wf'.
 				' WHERE w.widgetid='.zbx_dbstr($widget_id).' OR wf.widgetid='.zbx_dbstr($widget_id);
 		$this->assertEquals(0, CDBHelper::getCount($sql));
-
-		// Check by name too.
-		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM widget WHERE name='.zbx_dbstr($name)));
+		$this->assertEquals(0, CDBHelper::getCount('SELECT null FROM widget WHERE name='.zbx_dbstr($widget_name)));
 	}
 
 	/**
-	 * Prepares a dashboard with widgets for the Pie chart display scenario.
+	 * Prepare a dashboard with widgets for the Pie chart display scenario.
 	 */
 	public function preparePieChartDisplayData() {
 		// Create a host for Pie chart testing.
-		$hosts = [
+		$host_item_params = [
 			'one-item' => ['count' => 1, 'type' => ITEM_VALUE_TYPE_UINT64],
 			'two-items' => ['count' => 2, 'type' => ITEM_VALUE_TYPE_FLOAT],
 			'four-items' => ['count' => 4, 'type' => ITEM_VALUE_TYPE_FLOAT],
 			'doughnut' => ['count' => 4, 'type' => ITEM_VALUE_TYPE_UINT64],
 		];
 
-		$host_data = [];
+		// Host data array for API call.
+		$hosts = [];
 
-		foreach ($hosts as $host => $item_params) {
-			$item_data = [];
+		foreach ($host_item_params as $host => $item_params) {
+			// For all items of this host.
+			$items = [];
 
-			// Add as many items as needed.
+			// Generate items for this host.
 			for ($i = 1; $i <= $item_params['count']; $i++) {
-				$item_data[] = [
+				$items[] = [
 					'name' => 'item-'.$i,
 					'key_' => 'item-'.$i,
 					'type' => ITEM_TYPE_TRAPPER,
@@ -981,17 +952,18 @@ class testDashboardPieChartWidget extends CWebTest {
 				];
 			}
 
-			// Add host to the data array.
-			$host_data[] = [
+			// Add this host to all host array.
+			$hosts[] = [
 				'host' => self::HOST_NAME_SCREENSHOTS.$host,
-				'groups' => [['groupid' => 6]], // Virtual machines.
-				'items' => $item_data
+				'groups' => [['groupid' => 6]], // "Virtual machines"
+				'items' => $items
 			];
 		}
 
-		$response = CDataHelper::createHosts($host_data);
-		self::$item_ids = $response['itemids'];
+		// Create hosts with API and save item IDs for later.
+		self::$item_ids = CDataHelper::createHosts($hosts)['itemids'];
 
+		// Item history data.
 		$item_data = [
 			'one-item' => [
 				'item-1' => 99
@@ -1014,19 +986,20 @@ class testDashboardPieChartWidget extends CWebTest {
 			]
 		];
 
-		// Set item history.
+		// Set item history data - for each host.
 		foreach($item_data as $host => $items) {
-			// One item may have more than one history record.
+			// For each item.
 			foreach ($items as $item_key => $item_value) {
 				// Minus 10 seconds for safety.
 				$time = time() - 10;
+				// Set item data.
 				CDataHelper::addItemData(self::$item_ids[self::HOST_NAME_SCREENSHOTS.$host.':'.$item_key],
 						$item_value, $time
 				);
 			}
 		}
 
-		// Create dashboard
+		// Create a dashboard with widgets for the display test.
 		$response = CDataHelper::call('dashboard.create', [
 			'name' => 'Pie chart display dashboard',
 			'pages' => [
@@ -1039,8 +1012,16 @@ class testDashboardPieChartWidget extends CWebTest {
 							'width' => 12,
 							'height' => 8,
 							'fields' => [
-								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS],
-								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1']
+								[
+									'name' => 'ds.0.hosts.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => self::HOST_NAME_SCREENSHOTS
+								],
+								[
+									'name' => 'ds.0.items.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'item-1'
+								]
 							]
 						],
 						[
@@ -1052,10 +1033,26 @@ class testDashboardPieChartWidget extends CWebTest {
 							'x' => 12,
 							'y' => 0,
 							'fields' => [
-								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS.'one-item'],
-								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1'],
-								['name' => 'ds.0.data_set_label', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'TEST SET ☺'],
-								['name' => 'ds.0.dataset_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2]
+								[
+									'name' => 'ds.0.hosts.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => self::HOST_NAME_SCREENSHOTS.'one-item'
+								],
+								[
+									'name' => 'ds.0.items.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'item-1'
+								],
+								[
+									'name' => 'ds.0.data_set_label',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'TEST SET ☺'
+								],
+								[
+									'name' => 'ds.0.dataset_aggregation',
+									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+									'value' => 2
+								]
 							]
 						],
 						[
@@ -1067,11 +1064,31 @@ class testDashboardPieChartWidget extends CWebTest {
 							'x' => 0,
 							'y' => 8,
 							'fields' => [
-								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS.'two-items'],
-								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-1'],
-								['name' => 'ds.0.items.1', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-2'],
-								['name' => 'ds.0.aggregate_function', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 2],
-								['name' => 'legend_aggregation', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1]
+								[
+									'name' => 'ds.0.hosts.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => self::HOST_NAME_SCREENSHOTS.'two-items'
+								],
+								[
+									'name' => 'ds.0.items.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'item-1'
+								],
+								[
+									'name' => 'ds.0.items.1',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'item-2'
+								],
+								[
+									'name' => 'ds.0.aggregate_function',
+									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+									'value' => 2
+								],
+								[
+									'name' => 'legend_aggregation',
+									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+									'value' => 1
+								]
 							]
 						],
 						[
@@ -1083,10 +1100,26 @@ class testDashboardPieChartWidget extends CWebTest {
 							'x' => 12,
 							'y' => 8,
 							'fields' => [
-								['name' => 'ds.0.hosts.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => self::HOST_NAME_SCREENSHOTS.'four-*'],
-								['name' => 'ds.0.items.0', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'item-*'],
-								['name' => 'ds.0.color', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => 'FFA726'],
-								['name' => 'legend', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0]
+								[
+									'name' => 'ds.0.hosts.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => self::HOST_NAME_SCREENSHOTS.'four-*'
+								],
+								[
+									'name' => 'ds.0.items.0',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'item-*'
+								],
+								[
+									'name' => 'ds.0.color',
+									'type' => ZBX_WIDGET_FIELD_TYPE_STR,
+									'value' => 'FFA726'
+								],
+								[
+									'name' => 'legend',
+									'type' => ZBX_WIDGET_FIELD_TYPE_INT32,
+									'value' => 0
+								]
 							]
 						],
 						[
@@ -1151,14 +1184,13 @@ class testDashboardPieChartWidget extends CWebTest {
 				]
 			]
 		]);
-
 		$this->assertArrayHasKey('dashboardids', $response);
 		self::$display_dashboard_id = $response['dashboardids'][0];
 	}
 
 	public function getPieChartDisplayData() {
 		return [
-			// No data.
+			// Empty Pie chart (no items or data).
 			[
 				[
 					'widget_name' => 'no-data',
@@ -1186,7 +1218,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					]
 				]
 			],
-			// Four items, host and item pattern, mixed value types, custom color, hide legend and header.
+			// Four items, host and item pattern, custom colors, hide legend and header.
 			[
 				[
 					'widget_name' => 'four-items',
@@ -1199,7 +1231,7 @@ class testDashboardPieChartWidget extends CWebTest {
 					]
 				]
 			],
-			// Data set type Item list, Total item, merging enabled, doughnut with total value, custom legend display.
+			// Doughnut, data set type "Item list", Total item, merging enabled, total value display, custom legends.
 			[
 				[
 					'widget_name' => 'doughnut',
@@ -1215,17 +1247,18 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Generate different Pie charts and assert the display.
+	 * Generate different Pie charts and assert their display.
 	 *
 	 * @onBeforeOnce preparePieChartDisplayData
 	 * @dataProvider getPieChartDisplayData
 	 */
 	public function testDashboardPieChartWidget_PieChartDisplay($data) {
-		$this->page->login()->open('zabbix.php?action=dashboard.view&dashboardid='.self::$display_dashboard_id)->waitUntilReady();
+		$this->page->login()->
+				open('zabbix.php?action=dashboard.view&dashboardid='.self::$display_dashboard_id)->waitUntilReady();
 		$dashboard = CDashboardElement::find()->one();
 		$widget = $dashboard->getWidget($data['widget_name']);
 
-		// Only look sectors up if checking sectors.
+		// Only look sectors up if checking sectors at all.
 		if (CTestArrayHelper::get($data, 'expected_sectors')) {
 			$sectors = $widget->query('class:svg-pie-chart-arc')->waitUntilVisible()->all()->asArray();
 		}
@@ -1233,7 +1266,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Wait for the sector animation to end before clicking to increase test stability.
 		sleep(1);
 
-		// Assert Pie chart sectors by inspecting 'data-hintbox-contents' attribute.
+		// Assert Pie chart sectors.
 		foreach (CTestArrayHelper::get($data, 'expected_sectors', []) as $item_name => $expected_sector) {
 			// The name shown in the legend and in the hintbox.
 			$legend_name = self::HOST_NAME_SCREENSHOTS.$data['widget_name'].': '.$item_name;
@@ -1243,24 +1276,24 @@ class testDashboardPieChartWidget extends CWebTest {
 				$legend_name = CTestArrayHelper::get($data, 'expected_legend_function').'('.$legend_name.')';
 			}
 
-			// Special case - custom legend name.
-			if (CTestArrayHelper::get($data, 'expected_dataset_name')) {
-				$legend_name = $data['expected_dataset_name'];
-			}
-
 			// Special case - legend name is "Other" because sectors were merged.
 			if ($item_name === 'Other') {
 				$legend_name = 'Other';
 			}
 
-			// Check if any of the sectors matches the expected sector.
+			// Special case - custom legend name.
+			if (CTestArrayHelper::get($data, 'expected_dataset_name')) {
+				$legend_name = $data['expected_dataset_name'];
+			}
+
+			// Check if any visible sector matches the expected sector.
 			foreach ($sectors as $sector) {
-				// If 'data-hintbox-contents' attribute matches the sector.
+				// Check the correct sector by hintbox attribute.
 				if (strpos($sector->getAttribute('data-hintbox-contents'), $legend_name)) {
 					// Assert sector fill color.
 					$this->assertEquals($expected_sector['color'], $sector->getCSSValue('fill'));
 
-					// Open the hintbox and assert the value and legend color.
+					// Open and assert the hintbox.
 					$sector->click();
 					$hintbox = $this->query('class:overlay-dialogue')->asOverlayDialog()->waitUntilReady()->all()->last();
 					$this->assertEquals($legend_name.': '."\n".$expected_sector['value'], $hintbox->getText());
@@ -1275,7 +1308,7 @@ class testDashboardPieChartWidget extends CWebTest {
 			}
 
 			// Fail test if no match found.
-			$this->fail('Expected sector "'.$legend_name.': '.$expected_sector['value'].'" for item "'.$item_name.'" not found.');
+			$this->fail('Expected sector "'.$legend_name.': '.$expected_sector['value'].'" not found.');
 		}
 
 		// Assert expected Total value.
@@ -1286,7 +1319,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Make sure none of the sectors are hovered.
 		$this->query('id:page-title-general')->one()->hoverMouse();
 
-		// Wait for the sector animation to end before taking a screenshot.
+		// Wait for the sector hover animation to end before taking a screenshot.
 		sleep(1);
 
 		// Screenshot the widget.
@@ -1297,21 +1330,21 @@ class testDashboardPieChartWidget extends CWebTest {
 	/**
 	 * Creates or updates a widget according to data from data provider.
 	 *
-	 * @param array  $data                data from data provider
-	 * @param string $edit_widget_name    if this is set, then a widget named like this is updated
+	 * @param array  $data                  data from data provider
+	 * @param string $update_widget_name    if this is set, then a widget named like this is updated
 	 */
-	protected function createUpdatePieChart($data, $edit_widget_name = null) {
-		if ($edit_widget_name) {
-			$this->createCleanWidget($edit_widget_name);
+	protected function createUpdatePieChart($data, $update_widget_name = null) {
+		// Create a widget for update.
+		if ($update_widget_name) {
+			$this->createCleanWidget($update_widget_name);
 		}
 
+		// Open the Pie chart form and fill data.
 		$dashboard = $this->openDashboard();
 		$old_widget_count = $dashboard->getWidgets()->count();
-
-		$form = $edit_widget_name
-			? $dashboard->edit()->getWidget($edit_widget_name)->edit()
+		$form = $update_widget_name
+			? $dashboard->edit()->getWidget($update_widget_name)->edit()
 			: $dashboard->edit()->addWidget()->asForm();
-
 		$this->fillForm($form, $data['fields']);
 		$form->submit();
 
@@ -1319,12 +1352,12 @@ class testDashboardPieChartWidget extends CWebTest {
 		$this->assertEditFormAfterSave($dashboard, $data);
 
 		// Check total Widget count.
-		$count_added = (!$edit_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) ? 1 : 0;
+		$count_added = (!$update_widget_name && CTestArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) ? 1 : 0;
 		$this->assertEquals($old_widget_count + $count_added, $dashboard->getWidgets()->count());
 	}
 
 	/**
-	 * Checks the hintboxes in the Create/Edit form for both Data set forms.
+	 * Checks the hintboxes in the Data set tab.
 	 *
 	 * @param CFormElement $form    data set form
 	 */
@@ -1335,8 +1368,8 @@ class testDashboardPieChartWidget extends CWebTest {
 			'Data set label' => 'Also used as legend label for aggregated data sets.'
 		];
 
+		// For each hintbox - open, assert text, close.
 		foreach ($hints as $field => $text) {
-			// Summon the hint-box, assert text and close.
 			$form->getLabel($field)->query('xpath:./button[@data-hintbox]')->one()->waitUntilClickable()->click();
 			$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()->waitUntilPresent()->one();
 			$this->assertEquals($text, $hint->getText());
@@ -1345,7 +1378,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Asserts that a range/slider input is displayed as expected.
+	 * Asserts range input attributes.
 	 *
 	 * @param CFormElement $form               parent form
 	 * @param string       $label              label of the range input
@@ -1353,6 +1386,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	 */
 	protected function assertRangeSliderParameters($form, $label, $expected_values) {
 		$range = $form->getField($label)->query('xpath:.//input[@type="range"]')->one();
+
 		foreach ($expected_values as $attribute => $expected_value) {
 			$this->assertEquals($expected_value, $range->getAttribute($attribute));
 		}
@@ -1387,7 +1421,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Asserts that the data is saved and displayed as expected in the Edit form.
+	 * Asserts that data is saved and displayed as expected in the edit form.
 	 *
 	 * @param CDashboardElement $dashboard    dashboard element
 	 * @param array             $data         data from data provider
@@ -1412,12 +1446,14 @@ class testDashboardPieChartWidget extends CWebTest {
 			$main_fields['Name'] = $widget_name;
 			$form->checkValue($main_fields);
 
-			$data_sets = $this->extractDataSets($data['fields']);
-			$last = count($data_sets) - 1;
+			// Get expected data set data.
+			$expected_data_sets = $this->extractDataSets($data['fields']);
+			$last_data_set = count($expected_data_sets) - 1;
 
-			// Check Data set tab.
-			foreach ($data_sets as $i => $data_set) {
+			// For each expected data set.
+			foreach ($expected_data_sets as $i => $data_set) {
 				$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
+				// There is no actual "Type" field in the form.
 				unset($data_set['type']);
 
 				// Additional steps for Item list.
@@ -1426,27 +1462,30 @@ class testDashboardPieChartWidget extends CWebTest {
 					foreach ($data_set['items'] as $item) {
 						$this->assertTrue($form->query('link', $data_set['host'].': '.$item['name'])->exists());
 					}
-
+					// There is no "Host" field for Item lists.
 					unset($data_set['host']);
 				}
+
+				// Check data set form.
 				$data_set = $this->remapDataSet($data_set, $i);
 				$form->checkValue($data_set);
 
 				// Check data set label.
 				$label = CTestArrayHelper::get($data_set, 'Data set label', 'Data set #'.$i + 1);
 				$this->assertEquals($label,
-					$form->query('xpath:.//li[@data-set="'.$i.'"]//label[@class="sortable-drag-handle js-dataset-label"]')->one()->getText()
+						$form->query('xpath:.//li[@data-set="'.$i.'"]//label[@class="sortable-drag-handle js-dataset-label"]')->
+						one()->getText()
 				);
 
 				// Open the next data set, if it exists.
-				if ($i !== $last) {
+				if ($i !== $last_data_set) {
 					$form->query('xpath:.//li[contains(@class, "list-accordion-item")]['.
 							($i + 2).']//button[contains(@class, "list-accordion-item-toggle")]')->one()->click();
 					$form->invalidate();
 				}
 			}
 
-			// Check values in other tabs.
+			// Check forms of other tabs.
 			$tabs = ['Displaying options', 'Time period', 'Legend'];
 			foreach ($tabs as $tab) {
 				if (array_key_exists($tab, $data['fields'])) {
@@ -1455,13 +1494,13 @@ class testDashboardPieChartWidget extends CWebTest {
 				}
 			}
 
-			// Assert DB record exists.
+			// Assert that DB record exists.
 			$this->assertEquals(1, CDBHelper::getCount($count_sql));
 		}
 		else {
-			$this->assertMessage(TEST_BAD, null, $data['error']);
+			// When error expected.
 
-			// Assert DB record does not exist.
+			$this->assertMessage(TEST_BAD, null, $data['error']);
 			$this->assertEquals(0, CDBHelper::getCount($count_sql));
 		}
 
@@ -1485,7 +1524,6 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		if ($delete || $remake) {
 			$form->query('xpath:.//button[@title="Delete"]')->one()->click();
-
 			if ($remake) {
 				$form->query('button:Add new data set')->one()->click();
 				$form->invalidate();
@@ -1515,6 +1553,7 @@ class testDashboardPieChartWidget extends CWebTest {
 		// Count of data sets that already exist (needed for updating).
 		$count_sets = $form->query('xpath:.//li[contains(@class, "list-accordion-item")]')->all()->count();
 
+		// For each data set to fill.
 		foreach ($data_sets as $i => $data_set) {
 			$type = CTestArrayHelper::get($data_set, 'type', self::TYPE_ITEM_PATTERN);
 			unset($data_set['type']);
@@ -1567,10 +1606,10 @@ class testDashboardPieChartWidget extends CWebTest {
 	}
 
 	/**
-	 * Adds a new Data set of the correct type.
+	 * Clicks the correct "Add new data set" button.
 	 *
-	 * @param CFormElement $form      widget edit form element
-	 * @param string       $type      type of the data set
+	 * @param CFormElement $form      widget edit form
+	 * @param string       $type      type of data set
 	 * @param boolean      $button    for "Item pattern" only: use "Add new data set" button if true, or select from context menu if false
 	 */
 	protected function addNewDataSet($form, $type = null, $button = true) {
@@ -1591,7 +1630,7 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * @return array             remapped Data set
 	 */
 	protected function remapDataSet($data_set, $number) {
-		// Key - selector mapping.
+		// Simple selector to the actual selector mapping.
 		$mapping = [
 			'host' => 'xpath:.//div[@id="ds_'.$number.'_hosts_"]/..',
 			'item' => 'xpath:.//div[@id="ds_'.$number.'_items_"]/..',
@@ -1602,7 +1641,7 @@ class testDashboardPieChartWidget extends CWebTest {
 
 		// Exchange the keys for the actual selectors and clear the old key.
 		foreach ($data_set as $data_set_key => $data_set_value) {
-			// Only change mapped keys.
+			// Only change mapped selectors.
 			if (array_key_exists($data_set_key, $mapping)) {
 				$data_set += [$mapping[$data_set_key] => $data_set_value];
 				unset($data_set[$data_set_key]);
@@ -1613,9 +1652,9 @@ class testDashboardPieChartWidget extends CWebTest {
 		if (array_key_exists('items', $data_set)) {
 			// An Item list can have several items.
 			foreach ($data_set['items'] as $item_id => $item) {
-
 				// An item can have several fields.
 				foreach ($item as $field_key => $field_value) {
+					// Only change mapped selectors.
 					if (array_key_exists($field_key, $mapping)) {
 						// Set the item ID in selector, it starts at 1.
 						$mapped_value = str_replace('{id}', $item_id + 1, $mapping[$field_key]);
@@ -1638,14 +1677,17 @@ class testDashboardPieChartWidget extends CWebTest {
 	 * @return array           field data with default values set
 	 */
 	protected function extractDataSets($fields) {
+		// Add one default data set if none defined.
 		$data_sets = array_key_exists('Data set', $fields)
 			? $fields['Data set']
 			: ['host' => 'Test Host', 'item' => 'Test Item'];
 
+		// Set as an array of data sets if needed.
 		if (CTestArrayHelper::isAssociative($data_sets)) {
 			$data_sets = [$data_sets];
 		}
 
+		// Set default values for any empty data sets.
 		foreach ($data_sets as $i => $data_set) {
 			if ($data_set === []) {
 				$data_sets[$i] = ['host' => 'Test Host '.$i, 'item' => 'Test Item '.$i];
@@ -1686,28 +1728,28 @@ class testDashboardPieChartWidget extends CWebTest {
 		if ($login) {
 			$this->page->login();
 		}
-
 		$this->page->open('zabbix.php?action=dashboard.view&dashboardid='.self::$dashboard_id)->waitUntilReady();
 		return CDashboardElement::find()->one();
 	}
 
 	/**
-	 * Checks visible labels inside an element. Fails if a label is missing or if there are unexpected labels.
+	 * Checks visible labels inside an element (form). Fails if a label is missing or if there are unexpected labels.
 	 *
-	 * @param CElement $element    element to check
-	 * @param array    $labels     list of all expected visible labels
+	 * @param CElement $element            element to check
+	 * @param array    $expected_labels    list of all expected visible labels
 	 */
-	protected function assertAllVisibleLabels($element, $labels) {
-		// There are weird labels in this form but at the same time we don't need to match all of them, for example radio buttons.
-		$label_selector = 'xpath:.//div[@class="form-grid"]/label'. // standart case
+	protected function assertAllVisibleLabels($element, $expected_labels) {
+		// There are weird labels in this form but at the same time we don't need to match all labels, for example radio buttons.
+		$label_selector = 'xpath:.//div[@class="form-grid"]/label'. // standard case
 				' | .//div[@class="form-field"]/label'. // when the label is a child of the actual field
 				' | .//label[@class="sortable-drag-handle js-dataset-label"]'; // this matches data set labels
 		$actual_labels = $element->query($label_selector)->all()->filter(CElementFilter::VISIBLE)->asText();
 
-		// Remove empty labels (for checkboxes) from the list.
+		// Remove empty labels (checkbox styling is a label) from the list.
 		$actual_labels = array_filter($actual_labels);
 
-		$this->assertEqualsCanonicalizing($labels, $actual_labels,
+		// Make sure expected and actual labels match, but ignore the order.
+		$this->assertEqualsCanonicalizing($expected_labels, $actual_labels,
 				'The expected visible labels and the actual visible labels are different.'
 		);
 	}
