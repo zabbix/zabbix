@@ -102,8 +102,8 @@ ZBX_DC_LOGITEM;
 
 typedef union
 {
-	ZBX_DC_NUMITEM		*numitem;
-	ZBX_DC_LOGITEM		*logitem;
+	ZBX_DC_NUMITEM	*numitem;
+	ZBX_DC_LOGITEM	*logitem;
 }
 ZBX_DC_ITEMVALUETYPE;
 

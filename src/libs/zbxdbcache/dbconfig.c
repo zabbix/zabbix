@@ -452,7 +452,7 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 
 void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size)
 {
-	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
+	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCinsert_id() can be called for */
 
 	buffer[0] = id;
 
