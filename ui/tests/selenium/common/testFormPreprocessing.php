@@ -1099,7 +1099,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'json-wrong-parameter-space'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu usage_system']
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu usage_system']
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
 				]
@@ -1112,7 +1112,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'json-wrong-parameter-slash'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus to JSON',  'parameter_1' => 'cpu\\']
+						['type' => 'Prometheus to JSON', 'parameter_1' => 'cpu\\']
 
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
@@ -1126,7 +1126,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'Key' => 'json-wrong-parameter-digits'
 					],
 					'preprocessing' => [
-						['type' => 'Prometheus to JSON',  'parameter_1' => '123']
+						['type' => 'Prometheus to JSON', 'parameter_1' => '123']
 
 					],
 					'error' => 'Incorrect value for field "params": invalid Prometheus pattern.'
@@ -2673,7 +2673,7 @@ abstract class testFormPreprocessing extends CWebTest {
 	 */
 	public function getItemInheritancePreprocessing() {
 		$data = $this->getCommonInheritancePreprocessing();
-		$data[0][0]['preprocessing'] =  array_merge([
+		$data[0][0]['preprocessing'] = array_merge([
 					[
 						'type' => 'Check for not supported value'
 					],
@@ -2985,7 +2985,7 @@ abstract class testFormPreprocessing extends CWebTest {
 						'parameters' => [
 							['placeholder' => '<metric name>{<label name>="<label value>", ...} == <value>'],
 							['selector' => 'xpath:.//z-select[contains(@class, "preproc-param")]', 'value' => 'value'],
-							['placeholder' => '<label name>'],
+							['placeholder' => '<label name>']
 						]
 					],
 					[

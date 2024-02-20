@@ -428,7 +428,7 @@ class testFormPreprocessingLowLevelDiscovery extends testFormPreprocessing {
 	}
 
 	/**
-	 *  @dataProvider getLLDParametersData
+	 * @dataProvider getLLDParametersData
 	 */
 	public function testFormPreprocessingLowLevelDiscovery_CheckParametersPlaceholders($data) {
 		$this->checkParameters($data);

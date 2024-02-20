@@ -246,7 +246,7 @@ class testFormPreprocessingItem extends testFormPreprocessing {
 	}
 
 	/**
-	 *  @dataProvider getItemsParametersData
+	 * @dataProvider getItemsParametersData
 	 */
 	public function testFormPreprocessingItem_CheckParametersPlaceholders($data) {
 		$this->checkParameters($data);

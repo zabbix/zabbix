@@ -162,7 +162,7 @@ class testFormPreprocessingItemPrototype extends testFormPreprocessing {
 	}
 
 	/**
-	 *  @dataProvider getItemsParametersData
+	 * @dataProvider getItemsParametersData
 	 */
 	public function testFormPreprocessingItemPrototype_CheckParametersPlaceholders($data) {
 		$this->checkParameters($data);
