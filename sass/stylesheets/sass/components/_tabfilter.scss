@@ -193,18 +193,32 @@
 	}
 
 	.ui-sortable-container {
-		// Tab sortable handle left border is visible when handle is not selected, do not have selected sibling before and is not dragged.
-		.tabfilter-item-label.sortable-item-dragging,
-		.tabfilter-item-label:not(.selected) {
-			& + .tabfilter-item-label.ui-sortable-handle:not(.selected,.sortable-item-dragging) {
-				.tabfilter-item-link::before {
+		.tabfilter-item-label:not(:first-child) {
+			.tabfilter-item-link {
+				&::before {
 					content: ' ';
 					position: absolute;
 					top: 1px;
 					left: -3px;
 					display: inline-block;
 					height: 20px;
+					border-left: 1px solid transparent;
+				}
+
+				&.separated::before {
 					border-left: 1px solid $ui-tabfilter-item-border-color;
+				}
+			}
+		}
+
+		&.sortable-dragging {
+			.tabfilter-item-label:not(:first-child) {
+				.tabfilter-item-link {
+					&::before {
+						@if $ui-transitions {
+							transition: border-left-color $ui-transition-duration;
+						}
+					}
 				}
 			}
 		}

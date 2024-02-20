@@ -63,6 +63,13 @@ class CSortable {
 	static EVENT_DRAG_START = 'sortable-drag-start';
 
 	/**
+	 * Event fired on overtaking an item.
+	 *
+	 * @type {string}
+	 */
+	static EVENT_DRAG_OVERTAKE = 'sortable-drag-overtake';
+
+	/**
 	 * Event fired on end of dragging of an item.
 	 *
 	 * @type {string}
@@ -257,7 +264,7 @@ class CSortable {
 		if (item !== null) {
 			if (this.#revealItem(item)) {
 				if (immediate) {
-					this.#mutate(() => this.#resetTransitions());
+					this.mutate(() => this.#resetTransitions());
 				}
 			}
 		}
@@ -270,6 +277,19 @@ class CSortable {
 	 */
 	isScrollable() {
 		return this.#getScrollMax() > 0;
+	}
+
+	/**
+	 * Apply changes to items without modifying their order, size or positioning.
+	 *
+	 * @param {function} callback
+	 */
+	mutate(callback) {
+		const observe_mutations = this.#observeMutations(false);
+
+		callback();
+
+		this.#observeMutations(observe_mutations);
 	}
 
 	/**
@@ -337,7 +357,7 @@ class CSortable {
 			item.elements_live = this.#getLiveElements(item.elements);
 		}
 
-		this.#mutate(() => {
+		this.mutate(() => {
 			for (const item of this.#items) {
 				for (const element of item.elements_live) {
 					element.classList.add(CSortable.ZBX_STYLE_ITEM);
@@ -480,6 +500,11 @@ class CSortable {
 
 			this.#drag_overtake = overtake;
 
+			this.#fire(CSortable.EVENT_DRAG_OVERTAKE, {
+				index: this.#drag_index,
+				index_to: this.#drag_overtake
+			});
+
 			this.#render();
 		}
 
@@ -579,6 +604,15 @@ class CSortable {
 	}
 
 	#revealItem(item) {
+		const index = this.#items.indexOf(item);
+
+		if (index === 0) {
+			return this.#scrollTo(0);
+		}
+		else if (index === this.#items.length - 1) {
+			return this.#scrollTo(this.#getScrollMax());
+		}
+
 		const pos = item.pos + item.rel;
 
 		return this.#scrollTo(Math.min(pos, Math.max(this.#scroll_pos, pos + item.dim - this.#getTargetLoc().dim)));
@@ -589,7 +623,7 @@ class CSortable {
 
 		this.#target.classList.add(CSortable.ZBX_STYLE_DRAGGING);
 
-		this.#mutate(() => {
+		this.mutate(() => {
 			for (const element of this.#drag_item.elements_live) {
 				element.classList.add(CSortable.ZBX_STYLE_ITEM_DRAGGING);
 			}
@@ -624,7 +658,7 @@ class CSortable {
 
 		this.#target.classList.remove(CSortable.ZBX_STYLE_DRAGGING);
 
-		this.#mutate(() => {
+		this.mutate(() => {
 			for (const item of this.#items) {
 				for (const element of item.elements_live) {
 					element.classList.remove(CSortable.ZBX_STYLE_ITEM_DRAGGING);
@@ -804,14 +838,6 @@ class CSortable {
 		return !observe_intersection;
 	}
 
-	#mutate(callback) {
-		const observe_mutations = this.#observeMutations(false);
-
-		callback();
-
-		this.#observeMutations(observe_mutations);
-	}
-
 	#hasTransitions() {
 		return this.#transitions.size > 0;
 	}
@@ -980,6 +1006,7 @@ class CSortable {
 			}
 
 			e.preventDefault();
+			e.stopImmediatePropagation();
 
 			const index = this.#items.indexOf(item);
 			const index_to = index + direction;
@@ -991,7 +1018,7 @@ class CSortable {
 
 			this.#items.splice(index, 0, ...this.#items.splice(index_to, 1));
 
-			this.#mutate(() => this.#resetTransitions());
+			this.mutate(() => this.#resetTransitions());
 
 			this.#updateItemsLoc();
 
@@ -1003,7 +1030,17 @@ class CSortable {
 		},
 
 		focusIn: (e) => {
-			this.#target[this.#is_horizontal ? 'scrollLeft' : 'scrollTop'] = 0;
+			let scroll_parent = this.#target;
+
+			while (scroll_parent !== null) {
+				if (getComputedStyle(scroll_parent)[this.#is_horizontal ? 'overflowX' : 'overflowY'] === 'hidden') {
+					scroll_parent[this.#is_horizontal ? 'scrollLeft' : 'scrollTop'] = 0;
+
+					break;
+				}
+
+				scroll_parent = scroll_parent.parentElement;
+			}
 
 			const item = this.#matchItem(e.target);
 

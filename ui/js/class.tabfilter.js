@@ -24,6 +24,11 @@ const TABFILTER_EVENT_NEWITEM = 'newitem.tabfilter';
 
 class CTabFilter extends CBaseComponent {
 
+	/**
+	 * @type {CSortable|null}
+	 */
+	#tabs_sortable = null;
+
 	constructor(target, options) {
 		super(target);
 		this._options = options;
@@ -41,6 +46,8 @@ class CTabFilter extends CBaseComponent {
 		this.init(options);
 		this.registerEvents();
 		this.initItemUnsavedState(this._active_item, this._active_item._data);
+
+		this.scrollIntoView(this._items[options.selected]);
 
 		if (this._timeselector instanceof CTabFilterItem) {
 			this._timeselector._data = options.timeselector;
@@ -83,18 +90,16 @@ class CTabFilter extends CBaseComponent {
 	/**
 	 * Ensures item label is visible in tab filter navigation.
 	 *
-	 * @param {CTabfilterItem} item    Filter item object.
+	 * @param {CTabFilterItem} item  Filter item object.
 	 */
 	scrollIntoView(item) {
-		let scrollable_parent = item._target.closest('.ui-sortable-container').parentNode;
-
-		scrollable_parent.scrollLeft = item._target.parentNode.offsetLeft - item._target.parentNode.clientWidth;
+		setTimeout(() => this.#tabs_sortable.scrollIntoView(item._target.parentNode, {immediate: true}));
 	}
 
 	/**
 	 * Render filter with profiles stored data to hidden container to get source url for unsaved state comparison.
 	 *
-	 * @param {CTabfilterItem} item    Selected filter object.
+	 * @param {CTabFilterItem} item    Selected filter object.
 	 * @param {object} filter_data     Selected filter object filter data.
 	 */
 	initItemUnsavedState(item, filter_data) {
@@ -308,7 +313,6 @@ class CTabFilter extends CBaseComponent {
 
 		if (item !== this._timeselector) {
 			item._target.setAttribute('tabindex', 0);
-			this.scrollIntoView(item);
 			item.setBrowserLocationToApplyUrl();
 		}
 
@@ -320,6 +324,41 @@ class CTabFilter extends CBaseComponent {
 					_item._target.setAttribute('tabindex', -1);
 				}
 			}
+		}
+
+		this.#updateSeparators();
+	}
+
+	/**
+	 * Update separated state of items (whether to visually separate one item from another).
+	 */
+	#updateSeparators() {
+		for (let index = 0; index < this._items.length; index++) {
+			this._items[index].setSeparated(
+				index > 0 && !this._items[index].isSelected() && !this._items[index - 1].isSelected()
+			);
+		}
+	}
+
+	/**
+	 * Update separated state of items (whether to visually separate one item from another) for dragging.
+	 *
+	 * @param {number} index     Index of item being dragged.
+	 * @param {number} index_to  Overtake index.
+	 */
+	#updateSeparatorsForDragging(index, index_to) {
+		const items = [...this._items];
+
+		items.splice(index_to, 0, ...items.splice(index, 1));
+
+		for (let index = 0; index < items.length; index++) {
+			const separated_state = index > 0
+				&& index !== index_to
+				&& index !== index_to + 1
+				&& !items[index].isSelected()
+				&& !items[index - 1].isSelected();
+
+			this.#tabs_sortable.mutate(() => items[index].setSeparated(separated_state));
 		}
 	}
 
@@ -406,8 +445,6 @@ class CTabFilter extends CBaseComponent {
 							this._options.selected = item._index;
 						});
 					}
-
-					this.scrollIntoView(item);
 				}
 
 				if (item !== this._active_item) {
@@ -469,22 +506,56 @@ class CTabFilter extends CBaseComponent {
 			},
 
 			/**
-			 * UI sortable update event handler. Updates tab sorting in profile.
+			 * Listener for tabs event {CSortable.EVENT_DRAG_START}.
+			 *
+			 * Updates separated state of items.
+			 *
+			 * @param {Object} ev
 			 */
-			tabSortChanged: (e) => {
-				this._items.splice(e.detail.index_to, 0, ...this._items.splice(e.detail.index, 1));
+			tabsDragStart: (ev) => {
+				this.#updateSeparatorsForDragging(ev.detail.index, ev.detail.index_to);
+			},
 
-				// Tab order changed, update changes via ajax.
-				let value_str = this._items.map((item) => item._index).join(',');
+			/**
+			 * Listener for tabs event {CSortable.EVENT_DRAG_OVERTAKE}.
+			 *
+			 * Updates separated state of items.
+			 *
+			 * @param ev
+			 */
+			tabsDragOvertake: (ev) => {
+				this.#updateSeparatorsForDragging(ev.detail.index, ev.detail.index_to);
+			},
 
-				this.profileUpdate('taborder', {
-					value_str: value_str
-				})
-				.then(() => {
-					this._items.forEach((item, index) => {
-						item._index = index;
-					});
-				});
+			/**
+			 * Listener for tabs event {CSortable.EVENT_DRAG_END}.
+			 *
+			 * Updates tab sorting in profile as well as separated state of items.
+			 *
+			 * @param ev
+			 */
+			tabsDragEnd: (ev) => {
+				for (const item of this._items) {
+					if (item._target.parentNode.classList.contains(TABFILTERITEM_STYLE_FOCUSED)) {
+						item.setFocused();
+					}
+				}
+
+				if (ev.detail.index_to == ev.detail.index) {
+					this.#updateSeparators();
+				}
+			},
+
+			tabsSort: (ev) => {
+				this._items.splice(ev.detail.index_to, 0, ...this._items.splice(ev.detail.index, 1));
+
+				const value_str = this._items.map(item => item._index).join(',');
+
+				this._items.forEach((item, index) => item._index = index);
+
+				this.#updateSeparators();
+
+				this.profileUpdate('taborder', {value_str});
 			},
 
 			/**
@@ -697,16 +768,6 @@ class CTabFilter extends CBaseComponent {
 
 					cancelEvent(ev);
 				}
-			},
-
-			/**
-			 * Scroll horizontally with mouse wheel handler for sortable items container.
-			 */
-			mouseWheelHandler: (container, ev) => {
-				if ((ev.deltaY < 0 && container.scrollLeft > 0)
-						|| (ev.deltaY > 0 && container.scrollLeft < container.scrollWidth - container.clientWidth)) {
-					container.scrollBy({left: ev.deltaY});
-				}
 			}
 		}
 
@@ -718,25 +779,14 @@ class CTabFilter extends CBaseComponent {
 				.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 		}
 
-		new CSortable(this._target.querySelector('.ui-sortable-container'), {
+		this.#tabs_sortable = new CSortable(this._target.querySelector('.ui-sortable-container'), {
 			is_horizontal: true,
 			freeze_start: 1
 		})
-			.on(CSortable.EVENT_DRAG_END, (e) => {
-				this._items[e.detail.index]._target.closest('.tabfilter-item-label').classList
-					.remove(TABFILTERITEM_STYLE_FOCUSED);
-			})
-			.on(CSortable.EVENT_SORT, this._events.tabSortChanged);
-
-		const container = this._target.querySelector('.ui-sortable-container').parentNode;
-
-		try {
-			addEventListener('test', null, {get passive() {}});
-			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev), {passive: true});
-		}
-		catch(e) {
-			container.addEventListener('wheel', ev => this._events.mouseWheelHandler(container, ev));
-		}
+			.on(CSortable.EVENT_DRAG_START, this._events.tabsDragStart)
+			.on(CSortable.EVENT_DRAG_OVERTAKE, this._events.tabsDragOvertake)
+			.on(CSortable.EVENT_DRAG_END, this._events.tabsDragEnd)
+			.on(CSortable.EVENT_SORT, this._events.tabsSort);
 
 		for (const action of this._target.querySelectorAll('nav [data-action]')) {
 			action.addEventListener('click', this._events[action.getAttribute('data-action')]);

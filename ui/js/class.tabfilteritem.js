@@ -33,6 +33,7 @@ const TABFILTERITEM_STYLE_SELECTED = 'selected';
 const TABFILTERITEM_STYLE_EXPANDED = 'expanded';
 const TABFILTERITEM_STYLE_DISABLED = 'disabled';
 const TABFILTERITEM_STYLE_FOCUSED = 'focused';
+const TABFILTERITEM_STYLE_SEPARATED = 'separated';
 
 class CTabFilterItem extends CBaseComponent {
 
@@ -213,7 +214,7 @@ class CTabFilterItem extends CBaseComponent {
 	 * Set browser focus to filter label element.
 	 */
 	setFocused() {
-		this._target.focus();
+		this._target.focus({preventScroll: true});
 	}
 
 	/**
@@ -291,6 +292,15 @@ class CTabFilterItem extends CBaseComponent {
 	setDisabled(state) {
 		this.toggleClass(TABFILTERITEM_STYLE_DISABLED, state);
 		this._target.parentNode.classList.toggle(TABFILTERITEM_STYLE_DISABLED, state);
+	}
+
+	/**
+	 * Set item separated state (whether to visually separate the item from the previous one).
+	 *
+	 * @param {boolean} state
+	 */
+	setSeparated(state) {
+		this.toggleClass(TABFILTERITEM_STYLE_SEPARATED, state);
 	}
 
 	/**

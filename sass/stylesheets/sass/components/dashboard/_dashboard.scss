@@ -60,8 +60,6 @@
 	.sortable {
 		// Accommodate 2px shadow of focused tabs.
 		padding: 2px 0;
-		// Hide the invisible tab paddings.
-		margin: 0 -1.5px;
 
 		display: flex;
 		align-items: center;
