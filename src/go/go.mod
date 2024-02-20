@@ -17,7 +17,7 @@ require (
 	github.com/miekg/dns v1.1.43
 	github.com/natefinch/npipe v0.0.0-20160621034901-c1b8fa8bdcce
 	github.com/omeid/go-yarn v0.0.1
-	golang.org/x/sys v0.15.0
+	golang.org/x/sys v0.17.0
 	gopkg.in/mgo.v2 v2.0.0-20190816093944-a6b53ec6cb22
 )
 
@@ -32,7 +32,7 @@ require (
 	github.com/jackc/pgtype v1.4.3-0.20200905161353-e7d2b057a716 // indirect
 	github.com/jackc/puddle v1.1.2-0.20200821025810-91d0159cc97a // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	golang.org/x/crypto v0.16.0 // indirect
+	golang.org/x/crypto v0.19.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
