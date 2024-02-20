@@ -1497,7 +1497,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-
 	if (ITEM_TYPE_IPMI == item->type)
 	{
 		ipmiitem = item->itemtype.ipmiitem;

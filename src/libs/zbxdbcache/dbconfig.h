@@ -221,17 +221,17 @@ ZBX_DC_SCRIPTITEM;
 
 typedef union
 {
-	ZBX_DC_SNMPITEM		*snmpitem;
-	ZBX_DC_CALCITEM		*calcitem;
-	ZBX_DC_DEPENDENTITEM	*depitem;
-	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_TRAPITEM		*trapitem;
+	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_DBITEM		*dbitem;
+	ZBX_DC_IPMIITEM		*ipmiitem;
 	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
-	ZBX_DC_SIMPLEITEM	*simpleitem;
+	ZBX_DC_CALCITEM		*calcitem;
 	ZBX_DC_JMXITEM		*jmxitem;
+	ZBX_DC_DEPENDENTITEM	*depitem;
 	ZBX_DC_HTTPITEM		*httpitem;
+	ZBX_DC_SNMPITEM		*snmpitem;
 	ZBX_DC_SCRIPTITEM	*scriptitem;
 }
 ZBX_DC_ITEMTYPE;
