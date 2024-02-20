@@ -510,7 +510,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$sql = "select hostid from hosts where host='".self::HOST_NAME. "';";
 		//$this->assertEquals(1, CDBHelper::getCount($sql));
 $res = DBfetch(DBselect($sql));
-$this->assertArrayHasKey('hostidZZZZ', $response, "Res: ".$res." and hostid from API: ".$hostid);
+$this->assertArrayHasKey('hostidZZZZ', $response, "Res: ".json_encode($res)." and hostid from API: ".$hostid);
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'query [txnlev:1] [insert into triggers', true, 120);
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
