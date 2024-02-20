@@ -1539,27 +1539,33 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	else if (NULL != logitem)
 		return FAIL;
 
-	dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&dbsync_env.cache->dbitems, &item->itemid);
-	if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *dbrow[11])
+
+	if (ITEM_TYPE_DB_MONITOR == item->type)
 	{
-		if (NULL == dbitem)
-			return FAIL;
+		dbitem = item->itemtype.dbitem;
 
-		if (FAIL == dbsync_compare_str(dbrow[11], dbitem->params))
-			return FAIL;
+		if ('\0' != *dbrow[11])
+		{
+			if (NULL == dbitem)
+				return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], dbitem->username))
-			return FAIL;
+			if (FAIL == dbsync_compare_str(dbrow[11], dbitem->params))
+				return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[15], dbitem->password))
+			if (FAIL == dbsync_compare_str(dbrow[14], dbitem->username))
+				return FAIL;
+
+			if (FAIL == dbsync_compare_str(dbrow[15], dbitem->password))
+				return FAIL;
+		}
+		else if (NULL != dbitem)
 			return FAIL;
 	}
-	else if (NULL != dbitem)
-		return FAIL;
 
-	sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&dbsync_env.cache->sshitems, &item->itemid);
 	if (ITEM_TYPE_SSH == item->type)
 	{
+		sshitem = item->itemtype.sshitem;
+
 		if (NULL == sshitem)
 			return FAIL;
 
@@ -1581,8 +1587,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[13], sshitem->params))
 			return FAIL;
 	}
-	else if (NULL != sshitem)
-		return FAIL;
 
 	telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&dbsync_env.cache->telnetitems, &item->itemid);
 	if (ITEM_TYPE_TELNET == item->type)

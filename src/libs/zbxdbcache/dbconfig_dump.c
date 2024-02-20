@@ -611,8 +611,6 @@ static void	DCdump_items(void)
 	zbx_trace_item_t	trace_items[] =
 	{
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
-		{&config->dbitems, (zbx_dc_dump_func_t)DCdump_dbitem},
-		{&config->sshitems, (zbx_dc_dump_func_t)DCdump_sshitem},
 		{&config->telnetitems, (zbx_dc_dump_func_t)DCdump_telnetitem},
 		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
@@ -664,6 +662,12 @@ static void	DCdump_items(void)
 
 		if (ITEM_TYPE_TRAPPER == item->type)
 			DCdump_trapitem(item->itemtype.trapitem);
+
+		if (ITEM_TYPE_DB_MONITOR == item->type)
+			DCdump_dbitem(item->itemtype.dbitem);
+
+		if (ITEM_TYPE_SSH == item->type)
+			DCdump_sshitem(item->itemtype.sshitem);
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{

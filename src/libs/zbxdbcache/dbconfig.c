@@ -2701,44 +2701,193 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 
 static void	dc_item_free(ZBX_DC_ITEM *item, unsigned char type)
 {
-	if (ITEM_TYPE_SNMP == type)
+	switch (type)
 	{
-		/* remove SNMP parameters for non-SNMP item */
+		case ITEM_TYPE_SNMP:
+			/* remove SNMP parameters for non-SNMP item */
+			zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
 
-		zbx_strpool_release(item->itemtype.snmpitem->snmp_oid);
+			__config_mem_free_func(item->itemtype.snmpitem);
+			break;
+		case ITEM_TYPE_CALCULATED:
+			/* remove calculated item parameters */
 
-		__config_mem_free_func(item->itemtype.snmpitem);
+			if (NULL != item->itemtype.calcitem->formula_bin)
+				__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+			zbx_strpool_release(item->itemtype.calcitem->params);
+
+			__config_mem_free_func(item->itemtype.calcitem);
+			break;
+		case ITEM_TYPE_DEPENDENT:
+			dc_masteritem_remove_depitem(item->itemtype.depitem->master_itemid, item->itemid);
+
+			__config_mem_free_func(item->itemtype.depitem);
+			break;
+		case ITEM_TYPE_IPMI:
+			/* remove IPMI parameters for non-IPMI item */
+			zbx_strpool_release(item->itemtype.ipmiitem->ipmi_sensor);
+
+			__config_mem_free_func(item->itemtype.ipmiitem);
+			break;
+		case ITEM_TYPE_TRAPPER:
+			if (NULL != item->itemtype.trapitem)
+			{
+				zbx_strpool_release(item->itemtype.trapitem->trapper_hosts);
+				__config_mem_free_func(item->itemtype.trapitem);
+			}
+			break;
+
+		case ITEM_TYPE_DB_MONITOR:
+			if (NULL != item->itemtype.dbitem)
+			{
+				zbx_strpool_release(item->itemtype.dbitem->params);
+				zbx_strpool_release(item->itemtype.dbitem->username);
+				zbx_strpool_release(item->itemtype.dbitem->password);
+
+				__config_mem_free_func(item->itemtype.dbitem);
+			}
+			break;
+		case ITEM_TYPE_SSH:
+			zbx_strpool_release(item->itemtype.sshitem->username);
+			zbx_strpool_release(item->itemtype.sshitem->password);
+			zbx_strpool_release(item->itemtype.sshitem->publickey);
+			zbx_strpool_release(item->itemtype.sshitem->privatekey);
+			zbx_strpool_release(item->itemtype.sshitem->params);
+
+			__config_mem_free_func(item->itemtype.sshitem);
+			break;
 	}
-	else if (ITEM_TYPE_CALCULATED == type)
+}
+
+static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *last_type,
+		zbx_vector_ptr_t *dep_items, char **row)
+{
+	if (1 == found && *last_type != item->type)
 	{
-		/* remove calculated item parameters */
-
-		if (NULL != item->itemtype.calcitem->formula_bin)
-			__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
-		zbx_strpool_release(item->itemtype.calcitem->params);
-
-		__config_mem_free_func(item->itemtype.calcitem);
+		dc_item_free(item, *last_type);
+		found = 0;
 	}
-	else if (ITEM_TYPE_DEPENDENT == type)
-	{
-		dc_masteritem_remove_depitem(item->itemtype.depitem->master_itemid, item->itemid);
 
-		__config_mem_free_func(item->itemtype.depitem);
-	}
-	else if (ITEM_TYPE_IPMI == type)
+	switch (item->type)
 	{
-		/* remove IPMI parameters for non-IPMI item */
-		zbx_strpool_release(item->itemtype.ipmiitem->ipmi_sensor);
+		case ITEM_TYPE_SNMP:
+			if (0 == found)
+			{
+				item->itemtype.snmpitem = (ZBX_DC_SNMPITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_SNMPITEM));
+			}
 
-		__config_mem_free_func(item->itemtype.ipmiitem);
-	}
-	else if (ITEM_TYPE_TRAPPER == item->type)
-	{
-		if (NULL != item->itemtype.trapitem)
-		{
-			zbx_strpool_release(item->itemtype.trapitem->trapper_hosts);
-			__config_mem_free_func(item->itemtype.trapitem);
-		}
+			if (SUCCEED == DCstrpool_replace(found, &item->itemtype.snmpitem->snmp_oid, row[6]))
+			{
+				if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '{'))
+					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
+				else if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '['))
+					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
+				else
+					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
+			}
+			break;
+		case ITEM_TYPE_CALCULATED:
+			if (0 == found)
+			{
+				item->itemtype.calcitem = (ZBX_DC_CALCITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_CALCITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.calcitem->params, row[11]);
+
+			if (1 == found && NULL != item->itemtype.calcitem->formula_bin)
+				__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
+
+			item->itemtype.calcitem->formula_bin = config_decode_serialized_expression(row[49]);
+			break;
+		case ITEM_TYPE_DEPENDENT:
+			if (0 == found)
+			{
+				item->itemtype.depitem = (ZBX_DC_DEPENDENTITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_DEPENDENTITEM));
+			}
+
+			item->itemtype.depitem->itemid = item->itemid;
+
+			if (1 == found)
+				item->itemtype.depitem->last_master_itemid = item->itemtype.depitem->master_itemid;
+			else
+				item->itemtype.depitem->last_master_itemid = 0;
+
+			item->itemtype.depitem->flags = item->flags;
+			ZBX_DBROW2UINT64(item->itemtype.depitem->master_itemid, row[29]);
+
+			if (item->itemtype.depitem->last_master_itemid != item->itemtype.depitem->master_itemid)
+				zbx_vector_ptr_append(dep_items, item->itemtype.depitem);
+			break;
+		case ITEM_TYPE_IPMI:
+			if (0 == found)
+			{
+				item->itemtype.ipmiitem = (ZBX_DC_IPMIITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_IPMIITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.ipmiitem->ipmi_sensor, row[7]);
+			break;
+		case ITEM_TYPE_TRAPPER:
+			if ('\0' == *row[9])
+			{
+				if (1 == found)
+					dc_item_free(item, item->type);
+
+				item->itemtype.trapitem = NULL;
+				break;
+			}
+
+			if (1 == found && NULL == item->itemtype.trapitem)
+				found = 0;
+
+			if (0 == found)
+			{
+				item->itemtype.trapitem = (ZBX_DC_TRAPITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_TRAPITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.trapitem->trapper_hosts, row[9]);
+			break;
+		case ITEM_TYPE_DB_MONITOR:
+			if ('\0' == *row[11])
+			{
+				if (1 == found)
+					dc_item_free(item, item->type);
+
+				item->itemtype.dbitem = NULL;
+				break;
+			}
+
+			if (1 == found && NULL == item->itemtype.dbitem)
+				found = 0;
+
+			if (0 == found)
+			{
+				item->itemtype.dbitem = (ZBX_DC_DBITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_DBITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.dbitem->params, row[11]);
+			DCstrpool_replace(found, &item->itemtype.dbitem->username, row[14]);
+			DCstrpool_replace(found, &item->itemtype.dbitem->password, row[15]);
+			break;
+		case ITEM_TYPE_SSH:
+			if (0 == found)
+			{
+				item->itemtype.sshitem = (ZBX_DC_SSHITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_SSHITEM));
+			}
+
+			item->itemtype.sshitem->authtype = (unsigned short)atoi(row[13]);
+			DCstrpool_replace(found, &item->itemtype.sshitem->username, row[14]);
+			DCstrpool_replace(found, &item->itemtype.sshitem->password, row[15]);
+			DCstrpool_replace(found, &item->itemtype.sshitem->publickey, row[16]);
+			DCstrpool_replace(found, &item->itemtype.sshitem->privatekey, row[17]);
+			DCstrpool_replace(found, &item->itemtype.sshitem->params, row[11]);
+			break;
 	}
 }
 
@@ -2752,8 +2901,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_LOGITEM		*logitem;
-	ZBX_DC_DBITEM		*dbitem;
-	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
@@ -2928,7 +3075,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			dc_interface_update_agent_stats(interface, type, 1);
 		}
 
-		int	last_type, last_value_type;
+		unsigned char	last_type, last_value_type;
 
 		if (1 == found)
 		{
@@ -2999,117 +3146,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item->numitem = NULL;
 		}
 
-		unsigned char	found_type;
-
-		if (1 == found)
-		{
-			if (last_type != item->type)
-			{
-				found_type = 0;
-
-				dc_item_free(item, last_type);
-			}
-			else
-				found_type = 1;
-		}
-		else
-			found_type = 0;
-
-		/* SNMP items */
-		if (ITEM_TYPE_SNMP == item->type)
-		{
-			if (0 == found_type)
-				item->itemtype.snmpitem = (ZBX_DC_SNMPITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_SNMPITEM));
-
-			if (SUCCEED == DCstrpool_replace(found_type, &item->itemtype.snmpitem->snmp_oid, row[6]))
-			{
-				if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '{'))
-					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_MACRO;
-				else if (NULL != strchr(item->itemtype.snmpitem->snmp_oid, '['))
-					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_DYNAMIC;
-				else
-					item->itemtype.snmpitem->snmp_oid_type = ZBX_SNMP_OID_TYPE_NORMAL;
-			}
-		}
-
-		/* calculated items */
-
-		if (ITEM_TYPE_CALCULATED == item->type)
-		{
-			if (0 == found_type)
-				item->itemtype.calcitem = (ZBX_DC_CALCITEM *)__config_mem_malloc_func(NULL, sizeof(ZBX_DC_CALCITEM));
-
-			DCstrpool_replace(found_type, &item->itemtype.calcitem->params, row[11]);
-
-			if (1 == found_type && NULL != item->itemtype.calcitem->formula_bin)
-				__config_mem_free_func((void *)item->itemtype.calcitem->formula_bin);
-
-			item->itemtype.calcitem->formula_bin = config_decode_serialized_expression(row[49]);
-		}
-
-		/* dependent items */
-
-		if (ITEM_TYPE_DEPENDENT == item->type)
-		{
-			if (0 == found_type)
-			{
-				item->itemtype.depitem = (ZBX_DC_DEPENDENTITEM *)__config_mem_malloc_func(NULL,
-						sizeof(ZBX_DC_DEPENDENTITEM));
-			}
-
-			item->itemtype.depitem->itemid = item->itemid;
-
-			if (1 == found_type)
-				item->itemtype.depitem->last_master_itemid = item->itemtype.depitem->master_itemid;
-			else
-				item->itemtype.depitem->last_master_itemid = 0;
-
-			item->itemtype.depitem->flags = item->flags;
-			ZBX_DBROW2UINT64(item->itemtype.depitem->master_itemid, row[29]);
-
-			if (item->itemtype.depitem->last_master_itemid != item->itemtype.depitem->master_itemid)
-				zbx_vector_ptr_append(&dep_items, item->itemtype.depitem);
-		}
-
-		/* IPMI items */
-
-		if (ITEM_TYPE_IPMI == item->type)
-		{
-			if (0 == found_type)
-			{
-				item->itemtype.ipmiitem = (ZBX_DC_IPMIITEM *)__config_mem_malloc_func(NULL,
-						sizeof(ZBX_DC_IPMIITEM));
-			}
-
-			DCstrpool_replace(found_type, &item->itemtype.ipmiitem->ipmi_sensor, row[7]);
-		}
-
-		/* trapper items */
-
-		if (ITEM_TYPE_TRAPPER == item->type)
-		{
-			if ('\0' == *row[9])
-			{
-				if (1 == found_type)
-					dc_item_free(item, item->type);
-
-				item->itemtype.trapitem = NULL;
-			}
-			else
-			{
-				if (1 == found_type && NULL == item->itemtype.trapitem)
-					found_type = 0;
-
-				if (0 == found_type)
-				{
-					item->itemtype.trapitem = (ZBX_DC_TRAPITEM *)__config_mem_malloc_func(NULL,
-							sizeof(ZBX_DC_TRAPITEM));
-				}
-
-				DCstrpool_replace(found_type, &item->itemtype.trapitem->trapper_hosts, row[9]);
-			}
-		}
-
 		/* log items */
 
 		if (ITEM_VALUE_TYPE_LOG == item->value_type && '\0' != *row[10])
@@ -3125,51 +3161,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			zbx_hashset_remove_direct(&config->logitems, logitem);
 		}
 
-		/* db items */
-
-		if (ITEM_TYPE_DB_MONITOR == item->type && '\0' != *row[11])
-		{
-			dbitem = (ZBX_DC_DBITEM *)DCfind_id(&config->dbitems, itemid, sizeof(ZBX_DC_DBITEM), &found);
-
-			DCstrpool_replace(found, &dbitem->params, row[11]);
-			DCstrpool_replace(found, &dbitem->username, row[14]);
-			DCstrpool_replace(found, &dbitem->password, row[15]);
-		}
-		else if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &itemid)))
-		{
-			/* remove db item parameters */
-			zbx_strpool_release(dbitem->params);
-			zbx_strpool_release(dbitem->username);
-			zbx_strpool_release(dbitem->password);
-
-			zbx_hashset_remove_direct(&config->dbitems, dbitem);
-		}
-
-		/* SSH items */
-
-		if (ITEM_TYPE_SSH == item->type)
-		{
-			sshitem = (ZBX_DC_SSHITEM *)DCfind_id(&config->sshitems, itemid, sizeof(ZBX_DC_SSHITEM), &found);
-
-			sshitem->authtype = (unsigned short)atoi(row[13]);
-			DCstrpool_replace(found, &sshitem->username, row[14]);
-			DCstrpool_replace(found, &sshitem->password, row[15]);
-			DCstrpool_replace(found, &sshitem->publickey, row[16]);
-			DCstrpool_replace(found, &sshitem->privatekey, row[17]);
-			DCstrpool_replace(found, &sshitem->params, row[11]);
-		}
-		else if (NULL != (sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &itemid)))
-		{
-			/* remove SSH item parameters */
-
-			zbx_strpool_release(sshitem->username);
-			zbx_strpool_release(sshitem->password);
-			zbx_strpool_release(sshitem->publickey);
-			zbx_strpool_release(sshitem->privatekey);
-			zbx_strpool_release(sshitem->params);
-
-			zbx_hashset_remove_direct(&config->sshitems, sshitem);
-		}
+		dc_item_add(found, item, &last_type, &dep_items, row);
 
 		/* TELNET items */
 
@@ -3432,33 +3424,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			zbx_strpool_release(logitem->logtimefmt);
 			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
-
-		/* db items */
-
-		if (ITEM_TYPE_DB_MONITOR == item->type &&
-				NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &itemid)))
-		{
-			zbx_strpool_release(dbitem->params);
-			zbx_strpool_release(dbitem->username);
-			zbx_strpool_release(dbitem->password);
-
-			zbx_hashset_remove_direct(&config->dbitems, dbitem);
-		}
-
-		/* SSH items */
-
-		if (ITEM_TYPE_SSH == item->type)
-		{
-			sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &itemid);
-
-			zbx_strpool_release(sshitem->username);
-			zbx_strpool_release(sshitem->password);
-			zbx_strpool_release(sshitem->publickey);
-			zbx_strpool_release(sshitem->privatekey);
-			zbx_strpool_release(sshitem->params);
-
-			zbx_hashset_remove_direct(&config->sshitems, sshitem);
 		}
 
 		/* TELNET items */
@@ -6802,10 +6767,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() dbitems    : %d (%d slots)", __func__,
-				config->dbitems.num_data, config->dbitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() sshitems   : %d (%d slots)", __func__,
-				config->sshitems.num_data, config->sshitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __func__,
 				config->telnetitems.num_data, config->telnetitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __func__,
@@ -7282,8 +7243,6 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET(config->items, 0);
 	CREATE_HASHSET(config->logitems, 0);
-	CREATE_HASHSET(config->dbitems, 0);
-	CREATE_HASHSET(config->sshitems, 0);
 	CREATE_HASHSET(config->telnetitems, 0);
 	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
@@ -7940,7 +7899,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 				*dst_item->ipmi_sensor = '\0';
 			break;
 		case ITEM_TYPE_DB_MONITOR:
-			if (NULL != (dbitem = (ZBX_DC_DBITEM *)zbx_hashset_search(&config->dbitems, &src_item->itemid)))
+			if (NULL != (dbitem = src_item->itemtype.dbitem))
 			{
 				dst_item->params = zbx_strdup(NULL, dbitem->params);
 				strscpy(dst_item->username_orig, dbitem->username);
@@ -7957,7 +7916,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 
 			break;
 		case ITEM_TYPE_SSH:
-			if (NULL != (sshitem = (ZBX_DC_SSHITEM *)zbx_hashset_search(&config->sshitems, &src_item->itemid)))
+			if (NULL != (sshitem = src_item->itemtype.sshitem))
 			{
 				dst_item->authtype = sshitem->authtype;
 				strscpy(dst_item->username_orig, sshitem->username);
