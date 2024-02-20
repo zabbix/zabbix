@@ -460,7 +460,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->killComponent(self::COMPONENT_SERVER);
 		//DBexecute("DELETE from hosts");
 		//DBexecute("DELETE from autoreg_host");
-		prepareDataX();
+		$this->prepareDataX();
 		$this->startComponent(self::COMPONENT_SERVER);
 		sleep(10);
 		$this->killComponent(self::COMPONENT_AGENT);
