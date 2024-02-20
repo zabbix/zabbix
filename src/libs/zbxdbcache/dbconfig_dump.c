@@ -665,7 +665,8 @@ static void	DCdump_items(void)
 			case ITEM_TYPE_ZABBIX:
 				break;
 			case ITEM_TYPE_TRAPPER:
-				DCdump_trapitem(item->itemtype.trapitem);
+				if (NULL != item->itemtype.trapitem)
+					DCdump_trapitem(item->itemtype.trapitem);
 				break;
 			case ITEM_TYPE_SIMPLE:
 				DCdump_simpleitem(item->itemtype.simpleitem);
@@ -679,7 +680,8 @@ static void	DCdump_items(void)
 			case ITEM_TYPE_EXTERNAL:
 				break;
 			case ITEM_TYPE_DB_MONITOR:
-				DCdump_dbitem(item->itemtype.dbitem);
+				if (NULL != item->itemtype.dbitem)
+					DCdump_dbitem(item->itemtype.dbitem);
 				break;
 			case ITEM_TYPE_IPMI:
 				DCdump_ipmiitem(item->itemtype.ipmiitem);

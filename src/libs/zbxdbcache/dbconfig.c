@@ -2699,7 +2699,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
+static void	dc_item_type_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 {
 	switch (type)
 	{
@@ -2812,12 +2812,12 @@ static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 	}
 }
 
-static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
+static void	dc_item_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t *old_type,
 		zbx_vector_ptr_t *dep_items, char **row)
 {
 	if (1 == found && *old_type != item->type)
 	{
-		dc_item_free(item, *old_type);
+		dc_item_type_free(item, *old_type);
 		found = 0;
 	}
 
@@ -2829,7 +2829,7 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t 
 			if ('\0' == *row[9])
 			{
 				if (1 == found)
-					dc_item_free(item, item->type);
+					dc_item_type_free(item, item->type);
 
 				item->itemtype.trapitem = NULL;
 				break;
@@ -2868,7 +2868,7 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_type_t 
 			if ('\0' == *row[11])
 			{
 				if (1 == found)
-					dc_item_free(item, item->type);
+					dc_item_type_free(item, item->type);
 
 				item->itemtype.dbitem = NULL;
 				break;
@@ -3313,7 +3313,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		item->interfaceid = interfaceid;
 
 		dc_item_value_type_add(found, item, &old_value_type, row);
-		dc_item_add(found, item, &old_type, &dep_items, row);
+		dc_item_type_add(found, item, &old_type, &dep_items, row);
 
 		/* update items_hk index using new data, if not done already */
 
@@ -3439,7 +3439,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			dc_interface_snmpitems_remove(item);
 
 		dc_item_value_type_free(item, item->value_type);
-		dc_item_free(item, item->type);
+		dc_item_type_free(item, item->type);
 
 		/* items */
 
