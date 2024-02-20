@@ -838,7 +838,6 @@ typedef struct
 	zbx_hashset_t		logitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;
-
 	zbx_hashset_t		functions;
 	zbx_hashset_t		triggers;
 	zbx_hashset_t		trigdeps;

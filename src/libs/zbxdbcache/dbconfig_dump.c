@@ -481,6 +481,12 @@ static void	DCdump_sshitem(const ZBX_DC_SSHITEM *sshitem)
 			sshitem->privatekey);
 }
 
+static void	DCdump_depitem(const ZBX_DC_DEPENDENTITEM *depitem)
+{
+	zabbix_log(LOG_LEVEL_TRACE, "  depitem:[flags:%u last_master_itemid:" ZBX_FS_UI64 " master_itemid:"
+			ZBX_FS_UI64"]", depitem->flags, depitem->last_master_itemid, depitem->master_itemid);
+}
+
 static void	DCdump_httpitem(const ZBX_DC_HTTPITEM *httpitem)
 {
 	zabbix_log(LOG_LEVEL_TRACE, "  http:[url:'%s']", httpitem->url);
@@ -648,20 +654,27 @@ static void	DCdump_items(void)
 
 		switch ((zbx_item_type_t)item->type)
 		{
-			case ITEM_TYPE_SNMP:
-				DCdump_snmpitem(item->itemtype.snmpitem);
-				break;
-			case ITEM_TYPE_CALCULATED:
-				DCdump_calcitem(item->itemtype.calcitem);
-				break;
-			case ITEM_TYPE_IPMI:
-				DCdump_ipmiitem(item->itemtype.ipmiitem);
+			case ITEM_TYPE_ZABBIX:
 				break;
 			case ITEM_TYPE_TRAPPER:
 				DCdump_trapitem(item->itemtype.trapitem);
 				break;
+			case ITEM_TYPE_SIMPLE:
+				DCdump_simpleitem(item->itemtype.simpleitem);
+				break;
+			case ITEM_TYPE_INTERNAL:
+				break;
+			case ITEM_TYPE_ZABBIX_ACTIVE:
+				break;
+			case ITEM_TYPE_HTTPTEST:
+				break;
+			case ITEM_TYPE_EXTERNAL:
+				break;
 			case ITEM_TYPE_DB_MONITOR:
 				DCdump_dbitem(item->itemtype.dbitem);
+				break;
+			case ITEM_TYPE_IPMI:
+				DCdump_ipmiitem(item->itemtype.ipmiitem);
 				break;
 			case ITEM_TYPE_SSH:
 				DCdump_sshitem(item->itemtype.sshitem);
@@ -669,14 +682,22 @@ static void	DCdump_items(void)
 			case ITEM_TYPE_TELNET:
 				DCdump_telnetitem(item->itemtype.telnetitem);
 				break;
-			case ITEM_TYPE_SIMPLE:
-				DCdump_simpleitem(item->itemtype.simpleitem);
+			case ITEM_TYPE_CALCULATED:
+				DCdump_calcitem(item->itemtype.calcitem);
 				break;
 			case ITEM_TYPE_JMX:
 				DCdump_jmxitem(item->itemtype.jmxitem);
 				break;
+			case ITEM_TYPE_SNMPTRAP:
+				break;
+			case ITEM_TYPE_DEPENDENT:
+				DCdump_depitem(item->itemtype.depitem);
+				break;
 			case ITEM_TYPE_HTTPAGENT:
 				DCdump_httpitem(item->itemtype.httpitem);
+				break;
+			case ITEM_TYPE_SNMP:
+				DCdump_snmpitem(item->itemtype.snmpitem);
 				break;
 			case ITEM_TYPE_SCRIPT:
 				DCdump_scriptitem(item->itemtype.scriptitem);
