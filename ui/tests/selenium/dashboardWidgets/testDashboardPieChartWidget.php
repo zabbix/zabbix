@@ -1166,7 +1166,7 @@ class testDashboardPieChartWidget extends CWebTest {
 								['name' => 'width', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 50],
 								['name' => 'total_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 								['name' => 'value_size_type', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
-								['name' => 'value_size', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 30],
+								['name' => 'value_size', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 25],
 								['name' => 'decimal_places', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 0],
 								['name' => 'units_show', 'type' => ZBX_WIDGET_FIELD_TYPE_INT32, 'value' => 1],
 								['name' => 'units', 'type' => ZBX_WIDGET_FIELD_TYPE_STR, 'value' => '♥'],
