@@ -2793,6 +2793,14 @@ static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 
 			__config_mem_free_func(item->itemtype.httpitem);
 			break;
+		case ITEM_TYPE_SCRIPT:
+			zbx_strpool_release(item->itemtype.scriptitem->timeout);
+			zbx_strpool_release(item->itemtype.scriptitem->script);
+
+			zbx_vector_ptr_destroy(&item->itemtype.scriptitem->params);
+
+			__config_mem_free_func(item->itemtype.scriptitem);
+			break;
 	}
 }
 
@@ -2987,6 +2995,22 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *l
 			DCstrpool_replace(found, &item->itemtype.httpitem->username, row[14]);
 			DCstrpool_replace(found, &item->itemtype.httpitem->password, row[15]);
 			DCstrpool_replace(found, &item->itemtype.httpitem->trapper_hosts, row[9]);
+			break;
+		case ITEM_TYPE_SCRIPT:
+			if (0 == found)
+			{
+				item->itemtype.scriptitem = (ZBX_DC_SCRIPTITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_SCRIPTITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.scriptitem->timeout, row[30]);
+			DCstrpool_replace(found, &item->itemtype.scriptitem->script, row[11]);
+
+			if (0 == found)
+			{
+				zbx_vector_ptr_create_ext(&item->itemtype.scriptitem->params, __config_mem_malloc_func,
+						__config_mem_realloc_func, __config_mem_free_func);
+			}
 			break;
 	}
 }
@@ -3278,31 +3302,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			zbx_vector_uint64_append(&interface_snmpitem->itemids, itemid);
 		}
 
-		/* Script items */
-
-		if (ITEM_TYPE_SCRIPT == item->type)
-		{
-			scriptitem = (ZBX_DC_SCRIPTITEM *)DCfind_id(&config->scriptitems, itemid,
-					sizeof(ZBX_DC_SCRIPTITEM), &found);
-
-			DCstrpool_replace(found, &scriptitem->timeout, row[30]);
-			DCstrpool_replace(found, &scriptitem->script, row[11]);
-
-			if (0 == found)
-			{
-				zbx_vector_ptr_create_ext(&scriptitem->params, __config_mem_malloc_func,
-						__config_mem_realloc_func, __config_mem_free_func);
-			}
-		}
-		else if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid)))
-		{
-			zbx_strpool_release(scriptitem->timeout);
-			zbx_strpool_release(scriptitem->script);
-
-			zbx_vector_ptr_destroy(&scriptitem->params);
-			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
-		}
-
 		/* it is crucial to update type specific (config->snmpitems, config->ipmiitems, etc.) hashsets before */
 		/* attempting to requeue an item because type specific properties are used to arrange items in queues */
 
@@ -3410,19 +3409,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			zbx_strpool_release(logitem->logtimefmt);
 			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
-
-		/* Script items */
-
-		if (ITEM_TYPE_SCRIPT == item->type)
-		{
-			scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems, &itemid);
-
-			zbx_strpool_release(scriptitem->timeout);
-			zbx_strpool_release(scriptitem->script);
-
-			zbx_vector_ptr_destroy(&scriptitem->params);
-			zbx_hashset_remove_direct(&config->scriptitems, scriptitem);
 		}
 
 		/* items */
@@ -5511,6 +5497,7 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 	unsigned char			tag;
 	zbx_uint64_t			item_script_paramid, itemid;
 	int				found, ret, i, index;
+	ZBX_DC_ITEM			*item;
 	ZBX_DC_SCRIPTITEM		*scriptitem;
 	zbx_dc_scriptitem_param_t	*scriptitem_params;
 	zbx_vector_ptr_t		items;
@@ -5527,12 +5514,15 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(itemid, row[1]);
 
-		if (NULL == (scriptitem = (ZBX_DC_SCRIPTITEM *) zbx_hashset_search(&config->scriptitems, &itemid)))
+		if (NULL == (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items, &itemid)) ||
+				ITEM_TYPE_SCRIPT != item->type)
 		{
 			zabbix_log(LOG_LEVEL_DEBUG,
 					"cannot find parent item for item parameters (itemid=" ZBX_FS_UI64")", itemid);
 			continue;
 		}
+
+		scriptitem = item->itemtype.scriptitem;
 
 		ZBX_STR2UINT64(item_script_paramid, row[0]);
 		scriptitem_params = (zbx_dc_scriptitem_param_t *)DCfind_id(&config->itemscript_params,
@@ -5560,9 +5550,10 @@ static void	DCsync_itemscript_param(zbx_dbsync_t *sync)
 			continue;
 		}
 
-		if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems,
-				&scriptitem_params->itemid)))
+		if (NULL != (item = (ZBX_DC_ITEM *)zbx_hashset_search(&config->items,
+				&scriptitem_params->itemid)) && ITEM_TYPE_SCRIPT == item->type)
 		{
+			scriptitem = item->itemtype.scriptitem;
 			if (FAIL != (index = zbx_vector_ptr_search(&scriptitem->params, scriptitem_params,
 					ZBX_DEFAULT_PTR_COMPARE_FUNC)))
 			{
@@ -6692,8 +6683,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() scriptitems  : %d (%d slots)", __func__,
-				config->scriptitems.num_data, config->scriptitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() functions  : %d (%d slots)", __func__,
 				config->functions.num_data, config->functions.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() triggers   : %d (%d slots)", __func__,
@@ -7162,7 +7151,6 @@ int	init_configuration_cache(char **error)
 	CREATE_HASHSET(config->logitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
-	CREATE_HASHSET(config->scriptitems, 0);
 	CREATE_HASHSET(config->itemscript_params, 0);
 	CREATE_HASHSET(config->template_items, 0);
 	CREATE_HASHSET(config->item_discovery, 0);
@@ -7915,8 +7903,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_SCRIPT:
-			if (NULL != (scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&config->scriptitems,
-					&src_item->itemid)))
+			if (NULL != (scriptitem = src_item->itemtype.scriptitem))
 			{
 				int		i;
 				struct zbx_json	json;

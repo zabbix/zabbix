@@ -1604,9 +1604,9 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&dbsync_env.cache->scriptitems, &item->itemid);
 	if (ITEM_TYPE_SCRIPT == item->type)
 	{
+		scriptitem = item->itemtype.scriptitem;
 		if (NULL == scriptitem)
 			return FAIL;
 
@@ -1616,8 +1616,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[11], scriptitem->script))
 			return FAIL;
 	}
-	else if (NULL != scriptitem)
-		return FAIL;
 
 	if (ITEM_TYPE_SIMPLE == item->type)
 	{

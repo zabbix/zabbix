@@ -613,7 +613,6 @@ static void	DCdump_items(void)
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
-		{&config->scriptitems, (zbx_dc_dump_func_t)DCdump_scriptitem},
 	};
 
 	zabbix_log(LOG_LEVEL_TRACE, "In %s()", __func__);
@@ -678,6 +677,9 @@ static void	DCdump_items(void)
 				break;
 			case ITEM_TYPE_HTTPAGENT:
 				DCdump_httpitem(item->itemtype.httpitem);
+				break;
+			case ITEM_TYPE_SCRIPT:
+				DCdump_scriptitem(item->itemtype.scriptitem);
 				break;
 		}
 
