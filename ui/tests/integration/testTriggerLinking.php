@@ -524,7 +524,7 @@ class testTriggerLinking extends CIntegrationTest {
 			'selectDependencies' => ['triggerid']
 		]);
 
-		$this->assertEquals(1, count($response['result']));
+		$this->assertEquals(1, count($response['result']), json_encode($response['result']));
 
 		$entry = $response['result'][0];
 
