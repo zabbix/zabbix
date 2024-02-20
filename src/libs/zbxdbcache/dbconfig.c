@@ -2699,7 +2699,7 @@ static unsigned char	*config_decode_serialized_expression(const char *src)
 	return dst;
 }
 
-static void	dc_item_free(ZBX_DC_ITEM *item, unsigned char type)
+static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 {
 	switch (type)
 	{
@@ -2756,6 +2756,13 @@ static void	dc_item_free(ZBX_DC_ITEM *item, unsigned char type)
 
 			__config_mem_free_func(item->itemtype.sshitem);
 			break;
+		case ITEM_TYPE_TELNET:
+			zbx_strpool_release(item->itemtype.telnetitem->username);
+			zbx_strpool_release(item->itemtype.telnetitem->password);
+			zbx_strpool_release(item->itemtype.telnetitem->params);
+
+			__config_mem_free_func(item->itemtype.telnetitem);
+			break;
 	}
 }
 
@@ -2768,7 +2775,7 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *l
 		found = 0;
 	}
 
-	switch (item->type)
+	switch ((zbx_item_type_t)item->type)
 	{
 		case ITEM_TYPE_SNMP:
 			if (0 == found)
@@ -2888,6 +2895,17 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *l
 			DCstrpool_replace(found, &item->itemtype.sshitem->privatekey, row[17]);
 			DCstrpool_replace(found, &item->itemtype.sshitem->params, row[11]);
 			break;
+		case ITEM_TYPE_TELNET:
+			if (0 == found)
+			{
+				item->itemtype.telnetitem = (ZBX_DC_TELNETITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_TELNETITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.telnetitem->username, row[14]);
+			DCstrpool_replace(found, &item->itemtype.telnetitem->password, row[15]);
+			DCstrpool_replace(found, &item->itemtype.telnetitem->params, row[11]);
+			break;
 	}
 }
 
@@ -2901,7 +2919,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_LOGITEM		*logitem;
-	ZBX_DC_TELNETITEM	*telnetitem;
 	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
@@ -3163,27 +3180,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		dc_item_add(found, item, &last_type, &dep_items, row);
 
-		/* TELNET items */
-
-		if (ITEM_TYPE_TELNET == item->type)
-		{
-			telnetitem = (ZBX_DC_TELNETITEM *)DCfind_id(&config->telnetitems, itemid, sizeof(ZBX_DC_TELNETITEM), &found);
-
-			DCstrpool_replace(found, &telnetitem->username, row[14]);
-			DCstrpool_replace(found, &telnetitem->password, row[15]);
-			DCstrpool_replace(found, &telnetitem->params, row[11]);
-		}
-		else if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &itemid)))
-		{
-			/* remove TELNET item parameters */
-
-			zbx_strpool_release(telnetitem->username);
-			zbx_strpool_release(telnetitem->password);
-			zbx_strpool_release(telnetitem->params);
-
-			zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
-		}
-
 		/* simple items */
 
 		if (ITEM_TYPE_SIMPLE == item->type)
@@ -3424,19 +3420,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			zbx_strpool_release(logitem->logtimefmt);
 			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
-
-		/* TELNET items */
-
-		if (ITEM_TYPE_TELNET == item->type)
-		{
-			telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &itemid);
-
-			zbx_strpool_release(telnetitem->username);
-			zbx_strpool_release(telnetitem->password);
-			zbx_strpool_release(telnetitem->params);
-
-			zbx_hashset_remove_direct(&config->telnetitems, telnetitem);
 		}
 
 		/* simple items */
@@ -6767,8 +6750,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() telnetitems: %d (%d slots)", __func__,
-				config->telnetitems.num_data, config->telnetitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __func__,
 				config->simpleitems.num_data, config->simpleitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __func__,
@@ -7243,7 +7224,6 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET(config->items, 0);
 	CREATE_HASHSET(config->logitems, 0);
-	CREATE_HASHSET(config->telnetitems, 0);
 	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
@@ -8034,7 +8014,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->timeout = NULL;
 			break;
 		case ITEM_TYPE_TELNET:
-			if (NULL != (telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&config->telnetitems, &src_item->itemid)))
+			if (NULL != (telnetitem = src_item->itemtype.telnetitem))
 			{
 				strscpy(dst_item->username_orig, telnetitem->username);
 				strscpy(dst_item->password_orig, telnetitem->password);

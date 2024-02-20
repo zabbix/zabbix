@@ -1588,9 +1588,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	telnetitem = (ZBX_DC_TELNETITEM *)zbx_hashset_search(&dbsync_env.cache->telnetitems, &item->itemid);
 	if (ITEM_TYPE_TELNET == item->type)
 	{
+		telnetitem = item->itemtype.telnetitem;
+
 		if (NULL == telnetitem)
 			return FAIL;
 
@@ -1603,8 +1604,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[11], telnetitem->params))
 			return FAIL;
 	}
-	else if (NULL != telnetitem)
-		return FAIL;
 
 	scriptitem = (ZBX_DC_SCRIPTITEM *)zbx_hashset_search(&dbsync_env.cache->scriptitems, &item->itemid);
 	if (ITEM_TYPE_SCRIPT == item->type)

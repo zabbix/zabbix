@@ -611,7 +611,6 @@ static void	DCdump_items(void)
 	zbx_trace_item_t	trace_items[] =
 	{
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
-		{&config->telnetitems, (zbx_dc_dump_func_t)DCdump_telnetitem},
 		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
@@ -651,23 +650,30 @@ static void	DCdump_items(void)
 		if (ITEM_VALUE_TYPE_FLOAT == item->value_type || ITEM_VALUE_TYPE_UINT64 == item->value_type)
 			DCdump_numitem(item->numitem);
 
-		if (ITEM_TYPE_SNMP == item->type)
-			DCdump_snmpitem(item->itemtype.snmpitem);
-
-		if (ITEM_TYPE_CALCULATED == item->type)
-			DCdump_calcitem(item->itemtype.calcitem);
-
-		if (ITEM_TYPE_IPMI == item->type)
-			DCdump_ipmiitem(item->itemtype.ipmiitem);
-
-		if (ITEM_TYPE_TRAPPER == item->type)
-			DCdump_trapitem(item->itemtype.trapitem);
-
-		if (ITEM_TYPE_DB_MONITOR == item->type)
-			DCdump_dbitem(item->itemtype.dbitem);
-
-		if (ITEM_TYPE_SSH == item->type)
-			DCdump_sshitem(item->itemtype.sshitem);
+		switch ((zbx_item_type_t)item->type)
+		{
+			case ITEM_TYPE_SNMP:
+				DCdump_snmpitem(item->itemtype.snmpitem);
+				break;
+			case ITEM_TYPE_CALCULATED:
+				DCdump_calcitem(item->itemtype.calcitem);
+				break;
+			case ITEM_TYPE_IPMI:
+				DCdump_ipmiitem(item->itemtype.ipmiitem);
+				break;
+			case ITEM_TYPE_TRAPPER:
+				DCdump_trapitem(item->itemtype.trapitem);
+				break;
+			case ITEM_TYPE_DB_MONITOR:
+				DCdump_dbitem(item->itemtype.dbitem);
+				break;
+			case ITEM_TYPE_SSH:
+				DCdump_sshitem(item->itemtype.sshitem);
+				break;
+			case ITEM_TYPE_TELNET:
+				DCdump_telnetitem(item->itemtype.telnetitem);
+				break;
+		}
 
 		for (j = 0; j < (int)ARRSIZE(trace_items); j++)
 		{
