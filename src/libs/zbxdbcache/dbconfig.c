@@ -3487,10 +3487,18 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
-	int			ret, found;
+	int			ret, found, clean_sync = 0;
 	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
+	if (0 == config->items.num_slots)
+	{
+		int	row_num = zbx_db_get_row_num(sync->dbresult);
+
+		zbx_hashset_reserve(&config->item_discovery, MAX(row_num, 100));
+		clean_sync = 1;
+	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
 	{
@@ -3499,8 +3507,16 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id(&config->item_discovery, itemid,
-				sizeof(ZBX_DC_ITEM_DISCOVERY), &found);
+		if (1 == clean_sync)
+		{
+			item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCinsert_id(&config->item_discovery, itemid,
+					sizeof(ZBX_DC_ITEM_DISCOVERY));
+		}
+		else
+		{
+			item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id(&config->item_discovery, itemid,
+					sizeof(ZBX_DC_ITEM_DISCOVERY), &found);
+		}
 
 		/* LLD item prototype */
 		ZBX_STR2UINT64(item_discovery->parent_itemid, row[1]);
