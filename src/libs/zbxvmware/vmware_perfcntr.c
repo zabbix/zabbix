@@ -304,7 +304,7 @@ void	vmware_counter_free(zbx_vmware_counter_t *counter)
  *                                 VirtualMachine)                            *
  *             id           - [IN] the entity id                              *
  *             refresh_rate - [OUT] a pointer to variable to store the        *
- *                                  regresh rate                              *
+ *                                  refresh rate                              *
  *             error        - [OUT] the error message in the case of failure  *
  *                                                                            *
  * Return value: SUCCEED - the authentication was completed successfully      *
