@@ -458,7 +458,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->stopComponent(self::COMPONENT_AGENT);
 
 		$this->reloadConfigurationCache();
-		sleep(10);
+		//sleep(10);
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
