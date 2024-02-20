@@ -479,7 +479,7 @@ class testTriggerLinking extends CIntegrationTest {
 		]);
 
 		$this->reloadConfigurationCache();
-		sleep(5);
+		//		sleep(5);
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -490,7 +490,7 @@ class testTriggerLinking extends CIntegrationTest {
 
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
-		sleep(5);
+		sleep(10);
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
