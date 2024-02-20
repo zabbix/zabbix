@@ -57,10 +57,10 @@ class testTriggerLinking extends CIntegrationTest {
 	const NUMBER_OF_TEMPLATES = 10;
 	const NUMBER_OF_TRIGGERS_PER_TEMPLATE = 10;
 
-	/* when resolving conflicts during linking - trigger is considered unique, if its description and expression match
+	/* When resolving conflicts during linking - trigger is considered unique if its description and expression match
 		every template contains a set of triggers with:
 		1) unique description and unique expression
-		2) same description and unique expression */
+		2) same description and unique expression. */
 
 	private static $templateids = array();
 	private static $stringids = array();
@@ -455,10 +455,9 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->checkTriggersCreate();
 
 		$this->setupActions2();
-		$this->stopComponent(self::COMPONENT_AGENT);
 
+		$this->stopComponent(self::COMPONENT_AGENT);
 		$this->reloadConfigurationCache();
-		//sleep(10);
 
 		$response = $this->call('host.get', [
 			'output' => ['hostid'],
@@ -479,7 +478,6 @@ class testTriggerLinking extends CIntegrationTest {
 		]);
 
 		$this->reloadConfigurationCache();
-		//		sleep(5);
 
 		$sql = "select templateid from hosts_templates where hostid='".$hostid."';";
 		$this->assertEquals(0, CDBHelper::getCount($sql));
@@ -491,6 +489,7 @@ class testTriggerLinking extends CIntegrationTest {
 		$this->waitForLogLineToBePresent(self::COMPONENT_SERVER, 'End of DBcopy_template_elements', true, 120);
 		$this->reloadConfigurationCache();
 		sleep(10);
+
 		$response = $this->call('trigger.get', [
 			'selectTags' => 'extend',
 			'filter' => [
