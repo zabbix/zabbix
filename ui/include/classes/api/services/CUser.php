@@ -1671,9 +1671,8 @@ class CUser extends CApiService {
 		$auth_method = $session['sessionid'] !== null ? 'sessionid' : 'token';
 
 		// Access DB only once per page load.
-		if (self::$userData !== null && (array_key_exists($auth_method, self::$userData)
-				&& self::$userData[$auth_method] === $session[$auth_method]
-		)) {
+		if (self::$userData !== null && array_key_exists($auth_method, self::$userData)
+				&& self::$userData[$auth_method] === $session[$auth_method]) {
 			return array_diff_key(self::$userData, array_flip(['token']));
 		}
 
