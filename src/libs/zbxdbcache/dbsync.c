@@ -1649,9 +1649,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	calcitem = item->itemtype.calcitem;
 	if (ITEM_TYPE_CALCULATED == item->type)
 	{
+		calcitem = item->itemtype.calcitem;
+
 		if (FAIL == dbsync_compare_str(dbrow[11], calcitem->params))
 			return FAIL;
 
@@ -1659,9 +1660,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 			return FAIL;
 	}
 
-	depitem = item->itemtype.depitem;
 	if (ITEM_TYPE_DEPENDENT == item->type)
 	{
+		depitem = item->itemtype.depitem;
+
 		if (FAIL == dbsync_compare_uint64(dbrow[29], depitem->master_itemid))
 			return FAIL;
 	}

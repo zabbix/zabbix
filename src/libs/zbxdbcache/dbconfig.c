@@ -2955,8 +2955,6 @@ static void	dc_item_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_ty
 						sizeof(ZBX_DC_DEPENDENTITEM));
 			}
 
-			item->itemtype.depitem->itemid = item->itemid;
-
 			if (1 == found)
 				item->itemtype.depitem->last_master_itemid = item->itemtype.depitem->master_itemid;
 			else
@@ -2966,7 +2964,7 @@ static void	dc_item_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_item_ty
 			ZBX_DBROW2UINT64(item->itemtype.depitem->master_itemid, row[29]);
 
 			if (item->itemtype.depitem->last_master_itemid != item->itemtype.depitem->master_itemid)
-				zbx_vector_ptr_append(dep_items, item->itemtype.depitem);
+				zbx_vector_ptr_append(dep_items, item);
 			break;
 		case ITEM_TYPE_HTTPAGENT:
 			if (0 == found)
@@ -3399,9 +3397,10 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		zbx_uint64_pair_t	pair;
 		ZBX_DC_DEPENDENTITEM	*depitem;
 
-		depitem = (ZBX_DC_DEPENDENTITEM *)dep_items.values[i];
-		dc_masteritem_remove_depitem(depitem->last_master_itemid, depitem->itemid);
-		pair.first = depitem->itemid;
+		item = (ZBX_DC_ITEM *)dep_items.values[i];
+		depitem = item->itemtype.depitem;
+		dc_masteritem_remove_depitem(depitem->last_master_itemid, item->itemid);
+		pair.first = item->itemid;
 		pair.second = depitem->flags;
 
 		/* append item to dependent item vector of master item */
