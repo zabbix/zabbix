@@ -138,22 +138,12 @@ static int	vmware_uint16_compare(const void *d1, const void *d2)
 	return 0;
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: frees perfvalue data structure                                    *
- *                                                                            *
- ******************************************************************************/
 static void	vmware_free_perfvalue(zbx_vmware_perf_value_t *value)
 {
 	zbx_free(value->instance);
 	zbx_free(value);
 }
 
-/******************************************************************************
- *                                                                            *
- * Purpose: frees perfdata data structure                                     *
- *                                                                            *
- ******************************************************************************/
 static void	vmware_free_perfdata(zbx_vmware_perf_data_t *data)
 {
 	zbx_free(data->id);
@@ -272,7 +262,7 @@ void	vmware_shared_perf_entity_clean(zbx_vmware_perf_entity_t *entity)
  *                                                                            *
  * Purpose: frees resources allocated by vmware performance counter           *
  *                                                                            *
- * Parameters: counter - [IN] the performance counter to free                 *
+ * Parameters: counter - [IN] performance counter to free                     *
  *                                                                            *
  ******************************************************************************/
 void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
@@ -282,10 +272,9 @@ void	vmware_counter_shared_clean(zbx_vmware_counter_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: frees vmware performance counter and the resources allocated by   *
- *          it                                                                *
+ * Purpose: frees vmware performance counter and resources allocated by it    *
  *                                                                            *
- * Parameters: counter - [IN] the performance counter to free                 *
+ * Parameters: counter - [IN] performance counter to free                     *
  *                                                                            *
  ******************************************************************************/
 void	vmware_counter_free(zbx_vmware_counter_t *counter)
@@ -296,19 +285,18 @@ void	vmware_counter_free(zbx_vmware_counter_t *counter)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: get the performance counter refreshrate for the specified entity  *
+ * Purpose: gets performance counter refreshrate for specified entity         *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             type         - [IN] the entity type (HostSystem, Datastore or  *
+ * Parameters: service      - [IN] vmware service                             *
+ *             easyhandle   - [IN] CURL handle                                *
+ *             type         - [IN] entity type (HostSystem, Datastore or      *
  *                                 VirtualMachine)                            *
- *             id           - [IN] the entity id                              *
- *             refresh_rate - [OUT] a pointer to variable to store the        *
- *                                  refresh rate                              *
- *             error        - [OUT] the error message in the case of failure  *
+ *             id           - [IN] entity id                                  *
+ *             refresh_rate - [OUT] pointer to variable to store refresh rate *
+ *             error        - [OUT] error message in case of failure          *
  *                                                                            *
- * Return value: SUCCEED - the authentication was completed successfully      *
- *               FAIL    - the authentication process has failed              *
+ * Return value: SUCCEED - authentication was completed successfully          *
+ *               FAIL    - authentication process has failed                  *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *service, CURL *easyhandle,
@@ -556,7 +544,7 @@ out:
  *             instance - [IN] performance counter instance name              *
  *             now      - [IN] current timestamp                              *
  *                                                                            *
- * Comments: The performance counters are specified by their path:            *
+ * Comments: performance counters are specified by their path:                *
  *             <group>/<key>[<rollup type>]                                   *
  *                                                                            *
  ******************************************************************************/
@@ -573,7 +561,8 @@ static void	vmware_service_add_perf_entity(zbx_vmware_service_t *service, const 
 		entity.type = vmware_shared_strdup(type);
 		entity.id = vmware_shared_strdup(id);
 
-		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity, sizeof(zbx_vmware_perf_entity_t));
+		pentity = (zbx_vmware_perf_entity_t *)zbx_hashset_insert(&service->entities, &entity,
+				sizeof(zbx_vmware_perf_entity_t));
 
 		vmware_perf_counters_vector_ptr_create_ext(pentity);
 
@@ -833,7 +822,7 @@ clean:
  *             id       - [IN] performance entity id                          *
  *             error    - [IN] error to add                                   *
  *                                                                            *
- * Comments: The performance counters are specified by their path:            *
+ * Comments: performance counters are specified by their path:                *
  *             <group>/<key>[<rollup type>]                                   *
  *                                                                            *
  ******************************************************************************/
@@ -1097,10 +1086,11 @@ static int	vmware_perf_counters_expired_remove(zbx_vector_vmware_perf_counter_pt
  *             begin_time     - [IN] vmware begin time for perf counters list *
  *             perf_available - [IN/OUT] list of available counter per object *
  *             perf           - [IN/OUT] list of perf entities                *
- *             error          - [OUT] error message in the case of failure    *
+ *             error          - [OUT] error message in case of failure        *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
+ *                                                                            *
  ******************************************************************************/
 static int	vmware_perf_available_update(zbx_vmware_service_t *service, CURL *easyhandle, const char *type,
 		const char *id, const int refresh, const char *begin_time,
@@ -1305,7 +1295,8 @@ int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *co
 		goto clean;
 	}
 
-	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, config_vmware_timeout, &error))
+	if (SUCCEED != vmware_service_authenticate(service, easyhandle, &page, config_source_ip, config_vmware_timeout,
+			&error))
 	{
 		goto clean;
 	}
@@ -1480,15 +1471,15 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets vmware performance counter id and unit info by the path      *
+ * Purpose: gets vmware performance counter id and unit info by path          *
  *                                                                            *
- * Parameters: service   - [IN] the vmware service                            *
- *             path      - [IN] the path of counter to retrieve in format     *
+ * Parameters: service   - [IN] vmware service                                *
+ *             path      - [IN] path of counter to retrieve in format         *
  *                              <group>/<key>[<rollup type>]                  *
- *             counterid - [OUT] the counter id                               *
- *             unit      - [OUT] the counter unit info (kilo, mega, % etc)    *
+ *             counterid - [OUT]                                              *
+ *             unit      - [OUT] counter unit info (kilo, mega, % etc)        *
  *                                                                            *
- * Return value: SUCCEED if the counter was found, FAIL otherwise             *
+ * Return value: SUCCEED if counter was found, FAIL otherwise                 *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_service_get_counterid(const zbx_vmware_service_t *service, const char *path,
@@ -1522,17 +1513,17 @@ out:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: start monitoring performance counter of the specified entity      *
+ * Purpose: starts monitoring performance counter of specified entity         *
  *                                                                            *
- * Parameters: service   - [IN] the vmware service                            *
- *             type      - [IN] the entity type                               *
- *             id        - [IN] the entity id                                 *
- *             counterid - [IN] the performance counter id                    *
- *             instance  - [IN] the performance counter instance name         *
+ * Parameters: service   - [IN] vmware service                                *
+ *             type      - [IN] entity type                                   *
+ *             id        - [IN] entity id                                     *
+ *             counterid - [IN] performance counter id                        *
+ *             instance  - [IN] performance counter instance name             *
  *                                                                            *
- * Return value: SUCCEED - the entity counter was added to monitoring list.   *
- *               FAIL    - the performance counter of the specified entity    *
- *                         is already being monitored.                        *
+ * Return value: SUCCEED - entity counter was added to monitoring list        *
+ *               FAIL    - performance counter of specified entity is already *
+ *                         being monitored.                                   *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const char *type, const char *id,
@@ -1587,11 +1578,11 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
  *                                                                            *
  * Purpose: gets performance entity by type and id                            *
  *                                                                            *
- * Parameters: service - [IN] the vmware service                              *
- *             type    - [IN] the performance entity type                     *
- *             id      - [IN] the performance entity id                       *
+ * Parameters: service - [IN] vmware service                                  *
+ *             type    - [IN] performance entity type                         *
+ *             id      - [IN] performance entity id                           *
  *                                                                            *
- * Return value: the performance entity or NULL if not found                  *
+ * Return value: performance entity or NULL if not found                      *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(const zbx_vmware_service_t *service,
