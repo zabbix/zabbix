@@ -1620,9 +1620,10 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 	else if (NULL != scriptitem)
 		return FAIL;
 
-	simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&dbsync_env.cache->simpleitems, &item->itemid);
 	if (ITEM_TYPE_SIMPLE == item->type)
 	{
+		simpleitem = item->itemtype.simpleitem;
+
 		if (NULL == simpleitem)
 			return FAIL;
 
@@ -1632,8 +1633,6 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[15], simpleitem->password))
 			return FAIL;
 	}
-	else if (NULL != simpleitem)
-		return FAIL;
 
 	jmxitem = (ZBX_DC_JMXITEM *)zbx_hashset_search(&dbsync_env.cache->jmxitems, &item->itemid);
 	if (ITEM_TYPE_JMX == item->type)

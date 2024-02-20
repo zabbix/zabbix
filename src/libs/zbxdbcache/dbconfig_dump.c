@@ -611,7 +611,6 @@ static void	DCdump_items(void)
 	zbx_trace_item_t	trace_items[] =
 	{
 		{&config->logitems, (zbx_dc_dump_func_t)DCdump_logitem},
-		{&config->simpleitems, (zbx_dc_dump_func_t)DCdump_simpleitem},
 		{&config->jmxitems, (zbx_dc_dump_func_t)DCdump_jmxitem},
 		{&config->masteritems, (zbx_dc_dump_func_t)DCdump_masteritem},
 		{&config->preprocitems, (zbx_dc_dump_func_t)DCdump_preprocitem},
@@ -672,6 +671,9 @@ static void	DCdump_items(void)
 				break;
 			case ITEM_TYPE_TELNET:
 				DCdump_telnetitem(item->itemtype.telnetitem);
+				break;
+			case ITEM_TYPE_SIMPLE:
+				DCdump_simpleitem(item->itemtype.simpleitem);
 				break;
 		}
 

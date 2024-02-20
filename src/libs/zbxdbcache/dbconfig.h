@@ -156,6 +156,13 @@ typedef struct
 }
 ZBX_DC_TELNETITEM;
 
+typedef struct
+{
+	const char	*username;
+	const char	*password;
+}
+ZBX_DC_SIMPLEITEM;
+
 typedef union
 {
 	ZBX_DC_SNMPITEM		*snmpitem;
@@ -166,6 +173,7 @@ typedef union
 	ZBX_DC_DBITEM		*dbitem;
 	ZBX_DC_SSHITEM		*sshitem;
 	ZBX_DC_TELNETITEM	*telnetitem;
+	ZBX_DC_SIMPLEITEM	*simpleitem;
 }
 ZBX_DC_ITEMTYPE;
 
@@ -243,14 +251,6 @@ typedef struct
 	const char	*logtimefmt;
 }
 ZBX_DC_LOGITEM;
-
-typedef struct
-{
-	zbx_uint64_t	itemid;
-	const char	*username;
-	const char	*password;
-}
-ZBX_DC_SIMPLEITEM;
 
 typedef struct
 {
@@ -837,7 +837,6 @@ typedef struct
 	zbx_hashset_t		ipmiitems;
 	zbx_hashset_t		dependentitems;
 	zbx_hashset_t		logitems;
-	zbx_hashset_t		simpleitems;
 	zbx_hashset_t		jmxitems;
 	zbx_hashset_t		masteritems;
 	zbx_hashset_t		preprocitems;

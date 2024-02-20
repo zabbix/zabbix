@@ -2763,6 +2763,12 @@ static void	dc_item_free(ZBX_DC_ITEM *item, zbx_item_type_t type)
 
 			__config_mem_free_func(item->itemtype.telnetitem);
 			break;
+		case ITEM_TYPE_SIMPLE:
+			zbx_strpool_release(item->itemtype.simpleitem->username);
+			zbx_strpool_release(item->itemtype.simpleitem->password);
+
+			__config_mem_free_func(item->itemtype.simpleitem);
+			break;
 	}
 }
 
@@ -2906,6 +2912,16 @@ static void	dc_item_add(unsigned char found, ZBX_DC_ITEM *item, unsigned char *l
 			DCstrpool_replace(found, &item->itemtype.telnetitem->password, row[15]);
 			DCstrpool_replace(found, &item->itemtype.telnetitem->params, row[11]);
 			break;
+		case ITEM_TYPE_SIMPLE:
+			if (0 == found)
+			{
+				item->itemtype.simpleitem = (ZBX_DC_SIMPLEITEM *)__config_mem_malloc_func(NULL,
+						sizeof(ZBX_DC_SIMPLEITEM));
+			}
+
+			DCstrpool_replace(found, &item->itemtype.simpleitem->username, row[14]);
+			DCstrpool_replace(found, &item->itemtype.simpleitem->password, row[15]);
+			break;
 	}
 }
 
@@ -2919,7 +2935,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	ZBX_DC_ITEM		*item;
 	ZBX_DC_LOGITEM		*logitem;
-	ZBX_DC_SIMPLEITEM	*simpleitem;
 	ZBX_DC_JMXITEM		*jmxitem;
 	ZBX_DC_INTERFACE_ITEM	*interface_snmpitem;
 	ZBX_DC_MASTERITEM	*master;
@@ -3180,25 +3195,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		dc_item_add(found, item, &last_type, &dep_items, row);
 
-		/* simple items */
-
-		if (ITEM_TYPE_SIMPLE == item->type)
-		{
-			simpleitem = (ZBX_DC_SIMPLEITEM *)DCfind_id(&config->simpleitems, itemid, sizeof(ZBX_DC_SIMPLEITEM), &found);
-
-			DCstrpool_replace(found, &simpleitem->username, row[14]);
-			DCstrpool_replace(found, &simpleitem->password, row[15]);
-		}
-		else if (NULL != (simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems, &itemid)))
-		{
-			/* remove simple item parameters */
-
-			zbx_strpool_release(simpleitem->username);
-			zbx_strpool_release(simpleitem->password);
-
-			zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
-		}
-
 		/* JMX items */
 
 		if (ITEM_TYPE_JMX == item->type)
@@ -3420,18 +3416,6 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		{
 			zbx_strpool_release(logitem->logtimefmt);
 			zbx_hashset_remove_direct(&config->logitems, logitem);
-		}
-
-		/* simple items */
-
-		if (ITEM_TYPE_SIMPLE == item->type)
-		{
-			simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems, &itemid);
-
-			zbx_strpool_release(simpleitem->username);
-			zbx_strpool_release(simpleitem->password);
-
-			zbx_hashset_remove_direct(&config->simpleitems, simpleitem);
 		}
 
 		/* JMX items */
@@ -6750,8 +6734,6 @@ void	DCsync_configuration(unsigned char mode)
 				config->preprocops.num_data, config->preprocops.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() logitems   : %d (%d slots)", __func__,
 				config->logitems.num_data, config->logitems.num_slots);
-		zabbix_log(LOG_LEVEL_DEBUG, "%s() simpleitems: %d (%d slots)", __func__,
-				config->simpleitems.num_data, config->simpleitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() jmxitems   : %d (%d slots)", __func__,
 				config->jmxitems.num_data, config->jmxitems.num_slots);
 		zabbix_log(LOG_LEVEL_DEBUG, "%s() httpitems  : %d (%d slots)", __func__,
@@ -7224,7 +7206,6 @@ int	init_configuration_cache(char **error)
 
 	CREATE_HASHSET(config->items, 0);
 	CREATE_HASHSET(config->logitems, 0);
-	CREATE_HASHSET(config->simpleitems, 0);
 	CREATE_HASHSET(config->jmxitems, 0);
 	CREATE_HASHSET(config->masteritems, 0);
 	CREATE_HASHSET(config->preprocitems, 0);
@@ -8030,7 +8011,7 @@ static void	DCget_item(DC_ITEM *dst_item, const ZBX_DC_ITEM *src_item)
 			dst_item->password = NULL;
 			break;
 		case ITEM_TYPE_SIMPLE:
-			if (NULL != (simpleitem = (ZBX_DC_SIMPLEITEM *)zbx_hashset_search(&config->simpleitems, &src_item->itemid)))
+			if (NULL != (simpleitem = src_item->itemtype.simpleitem))
 			{
 				strscpy(dst_item->username_orig, simpleitem->username);
 				strscpy(dst_item->password_orig, simpleitem->password);
