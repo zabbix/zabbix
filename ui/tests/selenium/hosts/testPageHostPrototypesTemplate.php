@@ -33,7 +33,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 
 	protected $link = 'host_prototypes.php?context=template&sort=name&sortorder=ASC&parent_discoveryid=';
 	protected static $prototype_hostids;
-	protected static $host_druleids;
+	protected static $host_druleid;
 
 	public function prepareHostPrototypeTemplateData() {
 		$response = CDataHelper::createTemplates([
@@ -57,12 +57,12 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 			]
 		]);
 		$template_id = $response['templateids'];
-		self::$host_druleids = $response['discoveryruleids']['Template for prototype check:drule'];
+		self::$host_druleid = $response['discoveryruleids']['Template for prototype check:drule'];
 
 		CDataHelper::call('hostprototype.create', [
 			[
 				'host' => '3a Host prototype monitored discovered {#H}',
-				'ruleid' => self::$host_druleids,
+				'ruleid' => self::$host_druleid,
 				'groupLinks' => [
 					[
 						'groupid' => 4 // Zabbix server
@@ -81,7 +81,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 			],
 			[
 				'host' => '21 Host prototype not monitored discovered {#H}',
-				'ruleid' => self::$host_druleids,
+				'ruleid' => self::$host_druleid,
 				'groupLinks' => [
 					[
 						'groupid' => 4 // Zabbix server
@@ -91,7 +91,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 			],
 			[
 				'host' => 'a3 Host prototype not monitored not discovered {#H}',
-				'ruleid' => self::$host_druleids,
+				'ruleid' => self::$host_druleid,
 				'groupLinks' => [
 					[
 						'groupid' => 4 // Zabbix server
@@ -102,7 +102,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 			],
 			[
 				'host' => 'Yw Host prototype monitored not discovered {#H}',
-				'ruleid' => self::$host_druleids,
+				'ruleid' => self::$host_druleid,
 				'groupLinks' => [
 					[
 						'groupid' => 4 // Zabbix server
@@ -119,7 +119,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 	}
 
 	public function testPageHostPrototypesTemplate_Layout() {
-		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleid)->waitUntilReady();
 		$this->checkLayout(true);
 	}
 
@@ -130,7 +130,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 	 */
 	public function testPageHostPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('host_prototypes.php?context=template&sort='.$data['sort'].'&sortorder=ASC&parent_discoveryid='.
-				self::$host_druleids)->waitUntilReady();
+				self::$host_druleid)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -140,7 +140,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 	 * @dataProvider getHostPrototypesButtonLinkData
 	 */
 	public function testPageHostPrototypesTemplate_ButtonLink($data) {
-		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleid)->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -150,7 +150,7 @@ class testPageHostPrototypesTemplate extends testPagePrototypes {
 	 * @dataProvider getHostPrototypesDeleteData
 	 */
 	public function testPageHostPrototypesTemplate_Delete($data) {
-		$this->page->login()->open($this->link.self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open($this->link.self::$host_druleid)->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {

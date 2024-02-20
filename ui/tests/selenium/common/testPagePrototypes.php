@@ -106,7 +106,7 @@ class testPagePrototypes extends CWebTest {
 	public function checkLayout($template = false) {
 		// Checking Title, Header and Column names.
 		$this->page->assertTitle('Configuration of '.$this->source.' prototypes');
-		$page_header  = ucfirst($this->source).' prototypes';
+		$page_header = ucfirst($this->source).' prototypes';
 		$this->page->assertHeader($page_header);
 		$table = $this->query('class:list-table')->asTable()->one();
 		$this->assertSame($this->layout_data[$this->source]['headers'], $table->getHeadersText());
@@ -133,8 +133,9 @@ class testPagePrototypes extends CWebTest {
 
 		// Check displayed buttons and their default status after opening prototype page.
 		foreach ($this->layout_data[$this->source]['buttons'] as $button => $status) {
-			$this->assertTrue($this->query('button', $button)->one()->isEnabled($status));
-			$this->assertTrue($this->query('button', $button)->one()->isDisplayed());
+			$button_element = $this->assertTrue($this->query('button', $button)->one();
+			$this->assertTrue($button_element->isEnabled($status));
+			$this->assertTrue($button_element->isDisplayed());
 		}
 
 		switch ($this->source) {
@@ -143,7 +144,6 @@ class testPagePrototypes extends CWebTest {
 				foreach (['Width', 'Height'] as $column) {
 					$this->assertTableDataColumn([100, 200, 300, 400], $column);
 				}
-
 				break;
 
 			case 'item':
@@ -795,7 +795,7 @@ class testPagePrototypes extends CWebTest {
 
 		// Click on button or on link in column (Create enabled or Discover).
 		if (array_key_exists('button', $data)) {
-			// If there is no prototype name in data provider, then select all existing in table prototypes.
+			// If there is no prototype name in data provider, then select all prototypes that exist in table.
 			$selected = (array_key_exists('name', $data)) ? $data['name'] : null;
 			$this->selectTableRows($selected);
 			$this->query('button', $data['button'])->one()->click();

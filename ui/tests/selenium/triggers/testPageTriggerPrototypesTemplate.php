@@ -33,7 +33,7 @@ class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 
 	protected $link = 'zabbix.php?action=trigger.prototype.list&context=template&sort=description&sortorder=ASC&';
 	protected static $prototype_triggerids;
-	protected static $host_druleids;
+	protected static $host_druleid;
 
 	public function prepareTriggerPrototypeTemplateData() {
 		$response = CDataHelper::createTemplates([
@@ -57,14 +57,14 @@ class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 			]
 		]);
 		$template_id = $response['templateids']['Template for prototype check'];
-		self::$host_druleids = $response['discoveryruleids']['Template for prototype check:drule'];
+		self::$host_druleid = $response['discoveryruleids']['Template for prototype check:drule'];
 
 		$item_prototype = CDataHelper::call('itemprototype.create', [
 			[
 				'name' => '1 Item prototype for trigger',
 				'key_' => '1_key[{#KEY}]',
 				'hostid' => $template_id,
-				'ruleid' => self::$host_druleids,
+				'ruleid' => self::$host_druleid,
 				'type' => ITEM_TYPE_TRAPPER,
 				'value_type' => ITEM_VALUE_TYPE_UINT64,
 				'delay' => 0
@@ -130,7 +130,7 @@ class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 	}
 
 	public function testPageTriggerPrototypesTemplate_Layout() {
-		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 		$this->checkLayout(true);
 	}
 
@@ -141,7 +141,7 @@ class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 	 */
 	public function testPageTriggerPrototypesTemplate_Sorting($data) {
 		$this->page->login()->open('zabbix.php?action=trigger.prototype.list&context=template&sort='.$data['sort'].'&sortorder=ASC&'.
-				'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+				'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 		$this->executeSorting($data);
 	}
 
@@ -151,7 +151,7 @@ class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 	 * @dataProvider getTriggerPrototypesButtonLinkData
 	 */
 	public function testPageTriggerPrototypesTemplate_ButtonLink($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 		$this->checkTableAction($data);
 	}
 
@@ -161,7 +161,7 @@ class testPageTriggerPrototypesTemplate extends testPagePrototypes {
 	 * @dataProvider getTriggerPrototypesDeleteData
 	 */
 	public function testPageTriggerPrototypesTemplate_Delete($data) {
-		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleids)->waitUntilReady();
+		$this->page->login()->open($this->link.'parent_discoveryid='.self::$host_druleid)->waitUntilReady();
 
 		$ids = [];
 		foreach ($data['name'] as $name) {
