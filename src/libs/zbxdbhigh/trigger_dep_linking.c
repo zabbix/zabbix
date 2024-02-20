@@ -318,7 +318,7 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 		goto clean;
 	}
 
-	/* create a list of target host trigger dependencies*/
+	/* create a list of target host trigger dependencies */
 	while (NULL != (row = DBfetch(result)))
 	{
 		int				flags;
@@ -357,9 +357,9 @@ static int	prepare_trigger_dependencies_updates_and_deletes(const zbx_vector_uin
 
 	DBfree_result(result);
 
-	/* Go through the list of template trigger dependencies and if there is match between host triggers up and down */
-	/*  - then mark host pair dependency with "preserve status". If target host does not have this dependency pair  */
-	/*  - then add the source trigger dependency (from template) list of dependencies.                              */
+	/* Go through the list of template trigger dependencies and if there is match between host triggers up and  */
+	/* down then mark host pair dependency with "preserve status". If target host does not have this dependency */
+	/* pair - then add the source trigger dependency (from template) list of dependencies.                      */
 	for (i = 0; i < links->values_num; i++)
 	{
 		zbx_trigger_dep_entry_t	temp_t;

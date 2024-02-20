@@ -274,7 +274,6 @@ static int	get_hostid_by_host(const zbx_socket_t *sock, const char *host, const 
 		old_port_v = (unsigned short)(SUCCEED == DBis_null(old_port)) ? 0 : atoi(old_port);
 		old_flag_v = (zbx_conn_flags_t)(SUCCEED == DBis_null(old_flag)) ? ZBX_CONN_DEFAULT : atoi(old_flag);
 		/* metadata is available only on Zabbix server */
-
 		if (SUCCEED == DBis_null(old_flag) || 0 != strcmp(old_metadata, host_metadata) ||
 				(ZBX_CONN_IP  == flag && ( 0 != strcmp(old_ip, interface)  || old_port_v != port)) ||
 				(ZBX_CONN_DNS == flag && ( 0 != strcmp(old_dns, interface) || old_port_v != port)) ||
