@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -482,7 +482,7 @@ class testPageAdministrationGeneralModules extends CWebTest {
 		$this->page->waitUntilReady();
 		$this->query('button:Update')->one()->click();
 
-		$this->assertMessage(TEST_GOOD, 'Module updated: 1st Module name.');
+		$this->assertMessage(TEST_GOOD, 'Module updated');
 		// Check that Module has been updated and that there are no changes took place.
 		$this->assertEquals($initial_hash, CDBHelper::getHash($sql));
 	}
@@ -603,14 +603,14 @@ class testPageAdministrationGeneralModules extends CWebTest {
 			}
 			// In case of negative test check error message and confirm that module wasn't applied.
 			if (CTestArrayHelper::get($module, 'expected', TEST_GOOD) === TEST_BAD) {
-				$title = $from_form ? 'Cannot update module: ' : 'Cannot enable module: ';
-				$this->assertMessage($module['expected'], $title.$module['module_name'].'.', $module['error_details']);
+				$title = $from_form ? 'Cannot update module' : 'Cannot enable module';
+				$this->assertMessage($module['expected'], $title, $module['error_details']);
 				$this->assertModuleDisabled($module);
 				continue;
 			}
 			// Check message and confirm that changes, made by the enabled module, took place.
-			$message = $from_form ? 'Module updated: ' : 'Module enabled: ';
-			$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), $message.$module['module_name'].'.');
+			$message = $from_form ? 'Module updated' : 'Module enabled';
+			$this->assertMessage(CTestArrayHelper::get($module, 'expected', TEST_GOOD), $message);
 			$this->assertModuleEnabled($module);
 		}
 	}
@@ -634,8 +634,8 @@ class testPageAdministrationGeneralModules extends CWebTest {
 				$this->changeModuleStatusFromPage($module['module_name'], 'Enabled');
 			}
 			// Check message and confirm that changes, made by the module, were reversed.
-			$message = $from_form ? 'Module updated: ' : 'Module disabled: ';
-			$this->assertMessage(TEST_GOOD, $message.$module['module_name'].'.');
+			$message = $from_form ? 'Module updated' : 'Module disabled';
+			$this->assertMessage(TEST_GOOD, $message);
 			$this->assertModuleDisabled($module);
 		}
 	}

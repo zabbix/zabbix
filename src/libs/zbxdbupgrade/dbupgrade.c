@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1075,7 +1075,7 @@ out:
 
 	return ret;
 }
-
+#ifndef HAVE_SQLITE3
 int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 		const char *original_column_name, const char *indexed_column_name, const char *function,
 		const char *idname)
@@ -1119,6 +1119,14 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_insert(const char *table_name,
 			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name, table_name,
 			table_name, indexed_column_name, function);
+#else
+	ZBX_UNUSED(sql_alloc);
+	ZBX_UNUSED(sql_offset);
+	ZBX_UNUSED(table_name);
+	ZBX_UNUSED(original_column_name);
+	ZBX_UNUSED(indexed_column_name);
+	ZBX_UNUSED(function);
+	ZBX_UNUSED(idname);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1178,6 +1186,9 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 			table_name, indexed_column_name, function, table_name, indexed_column_name, function,
 			original_column_name, idname, idname, table_name, indexed_column_name,
 			original_column_name, table_name, table_name, indexed_column_name, function);
+#else
+	ZBX_UNUSED(sql_alloc);
+	ZBX_UNUSED(sql_offset);
 #endif
 	if (ZBX_DB_OK <= DBexecute("%s", sql))
 		ret = SUCCEED;
@@ -1186,3 +1197,4 @@ int	zbx_dbupgrade_attach_trigger_with_function_on_update(const char *table_name,
 
 	return ret;
 }
+#endif

@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -715,6 +715,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 	 */
 	public static function getUpdateData() {
 		return [
+			// #0.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -730,6 +731,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #1.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -744,7 +746,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-						[
+			// #2.
+			[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -758,6 +761,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #3.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -778,6 +782,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #4.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -798,6 +803,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #5.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -818,6 +824,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #6.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -838,6 +845,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #7.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -864,6 +872,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #8.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -889,6 +898,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #9.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -911,6 +921,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #10.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -937,6 +948,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #11.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -966,6 +978,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #12.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -995,6 +1008,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #13.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1017,6 +1031,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #14.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1050,6 +1065,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #15.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1079,7 +1095,8 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
-						[
+			// #16.
+			[
 				[
 					'expected' => TEST_BAD,
 					'overrides' => [
@@ -1110,6 +1127,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #17.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1131,6 +1149,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #18.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1163,6 +1182,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #19.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1195,6 +1215,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #20.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1222,6 +1243,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #21.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1249,6 +1271,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #22.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1276,6 +1299,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #23.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1303,6 +1327,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #24.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1327,6 +1352,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #25.
 			[
 				[
 					'expected' => TEST_BAD,
@@ -1351,6 +1377,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #26.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1366,6 +1393,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #27.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1404,6 +1432,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #28.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1464,20 +1493,20 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 										]
 									],
 									'Update interval' => [
-										'Delay' => '50m',
+										'Delay' => '1m',
 										'Custom intervals' => [
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 0,
-												'type' => 'Scheduling',
-												'delay' => 'wd1-3h10-17'
+												'type' => 'Flexible',
+												'delay' => '50s',
+												'period' => '1-7,00:00-24:00'
 											],
 											[
 												'action' => USER_ACTION_UPDATE,
 												'index' => 1,
-												'type' => 'Flexible',
-												'delay' => '60s',
-												'period' => '1-5,01:01-13:05'
+												'type' => 'Scheduling',
+												'delay' => 'wd1-5h9-18'
 											]
 										]
 									]
@@ -1521,6 +1550,7 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 					]
 				]
 			],
+			// #29.
 			[
 				[
 					'expected' => TEST_GOOD,
@@ -1614,14 +1644,13 @@ class testFormLowLevelDiscoveryOverrides extends CWebTest {
 						'Condition' => ['operator' => 'equals', 'value' => 'test item pattern'],
 						'Create enabled' => 'Yes',
 						'Discover' => 'Yes',
-						// TODO: uncomment after fix DEV-1071 and it is possible to check this field.
-//						'Update interval' => [
-//							'Delay' => '1m',
-//							'Custom intervals' => [
-//								['type' => 'Flexible', 'delay' => '50s', 'period' => '1-7,00:00-24:00'],
-//								['type' => 'Scheduling', 'delay' => 'wd1-5h9-18']
-//							]
-//						],
+						'Update interval' => [
+							'Delay' => '1m',
+							'Custom intervals' => [
+								['Type' => 'Flexible', 'Interval' => '50s', 'Period' => '1-7,00:00-24:00'],
+								['Type' => 'Scheduling', 'Interval' => 'wd1-5h9-18']
+							]
+						],
 						'History storage period' => ['ophistory_history_mode' => 'Do not keep history'],
 						'Trend storage period' => ['optrends_trends_mode' => 'Do not keep trends']
 					],

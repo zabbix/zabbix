@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:24:57Z'
+  date: '2023-11-01T20:48:26Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1857,62 +1857,38 @@ zabbix_export:
                   width: '24'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'GridGain by JMX'
                         name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Transactions rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'GridGain by JMX'
                         name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Discovery messages rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'GridGain by JMX'
                         name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Communication messages rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
                   height: '5'
                   fields:
-                    - type: INTEGER
-                      name: columns
-                      value: '2'
                     - type: GRAPH_PROTOTYPE
                       name: graphid
                       value:
                         host: 'GridGain by JMX'
                         name: 'GridGain [{#JMXIGNITEINSTANCENAME}]: Jobs rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'

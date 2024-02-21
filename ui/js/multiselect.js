@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -294,6 +294,7 @@
 	 *
 	 * @param string options['url']					backend url
 	 * @param string options['name']				input element name
+	 * @param string options['multiselect_id']		multiselect wrapper id (optional)
 	 * @param object options['labels']				translated labels (optional)
 	 * @param object options['data']				preload data {id, name, prefix} (optional)
 	 * @param string options['data'][id]
@@ -329,26 +330,27 @@
 		}
 
 		var defaults = {
-				url: '',
-				name: '',
-				labels: {
-					'No matches found': t('No matches found'),
-					'More matches found...': t('More matches found...'),
-					'type here to search': t('type here to search'),
-					'new': t('new'),
-					'Select': t('Select')
-				},
-				placeholder: t('type here to search'),
-				data: [],
-				excludeids: [],
-				addNew: false,
-				defaultValue: null,
-				disabled: false,
-				selectedLimit: 0,
-				limit: 20,
-				popup: {},
-				styles: {}
-			};
+			url: '',
+			name: '',
+			multiselect_id: '',
+			labels: {
+				'No matches found': t('No matches found'),
+				'More matches found...': t('More matches found...'),
+				'type here to search': t('type here to search'),
+				'new': t('new'),
+				'Select': t('Select')
+			},
+			placeholder: t('type here to search'),
+			data: [],
+			excludeids: [],
+			addNew: false,
+			defaultValue: null,
+			disabled: false,
+			selectedLimit: 0,
+			limit: 20,
+			popup: {},
+			styles: {}
+		};
 
 		options = $.extend({}, defaults, options);
 
@@ -393,7 +395,8 @@
 
 			$obj.wrap($('<div>', {
 				'class': ZBX_STYLE_CLASS,
-				css: ms.options.styles
+				css: ms.options.styles,
+				id: ms.options.multiselect_id !== '' ? ms.options.multiselect_id : null
 			}));
 
 			var $selected_div = $('<div>', {'class': 'selected'}).on('click', function() {

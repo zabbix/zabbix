@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:15:09Z'
+  date: '2023-11-01T20:45:27Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -898,9 +898,6 @@ zabbix_export:
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues total'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Mantis BT: Issues by priority'
                   'y': '5'
@@ -915,9 +912,6 @@ zabbix_export:
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by priority'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Mantis BT: Issues by resolution'
                   x: '6'
@@ -933,9 +927,6 @@ zabbix_export:
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by resolution'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Mantis BT: Issues by severity'
                   x: '12'
@@ -951,9 +942,6 @@ zabbix_export:
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by severity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Mantis BT: Issues by status'
                   x: '18'
@@ -969,6 +957,3 @@ zabbix_export:
                       value:
                         host: 'Mantis BT by HTTP'
                         name: 'Mantis BT: [{#NAME}] Issues by status'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'

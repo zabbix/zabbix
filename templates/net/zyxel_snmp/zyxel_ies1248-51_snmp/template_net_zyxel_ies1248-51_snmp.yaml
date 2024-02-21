@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:55:07Z'
+  date: '2024-01-22T15:58:28Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -322,28 +322,28 @@ zabbix_export:
               parameters:
                 - |
                   var valueArray = [
-                      'moduleNoDefect',
-                      'moduleOverHeat',
-                      'moduleFanRpmLow',
-                      'moduleVoltageLow',
-                      'moduleThermalSensorFailure',
-                      'modulePullOut',
-                      'powerDC48VAFailure',
-                      'powerDC48VBFailure',
-                      'extAlarmInputTrigger',
-                      'moduleDown',
-                      'mscSwitchOverOK',
-                      'networkTopologyChange',
-                      'macSpoof',
-                      'cpuHigh',
-                      'memoryUsageHigh',
-                      'packetBufferUsageHigh',
-                      'loopguardOccurence'
+                  	'moduleNoDefect',
+                  	'moduleOverHeat',
+                  	'moduleFanRpmLow',
+                  	'moduleVoltageLow',
+                  	'moduleThermalSensorFailure',
+                  	'modulePullOut',
+                  	'powerDC48VAFailure',
+                  	'powerDC48VBFailure',
+                  	'extAlarmInputTrigger',
+                  	'moduleDown',
+                  	'mscSwitchOverOK',
+                  	'networkTopologyChange',
+                  	'macSpoof',
+                  	'cpuHigh',
+                  	'memoryUsageHigh',
+                  	'packetBufferUsageHigh',
+                  	'loopguardOccurence'
                   ];
                   var base2 = parseInt(value).toString(2);
                   var outArray = [];
                   for (var i = 0; i < base2.length; ++i) {
-                      if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
+                  	if (base2[base2.length - 1 - i] === '1') outArray.push(valueArray[i]);
                   }
                   return outArray.join();
           tags:

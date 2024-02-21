@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:14:27Z'
+  date: '2023-11-01T20:45:09Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -862,6 +862,3 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Kubelet by HTTP'
                         name: 'Kubernetes: [{#OP_TYPE}] Operations latency'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'

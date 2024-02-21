@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -414,13 +414,15 @@ function PopUp(action, parameters, {
  * @returns {Overlay}
  */
 function acknowledgePopUp(parameters, trigger_element) {
-	var overlay = PopUp('popup.acknowledge.edit', parameters, {trigger_element}),
-		backurl = location.href;
+	const overlay = PopUp('popup.acknowledge.edit', parameters,
+		{dialogue_class: 'modal-popup-generic', trigger_element}
+	);
+	const backurl = location.href;
 
 	overlay.trigger_parents = $(trigger_element).parents();
 
 	overlay.xhr.then(function() {
-		var url = new Curl('zabbix.php', false);
+		const url = new Curl('zabbix.php', false);
 		url.setArgument('action', 'popup');
 		url.setArgument('popup_action', 'acknowledge.edit');
 		url.setArgument('eventids', parameters.eventids);
@@ -611,7 +613,7 @@ function addValues(frame, values, submit_parent) {
 		}
 
 		if (jQuery(frm_storage).is('span')) {
-			jQuery(frm_storage).html(values[key]);
+			jQuery(frm_storage).text(values[key]);
 		}
 		else {
 			jQuery(frm_storage).val(values[key]).change();

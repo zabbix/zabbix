@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -121,15 +121,13 @@ class CScreenDiscovery extends CScreenBase {
 		];
 
 		foreach ($services as $name => $foo) {
-			$header[] = (new CColHeader($name))
-				->addClass('vertical_rotation')
+			$header[] = (new CSpan($name))
+				->addClass(ZBX_STYLE_TEXT_VERTICAL)
 				->setTitle($name);
 		}
 
 		// create table
-		$table = (new CTableInfo())
-			->makeVerticalRotation()
-			->setHeader($header);
+		$table = (new CTableInfo())->setHeader($header);
 
 		foreach ($drules as $drule) {
 			$discovery_info = [];

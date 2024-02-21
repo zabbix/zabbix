@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:37:17Z'
+  date: '2024-02-13T12:41:45Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1172,7 +1172,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
@@ -1231,9 +1230,6 @@ zabbix_export:
                       value:
                         host: 'Juniper by SNMP'
                         name: '{#SNMPVALUE}: Memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'CPU utilization'
                   x: '12'
@@ -1248,9 +1244,6 @@ zabbix_export:
                       value:
                         host: 'Juniper by SNMP'
                         name: '{#SNMPVALUE}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 69625f8a027542638c3ca9b64522602d
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'

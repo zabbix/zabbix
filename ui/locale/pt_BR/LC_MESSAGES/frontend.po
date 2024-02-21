@@ -4,7 +4,7 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-10-25 21:47+0000\n"
+"PO-Revision-Date: 2022-12-20 18:24+0000\n"
 "Last-Translator: Marco <marcodefreitas@gmail.com>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: pt_BR\n"
@@ -198,6 +198,16 @@ msgid "%1$s of %2$s element in problem state"
 msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s de %2$s elemento em estado de incidente"
 msgstr[1] "%1$s de %2$s elementos em estado de incidente"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
 
 #: jsLoader.php:348
 #, c-format
@@ -2545,6 +2555,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] "Não é possível desabilitar o tipo de midia"
 msgstr[1] "Não é possível desabilitar os tipos de midia"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "Não é possível desativar o módulo"
+msgstr[1] "Não é possível desativar os módulos"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2628,6 +2644,12 @@ msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
 msgstr[0] "Não é possível ativar o tipo de mídia"
 msgstr[1] "Não é possível ativar os tipos de mídia"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "Não é possível habilitar o módulo"
+msgstr[1] "Não é possível habilitar os módulos"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3367,6 +3389,10 @@ msgstr "Não é possível atualizar período de manutenção"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Não é possível atualizar o tipo de mídia"
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr "Não é possível atualizar o módulo"
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -5560,7 +5586,7 @@ msgstr "Depende de"
 
 #: include/hosts.inc.php:264
 msgid "Deployment status"
-msgstr "Status de desenvolvimento"
+msgstr "Status de implantação"
 
 #: include/classes/widgets/CWidgetHelper.php:62
 msgid "Deprecated"
@@ -11965,6 +11991,12 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] "Módulo excluído: %1$s."
 msgstr[1] "Módulos excluídos: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Módulo desativado"
+msgstr[1] "Módulos desativados"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -11972,12 +12004,22 @@ msgid_plural "Modules disabled: %1$s."
 msgstr[0] "Módulo desativado: %1$s."
 msgstr[1] "Módulos desativados: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Módulo ativado"
+msgstr[1] "Módulos ativados"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Módulo ativado: %1$s."
 msgstr[1] "Módulos ativados: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr "Módulo atualizado"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13093,6 +13135,11 @@ msgstr "Itens não herdados"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Não suportado"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19187,6 +19234,10 @@ msgstr "Tempo em execução em segudos do processo do Zabbix."
 msgid "Uptime/Downtime"
 msgstr "Uptime/Downtime"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Usar requisições em lote"
@@ -19463,7 +19514,7 @@ msgstr "Sessões de usuários"
 #: include/classes/helpers/CMenuHelper.php:391
 #: include/classes/helpers/CMenuHelper.php:405
 msgid "User settings"
-msgstr "Definições de Utilizadores"
+msgstr "Configurações do usuário"
 
 #: include/classes/api/services/CMap.php:709
 #: include/classes/api/services/CMap.php:1178
@@ -20589,6 +20640,10 @@ msgstr "Eixo-X"
 msgid "X-Frame-Options HTTP header"
 msgstr "Cabeçalho HTTP X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -21008,6 +21063,11 @@ msgstr "espera-se um tempo relativo"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "um caractere especial"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"
@@ -21679,7 +21739,7 @@ msgstr "mensagem de erro"
 #: include/views/js/configuration.host.discovery.edit.js.php:50
 #: include/views/js/configuration.host.discovery.edit.overr.js.php:82
 msgid "exists"
-msgstr "rxiste"
+msgstr "existe"
 
 #: app/controllers/CControllerPopupTriggerExpr.php:603
 msgid "exp() - Euler's number at a power of a value"

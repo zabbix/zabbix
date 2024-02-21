@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -102,6 +102,14 @@ class CPage {
 				'--window-size='.self::DEFAULT_PAGE_WIDTH.','.self::DEFAULT_PAGE_HEIGHT,
 				'--disable-dev-shm-usage'
 			]);
+
+			if (defined('PHPUNIT_BROWSER_LOG_DIR')) {
+				$options->addArguments([
+					'--enable-logging',
+					'--log-file='.PHPUNIT_BROWSER_LOG_DIR.'/'.microtime(true).'.log',
+					'--log-level=0'
+				]);
+			}
 
 			$capabilities->setCapability(ChromeOptions::CAPABILITY, $options);
 		}

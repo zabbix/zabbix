@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:29:35Z'
+  date: '2024-02-13T12:40:33Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -425,7 +425,6 @@ zabbix_export:
           value: '1'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
@@ -464,9 +463,6 @@ zabbix_export:
                       value:
                         host: 'Interfaces Simple by SNMP'
                         name: 'Interface {#IFDESCR}: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 4578589110ec40e19297e1d35d17c82f
           name: 'IF-MIB::ifOperStatus'

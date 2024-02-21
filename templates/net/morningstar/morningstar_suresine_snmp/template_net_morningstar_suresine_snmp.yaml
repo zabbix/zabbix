@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:52:37Z'
+  date: '2024-01-22T15:55:44Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -136,19 +136,19 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'heatsinkTempSensorOpen',
-                    'heatsinkTempSensorShort',
-                    'unknownAlarm',
-                    'suresineHot'
+                  	'heatsinkTempSensorOpen',
+                  	'heatsinkTempSensorShort',
+                  	'unknownAlarm',
+                  	'suresineHot'
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
@@ -208,23 +208,23 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'reset',
-                    'overcurrent',
-                    'unknownFault',
-                    'software',
-                    'highVoltageDisconnect',
-                    'suresineHot',
-                    'dipSwitchChanged',
-                    'customSettingsEdit'
+                  	'reset',
+                  	'overcurrent',
+                  	'unknownFault',
+                  	'software',
+                  	'highVoltageDisconnect',
+                  	'suresineHot',
+                  	'dipSwitchChanged',
+                  	'customSettingsEdit'
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
@@ -453,11 +453,11 @@ zabbix_export:
               parameters:
                 - |
                   var v_range = [
-                        [[0, 18], [12, 15, 11.5, 15.5]],
-                        [[18, 36], [24, 30, 23, 31]],
-                        [[36, 99], [48, 60, 46, 62]],
-                    ],
-                    result = [];
+                      [[0, 18], [12, 15, 11.5, 15.5]],
+                      [[18, 36], [24, 30, 23, 31]],
+                      [[36, 99], [48, 60, 46, 62]],
+                  ],
+                      result = [];
                   
                   for (var idx in v_range) {
                       if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {

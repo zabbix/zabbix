@@ -209,6 +209,8 @@ Possible values:
 Username (optional) — the username for which the information is required. Usernames written in lowercase characters are not supported.
 Default: the current user.
 
+**oracle.version[\<commonParams\>]** — returns the database server information.
+
 ## Custom queries
 
 It is possible to extend the functionality of the plugin using user-defined queries. In order to do it, you should place all your queries in a specified directory in `Plugins.Oracle.CustomQueriesPath` (there is no default path) as it is for *.sql* files.

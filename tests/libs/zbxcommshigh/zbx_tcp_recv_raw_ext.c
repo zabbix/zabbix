@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@ void	zbx_mock_test_entry(void **state)
 	char		*buffer;
 	zbx_socket_t	s;
 	ssize_t		received;
+	size_t		in_fragments;
 	int		expected_ret;
 
 	ZBX_UNUSED(state);
@@ -51,9 +52,11 @@ void	zbx_mock_test_entry(void **state)
 	zbx_mock_assert_result_eq("zbx_tcp_recv_raw_ext() return code", SUCCEED, SUCCEED_OR_FAIL(received));
 	zbx_mock_assert_uint64_eq("Received bytes", zbx_mock_get_parameter_uint64("out.bytes"), received);
 
-	buffer = zbx_yaml_assemble_binary_sequence("in.fragments", received);
+	in_fragments = (size_t)received;
 
-	if (0 != memcmp(buffer, s.buffer, received))
+	buffer = zbx_yaml_assemble_binary_sequence("in.fragments", &in_fragments);
+
+	if (0 != memcmp(buffer, s.buffer, in_fragments))
 		fail_msg("Received message mismatch expected");
 
 	zbx_tcp_close(&s);

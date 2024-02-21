@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:12:52Z'
+  date: '2024-01-22T15:10:36Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -29,29 +29,29 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                    parsed = JSON.parse(value);
-                    var result = [];
+                  	parsed = JSON.parse(value);
+                  	var result = [];
                   
-                    function getNodes(nodes, state) {
-                        Object.keys(nodes).forEach(function (field) {
-                            var Node = {};
-                            Node['HostName'] = field || '';
-                            Node['adminState'] = nodes[field].adminState || '';
-                            Node['operState'] = state || '';
-                            Node['version'] = nodes[field].version || '';
-                            result.push(Node);
-                        });
-                    }
+                  	function getNodes(nodes, state) {
+                  		Object.keys(nodes).forEach(function (field) {
+                  			var Node = {};
+                  			Node['HostName'] = field || '';
+                  			Node['adminState'] = nodes[field].adminState || '';
+                  			Node['operState'] = state || '';
+                  			Node['version'] = nodes[field].version || '';
+                  			result.push(Node);
+                  		});
+                  	}
                   
-                    getNodes(JSON.parse(parsed.beans[0].LiveNodes), 'Live');
-                    getNodes(JSON.parse(parsed.beans[0].DeadNodes), 'Dead');
-                    getNodes(JSON.parse(parsed.beans[0].DecomNodes), 'Decommission');
-                    getNodes(JSON.parse(parsed.beans[0].EnteringMaintenanceNodes), 'Maintenance');
+                  	getNodes(JSON.parse(parsed.beans[0].LiveNodes), 'Live');
+                  	getNodes(JSON.parse(parsed.beans[0].DeadNodes), 'Dead');
+                  	getNodes(JSON.parse(parsed.beans[0].DecomNodes), 'Decommission');
+                  	getNodes(JSON.parse(parsed.beans[0].EnteringMaintenanceNodes), 'Maintenance');
                   
-                    return JSON.stringify(result);
+                  	return JSON.stringify(result);
                   }
                   catch (error) {
-                    throw 'Failed to process response received from Hadoop';
+                  	throw 'Failed to process response received from Hadoop';
                   }
           url: '{$HADOOP.NAMENODE.HOST}:{$HADOOP.NAMENODE.PORT}/jmx?qry=Hadoop:service=NameNode,name=NameNodeInfo'
           tags:
@@ -451,7 +451,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(JSON.parse(JSON.parse(value).beans[0].LiveNodeManagers))'
+                - 'return JSON.stringify(JSON.parse(JSON.parse(value).beans[0].LiveNodeManagers));'
           url: '{$HADOOP.RESOURCEMANAGER.HOST}:{$HADOOP.RESOURCEMANAGER.PORT}/jmx?qry=Hadoop:service=ResourceManager,name=RMNMInfo'
           tags:
             - tag: component
@@ -1061,28 +1061,28 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  try{
-                    parsed = JSON.parse(value);
-                    var result = [];
+                  try {
+                      parsed = JSON.parse(value);
+                      var result = [];
                   
-                    function getNodes(nodes) {
-                        Object.keys(nodes).forEach(function (field) {
-                            var Node = {};
-                            Node['{#HOSTNAME}'] = field || '';
-                            Node['{#INFOADDR}'] = nodes[field].infoAddr || '';
-                            result.push(Node);
-                        });
-                    }
+                      function getNodes(nodes) {
+                          Object.keys(nodes).forEach(function (field) {
+                              var Node = {};
+                              Node['{#HOSTNAME}'] = field || '';
+                              Node['{#INFOADDR}'] = nodes[field].infoAddr || '';
+                              result.push(Node);
+                          });
+                      }
                   
-                    getNodes(JSON.parse(parsed.beans[0].LiveNodes));
-                    getNodes(JSON.parse(parsed.beans[0].DeadNodes));
-                    getNodes(JSON.parse(parsed.beans[0].DecomNodes));
-                    getNodes(JSON.parse(parsed.beans[0].EnteringMaintenanceNodes));
+                      getNodes(JSON.parse(parsed.beans[0].LiveNodes));
+                      getNodes(JSON.parse(parsed.beans[0].DeadNodes));
+                      getNodes(JSON.parse(parsed.beans[0].DecomNodes));
+                      getNodes(JSON.parse(parsed.beans[0].EnteringMaintenanceNodes));
                   
-                    return JSON.stringify(result);
+                      return JSON.stringify(result);
                   }
                   catch (error) {
-                    throw 'Failed to process response received from Hadoop.';
+                      throw 'Failed to process response received from Hadoop.';
                   }
         - uuid: de2d5f97843345668bc0b8c8336b9c14
           name: 'Node manager discovery'
@@ -1352,24 +1352,24 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                    parsed = JSON.parse(value);
-                    var result = [];
+                      parsed = JSON.parse(value);
+                      var result = [];
                   
-                    function getNodes(nodes) {
-                        Object.keys(nodes).forEach(function (field) {
-                            var Node = {};
-                            Node['{#HOSTNAME}'] = nodes[field].HostName || '';
-                            Node['{#NODEHTTPADDRESS}'] = nodes[field].NodeHTTPAddress || '';
-                            result.push(Node);
-                        });
-                    }
+                      function getNodes(nodes) {
+                          Object.keys(nodes).forEach(function (field) {
+                              var Node = {};
+                              Node['{#HOSTNAME}'] = nodes[field].HostName || '';
+                              Node['{#NODEHTTPADDRESS}'] = nodes[field].NodeHTTPAddress || '';
+                              result.push(Node);
+                          });
+                      }
                   
-                    getNodes(JSON.parse(parsed.beans[0].LiveNodeManagers));
+                      getNodes(JSON.parse(parsed.beans[0].LiveNodeManagers));
                   
-                    return JSON.stringify(result);
+                      return JSON.stringify(result);
                   }
                   catch (error) {
-                    throw 'Failed to process response received from Hadoop.';
+                      throw 'Failed to process response received from Hadoop.';
                   }
       tags:
         - tag: class

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -229,9 +229,9 @@ void	zbx_mock_test_entry(void **state)
 	cfg = zbx_realloc(cfg, (parameter_count + 1) * sizeof(struct cfg_line));
 	cfg[parameter_count].parameter = NULL;
 
-	CONFIG_FILE = cfg_file;
+	CONFIG_FILE = zbx_strdup(NULL, cfg_file);
 
-	parse_cfg_file(cfg_file, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
+	parse_cfg_file(CONFIG_FILE, cfg, ZBX_CFG_FILE_REQUIRED, strict, ZBX_CFG_EXIT_FAILURE);
 
 	if (ZBX_MOCK_NO_EXIT_CODE != (error = zbx_mock_exit_code(&exit_code)))
 	{
@@ -380,4 +380,5 @@ void	zbx_mock_test_entry(void **state)
 
 	zbx_free(expected_values);
 	zbx_free(cfg);
+	zbx_free(CONFIG_FILE);
 }

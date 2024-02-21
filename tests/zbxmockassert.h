@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU Ge_neral Public License as published by
@@ -40,10 +40,10 @@ void	__zbx_mock_assert_int_eq(const char *file, int line, const char *prefix_msg
 void	__zbx_mock_assert_int_ne(const char *file, int line, const char *prefix_msg, int expected_value,
 		int returned_value);
 
-void	__zbx_mock_assert_double_eq(const char *file, double line, const char *prefix_msg, double expected_value,
+void	__zbx_mock_assert_double_eq(const char *file, int line, const char *prefix_msg, double expected_value,
 		double returned_value);
 
-void	__zbx_mock_assert_double_ne(const char *file, double line, const char *prefix_msg, double expected_value,
+void	__zbx_mock_assert_double_ne(const char *file, int line, const char *prefix_msg, double expected_value,
 		double returned_value);
 
 void	__zbx_mock_assert_result_eq(const char *file, int line, const char *prefix_msg, int expected_value,

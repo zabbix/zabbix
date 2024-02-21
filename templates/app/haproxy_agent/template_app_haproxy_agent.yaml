@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:13:06Z'
+  date: '2024-01-22T15:10:52Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -58,11 +58,11 @@ zabbix_export:
               parameters:
                 - |
                   try {
-                      var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
-                      return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
+                  	var t = value.match(/(\d+)d (\d+)h(\d+)m(\d+)s/);
+                  	return t[1] * 86400 + t[2] * 3600 + t[3] * 60 + t[4] * 1;
                   }
                   catch (error) {
-                      throw "HAProxy uptime is not found : " + error;
+                  	throw "HAProxy uptime is not found : " + error;
                   }
           master_item:
             key: 'web.page.get["{$HAPROXY.STATS.SCHEME}://{HOST.CONN}:{$HAPROXY.STATS.PORT}/{$HAPROXY.STATS.PATH}"]'
@@ -2112,9 +2112,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Backend {#PXNAME} Redispatched requests and retried connections per second'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2128,9 +2125,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Backend {#PXNAME} Responses by HTTP code'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -2144,9 +2138,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Backend {#PXNAME} In/Out traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 7c4decb2fefc4cfe9c4a3f8717d710ca
           name: 'HAProxy Frontend performance'
           pages:
@@ -2163,9 +2154,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} Requests and sessions per second'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2179,9 +2167,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} Errors and denials per second'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -2195,9 +2180,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} Responses by HTTP code'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -2211,9 +2193,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: Frontend {#PXNAME} In/Out traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: ebc5a517fa544fada42550059c014c5b
           name: 'HAProxy Server performance'
           pages:
@@ -2230,9 +2209,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} Response time and time in queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2246,9 +2222,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} Responses by HTTP code'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -2262,9 +2235,6 @@ zabbix_export:
                       value:
                         host: 'HAProxy by Zabbix agent'
                         name: 'HAProxy: {#PXNAME} {#SVNAME} In/Out traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: bf2e9463450d4f4899abcac85cde0a92
           name: 'Server mode'

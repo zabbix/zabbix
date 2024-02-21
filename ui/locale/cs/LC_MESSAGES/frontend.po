@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: Zabbix 6.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-03-02 16:36+0200\n"
-"PO-Revision-Date: 2023-09-25 12:19+0000\n"
-"Last-Translator: Tomáš Heřmánek <tomas.hermanek@initmax.cz>\n"
+"PO-Revision-Date: 2023-12-26 22:01+0000\n"
+"Last-Translator: Tomáš Skočdopole <tomas.skocdopole@initmax.cz>\n"
 "Language-Team: Zabbix <info@zabbix.com>\n"
 "Language: cs\n"
 "MIME-Version: 1.0\n"
@@ -208,6 +208,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s z %2$s prvků v hlásí problém"
 msgstr[1] "%1$s z %2$s prvků v hlásí problém"
 msgstr[2] "%1$s z %2$s prvků v hlásí problém"
+
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr "%1$s nebo %2$s – umožňuje zobrazení stránky pouze ve framu ve stejném origin jako stránka samotná"
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr "%1$s nebo %2$s – zabrání zobrazení stránky v rámci, bez ohledu na web, který se o to pokouší"
 
 #: jsLoader.php:348
 #, c-format
@@ -2130,7 +2140,7 @@ msgstr "Nelze smazat historii"
 
 #: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
 msgid "Cannot clear history and trends"
-msgstr ""
+msgstr "Historii a trendy nelze vymazat"
 
 #: include/classes/api/services/CDiscoveryRule.php:2514
 msgid "Cannot clone graph prototypes."
@@ -2598,6 +2608,13 @@ msgstr[0] "Není možné vypnout typ média"
 msgstr[1] "Není možné vypnout typ média"
 msgstr[2] "Není možné vypnout typ média"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] "Modul nelze zakázat"
+msgstr[1] "Moduly nelze zakázat"
+msgstr[2] "Moduly nelze zakázat"
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2693,6 +2710,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Není možné povolit typ média"
 msgstr[1] "Není možné povolit typy médií"
 msgstr[2] "Není možné povolit typy médií"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] "Moduly nelze povolit"
+msgstr[1] "Moduly nelze povolit"
+msgstr[2] "Moduly nelze povolit"
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3443,6 +3467,10 @@ msgstr "Nelze upravit servisní okno"
 msgid "Cannot update media type"
 msgstr "Není možné aktualizovat typ média"
 
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr "Modul nelze aktualizovat"
+
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
 msgid "Cannot update module: %1$s."
@@ -3817,11 +3845,11 @@ msgstr "Vyčistit historii a trendy"
 
 #: include/views/configuration.item.list.php:293
 msgid "Clear history and trends of selected items?"
-msgstr ""
+msgstr "Vyčistit historii a trendy vybraných položek?"
 
 #: include/views/configuration.httpconf.list.php:218
 msgid "Clear history and trends of selected web scenarios?"
-msgstr ""
+msgstr "Vyčistit historii a trendy vybraných webových scénářů?"
 
 #: app/views/popup.massupdate.host.php:69
 #: app/views/popup.massupdate.template.php:72
@@ -6848,7 +6876,7 @@ msgstr "Název události"
 
 #: app/views/popup.condition.common.php:642
 msgid "Event name matches Trigger name (with macros expanded) unless a custom Event name is specified in Trigger settings."
-msgstr ""
+msgstr "Název Eventuálně odpovídá názvu Triggeru  (s expandovanými makry), pokud není v nastavení Triggeru určen vlastní název Eventu."
 
 #: include/classes/helpers/CCorrelationHelper.php:55
 msgid "Event tag pair"
@@ -8070,7 +8098,7 @@ msgstr "Historie"
 
 #: httpconf.php:189 httpconf.php:433 items.php:908 items.php:987
 msgid "History and trends cleared"
-msgstr ""
+msgstr "Historie a trendy vyčištěny"
 
 #: app/views/administration.housekeeping.edit.php:158
 msgid "History and trends compression"
@@ -12070,6 +12098,13 @@ msgstr[0] "Modul smazán: %1$s."
 msgstr[1] "Moduly smazány: %1$s."
 msgstr[2] "Moduly smazány: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] "Modul zakázán"
+msgstr[1] "Moduly zakázány"
+msgstr[2] "Moduly zakázány"
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -12078,6 +12113,13 @@ msgstr[0] "Modul zakázán: %1$s."
 msgstr[1] "Moduly zakázány: %1$s."
 msgstr[2] "Moduly zakázány: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] "Modul povolen"
+msgstr[1] "Moduly povoleny"
+msgstr[2] "Moduly povoleny"
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
@@ -12085,6 +12127,10 @@ msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Modul povolen: %1$s."
 msgstr[1] "Moduly povoleny: %1$s."
 msgstr[2] "Moduly povoleny: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr "Modul aktualizován"
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13198,6 +13244,11 @@ msgstr "Žádné zděděné položky"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Nepodporováno"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr "Pamatujte, že %1$s nebo %2$s budou považovány za názvy hostitelů, pokud budou použity bez jednoduchých uvozovek."
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19310,6 +19361,10 @@ msgstr "Doba provozu Zabbix server procesů v sekundách."
 msgid "Uptime/Downtime"
 msgstr "Doba dostupnosti/nedostupnosti"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr "Použít HTTP hlavičku X-Frame-Options"
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Použít hromadné žádosti"
@@ -20719,6 +20774,10 @@ msgstr "Osa X"
 msgid "X-Frame-Options HTTP header"
 msgstr "HTTP hlavička X-Frame-Options"
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr "Podporované hodnoty HTTP hlavičky X-Frame-Options:"
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -21138,6 +21197,11 @@ msgstr "je očekáván relativní čas"
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
 msgstr "speciální znak"
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
+msgstr "řetězec názvů hostitelů oddělených mezerami; přidání %1$s do seznamu umožňuje zobrazení stránky ve frame na stejném origin jako stránka samotná"
 
 #: include/classes/validators/CApiInputValidator.php:2530
 msgid "a string, number or null value is expected"

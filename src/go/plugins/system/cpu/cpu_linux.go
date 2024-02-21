@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -31,8 +31,13 @@ import (
 	"strconv"
 	"strings"
 
-	"git.zabbix.com/ap/plugin-support/plugin"
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/log"
+	"git.zabbix.com/ap/plugin-support/plugin"
+)
+
+const (
+	procStatLocation = "/proc/stat"
 )
 
 // Plugin -
@@ -41,9 +46,17 @@ type Plugin struct {
 	cpus []*cpuUnit
 }
 
-const (
-	procStatLocation = "/proc/stat"
-)
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, pluginName,
+		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
+		"system.cpu.num", "Number of CPUs.",
+		"system.cpu.util", "CPU utilization percentage.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
 
 func (p *Plugin) getCpuLoad(params []string) (result interface{}, err error) {
 	return nil, plugin.UnsupportedMetricError
@@ -165,11 +178,4 @@ func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider)
 	default:
 		return nil, plugin.UnsupportedMetricError
 	}
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, pluginName,
-		"system.cpu.discovery", "List of detected CPUs/CPU cores, used for low-level discovery.",
-		"system.cpu.num", "Number of CPUs.",
-		"system.cpu.util", "CPU utilisation percentage.")
 }

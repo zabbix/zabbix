@@ -127,6 +127,14 @@ AS_HELP_STRING([--with-ssh@<:@=DIR@:>@],[use SSH package @<:@default=no@:>@, DIR
     if test "x$found_ssh" = "xyes"; then
       AC_DEFINE([HAVE_SSH], 1, [Define to 1 if you have the 'libssh' library (-lssh)])
       AC_MSG_RESULT(yes)
+
+      ENUM_CHECK([SSH_OPTIONS_KEY_EXCHANGE],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_HOSTKEYS],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_CIPHERS_C_S],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_CIPHERS_S_C],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_HMAC_C_S],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_HMAC_S_C],[libssh/libssh.h])
+      ENUM_CHECK([SSH_OPTIONS_PROCESS_CONFIG],[libssh/libssh.h])
     else
       AC_MSG_RESULT(no)
       SSH_CFLAGS=""

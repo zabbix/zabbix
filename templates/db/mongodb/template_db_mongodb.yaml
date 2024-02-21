@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:25:35Z'
+  date: '2023-11-01T20:48:38Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2954,9 +2954,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}.{#COLLECTION}: Locks'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -2970,9 +2967,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}.{#COLLECTION}: Locks time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -2986,9 +2980,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -3002,9 +2993,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}.{#COLLECTION}: Operations time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Databases
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -3019,9 +3007,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}: Collections stats'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -3035,9 +3020,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}: Disk usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Replication
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -3052,9 +3034,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB node by Zabbix agent 2'
                         name: 'MongoDB: Replication lag time [{#RS_NAME}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 9f921e1503e74204b8f128966f9562bc
           name: 'MongoDB flag'

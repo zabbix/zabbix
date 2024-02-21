@@ -23,12 +23,12 @@ This template has been tested on:
 1. On the FortiGate GUI, select `System > Admin Profiles > Create New`.
 2. Enter a profile name (ex. zabbix_ro) and enable all the Read permissions. Please note the profile name, it will be used a bit later.
 3. Go to `System > Administrators > Create New > REST API Admin`.
-4. Enter the API-user's name and select the profile name you created from the step 2.
+4. Enter the API-user's name and select the profile name you created in step 2.
 5. The trusted host can be specified to ensure that only Zabbix server can reach the FortiGate.
 6. Click OK and an API token will be generated. Make a note of the API token as it's only shown once and cannot be retrieved.
 7. Put the API token into `{$FGATE.API.TOKEN}` macro.
 8. Set your FortiGate GUI IP/FQDN as `{$FGATE.API.FQDN}` macro value.
-9. If FortiGate GUI uses https, put **https** value into `{$FGATE.SCHEME}` macro and **443** into `{$FGATE.API.PORT}` macro.
+9. If FortiGate GUI uses HTTPS, put **https** value into `{$FGATE.SCHEME}` macro and **443** into `{$FGATE.API.PORT}` macro.
 10. If FortiGate GUI port differs from the standard one, specify it in `{$FGATE.API.PORT}` macro. 
 
 >Please, refer to the [vendor documentation](https://docs.fortinet.com/document/fortigate/7.4.0/administration-guide/399023/rest-api-administrator) about the FortiGate REST API Authentication.
@@ -43,26 +43,26 @@ This template has been tested on:
 |{$FGATE.API.PORT}|<p>The port of FortiGate API endpoint.</p>|`80`|
 |{$FGATE.DATA.TIMEOUT}|<p>Response timeout for an API.</p>|`15s`|
 |{$FGATE.HTTP.PROXY}|<p>HTTP proxy for API requests. You can specify it using the format [protocol://][username[:password]@]proxy.example.com[:port]. See the documentation at https://www.zabbix.com/documentation/6.0/manual/config/items/itemtypes/http</p>||
-|{$FIRMWARE.UPDATES.CONTROL}|<p>This macro is used in "New available firmwares found" trigger.</p>|`1`|
+|{$FIRMWARE.UPDATES.CONTROL}|<p>This macro is used in "New available firmware found" trigger.</p>|`1`|
 |{$CPU.UTIL.WARN}|<p>Threshold of CPU utilization for warning trigger in %.</p>|`85`|
 |{$CPU.UTIL.CRIT}|<p>Threshold of CPU utilization for critical trigger in %.</p>|`95`|
-|{$MEMORY.UTIL.WARN}|<p>Threshold of memory utilization for warning trigger in %</p>|`80`|
-|{$MEMORY.UTIL.CRIT}|<p>Threshold of memory utilization for critical trigger in %</p>|`90`|
-|{$DISK.FREE.WARN}|<p>Threshold of disk free space for warning trigger in %</p>|`20`|
-|{$DISK.FREE.CRIT}|<p>Threshold of disk free space for critical trigger in %</p>|`10`|
-|{$NET.IF.CONTROL}|<p>Macro for operational state of the interface for link down trigger. Can be used with interface name as context.</p>|`1`|
+|{$MEMORY.UTIL.WARN}|<p>Threshold of memory utilization for warning trigger in %.</p>|`80`|
+|{$MEMORY.UTIL.CRIT}|<p>Threshold of memory utilization for critical trigger in %.</p>|`90`|
+|{$DISK.FREE.WARN}|<p>Threshold of disk free space for warning trigger in %.</p>|`20`|
+|{$DISK.FREE.CRIT}|<p>Threshold of disk free space for critical trigger in %.</p>|`10`|
+|{$NET.IF.CONTROL}|<p>Macro for operational state of the interface for "Link down" trigger. Can be used with interface name as context.</p>|`1`|
 |{$NET.IF.ERRORS.WARN}|<p>Threshold of error packets rate for warning trigger. Can be used with interface name as context.</p>|`2`|
 |{$NET.IF.UTIL.MAX}|<p>Threshold of interface bandwidth utilization for warning trigger in %. Can be used with interface name as context.</p>|`95`|
-|{$NET.IF.IFDESCR.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$NET.IF.IFDESCR.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFNAME.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$NET.IF.IFNAME.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFTYPE.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$NET.IF.IFTYPE.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFALIAS.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$NET.IF.IFALIAS.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$NET.IF.IFSTATUS.MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$NET.IF.IFSTATUS.NOT_MATCHES}|<p>This macro is used in Network interface discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFDESCR.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$NET.IF.IFDESCR.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFNAME.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$NET.IF.IFNAME.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFTYPE.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$NET.IF.IFTYPE.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFALIAS.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$NET.IF.IFALIAS.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$NET.IF.IFSTATUS.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$NET.IF.IFSTATUS.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$FWP.FWACTION.MATCHES}|<p>This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$FWP.FWACTION.NOT_MATCHES}|<p>This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$FWP.FWTYPE.MATCHES}|<p>This macro is used in Firewall policies discovery. Can be overridden on the host or linked template level.</p>|`.*`|
@@ -77,7 +77,7 @@ This template has been tested on:
 |{$SERVICE.STATUS.NOT_MATCHES}|<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p>|`(no_support\|no_license)`|
 |{$SERVICE.TYPE.MATCHES}|<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SERVICE.TYPE.NOT_MATCHES}|<p>This macro is used in Service discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$SDWAN.MEMBER.IF.CONTROL}|<p>Macro for the interface state for link down trigger. Can be used with interface name as context.</p>|`1`|
+|{$SDWAN.MEMBER.IF.CONTROL}|<p>Macro for the interface state for "Link down" trigger. Can be used with interface name as context.</p>|`1`|
 |{$SDWAN.MEMBER.ID.MATCHES}|<p>This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SDWAN.MEMBER.ID.NOT_MATCHES}|<p>This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$SDWAN.MEMBER.NAME.MATCHES}|<p>This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.</p>|`.*`|
@@ -86,7 +86,7 @@ This template has been tested on:
 |{$SDWAN.MEMBER.STATUS.NOT_MATCHES}|<p>This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$SDWAN.MEMBER.ZONE.MATCHES}|<p>This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SDWAN.MEMBER.ZONE.NOT_MATCHES}|<p>This macro is used in SD-WAN members discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
-|{$SDWAN.HEALTH.IF.CONTROL}|<p>Macro for the interface state for link down trigger. Can be used with interface name as context.</p>|`1`|
+|{$SDWAN.HEALTH.IF.CONTROL}|<p>Macro for the interface state for "Link down" trigger. Can be used with interface name as context.</p>|`1`|
 |{$SDWAN.HEALTH.ID.MATCHES}|<p>This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SDWAN.HEALTH.ID.NOT_MATCHES}|<p>This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$SDWAN.HEALTH.NAME.MATCHES}|<p>This macro is used in SD-WAN health-checks discovery. Can be overridden on the host or linked template level.</p>|`.*`|
@@ -146,7 +146,7 @@ This template has been tested on:
 |FortiGate: There are errors in the 'Get interfaces data' metric||`length(last(/FortiGate by HTTP/fgate.netif.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.netif.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.netif.data_errors,2m)=0`|Warning|**Depends on**:<br><ul><li>FortiGate: Unexpected response from API</li></ul>|
 |FortiGate: There are errors in the 'Get SD-WAN data' metric||`length(last(/FortiGate by HTTP/fgate.sdwan.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.sdwan.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.sdwan.data_errors,2m)=0`|Warning|**Depends on**:<br><ul><li>FortiGate: Unexpected response from API</li></ul>|
 |FortiGate: There are errors in the 'Get firewall policies data' metric||`length(last(/FortiGate by HTTP/fgate.fwp.data_errors))>0 and length(last(/FortiGate by HTTP/fgate.fwp.data_errors,#1:now-1m))>0 and nodata(/FortiGate by HTTP/fgate.fwp.data_errors,2m)=0`|Warning|**Depends on**:<br><ul><li>FortiGate: Unexpected response from API</li></ul>|
-|FortiGate: New available firmwares found|<p>New available firmware versions found to download.<br><br>This trigger expression works as follows:<br>1. It can be triggered if there are one or more available firmware versions.<br>2. `{$FIRMWARE.UPDATES.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if new firmware is found.</p>|`{$FIRMWARE.UPDATES.CONTROL}=1 and last(/FortiGate by HTTP/fgate.device.firmwares_avail)>0`|Info|**Manual close**: Yes|
+|FortiGate: New available firmware found|<p>New available firmware versions found to download.<br><br>This trigger expression works as follows:<br>1. It can be triggered if there are one or more available firmware versions.<br>2. `{$FIRMWARE.UPDATES.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if new firmware is found.</p>|`{$FIRMWARE.UPDATES.CONTROL}=1 and last(/FortiGate by HTTP/fgate.device.firmwares_avail)>0`|Info|**Manual close**: Yes|
 |FortiGate: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/FortiGate by HTTP/fgate.device.serialnumber,#1)<>last(/FortiGate by HTTP/fgate.device.serialnumber,#2) and length(last(/FortiGate by HTTP/fgate.device.serialnumber))>0`|Info|**Manual close**: Yes|
 |FortiGate: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/FortiGate by HTTP/fgate.name,#1)<>last(/FortiGate by HTTP/fgate.name,#2) and length(last(/FortiGate by HTTP/fgate.name))>0`|Info|**Manual close**: Yes|
 |FortiGate: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/FortiGate by HTTP/fgate.uptime)<10m`|Info|**Manual close**: Yes|
@@ -161,7 +161,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Firewall policies discovery|<p>Discovery for FortiGate firewall policies</p>|Dependent item|fgate.fwp.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|Firewall policies discovery|<p>Discovery for FortiGate firewall policies.</p>|Dependent item|fgate.fwp.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for Firewall policies discovery
 
@@ -181,7 +181,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Service discovery|<p>Discovery for FortiGate services</p>|Dependent item|fgate.service.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lld`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Service discovery|<p>Discovery for FortiGate services.</p>|Dependent item|fgate.service.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.lld`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Service discovery
 
@@ -208,7 +208,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SD-WAN members discovery|<p>Discovery for FortiGate SD-WAN members</p>|Dependent item|fgate.sdwan_member.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.member_lld`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SD-WAN members discovery|<p>Discovery for FortiGate SD-WAN members.</p>|Dependent item|fgate.sdwan_member.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.member_lld`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for SD-WAN members discovery
 
@@ -220,7 +220,7 @@ This template has been tested on:
 |SD-WAN [{#ZONE}]:[{#NAME}]: Sessions|<p>Number of active sessions opened through the {#NAME} interface in the {#ZONE} zone.</p>|Dependent item|fgate.sdwan_member.sessions[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.session`</p></li></ul>|
 |SD-WAN [{#ZONE}]:[{#NAME}]: Bytes sent per second|<p>Bytes sent through the {#NAME} interface in the {#ZONE} zone per second.</p>|Dependent item|fgate.sdwan_member.tx_bytes[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tx_bytes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |SD-WAN [{#ZONE}]:[{#NAME}]: Bytes received per second|<p>Bytes received from the {#NAME} interface in the {#ZONE} zone per second.</p>|Dependent item|fgate.sdwan_member.rx_bytes[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rx_bytes`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
-|SD-WAN [{#ZONE}]:[{#NAME}]: Output bandwidth|<p>Transmiting bandwidth of the {#NAME} interface in the {#ZONE} zone.</p>|Dependent item|fgate.sdwan_member.tx_bandwidth[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tx_bandwidth`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
+|SD-WAN [{#ZONE}]:[{#NAME}]: Output bandwidth|<p>Transmitting bandwidth of the {#NAME} interface in the {#ZONE} zone.</p>|Dependent item|fgate.sdwan_member.tx_bandwidth[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.tx_bandwidth`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |SD-WAN [{#ZONE}]:[{#NAME}]: Input bandwidth|<p>Receiving bandwidth of the {#NAME} interface in the {#ZONE} zone.</p>|Dependent item|fgate.sdwan_member.rx_bandwidth[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.rx_bandwidth`</p><p>⛔️Custom on fail: Set value to: `0`</p></li><li>Change per second</li></ul>|
 |SD-WAN [{#ZONE}]:[{#NAME}]: State changing time|<p>Last state changing time of the {#NAME} interface in the {#ZONE} zone.</p>|Dependent item|fgate.service.state_changed[{#ID}]<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.state_changed`</p><p>⛔️Custom on fail: Discard value</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
@@ -234,7 +234,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|SD-WAN health-checks discovery|<p>Discovery for FortiGate SD-WAN health-checks</p>|Dependent item|fgate.sdwan_health.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.health_lld`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
+|SD-WAN health-checks discovery|<p>Discovery for FortiGate SD-WAN health-checks.</p>|Dependent item|fgate.sdwan_health.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data.health_lld`</p></li><li><p>Discard unchanged with heartbeat: `1h`</p></li></ul>|
 
 ### Item prototypes for SD-WAN health-checks discovery
 
@@ -260,7 +260,7 @@ This template has been tested on:
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|Network interfaces discovery|<p>Discovery for FortiGate network interfaces</p>|Dependent item|fgate.netif.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|Network interfaces discovery|<p>Discovery for FortiGate network interfaces.</p>|Dependent item|fgate.netif.discovery<p>**Preprocessing**</p><ul><li><p>JSON Path: `$.data`</p></li><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
 
 ### Item prototypes for Network interfaces discovery
 

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:28:39Z'
+  date: '2024-01-22T15:28:27Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -243,9 +243,7 @@ zabbix_export:
                 - $.start_timestamp
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //use boottime to calculate uptime
-                  return (Math.floor(Date.now()/1000)-Number(value));
+                - 'return (Math.floor(Date.now() / 1000) - Number(value));'
           master_item:
             key: pd.get_status
           tags:
@@ -619,7 +617,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(value != "[]" ? [{''{#SINGLETON}'': ''''}] : []);'
+                - 'return JSON.stringify(value != "[]" ? [{ ''{#SINGLETON}'': '''' }] : []);'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -667,7 +665,7 @@ zabbix_export:
                           lookup[grpc_method] = 1;
                           result.push({ "{#GRPC_METHOD}": grpc_method });
                       }
-                  })
+                  });
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -811,7 +809,7 @@ zabbix_export:
                           lookup[address] = 1;
                           result.push({ "{#STORE_ADDRESS}": address });
                       }
-                  })
+                  });
                   
                   return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
@@ -849,11 +847,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  output = JSON.parse(value).map(function (item) {
+                      return {
+                          "{#TYPE}": item.labels.type,
+                      };
+                  });
+                  return JSON.stringify({ "data": output });
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -909,11 +908,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#TYPE}": item.labels.type,
-                       }})
-                   return JSON.stringify({"data": output})
+                  output = JSON.parse(value).map(function (item) {
+                      return {
+                          "{#TYPE}": item.labels.type,
+                      };
+                  });
+                  return JSON.stringify({ "data": output });
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -978,11 +978,12 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  output = JSON.parse(value).map(function(item){
-                       return {
-                           "{#KIND}": item.labels.kind,
-                       }})
-                   return JSON.stringify({"data": output})
+                  output = JSON.parse(value).map(function (item) {
+                      return {
+                          "{#KIND}": item.labels.kind,
+                      };
+                  });
+                  return JSON.stringify({ "data": output });
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -1040,9 +1041,6 @@ zabbix_export:
                       value:
                         host: 'TiDB PD by HTTP'
                         name: 'TiDB cluster: Storage Usage[{#SINGLETON}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: ITEM
                   name: Uptime
                   x: '4'
@@ -1086,9 +1084,6 @@ zabbix_export:
                       value:
                         host: 'TiDB PD by HTTP'
                         name: 'TiDB cluster: Stores number by states[{#SINGLETON}]'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: bce54cbdf2b8487985f9c7847a4c4918
           name: 'Service state'

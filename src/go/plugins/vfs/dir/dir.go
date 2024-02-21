@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -25,11 +25,17 @@ import (
 	"regexp"
 	"strings"
 
+	"git.zabbix.com/ap/plugin-support/errs"
 	"git.zabbix.com/ap/plugin-support/plugin"
 	"git.zabbix.com/ap/plugin-support/zbxerr"
 )
 
 var impl Plugin
+
+type inodeData struct {
+	Dev uint64
+	Ino uint64
+}
 
 type common struct {
 	path          string
@@ -38,10 +44,21 @@ type common struct {
 	regExclude    *regexp.Regexp
 	regInclude    *regexp.Regexp
 	dirRegExclude *regexp.Regexp
-	files         []fs.FileInfo
+	files         map[inodeData]bool
 }
 
-//Export -
+func init() {
+	err := plugin.RegisterMetrics(
+		&impl, "VFSDir",
+		"vfs.dir.count", "Directory entry count.",
+		"vfs.dir.size", "All directory entry size.",
+	)
+	if err != nil {
+		panic(errs.Wrap(err, "failed to register metrics"))
+	}
+}
+
+// Export -
 func (p *Plugin) Export(key string, params []string, ctx plugin.ContextProvider) (result interface{}, err error) {
 	switch key {
 	case "vfs.dir.count":
@@ -111,11 +128,4 @@ func parseReg(in string) (*regexp.Regexp, error) {
 	}
 
 	return regexp.Compile(in)
-}
-
-func init() {
-	plugin.RegisterMetrics(&impl, "VFSDir",
-		"vfs.dir.count", "Directory entry count.",
-		"vfs.dir.size", "All directory entry size.",
-	)
 }

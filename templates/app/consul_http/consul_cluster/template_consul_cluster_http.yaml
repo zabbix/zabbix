@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:11:12Z'
+  date: '2024-01-22T15:08:43Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -340,18 +340,18 @@ zabbix_export:
                       consul_api_port = '{$CONSUL.API.PORT}',
                       result = [];
                   
-                  data.forEach(function(instance) {
+                  data.forEach(function (instance) {
                       if (instance["ID"] != '') {
-                        result.push({
-                        '{#NODE_NAME}': instance["Node"],
-                        '{#NODE_ADDRESS}': instance["Address"],
-                        '{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
-                        '{#NODE_DATACENTER}': instance["Datacenter"]
-                        });
+                          result.push({
+                              '{#NODE_NAME}': instance["Node"],
+                              '{#NODE_ADDRESS}': instance["Address"],
+                              '{#NODE_API_URL}': consul_api_scheme + '://' + instance["Address"] + ':' + consul_api_port,
+                              '{#NODE_DATACENTER}': instance["Datacenter"]
+                          });
                       }
-                    });
+                  });
                   
-                  return JSON.stringify(result)
+                  return JSON.stringify(result);
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 3h
@@ -477,7 +477,7 @@ zabbix_export:
                   var data = [];
                   
                   Object.keys(JSON.parse(value)).forEach(function (v) {
-                      data.push({ '{#SERVICE_NAME}': v })
+                      data.push({ '{#SERVICE_NAME}': v });
                   });
                   
                   return JSON.stringify(data);

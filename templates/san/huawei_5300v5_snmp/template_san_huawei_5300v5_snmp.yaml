@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:02:36Z'
+  date: '2023-11-01T21:00:06Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -1551,9 +1551,6 @@ zabbix_export:
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Controller {#ID}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Node {#NODE}: CPU utilization'
                   x: '12'
@@ -1568,9 +1565,6 @@ zabbix_export:
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Node {#NODE}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Node
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1586,9 +1580,6 @@ zabbix_export:
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Node {#NODE}: Node I/O'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Node {#NODE}: Node traffic'
                   x: '12'
@@ -1603,9 +1594,6 @@ zabbix_export:
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'Node {#NODE}: Node traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Lun
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1621,9 +1609,6 @@ zabbix_export:
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'LUN {#NAME}: LUN I/O'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'LUN {#NAME}: LUN traffic'
                   x: '12'
@@ -1638,9 +1623,6 @@ zabbix_export:
                       value:
                         host: 'Huawei OceanStor 5300 V5 by SNMP'
                         name: 'LUN {#NAME}: LUN traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: b5c6d9d67da54531a918c93a9c98cec8
           name: 'Huawei storage: Controller role'

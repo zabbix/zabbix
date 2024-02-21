@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-17T14:13:07Z'
+  date: '2024-01-22T15:17:41Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -101,73 +101,73 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Veeam = {
-                params: {},
+            	params: {},
             
-                setParams: function (params) {
-                    ['api_endpoint', 'user', 'password'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_endpoint', 'user', 'password'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    Veeam.params = params;
-                    if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
-                        Veeam.params.api_endpoint += '/';
-                    }
-                },
+            		Veeam.params = params;
+            		if (typeof Veeam.params.api_endpoint === 'string' && !Veeam.params.api_endpoint.endsWith('/')) {
+            			Veeam.params.api_endpoint += '/';
+            		}
+            	},
             
-                request: function (url) {
-                    var response, request = new HttpRequest();
-                    if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
-                        request.setProxy(Veeam.params.http_proxy);
-                    }
-                    request.addHeader('Accept: application/json');
-                    request.addHeader('Authorization: Basic ' + btoa(Veeam.params.user + ':' + Veeam.params.password));
-                    request.post(Veeam.params.api_endpoint + 'api/sessionMngr');
-                    response = request.get(url);
-                    if (request.getStatus() !== 200 || response === null) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
-                    try {
-                        return JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from API.';
-                    }
-                },
+            	request: function (url) {
+            		var response, request = new HttpRequest();
+            		if (typeof Veeam.params.http_proxy !== 'undefined' && Veeam.params.http_proxy !== '') {
+            			request.setProxy(Veeam.params.http_proxy);
+            		}
+            		request.addHeader('Accept: application/json');
+            		request.addHeader('Authorization: Basic ' + btoa(Veeam.params.user + ':' + Veeam.params.password));
+            		request.post(Veeam.params.api_endpoint + 'api/sessionMngr');
+            		response = request.get(url);
+            		if (request.getStatus() !== 200 || response === null) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
+            		try {
+            			return JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from API.';
+            		}
+            	},
             
-                getMetricsData: function() {
-                    var data = {};
-                    endpoints = {
-                        'backupFiles': 'api/backupFiles',
-                    };
-                    reports_summary = Veeam.request(Veeam.params.api_endpoint + 'api/reports/summary')
-                    if (typeof reports_summary !== 'object' || reports_summary.hasOwnProperty('Links') === false)
-                        throw 'Failed response parse. Check debug log for more information.';
-                    reports_summary.Links.forEach(function (field)  {
-                            data[field.Name] = Veeam.request(field.Href)
-                        })
-                    Object.keys(endpoints).forEach(function (key) {
-                        data[key] = Veeam.request(Veeam.params.api_endpoint + endpoints[key]);
-                        if (typeof data[key] !== 'object' || data[key].hasOwnProperty('Refs') === false)
-                            throw 'Failed response parse. Check debug log for more information.';
-                        data[key].Refs.forEach(function (field) {
-                            data[field.Name] = Veeam.request(field.Href)
-                        })
-                    
-                    })
-                    return data;
-                }
+            	getMetricsData: function () {
+            		var data = {};
+            		endpoints = {
+            			'backupFiles': 'api/backupFiles',
+            		};
+            		reports_summary = Veeam.request(Veeam.params.api_endpoint + 'api/reports/summary');
+            		if (typeof reports_summary !== 'object' || reports_summary.hasOwnProperty('Links') === false)
+            			throw 'Failed response parse. Check debug log for more information.';
+            		reports_summary.Links.forEach(function (field) {
+            			data[field.Name] = Veeam.request(field.Href);
+            		});
+            		Object.keys(endpoints).forEach(function (key) {
+            			data[key] = Veeam.request(Veeam.params.api_endpoint + endpoints[key]);
+            			if (typeof data[key] !== 'object' || data[key].hasOwnProperty('Refs') === false)
+            				throw 'Failed response parse. Check debug log for more information.';
+            			data[key].Refs.forEach(function (field) {
+            				data[field.Name] = Veeam.request(field.Href);
+            			});
             
-            };  
+            		});
+            		return data;
+            	}
+            
+            };
             try {
-                Veeam.setParams(JSON.parse(value));
-                return JSON.stringify(Veeam.getMetricsData());
+            	Veeam.setParams(JSON.parse(value));
+            	return JSON.stringify(Veeam.getMetricsData());
             }
             catch (error) {
-                error += (String(error).endsWith('.')) ? '' : '.';
-                Zabbix.log(3, '[ VEEAM MANAGER ] ERROR: ' + error);
-                return JSON.stringify({'error': error});
+            	error += (String(error).endsWith('.')) ? '' : '.';
+            	Zabbix.log(3, '[ VEEAM MANAGER ] ERROR: ' + error);
+            	return JSON.stringify({ 'error': error });
             }
           description: 'The result of API requests is expressed in the JSON.'
           timeout: '{$VEEAM.MANAGER.DATA.TIMEOUT}'

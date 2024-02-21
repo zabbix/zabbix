@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -260,6 +260,18 @@ class CIntegrationTest extends CAPITest {
 			self::stopComponent($component);
 		}
 
+		if ($this->hasFailed()) {
+			$case_name = strtr($this->getName(true), [' ' => '-']);
+			mkdir(PHPUNIT_COMPONENT_DIR.'failed/'.$case_name, 0775, true);
+
+			foreach ($components as $component) {
+				$log_file = self::getLogPath($component);
+				if (file_exists($log_file)) {
+					rename($log_file, PHPUNIT_COMPONENT_DIR.'failed/'.$case_name.'/'.basename($log_file));
+				}
+			}
+		}
+
 		self::setHostStatus($this->case_hosts, HOST_STATUS_NOT_MONITORED);
 
 		parent::onAfterTestCase();
@@ -470,19 +482,22 @@ class CIntegrationTest extends CAPITest {
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_SERVER_HANODE1 => array_merge($db, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_server_ha1.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR.'ha1/',
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::SERVER_HANODE1_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_PROXY => array_merge($db, [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.log',
 				'PidFile' => PHPUNIT_COMPONENT_DIR.'zabbix_proxy.pid',
 				'SocketDir' => PHPUNIT_COMPONENT_DIR,
-				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX
+				'ListenPort' => PHPUNIT_PORT_PREFIX.self::PROXY_PORT_SUFFIX,
+				'AllowUnsupportedDBVersions' => '1'
 			]),
 			self::COMPONENT_AGENT => [
 				'LogFile' => PHPUNIT_COMPONENT_DIR.'zabbix_agent.log',

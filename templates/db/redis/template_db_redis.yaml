@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-18T11:11:48Z'
+  date: '2024-02-12T14:37:25Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -539,7 +539,7 @@ zabbix_export:
           key: redis.persistence.aof_rewrite_in_progress
           delay: '0'
           history: 7d
-          description: 'Flag indicating a AOF rewrite operation is on-going'
+          description: 'Flag indicating an AOF rewrite operation is on-going'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -1551,7 +1551,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.Keyspace["{#DB}"]'
+                    - '$[''{#DB}'']'
                   error_handler: DISCARD_VALUE
               master_item:
                 key: redis.keyspace.info_raw
@@ -2436,12 +2436,12 @@ zabbix_export:
                     - |
                       var repl = JSON.parse(value);
                       var res = Object.keys(repl)
-                          .filter(function (v) {return v.match(/slave\d+/)})
-                          .filter(function (v) {return (repl[v].ip === "{#SLAVE_IP}" && repl[v].port === "{#SLAVE_PORT}")})
-                          .map(function (v) {return repl[v].offset})[0];
+                      	.filter(function (v) {return v.match(/slave\d+/)})
+                      	.filter(function (v) {return (repl[v].ip === "{#SLAVE_IP}" && repl[v].port === "{#SLAVE_PORT}")})
+                      	.map(function (v) {return repl[v].offset})[0];
                       
                       if (res === undefined) {
-                          throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.';
+                      	throw 'Slave {#SLAVE_IP}:{#SLAVE_PORT} is no longer available.';
                       }
                       
                       return res;
@@ -2745,9 +2745,6 @@ zabbix_export:
                       value:
                         host: 'Redis by Zabbix agent 2'
                         name: 'Redis: Replication lag time{#SINGLETON}'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'

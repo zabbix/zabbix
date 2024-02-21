@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // create form
@@ -35,15 +36,17 @@ $form = (new CForm())
 
 $host_tab = new CFormList('hostFormList');
 
-$link_templates = (new CTable())
-	->addRow(
+$host_tab->addRow(
+	(new CVisibilityBox('visible[templates]', 'linked-templates-field', _('Original')))
+		->setLabel(_('Link templates'))
+		->setAttribute('autofocus', 'autofocus'),
+	(new CDiv([
 		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
 			->addValue(_('Link'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
 			->setModern(true)
-	)
-	->addRow([
+			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
 			'name' => 'templates[]',
 			'object_name' => 'templates',
@@ -57,25 +60,17 @@ $link_templates = (new CTable())
 					'dstfld1' => 'templates_'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->addStyle('margin-bottom: 5px;'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
 			->addItem((new CCheckBox('mass_clear_tpls'))->setLabel(_('Clear when unlinking')))
-	]);
-
-$host_tab->addRow(
-	(new CVisibilityBox('visible[templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates'))
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv($link_templates))
-		->setId('linked-templates-div')
-		->addStyle('margin-top: -5px;')
+	]))->setId('linked-templates-field')
 );
 
 $host_tab->addRow(
-	(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))->setLabel(_('Host groups')),
+	(new CVisibilityBox('visible[groups]', 'groups-field', _('Original')))->setLabel(_('Host groups')),
 	(new CDiv([
 		(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
 			->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -98,7 +93,7 @@ $host_tab->addRow(
 				]
 			]
 		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	]))->setId('groups-div')
+	]))->setId('groups-field')
 );
 
 // append description to form list
@@ -171,21 +166,20 @@ $inventory_tab = new CFormList('inventoryFormList');
 
 // append inventories to form list
 $inventory_tab->addRow(
-	(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode_div', _('Original')))->setLabel(_('Inventory mode')),
-	(new CDiv(
-		(new CRadioButtonList('inventory_mode', HOST_INVENTORY_DISABLED))
-			->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
-			->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
-			->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
-			->setModern(true)
-	))->setId('inventory_mode_div')
+	(new CVisibilityBox('visible[inventory_mode]', 'inventory_mode', _('Original')))->setLabel(_('Inventory mode')),
+	(new CRadioButtonList('inventory_mode', HOST_INVENTORY_DISABLED))
+		->setId('inventory_mode')
+		->addValue(_('Disabled'), HOST_INVENTORY_DISABLED)
+		->addValue(_('Manual'), HOST_INVENTORY_MANUAL)
+		->addValue(_('Automatic'), HOST_INVENTORY_AUTOMATIC)
+		->setModern(true)
 );
 
 $tags_tab = new CFormList('tagsFormList');
 
 // append tags table to form list
 $tags_tab->addRow(
-	(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+	(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 	(new CDiv([
 		(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 			->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -196,7 +190,7 @@ $tags_tab->addRow(
 		renderTagTable([['tag' => '', 'value' => '']])
 			->setHeader([_('Name'), _('Value'), _('Action')])
 			->addClass('tags-table')
-	]))->setId('tags-div')
+	]))->setId('tags-field')
 );
 
 $hostInventoryTable = DB::getSchema('host_inventory');
@@ -220,7 +214,7 @@ foreach ($data['inventories'] as $field => $fieldInfo) {
 
 $encryption_tab = new CFormList('encryption');
 
-$encryption_table = (new CFormList('encryption'))
+$encryption_table = (new CFormList('encryption-field'))
 	->addRow(_('Connections to host'),
 		(new CRadioButtonList('tls_connect', HOST_ENCRYPTION_NONE))
 			->addValue(_('No encryption'), HOST_ENCRYPTION_NONE)
@@ -268,10 +262,8 @@ $encryption_table = (new CFormList('encryption'))
 	);
 
 $encryption_tab->addRow(
-	(new CVisibilityBox('visible[encryption]', 'encryption_div', _('Original')))->setLabel(_('Connections')),
-	(new CDiv($encryption_table))
-		->setId('encryption_div')
-		->addStyle('margin-top: -5px;')
+	(new CVisibilityBox('visible[encryption]', 'encryption-field', _('Original')))->setLabel(_('Connections')),
+	$encryption_table->addStyle('margin-top: -5px;')
 );
 
 // append tabs to form

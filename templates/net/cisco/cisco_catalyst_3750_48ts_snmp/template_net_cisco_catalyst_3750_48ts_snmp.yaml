@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:33:52Z'
+  date: '2023-11-01T20:51:08Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1328,9 +1328,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Catalyst 3750V2-48TS by SNMP'
                         name: '#{#SNMPINDEX}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1344,9 +1341,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Catalyst 3750V2-48TS by SNMP'
                         name: '{#SNMPVALUE}: Memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -1360,9 +1354,6 @@ zabbix_export:
                       value:
                         host: 'Cisco Catalyst 3750V2-48TS by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 52875f5c6b1b4bb3987c3baa03860d4d
           name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'

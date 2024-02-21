@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-20T05:59:21Z'
+  date: '2023-11-01T20:49:21Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1746,9 +1746,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Tuples'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -1762,9 +1759,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Block hit/read'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -1778,9 +1772,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Locks'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '12'
@@ -1794,9 +1785,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Queries'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -1810,9 +1798,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Events'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -1827,9 +1812,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Temp files'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -1844,9 +1826,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Database size'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '15'
@@ -1861,9 +1840,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by Zabbix agent'
                         name: 'DB [{#DBNAME}]: Slow queries'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: f2ceabf59fd64ca9828ea55e9b9668bd
           name: 'PostgreSQL stat'
           pages:

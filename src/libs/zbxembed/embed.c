@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -654,6 +654,10 @@ out:
 		zbx_json_close(es->env->json);
 		zbx_json_adduint64(es->env->json, "ms", zbx_get_duration_ms(&es->env->start_time));
 	}
+
+	/* Duktape documentation recommends calling duk_gc() twice, see https://duktape.org/api#duk_gc */
+	duk_gc(es->env->ctx, 0);
+	duk_gc(es->env->ctx, 0);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s %s allocated memory: " ZBX_FS_SIZE_T " max allocated or requested "
 			"memory: " ZBX_FS_SIZE_T " max allowed memory: %d", __func__, zbx_result_string(ret),

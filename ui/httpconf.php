@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -218,12 +218,17 @@ elseif (hasRequest('add') || hasRequest('update')) {
 			if (array_key_exists('pairs', $step)) {
 				foreach ($field_names as $field_name) {
 					foreach ($step['pairs'] as $pair) {
-						if (array_key_exists('type', $pair) && $field_name === $pair['type'] &&
-							((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-							(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
+						if (array_key_exists('type', $pair) && $field_name === $pair['type']) {
+							$name = array_key_exists('name', $pair) ? trim($pair['name']) : '';
+							$value = array_key_exists('value', $pair) ? trim($pair['value']) : '';
+
+							if ($name === '' && $value === '') {
+								continue;
+							}
+
 							$step[$field_name][] = [
-								'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-								'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
+								'name' => $name,
+								'value' => $value
 							];
 						}
 					}
@@ -231,14 +236,13 @@ elseif (hasRequest('add') || hasRequest('update')) {
 				unset($step['pairs']);
 			}
 
-			foreach ($step['variables'] as &$variable) {
-				$variable['name'] = trim($variable['name']);
-			}
-			unset($variable);
-
 			if ($step['post_type'] == ZBX_POSTTYPE_FORM) {
 				$step['posts'] = $step['post_fields'];
 			}
+			else {
+				$step['posts'] = trim($step['posts']);
+			}
+
 			unset($step['post_fields'], $step['post_type']);
 		}
 		unset($step);
@@ -266,21 +270,20 @@ elseif (hasRequest('add') || hasRequest('update')) {
 		];
 
 		foreach (getRequest('pairs', []) as $pair) {
-			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers']) &&
-				((array_key_exists('name', $pair) && $pair['name'] !== '') ||
-				(array_key_exists('value', $pair) && $pair['value'] !== ''))) {
+			if (array_key_exists('type', $pair) && in_array($pair['type'], ['variables', 'headers'])) {
+				$name = array_key_exists('name', $pair) ? trim($pair['name']) : '';
+				$value = array_key_exists('value', $pair) ? trim($pair['value']) : '';
+
+				if ($name === '' && $value === '') {
+					continue;
+				}
 
 				$httpTest[$pair['type']][] = [
-					'name' => (array_key_exists('name', $pair) ? $pair['name'] : ''),
-					'value' => (array_key_exists('value', $pair) ? $pair['value'] : '')
+					'name' => $name,
+					'value' => $value
 				];
 			}
 		}
-
-		foreach ($httpTest['variables'] as &$variable) {
-			$variable['name'] = trim($variable['name']);
-		}
-		unset($variable);
 
 		if (isset($_REQUEST['httptestid'])) {
 			// unset fields that did not change
@@ -498,10 +501,6 @@ if (isset($_REQUEST['form'])) {
 		$data['delay'] = $db_httptest['delay'];
 		$data['retries'] = $db_httptest['retries'];
 		$data['status'] = $db_httptest['status'];
-		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
-			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
-		);
-
 		$data['agent'] = ZBX_AGENT_OTHER;
 		$data['agent_other'] = $db_httptest['agent'];
 
@@ -540,7 +539,6 @@ if (isset($_REQUEST['form'])) {
 		$data['http_password'] = $db_httptest['http_password'];
 		$data['http_proxy'] = $db_httptest['http_proxy'];
 		$data['templated'] = (bool) $db_httptest['templateid'];
-
 		$data['verify_peer'] = $db_httptest['verify_peer'];
 		$data['verify_host'] = $db_httptest['verify_host'];
 		$data['ssl_cert_file'] = $db_httptest['ssl_cert_file'];
@@ -641,6 +639,10 @@ if (isset($_REQUEST['form'])) {
 	}
 
 	if ($db_httptest) {
+		$data['templates'] = makeHttpTestTemplatesHtml($db_httptest['httptestid'],
+			getHttpTestParentTemplates($db_httptests), CWebUser::checkAccess(CRoleHelper::UI_CONFIGURATION_TEMPLATES)
+		);
+
 		$parent_templates = getHttpTestParentTemplates($db_httptests)['templates'];
 
 		$rw_templates = $data['host']['parentTemplates']

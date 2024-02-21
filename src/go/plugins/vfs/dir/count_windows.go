@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -53,7 +53,6 @@ func (cp *countParams) skipType(path string, d fs.DirEntry) bool {
 			if attr.FileAttributes&syscall.FILE_ATTRIBUTE_DIRECTORY != 0 && typeDir {
 				return false
 			} else if attr.FileAttributes&syscall.FILE_ATTRIBUTE_DIRECTORY == 0 && typeFile {
-				cp.common.files = append(cp.common.files, i)
 				return false
 			}
 		} else if attr.FileAttributes&syscall.FILE_ATTRIBUTE_DIRECTORY == 0 && typeFile {

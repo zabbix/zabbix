@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:28:11Z'
+  date: '2023-11-01T20:49:26Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -2640,9 +2640,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: pg_stat_database metrics'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -2656,9 +2653,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Size'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -2672,9 +2666,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Queries'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -2688,9 +2679,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Locks'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -2705,9 +2693,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Number of bloating tables'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -2722,9 +2707,6 @@ zabbix_export:
                       value:
                         host: 'PostgreSQL by ODBC'
                         name: 'DB [{#DBNAME}]: Slow queries'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 6e5062ae5345454f95cb8608b35eddf4
           name: 'PostgreSQL recovery role'

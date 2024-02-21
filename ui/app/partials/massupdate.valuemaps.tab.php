@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -86,7 +86,7 @@ $remove_all_container = (new CDiv())->addItem((new CDiv(
 
 $form_list = (new CFormList('valuemap-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[valuemaps]', 'valuemap-div', _('Original')))
+		(new CVisibilityBox('visible[valuemaps]', 'valuemap-field', _('Original')))
 			->setLabel(_('Value mapping'))
 			->setChecked(array_key_exists('valuemaps', $data['visible'])),
 		(new CDiv([
@@ -104,7 +104,7 @@ $form_list = (new CFormList('valuemap-form-list'))
 			$rename_container->setAttribute('data-type', ZBX_ACTION_RENAME),
 			$remove_container->setAttribute('data-type', ZBX_ACTION_REMOVE),
 			$remove_all_container->setAttribute('data-type', ZBX_ACTION_REMOVE_ALL)
-		]))->setId('valuemap-div')
+		]))->setId('valuemap-field')
 	);
 
 $form_list->show();

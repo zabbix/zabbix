@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:53:01Z'
+  date: '2024-01-22T15:56:09Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -273,47 +273,47 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'rtsOpen',
-                    'rtsShorted',
-                    'rtsDisconnected',
-                    'heatsinkTempSensorOpen',
-                    'heatsinkTempSensorShorted',
-                    'highTemperatureCurrentLimit',
-                    'currentLimit',
-                    'currentOffset',
-                    'batterySense',
-                    'batterySenseDisconnected',
-                    'uncalibrated',
-                    'rtsMiswire',
-                    'highVoltageDisconnect',
-                    'undefined',
-                    'systemMiswire',
-                    'mosfetSOpen',
-                    'p12VoltageOutOfRange',
-                    'highArrayVCurrentLimit',
-                    'maxAdcValueReached',
-                    'controllerWasReset',
-                    'alarm21Internal',
-                    'p3VoltageOutOfRange',
-                    'derateLimit',
-                    'arrayCurrentOffset',
-                    'ee-i2cRetryLimit',
-                    'ethernetAlarm',
-                    'lvd',
-                    'software',
-                    'fp12VoltageOutOfRange',
-                    'extflashFault',
-                    'slaveControlFault',
-                    'alarm32Undefined'
+                  	'rtsOpen',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
+                  	'heatsinkTempSensorOpen',
+                  	'heatsinkTempSensorShorted',
+                  	'highTemperatureCurrentLimit',
+                  	'currentLimit',
+                  	'currentOffset',
+                  	'batterySense',
+                  	'batterySenseDisconnected',
+                  	'uncalibrated',
+                  	'rtsMiswire',
+                  	'highVoltageDisconnect',
+                  	'undefined',
+                  	'systemMiswire',
+                  	'mosfetSOpen',
+                  	'p12VoltageOutOfRange',
+                  	'highArrayVCurrentLimit',
+                  	'maxAdcValueReached',
+                  	'controllerWasReset',
+                  	'alarm21Internal',
+                  	'p3VoltageOutOfRange',
+                  	'derateLimit',
+                  	'arrayCurrentOffset',
+                  	'ee-i2cRetryLimit',
+                  	'ethernetAlarm',
+                  	'lvd',
+                  	'software',
+                  	'fp12VoltageOutOfRange',
+                  	'extflashFault',
+                  	'slaveControlFault',
+                  	'alarm32Undefined'
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
@@ -573,44 +573,44 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'overcurrent',
-                    'fetShort',
-                    'softwareFault',
-                    'batteryHvd',
-                    'arrayHvd',
-                    'dipSwitchChange',
-                    'customSettingsEdit',
-                    'rtsShorted',
-                    'rtsDisconnected',
-                    'eepromRetryLimit',
-                    'controllerWasReset',
-                    'chargeSlaveControlTimeout',
-                    'rs232SerialToMeterBridge',
-                    'batteryLvd',
-                    'fault14Undefined',
-                    'powerboardCommunicationFault',
-                    'fault16Software',
-                    'fault17Software',
-                    'fault18Software',
-                    'fault19Software',
-                    'fault20Software',
-                    'fault21Software',
-                    'fpgaVersion',
-                    'currentSensorReferenceOutOfRange',
-                    'ia-refSlaveModeTimeout',
-                    'blockbusBoot',
-                    'hscommMaster',
-                    'hscomm',
-                    'slave',
+                  	'overcurrent',
+                  	'fetShort',
+                  	'softwareFault',
+                  	'batteryHvd',
+                  	'arrayHvd',
+                  	'dipSwitchChange',
+                  	'customSettingsEdit',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
+                  	'eepromRetryLimit',
+                  	'controllerWasReset',
+                  	'chargeSlaveControlTimeout',
+                  	'rs232SerialToMeterBridge',
+                  	'batteryLvd',
+                  	'fault14Undefined',
+                  	'powerboardCommunicationFault',
+                  	'fault16Software',
+                  	'fault17Software',
+                  	'fault18Software',
+                  	'fault19Software',
+                  	'fault20Software',
+                  	'fault21Software',
+                  	'fpgaVersion',
+                  	'currentSensorReferenceOutOfRange',
+                  	'ia-refSlaveModeTimeout',
+                  	'blockbusBoot',
+                  	'hscommMaster',
+                  	'hscomm',
+                  	'slave',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
@@ -1074,11 +1074,11 @@ zabbix_export:
               parameters:
                 - |
                   var v_range = [
-                        [[0, 18], [12, 15, 11.5, 15.5]],
-                        [[18, 36], [24, 30, 23, 31]],
-                        [[36, 99], [48, 60, 46, 62]],
-                    ],
-                    result = [];
+                      [[0, 18], [12, 15, 11.5, 15.5]],
+                      [[18, 36], [24, 30, 23, 31]],
+                      [[36, 99], [48, 60, 46, 62]],
+                  ],
+                      result = [];
                   
                   for (var idx in v_range) {
                       if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {

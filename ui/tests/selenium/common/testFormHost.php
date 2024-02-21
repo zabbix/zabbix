@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -331,7 +331,7 @@ class testFormHost extends CWebTest {
 				[
 					'expected' => TEST_BAD,
 					'host_fields' => [
-						'Host name' => 'Existen visible name',
+						'Host name' => 'Existed visible name',
 						'Groups' => 'Zabbix servers',
 						'Visible name' => 'ЗАББИКС Сервер'
 					],
@@ -1661,7 +1661,7 @@ class testFormHost extends CWebTest {
 		$this->assertMessage(TEST_GOOD, 'Host added');
 
 		// Check the values of the original host with the cloned host.
-		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])) )
+		$this->filterAndSelectHost((CTestArrayHelper::get($data, 'Visible name', $data['Host name'])))
 				->checkValue($original);
 		COverlayDialogElement::find()->one()->close();
 	}
@@ -1903,7 +1903,7 @@ class testFormHost extends CWebTest {
 	 * @return CFormElement
 	 */
 	public function filterAndSelectHost($host) {
-		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->one()->waitUntilVisible();
+		$table = $this->query('xpath://table[@class="list-table"]')->asTable()->waitUntilVisible(25)->one();
 		$this->query('button:Reset')->one()->click();
 		$table->waitUntilReloaded();
 		$this->query('name:zbx_filter')->asForm()->waitUntilReady()->one()->fill(['Name' => $host]);

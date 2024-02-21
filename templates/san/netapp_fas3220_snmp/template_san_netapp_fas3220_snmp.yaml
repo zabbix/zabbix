@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:03:02Z'
+  date: '2023-11-01T21:00:14Z'
   groups:
     - uuid: 7c2cb727f85b492d88cd56e17127c64d
       name: Templates/SAN
@@ -1497,9 +1497,6 @@ zabbix_export:
                       value:
                         host: 'NetApp FAS3220 by SNMP'
                         name: 'Node {#NODE.NAME}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1513,9 +1510,6 @@ zabbix_export:
                       value:
                         host: 'NetApp FAS3220 by SNMP'
                         name: '{#VSERVER}{#FSNAME}: Free space'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -1529,9 +1523,6 @@ zabbix_export:
                       value:
                         host: 'NetApp FAS3220 by SNMP'
                         name: 'Node {#NODE}: port {#IFNAME} ({#TYPE}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: e078162b11ff49f59c3ab6d905f88f2c
           name: 'FAS3220 HA cannot takeover cause'

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:25:45Z'
+  date: '2023-11-01T20:48:41Z'
   groups:
     - uuid: 748ad4d098d447d492bb935c907f652f
       name: Templates/Databases
@@ -1256,9 +1256,6 @@ zabbix_export:
                       value:
                         host: 'MongoDB cluster by Zabbix agent 2'
                         name: 'MongoDB {#DBNAME}: Disk usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 2014769595e34d4bb18dbcf4d9eaf112
           name: 'MongoDB flag'

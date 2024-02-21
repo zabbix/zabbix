@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:32:48Z'
+  date: '2023-12-28T08:16:28Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -565,7 +565,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the operations status is down.
-                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'ethernal off' interfaces.)
+                    2. {TEMPLATE_NAME:METRIC.diff()}=1) - trigger fires only if operational status was up(1) sometime before. (So, do not fire 'eternal off' interfaces.)
                     
                     WARNING: if closed manually - won't fire again on next poll, because of .diff.
                   manual_close: 'YES'
@@ -1338,9 +1338,6 @@ zabbix_export:
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.IF.NAME} Traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1354,9 +1351,6 @@ zabbix_export:
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.IF.NAME}: Packets traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1370,9 +1364,6 @@ zabbix_export:
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.IF.NAME}: Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: Resources
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1387,9 +1378,6 @@ zabbix_export:
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: Memory[{#SNMPVALUE}] Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1403,9 +1391,6 @@ zabbix_export:
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: CPU[{#SNMPINDEX}] Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Sessions traffic'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1420,9 +1405,6 @@ zabbix_export:
                       value:
                         host: 'Cisco ASAv by SNMP'
                         name: 'Cisco ASAv: {#CISCO.CRAS.USER} [{#CISCO.CRAS.INDEX}] Traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 764f7c162b8a45d9b41e795cf2f5f8da
           name: 'Cisco ASAv algorithm validate packets'

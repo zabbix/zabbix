@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:34:44Z'
+  date: '2024-02-13T12:41:19Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1275,7 +1275,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
@@ -1344,9 +1343,6 @@ zabbix_export:
                       value:
                         host: 'Cisco IOS by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: fb67666002524322b1b9ae9ed1611be5
           name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'
@@ -3962,7 +3958,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
@@ -4031,9 +4026,6 @@ zabbix_export:
                       value:
                         host: 'Cisco IOS versions 12.0_3_T-12.2_3.5 by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: d811f4c78e8246f6a3ed1e903ade574d
           name: 'CISCO-ENVMON-MIB::CiscoEnvMonState'

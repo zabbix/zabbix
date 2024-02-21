@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:54:06Z'
+  date: '2024-01-22T15:57:20Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -33,116 +33,116 @@ zabbix_export:
             request.addHeader('Authorization: Token ' + params.token);
             
             var response,
-                output,
-                error_msg = '',
-                enterprises = [],
-                edges = [],
-                links = [],
-                gateways = [],
-                version = [],
-                apps = [],
-                appsLinks = [],
-                edgeSDWan = [],
-                edgeSDWanPath = [];
+            	output,
+            	error_msg = '',
+            	enterprises = [],
+            	edges = [],
+            	links = [],
+            	gateways = [],
+            	version = [],
+            	apps = [],
+            	appsLinks = [],
+            	edgeSDWan = [],
+            	edgeSDWanPath = [];
             
             function getHttpData(url, body) {
-                response = request.post(url, body);
-                Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            	response = request.post(url, body);
+            	Zabbix.log(4, '[ SD-WAN API ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
-                    }
-                }
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response received from SD-WAN API. Check debug log for more information.';
+            		}
+            	}
             
-                if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
-                        throw response.error.message;
-                    } else {
-                        throw 'Failed to receive data: invalid response status code.';
-                    }
-                }
+            	if (request.getStatus() !== 200) {
+            		if (response.error && response.error.message) {
+            			throw response.error.message;
+            		} else {
+            			throw 'Failed to receive data: invalid response status code.';
+            		}
+            	}
             
-                if (typeof (response) !== 'object' || response === null) {
-                    throw 'Cannot process response data: received data is not an object.';
-                }
+            	if (typeof (response) !== 'object' || response === null) {
+            		throw 'Cannot process response data: received data is not an object.';
+            	}
             
-                return response;
+            	return response;
             };
             
             try {
             
-                if (params.token === '{' + '$VELOCLOUD.TOKEN}') {
-                    throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
-                }
+            	if (params.token === '{' + '$VELOCLOUD.TOKEN}') {
+            		throw 'Please change {' + '$VELOCLOUD.TOKEN} macro with the proper value.';
+            	}
             
-                if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
-                    params.url = 'https://' + params.url;
-                }
+            	if (params.url.indexOf('http://') === -1 && params.url.indexOf('https://') === -1) {
+            		params.url = 'https://' + params.url;
+            	}
             
-                if (!params.url.endsWith('/')) {
-                    params.url += '/';
-                }
+            	if (!params.url.endsWith('/')) {
+            		params.url += '/';
+            	}
             
-                enterprises = getHttpData(params.url + 'portal/rest/monitoring/getAggregates', '{}').enterprises;
+            	enterprises = getHttpData(params.url + 'portal/rest/monitoring/getAggregates', '{}').enterprises;
             
-                if (!Array.isArray(enterprises)) {
-                    throw 'Cannot process edges: enterprises is not an array.';
-                }
+            	if (!Array.isArray(enterprises)) {
+            		throw 'Cannot process edges: enterprises is not an array.';
+            	}
             
-                links = getHttpData(params.url + 'portal/rest/monitoring/getAggregateEdgeLinkMetrics', '{}');
-                gateways = getHttpData(params.url + 'portal/rest/network/getNetworkGateways', JSON.stringify({ with: ['site'] }));
-                version = getHttpData(params.url + 'portal/rest/system/getVersionInfo', '{}');
+            	links = getHttpData(params.url + 'portal/rest/monitoring/getAggregateEdgeLinkMetrics', '{}');
+            	gateways = getHttpData(params.url + 'portal/rest/network/getNetworkGateways', JSON.stringify({ with: ['site'] }));
+            	version = getHttpData(params.url + 'portal/rest/system/getVersionInfo', '{}');
             
-                for (var i in enterprises) {
-                    responseEdges = getHttpData(params.url + 'portal/rest/enterprise/getEnterpriseEdges', JSON.stringify({ enterpriseId: enterprises[i].id, with: ['site'] }));
-                    edges = edges.concat(responseEdges);
-                }
+            	for (var i in enterprises) {
+            		responseEdges = getHttpData(params.url + 'portal/rest/enterprise/getEnterpriseEdges', JSON.stringify({ enterpriseId: enterprises[i].id, with: ['site'] }));
+            		edges = edges.concat(responseEdges);
+            	}
             
-                if (!Array.isArray(edges)) {
-                    throw 'Cannot process edges SDWans: edges is not an array.';
-                }
+            	if (!Array.isArray(edges)) {
+            		throw 'Cannot process edges SDWans: edges is not an array.';
+            	}
             
-                for (var i in edges) {
-                    responseEdgeSDWan = getHttpData(params.url + 'portal/rest/edge/getEdgeSDWANPeers', JSON.stringify({ enterpriseId: edges[i].enterpriseId, edgeId: edges[i].id }));
+            	for (var i in edges) {
+            		responseEdgeSDWan = getHttpData(params.url + 'portal/rest/edge/getEdgeSDWANPeers', JSON.stringify({ enterpriseId: edges[i].enterpriseId, edgeId: edges[i].id }));
             
-                    if (!Array.isArray(responseEdgeSDWan)) {
-                        throw 'Cannot process edges SDWan Path: edges SDWans is not an array.';
-                    }
+            		if (!Array.isArray(responseEdgeSDWan)) {
+            			throw 'Cannot process edges SDWan Path: edges SDWans is not an array.';
+            		}
             
-                    for (var e in responseEdgeSDWan) {
-                        data = {
-                            'enterpriseId': edges[i].enterpriseId,
-                            'edgeId': edges[i].id,
-                            'peerLogicalId': responseEdgeSDWan[e].deviceLogicalId
-                        };
-                        responseEdgeSDWanPath = getHttpData(params.url + 'portal/rest/metrics/getEdgeSDWANPeerPathMetrics', JSON.stringify(data));
-                        edgeSDWanPath = edgeSDWanPath.concat(responseEdgeSDWanPath);
+            		for (var e in responseEdgeSDWan) {
+            			data = {
+            				'enterpriseId': edges[i].enterpriseId,
+            				'edgeId': edges[i].id,
+            				'peerLogicalId': responseEdgeSDWan[e].deviceLogicalId
+            			};
+            			responseEdgeSDWanPath = getHttpData(params.url + 'portal/rest/metrics/getEdgeSDWANPeerPathMetrics', JSON.stringify(data));
+            			edgeSDWanPath = edgeSDWanPath.concat(responseEdgeSDWanPath);
             
-                        responseEdgeSDWan[e].edgeId = edges[i].id;
-                        responseEdgeSDWan[e].edgeName = edges[i].name;
-                        responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
-                    }
+            			responseEdgeSDWan[e].edgeId = edges[i].id;
+            			responseEdgeSDWan[e].edgeName = edges[i].name;
+            			responseEdgeSDWan[e].enterpriseId = edges[i].enterpriseId;
+            		}
             
-                    edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
-                }
+            		edgeSDWan = edgeSDWan.concat(responseEdgeSDWan);
+            	}
             
             } catch (error) {
-                error_msg = error;
+            	error_msg = error;
             };
             
             return JSON.stringify({
-                'enterprises': enterprises,
-                'edges': edges,
-                'links': links,
-                'gateways': gateways,
-                'edgeSDWan': edgeSDWan,
-                'edgeSDWanPath': edgeSDWanPath,
-                'info': version,
-                'error': error_msg.toString()
+            	'enterprises': enterprises,
+            	'edges': edges,
+            	'links': links,
+            	'gateways': gateways,
+            	'edgeSDWan': edgeSDWan,
+            	'edgeSDWanPath': edgeSDWanPath,
+            	'info': version,
+            	'error': error_msg.toString()
             });
           description: 'The JSON with result of Velocloud API requests.'
           timeout: 10s
@@ -366,12 +366,12 @@ zabbix_export:
                   parameters:
                     - |
                       switch (value) {
-                          case 'PENDING':
-                              return 0
-                          case 'ACTIVATED':
-                              return 1
-                          default:
-                              return 10
+                      	case 'PENDING':
+                      		return 0;
+                      	case 'ACTIVATED':
+                      		return 1;
+                      	default:
+                      		return 10;
                       }
               master_item:
                 key: 'velocloud.get.edge[{#ID}]'
@@ -431,16 +431,16 @@ zabbix_export:
                   parameters:
                     - |
                       switch (value) {
-                          case 'UNCONFIGURED':
-                              return 0
-                          case 'READY':
-                              return 1
-                          case 'PENDING_INIT':
-                              return 2
-                          case 'FAILED':
-                              return 3
-                          default:
-                              return 10
+                      	case 'UNCONFIGURED':
+                      		return 0;
+                      	case 'READY':
+                      		return 1;
+                      	case 'PENDING_INIT':
+                      		return 2;
+                      	case 'FAILED':
+                      		return 3;
+                      	default:
+                      		return 10;
                       }
               master_item:
                 key: 'velocloud.get.edge[{#ID}]'
@@ -504,8 +504,8 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
-                      return value
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000);
+                      return value;
               master_item:
                 key: 'velocloud.get.edge[{#ID}]'
               tags:
@@ -564,14 +564,14 @@ zabbix_export:
                   parameters:
                     - |
                       switch (value) {
-                          case 'OFFLINE':
-                              return 0
-                          case 'CONNECTED':
-                              return 1
-                          case 'NEVER_ACTIVATED':
-                              return 2
-                          default:
-                              return 10
+                      	case 'OFFLINE':
+                      		return 0;
+                      	case 'CONNECTED':
+                      		return 1;
+                      	case 'NEVER_ACTIVATED':
+                      		return 2;
+                      	default:
+                      		return 10;
                       }
               master_item:
                 key: 'velocloud.get.edge[{#ID}]'
@@ -608,8 +608,8 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
-                      return value
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000);
+                      return value;
               master_item:
                 key: 'velocloud.get.edge[{#ID}]'
               tags:
@@ -785,8 +785,8 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
-                      return value
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000);
+                      return value;
               master_item:
                 key: 'velocloud.get.gateway[{#ID}]'
               tags:
@@ -840,8 +840,8 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000)
-                      return value
+                      value == '0000-00-00 00:00:00' ? value = 0 : value = Math.round((Date.now() - new Date(value).valueOf()) / 1000);
+                      return value;
               master_item:
                 key: 'velocloud.get.gateway[{#ID}]'
               tags:
@@ -1179,7 +1179,7 @@ zabbix_export:
                     - $.link.linkLastActive
                 - type: JAVASCRIPT
                   parameters:
-                    - 'return Math.round((Date.now() - new Date(value).valueOf()) / 1000)'
+                    - 'return Math.round((Date.now() - new Date(value).valueOf()) / 1000);'
               master_item:
                 key: 'velocloud.get.link[{#ID}]'
               tags:
@@ -1269,14 +1269,14 @@ zabbix_export:
                   parameters:
                     - |
                       switch (value) {
-                          case 'UNSTABLE':
-                              return 0
-                          case 'STABLE':
-                              return 1
-                          case 'DISCONNECTED':
-                              return 2
-                          default:
-                              return 10
+                      	case 'UNSTABLE':
+                      		return 0;
+                      	case 'STABLE':
+                      		return 1;
+                      	case 'DISCONNECTED':
+                      		return 2;
+                      	default:
+                      		return 10;
                       }
               master_item:
                 key: 'velocloud.get.link[{#ID}]'
@@ -1931,9 +1931,6 @@ zabbix_export:
                       value:
                         host: 'VMWare SD-WAN VeloCloud by HTTP'
                         name: 'Gateway [{#NAME}]: Utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Velocloud: Links'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -1949,9 +1946,6 @@ zabbix_export:
                       value:
                         host: 'VMWare SD-WAN VeloCloud by HTTP'
                         name: 'Link [{#NAME}]:[{#IP}]: Best loss'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Packets summary'
                   'y': '5'
@@ -1966,9 +1960,6 @@ zabbix_export:
                       value:
                         host: 'VMWare SD-WAN VeloCloud by HTTP'
                         name: 'Link [{#NAME}]:[{#IP}]: Packets summary'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Bytes summary'
                   x: '12'
@@ -1983,9 +1974,6 @@ zabbix_export:
                       value:
                         host: 'VMWare SD-WAN VeloCloud by HTTP'
                         name: 'Link [{#NAME}]:[{#IP}]: Bytes summary'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Velocloud: SDWAN peers'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2001,9 +1989,6 @@ zabbix_export:
                       value:
                         host: 'VMWare SD-WAN VeloCloud by HTTP'
                         name: 'SDWAN Peer [{#NAME}]:[{#TYPE}]: {#EDGE.ID}: Path overview'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 6ac13cd1206145919ae7c9776ef5e76b
           name: 'Edge activation state'

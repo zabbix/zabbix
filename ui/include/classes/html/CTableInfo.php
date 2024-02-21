@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,11 +23,6 @@ class CTableInfo extends CTable {
 
 	protected $message;
 
-	/**
-	 * @var bool
-	 */
-	private $addMakeVerticalRotationJs = false;
-
 	public function __construct() {
 		parent::__construct();
 
@@ -44,41 +39,11 @@ class CTableInfo extends CTable {
 			$this->setId($tableid);
 		}
 
-		$string = parent::toString($destroy);
-
-		if ($this->addMakeVerticalRotationJs) {
-			$string .= get_js(
-				'var makeVerticalRotationForTable = function() {'.
-					'jQuery("#'.$tableid.'").makeVerticalRotation();'.
-				'}'.
-				"\n".
-				'if (!jQuery.isReady) {'.
-					'jQuery(document).ready(makeVerticalRotationForTable);'.
-				'}'.
-				'else {'.
-					'makeVerticalRotationForTable();'.
-				'}',
-				true
-			);
-		}
-
-		return $string;
+		return parent::toString($destroy);
 	}
 
 	public function setNoDataMessage($message) {
 		$this->message = $message;
-
-		return $this;
-	}
-
-	/**
-	 * Rotate table header text vertical.
-	 * Cells must be marked with "vertical_rotation" class.
-	 *
-	 * @deprecated  Use CSS writing-mode.
-	 */
-	public function makeVerticalRotation() {
-		$this->addMakeVerticalRotationJs = true;
 
 		return $this;
 	}

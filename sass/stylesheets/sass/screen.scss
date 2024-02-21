@@ -48,7 +48,6 @@ $browser-sprite-path: '../img/browser-sprite.png?20211222';
 @import "components/z-bar-gauge";
 @import "components/z-select";
 
-@import "components/dashboard/widget-slareport";
 @import "components/dashboard/widget-svggraph";
 
 .link-action {
@@ -341,7 +340,11 @@ form {
 		.icon-depend-up,
 		.icon-depend-down,
 		.icon-ackn {
-			margin: 0 4px -3px 0;
+			margin-bottom: -3px;
+
+			&:not(:first-of-type) {
+				margin-left: 4px;
+			}
 		}
 	}
 
@@ -619,8 +622,12 @@ form {
 			}
 		}
 
-		.vertical {
+		.text-vertical {
+			max-height: 150px;
+			overflow: hidden;
+			text-overflow: ellipsis;
 			writing-mode: vertical-lr;
+			line-height: 22px;
 			transform: rotate(180deg);
 		}
 
@@ -703,11 +710,6 @@ form {
 
 	tbody th {
 		text-align: left;
-	}
-
-	.vertical_rotation_inner {
-		transform: rotate(270deg);
-		white-space: nowrap;
 	}
 
 	.list-table-footer {
@@ -995,12 +997,6 @@ form {
 	word-break: break-word;
 }
 
-.overflow-table {
-	overflow-x: auto;
-	position: relative;
-	@extend %webkit-hor-scrollbar;
-}
-
 // Timeline in table view.
 .timeline-date {
 	text-align: right;
@@ -1076,11 +1072,11 @@ form {
 }
 
 .filter-container {
+	position: relative;
+	padding: 10px 0;
+	margin-bottom: 8px;
 	background-color: $ui-bg-color;
 	border: 1px solid $ui-border-color;
-	margin: 0 0 10px;
-	padding: 10px 0;
-	position: relative;
 
 	.table {
 		border-bottom: 1px solid $table-border-color;
@@ -1129,6 +1125,10 @@ form {
 
 		button {
 			margin: 0;
+		}
+
+		table {
+			width: auto;
 		}
 	}
 
@@ -1491,6 +1491,11 @@ form {
 				margin-top: 5px;
 			}
 		}
+	}
+
+	.table-subforms {
+		margin-top: -5px;
+		margin-bottom: -5px;
 	}
 
 	h4 {
@@ -4142,6 +4147,10 @@ a.link-action {
 			border-top-right-radius: 2px;
 			border-bottom-right-radius: 2px;
 		}
+
+		&[data-hintbox='1'] {
+			cursor: pointer;
+		}
 	}
 
 	.status-na-bg,
@@ -4511,25 +4520,21 @@ span {
 	}
 }
 
-.menu-popup-preloader,
-.hintbox-preloader {
+.menu-popup-preloader {
 	background: $preloader-bg-color;
 	border: 1px solid $overlay-border-color;
 	box-shadow: 0 4px 20px 0 $action-shadow-color;
-	height: 128px;
-	width: 128px;
+	height: 50px;
+	width: 50px;
 	position: fixed;
 	right: auto;
 	bottom: auto;
 	z-index: 1010;
-
-	&::before {
-		background: $preloader-bg-color;
-	}
 }
 
 .hintbox-preloader {
-	position: absolute;
+	height: 50px;
+	width: 50px;
 }
 
 $browser-logos: (
@@ -4598,6 +4603,7 @@ $browser-logos: (
 
 	&::-webkit-scrollbar {
 		width: 9px;
+		height: 9px;
 	}
 
 	&::-webkit-scrollbar-track {
@@ -4608,15 +4614,6 @@ $browser-logos: (
 		background-color: $scrollbar-thumb-color;
 		border: 1px solid darken($scrollbar-thumb-color, $scrollbar-thumb-color-darken);
 	}
-}
-
-// TODO: Legacy
-%webkit-hor-scrollbar {
-	&::-webkit-scrollbar {
-		height: 9px;
-	}
-
-	@extend %webkit-scrollbar;
 }
 
 %cursor-drag {
@@ -5424,7 +5421,7 @@ svg {
 	}
 }
 
-.icon-invisible {
+a.icon-invisible {
 	&:link,
 	&:hover,
 	&:focus {

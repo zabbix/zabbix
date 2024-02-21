@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:30:38Z'
+  date: '2024-01-22T15:30:41Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -129,9 +129,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by SNMP'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: f55b1b1c10a44fe8aef0631f6f41b86d
       template: 'Linux CPU by SNMP'
       name: 'Linux CPU by SNMP'
@@ -203,9 +200,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //count the number of cores
-                  return JSON.parse(value).length;
+                - 'return JSON.parse(value).length;'
           tags:
             - tag: component
               value: cpu
@@ -248,9 +243,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -271,9 +264,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -294,9 +285,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -317,9 +306,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -340,9 +327,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -363,9 +348,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -386,9 +369,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -409,9 +390,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -432,9 +411,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -455,9 +432,7 @@ zabbix_export:
                     - ''
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //to get utilization in %, divide by N, where N is number of cores.
-                      return value/{#CPU.COUNT}
+                    - 'return value/{#CPU.COUNT}'
               tags:
                 - tag: component
                   value: cpu
@@ -473,9 +448,7 @@ zabbix_export:
               preprocessing:
                 - type: JAVASCRIPT
                   parameters:
-                    - |
-                      //Calculate utilization
-                      return (100 - value)
+                    - 'return (100 - value)'
               master_item:
                 key: 'system.cpu.idle[ssCpuRawIdle.{#SNMPINDEX}]'
               tags:
@@ -883,9 +856,6 @@ zabbix_export:
                       value:
                         host: 'Linux filesystems by SNMP'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: 443e4897fb0a4eef9d4624a3baa8f174
       template: 'Linux memory by SNMP'
       name: 'Linux memory by SNMP'

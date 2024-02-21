@@ -1,7 +1,7 @@
 <?php declare(strict_types = 0);
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 
 /**
  * @var CView $this
+ * @var array $data
  */
 
 // Create form.
@@ -37,15 +38,17 @@ $form = (new CForm())
  */
 $template_tab = new CFormList('template-form-list');
 
-$link_templates = (new CTable())
-	->addRow(
+$template_tab->addRow(
+	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-field', _('Original')))
+		->setLabel(_('Link templates'))
+		->setAttribute('autofocus', 'autofocus'),
+	(new CDiv([
 		(new CRadioButtonList('mass_action_tpls', ZBX_ACTION_ADD))
 			->addValue(_('Link'), ZBX_ACTION_ADD)
 			->addValue(_('Replace'), ZBX_ACTION_REPLACE)
 			->addValue(_('Unlink'), ZBX_ACTION_REMOVE)
 			->setModern(true)
-	)
-	->addRow([
+			->addStyle('margin-bottom: 5px;'),
 		(new CMultiSelect([
 			'name' => 'linked_templates[]',
 			'object_name' => 'templates',
@@ -59,28 +62,20 @@ $link_templates = (new CTable())
 					'dstfld1' => 'linked_templates_'
 				]
 			]
-		]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-	])
-	->addRow([
+		]))
+			->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
+			->addStyle('margin-bottom: 5px;'),
 		(new CList())
 			->addClass(ZBX_STYLE_LIST_CHECK_RADIO)
-			->addItem((new CCheckBox('mass_clear_tpls'))
-				->setLabel(_('Clear when unlinking'))
+			->addItem(
+				(new CCheckBox('mass_clear_tpls'))->setLabel(_('Clear when unlinking'))
 			)
-	]);
-
-$template_tab->addRow(
-	(new CVisibilityBox('visible[linked_templates]', 'linked-templates-div', _('Original')))
-		->setLabel(_('Link templates'))
-		->setAttribute('autofocus', 'autofocus'),
-	(new CDiv($link_templates))
-		->setId('linked-templates-div')
-		->addStyle('min-width: '.ZBX_TEXTAREA_BIG_WIDTH.'px;')
+	]))->setId('linked-templates-field')
 );
 
 $template_tab
 	->addRow(
-		(new CVisibilityBox('visible[groups]', 'groups-div', _('Original')))->setLabel(_('Host groups')),
+		(new CVisibilityBox('visible[groups]', 'groups-field', _('Original')))->setLabel(_('Host groups')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_groups', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -103,7 +98,7 @@ $template_tab
 					]
 				]
 			]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH)
-		]))->setId('groups-div')
+		]))->setId('groups-field')
 	)
 	->addRow(
 		(new CVisibilityBox('visible[description]', 'description', _('Original')))->setLabel(_('Description')),
@@ -114,7 +109,7 @@ $template_tab
 
 $tags_tab = (new CFormList('tags-form-list'))
 	->addRow(
-		(new CVisibilityBox('visible[tags]', 'tags-div', _('Original')))->setLabel(_('Tags')),
+		(new CVisibilityBox('visible[tags]', 'tags-field', _('Original')))->setLabel(_('Tags')),
 		(new CDiv([
 			(new CRadioButtonList('mass_update_tags', ZBX_ACTION_ADD))
 				->addValue(_('Add'), ZBX_ACTION_ADD)
@@ -125,7 +120,7 @@ $tags_tab = (new CFormList('tags-form-list'))
 			renderTagTable([['tag' => '', 'value' => '']])
 				->setHeader([_('Name'), _('Value'), _('Action')])
 				->addClass('tags-table')
-		]))->setId('tags-div')
+		]))->setId('tags-field')
 	);
 
 // Append tabs to the form.

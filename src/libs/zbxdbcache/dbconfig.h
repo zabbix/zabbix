@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -315,6 +315,8 @@ typedef struct
 }
 ZBX_DC_PSK;
 #endif
+
+ZBX_PTR_VECTOR_DECL(dc_item_ptr, ZBX_DC_ITEM *)
 
 #define ZBX_LOC_NOWHERE	0
 #define ZBX_LOC_QUEUE	1
@@ -968,5 +970,9 @@ int	dc_expand_user_macros_len(const char *text, size_t text_len, zbx_uint64_t *h
 #define ZBX_TRIGGER_TIMER_FUNCTION_TIME		0x0002
 #define ZBX_TRIGGER_TIMER_FUNCTION_TREND	0x0004
 #define ZBX_TRIGGER_TIMER_FUNCTION		(ZBX_TRIGGER_TIMER_FUNCTION_TIME | ZBX_TRIGGER_TIMER_FUNCTION_TREND)
+
+#define ZBX_DC_ITEM_UPDATE_TRIGGER_NONE		0
+#define ZBX_DC_ITEM_UPDATE_TRIGGER_REFRESH	1
+#define ZBX_ITEM_UPDATE_TRIGGER_NEW_ITEM	2
 
 #endif

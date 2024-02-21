@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1012,6 +1012,7 @@ zbx_task_t;
 
 /* runtime control notifications, must be less than 10000 */
 #define ZBX_RTC_CONFIG_SYNC_NOTIFY		9999
+#define ZBX_RTC_SERVICE_SYNC_NOTIFY		9998
 
 #define ZBX_IPC_RTC_MAX				9999
 
@@ -1355,6 +1356,7 @@ void	zbx_strupper(char *str);
 #if defined(_WINDOWS) || defined(__MINGW32__) || defined(HAVE_ICONV)
 char	*convert_to_utf8(char *in, size_t in_size, const char *encoding);
 #endif	/* HAVE_ICONV */
+const char	*get_bom_econding(char *in, size_t in_size);
 #define ZBX_MAX_BYTES_IN_UTF8_CHAR	4
 size_t	zbx_utf8_char_len(const char *text);
 size_t	zbx_strlen_utf8(const char *text);
@@ -1392,13 +1394,17 @@ typedef struct
 zbx_file_time_t;
 
 int	zbx_get_file_time(const char *path, int sym, zbx_file_time_t *time);
-void	find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+void	zbx_find_cr_lf_szbyte(const char *encoding, const char **cr, const char **lf, size_t *szbyte);
+char	*zbx_find_buf_newline(char *p, char **p_next, const char *p_end, const char *cr, const char *lf,
+		size_t szbyte);
 #define ZBX_READ_ERR		-1
 #define ZBX_READ_WRONG_ENCODING	-2
 int	zbx_read_text_line_from_file(int fd, char *buf, size_t count, const char *encoding);
 int	zbx_is_regular_file(const char *path);
 char	*zbx_fgets(char *buffer, int size, FILE *fp);
 int	zbx_write_all(int fd, const char *buf, size_t n);
+
+ssize_t	zbx_buf_readln(int fd, char *buf, size_t bufsz, const char *encoding, char **value, void **saveptr);
 
 int	MAIN_ZABBIX_ENTRY(int flags);
 
@@ -1839,9 +1845,11 @@ typedef enum
 	ERR_Z3005,
 	ERR_Z3006,
 	ERR_Z3007,
-	ERR_Z3008
+	ERR_Z3008,
+	ERR_Z3009
 }
 zbx_err_codes_t;
 
 void	zbx_md5buf2str(const md5_byte_t *md5, char *str);
+#define zbx_strscpy(x, y)	zbx_strlcpy(x, y, sizeof(x))
 #endif

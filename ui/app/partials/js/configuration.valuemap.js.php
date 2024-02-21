@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -35,7 +35,8 @@
 		let valuemap_table = event.target.closest('table');
 
 		valuemap_table.querySelectorAll('[name$="[name]"]').forEach((elm) => valuemap_names.push(elm.value));
-		PopUp('popup.valuemap.edit', {valuemap_names}, {trigger_element: event.target});
+
+		PopUp('popup.valuemap.edit', {valuemap_names}, {dialogue_class: 'modal-popup-generic'});
 	}
 })();
 </script>
@@ -66,12 +67,12 @@ var AddValueMap = class {
 
 	render(edit) {
 		if (edit instanceof Element) {
-			return edit.replaceWith(this.row);
+			edit.replaceWith(this.row);
+			this.row.querySelector(`input[value="${this.data.name}"] ~ a`).focus();
 		}
-
-		return document
-			.querySelector('#valuemap-table tbody')
-			.append(this.row);
+		else {
+			document.querySelector('#valuemap-table tbody').append(this.row);
+		}
 	}
 
 	createNameCell() {
@@ -89,7 +90,10 @@ var AddValueMap = class {
 					valuemap_names.push(element.value);
 				}
 			});
-			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1}, {trigger_element: e.target});
+
+			PopUp('popup.valuemap.edit', {...this.data, valuemap_names, edit: 1},
+				{dialogue_class: 'modal-popup-generic'}
+			);
 		});
 
 		cell.appendChild(this.createHiddenInput('[name]', this.data.name));

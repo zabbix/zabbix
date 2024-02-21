@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:30:26Z'
+  date: '2024-01-22T15:30:27Z'
   groups:
     - uuid: 57b7ae836ca64446ba2c296389c009b7
       name: Templates/Modules
@@ -308,9 +308,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by Zabbix agent active'
                         name: '{#DEVNAME}: Disk average waiting time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -324,9 +321,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by Zabbix agent active'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -340,9 +334,6 @@ zabbix_export:
                       value:
                         host: 'Linux block devices by Zabbix agent active'
                         name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: da53e44145304098b4c3ff749996e3e7
       template: 'Linux CPU by Zabbix agent active'
       name: 'Linux CPU by Zabbix agent active'
@@ -427,9 +418,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //Calculate utilization
-                  return (100 - value)
+                - 'return (100 - value)'
           master_item:
             key: 'system.cpu.util[,idle]'
           tags:
@@ -857,9 +846,6 @@ zabbix_export:
                       value:
                         host: 'Linux filesystems by Zabbix agent active'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
     - uuid: 7e4dc41320fd48bd97549025f4c3bcc6
       template: 'Linux generic by Zabbix agent active'
       name: 'Linux generic by Zabbix agent active'
@@ -1453,27 +1439,27 @@ zabbix_export:
                       var newvalue;
                       switch(value) {
                         case "unknown":
-                          newvalue = 0;
-                          break;
+                      	newvalue = 0;
+                      	break;
                         case "notpresent":
-                          newvalue = 1;
-                          break;
+                      	newvalue = 1;
+                      	break;
                         case "down":
-                          newvalue = 2;
-                          break;
+                      	newvalue = 2;
+                      	break;
                         case "lowerlayerdown":
-                          newvalue = 3;
-                          break;
+                      	newvalue = 3;
+                      	break;
                         case "testing":
-                          newvalue = 4;
-                          break;
+                      	newvalue = 4;
+                      	break;
                         case "dormant":
-                          newvalue = 5;
-                          break;
+                      	newvalue = 5;
+                      	break;
                         case "up":
-                          newvalue = 6;
-                          break;  default:
-                          newvalue = "Problem parsing interface operstate in JS";
+                      	newvalue = 6;
+                      	break;  default:
+                      	newvalue = "Problem parsing interface operstate in JS";
                       }
                       return newvalue;
               tags:
@@ -1685,9 +1671,6 @@ zabbix_export:
                       value:
                         host: 'Linux network interfaces by Zabbix agent active'
                         name: 'Interface {#IFNAME}: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 9bc9524635a349409e244ad5215c80c1
           name: ifOperStatus

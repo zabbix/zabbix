@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:36:30Z'
+  date: '2024-02-13T12:41:39Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1212,7 +1212,6 @@ zabbix_export:
           value: '90'
         - macro: '{$NET.IF.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'Ignore notPresent(6)'
         - macro: '{$NET.IF.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'Ignore down(2) administrative status'
@@ -1269,9 +1268,6 @@ zabbix_export:
                       value:
                         host: 'HP Comware HH3C by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 74325ab2f9e346a89eb281df04154ab2
           name: Resources
           pages:
@@ -1288,9 +1284,6 @@ zabbix_export:
                       value:
                         host: 'HP Comware HH3C by SNMP'
                         name: '{#MODULE_NAME}: CPU utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -1304,9 +1297,6 @@ zabbix_export:
                       value:
                         host: 'HP Comware HH3C by SNMP'
                         name: '{#MODULE_NAME}: Memory utilization'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: ec3b9adaa2ad448db5a613cfb6e02fd3
           name: 'EtherLike-MIB::dot3StatsDuplexStatus'

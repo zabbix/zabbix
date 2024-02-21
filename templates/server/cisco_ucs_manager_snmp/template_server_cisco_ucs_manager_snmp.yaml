@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:03:22Z'
+  date: '2024-02-13T12:45:18Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -1697,7 +1697,7 @@ zabbix_export:
           value: '1'
         - macro: '{$NET.IFADMINSTATUS.MATCHES}'
           value: '^.*'
-          description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore notPresent(6) by default.'
+          description: 'This macro is used in network interface discovery. Can be overridden on the host level.'
         - macro: '{$NET.IFADMINSTATUS.NOT_MATCHES}'
           value: ^2$
           description: 'This macro is used in network interface discovery. Can be overridden on the host level. Ignore down(2) administrative status by default.'
@@ -1766,9 +1766,6 @@ zabbix_export:
                       value:
                         host: 'Cisco UCS Manager by SNMP'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 8648df22d8be42359900e11ea395a98c
           name: 'CISCO-UNIFIED-COMPUTING-TC-MIB::CucsEquipmentOperability'

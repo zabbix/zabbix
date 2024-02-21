@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2022 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -259,7 +259,7 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 			[
 				[
 					'fields' => [
-						'Name' => 'Group, unucknowledged filter',
+						'Name' => 'Group, unacknowledged filter',
 						'Host groups' => 'Group for Problems Widgets',
 						'Show unacknowledged only' => true
 					],
@@ -677,8 +677,8 @@ class testDashboardProblemsWidgetDisplay extends CWebTest {
 							// Click on icon and open hint.
 							$button->click();
 							$hint = $this->query('xpath://div[@class="overlay-dialogue"]')->asOverlayDialog()
-									->waitUntilVisible()->one();
-							$hint_table = $hint->query('class:list-table')->asTable()->one();
+									->waitUntilReady()->one();
+							$hint_table = $hint->query('class:list-table')->asTable()->waitUntilVisible()->one();
 
 							// Check rows in hint's table.
 							foreach ($hint_table->getRows() as $i => $row) {

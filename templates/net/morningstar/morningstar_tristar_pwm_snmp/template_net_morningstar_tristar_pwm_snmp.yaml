@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:53:13Z'
+  date: '2024-01-22T15:56:22Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -132,33 +132,33 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'rtsOpen',
-                    'rtsShorted',
-                    'rtsDisconnected',
-                    'heatsinkTempSensorOpen',
-                    'heatsinkTempSensorShorted',
-                    'tristarHot',
-                    'currentLimit',
-                    'currentOffset',
-                    'batterySense',
-                    'batterySenseDisconnected',
-                    'uncalibrated',
-                    'rtsMiswire',
-                    'highVoltageDisconnect',
-                    'diversionLoadNearMax',
-                    'systemMiswire',
-                    'mosfetSOpen',
-                    'p12VoltageReferenceOff',
-                    'loadDisconnectState',
+                  	'rtsOpen',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
+                  	'heatsinkTempSensorOpen',
+                  	'heatsinkTempSensorShorted',
+                  	'tristarHot',
+                  	'currentLimit',
+                  	'currentOffset',
+                  	'batterySense',
+                  	'batterySenseDisconnected',
+                  	'uncalibrated',
+                  	'rtsMiswire',
+                  	'highVoltageDisconnect',
+                  	'diversionLoadNearMax',
+                  	'systemMiswire',
+                  	'mosfetSOpen',
+                  	'p12VoltageReferenceOff',
+                  	'loadDisconnectState',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No alarms';
@@ -325,27 +325,27 @@ zabbix_export:
               parameters:
                 - |
                   var FIELDS = [
-                    'externalShort',
-                    'overcurrent',
-                    'mosfetSShorted',
-                    'softwareFault',
-                    'highVoltageDisconnect',
-                    'tristarHot',
-                    'dipSwitchChange',
-                    'customSettingsEdit',
-                    'reset',
-                    'systemMiswire',
-                    'rtsShorted',
-                    'rtsDisconnected',
+                  	'externalShort',
+                  	'overcurrent',
+                  	'mosfetSShorted',
+                  	'softwareFault',
+                  	'highVoltageDisconnect',
+                  	'tristarHot',
+                  	'dipSwitchChange',
+                  	'customSettingsEdit',
+                  	'reset',
+                  	'systemMiswire',
+                  	'rtsShorted',
+                  	'rtsDisconnected',
                   ];
                   
                   var flags = parseInt(value.replace(/\x20/g, ''), 16),
-                    result = [];
+                  	result = [];
                   
                   for (var i = 0, f = 1 << 31 >>> 0, l = FIELDS.length; i < l; i++, f >>>= 1) {
-                      if (flags & f) {
-                          result.push(FIELDS[i]);
-                      }
+                  	if (flags & f) {
+                  		result.push(FIELDS[i]);
+                  	}
                   }
                   
                   return result.length ? result.join('\n') : 'No faults';
@@ -667,11 +667,11 @@ zabbix_export:
               parameters:
                 - |
                   var v_range = [
-                        [[0, 18], [12, 15, 11.5, 15.5]],
-                        [[18, 36], [24, 30, 23, 31]],
-                        [[36, 99], [48, 60, 46, 62]],
-                    ],
-                    result = [];
+                      [[0, 18], [12, 15, 11.5, 15.5]],
+                      [[18, 36], [24, 30, 23, 31]],
+                      [[36, 99], [48, 60, 46, 62]],
+                  ],
+                      result = [];
                   
                   for (var idx in v_range) {
                       if (v_range[idx][0][0] < value && value <= v_range[idx][0][1]) {
@@ -769,7 +769,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(parseInt(value) === 0 ? [{''{#SINGLETON}'': ''''}] : []);'
+                - 'return JSON.stringify(parseInt(value) === 0 ? [{ ''{#SINGLETON}'': '''' }] : []);'
         - uuid: 02fbfa1dd59a4b9c87bb81da81312f54
           name: 'Charge + Diversion mode discovery'
           type: DEPENDENT
@@ -851,7 +851,7 @@ zabbix_export:
               parameters:
                 - |
                   var mode = parseInt(value);
-                  return JSON.stringify((mode === 0 || mode === 2) ? [{'{#SINGLETON}': ''}] : []);
+                  return JSON.stringify((mode === 0 || mode === 2) ? [{ '{#SINGLETON}': '' }] : []);
         - uuid: 8c345c0134fe4d90af83292e557d7309
           name: 'Diversion mode discovery'
           type: DEPENDENT
@@ -890,7 +890,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(parseInt(value) === 2 ? [{''{#SINGLETON}'': ''''}] : []);'
+                - 'return JSON.stringify(parseInt(value) === 2 ? [{ ''{#SINGLETON}'': '''' }] : []);'
         - uuid: 54bfd7f730e64af89f937e9b1b6e4d79
           name: 'Load mode discovery'
           type: DEPENDENT
@@ -954,7 +954,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - 'return JSON.stringify(parseInt(value) === 1 ? [{''{#SINGLETON}'': ''''}] : []);'
+                - 'return JSON.stringify(parseInt(value) === 1 ? [{ ''{#SINGLETON}'': '''' }] : []);'
         - uuid: 2e2e01f5c1db4224a97162382c77832c
           name: 'Load + Diversion mode discovery'
           type: DEPENDENT
@@ -1039,7 +1039,7 @@ zabbix_export:
               parameters:
                 - |
                   var mode = parseInt(value);
-                  return JSON.stringify((mode === 1 || mode === 2) ? [{'{#SINGLETON}': ''}] : []);
+                  return JSON.stringify((mode === 1 || mode === 2) ? [{ '{#SINGLETON}': '' }] : []);
       tags:
         - tag: class
           value: power

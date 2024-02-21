@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -138,7 +138,7 @@ static void test_queue_ptr_compact_head_tail(void)
 	mock_read_values(zbx_mock_get_parameter_handle("in.values"), &values);
 
 	zbx_queue_ptr_create(&queue);
-	zbx_queue_ptr_reserve(&queue, values.values_num * 1.5);
+	zbx_queue_ptr_reserve(&queue, (int)(values.values_num * 1.5));
 	zbx_mock_assert_int_eq("allocated memory", queue.alloc_num, (int)(values.values_num * 1.5 + 1));
 
 	/* move tail/head positions towards the end of queue buffer so that pushing all values will */
@@ -241,7 +241,7 @@ static void test_queue_ptr_remove_head_tail(void)
 	/* try removing value that is not in queue */
 
 	zbx_queue_ptr_create(&queue);
-	zbx_queue_ptr_reserve(&queue, values.values_num * 1.5);
+	zbx_queue_ptr_reserve(&queue, (int)(values.values_num * 1.5));
 	queue.tail_pos = values.values_num;
 	queue.head_pos = queue.tail_pos;
 
@@ -257,7 +257,7 @@ static void test_queue_ptr_remove_head_tail(void)
 	for (j = 0; j < values.values_num; j++)
 	{
 		zbx_queue_ptr_create(&queue);
-		zbx_queue_ptr_reserve(&queue, values.values_num * 1.5);
+		zbx_queue_ptr_reserve(&queue, (int)(values.values_num * 1.5));
 		queue.tail_pos = values.values_num;
 		queue.head_pos = queue.tail_pos;
 

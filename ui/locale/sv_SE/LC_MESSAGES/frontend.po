@@ -199,6 +199,16 @@ msgid_plural "%1$s of %2$s elements in problem state"
 msgstr[0] "%1$s av %2$s element i problemtillstånd"
 msgstr[1] "%1$s av %2$s element i problemtillstånd"
 
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
@@ -2544,6 +2554,12 @@ msgid_plural "Cannot disable media types"
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2625,6 +2641,12 @@ msgstr[1] ""
 #: app/controllers/CControllerMediatypeEnable.php:75
 msgid "Cannot enable media type"
 msgid_plural "Cannot enable media types"
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -3365,6 +3387,10 @@ msgstr ""
 #: app/controllers/CControllerMediatypeUpdate.php:77
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
+msgstr ""
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
 msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:157
@@ -11948,10 +11974,22 @@ msgid_plural "Modules deleted: %1$s."
 msgstr[0] ""
 msgstr[1] ""
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
 msgid_plural "Modules disabled: %1$s."
+msgstr[0] ""
+msgstr[1] ""
+
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
 msgstr[0] ""
 msgstr[1] ""
 
@@ -11961,6 +11999,10 @@ msgid "Module enabled: %1$s."
 msgid_plural "Modules enabled: %1$s."
 msgstr[0] ""
 msgstr[1] ""
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13074,6 +13116,11 @@ msgstr ""
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Stöds inte"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19168,6 +19215,10 @@ msgstr ""
 msgid "Uptime/Downtime"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr ""
@@ -20570,6 +20621,10 @@ msgstr ""
 msgid "X-Frame-Options HTTP header"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr ""
@@ -20985,6 +21040,11 @@ msgstr ""
 
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2530

@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T17:07:23Z'
+  date: '2024-02-08T15:05:24Z'
   groups:
     - uuid: e960332b3f6c46a1956486d4f3f99fce
       name: 'Templates/Server hardware'
@@ -31,209 +31,209 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Synergy = {
-                params: {},
-                session_id: null,
-                api_version: null,
+            	params: {},
+            	session_id: null,
+            	api_version: null,
             
-                setParams: function (params) {
-                    ['username', 'password', 'base_url'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: ' + field + '.';
-                        }
-                    });
+            	setParams: function (params) {
+            		['username', 'password', 'base_url'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
+            				throw 'Required param is not set: ' + field + '.';
+            			}
+            		});
             
-                    Synergy.params = params;
-                    if (typeof Synergy.params.base_url === 'string' && !Synergy.params.base_url.endsWith('/')) {
-                        Synergy.params.base_url += '/';
-                    }
-                },
+            		Synergy.params = params;
+            		if (typeof Synergy.params.base_url === 'string' && !Synergy.params.base_url.endsWith('/')) {
+            			Synergy.params.base_url += '/';
+            		}
+            	},
             
-                checkVersion: function () {
-                    if (Synergy.api_version !== null) {
-                        return;
-                    }
+            	checkVersion: function () {
+            		if (Synergy.api_version !== null) {
+            			return;
+            		}
             
-                    var response, request = new HttpRequest();
-                    request.addHeader('Content-Type: application/json');
+            		var response, request = new HttpRequest();
+            		request.addHeader('Content-Type: application/json');
             
-                    response = request.post(Synergy.params.base_url + 'rest/version');
+            		response = request.post(Synergy.params.base_url + 'rest/version');
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Get version request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200) {
+            			throw 'Get version request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (response !== null) {
-                        try {
-                            version_data = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse get version response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by get version request.';
-                    }
+            		if (response !== null) {
+            			try {
+            				version_data = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse get version response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by get version request.';
+            		}
             
-                    if ('currentVersion' in version_data && 'minimumVersion' in version_data) {
-                        if (version_data['minimumVersion'] <= 1200 && version_data['currentVersion'] >= 1200) {
-                            Synergy.api_version = 1200;
-                        } else {
-                            throw 'API version is not supported.';
-                        }
-                    } else {
-                        throw 'Get version response does not contain version.';
-                    }
-                },
+            		if ('currentVersion' in version_data && 'minimumVersion' in version_data) {
+            			if (version_data['minimumVersion'] <= 1200 && version_data['currentVersion'] >= 1200) {
+            				Synergy.api_version = 1200;
+            			} else {
+            				throw 'API version is not supported.';
+            			}
+            		} else {
+            			throw 'Get version response does not contain version.';
+            		}
+            	},
             
-                login: function () {
-                    if (Synergy.session_id !== null || Synergy.api_version === null) {
-                        return;
-                    }
+            	login: function () {
+            		if (Synergy.session_id !== null || Synergy.api_version === null) {
+            			return;
+            		}
             
-                    var response, request = new HttpRequest();
-                    request.addHeader('Content-Type: application/json');
-                    request.addHeader('X-API-Version: ' + Synergy.api_version);
+            		var response, request = new HttpRequest();
+            		request.addHeader('Content-Type: application/json');
+            		request.addHeader('X-API-Version: ' + Synergy.api_version);
             
-                    response = request.post(Synergy.params.base_url + 'rest/login-sessions', JSON.stringify({
-                        'userName': Synergy.params.username,
-                        'password': Synergy.params.password
-                    }));
+            		response = request.post(Synergy.params.base_url + 'rest/login-sessions', JSON.stringify({
+            			'userName': Synergy.params.username,
+            			'password': Synergy.params.password
+            		}));
             
-                    if (request.getStatus() !== 200) {
-                        throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
-                    }
+            		if (request.getStatus() !== 200) {
+            			throw 'Auth request failed with status code ' + request.getStatus() + ': ' + response;
+            		}
             
-                    if (response !== null) {
-                        try {
-                            auth_data = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse auth response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by auth request.';
-                    }
+            		if (response !== null) {
+            			try {
+            				auth_data = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse auth response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by auth request.';
+            		}
             
-                    if ('sessionID' in auth_data) {
-                        Synergy.session_id = auth_data['sessionID'];
-                    } else {
-                        throw 'Auth response does not contain session ID.';
-                    }
-                },
+            		if ('sessionID' in auth_data) {
+            			Synergy.session_id = auth_data['sessionID'];
+            		} else {
+            			throw 'Auth response does not contain session ID.';
+            		}
+            	},
             
-                logout: function () {
-                    if (Synergy.session_id !== null && Synergy.api_version !== null) {
-                        var response, request = new HttpRequest();
-                        request.addHeader('Content-Type: application/json');
-                        request.addHeader('X-API-Version: ' + Synergy.api_version);
-                        response = request.delete(Synergy.params.base_url + 'rest/login-sessions');
-                    }
-                },
+            	logout: function () {
+            		if (Synergy.session_id !== null && Synergy.api_version !== null) {
+            			var response, request = new HttpRequest();
+            			request.addHeader('Content-Type: application/json');
+            			request.addHeader('X-API-Version: ' + Synergy.api_version);
+            			response = request.delete(Synergy.params.base_url + 'rest/login-sessions');
+            		}
+            	},
             
-                requestData: function (method) {
-                    if (Synergy.session_id === null || Synergy.api_version === null) {
-                        return;
-                    }
+            	requestData: function (method) {
+            		if (Synergy.session_id === null || Synergy.api_version === null) {
+            			return;
+            		}
             
-                    request = new HttpRequest();
-                    request.addHeader('Auth: ' + Synergy.session_id);
-                    request.addHeader('X-API-Version: ' + Synergy.api_version);
+            		request = new HttpRequest();
+            		request.addHeader('Auth: ' + Synergy.session_id);
+            		request.addHeader('X-API-Version: ' + Synergy.api_version);
             
-                    raw_data = request.get(Synergy.params.base_url + 'rest/' + method);
+            		raw_data = request.get(Synergy.params.base_url + 'rest/' + method);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        throw 'Request failed with status code ' + request.getStatus() + ': ' + raw_data;
-                    }
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			throw 'Request failed with status code ' + request.getStatus() + ': ' + raw_data;
+            		}
             
-                    if (raw_data !== null) {
-                        try {
-                            return JSON.parse(raw_data);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from device API.';
-                        }
-                    }
-                    else {
-                        throw 'No data received by ' + method + ' request.';
-                    }
-                }
+            		if (raw_data !== null) {
+            			try {
+            				return JSON.parse(raw_data);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from device API.';
+            			}
+            		}
+            		else {
+            			throw 'No data received by ' + method + ' request.';
+            		}
+            	}
             };
             
             var methods = ['datacenters', 'enclosures', 'ethernet-networks', 'fabrics', 'fc-networks', 'hypervisor-managers', 'interconnects', 'logical-enclosures', 'racks', 'server-hardware', 'storage-pools', 'storage-systems', 'storage-volumes', 'uplink-sets'],
-                data = {};
+            	data = {};
             
             data['errors'] = {};
             
             try {
-                Synergy.setParams(JSON.parse(value));
+            	Synergy.setParams(JSON.parse(value));
             
-                try {
-                    Synergy.checkVersion();
-                }
-                catch (error) {
-                    data.errors.version = error.toString();
-                }
+            	try {
+            		Synergy.checkVersion();
+            	}
+            	catch (error) {
+            		data.errors.version = error.toString();
+            	}
             
-                try {
-                    Synergy.login();
-                }
-                catch (error) {
-                    data.errors.auth = error.toString();
-                }
+            	try {
+            		Synergy.login();
+            	}
+            	catch (error) {
+            		data.errors.auth = error.toString();
+            	}
             
-                if (!('auth' in data.errors) && !('version' in data.errors)) {
-                    for (var i in methods) {
-                        try {
-                            if (methods[i] === 'enclosures') {
-                                var bays = ['applianceBays', 'crossBars', 'deviceBays', 'fanBays', 'partitions', 'powerSupplyBays', 'managerBays'];
+            	if (!('auth' in data.errors) && !('version' in data.errors)) {
+            		for (var i in methods) {
+            			try {
+            				if (methods[i] === 'enclosures') {
+            					var bays = ['applianceBays', 'crossBars', 'deviceBays', 'fanBays', 'partitions', 'powerSupplyBays', 'managerBays'];
             
-                                enclosures = Synergy.requestData(methods[i]);
+            					enclosures = Synergy.requestData(methods[i]);
             
-                                enclosures.members.forEach(function (enclosure) {
-                                    enclosure_name = enclosure.name;
+            					enclosures.members.forEach(function (enclosure) {
+            						enclosure_name = enclosure.name;
             
-                                    for (var j in bays) {
-                                        bay = enclosure[bays[j]];
+            						for (var j in bays) {
+            							bay = enclosure[bays[j]];
             
-                                        bay.forEach(function (b) {
-                                            b.enclosureName = enclosure_name;
-                                            enclosures.members[bays[j[b]]] = b;
-                                        });
-                                    }
-                                });
+            							bay.forEach(function (b) {
+            								b.enclosureName = enclosure_name;
+            								enclosures.members[bays[j[b]]] = b;
+            							});
+            						}
+            					});
             
-                                data[methods[i]] = enclosures;
-                            }
-                            else {
-                                data[methods[i]] = Synergy.requestData(methods[i]);
-                            }
-                        }
-                        catch (error) {
-                            data.errors[methods[i]] = error.toString();
-                        }
-                    }
-                }
+            					data[methods[i]] = enclosures;
+            				}
+            				else {
+            					data[methods[i]] = Synergy.requestData(methods[i]);
+            				}
+            			}
+            			catch (error) {
+            				data.errors[methods[i]] = error.toString();
+            			}
+            		}
+            	}
             }
             catch (error) {
-                data.errors.params = error.toString();
+            	data.errors.params = error.toString();
             }
             
             try {
-                Synergy.logout();
+            	Synergy.logout();
             }
             catch (error) {
             }
             
             if (Object.keys(data.errors).length !== 0) {
-                errors = 'Failed to receive data:';
-                for (var error in data.errors) {
-                    errors += '\n' + error + ' : ' + data.errors[error];
-                }
-                data.errors = errors;
+            	errors = 'Failed to receive data:';
+            	for (var error in data.errors) {
+            		errors += '\n' + error + ' : ' + data.errors[error];
+            	}
+            	data.errors = errors;
             }
             else {
-                data.errors = '';
+            	data.errors = '';
             }
             
             return JSON.stringify(data);
@@ -241,7 +241,7 @@ zabbix_export:
           timeout: '{$HPE.SYNERGY.DATA.TIMEOUT}'
           parameters:
             - name: base_url
-              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}'
+              value: '{$HPE.SYNERGY.API.SCHEME}://{HOST.CONN}:{$HPE.SYNERGY.API.PORT}'
             - name: password
               value: '{$HPE.SYNERGY.API.PASSWORD}'
             - name: username
@@ -7168,9 +7168,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Enclosure [{#NAME}]: Power capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Storage pools'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -7185,9 +7182,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Storage pool [{#NAME}]: Capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Storage systems'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -7202,9 +7196,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Storage system [{#NAME}]: Capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
             - name: 'Storage volumes'
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -7219,9 +7210,6 @@ zabbix_export:
                       value:
                         host: 'HPE Synergy by HTTP'
                         name: 'Storage volume [{#NAME}]: Capacity'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 20d3a73c6cc84329a5dfafff29de32cc
           name: Boolean

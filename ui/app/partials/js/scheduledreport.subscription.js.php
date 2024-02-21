@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -101,7 +101,9 @@
 						parameters.usrgrpids = Array.from(usrgrpids);
 					}
 
-					PopUp('popup.scheduledreport.subscription.edit', parameters, {trigger_element: event.target});
+					PopUp('popup.scheduledreport.subscription.edit', parameters,
+						{dialogue_class: 'modal-popup-medium', trigger_element: event.target}
+					);
 				});
 			}
 			else {
@@ -242,7 +244,7 @@
 				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER ?>,
 					userids: Array.from(userids)
-				}, {trigger_element: event.target});
+				}, {dialogue_class: 'modal-popup-medium', trigger_element: event.target});
 			});
 		}
 
@@ -257,7 +259,7 @@
 				PopUp('popup.scheduledreport.subscription.edit', {
 					recipient_type: <?= ZBX_REPORT_RECIPIENT_TYPE_USER_GROUP ?>,
 					usrgrpids: Array.from(usrgrpids)
-				}, {trigger_element: event.target});
+				}, {dialogue_class: 'modal-popup-medium', trigger_element: event.target});
 			});
 		}
 	}

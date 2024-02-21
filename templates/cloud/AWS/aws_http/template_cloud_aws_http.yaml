@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:21:58Z'
+  date: '2024-01-12T10:13:38Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -47,11 +47,15 @@ zabbix_export:
                 },
             
                 setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
                     switch (AWS.getField(params, 'auth_type')) {
                         case 'role_base':
                             AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
                             if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                                 throw 'Error getting security credentials from instance metadata. Role not found.';
@@ -159,8 +163,8 @@ zabbix_export:
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
-                        Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
+            
+                    Zabbix.log(4, '[ AWS EC2 ] Sending request: ' + url);
             
                     response = request.post(url, data);
             
@@ -182,18 +186,23 @@ zabbix_export:
                 },
             
                 tagToNameInstances: function (instance) {
-                    var tags = AWS.getField(instance, 'tagSet.item'),
-                        instanceName = AWS.getField(instance, 'instanceId');
-                    if (!Array.isArray(tags))
-                        tags = [tags]
-                    tags.forEach(
-                        function (tag) {
-                            if (String(AWS.getField(tag, 'key')) === 'Name') {
-                                instanceName = AWS.getField(tag, 'value');
+                    try {
+                        var tags = AWS.getField(instance, 'tagSet.item'),
+                            instanceName = AWS.getField(instance, 'instanceId');
+                        if (!Array.isArray(tags))
+                            tags = [tags]
+                        tags.forEach(
+                            function (tag) {
+                                if (String(AWS.getField(tag, 'key')) === 'Name') {
+                                    instanceName = AWS.getField(tag, 'value');
+                                }
                             }
-                        }
-                    );
-                    return instanceName;
+                        );
+                        return instanceName;
+                    }
+                    catch (error){
+                        return AWS.getField(instance, 'instanceId');
+                    }
                 },
             
                 listRegions: function () {
@@ -347,11 +356,15 @@ zabbix_export:
             var AWS = {
                 params: {},
                 setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
                     switch (AWS.getField(params, 'auth_type')) {
                         case 'role_base':
                             AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
                             if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                                 throw 'Error getting security credentials from instance metadata. Role not found.';
@@ -467,7 +480,7 @@ zabbix_export:
                     request.addHeader('Authorization: ' + 'AWS4-HMAC-SHA256 Credential=' + AWS.params.AccessKeyId + '/' + credential_scope + ', ' + 'SignedHeaders=' + signed_headers + ', ' + 'Signature=' + hmac('sha256', key, request_string));
                     if (AWS.params.auth_type === 'role_base')
                         request.addHeader('X-Amz-Security-Token: ' + AWS.params.Token);
-                    
+            
                     Zabbix.log(4, '[ AWS ECS ] Sending request: ' + url);
             
                     response = request.post(url, data);
@@ -711,11 +724,15 @@ zabbix_export:
                 },
             
                 setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
                     switch (AWS.getField(params, 'auth_type')) {
                         case 'role_base':
                             AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
                             if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                                 throw 'Error getting security credentials from instance metadata. Role not found.';
@@ -978,7 +995,8 @@ zabbix_export:
           params: |
             var AWS = {
                 params: {},
-                
+            
+            
                 getField: function (data, path) {
                     var steps = path.split('.');
                     for (var i = 0; i < steps.length; i++) {
@@ -994,11 +1012,15 @@ zabbix_export:
                 },
             
                 setParams: function (params) {
+                    AWS.params['proxy'] = params.proxy;
                     switch (AWS.getField(params, 'auth_type')) {
                         case 'role_base':
                             AWS.params['auth_type'] = 'role_base';
-                            var request = new HttpRequest(),
-                                IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
+                            var request = new HttpRequest();
+                            if (typeof AWS.params.proxy !== 'undefined' && AWS.params.proxy !== '') {
+                                request.setProxy(AWS.params.proxy);
+                            }
+                            var IamRoleName = request.get('http://169.254.169.254/latest/meta-data/iam/security-credentials');
             
                             if (request.getStatus() !== 200 || IamRoleName === null || IamRoleName === '') {
                                 throw 'Error getting security credentials from instance metadata. Role not found.';
@@ -1034,12 +1056,6 @@ zabbix_export:
                                 AWS.params[field] = params[field];
                             });
                     }
-                    ['region_match', 'region_not_match'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined' || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                        AWS.params[field] = params[field];
-                    });
                 },
             
                 sign: function (key, message) {
@@ -1082,7 +1098,7 @@ zabbix_export:
             
                         canonical_uri = '/' + uri;
             
-                    if (AWS.params.auth_type === 'role_base'){
+                    if (AWS.params.auth_type === 'role_base') {
                         var canonical_headers = 'content-encoding:amz-1.0\n' + 'host:' + host + '\n' + 'x-amz-date:' + amzdate + '\n' + 'x-amz-security-token:' + AWS.params.Token + '\n',
                             signed_headers = 'content-encoding;host;x-amz-date;x-amz-security-token';
                     } else {
@@ -1135,60 +1151,22 @@ zabbix_export:
                     return JSON.parse(response);
                 },
             
-                getBucketLocation: function (bucket_name) {
-                    var payload = {};
-            
-                    payload['location'] = '',
-            
-                        result = AWS.request('GET', 'us-east-1', 's3', 's3.amazonaws.com', AWS.prepareParams(payload), '', bucket_name);
-            
-                    if (typeof result !== 'object'
-                        || result.hasOwnProperty('LocationConstraint') === false
-                    ) {
-                        throw 'Cannot get buckets region location data from AWS S3 API. Check debug log for more information.';
-                    }
-            
-                    return result.LocationConstraint !== null ? result.LocationConstraint : 'us-east-1';
-                },
-            
                 listBuckets: function () {
-                    var lld_array = [],
-                        payload = {
+                    var payload = {
                         'Action': 'ListBuckets',
                         'Version': '2006-03-01'
                     };
-                    
-                    result = AWS.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AWS.prepareParams(payload), '', '');
-                    
-                    if (typeof result !== 'object'
-                        || typeof result.ListAllMyBucketsResult !== 'object'
-                        || typeof result.ListAllMyBucketsResult.Buckets !== 'object') {
-                        throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
-                    }
-                    if (result.ListAllMyBucketsResult.Buckets === null)
-                        return []
-                    if (typeof result.ListAllMyBucketsResult.Buckets.Bucket !== 'object') {
-                        throw 'Cannot get buckets list from AWS S3 API. Check debug log for more information.';
+            
+                    var result = AWS.getField(AWS.request('GET', 'us-east-1', 's3', 's3.us-east-1.amazonaws.com', AWS.prepareParams(payload), '', ''), 'ListAllMyBucketsResult.Buckets.Bucket');
+            
+                    if (result === null) {
+                        return [];
                     }
             
-                    var buckets = [];
-                    if (!Array.isArray(result.ListAllMyBucketsResult.Buckets.Bucket))
-                        buckets = [result.ListAllMyBucketsResult.Buckets.Bucket]
-                    else
-                        buckets = result.ListAllMyBucketsResult.Buckets.Bucket
-                    buckets.forEach(
-                        function (bucket, index, buckets_array) {
-                            if (!bucket.hasOwnProperty('Name'))
-                                throw 'Cannot get location for bucket. Check debug log for more information.';
-                            var region_name = AWS.getBucketLocation(bucket['Name']);
-                            buckets_array[index]['location'] = region_name;
-                            if (region_name.match(AWS.params.region_match) !== null &&
-                                region_name.match(AWS.params.region_not_match) === null)
-                                lld_array.push(buckets_array[index]);
-                        });
+                    return Array.isArray(result) ? result : [result];
             
-                    return lld_array;
                 }
+            
             };
             
             try {
@@ -1211,13 +1189,6 @@ zabbix_export:
                 value: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
-              - macro: '{#AWS.S3.REGION}'
-                value: '{$AWS.S3.LLD.FILTER.REGION.MATCHES}'
-                formulaid: C
-              - macro: '{#AWS.S3.REGION}'
-                value: '{$AWS.S3.LLD.FILTER.REGION.NOT_MATCHES}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: D
           description: 'Get S3 bucket instances.'
           host_prototypes:
             - uuid: e45bd9810ea14718b17b875aad3fc544
@@ -1226,14 +1197,9 @@ zabbix_export:
               group_links:
                 - group:
                     name: Templates/Applications
-              group_prototypes:
-                - name: '{#AWS.S3.REGION}'
               templates:
                 - name: 'AWS S3 bucket by HTTP'
               macros:
-                - macro: '{$AWS.REGION}'
-                  value: '{#AWS.S3.REGION}'
-                  description: 'Amazon S3 region code.'
                 - macro: '{$AWS.S3.BUCKET.NAME}'
                   value: '{#AWS.S3.NAME}'
                   description: 'S3 bucket name.'
@@ -1243,8 +1209,6 @@ zabbix_export:
               tags:
                 - tag: name
                   value: '{#AWS.S3.NAME}'
-                - tag: region
-                  value: '{#AWS.S3.REGION}'
                 - tag: service
                   value: s3
               custom_interfaces: 'YES'
@@ -1258,17 +1222,11 @@ zabbix_export:
               value: '{$AWS.AUTH_TYPE}'
             - name: proxy
               value: '{$AWS.PROXY}'
-            - name: region_match
-              value: '{$AWS.S3.LLD.FILTER.REGION.MATCHES}'
-            - name: region_not_match
-              value: '{$AWS.S3.LLD.FILTER.REGION.NOT_MATCHES}'
             - name: SecretAccessKey
               value: '{$AWS.SECRET.ACCESS.KEY}'
           lld_macro_paths:
             - lld_macro: '{#AWS.S3.NAME}'
               path: $.Name
-            - lld_macro: '{#AWS.S3.REGION}'
-              path: $.location
       tags:
         - tag: class
           value: software
@@ -1278,7 +1236,7 @@ zabbix_export:
         - macro: '{$AWS.ACCESS.KEY.ID}'
           description: 'Access key ID.'
         - macro: '{$AWS.AUTH_TYPE}'
-          value: role_base
+          value: access_key
           description: 'Authorization method. Possible values: role_base, access_key.'
         - macro: '{$AWS.EC2.LLD.FILTER.NAME.MATCHES}'
           value: '.*'
@@ -1330,12 +1288,6 @@ zabbix_export:
         - macro: '{$AWS.S3.LLD.FILTER.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'Filter to exclude discovered S3 buckets by namespace.'
-        - macro: '{$AWS.S3.LLD.FILTER.REGION.MATCHES}'
-          value: '.*'
-          description: 'Filter of discoverable S3 buckets by region.'
-        - macro: '{$AWS.S3.LLD.FILTER.REGION.NOT_MATCHES}'
-          value: CHANGE_IF_NEEDED
-          description: 'Filter to exclude discovered S3 buckets by region.'
         - macro: '{$AWS.SECRET.ACCESS.KEY}'
           type: SECRET_TEXT
           description: 'Secret access key.'

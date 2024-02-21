@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -246,8 +246,4 @@ ZBX_THREAD_ENTRY(lld_worker_thread, args)
 
 	while (1)
 		zbx_sleep(SEC_PER_MIN);
-
-	DBclose();
-
-	zbx_ipc_socket_close(&lld_socket);
 }

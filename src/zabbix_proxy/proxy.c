@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -1319,7 +1319,7 @@ int	MAIN_ZABBIX_ENTRY(int flags)
 		{
 			case ZBX_PROCESS_TYPE_CONFSYNCER:
 				zbx_thread_start(proxyconfig_thread, &thread_args, &threads[i]);
-				if (FAIL == zbx_rtc_wait_config_sync(&rtc))
+				if (FAIL == zbx_rtc_wait_for_sync_finish(&rtc))
 					goto out;
 				break;
 			case ZBX_PROCESS_TYPE_TRAPPER:

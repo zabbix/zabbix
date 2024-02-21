@@ -209,6 +209,16 @@ msgstr[0] "%1$s з %2$s елемента в стані проблеми"
 msgstr[1] "%1$s з %2$s елементів в стані проблеми"
 msgstr[2] "%1$s з %2$s елементів в стані проблеми"
 
+#: app/views/administration.miscconfig.edit.php:119
+#, c-format
+msgid "%1$s or %2$s - allows the page to be displayed only in a frame on the same origin as the page itself"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:122
+#, c-format
+msgid "%1$s or %2$s - prevents the page from being displayed in a frame, regardless of the site attempting to do so"
+msgstr ""
+
 #: jsLoader.php:348
 #, c-format
 msgctxt "screen reader"
@@ -2598,6 +2608,13 @@ msgstr[0] "Не вдалося відключити метод повідомл�
 msgstr[1] "Не вдалося відключити методи повідомлень"
 msgstr[2] "Не вдалося відключити методи повідомлень"
 
+#: app/controllers/CControllerModuleUpdate.php:148
+msgid "Cannot disable module"
+msgid_plural "Cannot disable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:165
 #, c-format
 msgid "Cannot disable module: %1$s."
@@ -2693,6 +2710,13 @@ msgid_plural "Cannot enable media types"
 msgstr[0] "Не вдалося активувати метод повідомлень"
 msgstr[1] "Не вдалося активувати методи повідомлень"
 msgstr[2] "Не вдалося активувати методи повідомлень"
+
+#: app/controllers/CControllerModuleUpdate.php:143
+msgid "Cannot enable module"
+msgid_plural "Cannot enable modules"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
 
 #: app/controllers/CControllerModuleUpdate.php:160
 #, c-format
@@ -3442,6 +3466,10 @@ msgstr "Не вдалося оновити період сервісу"
 #: app/controllers/CControllerMediatypeUpdate.php:180
 msgid "Cannot update media type"
 msgstr "Не вдалося оновити метод повідомлень"
+
+#: app/controllers/CControllerModuleUpdate.php:139
+msgid "Cannot update module"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:157
 #, c-format
@@ -12071,6 +12099,13 @@ msgstr[0] "Модуль видалено: %1$s."
 msgstr[1] "Модулі видалено: %1$s."
 msgstr[2] "Модулі видалено: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:134
+msgid "Module disabled"
+msgid_plural "Modules disabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:150
 #, c-format
 msgid "Module disabled: %1$s."
@@ -12079,6 +12114,13 @@ msgstr[0] "Модуль вимкнено: %1$s."
 msgstr[1] "Модулі вимкнено: %1$s."
 msgstr[2] "Модулі вимкнено: %1$s."
 
+#: app/controllers/CControllerModuleUpdate.php:131
+msgid "Module enabled"
+msgid_plural "Modules enabled"
+msgstr[0] ""
+msgstr[1] ""
+msgstr[2] ""
+
 #: app/controllers/CControllerModuleUpdate.php:145
 #, c-format
 msgid "Module enabled: %1$s."
@@ -12086,6 +12128,10 @@ msgid_plural "Modules enabled: %1$s."
 msgstr[0] "Модуль увімкнено: %1$s."
 msgstr[1] "Модулі ввімкнено: %1$s."
 msgstr[2] "Модулі ввімкнено: %1$s."
+
+#: app/controllers/CControllerModuleUpdate.php:128
+msgid "Module updated"
+msgstr ""
 
 #: app/controllers/CControllerModuleUpdate.php:142
 #, c-format
@@ -13199,6 +13245,11 @@ msgstr "Не успадковані елементи дані"
 #: include/views/configuration.host.discovery.list.php:158
 msgid "Not supported"
 msgstr "Не підтримується"
+
+#: app/views/administration.miscconfig.edit.php:130
+#, c-format
+msgid "Note that %1$s or %2$s will be regarded as hostnames if used without single quotes."
+msgstr ""
 
 #: include/hosts.inc.php:229
 msgid "Notes"
@@ -19311,6 +19362,10 @@ msgstr "Час роботи процесу Zabbix сервера в секунд
 msgid "Uptime/Downtime"
 msgstr "Доступний/Недоступний"
 
+#: app/views/administration.miscconfig.edit.php:115
+msgid "Use X-Frame-Options HTTP header"
+msgstr ""
+
 #: app/partials/configuration.host.interface.row.php:194
 msgid "Use bulk requests"
 msgstr "Використовувати масові запити"
@@ -20720,6 +20775,10 @@ msgstr "Вісь X"
 msgid "X-Frame-Options HTTP header"
 msgstr ""
 
+#: app/views/administration.miscconfig.edit.php:117
+msgid "X-Frame-Options HTTP header supported values:"
+msgstr ""
+
 #: include/views/js/monitoring.sysmaps.js.php:436
 msgid "X1"
 msgstr "X1"
@@ -21135,6 +21194,11 @@ msgstr "очікується відносний час"
 
 #: app/views/administration.authentication.edit.php:86
 msgid "a special character"
+msgstr ""
+
+#: app/views/administration.miscconfig.edit.php:125
+#, c-format
+msgid "a string of space-separated hostnames; adding %1$s to the list allows the page to be displayed in a frame on the same origin as the page itself"
 msgstr ""
 
 #: include/classes/validators/CApiInputValidator.php:2530

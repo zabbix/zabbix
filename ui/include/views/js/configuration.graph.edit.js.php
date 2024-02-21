@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -581,7 +581,7 @@
 
 				$('#items_' + i + '_name').attr('onclick', 'PopUp("popup.generic", ' +
 					'$.extend(' + JSON.stringify(parameters) + ', view.getOnlyHostParam()),' +
-					'{dialogue_class: "modal-popup-generic", trigger_element: this});'
+					'{dialogue_class: "modal-popup-generic", trigger_element: this.parentNode});'
 				);
 			}
 		},

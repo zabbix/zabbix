@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:16:34Z'
+  date: '2024-01-22T15:14:46Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -48,116 +48,116 @@ zabbix_export:
           value_type: TEXT
           params: |
             var params = JSON.parse(value),
-                request = new HttpRequest(),
-                data = [],
-                error_msg = [],
-                measurement,
-                temp_unit,
-                wind_unit,
-                errors_only = [],
-                error_locations = [],
-                unique_errors,
-                new_error_msg;
-              
+            	request = new HttpRequest(),
+            	data = [],
+            	error_msg = [],
+            	measurement,
+            	temp_unit,
+            	wind_unit,
+            	errors_only = [],
+            	error_locations = [],
+            	unique_errors,
+            	new_error_msg;
+            
             function getHttpData(query) {
-                url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
-                response = request.get(url);
-                Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
-              
-                if (response !== null) {
-                    try {
-                        response = JSON.parse(response);
-                    }
-                    catch (error) {
-                        throw 'Failed to parse response.';
-                    }
-                }
-              
-                if (request.getStatus() !== 200) {
-                    if (response.error && response.error.message) {
-                        throw response.error.message;
-                    } 
-                    else {
-                        throw 'Failed to receive data. Invalid response status code: ' + request.getStatus();
-                    }
-                }
-                return response;
+            	url = params.api_endpoint + query + '&appid=' + params.apikey + '&units=' + params.units + '&lang=' + params.lang;
+            	response = request.get(url);
+            	Zabbix.log(4, '[ Openweathermap ] [ ' + url + ' ] Received response with status code ' + request.getStatus() + ': ' + response);
+            
+            	if (response !== null) {
+            		try {
+            			response = JSON.parse(response);
+            		}
+            		catch (error) {
+            			throw 'Failed to parse response.';
+            		}
+            	}
+            
+            	if (request.getStatus() !== 200) {
+            		if (response.error && response.error.message) {
+            			throw response.error.message;
+            		}
+            		else {
+            			throw 'Failed to receive data. Invalid response status code: ' + request.getStatus();
+            		}
+            	}
+            	return response;
             }
-              
+            
             switch (params.units) {
-                case 'metric':
-                    measurement = 'metric';
-                    temp_unit = 'C';
-                    wind_unit = 'meter/sec';
-                    break;
-                case 'imperial':
-                    measurement = 'imperial';
-                    temp_unit = 'F';
-                    wind_unit = 'miles/hour';
-                    break;
-                default:
-                    measurement = 'standard';
-                    temp_unit = 'K';
-                    wind_unit = 'meter/sec';
+            	case 'metric':
+            		measurement = 'metric';
+            		temp_unit = 'C';
+            		wind_unit = 'meter/sec';
+            		break;
+            	case 'imperial':
+            		measurement = 'imperial';
+            		temp_unit = 'F';
+            		wind_unit = 'miles/hour';
+            		break;
+            	default:
+            		measurement = 'standard';
+            		temp_unit = 'K';
+            		wind_unit = 'meter/sec';
             }
-              
+            
             locations = params.location.split('|');
             for (var i in locations) {
-                try {
-                    if (/^[0-9]+$/g.test(locations[i])) {
-                        result = getHttpData('id=' + locations[i]);
-                    } 
-                    else if (/^.*,[\w]+$/g.test(locations[i])) {
-                        result = getHttpData('zip=' + locations[i]);
-                    }
-                    else if (/^(\-)?[0-9]{1,2}(\.[0-9]+)?,(\-)?[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
-                        coordinates = locations[i].split(',');
-                        result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
-                    }
-                    else {
-                        result = getHttpData('q=' + encodeURIComponent(locations[i]));
-                    }
-                    if (!data.filter(function (location) { return location.id === result.id; }).length) {
-                        result.measurement = measurement;
-                        result.temp_unit = temp_unit;
-                        result.wind_unit = wind_unit;
-                        data.push(result);
-                    }
-                } catch (error) {
-                    errors = {};
-                    errors.location = locations[i];
-                    errors.error = error.toString();
-                    error_msg.push(errors);
-                    errors_only.push(error.toString());
-                }
+            	try {
+            		if (/^[0-9]+$/g.test(locations[i])) {
+            			result = getHttpData('id=' + locations[i]);
+            		}
+            		else if (/^.*,[\w]+$/g.test(locations[i])) {
+            			result = getHttpData('zip=' + locations[i]);
+            		}
+            		else if (/^(\-)?[0-9]{1,2}(\.[0-9]+)?,(\-)?[0-9]{1,2}(\.[0-9]+)?/g.test(locations[i])) {
+            			coordinates = locations[i].split(',');
+            			result = getHttpData('lat=' + coordinates[0] + '&lon=' + coordinates[1]);
+            		}
+            		else {
+            			result = getHttpData('q=' + encodeURIComponent(locations[i]));
+            		}
+            		if (!data.filter(function (location) { return location.id === result.id; }).length) {
+            			result.measurement = measurement;
+            			result.temp_unit = temp_unit;
+            			result.wind_unit = wind_unit;
+            			data.push(result);
+            		}
+            	} catch (error) {
+            		errors = {};
+            		errors.location = locations[i];
+            		errors.error = error.toString();
+            		error_msg.push(errors);
+            		errors_only.push(error.toString());
+            	}
             }
             
             if (error_msg.length === 0) {
-                return JSON.stringify({
-                    'data': data,
-                    'errors': error_msg.toString()
-                });
+            	return JSON.stringify({
+            		'data': data,
+            		'errors': error_msg.toString()
+            	});
             } else {
-                unique_errors = errors_only.filter(function (value, index, self) { 
-                    return self.indexOf(value) == index; 
-                });
-              
-                if (unique_errors.length === 1) {
-                    for (var j in error_msg) {
-                        error_locations.push(error_msg[j].location);
-                    }
-                    new_error_msg = 'Failed to retrieve data for the following locations: ' + error_locations + '. ' + unique_errors[0];
-                  
-                    return JSON.stringify({
-                        'data': data,
-                        'errors': new_error_msg
-                    });
-                } else {
-                    return JSON.stringify({
-                        'data': data,
-                        'errors': error_msg
-                    });
-                }
+            	unique_errors = errors_only.filter(function (value, index, self) {
+            		return self.indexOf(value) == index;
+            	});
+            
+            	if (unique_errors.length === 1) {
+            		for (var j in error_msg) {
+            			error_locations.push(error_msg[j].location);
+            		}
+            		new_error_msg = 'Failed to retrieve data for the following locations: ' + error_locations + '. ' + unique_errors[0];
+            
+            		return JSON.stringify({
+            			'data': data,
+            			'errors': new_error_msg
+            		});
+            	} else {
+            		return JSON.stringify({
+            			'data': data,
+            			'errors': error_msg
+            		});
+            	}
             }
           description: 'JSON array with result of OpenWeatherMap API requests.'
           timeout: '{$OPENWEATHERMAP.DATA.TIMEOUT}'
@@ -635,9 +635,6 @@ zabbix_export:
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Atmospheric pressure'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Snow volume'
                   'y': '5'
@@ -652,9 +649,6 @@ zabbix_export:
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Snow volume'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: 'Rain volume'
                   x: '12'
@@ -669,9 +663,6 @@ zabbix_export:
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Rain volume'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   name: Temperature
                   x: '12'
@@ -687,9 +678,6 @@ zabbix_export:
                       value:
                         host: 'OpenWeatherMap by HTTP'
                         name: '[{#LOCATION}, {#COUNTRY}]: Temperature'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: 9a8fdac997914722acfea90f1f9d45e9
           name: 'Wind direction'

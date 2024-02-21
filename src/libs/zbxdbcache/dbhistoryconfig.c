@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -93,6 +93,8 @@ static void	dc_get_history_sync_item(zbx_history_sync_item_t *dst_item, const ZB
 			dst_item->trends_sec = 0;
 			dst_item->units = NULL;
 	}
+
+	dst_item->has_trigger = (ZBX_DC_ITEM_UPDATE_TRIGGER_NONE == src_item->update_triggers ? 0 : 1);
 }
 
 /******************************************************************************

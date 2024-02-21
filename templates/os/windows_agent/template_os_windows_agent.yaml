@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:58:33Z'
+  date: '2023-11-01T20:58:49Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -1411,9 +1411,6 @@ zabbix_export:
                       value:
                         host: 'Windows by Zabbix agent'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 5f494fac9dc94bf3827b67ea212240f2
           name: 'System performance'
           pages:
@@ -1450,9 +1447,6 @@ zabbix_export:
                       value:
                         host: 'Windows by Zabbix agent'
                         name: '{#FSLABEL}({#FSNAME}): Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1466,9 +1460,6 @@ zabbix_export:
                       value:
                         host: 'Windows by Zabbix agent'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -1482,9 +1473,6 @@ zabbix_export:
                       value:
                         host: 'Windows by Zabbix agent'
                         name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '25'
                   width: '24'
@@ -1498,9 +1486,6 @@ zabbix_export:
                       value:
                         host: 'Windows by Zabbix agent'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'

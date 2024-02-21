@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -28,12 +28,25 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 
 <script type="text/javascript">
 	$(document).ready(function() {
+		const $form = jQuery('#miscconfig-form');
+
 		$('#validate_uri_schemes').change(function() {
 			$('#uri_valid_schemes').prop('disabled', !this.checked);
 		});
 
+		$('#x_frame_header_enabled').change(function() {
+			$('#x_frame_options').prop('disabled', !this.checked);
+		});
+
 		$('#iframe_sandboxing_enabled').change(function() {
 			$('#iframe_sandboxing_exceptions').prop('disabled', !this.checked);
+		});
+
+		$form.on('submit', () => {
+			$form.trimValues(['#url', '#login_block', '#uri_valid_schemes', '#x_frame_options',
+				'#iframe_sandboxing_exceptions', '#socket_timeout', '#connect_timeout', '#media_type_test_timeout',
+				'#script_timeout', '#item_test_timeout', '#report_test_timeout'
+			]);
 		});
 
 		$("#resetDefaults").click(function() {
@@ -76,6 +89,11 @@ $default_inventory_mode = DB::getDefault('config', 'default_inventory_mode');
 								)
 								.change();
 							$('#uri_valid_schemes').val("<?= DB::getDefault('config', 'uri_valid_schemes') ?>");
+							$('#x_frame_header_enabled')
+								.prop('checked',
+									<?= DB::getDefault('config', 'x_frame_options') === 'null' ? 'false' : 'true' ?>
+								)
+								.change();
 							$('#x_frame_options').val("<?= DB::getDefault('config', 'x_frame_options') ?>");
 							$('#iframe_sandboxing_enabled')
 								.prop('checked',

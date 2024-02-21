@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:57:22Z'
+  date: '2024-01-22T16:00:55Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -225,9 +225,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //Calculate utilization
-                  return (100 - value)
+                - 'return (100 - value)'
           master_item:
             key: 'system.cpu.util[,idle]'
           tags:
@@ -788,27 +786,27 @@ zabbix_export:
                       var newvalue;
                       switch(value) {
                         case "unknown":
-                          newvalue = 0;
-                          break;
+                      	newvalue = 0;
+                      	break;
                         case "notpresent":
-                          newvalue = 1;
-                          break;
+                      	newvalue = 1;
+                      	break;
                         case "down":
-                          newvalue = 2;
-                          break;
+                      	newvalue = 2;
+                      	break;
                         case "lowerlayerdown":
-                          newvalue = 3;
-                          break;
+                      	newvalue = 3;
+                      	break;
                         case "testing":
-                          newvalue = 4;
-                          break;
+                      	newvalue = 4;
+                      	break;
                         case "dormant":
-                          newvalue = 5;
-                          break;
+                      	newvalue = 5;
+                      	break;
                         case "up":
-                          newvalue = 6;
-                          break;  default:
-                          newvalue = "Problem parsing interface operstate in JS";
+                      	newvalue = 6;
+                      	break;  default:
+                      	newvalue = "Problem parsing interface operstate in JS";
                       }
                       return newvalue;
               tags:
@@ -1543,9 +1541,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Zabbix agent active'
                         name: 'Interface {#IFNAME}: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 3e6ceed431734cc29836019e93b5f89e
           name: 'System performance'
           pages:
@@ -1582,9 +1577,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Zabbix agent active'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -1598,9 +1590,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Zabbix agent active'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -1614,9 +1603,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Zabbix agent active'
                         name: '{#DEVNAME}: Disk average waiting time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '25'
                   width: '24'
@@ -1630,9 +1616,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Zabbix agent active'
                         name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '30'
                   width: '24'
@@ -1646,9 +1629,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Zabbix agent active'
                         name: 'Interface {#IFNAME}: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'

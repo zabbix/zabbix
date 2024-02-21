@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:10:36Z'
+  date: '2024-01-22T15:07:59Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -21,266 +21,266 @@ zabbix_export:
           value_type: TEXT
           params: |
             var Aranet = {
-                params: {},
-                auth_token: null,
-                refresh_token: null,
-                space_id: null,
+            	params: {},
+            	auth_token: null,
+            	refresh_token: null,
+            	space_id: null,
             
-                setParams: function (params) {
-                    ['api_endpoint', 'username', 'password', 'space_name'].forEach(function (field) {
-                        if (typeof params !== 'object' || typeof params[field] === 'undefined'
-                                || params[field] === '') {
-                            throw 'Required param is not set: "' + field + '".';
-                        }
-                    });
+            	setParams: function (params) {
+            		['api_endpoint', 'username', 'password', 'space_name'].forEach(function (field) {
+            			if (typeof params !== 'object' || typeof params[field] === 'undefined'
+            					|| params[field] === '') {
+            				throw 'Required param is not set: "' + field + '".';
+            			}
+            		});
             
-                    Aranet.params = params;
-                    if (typeof Aranet.params.api_endpoint === 'string') {
-                        if (!Aranet.params.api_endpoint.endsWith('/')) {
-                            Aranet.params.api_endpoint += '/';
-                        }
-                    }
-                },
+            		Aranet.params = params;
+            		if (typeof Aranet.params.api_endpoint === 'string') {
+            			if (!Aranet.params.api_endpoint.endsWith('/')) {
+            				Aranet.params.api_endpoint += '/';
+            			}
+            		}
+            	},
             
-                request: function (method, query, data) {
-                    var response,
-                        request = new HttpRequest(),
-                        url = Aranet.params.api_endpoint + query;
+            	request: function (method, query, data) {
+            		var response,
+            			request = new HttpRequest(),
+            			url = Aranet.params.api_endpoint + query;
             
-                    request.addHeader('Content-Type: application/json');
+            		request.addHeader('Content-Type: application/json');
             
-                    if (Aranet.auth_token !== null) {
-                        request.addHeader('Authorization: Bearer ' + Aranet.auth_token);
-                    }
+            		if (Aranet.auth_token !== null) {
+            			request.addHeader('Authorization: Bearer ' + Aranet.auth_token);
+            		}
             
-                    if (typeof data !== 'undefined') {
-                        data = JSON.stringify(data);
-                    }
+            		if (typeof data !== 'undefined') {
+            			data = JSON.stringify(data);
+            		}
             
-                    switch (method) {
-                        case 'get':
-                            response = request.get(url, data);
-                            break;
+            		switch (method) {
+            			case 'get':
+            				response = request.get(url, data);
+            				break;
             
-                        case 'post':
-                            response = request.post(url, data);
-                            break;
+            			case 'post':
+            				response = request.post(url, data);
+            				break;
             
-                        default:
-                            throw 'Unsupported HTTP request method: ' + method;
-                    }
+            			default:
+            				throw 'Unsupported HTTP request method: ' + method;
+            		}
             
-                    Zabbix.log(4, '[ Aranet scraper ] Received response with status code ' + request.getStatus() + ': ' + response);
+            		Zabbix.log(4, '[ Aranet scraper ] Received response with status code ' + request.getStatus() + ': ' + response);
             
-                    if (request.getStatus() < 200 || request.getStatus() >= 300) {
-                        var message = 'Request failed with status code ' + request.getStatus();
+            		if (request.getStatus() < 200 || request.getStatus() >= 300) {
+            			var message = 'Request failed with status code ' + request.getStatus();
             
-                        message += ': ' + response;
-                        throw message;
-                    }
+            			message += ': ' + response;
+            			throw message;
+            		}
             
-                    if (response !== null) {
-                        try {
-                            response = JSON.parse(response);
-                        }
-                        catch (error) {
-                            throw 'Failed to parse response received from Aranet Cloud. Check debug log for more information.';
-                        }
-                    }
+            		if (response !== null) {
+            			try {
+            				response = JSON.parse(response);
+            			}
+            			catch (error) {
+            				throw 'Failed to parse response received from Aranet Cloud. Check debug log for more information.';
+            			}
+            		}
             
-                    return {
-                        status: request.getStatus(),
-                        response: response
-                    };
-                },
+            		return {
+            			status: request.getStatus(),
+            			response: response
+            		};
+            	},
             
-                login: function () {
-                    var result,
-                        data = {
-                            login: Aranet.params.username,
-                            passw: Aranet.params.password
-                        };
+            	login: function () {
+            		var result,
+            			data = {
+            				login: Aranet.params.username,
+            				passw: Aranet.params.password
+            			};
             
-                    result = Aranet.request('post', 'user/login', data);
-                    if (typeof result.response !== 'object'
-                            || typeof result.response.auth === 'undefined'
-                            || result.status != 200) {
-                        throw 'Cannot login to Aranet Cloud. Check debug log for more information.';
-                    }
+            		result = Aranet.request('post', 'user/login', data);
+            		if (typeof result.response !== 'object'
+            				|| typeof result.response.auth === 'undefined'
+            				|| result.status != 200) {
+            			throw 'Cannot login to Aranet Cloud. Check debug log for more information.';
+            		}
             
-                    Aranet.auth_token = result.response.auth;
-                    Aranet.refresh_token = result.response.refresh;
+            		Aranet.auth_token = result.response.auth;
+            		Aranet.refresh_token = result.response.refresh;
             
-                    var spaces = result.response.spaces;
-                    for (var key in spaces) {
-                        if (spaces[key] == Aranet.params.space_name) {
-                            Aranet.space_id = key;
-                            break;
-                        }
-                    }
+            		var spaces = result.response.spaces;
+            		for (var key in spaces) {
+            			if (spaces[key] == Aranet.params.space_name) {
+            				Aranet.space_id = key;
+            				break;
+            			}
+            		}
             
-                    return result.response;
-                },
+            		return result.response;
+            	},
             
-                logout: function () {
-                    var result,
-                        data = {
-                            refresh: Aranet.refresh_token
-                        };
+            	logout: function () {
+            		var result,
+            			data = {
+            				refresh: Aranet.refresh_token
+            			};
             
-                    try {
-                        result = Aranet.request('post', 'user/logout', data);
-                        if (result.status != 204) {
-                            throw 'Cannot logout from Aranet Cloud ' + request.getStatus() + ': ' + result.response;
-                        }
-                    }
-                    catch (error) {
-                        Zabbix.log(4, '[ Aranet scraper ] ' + error)
-                    }
-                },
+            		try {
+            			result = Aranet.request('post', 'user/logout', data);
+            			if (result.status != 204) {
+            				throw 'Cannot logout from Aranet Cloud ' + request.getStatus() + ': ' + result.response;
+            			}
+            		}
+            		catch (error) {
+            			Zabbix.log(4, '[ Aranet scraper ] ' + error)
+            		}
+            	},
             
-                getMetrics: function () {
-                    var result = Aranet.request('get', 'metrics/' + Aranet.space_id);
+            	getMetrics: function () {
+            		var result = Aranet.request('get', 'metrics/' + Aranet.space_id);
             
-                    if (typeof result.response !== 'object'
-                            || typeof result.response.data === 'undefined'
-                            || result.status != 200) {
-                        throw 'Cannot get metrics data from Aranet Cloud. Check debug log for more information.';
-                    };
+            		if (typeof result.response !== 'object'
+            				|| typeof result.response.data === 'undefined'
+            				|| result.status != 200) {
+            			throw 'Cannot get metrics data from Aranet Cloud. Check debug log for more information.';
+            		};
             
-                    return result.response;
-                },
+            		return result.response;
+            	},
             
-                getSensors: function () {
-                    var result = Aranet.request('get', 'sensors/' + Aranet.space_id + '?fields=devices,metrics,telemetry,name');
+            	getSensors: function () {
+            		var result = Aranet.request('get', 'sensors/' + Aranet.space_id + '?fields=devices,metrics,telemetry,name');
             
-                    if (typeof result.response !== 'object'
-                            || typeof result.response.data === 'undefined'
-                            || result.status != 200) {
-                        throw 'Cannot get sensors data from Aranet Cloud. Check debug log for more information.';
-                    };
+            		if (typeof result.response !== 'object'
+            				|| typeof result.response.data === 'undefined'
+            				|| result.status != 200) {
+            			throw 'Cannot get sensors data from Aranet Cloud. Check debug log for more information.';
+            		};
             
-                    return result.response;
-                },
+            		return result.response;
+            	},
             
-                getGateways: function () {
-                    var result = Aranet.request('get', 'gateways/' + Aranet.space_id);
+            	getGateways: function () {
+            		var result = Aranet.request('get', 'gateways/' + Aranet.space_id);
             
-                    if (typeof result.response !== 'object'
-                        || typeof result.response.devices === 'undefined'
-                        || result.status != 200) {
-                        throw 'Cannot get gateways data from Aranet Cloud. Check debug log for more information.';
-                    };
+            		if (typeof result.response !== 'object'
+            			|| typeof result.response.devices === 'undefined'
+            			|| result.status != 200) {
+            			throw 'Cannot get gateways data from Aranet Cloud. Check debug log for more information.';
+            		};
             
-                    return result.response;
-                }
+            		return result.response;
+            	}
             }
             
             var processed_metrics = {},
-                processed_sensors = [];
+            	processed_sensors = [];
             
             try {
-                Aranet.setParams(JSON.parse(value));
+            	Aranet.setParams(JSON.parse(value));
             
-                Aranet.login();
+            	Aranet.login();
             
-                var raw_metrics = Aranet.getMetrics(),
-                    raw_sensors = Aranet.getSensors(),
-                    raw_gateways = Aranet.getGateways();
+            	var raw_metrics = Aranet.getMetrics(),
+            		raw_sensors = Aranet.getSensors(),
+            		raw_gateways = Aranet.getGateways();
             
-                Aranet.logout();
+            	Aranet.logout();
             
-                var items = raw_metrics.data.items;
-                for (item_idx in items) {
-                    var unit_name,
-                        units = items[item_idx].units;
+            	var items = raw_metrics.data.items;
+            	for (item_idx in items) {
+            		var unit_name,
+            			units = items[item_idx].units;
             
-                    units.some(function (unit) {
-                        unit_name = unit.name;
-                        if (unit.selected) {
-                            return true;
-                        }
-                    });
+            		units.some(function (unit) {
+            			unit_name = unit.name;
+            			if (unit.selected) {
+            				return true;
+            			}
+            		});
             
-                    processed_metrics[items[item_idx].id] = {
-                        name: items[item_idx].name,
-                        unit: unit_name
-                    }
+            		processed_metrics[items[item_idx].id] = {
+            			name: items[item_idx].name,
+            			unit: unit_name
+            		}
             
-                    delete items[item_idx];
-                }
+            		delete items[item_idx];
+            	}
             
-                var items = raw_sensors.data.items;
-                for (item_idx in items) {
-                    var upd_ts = 0,
-                        gateway = {},
-                        sensor_metrics = [],
-                        metrics = items[item_idx].metrics,
-                        telemetry = items[item_idx].telemetry;
+            	var items = raw_sensors.data.items;
+            	for (item_idx in items) {
+            		var upd_ts = 0,
+            			gateway = {},
+            			sensor_metrics = [],
+            			metrics = items[item_idx].metrics,
+            			telemetry = items[item_idx].telemetry;
             
-                    for (m_idx in metrics) {
-                        var unit = processed_metrics[metrics[m_idx].id];
+            		for (m_idx in metrics) {
+            			var unit = processed_metrics[metrics[m_idx].id];
             
-                        if (upd_ts < metrics[m_idx].t) {
-                            upd_ts = metrics[m_idx].t;
-                        }
+            			if (upd_ts < metrics[m_idx].t) {
+            				upd_ts = metrics[m_idx].t;
+            			}
             
-                        sensor_metrics.push({
-                            name: unit.name,
-                            unit: unit.unit,
-                            value: metrics[m_idx].v
-                        });
-                    }
+            			sensor_metrics.push({
+            				name: unit.name,
+            				unit: unit.unit,
+            				value: metrics[m_idx].v
+            			});
+            		}
             
-                    for (var t_idx in telemetry) {
-                        var unit = processed_metrics[telemetry[t_idx].id];
+            		for (var t_idx in telemetry) {
+            			var unit = processed_metrics[telemetry[t_idx].id];
             
-                        if (upd_ts < telemetry[t_idx].t) {
-                            upd_ts = telemetry[t_idx].t;
-                        }
+            			if (upd_ts < telemetry[t_idx].t) {
+            				upd_ts = telemetry[t_idx].t;
+            			}
             
-                        sensor_metrics.push({
-                            name: unit.name,
-                            unit: unit.unit,
-                            value: telemetry[t_idx].v
-                        });
-                    }
+            			sensor_metrics.push({
+            				name: unit.name,
+            				unit: unit.unit,
+            				value: telemetry[t_idx].v
+            			});
+            		}
             
-                    raw_gateways.devices.some(function (dev) {
-                        if (items[item_idx].devices[0].id === dev.id) {
-                            gateway = {
-                                id: dev.id,
-                                name: dev.device
-                            }
-                            return true;
-                        }
-                    })
+            		raw_gateways.devices.some(function (dev) {
+            			if (items[item_idx].devices[0].id === dev.id) {
+            				gateway = {
+            					id: dev.id,
+            					name: dev.device
+            				}
+            				return true;
+            			}
+            		})
             
-                    if (upd_ts) {
-                        sensor_metrics.push({
-                            name: 'Last update',
-                            unit: 's',
-                            value: upd_ts
-                        });
-                    }
+            		if (upd_ts) {
+            			sensor_metrics.push({
+            				name: 'Last update',
+            				unit: 's',
+            				value: upd_ts
+            			});
+            		}
             
-                    var sensor_id = parseInt(items[item_idx].id).toString(16).slice(-5);
+            		var sensor_id = parseInt(items[item_idx].id).toString(16).slice(-5);
             
-                    processed_sensors.push({
-                        id: sensor_id,
-                        name: items[item_idx].name.trim() === '' ? sensor_id : items[item_idx].name,
-                        gateway: gateway,
-                        metrics: sensor_metrics
-                    });
+            		processed_sensors.push({
+            			id: sensor_id,
+            			name: items[item_idx].name.trim() === '' ? sensor_id : items[item_idx].name,
+            			gateway: gateway,
+            			metrics: sensor_metrics
+            		});
             
-                    delete items[item_idx];
-                }
+            		delete items[item_idx];
+            	}
             
-                return JSON.stringify(processed_sensors);
+            	return JSON.stringify(processed_sensors);
             }
             catch (error) {
-                Zabbix.log(3, '[ Aranet scraper ] ERROR: ' + error);
-                throw 'Scraping failed: ' + error;
+            	Zabbix.log(3, '[ Aranet scraper ] ERROR: ' + error);
+            	throw 'Scraping failed: ' + error;
             }
           timeout: 10s
           parameters:
@@ -309,21 +309,21 @@ zabbix_export:
               parameters:
                 - |
                   var input = JSON.parse(value),
-                      output = [];
+                  	output = [];
                   
                   input.forEach(function (sensor) {
-                      sensor.metrics.forEach(function (metric) {
-                          output.push(
-                              {
-                                  '{#SENSOR_ID}': sensor.id,
-                                  '{#SENSOR_NAME}': sensor.name,
-                                  '{#GATEWAY_ID}': sensor.gateway.id,
-                                  '{#GATEWAY_NAME}': sensor.gateway.name,
-                                  '{#METRIC}': metric.name,
-                                  '{#UNIT}': metric.unit
-                              }
-                          );
-                      })
+                  	sensor.metrics.forEach(function (metric) {
+                  		output.push(
+                  			{
+                  				'{#SENSOR_ID}': sensor.id,
+                  				'{#SENSOR_NAME}': sensor.name,
+                  				'{#GATEWAY_ID}': sensor.gateway.id,
+                  				'{#GATEWAY_NAME}': sensor.gateway.name,
+                  				'{#METRIC}': metric.name,
+                  				'{#UNIT}': metric.unit
+                  			}
+                  		);
+                  	})
                   });
                   
                   return JSON.stringify(output);

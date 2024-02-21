@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:16:44Z'
+  date: '2023-11-01T20:45:56Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -1388,9 +1388,6 @@ zabbix_export:
                       value:
                         host: 'OPNsense by SNMP'
                         name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Inbound packet filter traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -1404,9 +1401,6 @@ zabbix_export:
                       value:
                         host: 'OPNsense by SNMP'
                         name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Outbound packet filter traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -1420,9 +1414,6 @@ zabbix_export:
                       value:
                         host: 'OPNsense by SNMP'
                         name: 'OPNsense: Interface [{#IFNAME}({#IFALIAS})]: Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: b556be6037b449139eab7830cdab494a
           name: 'IF-MIB::ifOperStatus'

@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -320,6 +320,14 @@ void	DBrollback(void)
 
 		DBclose();
 		DBconnect(ZBX_DB_CONNECT_NORMAL);
+	}
+	else
+	{
+		if (ZBX_DB_DOWN == zbx_db_txn_end_error() && ERR_Z3009 == zbx_db_last_errcode())
+		{
+			zabbix_log(LOG_LEVEL_ERR, "database is read-only: waiting for %d seconds", ZBX_DB_WAIT_DOWN);
+			sleep(ZBX_DB_WAIT_DOWN);
+		}
 	}
 }
 
@@ -2053,6 +2061,8 @@ int	DBexecute_overflowed_sql(char **sql, size_t *sql_alloc, size_t *sql_offset)
 			(*sql_offset)--;
 			zbx_strcpy_alloc(sql, sql_alloc, sql_offset, ";\n");
 		}
+#else
+		ZBX_UNUSED(sql_alloc);
 #endif
 #if defined(HAVE_ORACLE) && 0 == ZBX_MAX_OVERFLOW_SQL_SIZE
 		/* make sure we are not called twice without */
@@ -4069,7 +4079,7 @@ char	*zbx_db_get_schema_esc(void)
 void	zbx_recalc_time_period(int *ts_from, int table_group)
 {
 #define HK_CFG_UPDATE_INTERVAL	5
-	int			least_ts, now;
+	int			least_ts = 0, now;
 	zbx_config_t		cfg;
 	static int		last_cfg_retrieval = 0;
 	static zbx_config_hk_t	hk;

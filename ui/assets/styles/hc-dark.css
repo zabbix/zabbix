@@ -966,14 +966,14 @@ footer {
 
 .dashboard-navigation {
   display: flex;
-  margin-top: 10px;
-  padding-bottom: 2px; }
+  margin-top: 2px;
+  margin-bottom: 6px; }
   .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.dashboard-previous-page, .dashboard-navigation.is-scrollable .dashboard-navigation-controls button.dashboard-next-page {
     display: inline-block; }
 
 .dashboard-grid {
   position: relative;
-  margin: 0 -4px -4px -4px;
+  margin: -4px;
   z-index: 3;
   transition: margin-top .3s; }
   .dashboard-grid.reserve-header-lines-1 {
@@ -2389,10 +2389,10 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
   .filter-container.tabfilter-container .form-buttons [name="filter_update"] {
     margin-right: 20px; }
   .filter-container.tabfilter-container .tabfilter-content-container {
-    border: 1px solid #444444;
-    background-color: #000000;
     padding: 10px 0;
-    margin-bottom: 6px; }
+    margin-bottom: 8px;
+    background-color: #000000;
+    border: 1px solid #444444; }
     .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed {
       padding: 0 0 10px 0; }
       .filter-container.tabfilter-container .tabfilter-content-container.tabfilter-collapsed .tabfilter-tabs-container,
@@ -2402,7 +2402,6 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
     display: flex;
     flex: 1;
     justify-content: space-between;
-    background-color: #111111;
     margin-top: -3px; }
   .filter-container.tabfilter-container nav > ul > li {
     margin: 0 3px 5px 0;
@@ -2432,6 +2431,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       .filter-container.tabfilter-container nav li button {
         vertical-align: middle;
         margin-top: 0; }
+        .filter-container.tabfilter-container nav li button.btn-time-left:disabled, .filter-container.tabfilter-container nav li button.btn-time-right:disabled {
+          opacity: .25; }
   .filter-container.tabfilter-container .tabfilter-item-label {
     display: inline-block;
     border-radius: 2px;
@@ -2450,6 +2451,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       background-color: #000000;
       border: 1px solid #444444;
       border-bottom: 0;
+      border-bottom-right-radius: 0;
+      border-bottom-left-radius: 0;
       padding-bottom: 7px;
       vertical-align: baseline; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded .tabfilter-item-link {
@@ -2457,7 +2460,8 @@ div.dashboard-grid-widget-tophosts z-bar-gauge {
       .filter-container.tabfilter-container .tabfilter-item-label.selected.expanded:hover {
         background: #414141; }
     .filter-container.tabfilter-container .tabfilter-item-label.selected {
-      background-color: #000000; }
+      background-color: #000000;
+      border-color: #444444; }
       .filter-container.tabfilter-container .tabfilter-item-label.selected .tabfilter-item-link[data-counter]::after {
         display: none; }
     .filter-container.tabfilter-container .tabfilter-item-label.focused {
@@ -2627,6 +2631,9 @@ z-select,
     display: none;
     z-index: 20000;
     max-height: 362px;
+    max-width: 453px;
+    box-sizing: border-box;
+    overflow-x: hidden;
     overflow-y: auto;
     border: 1px solid;
     box-shadow: 0 6px 10px 0 rgba(0, 0, 0, 0.5); }
@@ -2636,6 +2643,7 @@ z-select,
       height: inherit;
       box-sizing: border-box;
       min-height: 24px;
+      max-width: 453px;
       padding: 5px;
       line-height: normal;
       color: #ffffff;
@@ -2660,9 +2668,12 @@ z-select,
         font-weight: bold; }
     z-select .list > li > ul,
     .z-select .list > li > ul {
+      display: grid;
+      grid-template-columns: minmax(max-content, 1fr);
       margin: 5px -5px -5px; }
       z-select .list > li > ul li,
       .z-select .list > li > ul li {
+        padding-right: 15px;
         padding-left: 15px; }
     z-select .list.fall-upwards,
     .z-select .list.fall-upwards {
@@ -2674,10 +2685,6 @@ z-select,
   z-select[disabled] .focusable,
   .z-select[disabled] .focusable {
     pointer-events: none; }
-
-div.dashboard-grid-widget-slareport .date-vertical {
-  writing-mode: vertical-lr;
-  transform: rotate(180deg); }
 
 .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .table-forms-container, .overlay-dialogue.modal-popup .dashboard-grid-widget-svggraph .browser-warning-container {
   border: 1px solid #444444; }
@@ -2876,7 +2883,11 @@ form.is-loading {
   .list-table td .icon-depend-up,
   .list-table td .icon-depend-down,
   .list-table td .icon-ackn {
-    margin: 0 4px -3px 0; }
+    margin-bottom: -3px; }
+    .list-table td .icon-depend-up:not(:first-of-type),
+    .list-table td .icon-depend-down:not(:first-of-type),
+    .list-table td .icon-ackn:not(:first-of-type) {
+      margin-left: 4px; }
   .list-table.compact-view .link-action {
     color: #ffffff; }
     .list-table.compact-view .link-action.red {
@@ -2990,8 +3001,12 @@ form.is-loading {
       border-top-color: #cacaca; }
     .list-table thead th .treeview span {
       margin: 0; }
-    .list-table thead th .vertical {
+    .list-table thead th .text-vertical {
+      max-height: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
       writing-mode: vertical-lr;
+      line-height: 22px;
       transform: rotate(180deg); }
     .list-table thead th a {
       display: block;
@@ -3033,9 +3048,6 @@ form.is-loading {
       color: #cacaca; }
   .list-table tbody th {
     text-align: left; }
-  .list-table .vertical_rotation_inner {
-    transform: rotate(270deg);
-    white-space: nowrap; }
   .list-table .list-table-footer {
     border-bottom: 0;
     color: #cacaca;
@@ -3224,10 +3236,6 @@ form.is-loading {
   white-space: pre-wrap;
   word-break: break-word; }
 
-.overflow-table {
-  overflow-x: auto;
-  position: relative; }
-
 .timeline-date {
   text-align: right;
   white-space: nowrap;
@@ -3282,11 +3290,11 @@ form.is-loading {
   text-align: right; }
 
 .filter-container {
-  background-color: #000000;
-  border: 1px solid #444444;
-  margin: 0 0 10px;
+  position: relative;
   padding: 10px 0;
-  position: relative; }
+  margin-bottom: 8px;
+  background-color: #000000;
+  border: 1px solid #444444; }
   .filter-container .table {
     border-bottom: 1px solid #333333; }
   .filter-container .filter-forms {
@@ -3316,6 +3324,8 @@ form.is-loading {
       border-right: 0; }
     .filter-forms .cell button {
       margin: 0; }
+    .filter-forms .cell table {
+      width: auto; }
   .filter-forms button {
     margin: 10px 5px 0; }
   .filter-forms select {
@@ -3539,6 +3549,9 @@ form.is-loading {
       display: flex; }
     .table-forms .table-forms-td-right .table-forms-separator .radio-segmented + .multiselect-wrapper {
       margin-top: 5px; }
+  .table-forms .table-subforms {
+    margin-top: -5px;
+    margin-bottom: -5px; }
   .table-forms h4 {
     margin-bottom: -5px; }
   .table-forms .hor-list li {
@@ -5280,6 +5293,8 @@ a.link-action {
     .status-container span:last-of-type {
       border-top-right-radius: 2px;
       border-bottom-right-radius: 2px; }
+    .status-container span[data-hintbox='1'] {
+      cursor: pointer; }
   .status-container .status-na-bg,
   .status-container .status-info-bg,
   .status-container .status-warning-bg,
@@ -5572,23 +5587,20 @@ span.is-loading {
 .overlay-dialogue.modal .overlay-dialogue-body.is-loading {
   overflow: hidden; }
 
-.menu-popup-preloader,
-.hintbox-preloader {
-  background: #111111;
+.menu-popup-preloader {
+  background: #000000;
   border: 1px solid #666666;
   box-shadow: 0 4px 20px 0 rgba(0, 0, 0, 0.5);
-  height: 128px;
-  width: 128px;
+  height: 50px;
+  width: 50px;
   position: fixed;
   right: auto;
   bottom: auto;
   z-index: 1010; }
-  .menu-popup-preloader::before,
-  .hintbox-preloader::before {
-    background: #111111; }
 
 .hintbox-preloader {
-  position: absolute; }
+  height: 50px;
+  width: 50px; }
 
 .browser-logo-chrome, .browser-logo-ff, .browser-logo-ed, .browser-logo-opera, .browser-logo-safari {
   background: url("../img/browser-sprite.png?20211222") no-repeat;
@@ -5636,28 +5648,26 @@ span.is-loading {
 
 .dashboard-grid-widget-content, div.dashboard-grid-widget-item, .msg-details ul, z-select .focusable,
 .z-select .focusable, z-select .list,
-.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .overflow-table, .import-compare .toc,
+.z-select .list, .multiselect-available, textarea, select, .setup-right-body, .overlay-dialogue.modal .overlay-dialogue-body, .overlay-dialogue .hintbox-wrap, .overlay-dialogue .maps-container, .notif-body, .debug-output, .overlay-descr, .import-compare .toc,
 .import-compare .diff {
   scrollbar-width: thin; }
   .dashboard-grid-widget-content::-webkit-scrollbar, div.dashboard-grid-widget-item::-webkit-scrollbar, .msg-details ul::-webkit-scrollbar, z-select .focusable::-webkit-scrollbar,
   .z-select .focusable::-webkit-scrollbar, z-select .list::-webkit-scrollbar,
-  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .overflow-table::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
+  .z-select .list::-webkit-scrollbar, .multiselect-available::-webkit-scrollbar, textarea::-webkit-scrollbar, select::-webkit-scrollbar, .setup-right-body::-webkit-scrollbar, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar, .overlay-dialogue .maps-container::-webkit-scrollbar, .notif-body::-webkit-scrollbar, .debug-output::-webkit-scrollbar, .overlay-descr::-webkit-scrollbar, .import-compare .toc::-webkit-scrollbar,
   .import-compare .diff::-webkit-scrollbar {
-    width: 9px; }
+    width: 9px;
+    height: 9px; }
   .dashboard-grid-widget-content::-webkit-scrollbar-track, div.dashboard-grid-widget-item::-webkit-scrollbar-track, .msg-details ul::-webkit-scrollbar-track, z-select .focusable::-webkit-scrollbar-track,
   .z-select .focusable::-webkit-scrollbar-track, z-select .list::-webkit-scrollbar-track,
-  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .overflow-table::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
+  .z-select .list::-webkit-scrollbar-track, .multiselect-available::-webkit-scrollbar-track, textarea::-webkit-scrollbar-track, select::-webkit-scrollbar-track, .setup-right-body::-webkit-scrollbar-track, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-track, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-track, .overlay-dialogue .maps-container::-webkit-scrollbar-track, .notif-body::-webkit-scrollbar-track, .debug-output::-webkit-scrollbar-track, .overlay-descr::-webkit-scrollbar-track, .import-compare .toc::-webkit-scrollbar-track,
   .import-compare .diff::-webkit-scrollbar-track {
     background-color: #1f1f1f; }
   .dashboard-grid-widget-content::-webkit-scrollbar-thumb, div.dashboard-grid-widget-item::-webkit-scrollbar-thumb, .msg-details ul::-webkit-scrollbar-thumb, z-select .focusable::-webkit-scrollbar-thumb,
   .z-select .focusable::-webkit-scrollbar-thumb, z-select .list::-webkit-scrollbar-thumb,
-  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .overflow-table::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
+  .z-select .list::-webkit-scrollbar-thumb, .multiselect-available::-webkit-scrollbar-thumb, textarea::-webkit-scrollbar-thumb, select::-webkit-scrollbar-thumb, .setup-right-body::-webkit-scrollbar-thumb, .overlay-dialogue.modal .overlay-dialogue-body::-webkit-scrollbar-thumb, .overlay-dialogue .hintbox-wrap::-webkit-scrollbar-thumb, .overlay-dialogue .maps-container::-webkit-scrollbar-thumb, .notif-body::-webkit-scrollbar-thumb, .debug-output::-webkit-scrollbar-thumb, .overlay-descr::-webkit-scrollbar-thumb, .import-compare .toc::-webkit-scrollbar-thumb,
   .import-compare .diff::-webkit-scrollbar-thumb {
     background-color: #999999;
     border: 1px solid #4d4d4d; }
-
-.overflow-table::-webkit-scrollbar {
-  height: 9px; }
 
 .dashboard-grid-widget.ui-draggable .dashboard-grid-widget-head,
 .dashboard-grid-widget.ui-draggable .dashboard-grid-iterator-head,
@@ -6267,9 +6277,9 @@ svg {
     background-image: url("../img/icon-sprite.svg?20211222");
     background-repeat: no-repeat; }
 
-.icon-invisible:link, .icon-invisible:hover, .icon-invisible:focus {
+a.icon-invisible:link, a.icon-invisible:hover, a.icon-invisible:focus {
   border-bottom: none; }
-.icon-invisible:focus {
+a.icon-invisible:focus {
   box-shadow: 0 0 0 2px #ffffff;
   border-radius: 2px; }
 

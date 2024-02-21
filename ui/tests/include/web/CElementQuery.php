@@ -1,7 +1,7 @@
 <?php
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -501,17 +501,8 @@ class CElementQuery implements IWaitable {
 
 		return function () use ($target, $attributes) {
 			$element = $target->one(false);
-			if (!$element->isValid()) {
+			if (!$element->isValid() || !$element->isAttributePresent($attributes)) {
 				return false;
-			}
-
-			foreach ($attributes as $key => $value) {
-				if (is_numeric($key) && $element->getAttribute($value) === null) {
-					return false;
-				}
-				elseif ($element->getAttribute($key) !== $value) {
-					return false;
-				}
 			}
 
 			return true;
@@ -580,13 +571,11 @@ class CElementQuery implements IWaitable {
 			'CDropdownElement'			=> '/z-select[@name]',
 			'CCheckboxElement'			=> '/input[@name][@type="checkbox" or @type="radio"]',
 			'CMultiselectElement'		=> [
-				'/div[contains(@class, "multiselect-control")]',
-				'/div/div[contains(@class, "multiselect-control")]' // TODO: remove after fix DEV-1071.
+				'/div[contains(@class, "multiselect-control")]'
 			],
 			'CSegmentedRadioElement'	=> [
 				'/ul[contains(@class, "radio-list-control")]',
-				'/ul/li/ul[contains(@class, "radio-list-control")]',
-				'/div/ul[contains(@class, "radio-list-control")]' // TODO: remove after fix DEV-1071.
+				'/ul/li/ul[contains(@class, "radio-list-control")]'
 			],
 			'CCheckboxListElement'		=> [
 				'/ul[contains(@class, "checkbox-list")]',
@@ -597,7 +586,6 @@ class CElementQuery implements IWaitable {
 			],
 			'CMultifieldTableElement'	=> [
 				'/table',
-				'/div/table', // TODO: remove after fix DEV-1071.
 				'/*[contains(@class, "table-forms-separator")]/table'
 			],
 			'CCompositeInputElement'	=> [

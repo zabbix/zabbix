@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:57:38Z'
+  date: '2024-02-14T13:41:35Z'
   groups:
     - uuid: 846977d1dfed4968bc5f8bdb363285bc
       name: 'Templates/Operating systems'
@@ -157,7 +157,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -189,7 +188,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -221,7 +219,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -253,7 +250,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -306,7 +302,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -392,7 +387,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -420,9 +414,7 @@ zabbix_export:
                 - '{__name__=~"^node_cpu(?:_seconds_total)?$",cpu=~".+",mode="idle"}'
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //count the number of cores
-                  return JSON.parse(value).length
+                - 'return JSON.parse(value).length'
           master_item:
             key: node_exporter.get
           tags:
@@ -444,7 +436,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -476,7 +467,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -529,7 +519,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -561,7 +550,6 @@ zabbix_export:
             - type: JAVASCRIPT
               parameters:
                 - |
-                  //calculates average, all cpu utilization
                   var valueArr = JSON.parse(value);
                   return valueArr.reduce(function(acc,obj){
                      return acc + parseFloat(obj['value'])
@@ -589,9 +577,7 @@ zabbix_export:
           preprocessing:
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //Calculate utilization
-                  return (100 - value)
+                - 'return (100 - value)'
           master_item:
             key: 'system.cpu.idle[node_exporter]'
           tags:
@@ -839,9 +825,7 @@ zabbix_export:
                 - ''
             - type: JAVASCRIPT
               parameters:
-                - |
-                  //use boottime to calculate uptime
-                  return (Math.floor(Date.now()/1000)-Number(value));
+                - 'return (Math.floor(Date.now()/1000)-Number(value));'
           master_item:
             key: node_exporter.get
           tags:
@@ -1171,27 +1155,27 @@ zabbix_export:
                       var newvalue;
                       switch(value) {
                         case "unknown":
-                          newvalue = 0;
-                          break;
+                      	newvalue = 0;
+                      	break;
                         case "notpresent":
-                          newvalue = 1;
-                          break;
+                      	newvalue = 1;
+                      	break;
                         case "down":
-                          newvalue = 2;
-                          break;
+                      	newvalue = 2;
+                      	break;
                         case "lowerlayerdown":
-                          newvalue = 3;
-                          break;
+                      	newvalue = 3;
+                      	break;
                         case "testing":
-                          newvalue = 4;
-                          break;
+                      	newvalue = 4;
+                      	break;
                         case "dormant":
-                          newvalue = 5;
-                          break;
+                      	newvalue = 5;
+                      	break;
                         case "up":
-                          newvalue = 6;
-                          break;  default:
-                          newvalue = "Problem parsing interface operstate in JS";
+                      	newvalue = 6;
+                      	break;  default:
+                      	newvalue = "Problem parsing interface operstate in JS";
                       }
                       return newvalue;
               master_item:
@@ -1724,14 +1708,13 @@ zabbix_export:
                 - type: JAVASCRIPT
                   parameters:
                     - |
-                      //count vfs.fs.inode.pfree
                       var inode_free;
                       var inode_total;
                       JSON.parse(value).forEach(function(metric) {
                         if (metric['name'] == 'node_filesystem_files'){
-                            inode_total = metric['value'];
+                      	  inode_total = metric['value'];
                         } else if (metric['name'] == 'node_filesystem_files_free'){
-                            inode_free = metric['value'];
+                      	  inode_free = metric['value'];
                         }
                       });
                       return (inode_free/inode_total)*100;
@@ -1944,8 +1927,8 @@ zabbix_export:
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '^.*$'
         - macro: '{$NET.IF.IFOPERSTATUS.NOT_MATCHES}'
-          value: ^7$
-          description: 'Ignore notPresent(7).'
+          value: ^notpresent$
+          description: 'Ignore notpresent(1).'
         - macro: '{$NODE_EXPORTER_PORT}'
           value: '9100'
           description: 'TCP Port node_exporter is listening on.'
@@ -2014,9 +1997,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Prom'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
         - uuid: 558606056f464970a7c544ba75d544f2
           name: 'System performance'
           pages:
@@ -2053,9 +2033,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Prom'
                         name: '{#FSNAME}: Disk space usage'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '15'
                   width: '24'
@@ -2069,9 +2046,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Prom'
                         name: '{#DEVNAME}: Disk read/write rates'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '20'
                   width: '24'
@@ -2085,9 +2059,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Prom'
                         name: '{#DEVNAME}: Disk average waiting time'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '25'
                   width: '24'
@@ -2101,9 +2072,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Prom'
                         name: '{#DEVNAME}: Disk utilization and queue'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '30'
                   width: '24'
@@ -2117,9 +2085,6 @@ zabbix_export:
                       value:
                         host: 'Linux by Prom'
                         name: 'Interface {#IFNAME}({#IFALIAS}): Network traffic'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_CLASSIC
                   x: '12'
                   width: '12'

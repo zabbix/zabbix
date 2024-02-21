@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -173,7 +173,7 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 	zbx_setproctitle("%s [syncing configuration]", get_process_type_string(process_type));
 	DCsync_configuration(ZBX_DBSYNC_INIT);
 
-	zbx_rtc_notify_config_sync(&rtc);
+	zbx_rtc_notify_finished_sync(&rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY, get_process_type_string(process_type));
 
 	sleeptime = (ZBX_PROGRAM_TYPE_PROXY_PASSIVE == program_type ? ZBX_IPC_WAIT_FOREVER : 0);
 
@@ -204,7 +204,9 @@ ZBX_THREAD_ENTRY(proxyconfig_thread, args)
 
 				DCsync_configuration(ZBX_DBSYNC_UPDATE);
 				DCupdate_interfaces_availability();
-				zbx_rtc_notify_config_sync(&rtc);
+
+				zbx_rtc_notify_finished_sync(&rtc, ZBX_RTC_CONFIG_SYNC_NOTIFY,
+						get_process_type_string(process_type));
 
 				zbx_setproctitle("%s [synced config in " ZBX_FS_DBL " sec]",
 						get_process_type_string(process_type), zbx_time() - sec);

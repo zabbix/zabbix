@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:59:14Z'
+  date: '2023-11-01T20:59:03Z'
   groups:
     - uuid: 3dcd5bbe90534f9e8eb5c2d53756af63
       name: Templates/Power

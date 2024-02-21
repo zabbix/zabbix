@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-10-16T16:14:21Z'
+  date: '2023-11-01T20:45:07Z'
   groups:
     - uuid: a571c0d144b14fd4a87a9d9b2aa9fcd6
       name: Templates/Applications
@@ -797,9 +797,6 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Controller manager by HTTP'
                         name: 'Kubernetes Controller Manager: ["{#NAME}"] Workqueue add rate'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '24'
@@ -813,9 +810,6 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Controller manager by HTTP'
                         name: 'Kubernetes Controller Manager: ["{#NAME}"] Workqueue depth'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '24'
@@ -829,9 +823,6 @@ zabbix_export:
                       value:
                         host: 'Kubernetes Controller manager by HTTP'
                         name: 'Kubernetes Controller Manager: ["{#NAME}"] Workqueue latency'
-                    - type: INTEGER
-                      name: rows
-                      value: '1'
       valuemaps:
         - uuid: fa1732213d27418a88a61c964d93e9d7
           name: 'Leader status'

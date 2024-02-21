@@ -1,6 +1,6 @@
 /*
 ** Zabbix
-** Copyright (C) 2001-2023 Zabbix SIA
+** Copyright (C) 2001-2024 Zabbix SIA
 **
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -324,23 +324,6 @@ zbx_vcmock_ds_item_t	*zbx_vcmock_ds_first_item(void)
 
 	zbx_hashset_iter_reset((zbx_hashset_t *)&vc_ds.items, &iter);
 	return (zbx_vcmock_ds_item_t *)zbx_hashset_iter_next(&iter);
-}
-
-/******************************************************************************
- *                                                                            *
- * Purpose: converts value cache mode from text format                        *
- *                                                                            *
- ******************************************************************************/
-int	zbx_vcmock_str_to_cache_mode(const char *mode)
-{
-	if (0 == strcmp(mode, "ZBX_VC_MODE_NORMAL"))
-		return ZBX_VC_MODE_NORMAL;
-
-	if (0 == strcmp(mode, "ZBX_VC_MODE_LOWMEM"))
-		return ZBX_VC_MODE_LOWMEM;
-
-	fail_msg("Unknown value cache mode \"%s\"", mode);
-	return FAIL;
 }
 
 /******************************************************************************
@@ -739,31 +722,6 @@ void	zbx_vcmock_get_request_params(zbx_mock_handle_t handle, zbx_uint64_t *itemi
 	*seconds = atoi(zbx_mock_get_object_member_string(handle, "seconds"));
 	*count = atoi(zbx_mock_get_object_member_string(handle, "count"));
 	zbx_strtime_to_timespec(zbx_mock_get_object_member_string(handle, "end"), end);
-}
-
-/*
- * cache working mode handling
- */
-
-/******************************************************************************
- *                                                                            *
- * Purpose: sets value cache mode if the specified key is present in input    *
- *          data                                                              *
- *                                                                            *
- ******************************************************************************/
-void	zbx_vcmock_set_mode(zbx_mock_handle_t hitem, const char *key)
-{
-	const char		*data;
-	zbx_mock_handle_t	hmode;
-	zbx_mock_error_t	err;
-
-	if (ZBX_MOCK_SUCCESS == zbx_mock_object_member(hitem, key, &hmode))
-	{
-		if (ZBX_MOCK_SUCCESS != (err = zbx_mock_string(hmode, &data)))
-			fail_msg("Cannot read \"%s\" parameter: %s", key, zbx_mock_error_string(err));
-
-		zbx_vc_set_mode(zbx_vcmock_str_to_cache_mode(data));
-	}
 }
 
 /*
