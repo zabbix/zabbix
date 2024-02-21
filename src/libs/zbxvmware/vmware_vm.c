@@ -211,11 +211,10 @@ static char	*vmware_vm_get_nic_device_ips(xmlDoc *details, xmlNode *guestnet_nod
 	if (SUCCEED == zbx_xml_node_read_values(details, guestnet_node, xpath, &ips))
 	{
 		struct zbx_json	json_data;
-		int		i;
 
 		zbx_json_initarray(&json_data, VMWARE_SHORT_STR_LEN);
 
-		for (i = 0; i < ips.values_num; i++)
+		for (int i = 0; i < ips.values_num; i++)
 			zbx_json_addstring(&json_data, NULL, ips.values[i], ZBX_JSON_TYPE_STRING);
 
 		zbx_json_close(&json_data);
@@ -667,12 +666,12 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	*tmp, props[ZBX_VMWARE_VMPROPS_NUM * 150], *vmid_esc;
-	int	i, ret;
+	int	ret;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() vmid:'%s'", __func__, vmid);
 	props[0] = '\0';
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 	{
 		zbx_strscat(props, "<ns0:pathSet>");
 		zbx_strscat(props, propmap[i].name);
@@ -833,7 +832,7 @@ static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode 
 		zbx_vector_uint64_t *disks_used, zbx_uint64_t *size, zbx_uint64_t *uniquesize, zbx_uint64_t *count,
 		char **latestdate, char **oldestdate, struct zbx_json *json_data)
 {
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	char			*value, xpath[MAX_STRING_LEN], *name, *desc, *crtime;
 	zbx_vector_str_t	ids;
 	zbx_uint64_t		snap_size, snap_usize;
@@ -881,7 +880,7 @@ static int	vmware_vm_snapshot_collect(xmlDoc *xdoc, xmlNode *snap_node, xmlNode 
 
 	zbx_free(value);
 
-	for (i = 0; i < ids.values_num; i++)
+	for (int i = 0; i < ids.values_num; i++)
 	{
 		zbx_uint64_t	dsize, dusize, disk_id =  (unsigned int)atoi(ids.values[i]);
 

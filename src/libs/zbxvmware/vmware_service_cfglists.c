@@ -447,8 +447,8 @@ out:
  *                                                                            *
  * Purpose: retrieves list of vmware service datastore diskextents            *
  *                                                                            *
- * Parameters: doc          - [IN] xml document                               *
- *             diskextents  - [OUT] list of vmware diskextents                *
+ * Parameters: doc         - [IN] xml document                                *
+ *             diskextents - [OUT] list of vmware diskextents                 *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *

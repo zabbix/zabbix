@@ -764,12 +764,10 @@ static void	vmware_dvswitch_free(zbx_vmware_dvswitch_t *dvs)
  ******************************************************************************/
 void	vmware_props_free(char **props, int props_num)
 {
-	int	i;
-
 	if (NULL == props)
 		return;
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 		zbx_free(props[i]);
 
 	zbx_free(props);
@@ -1256,14 +1254,14 @@ out:
  *                                                                            *
  * Purpose: gets open alarms and their details                                *
  *                                                                            *
- * Parameters: func_parent  - [IN] parent function name                       *
- *             service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             xdoc         - [IN] xml doc with info about alarms             *
- *             node         - [IN] xml node with info about alarms            *
- *             ids          - [IN] linked alarms ids                          *
- *             alarms_data  - [IN/OUT] all alarms with cache                  *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: func_parent - [IN] parent function name                        *
+ *             service     - [IN] vmware service                              *
+ *             easyhandle  - [IN] CURL handle                                 *
+ *             xdoc        - [IN] xml doc with info about alarms              *
+ *             node        - [IN] xml node with info about alarms             *
+ *             ids         - [IN] linked alarms ids                           *
+ *             alarms_data - [IN/OUT] all alarms with cache                   *
+ *             error       - [OUT] error message in case of failure           *
  *                                                                            *
  * Return value: SUCCEED   - operation has completed successfully             *
  *               FAIL      - operation has failed                             *
@@ -1446,13 +1444,13 @@ int	zbx_vmware_pnic_compare(const void *v1, const void *v2)
  *                                                                             *
  * Purpose: retrieves list of vmware service clusters and resource pools       *
  *                                                                             *
- * Parameters: service       - [IN] vmware service                             *
- *             easyhandle    - [IN] CURL handle                                *
- *             cluster_data  - [OUT] pointer to output variable                *
- *             clusters      - [OUT] pointer to resulting clusters vector      *
- *             rp_chunks     - [OUT] pointer to resulting resource pool vector *
- *             alarms_data   - [OUT] vector with all alarms                    *
- *             error         - [OUT] error message in case of failure          *
+ * Parameters: service      - [IN] vmware service                              *
+ *             easyhandle   - [IN] CURL handle                                 *
+ *             cluster_data - [OUT] pointer to output variable                 *
+ *             clusters     - [OUT] pointer to resulting clusters vector       *
+ *             rp_chunks    - [OUT] pointer to resulting resource pool vector  *
+ *             alarms_data  - [OUT] vector with all alarms                     *
+ *             error        - [OUT] error message in case of failure           *
  *                                                                             *
  * Return value: SUCCEED - operation has completed successfully                *
  *               FAIL    - operation has failed                                *
@@ -1943,6 +1941,7 @@ out:
 			clusters->values_num, resourcepools->values_num);
 
 	return ret;
+
 #	undef ZBX_POST_VCENTER_CLUSTER
 }
 
@@ -2839,7 +2838,7 @@ static void	zbx_vmware_job_create(zbx_vmware_t *vmw, zbx_vmware_service_t *servi
  ******************************************************************************/
 zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* username, const char* password)
 {
-	int			i, now;
+	int			now;
 	zbx_vmware_service_t	*service = NULL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() '%s'@'%s'", __func__, username, url);
@@ -2849,7 +2848,7 @@ zbx_vmware_service_t	*zbx_vmware_get_service(const char* url, const char* userna
 
 	now = time(NULL);
 
-	for (i = 0; i < vmware->services.values_num; i++)
+	for (int i = 0; i < vmware->services.values_num; i++)
 	{
 		service = (zbx_vmware_service_t *)vmware->services.values[i];
 
@@ -2922,7 +2921,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 		const char *id, const char *key, zbx_vmware_custom_query_type_t query_type, const char *mode,
 		zbx_vector_custquery_param_t *query_params)
 {
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 	zbx_vmware_cust_query_t	cq, *pcq;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() soap_type:%s id:%s query_type:%u key:%s", __func__, soap_type, id,
@@ -2948,7 +2947,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t 
 		cq.query_params = NULL;
 	}
 
-	for (i = 0; NULL != cq.query_params && i < query_params->values_num; i++)
+	for (int i = 0; NULL != cq.query_params && i < query_params->values_num; i++)
 	{
 		zbx_vmware_custquery_param_t	cqp;
 
@@ -3005,6 +3004,7 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 void	zbx_vmware_destroy(void)
 {
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
+
 	if (NULL != vmware_shmem_get_vmware_mem())
 	{
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)

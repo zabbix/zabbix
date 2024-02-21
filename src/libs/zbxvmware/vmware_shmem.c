@@ -854,7 +854,6 @@ static int	vmware_vm_compare(const void *d1, const void *d2)
 	return strcmp(vmi1->vm->uuid, vmi2->vm->uuid);
 }
 
-
 /* virtual machine index support */
 static zbx_hash_t	vmware_vm_hash(const void *data)
 {

@@ -110,7 +110,7 @@ int	vmware_hv_compare(const void *d1, const void *d2)
  *                                                                            *
  * Purpose: frees shared resources allocated to store vmware hypervisor       *
  *                                                                            *
- * Parameters: hv   - [IN] vmware hypervisor                                  *
+ * Parameters: hv - [IN] vmware hypervisor                                    *
  *                                                                            *
  ******************************************************************************/
 void	vmware_hv_shared_clean(zbx_vmware_hv_t *hv)
@@ -235,14 +235,14 @@ void	vmware_hv_clean(zbx_vmware_hv_t *hv)
  *                                                                            *
  * Purpose: gets vmware hypervisor data                                       *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             hvid         - [IN] vmware hypervisor id                       *
- *             propmap      - [IN] xpaths of properties to read               *
- *             props_num    - [IN] number of properties to read               *
- *             cq_prop      - [IN] soap part of query with cq property        *
- *             xdoc         - [OUT] reference to output xml document          *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             hvid       - [IN] vmware hypervisor id                         *
+ *             propmap    - [IN] xpaths of properties to read                 *
+ *             props_num  - [IN] number of properties to read                 *
+ *             cq_prop    - [IN] soap part of query with cq property          *
+ *             xdoc       - [OUT] reference to output xml document            *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -280,12 +280,12 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
 		ZBX_POST_VSPHERE_FOOTER
 
 	char	*tmp, props[ZBX_VMWARE_HVPROPS_NUM * 150], *hvid_esc;
-	int	i, ret = FAIL;
+	int	ret = FAIL;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s() guesthvid:'%s'", __func__, hvid);
 	props[0] = '\0';
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 	{
 		if (NULL == propmap[i].name)
 			continue;
@@ -318,10 +318,10 @@ static int	vmware_service_get_hv_data(const zbx_vmware_service_t *service, CURL 
  *                                                                            *
  * Purpose: gets vmware hypervisor datacenter, parent folder or cluster name  *
  *                                                                            *
- * Parameters: service     - [IN] vmware service                              *
- *             easyhandle  - [IN] CURL handle                                 *
- *             hv          - [IN/OUT] vmware hypervisor                       *
- *             error       - [OUT] error message in case of failure           *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             hv         - [IN/OUT] vmware hypervisor                        *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -542,7 +542,6 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, const zbx_vector_vmw
 	char		*lun_key = NULL, *name = NULL;
 	int 		created = 0, j = FAIL;
 
-
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
 	xpathCtx = xmlXPathNewContext(xdoc);
@@ -595,14 +594,16 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, const zbx_vector_vmw
 		else if (0 == strcmp(name, "operationalState"))
 		{
 			zbx_vector_str_t	values;
-			int			k;
 
 			zbx_vector_str_create(&values);
 			zbx_xml_node_read_values(xdoc, node, ZBX_XNN("val") "/*", &values);
 			di->operational_state = zbx_strdcat(di->operational_state, "[");
 
-			for (k = 0; k < values.values_num; k++)
-				di->operational_state = zbx_strdcatf(di->operational_state, "\"%s\",", values.values[k]);
+			for (int k = 0; k < values.values_num; k++)
+			{
+				di->operational_state = zbx_strdcatf(di->operational_state, "\"%s\",",
+						values.values[k]);
+			}
 
 			if (0 != values.values_num)
 				di->operational_state[strlen(di->operational_state) - 1] = '\0';
@@ -735,14 +736,14 @@ clean:
  *                                                                            *
  * Purpose: gets vmware hypervisor internal disks details info                *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             hv_data      - [IN] hv data with scsi topology info            *
- *             hvid         - [IN] vmware hypervisor id                       *
- *             dss          - [IN] all known Datastores                       *
- *             vsan_uuid    - [IN] uuid of vsan Datastore                     *
- *             disks_info   - [OUT]                                           *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             hv_data    - [IN] hv data with scsi topology info              *
+ *             hvid       - [IN] vmware hypervisor id                         *
+ *             dss        - [IN] all known Datastores                         *
+ *             vsan_uuid  - [IN] uuid of vsan Datastore                       *
+ *             disks_info - [OUT]                                             *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -959,7 +960,6 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 	xmlNode			*node;
 	zbx_vector_str_t	selected_ifs, selected_ips;
 	char			*value = NULL, *ip_vc = NULL, *ip_gw = NULL, *end;
-	int			i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1001,7 +1001,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() managementServerIp rule; selected_ifs:%d ip_vc:%s", __func__,
 			selected_ifs.values_num, ZBX_NULL2EMPTY_STR(ip_vc));
 
-	for (i = 0; i < selected_ifs.values_num; i++)
+	for (int i = 0; i < selected_ifs.values_num; i++)
 	{
 		char	*ip_hv = NULL, *mask = NULL, buff[MAX_STRING_LEN];
 		int	ipv6 = 0;
@@ -1057,7 +1057,7 @@ static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 	zabbix_log(LOG_LEVEL_DEBUG, "%s() default gateway rule; selected_ips:%d ip_gw:%s", __func__,
 			selected_ips.values_num, ZBX_NULL2EMPTY_STR(ip_gw));
 
-	for (i = 0; NULL != ip_gw && i < selected_ips.values_num; i++)
+	for (int i = 0; NULL != ip_gw && i < selected_ips.values_num; i++)
 	{
 		if (SUCCEED != zbx_ip_in_list(selected_ips.values[i], ip_gw))
 		{
@@ -1113,6 +1113,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
+	int		i;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
 
@@ -1127,7 +1128,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 	nodeset = xpathObj->nodesetval;
 	zbx_vector_vmware_pnic_ptr_reserve(nics, (size_t)nodeset->nodeNr);
 
-	for (int i = 0; i < nodeset->nodeNr; i++)
+	for (i = 0; i < nodeset->nodeNr; i++)
 	{
 		zbx_vmware_pnic_t	*nic;
 		char			*value;
@@ -1173,7 +1174,7 @@ clean:
  * Purpose: searches for Datastore uuid with type equal to 'vsan'             *
  *                                                                            *
  * Parameters: dss    - [IN] vector with all Datastores                       *
- *             hv_dss - [IN] vector with all Datastores attechad to HV        *
+ *             hv_dss - [IN] vector with all Datastores attached to HV        *
  *                                                                            *
  * Return value: pointer to vsan DS uuid or NULL                              *
  *                                                                            *
