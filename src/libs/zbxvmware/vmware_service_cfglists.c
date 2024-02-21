@@ -36,7 +36,7 @@
  * Parameters:                                                                *
  *             service      - [IN]                                            *
  *             easyhandle   - [IN]                                            *
- *             doc          - [IN] XML document                               *
+ *             doc          - [IN] xml document                               *
  *             alarms_data  - [IN]                                            *
  *             datacenters  - [OUT] list of vmware datacenters                *
  *                                                                            *
@@ -84,7 +84,8 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 			continue;
 		}
 
-		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i], ZBX_XPATH_PROP_NAME_NODE("name"))))
+		if (NULL == (name = zbx_xml_node_read_value(doc, nodeset->nodeTab[i],
+				ZBX_XPATH_PROP_NAME_NODE("name"))))
 		{
 			zabbix_log(LOG_LEVEL_DEBUG, "%s(): Cannot get datacenter name for id: %s.", __func__, id);
 			zbx_free(id);
@@ -122,7 +123,7 @@ out:
  *                                                                            *
  * Purpose: retrieves list of vmware service DVSwitch                         *
  *                                                                            *
- * Parameters: doc         - [IN] XML document                                *
+ * Parameters: doc         - [IN] xml document                                *
  *             dvswitches  - [OUT] list of vmware DVSwitch                    *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
@@ -449,7 +450,7 @@ out:
  *                                                                            *
  * Purpose: retrieves list of vmware service datastore diskextents            *
  *                                                                            *
- * Parameters: doc          - [IN] XML document                               *
+ * Parameters: doc          - [IN] xml document                               *
  *             diskextents  - [OUT] list of vmware diskextents                *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
