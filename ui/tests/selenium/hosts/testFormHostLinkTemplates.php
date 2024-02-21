@@ -22,9 +22,21 @@ require_once dirname(__FILE__).'/../../include/CLegacyWebTest.php';
 
 /**
  * @backup hosts
+ *
+ * @onBefore prepareHostData
  */
 class testFormHostLinkTemplates extends CLegacyWebTest {
-	public $host_for_template = 'Visible host for template linkage';
+	const HOST_VISIBLE_NAME = 'Visible host for template linkage';
+
+	public static function prepareHostData() {
+		CDataHelper::call('host.create', [
+			[
+				'host' => 'Template linkage test host',
+				'name' => self::HOST_VISIBLE_NAME,
+				'groups' => ['groupid' => 4], // Zabbix servers.
+			]
+		]);
+	}
 
 	public function testFormHostLinkTemplates_Layout() {
 		$this->page->login()->open('zabbix.php?action=host.list')->waitUntilReady();
@@ -44,7 +56,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateLink() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait($this->host_for_template);
+		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 		$dialog->fill(['Templates' => 'Linux by Zabbix agent active']);
@@ -53,7 +65,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$dialog->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
-		$this->zbxTestTextPresent($this->host_for_template);
+		$this->zbxTestTextPresent(self::HOST_VISIBLE_NAME);
 	}
 
 	/**
@@ -75,7 +87,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait($this->host_for_template);
+		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 
@@ -104,7 +116,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 	public function testFormHostLinkTemplates_TemplateLinkUpdate() {
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait($this->host_for_template);
+		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
 
 		$form = $this->query('name:host-form')->asForm()->waitUntilReady()->one();
 		$form->fill(['Templates' => 'Linux by Zabbix agent active']);
@@ -113,7 +125,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 		$form->submit();
 		$this->zbxTestCheckTitle('Configuration of hosts');
 		$this->zbxTestWaitUntilMessageTextPresent('msg-good', 'Host updated');
-		$this->zbxTestTextPresent($this->host_for_template);
+		$this->zbxTestTextPresent(self::HOST_VISIBLE_NAME);
 	}
 
 	/**
@@ -135,7 +147,7 @@ class testFormHostLinkTemplates extends CLegacyWebTest {
 
 		$this->zbxTestLogin(self::HOST_LIST_PAGE);
 		$this->query('button:Reset')->one()->click();
-		$this->zbxTestClickLinkTextWait($this->host_for_template);
+		$this->zbxTestClickLinkTextWait(self::HOST_VISIBLE_NAME);
 
 		$dialog = COverlayDialogElement::find()->asForm()->waitUntilReady()->one();
 

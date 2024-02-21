@@ -27,6 +27,8 @@ require_once dirname(__FILE__).'/../behaviors/CTableBehavior.php';
  * @backup items
  *
  * @dataSource ExecuteNowAction, DiscoveredHosts, HostTemplateGroups, AllItemValueTypes
+ *
+ * @onBefore prepareLLDData
  */
 class testPageLowLevelDiscovery extends CWebTest {
 
@@ -43,8 +45,25 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	const HOST_ID = 90001;
+	const SELECTOR = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
 
-	private $selector = 'xpath://form[@name="discovery"]/table[@class="list-table"]';
+	public static function prepareLLDData() {
+		$hosts = CDataHelper::call('host.create', [
+			[
+				'host' => 'Host with LLD',
+				'groups' => ['groupid' => 4], // Zabbix servers.
+			]
+		]);
+		$hostid = $hosts['hostids'][0];
+
+		// Create discovery rule.
+		CDataHelper::call('discoveryrule.create', [
+			'name' => 'LLD for Deleting',
+			'key_' => 'key_lld_trapper',
+			'hostid' => $hostid,
+			'type' => ITEM_TYPE_TRAPPER
+		]);
+	}
 
 	public function testPageLowLevelDiscovery_CheckLayout() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
@@ -108,7 +127,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 				'Key', 'Interval', 'Type', 'Status', 'Info'];
 		$this->page->assertTitle('Configuration of discovery rules');
 		$this->page->assertHeader('Discovery rules');
-		$table = $this->query($this->selector)->asTable()->one();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$this->assertSame($headers, $table->getHeadersText());
 
 		// Check table buttons.
@@ -119,7 +138,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 
 	public function testPageLowLevelDiscovery_ResetButton() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
-		$table = $this->query($this->selector)->asTable()->one();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 
 		// Check table contents before filtering.
@@ -150,7 +169,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	 */
 	public function testPageLowLevelDiscovery_EnableDisableSingle() {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.self::HOST_ID.'&context=host');
-		$table = $this->query($this->selector)->asTable()->one();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$row = $table->findRow('Name', 'Discovery rule 2');
 
 		// Clicking Enabled/Disabled link
@@ -250,13 +269,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$this->page->login()->open('host_discovery.php?filter_set=1&filter_hostids%5B0%5D='.$data['hostid'].$context);
 		// Enable all LLDs, so Execute now can be sent successfully.
 		$this->massChangeStatus('Enable');
-		$this->selectTableRows($data['names'], 'Name', $this->selector);
+		$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 
 		switch (CTestArrayHelper::get($data, 'type')) {
 			case 'disabled':
 				$this->query('button:Disable')->one()->click();
 				$this->page->acceptAlert();
-				$this->selectTableRows($data['names'], 'Name', $this->selector);
+				$this->selectTableRows($data['names'], 'Name', self::SELECTOR);
 				$this->assertFalse($this->query('button:Execute now')->one()->isEnabled());
 				break;
 			case 'template';
@@ -281,7 +300,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	private function getTableData() {
 		$result = [];
 
-		foreach ($this->query($this->selector)->asTable()->one()->getRows() as $row) {
+		foreach ($this->query(self::SELECTOR)->asTable()->one()->getRows() as $row) {
 			$result[] = $row->getColumn('Name')->getText();
 		}
 
@@ -357,12 +376,12 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'filter' => [
 						'Hosts' => [
-							'Visible host for template linkage',
+							'Host with LLD',
 							'Test item host'
 						]
 					],
 					'expected' => [
-						'delete Discovery Rule',
+						'LLD for Deleting',
 						'Test discovery rule'
 					]
 				]
@@ -372,13 +391,13 @@ class testPageLowLevelDiscovery extends CWebTest {
 				[
 					'filter' => [
 						'Hosts' => [
-							'Visible host for template linkage',
+							'Host with LLD',
 							'Test item host'
 						],
 						'Key' => 'key'
 					],
 					'expected' => [
-						'delete Discovery Rule'
+						'LLD for Deleting'
 					]
 				]
 			],
@@ -589,10 +608,10 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form->fill($data['filter']);
 		$form->submit();
 		$this->page->waitUntilReady();
-		$table = $this->query($this->selector)->asTable()->one();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 
 		if (array_key_exists('expected', $data)) {
-			$this->assertTableDataColumn($data['expected'], 'Name', $this->selector);
+			$this->assertTableDataColumn($data['expected'], 'Name', self::SELECTOR);
 		}
 
 		if (array_key_exists('rows', $data)) {
@@ -601,7 +620,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 	}
 
 	private function massChangeStatus($action) {
-		$table = $this->query($this->selector)->asTable()->one();
+		$table = $this->query(self::SELECTOR)->asTable()->one();
 		$this->query('id:all_items')->asCheckbox()->one()->check();
 		$this->query('button', $action)->one()->click();
 		$this->page->acceptAlert();
@@ -657,7 +676,7 @@ class testPageLowLevelDiscovery extends CWebTest {
 		$form = $this->query('name:zbx_filter')->one()->asForm();
 		$form->fill($data['filter']);
 		$form->submit();
-		$this->selectTableRows($data['keys'], 'Key', $this->selector);
+		$this->selectTableRows($data['keys'], 'Key', self::SELECTOR);
 		$this->query('button:Delete')->one()->click();
 		$this->page->acceptAlert();
 		$this->assertMessage($data['expected'], $data['message'], CTestArrayHelper::get($data, 'details'));
