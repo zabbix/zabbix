@@ -9,8 +9,7 @@ COMMON_SRC_FILES = \
 TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller.a \
-	$(top_srcdir)/src/zabbix_server/poller/libzbxpoller_server.a \
+	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a
 	$(top_srcdir)/src/zabbix_server/lld/libzbxlld.a \
 	$(top_srcdir)/src/zabbix_server/ha/libzbxha.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \

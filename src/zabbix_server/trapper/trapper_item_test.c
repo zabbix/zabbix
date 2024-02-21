@@ -20,7 +20,14 @@
 #include "trapper_item_test.h"
 #include "zbxexpression.h"
 
-#include "../poller/poller.h"
+#include "zbxalgo.h"
+#include "zbxcacheconfig.h"
+#include "zbxdbhigh.h"
+#include "zbxdbschema.h"
+#include "zbxeval.h"
+#include "zbxjson.h"
+#include "zbxstr.h"
+#include "zbxpoller.h"
 #include "zbxtasks.h"
 #include "zbxcommshigh.h"
 #include "zbxversion.h"
@@ -523,7 +530,8 @@ out:
 int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t proxyid, char **info,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks,  const char *config_java_gateway,
-		int config_java_gateway_port, const char *config_externalscripts)
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	char				tmp[MAX_STRING_LEN + 1], **pvalue;
 	zbx_dc_item_t			item;
@@ -782,7 +790,7 @@ int	zbx_trapper_item_test_run(const struct zbx_json_parse *jp_data, zbx_uint64_t
 
 		zbx_check_items(&item, &errcode, 1, &result, &add_results, ZBX_NO_POLLER, config_comms,
 				config_startup_time, program_type, progname, get_config_forks, config_java_gateway,
-				config_java_gateway_port, config_externalscripts);
+				config_java_gateway_port, config_externalscripts, get_value_internal_ext_cb);
 
 		switch (errcode)
 		{
@@ -854,7 +862,8 @@ static int	try_find_preproc_value(const struct zbx_json_parse *jp_first, const c
 static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, unsigned char program_type, const char *progname,
 		zbx_get_config_forks_f get_config_forks, const char *config_java_gateway, int config_java_gateway_port,
-		const char *config_externalscripts, struct zbx_json *json, char **error)
+		const char *config_externalscripts, zbx_get_value_internal_ext_f get_value_internal_ext_cb,
+		struct zbx_json *json, char **error)
 {
 	zbx_user_t		user;
 	struct zbx_json_parse	jp_data, jp_item, jp_host, jp_options, jp_steps;
@@ -921,7 +930,7 @@ static int	trapper_item_test(const struct zbx_json_parse *jp, const zbx_config_c
 
 	ret = zbx_trapper_item_test_run(&jp_data, proxyid, &info, config_comms, config_startup_time, program_type,
 			progname, get_config_forks, config_java_gateway, config_java_gateway_port,
-			config_externalscripts);
+			config_externalscripts, get_value_internal_ext_cb);
 
 	if (FAIL == ret)
 		state = ZBX_STATE_NOT_SUPPORTED;
@@ -966,7 +975,8 @@ out:
 void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 		const zbx_config_comms_args_t *config_comms, int config_startup_time, unsigned char program_type,
 		const char *progname, zbx_get_config_forks_f get_config_forks, const char *config_java_gateway,
-		int config_java_gateway_port, const char *config_externalscripts)
+		int config_java_gateway_port, const char *config_externalscripts,
+		zbx_get_value_internal_ext_f get_value_internal_ext_cb)
 {
 	struct zbx_json	json;
 	int		ret;
@@ -977,8 +987,8 @@ void	zbx_trapper_item_test(zbx_socket_t *sock, const struct zbx_json_parse *jp,
 	zbx_json_init(&json, 1024);
 
 	if (SUCCEED == (ret = trapper_item_test(jp, config_comms, config_startup_time, program_type, progname,
-			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts, &json,
-			&error)))
+			get_config_forks, config_java_gateway, config_java_gateway_port, config_externalscripts,
+			get_value_internal_ext_cb, &json, &error)))
 	{
 		zbx_tcp_send_bytes_to(sock, json.buffer, json.buffer_size, config_comms->config_timeout);
 	}
