@@ -1369,7 +1369,7 @@ clean:
  * Purpose: sorting function to sort Datacenter vector by id                  *
  *                                                                            *
  ******************************************************************************/
-int	vmware_dc_id_compare(const void *d1, const void *d2)
+int	zbx_vmware_dc_id_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datacenter_t	*dc1 = *(const zbx_vmware_datacenter_t * const *)d1;
 	const zbx_vmware_datacenter_t	*dc2 = *(const zbx_vmware_datacenter_t * const *)d2;
@@ -1395,7 +1395,7 @@ int	vmware_custom_attr_compare_name(const void *a1, const void *a2)
  * Purpose: sorting function to sort DVSwitch vector by uuid                  *
  *                                                                            *
  ******************************************************************************/
-int	vmware_dvs_uuid_compare(const void *d1, const void *d2)
+int	zbx_vmware_dvs_uuid_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_dvswitch_t	*dvs1 = *(const zbx_vmware_dvswitch_t * const *)d1;
 	const zbx_vmware_dvswitch_t	*dvs2 = *(const zbx_vmware_dvswitch_t * const *)d2;
@@ -1426,7 +1426,7 @@ static int	vmware_cq_instance_id_compare(const void *d1, const void *d2)
  * Purpose: sorting function to sort Datastore names vector by name           *
  *                                                                            *
  ******************************************************************************/
-int	vmware_dsname_compare(const void *d1, const void *d2)
+int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_dsname_t	*ds1 = *(const zbx_vmware_dsname_t * const *)d1;
 	const zbx_vmware_dsname_t	*ds2 = *(const zbx_vmware_dsname_t * const *)d2;
@@ -1434,7 +1434,7 @@ int	vmware_dsname_compare(const void *d1, const void *d2)
 	return strcmp(ds1->name, ds2->name);
 }
 
-int	vmware_pnic_compare(const void *v1, const void *v2)
+int	zbx_vmware_pnic_compare(const void *v1, const void *v2)
 {
 	const zbx_vmware_pnic_t		*nic1 = *(const zbx_vmware_pnic_t * const *)v1;
 	const zbx_vmware_pnic_t		*nic2 = *(const zbx_vmware_pnic_t * const *)v2;
@@ -2600,7 +2600,7 @@ int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_
 				zbx_str_uint64_pair_name_compare);
 	}
 
-	zbx_vector_vmware_datastore_ptr_sort(&data->datastores, vmware_ds_uuid_compare);
+	zbx_vector_vmware_datastore_ptr_sort(&data->datastores, zbx_vmware_ds_uuid_compare);
 
 	vmware_service_dvswitch_load(easyhandle, &dvs_query_values);
 	vmware_service_props_load(easyhandle, get_vmware_service_objects()[service->type].property_collector,

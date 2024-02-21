@@ -129,7 +129,7 @@ char	*vmware_datastores_diskname_search(const zbx_vector_vmware_datastore_ptr_t 
  * Purpose: sorting function to sort datastore vector by uuid                 *
  *                                                                            *
  ******************************************************************************/
-int	vmware_ds_uuid_compare(const void *d1, const void *d2)
+int	zbx_vmware_ds_uuid_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
 	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;
@@ -142,7 +142,7 @@ int	vmware_ds_uuid_compare(const void *d1, const void *d2)
  * Purpose: sorting function to sort datastore vector by name                 *
  *                                                                            *
  ******************************************************************************/
-int	vmware_ds_name_compare(const void *d1, const void *d2)
+int	zbx_vmware_ds_name_compare(const void *d1, const void *d2)
 {
 	const zbx_vmware_datastore_t	*ds1 = *(const zbx_vmware_datastore_t * const *)d1;
 	const zbx_vmware_datastore_t	*ds2 = *(const zbx_vmware_datastore_t * const *)d2;

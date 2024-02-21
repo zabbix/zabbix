@@ -1159,7 +1159,7 @@ static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_
 		zbx_vector_vmware_pnic_ptr_append(nics, nic);
 	}
 
-	zbx_vector_vmware_pnic_ptr_sort(nics, vmware_pnic_compare);
+	zbx_vector_vmware_pnic_ptr_sort(nics, zbx_vmware_pnic_compare);
 clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
@@ -1388,7 +1388,7 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 		zbx_vector_vmware_dsname_ptr_append(&hv->dsnames, dsname);
 	}
 
-	zbx_vector_vmware_dsname_ptr_sort(&hv->dsnames, vmware_dsname_compare);
+	zbx_vector_vmware_dsname_ptr_sort(&hv->dsnames, zbx_vmware_dsname_compare);
 	zbx_xml_read_values(details, ZBX_XPATH_HV_VMS(), &vms);
 	zbx_vector_vmware_vm_ptr_reserve(&hv->vms, (size_t)(vms.values_num + hv->vms.values_alloc));
 

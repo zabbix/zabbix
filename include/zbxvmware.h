@@ -40,7 +40,7 @@ zbx_str_uint64_pair_t;
 ZBX_PTR_VECTOR_DECL(str_uint64_pair, zbx_str_uint64_pair_t)
 int	zbx_str_uint64_pair_name_compare(const void *p1, const void *p2);
 
-#define UC(v)	((unsigned char)v)
+#define ZBX_UC(v)	((unsigned char)v)
 
 /* performance counter data */
 typedef struct
@@ -53,12 +53,12 @@ typedef struct
 	/*    pair->value - value                   */
 	zbx_vector_str_uint64_pair_t	values;
 
-#define ZBX_VMWARE_COUNTER_NEW		UC(0x00)
-#define ZBX_VMWARE_COUNTER_READY	UC(0x01)
-#define ZBX_VMWARE_COUNTER_UPDATING	UC(0x02)
-#define ZBX_VMWARE_COUNTER_CUSTOM	UC(0x10)
-#define ZBX_VMWARE_COUNTER_ACCEPTABLE	UC(0x20)
-#define ZBX_VMWARE_COUNTER_NOTSUPPORTED	UC(0x40)
+#define ZBX_VMWARE_COUNTER_NEW		ZBX_UC(0x00)
+#define ZBX_VMWARE_COUNTER_READY	ZBX_UC(0x01)
+#define ZBX_VMWARE_COUNTER_UPDATING	ZBX_UC(0x02)
+#define ZBX_VMWARE_COUNTER_CUSTOM	ZBX_UC(0x10)
+#define ZBX_VMWARE_COUNTER_ACCEPTABLE	ZBX_UC(0x20)
+#define ZBX_VMWARE_COUNTER_NOTSUPPORTED	ZBX_UC(0x40)
 
 #define ZBX_VMWARE_COUNTER_STATE_MASK	0xF0
 	/* the vmware performance counter state */
@@ -165,8 +165,8 @@ typedef struct
 }
 zbx_vmware_datastore_t;
 
-int	vmware_ds_uuid_compare(const void *d1, const void *d2);
-int	vmware_ds_name_compare(const void *d1, const void *d2);
+int	zbx_vmware_ds_uuid_compare(const void *d1, const void *d2);
+int	zbx_vmware_ds_name_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datastore_ptr, zbx_vmware_datastore_t *)
 
 typedef struct
@@ -187,7 +187,7 @@ typedef struct
 }
 zbx_vmware_dsname_t;
 
-int	vmware_dsname_compare(const void *d1, const void *d2);
+int	zbx_vmware_dsname_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_dsname_ptr, zbx_vmware_dsname_t *)
 
 typedef struct
@@ -197,7 +197,7 @@ typedef struct
 	zbx_vector_str_t	alarm_ids;
 }
 zbx_vmware_datacenter_t;
-int	vmware_dc_id_compare(const void *d1, const void *d2);
+int	zbx_vmware_dc_id_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_datacenter_ptr, zbx_vmware_datacenter_t *)
 
 typedef struct
@@ -207,7 +207,7 @@ typedef struct
 	char			*name;
 }
 zbx_vmware_dvswitch_t;
-int	vmware_dvs_uuid_compare(const void *d1, const void *d2);
+int	zbx_vmware_dvs_uuid_compare(const void *d1, const void *d2);
 ZBX_PTR_VECTOR_DECL(vmware_dvswitch_ptr, zbx_vmware_dvswitch_t *)
 
 #define ZBX_VMWARE_DEV_TYPE_NIC				1
@@ -247,7 +247,7 @@ typedef struct
 }
 zbx_vmware_pnic_t;
 
-int	vmware_pnic_compare(const void *v1, const void *v2);
+int	zbx_vmware_pnic_compare(const void *v1, const void *v2);
 ZBX_PTR_VECTOR_DECL(vmware_pnic_ptr, zbx_vmware_pnic_t *)
 
 /* Alarm data */
@@ -392,7 +392,8 @@ typedef struct
 	zbx_hashset_t				vms_index;
 	zbx_vector_vmware_cluster_ptr_t		clusters;
 	zbx_vector_vmware_event_ptr_t		events;
-	int					max_query_metrics;	/* max count of Datastore perfCounters in one request */
+	int					max_query_metrics;	/* max count of Datastore      */
+									/* perfCounters in one request */
 	zbx_vector_vmware_datastore_ptr_t	datastores;
 	zbx_vector_vmware_datacenter_ptr_t	datacenters;
 	zbx_vector_vmware_resourcepool_ptr_t	resourcepools;
@@ -445,11 +446,11 @@ typedef struct
 	/* the result of query */
 	char				*value;
 
-#define ZBX_VMWARE_CQ_NEW		UC(0x01)
-#define ZBX_VMWARE_CQ_READY		UC(0x02)
-#define ZBX_VMWARE_CQ_ERROR		UC(0x04)
-#define ZBX_VMWARE_CQ_PAUSED		UC(0x08)
-#define ZBX_VMWARE_CQ_SEPARATE		UC(0x10)
+#define ZBX_VMWARE_CQ_NEW		ZBX_UC(0x01)
+#define ZBX_VMWARE_CQ_READY		ZBX_UC(0x02)
+#define ZBX_VMWARE_CQ_ERROR		ZBX_UC(0x04)
+#define ZBX_VMWARE_CQ_PAUSED		ZBX_UC(0x08)
+#define ZBX_VMWARE_CQ_SEPARATE		ZBX_UC(0x10)
 	/* the state of query */
 	unsigned char			state;
 
@@ -596,7 +597,7 @@ void	zbx_vmware_unlock(void);
 
 int	zbx_vmware_get_statistics(zbx_vmware_stats_t *stats);
 
-void zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
+void	zbx_vmware_stats_ext_get(struct zbx_json *json, const void *arg);
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 

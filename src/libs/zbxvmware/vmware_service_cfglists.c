@@ -109,7 +109,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 		zbx_vector_vmware_datacenter_ptr_append(datacenters, datacenter);
 	}
 
-	zbx_vector_vmware_datacenter_ptr_sort(datacenters, vmware_dc_id_compare);
+	zbx_vector_vmware_datacenter_ptr_sort(datacenters, zbx_vmware_dc_id_compare);
 
 	ret = SUCCEED;
 	xmlXPathFreeObject(xpathObj);
