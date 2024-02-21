@@ -581,7 +581,7 @@ static int	vmware_http_request(const char *fn_parent, CURL *easyhandle, const ch
  *             url_suffix - [IN] second part of url request                   *
  *             param      - [IN] url parameter                                *
  *             jp         - [OUT] json document response                      *
- *             error      - [OUT] error message in the case of failure        *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - SOAP request was completed successfully            *
  *               FAIL    - SOAP request has failed                            *

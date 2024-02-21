@@ -47,7 +47,7 @@ typedef struct
 	/* entity id */
 	char			*id;
 
-	/* the performance counter values */
+	/* performance counter values */
 	zbx_vector_vmware_perf_value_ptr_t	values;
 
 	/* error information */
