@@ -211,10 +211,24 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
-	 * Set browser focus to filter label element.
+	 * Get focused state of item.
+	 *
+	 * @return {boolean}
 	 */
-	setFocused() {
-		this._target.focus({preventScroll: true});
+	isFocused() {
+		return this._target.parentNode.classList.contains(TABFILTERITEM_STYLE_FOCUSED);
+	}
+
+	/**
+	 * Focus or blur the item.
+	 */
+	setFocused(focused = true) {
+		if (focused) {
+			this._target.focus({preventScroll: true});
+		}
+		else {
+			this._target.blur();
+		}
 	}
 
 	/**

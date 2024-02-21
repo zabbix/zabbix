@@ -330,6 +330,17 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
+	 * Focus the specified item and blur all other items.
+	 *
+	 * @param {CTabFilterItem} focus_item
+	 */
+	#setFocusedItem(focus_item) {
+		for (const item of this._items) {
+			item.setFocused(item === focus_item);
+		}
+	}
+
+	/**
 	 * Update separated state of items (whether to visually separate one item from another).
 	 */
 	#updateSeparators() {
@@ -437,7 +448,7 @@ class CTabFilter extends CBaseComponent {
 						});
 					}
 					else {
-						item.setFocused();
+						this.#setFocusedItem(item);
 						item.initUnsavedState();
 						this.profileUpdate('selected', {
 							value_int: item._index
@@ -452,7 +463,7 @@ class CTabFilter extends CBaseComponent {
 					this.collapseAllItemsExcept(item);
 
 					if (expand) {
-						item.setFocused();
+						this.#setFocusedItem(item);
 						item.fire(TABFILTERITEM_EVENT_EXPAND);
 					}
 				}
@@ -530,15 +541,15 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Listener for tabs event {CSortable.EVENT_DRAG_END}.
 			 *
-			 * Updates tab sorting in profile as well as separated state of items.
+			 * Re-focuses the item marked as focused and updates separators of items.
 			 *
 			 * @param ev
 			 */
 			tabsDragEnd: (ev) => {
-				for (const item of this._items) {
-					if (item._target.parentNode.classList.contains(TABFILTERITEM_STYLE_FOCUSED)) {
-						item.setFocused();
-					}
+				const focus_item = this._items.find(item => item.isFocused());
+
+				if (focus_item !== undefined) {
+					this.#setFocusedItem(focus_item);
 				}
 
 				if (ev.detail.index_to == ev.detail.index) {
@@ -546,6 +557,13 @@ class CTabFilter extends CBaseComponent {
 				}
 			},
 
+			/**
+			 * Listener for tabs event {CSortable.EVENT_SORT}.
+			 *
+			 * Updates tab sorting and updates separators of items.
+			 *
+			 * @param ev
+			 */
 			tabsSort: (ev) => {
 				this._items.splice(ev.detail.index_to, 0, ...this._items.splice(ev.detail.index, 1));
 
@@ -645,7 +663,7 @@ class CTabFilter extends CBaseComponent {
 								if (this._active_item !== this._items[0]) {
 									this._items[0].fire(TABFILTERITEM_EVENT_SELECT);
 									// Set selected item focus after popup menu will focus it opener element (used for ESC).
-									setTimeout(() => this._items[0].setFocused(), 0);
+									setTimeout(() => this.#setFocusedItem(this._items[0]));
 								}
 							}
 						}]
@@ -662,7 +680,7 @@ class CTabFilter extends CBaseComponent {
 								if (this._active_item !== item) {
 									item.fire(TABFILTERITEM_EVENT_SELECT);
 									// Set selected item focus after popup menu will focus it opener element (used for ESC).
-									setTimeout(() => item.setFocused(), 0);
+									setTimeout(() => this.#setFocusedItem(item));
 								}
 							}
 						});
@@ -763,7 +781,7 @@ class CTabFilter extends CBaseComponent {
 					index = focused_item._index + ((ev.key === 'ArrowRight') ? 1 : -1);
 
 					if (this._items[index] instanceof CTabFilterItem && this._items[index] !== this._timeselector) {
-						this._items[index].setFocused();
+						this.#setFocusedItem(this._items[index]);
 					}
 
 					cancelEvent(ev);
