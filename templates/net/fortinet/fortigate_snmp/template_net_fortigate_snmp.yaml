@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-13T12:20:25Z'
+  date: '2024-02-21T01:47:01Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -74,7 +74,7 @@ zabbix_export:
           preprocessing:
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
-                - 6d
+                - 1d
           tags:
             - tag: component
               value: ha
@@ -427,7 +427,7 @@ zabbix_export:
           name: 'FortiGate: SNMP traps (fallback)'
           type: SNMP_TRAP
           key: snmptrap.fallback
-          history: 2w
+          history: 7d
           trends: '0'
           value_type: LOG
           description: 'The item is used to collect all SNMP traps unmatched by other snmptrap items.'
@@ -700,7 +700,7 @@ zabbix_export:
             - tag: component
               value: storage
         - uuid: b7001a7fd88040fe8a11512df1d9ec07
-          name: 'FortiGate: Free disk space, %'
+          name: 'FortiGate: Free disk percentage'
           type: CALCULATED
           key: vfs.fs.pfree
           history: 7d
@@ -712,11 +712,26 @@ zabbix_export:
             - tag: component
               value: storage
           triggers:
-            - uuid: a323a6c7a5a54ad1bf0db0ec9441bf83
-              expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.MIN}'
-              name: 'FortiGate: Free disk space is less than {$DISK.FREE.MIN}%'
+            - uuid: 424ab075f1ff46e1b64f9416dee4f3f7
+              expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.WARN}'
+              name: 'FortiGate: Free disk space is low'
+              event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.WARN}%'
               priority: WARNING
               description: 'Left disk space is not enough.'
+              dependencies:
+                - name: 'FortiGate: Free disk space is too low'
+                  expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}'
+              tags:
+                - tag: scope
+                  value: capacity
+                - tag: scope
+                  value: performance
+            - uuid: a323a6c7a5a54ad1bf0db0ec9441bf83
+              expression: 'last(/FortiGate by SNMP/vfs.fs.pfree)<{$DISK.FREE.CRIT}'
+              name: 'FortiGate: Free disk space is too low'
+              event_name: 'FortiGate: Free disk space is less than {$DISK.FREE.CRIT}%'
+              priority: HIGH
+              description: 'Left disk space is too low.'
               tags:
                 - tag: scope
                   value: capacity
@@ -832,6 +847,8 @@ zabbix_export:
                 - 1h
           tags:
             - tag: component
+              value: ssl
+            - tag: component
               value: vpn
         - uuid: 1699dd171a1f41d5896ac766477033ca
           name: 'FortiGate: Active IPsec VPN tunnels'
@@ -863,6 +880,8 @@ zabbix_export:
               parameters:
                 - 1h
           tags:
+            - tag: component
+              value: ssl
             - tag: component
               value: vpn
         - uuid: 3e37679441344327bf86ae38cd62f580
@@ -1000,7 +1019,7 @@ zabbix_export:
           description: 'Discovering HA members from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 93a6937b6fbe488cbd78cf8f962f94ad
-              name: 'HA #{#HA.ID}: Anti-virus events'
+              name: 'HA {#HA.ID}: Anti-virus events'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.10.{#SNMPINDEX}'
               key: 'ha.av.events[fgHaStatsAvCount.{#SNMPINDEX}]'
@@ -1017,9 +1036,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 8290da04f8194186966c8670c89ebf37
-              name: 'HA #{#HA.ID}: Bytes processed'
+              name: 'HA {#HA.ID}: Bytes processed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.8.{#SNMPINDEX}'
               key: 'ha.bytes.rate[fgHaStatsByteCount.{#SNMPINDEX}]'
@@ -1037,9 +1056,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 4a3763ad9d134802993b6f82c6a8ccb6
-              name: 'HA #{#HA.ID}: Global checksum'
+              name: 'HA {#HA.ID}: Global checksum'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.15.{#SNMPINDEX}'
               key: 'ha.checksum.global[fgHaStatsGlobalChecksum.{#SNMPINDEX}]'
@@ -1058,9 +1077,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 4253edcd725844a0b438af65fe6206c7
-              name: 'HA #{#HA.ID}: CPU usage'
+              name: 'HA {#HA.ID}: CPU usage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.3.{#SNMPINDEX}'
               key: 'ha.cpu.usage[fgHaStatsCpuUsage.{#SNMPINDEX}]'
@@ -1074,9 +1093,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 22a3cd6732af4efcb2ef0b3ac07e5948
-              name: 'HA #{#HA.ID}: Hostname'
+              name: 'HA {#HA.ID}: Hostname'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.11.{#SNMPINDEX}'
               key: 'ha.hostname[fgHaStatsHostname.{#SNMPINDEX}]'
@@ -1095,9 +1114,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: ef06add0e6cc4064b3696960a627699d
-              name: 'HA #{#HA.ID}: IPS events'
+              name: 'HA {#HA.ID}: IPS events'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.9.{#SNMPINDEX}'
               key: 'ha.ips.events[fgHaStatsIdsCount.{#SNMPINDEX}]'
@@ -1114,9 +1133,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: e54c3edd5b1c4a73b135e24495756bca
-              name: 'HA #{#HA.ID}: Memory usage'
+              name: 'HA {#HA.ID}: Memory usage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.4.{#SNMPINDEX}'
               key: 'ha.mem.usage[fgHaStatsMemUsage.{#SNMPINDEX}]'
@@ -1130,9 +1149,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 653ae601538545f1b2aeb1459497104f
-              name: 'HA #{#HA.ID}: Network bandwidth usage'
+              name: 'HA {#HA.ID}: Network bandwidth usage'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.5.{#SNMPINDEX}'
               key: 'ha.net.usage[fgHaStatsNetUsage.{#SNMPINDEX}]'
@@ -1149,9 +1168,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 1594d7c870e6425f8872991b25cba0f8
-              name: 'HA #{#HA.ID}: Packets processed'
+              name: 'HA {#HA.ID}: Packets processed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.7.{#SNMPINDEX}'
               key: 'ha.packets.rate[fgHaStatsPktCount.{#SNMPINDEX}]'
@@ -1168,9 +1187,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 1af6ca37fc104d6cb5192437b4bfc881
-              name: 'HA #{#HA.ID}: Primary serial number'
+              name: 'HA {#HA.ID}: Primary serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.16.{#SNMPINDEX}'
               key: 'ha.primary.serialnumber[fgHaStatsMasterSerial.{#SNMPINDEX}]'
@@ -1180,7 +1199,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                Serial number of the primary during the last synch attempt (successful of not).
+                Serial number of the primary during the last synch attempt (successful or not).
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1189,9 +1208,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 1ba63c880654491a90bddd1ebde52252
-              name: 'HA #{#HA.ID}: Serial number'
+              name: 'HA {#HA.ID}: Serial number'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.2.{#SNMPINDEX}'
               key: 'ha.serialnumber[fgHaStatsSerial.{#SNMPINDEX}]'
@@ -1210,9 +1229,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 4c8e8e4787954e89a116e56306a275d9
-              name: 'HA #{#HA.ID}: Session count'
+              name: 'HA {#HA.ID}: Session count'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.6.{#SNMPINDEX}'
               key: 'ha.session.count[fgHaStatsSesCount.{#SNMPINDEX}]'
@@ -1224,9 +1243,9 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
             - uuid: 10e2717f461f4f8887cfc9ae0ab6d932
-              name: 'HA #{#HA.ID}: Sync status'
+              name: 'HA {#HA.ID}: Sync status'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.13.2.1.1.12.{#SNMPINDEX}'
               key: 'ha.sync.status[fgHaStatsSyncStatus.{#SNMPINDEX}]'
@@ -1242,24 +1261,24 @@ zabbix_export:
                 - tag: component
                   value: ha
                 - tag: member
-                  value: '#{#HA.ID}'
+                  value: '{#HA.ID}'
           graph_prototypes:
             - uuid: 0ffb9affa29643f1b7a098e9c77ac412
-              name: 'HA #{#HA.ID}: Bytes processed'
+              name: 'HA {#HA.ID}: Bytes processed'
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'FortiGate by SNMP'
                     key: 'ha.bytes.rate[fgHaStatsByteCount.{#SNMPINDEX}]'
             - uuid: c0b2565a140547dc94065bebceea2cd4
-              name: 'HA #{#HA.ID}: CPU usage'
+              name: 'HA {#HA.ID}: CPU usage'
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'FortiGate by SNMP'
                     key: 'ha.cpu.usage[fgHaStatsCpuUsage.{#SNMPINDEX}]'
             - uuid: 10a28c1634e24df2bcb2f0c6187a1459
-              name: 'HA #{#HA.ID}: HA events'
+              name: 'HA {#HA.ID}: HA events'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1271,21 +1290,21 @@ zabbix_export:
                     host: 'FortiGate by SNMP'
                     key: 'ha.av.events[fgHaStatsAvCount.{#SNMPINDEX}]'
             - uuid: 206b306fff5f49838f52584038299df9
-              name: 'HA #{#HA.ID}: Memory usage'
+              name: 'HA {#HA.ID}: Memory usage'
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'FortiGate by SNMP'
                     key: 'ha.mem.usage[fgHaStatsMemUsage.{#SNMPINDEX}]'
             - uuid: 3ec1552b04014d848419d66fd17e2fe4
-              name: 'HA #{#HA.ID}: Network bandwidth usage'
+              name: 'HA {#HA.ID}: Network bandwidth usage'
               graph_items:
                 - color: 199C0D
                   item:
                     host: 'FortiGate by SNMP'
                     key: 'ha.net.usage[fgHaStatsNetUsage.{#SNMPINDEX}]'
             - uuid: b076c55d490b48e3a98491f3132f49ac
-              name: 'HA #{#HA.ID}: Packets processed'
+              name: 'HA {#HA.ID}: Packets processed'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1325,7 +1344,7 @@ zabbix_export:
               value_type: CHAR
               description: |
                 MIB: FORTINET-FORTIGATE-MIB
-                A string representation of the value of the sensor. Because sensors can present data in different formats, string representation is most general format. Interpretation of the value (units of measure, for example) is dependent on the individual sensor.\
+                A string representation of the value of the sensor. Because sensors can present data in different formats, string representation is most general format. Interpretation of the value (units of measure, for example) is dependent on the individual sensor.
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
                   parameters:
@@ -1422,7 +1441,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system
+                For packet-oriented interfaces, the number of inbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of inbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system 
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
@@ -1439,7 +1458,7 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits received'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.6.{#SNMPINDEX}'
-              key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
+              key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
               units: bps
@@ -1495,7 +1514,7 @@ zabbix_export:
               history: 7d
               description: |
                 MIB: IF-MIB
-                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system
+                For packet-oriented interfaces, the number of outbound packets that contained errors preventing them from being deliverable to a higher-layer protocol. For character-oriented or fixed-length interfaces, the number of outbound transmission units that contained errors preventing them from being deliverable to a higher-layer protocol. Discontinuities in the value of this counter can occur at re-initialization of the management system 
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
@@ -1512,13 +1531,13 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Bits sent'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.10.{#SNMPINDEX}'
-              key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
+              key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
               delay: 3m
               history: 7d
               units: bps
               description: |
                 MIB: IF-MIB
-                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets. Discontinuities in the value of this counter can occur at re-initialization of the management system
+                The total number of octets transmitted out of the interface, including framing characters. This object is a 64-bit version of ifOutOctets.Discontinuities in the value of this counter can occur at re-initialization of the management system 
                 and at other times as indicated by the value of ifCounterDiscontinuityTime.
               preprocessing:
                 - type: CHANGE_PER_SECOND
@@ -1538,14 +1557,17 @@ zabbix_export:
               name: 'Interface {#IFNAME}({#IFALIAS}): Speed'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.2.1.31.1.1.1.15.{#SNMPINDEX}'
-              key: 'net.if.speed[ifSpeed.{#SNMPINDEX}]'
+              key: 'net.if.speed[ifHighSpeed.{#SNMPINDEX}]'
               delay: 5m
               history: 7d
               trends: '0'
               units: bps
               description: |
                 MIB: IF-MIB
-                An estimate of the interface current bandwidth in units of 1,000,000 bits per second. If this object reports a value of `n`, then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`. For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth. For a sub-layer which has no concept of bandwidth, this object should be zero.
+                An estimate of the interface's current bandwidth in units of 1,000,000 bits per second.
+                If this object reports a value of `n` then the speed of the interface is somewhere in the range of `n-500,000` to `n+499,999`.
+                For interfaces which do not vary in bandwidth or for those where no accurate estimation can be made, this object should contain the nominal bandwidth.
+                For a sub-layer which has no concept of bandwidth, this object should be zero.
               preprocessing:
                 - type: MULTIPLIER
                   parameters:
@@ -1570,7 +1592,7 @@ zabbix_export:
               description: |
                 MIB: IF-MIB
                 The current operational state of the interface.
-                - The testing(3) state indicates that no operational packets can be passed.
+                - The testing(3) state indicates that no operational packets can be passed
                 - If ifAdminStatus is down(2), then ifOperStatus should be down(2).
                 - If ifAdminStatus is changed to up(1), then ifOperStatus should change to up(1) if the interface is ready to transmit and receive network traffic.
                 - It should change to dormant(5) if the interface is waiting for external actions (such as a serial line waiting for an incoming connection).
@@ -1599,7 +1621,7 @@ zabbix_export:
                     2. `{$IFCONTROL:"{#IFNAME}"}=1` - a user can redefine context macro to value - 0. That marks this interface as not important. No new trigger will be fired if this interface is down.
                     3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the operational status was up to (1) sometime before (so, does not fire for the 'eternal off' interfaces).
                     
-                    WARNING: if closed manually - it will not fire again on the next poll, because of .diff.
+                    WARNING: if closed manually - it will not fire again on the next poll, because of `.diff`.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1632,20 +1654,18 @@ zabbix_export:
           trigger_prototypes:
             - uuid: bb4f3ffe2fc44a78b1e7ab2b7b700696
               expression: |
-                change(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])<0 and last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
-                and (
+                change(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])<0 and last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and (
                 last(/FortiGate by SNMP/net.if.type[ifType.{#SNMPINDEX}])=6 or
                 last(/FortiGate by SNMP/net.if.type[ifType.{#SNMPINDEX}])=7 or
                 last(/FortiGate by SNMP/net.if.type[ifType.{#SNMPINDEX}])=11 or
                 last(/FortiGate by SNMP/net.if.type[ifType.{#SNMPINDEX}])=62 or
                 last(/FortiGate by SNMP/net.if.type[ifType.{#SNMPINDEX}])=69 or
                 last(/FortiGate by SNMP/net.if.type[ifType.{#SNMPINDEX}])=117
-                )
-                and
-                (last(/FortiGate by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
+                ) and (last(/FortiGate by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])<>2)
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                (change(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0 and last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}],#2)>0) or
+                (change(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0 and 
+                last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}],#2)>0) or
                 (last(/FortiGate by SNMP/net.if.status[ifOperStatus.{#SNMPINDEX}])=2)
               name: 'Interface {#IFNAME}({#IFALIAS}): Ethernet has changed to lower speed than it was before'
               opdata: 'Current reported speed: {ITEM.LASTVALUE1}'
@@ -1661,13 +1681,13 @@ zabbix_export:
                   value: performance
             - uuid: f2e0d7ffd8664f80bdd009462fa58060
               expression: |
-                (avg(/FortiGate by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/FortiGate by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
-                last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
+                (avg(/FortiGate by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) or 
+                avg(/FortiGate by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)>({$IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])) and 
+                last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/FortiGate by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
-                avg(/FortiGate by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/FortiGate by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
+                avg(/FortiGate by SNMP/net.if.in[ifHCInOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}]) and 
+                avg(/FortiGate by SNMP/net.if.out[ifHCOutOctets.{#SNMPINDEX}],15m)<(({$IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/FortiGate by SNMP/net.if.speed[ifHighSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$IF.UTIL.MAX:"{#IFNAME}"}%)'
               opdata: 'In: {ITEM.LASTVALUE1}, out: {ITEM.LASTVALUE3}, speed: {ITEM.LASTVALUE2}'
@@ -1712,13 +1732,13 @@ zabbix_export:
                   color: 199C0D
                   item:
                     host: 'FortiGate by SNMP'
-                    key: 'net.if.in[ifInOctets.{#SNMPINDEX}]'
+                    key: 'net.if.in[ifHCInOctets.{#SNMPINDEX}]'
                 - sortorder: '1'
                   drawtype: BOLD_LINE
                   color: F63100
                   item:
                     host: 'FortiGate by SNMP'
-                    key: 'net.if.out[ifOutOctets.{#SNMPINDEX}]'
+                    key: 'net.if.out[ifHCOutOctets.{#SNMPINDEX}]'
                 - sortorder: '2'
                   color: 00611C
                   yaxisside: RIGHT
@@ -1956,7 +1976,7 @@ zabbix_export:
           description: 'Discovering SoC3 NP6Lite processors from FORTINET-FORTIGATE-MIB.'
           item_prototypes:
             - uuid: 15caa12cf78b430dbe63ba27606cf04b
-              name: 'SoC3 #{#CPU.ID}: Packets dropped'
+              name: 'SoC3 {#CPU.ID}: Packets dropped'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.4.4.2.1.8.{#CPU.ID}'
               key: 'soc3.np6lite.pkt.dropped[fgProcessorPktDroppedCount.{#CPU.ID}]'
@@ -1976,7 +1996,7 @@ zabbix_export:
                 - tag: processor
                   value: 'np6lite #{#CPU.ID}'
             - uuid: f9b37041d4ae4ccab1b9a92835a45649
-              name: 'SoC3 #{#CPU.ID}: Packets received'
+              name: 'SoC3 {#CPU.ID}: Packets received'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.4.4.2.1.6.{#CPU.ID}'
               key: 'soc3.np6lite.pkt.received[fgProcessorPktRxCount.{#CPU.ID}]'
@@ -1996,7 +2016,7 @@ zabbix_export:
                 - tag: processor
                   value: 'np6lite #{#CPU.ID}'
             - uuid: 8f80b2d538ef4f20a654156e280394ab
-              name: 'SoC3 #{#CPU.ID}: Packets transmitted'
+              name: 'SoC3 {#CPU.ID}: Packets transmitted'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.12356.101.4.4.2.1.7.{#CPU.ID}'
               key: 'soc3.np6lite.pkt.transmitted[fgProcessorPktRxCount.{#CPU.ID}]'
@@ -2017,7 +2037,7 @@ zabbix_export:
                   value: 'np6lite #{#CPU.ID}'
           graph_prototypes:
             - uuid: fcef7d91b3d94d4ebd12cfe1eb3d077e
-              name: 'SoC3 #{#CPU.ID}: Packets flow'
+              name: 'SoC3 {#CPU.ID}: Packets flow'
               graph_items:
                 - color: 199C0D
                   item:
@@ -2230,6 +2250,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the administrative status of this WTP.
                 
+                The following enumerated values are supported:
                 discovered(1) - This WTP was discovered though discovery or join request messages.
                 disable(2) - Controller is configured to not provide service to this WTP.
                 enable(3) - Controller is configured to provide service to this WTP.
@@ -3000,9 +3021,12 @@ zabbix_export:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
           description: 'Threshold of CPU utilization for warning trigger in %.'
-        - macro: '{$DISK.FREE.MIN}'
+        - macro: '{$DISK.FREE.CRIT}'
+          value: '10'
+          description: 'Threshold of disk free space for critical trigger in %.'
+        - macro: '{$DISK.FREE.WARN}'
           value: '20'
-          description: 'Threshold of disk free space for trigger in %.'
+          description: 'Threshold of disk free space for warning trigger in %.'
         - macro: '{$HA.MEMBER.SN.MATCHES}'
           value: '.*'
           description: 'This macro is used in HA members discovery. Can be overridden on the host or linked template level.'
@@ -3321,7 +3345,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'SoC3 #{#CPU.ID}: Packets flow'
+                        name: 'SoC3 {#CPU.ID}: Packets flow'
             - name: 'IPS statistics'
               widgets:
                 - type: GRAPH_CLASSIC
@@ -3487,7 +3511,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'HA #{#HA.ID}: CPU usage'
+                        name: 'HA {#HA.ID}: CPU usage'
                 - type: GRAPH_PROTOTYPE
                   'y': '5'
                   width: '12'
@@ -3500,7 +3524,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'HA #{#HA.ID}: Bytes processed'
+                        name: 'HA {#HA.ID}: Bytes processed'
                 - type: GRAPH_PROTOTYPE
                   'y': '10'
                   width: '12'
@@ -3513,7 +3537,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'HA #{#HA.ID}: Network bandwidth usage'
+                        name: 'HA {#HA.ID}: Network bandwidth usage'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -3526,7 +3550,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'HA #{#HA.ID}: Memory usage'
+                        name: 'HA {#HA.ID}: Memory usage'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '5'
@@ -3540,7 +3564,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'HA #{#HA.ID}: Packets processed'
+                        name: 'HA {#HA.ID}: Packets processed'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   'y': '10'
@@ -3554,7 +3578,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'FortiGate by SNMP'
-                        name: 'HA #{#HA.ID}: HA events'
+                        name: 'HA {#HA.ID}: HA events'
       valuemaps:
         - uuid: a7e08ed8bf9d4372b60dd44157ed8dc3
           name: 'HA load-balancing schedule'
