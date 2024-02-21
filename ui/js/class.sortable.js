@@ -972,7 +972,7 @@ class CSortable {
 			this.#cancelDragScrolling();
 
 			if (this.#scrollRel(e.deltaY !== 0 ? e.deltaY : e.deltaX) !== 0
-					|| this.#is_horizontal
+					|| (this.#is_horizontal && this.#getScrollMax() > 0)
 					|| this.#is_dragging
 					|| this.#hasTransitions()) {
 				e.preventDefault();
