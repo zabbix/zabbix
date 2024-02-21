@@ -67,8 +67,6 @@
  */
 
 
-#define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
-
 static zbx_mutex_t	vmware_lock = ZBX_MUTEX_NULL;
 
 static zbx_vmware_t	*vmware = NULL;
@@ -129,22 +127,6 @@ zbx_vmware_rpool_chunk_t;
 
 ZBX_PTR_VECTOR_DECL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_rpool_chunk_ptr, zbx_vmware_rpool_chunk_t *)
-
-#define ZBX_XPATH_FAULTSTRING(sz)									\
-	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
-
-#define ZBX_XPATH_FAULT_FAST(name)									\
-	"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
-
-#define ZBX_XPATH_FAULT_SLOW(max_len)									\
-	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
-	"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
-	ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
-	ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
-	"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
-
-#define ZBX_XPATH_VMWARE_ABOUT(property)								\
-	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 /* string pool support */
 
@@ -356,6 +338,19 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 		"/*[local-name()='RetrievePropertiesExResponse']"	\
 		"/*[local-name()='returnval']/*[local-name()='token'][1]"
 
+#define ZBX_XPATH_FAULT_SLOW(max_len)									\
+	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
+	"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
+	ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
+	ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
+	"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
+
+#define ZBX_XPATH_FAULTSTRING(sz)					\
+	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
+
+#define ZBX_XPATH_FAULT_FAST(name)					\
+	"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
+
 	xmlDoc		*doc;
 	ZBX_HTTPPAGE	*resp;
 	int		ret = SUCCEED;
@@ -412,6 +407,9 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 	return ret;
 
 #	undef ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN
+#undef ZBX_XPATH_FAULTSTRING
+#undef ZBX_XPATH_FAULT_SLOW
+#undef ZBX_XPATH_FAULT_FAST
 }
 
 /******************************************************************************
@@ -1123,6 +1121,9 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 		"</ns0:RetrieveServiceContent>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
+#define ZBX_XPATH_VMWARE_ABOUT(property)							\
+	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
+
 	xmlDoc	*doc = NULL;
 
 	if (SUCCEED != zbx_soap_post(__func__, easyhandle, ZBX_POST_VMWARE_CONTENTS, &doc, NULL, error))
@@ -1144,6 +1145,7 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
+#undef ZBX_XPATH_VMWARE_ABOUT
 }
 
 /******************************************************************************
@@ -2450,6 +2452,7 @@ static int	vmware_curl_set_header(CURL *easyhandle, int vc_version, struct curl_
 int	zbx_vmware_service_update(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout, int cache_update_period)
 {
+#define ZBX_INIT_UPD_XML_SIZE		(100 * ZBX_KIBIBYTE)
 	CURL				*easyhandle = NULL;
 	struct curl_slist		*headers = NULL;
 	zbx_vmware_data_t		*data;
@@ -2779,6 +2782,7 @@ out:
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc, msg);
 
 	return ret;
+#undef ZBX_INIT_UPD_XML_SIZE
 }
 
 /******************************************************************************
