@@ -1078,13 +1078,37 @@ static void	lld_row_free(zbx_lld_row_t *lld_row)
  ******************************************************************************/
 int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char **error)
 {
+#define LIFETIME_DURATION_GET(lt, lt_str)									\
+	do													\
+	{													\
+		char	*lt_res;										\
+														\
+		if (ZBX_LLD_LIFETIME_TYPE_AFTER != lt.type)							\
+			break;											\
+														\
+		lt_res = zbx_strdup(NULL, lt_str);								\
+		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL,	\
+				NULL, NULL, &lt_res, ZBX_MACRO_TYPE_COMMON, NULL, 0);				\
+														\
+		if (SUCCEED != zbx_is_time_suffix(lt_str, &lt.duration, ZBX_LENGTH_UNLIMITED))			\
+		{												\
+			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule "	\
+					" \"%s:%s\": \"%s\" is not a valid value", zbx_host_string(hostid),	\
+					discovery_key, lt_res);							\
+			lt.duration = 25 * SEC_PER_YEAR;	/* max value for the field */			\
+		}												\
+		zbx_free(lt_res);										\
+	}													\
+	while(0)
+
 	zbx_db_result_t			result;
 	zbx_db_row_t			row;
 	zbx_uint64_t			hostid;
 	char				*discovery_key = NULL, *info = NULL;
-	int				lifetime, ret = SUCCEED, errcode;
+	int				errcode, ret = SUCCEED;
 	zbx_vector_lld_macro_path_t	lld_macro_paths;
 	zbx_lld_filter_t		filter;
+	zbx_lld_lifetime_t		lifetime, enabled_lifetime;
 	time_t				now;
 	zbx_dc_item_t			item;
 	zbx_config_t			cfg;
@@ -1112,32 +1136,23 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	}
 
 	result = zbx_db_select(
-			"select hostid,key_,evaltype,formula,lifetime"
+			"select hostid,key_,evaltype,formula,lifetime_type,lifetime,enabled_lifetime_type,"
+				"enabled_lifetime"
 			" from items"
 			" where itemid=" ZBX_FS_UI64,
 			lld_ruleid);
 
 	if (NULL != (row = zbx_db_fetch(result)))
 	{
-		char	*lifetime_str;
 
 		ZBX_STR2UINT64(hostid, row[0]);
 		discovery_key = zbx_strdup(discovery_key, row[1]);
 		filter.evaltype = atoi(row[2]);
 		filter.expression = zbx_strdup(NULL, row[3]);
-		lifetime_str = zbx_strdup(NULL, row[4]);
-		zbx_substitute_simple_macros(NULL, NULL, NULL, NULL, &hostid, NULL, NULL, NULL, NULL, NULL, NULL, NULL,
-				&lifetime_str, ZBX_MACRO_TYPE_COMMON, NULL, 0);
-
-		if (SUCCEED != zbx_is_time_suffix(lifetime_str, &lifetime, ZBX_LENGTH_UNLIMITED))
-		{
-			zabbix_log(LOG_LEVEL_WARNING, "cannot process lost resources for the discovery rule \"%s:%s\":"
-					" \"%s\" is not a valid value",
-					zbx_host_string(hostid), discovery_key, lifetime_str);
-			lifetime = 25 * SEC_PER_YEAR;	/* max value for the field */
-		}
-
-		zbx_free(lifetime_str);
+		ZBX_STR2UCHAR(lifetime.type, row[4]);
+		LIFETIME_DURATION_GET(lifetime, row[5]);
+		ZBX_STR2UCHAR(enabled_lifetime.type, row[6]);
+		LIFETIME_DURATION_GET(enabled_lifetime, row[7]);
 	}
 	zbx_db_free_result(result);
 
@@ -1175,7 +1190,8 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 	zbx_config_get(&cfg, ZBX_CONFIG_FLAGS_AUDITLOG_ENABLED | ZBX_CONFIG_FLAGS_AUDITLOG_MODE);
 	zbx_audit_init(cfg.auditlog_enabled, cfg.auditlog_mode, ZBX_AUDIT_LLD_CONTEXT);
 
-	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
+	if (SUCCEED != lld_update_items(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime,
+			&enabled_lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add items because parent host was removed while"
 				" processing lld rule");
@@ -1184,21 +1200,22 @@ int	lld_process_discovery_rule(zbx_uint64_t lld_ruleid, const char *value, char 
 
 	lld_item_links_sort(&lld_rows);
 
-	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
+	if (SUCCEED != lld_update_triggers(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime,
+			&enabled_lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add triggers because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now))
+	if (SUCCEED != lld_update_graphs(hostid, lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime, now))
 	{
 		zabbix_log(LOG_LEVEL_DEBUG, "cannot update/add graphs because parent host was removed while"
 				" processing lld rule");
 		goto out;
 	}
 
-	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, error, lifetime, now);
+	lld_update_hosts(lld_ruleid, &lld_rows, &lld_macro_paths, error, &lifetime, &enabled_lifetime, now);
 
 	/* add informative warning to the error message about lack of data for macros used in filter */
 	if (NULL != info)
@@ -1223,4 +1240,5 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return ret;
+#undef LIFETIME_DURATION_GET
 }

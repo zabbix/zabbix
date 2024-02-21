@@ -116,7 +116,9 @@ typedef struct
 		ZBX_FLAG_LLD_TRIGGER_UPDATE_EVENT_NAME | ZBX_FLAG_LLD_TRIGGER_UPDATE_URL_NAME)
 	zbx_uint64_t		flags;
 	int			lastcheck;
+	unsigned char		discovery_status;
 	int			ts_delete;
+	int			ts_disable;
 	unsigned char		status;
 	unsigned char		priority_orig;
 	unsigned char		priority;
@@ -413,7 +415,8 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 	zbx_strcpy_alloc(&sql, &sql_alloc, &sql_offset,
 			"select td.parent_triggerid,t.triggerid,t.description,t.expression,t.type,t.priority,"
 				"t.comments,t.url,t.url_name,t.recovery_expression,t.recovery_mode,t.correlation_mode,"
-				"t.correlation_tag,t.manual_close,t.opdata,td.lastcheck,td.ts_delete,t.event_name"
+				"t.correlation_tag,t.manual_close,t.opdata,td.lastcheck,td.discovery_status,"
+				"td.ts_delete,td.ts_disable,t.event_name"
 			" from triggers t,trigger_discovery td"
 			" where t.triggerid=td.triggerid"
 				" and");
@@ -499,10 +502,12 @@ static void	lld_triggers_get(const zbx_vector_ptr_t *trigger_prototypes, zbx_vec
 		trigger->correlation_tag_orig = NULL;
 		trigger->opdata = zbx_strdup(NULL, row[14]);
 		trigger->opdata_orig = NULL;
-		trigger->event_name = zbx_strdup(NULL, row[17]);
+		trigger->event_name = zbx_strdup(NULL, row[19]);
 		trigger->event_name_orig = NULL;
 		trigger->lastcheck = atoi(row[15]);
-		trigger->ts_delete = atoi(row[16]);
+		ZBX_STR2UCHAR(trigger->discovery_status, row[16]);
+		trigger->ts_delete = atoi(row[17]);
+		trigger->ts_disable = atoi(row[18]);
 
 		zbx_vector_ptr_create(&trigger->functions);
 		zbx_vector_ptr_create(&trigger->dependencies);
@@ -1491,7 +1496,9 @@ static void 	lld_trigger_make(const zbx_lld_trigger_prototype_t *trigger_prototy
 
 		trigger->triggerid = 0;
 		trigger->lastcheck = 0;
+		trigger->discovery_status = ZBX_LLD_DISCOVERY_STATUS_NORMAL;
 		trigger->ts_delete = 0;
+		trigger->ts_disable = 0;
 		trigger->parent_triggerid = trigger_prototype->triggerid;
 
 		trigger->description = zbx_strdup(NULL, trigger_prototype->description);
@@ -3591,15 +3598,25 @@ static void	lld_trigger_dependencies_validate(zbx_vector_ptr_t *triggers, char *
 }
 
 static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discovery_flag, int *lastcheck,
-		int *ts_delete, const char **name)
+		unsigned char *discovery_status, int *ts_delete, int *ts_disable, const char **name)
 {
 	const zbx_lld_trigger_t	*trigger = (const zbx_lld_trigger_t *)object;
 
 	*id = trigger->triggerid;
 	*discovery_flag = trigger->flags & ZBX_FLAG_LLD_TRIGGER_DISCOVERED;
 	*lastcheck = trigger->lastcheck;
+	*discovery_status = trigger->discovery_status;
 	*ts_delete = trigger->ts_delete;
+	*ts_disable = trigger->ts_disable;
 	*name = trigger->description;
+}
+
+static	int	get_trigger_status_value(int status)
+{
+	if (ZBX_LLD_OBJECT_STATUS_ENABLED == status)
+		return TRIGGER_STATUS_ENABLED;
+
+	return TRIGGER_STATUS_DISABLED;
 }
 
 /******************************************************************************
@@ -3612,7 +3629,8 @@ static	void	get_trigger_info(const void *object, zbx_uint64_t *id, int *discover
  *                                                                            *
  ******************************************************************************/
 int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_vector_lld_row_t *lld_rows,
-		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, int lifetime, int lastcheck)
+		const zbx_vector_lld_macro_path_t *lld_macro_paths, char **error, zbx_lld_lifetime_t *lifetime,
+		zbx_lld_lifetime_t *enabled_lifetime, int lastcheck)
 {
 	zbx_vector_ptr_t		trigger_prototypes;
 	zbx_vector_ptr_t		triggers;
@@ -3666,8 +3684,10 @@ int	lld_update_triggers(zbx_uint64_t hostid, zbx_uint64_t lld_ruleid, const zbx_
 	lld_trigger_dependencies_validate(&triggers, error);
 	lld_trigger_tags_make(&trigger_prototypes, &triggers, lld_rows, lld_macro_paths, error);
 	ret = lld_triggers_save(hostid, &trigger_prototypes, &triggers);
-	lld_remove_lost_objects("trigger_discovery", "triggerid", (const zbx_vector_ptr_t *)&triggers, lifetime,
-			lastcheck, zbx_db_delete_triggers, get_trigger_info);
+	lld_process_lost_objects("triggers", "trigger_discovery", "triggerid", (const zbx_vector_ptr_t *)&triggers,
+			lifetime, enabled_lifetime, lastcheck, zbx_db_delete_triggers, get_trigger_info,
+			zbx_audit_trigger_create_entry, zbx_audit_trigger_update_json_update_status,
+			get_trigger_status_value);
 	/* cleaning */
 
 	zbx_vector_ptr_clear_ext(&items, (zbx_mem_free_func_t)lld_item_free);
