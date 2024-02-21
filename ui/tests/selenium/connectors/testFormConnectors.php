@@ -82,6 +82,11 @@ class testFormConnectors extends CWebTest {
 			'default' => [
 				'Data type' => 'Item values',
 				'Tag filter' => 'And/Or',
+				'id:item_value_types_8' => true, // Numeric (unsigned).
+				'id:item_value_types_1' => true, // Numeric (float).
+				'id:item_value_types_2' => true, // Character.
+				'id:item_value_types_4' => true, // Log.
+				'id:item_value_types_16' => true, // Text.
 				'HTTP authentication' => 'None',
 				'Max records per message' => 'Unlimited',
 				'Concurrent sessions' => '1',
@@ -207,6 +212,9 @@ class testFormConnectors extends CWebTest {
 			'Attempts' => [
 				'maxlength' => '1'
 			],
+			'Attempt interval' => [
+				'maxlength' => '32'
+			],
 			'Timeout' => [
 				'maxlength' => '255'
 			],
@@ -230,6 +238,15 @@ class testFormConnectors extends CWebTest {
 		foreach ($inputs as $field => $attributes) {
 			$this->assertTrue($form->getField($field)->isAttributePresent($attributes));
 		}
+
+		/**
+		* Check that 'Attempt interval' and 'Type of information' fields state changes
+		* if 'Attempts' and 'Data type' match criteria (Attempts > 1, Data type !== Item values).
+		*/
+		$this->assertFalse($form->getField('Attempt interval')->isEnabled());
+		$form->fill(['Attempts' => 2, 'Data type' => 'Events']);
+		$this->assertFalse($form->getField('Type of information')->isDisplayed());
+		$this->assertTrue($form->getField('Attempt interval')->isEnabled());
 
 		// Check that both 'Cancel' and 'Add' footer buttons are present and clickable.
 		$this->assertEquals(2, $dialog->getFooter()->query('button', ['Add', 'Cancel'])->all()
