@@ -290,6 +290,12 @@ $trigger_form_grid
 		)
 	]);
 
+$disabled_by_lld_icon = array_key_exists('disable_source', $data['triggerDiscovery'])
+		&& $data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		&& $data['status'] == TRIGGER_STATUS_DISABLED
+	? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))->addClass('js-disabled-by-lld')
+	: null;
+
 if (array_key_exists('parent_discoveryid', $data)) {
 	$trigger_form_grid
 		->addItem([new CLabel(_('Create enabled'), 'status'),
@@ -307,14 +313,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 } else {
 	$trigger_form_grid
 		->addItem([
-			new CLabel([
-				_('Enabled'),
-				$data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-						&& $data['status'] == TRIGGER_STATUS_DISABLED
-					? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
-						->addClass('js-disabled-by-lld')
-					: null
-			], 'status'),
+			new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 			new CFormField((new CCheckBox('status', TRIGGER_STATUS_ENABLED))
 				->setChecked($data['status'] == TRIGGER_STATUS_ENABLED)
 			)

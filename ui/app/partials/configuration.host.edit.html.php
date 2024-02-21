@@ -175,6 +175,12 @@ $templates_field_items[] = (new CMultiSelect([
 	]
 ]))->setWidth(ZBX_TEXTAREA_STANDARD_WIDTH);
 
+$disabled_by_lld_icon = array_key_exists('disable_source', $data['host']['hostDiscovery'])
+		&& $data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		&& $data['host']['status'] == HOST_STATUS_NOT_MONITORED
+	? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))->addClass('js-disabled-by-lld')
+	: null;
+
 $host_tab
 	->addItem([
 		new CLabel([
@@ -262,14 +268,7 @@ $host_tab
 		)
 	])
 	->addItem([
-		new CLabel([
-			_('Enabled'),
-			$data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-					&& $data['host']['status'] == HOST_STATUS_NOT_MONITORED
-				? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
-					->addClass('js-disabled-by-lld')
-				: null
-		], 'status'),
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
 			(new CCheckBox('status', HOST_STATUS_MONITORED))
 				->setChecked($data['host']['status'] == HOST_STATUS_MONITORED)

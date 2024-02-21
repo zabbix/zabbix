@@ -847,16 +847,15 @@ $formgrid
 		)
 	]);
 
+$disabled_by_lld_icon = array_key_exists('disable_source', $item['itemDiscovery'])
+		&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+		&& $item['status'] == ITEM_STATUS_DISABLED
+	? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))->addClass('js-disabled-by-lld')
+	: null;
+
 if ($data['source'] === 'item') {
 	$formgrid->addItem([
-		new CLabel([
-			_('Enabled'),
-			$item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
-					&& $item['status'] == ITEM_STATUS_DISABLED
-				? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
-					->addClass('js-disabled-by-lld')
-				: null
-		], 'status'),
+		new CLabel([_('Enabled'), $disabled_by_lld_icon], 'status'),
 		new CFormField(
 			(new CCheckBox('status', ITEM_STATUS_ACTIVE))->setChecked($item['status'] == ITEM_STATUS_ACTIVE))
 	]);
