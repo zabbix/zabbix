@@ -63,13 +63,9 @@ class CMfa extends CApiService {
 		if ($db_mfas) {
 			$db_mfas = $this->addRelatedObjects($options, $db_mfas);
 			$db_mfas = $this->unsetExtraFields($db_mfas, ['mfaid'], $options['output']);
-
-			if (!$options['preservekeys']) {
-				$db_mfas = array_values($db_mfas);
-			}
 		}
 
-		return $db_mfas;
+		return $options['preservekeys'] ? $db_mfas : array_values($db_mfas);
 	}
 
 	private static function validateGet(array &$options): void {
@@ -288,7 +284,8 @@ class CMfa extends CApiService {
 
 	private function validateUpdate(array &$mfas, ?array &$db_mfas): void {
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE | API_ALLOW_UNEXPECTED, 'uniq' => [['mfaid']], 'fields' => [
-			'mfaid' => ['type' => API_ID, 'flags' => API_REQUIRED]
+			'mfaid' =>	['type' => API_ID, 'flags' => API_REQUIRED],
+			'type' =>	['type' => API_INT32, 'flags' =>  API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])]
 		]];
 
 		if (!CApiInputValidator::validate($api_input_rules, $mfas, '/', $error)) {
@@ -307,16 +304,29 @@ class CMfa extends CApiService {
 
 		$mfas = $this->extendObjectsByKey($mfas, $db_mfas, 'mfaid', ['type']);
 
+		foreach ($mfas as &$mfa) {
+			if ($mfa['type'] != $db_mfas[$mfa['mfaid']]['type']) {
+				$mfa += [
+					'hash_function' => DB::getDefault('mfa', 'hash_function'),
+					'code_length' => DB::getDefault('mfa', 'code_length'),
+					'api_hostname' => DB::getDefault('mfa', 'api_hostname'),
+					'clientid' => DB::getDefault('mfa', 'clientid'),
+					'client_secret' => DB::getDefault('mfa', 'client_secret')
+				];
+			}
+		}
+		unset($mfa);
+
 		$api_input_rules = ['type' => API_OBJECTS, 'flags' => API_NOT_EMPTY | API_NORMALIZE, 'uniq' => [['name']], 'fields' => [
 			'mfaid' =>			['type' => API_ID, 'flags' => API_REQUIRED],
 			'type' =>			['type' => API_INT32, 'flags' =>  API_NOT_EMPTY, 'in' => implode(',', [MFA_TYPE_TOTP, MFA_TYPE_DUO])],
 			'name' =>			['type' => API_STRING_UTF8, 'flags' => API_NOT_EMPTY, 'length' => DB::getFieldLength('mfa', 'name')],
 			'hash_function' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512]), 'default' => DB::getDefault('mfa', 'hash_function')],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_HASH_SHA1, TOTP_HASH_SHA256, TOTP_HASH_SHA512])],
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'hash_function')]
 			]],
 			'code_length' =>	['type' => API_MULTIPLE, 'rules' => [
-									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8]), 'default' => DB::getDefault('mfa', 'code_length')],
+									['if' => ['field' => 'type', 'in' => MFA_TYPE_TOTP], 'type' => API_INT32, 'in' => implode(',', [TOTP_CODE_LENGTH_6, TOTP_CODE_LENGTH_8])],
 									['else' => true, 'type' => API_INT32, 'in' => DB::getDefault('mfa', 'code_length')]
 			]],
 			'api_hostname' =>	['type' => API_MULTIPLE, 'rules' => [
@@ -341,7 +351,16 @@ class CMfa extends CApiService {
 	}
 
 	public function delete(array $mfaids): array {
-		self::validateDelete($mfaids, $db_mfaids);
+		$auth = API::Authentication()->get([
+			'output' => ['mfa_status', 'mfaid']
+		]);
+
+		self::validateDelete($mfaids, $db_mfaids, $auth);
+
+		// If last (default) is removed, reset default mfaid to prevent from foreign key constraint.
+		if (in_array($auth['mfaid'], $mfaids)) {
+			API::Authentication()->update(['mfaid' => 0]);
+		}
 
 		DB::delete('mfa', ['mfaid' => $mfaids]);
 
@@ -350,7 +369,7 @@ class CMfa extends CApiService {
 		return ['mfaids' => $mfaids];
 	}
 
-	private static function validateDelete(array $mfaids, ?array &$db_mfas): void {
+	private static function validateDelete(array $mfaids, ?array &$db_mfas, array $auth): void {
 		$api_input_rules = ['type' => API_IDS, 'flags' => API_NOT_EMPTY, 'uniq' => true];
 
 		if (!CApiInputValidator::validate($api_input_rules, $mfaids, '/', $error)) {
@@ -374,13 +393,9 @@ class CMfa extends CApiService {
 			1
 		));
 
-		$auth = API::Authentication()->get([
-			'output' => ['mfa_status', 'mfaid']
-		]);
-
 		// Default MFA method cannot be removed if there are no remaining MFA methods.
 		if (in_array($auth['mfaid'], $mfaids)
-				&& ($auth['mfa_status'] == MFA_ENABLED || $mfas_left)) {
+				&& ($auth['mfa_status'] == MFA_ENABLED || !$mfas_left)) {
 			self::exception(ZBX_API_ERROR_PARAMETERS, _('Cannot delete default MFA method.'));
 		}
 
@@ -394,13 +409,8 @@ class CMfa extends CApiService {
 			$db_group = reset($db_groups);
 
 			self::exception(ZBX_API_ERROR_PARAMETERS, _s('Cannot delete MFA method "%1$s".',
-					$db_mfas[$db_group['mfaid']]['name'])
+				$db_mfas[$db_group['mfaid']]['name'])
 			);
-		}
-
-		if (in_array($auth['mfaid'], $mfaids)) {
-			// If last (default) is removed, reset default mfaid to prevent from foreign key constraint.
-			API::Authentication()->update(['mfaid' => 0]);
 		}
 	}
 }
