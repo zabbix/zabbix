@@ -265,6 +265,7 @@ $host_tab
 		new CLabel([
 			_('Enabled'),
 			$data['host']['hostDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+					&& $data['host']['status'] == HOST_STATUS_NOT_MONITORED
 				? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
 					->addClass('js-disabled-by-lld')
 				: null

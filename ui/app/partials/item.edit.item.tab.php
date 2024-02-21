@@ -852,6 +852,7 @@ if ($data['source'] === 'item') {
 		new CLabel([
 			_('Enabled'),
 			$item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+					&& $item['status'] == ITEM_STATUS_DISABLED
 				? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
 					->addClass('js-disabled-by-lld')
 				: null

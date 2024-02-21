@@ -219,7 +219,8 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		'output' => [
 			'hostid', 'status', 'name', 'maintenance_status', 'flags', 'active_available'
 		],
-		'selectHostDiscovery' => ['ts_delete'],
+		'selectHostDiscovery' => ['status', 'ts_delete', 'ts_disable', 'disable_source'],
+		'selectDiscoveryRule' => ['lifetime_type', 'enabled_lifetime_type'],
 		'selectInterfaces' => ['type', 'useip', 'ip', 'dns', 'port', 'version', 'details', 'available', 'error'],
 		'hostids' => [$hostid],
 		'editable' => true
@@ -231,6 +232,7 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 		$options['selectDiscoveries'] = API_OUTPUT_COUNT;
 		$options['selectHttpTests'] = API_OUTPUT_COUNT;
 	}
+
 
 	// get hosts
 	$db_host = API::Host()->get($options);
@@ -360,14 +362,15 @@ function getHostNavigation(string $current_element, $hostid, $lld_ruleid = 0): ?
 			->addItem($status)
 			->addItem(getHostAvailabilityTable($db_host['interfaces']));
 
-		// todo - uncomment and update this. E.S.
-//		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED && $db_host['hostDiscovery']['ts_delete'] != 0) {
-//			$info_icons = [getLldLostEntityIndicator(time(), ZBX_LLD_DISABLE_AFTER, time()+5000,
-//				ZBX_LLD_DELETE_AFTER, time()+2500, 'host'
-//			)];
+		if ($db_host['flags'] == ZBX_FLAG_DISCOVERY_CREATED
+				&& $db_host['hostDiscovery']['status'] == ZBX_LLD_STATUS_LOST) {
+			$info_icons = [getLldLostEntityIndicator(time(), $db_host['discoveryRule']['lifetime_type'],
+				$db_host['hostDiscovery']['ts_delete'], $db_host['discoveryRule']['enabled_lifetime_type'],
+				$db_host['hostDiscovery']['ts_disable'], 'host'
+			)];
 
-//			$list->addItem(makeInformationList($info_icons));
-//		}
+			$list->addItem(makeInformationList($info_icons));
+		}
 	}
 
 	$content_menu = (new CList())

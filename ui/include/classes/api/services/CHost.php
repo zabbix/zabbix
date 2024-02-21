@@ -813,7 +813,7 @@ class CHost extends CHostGeneral {
 		$inventories = zbx_toHash($inventories, 'hostid');
 
 		$hosts = $this->extendObjectsByKey($hosts, $db_hosts, 'hostid', ['tls_connect', 'tls_accept', 'tls_issuer',
-			'tls_subject', 'tls_psk_identity', 'tls_psk'
+			'tls_subject', 'tls_psk_identity', 'tls_psk', 'flags'
 		]);
 
 		foreach ($hosts as $host) {
@@ -1096,11 +1096,20 @@ class CHost extends CHostGeneral {
 		unset($data['hosts'], $data['groups'], $data['interfaces'], $data['templates_clear'], $data['templates'],
 			$data['macros'], $data['inventory'], $data['inventory_mode']);
 
-		if (!zbx_empty($data)) {
+		if ($data) {
 			DB::update('hosts', [
 				'values' => $data,
 				'where' => ['hostid' => $hostids]
 			]);
+
+			// Update disable_source in host_discovery table when discovered host status is changed to disabled.
+			if ($data['flags'] == ZBX_FLAG_DISCOVERY_CREATED && array_key_exists('status', $data)
+					&& $data['status'] == HOST_STATUS_NOT_MONITORED) {
+				DB::update('host_discovery', [
+					'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
+					'where' => ['hostid' => $hostids]
+				]);
+			}
 		}
 
 		/*

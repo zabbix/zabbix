@@ -310,6 +310,7 @@ if (array_key_exists('parent_discoveryid', $data)) {
 			new CLabel([
 				_('Enabled'),
 				$data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
+						&& $data['status'] == TRIGGER_STATUS_DISABLED
 					? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))
 						->addClass('js-disabled-by-lld')
 					: null

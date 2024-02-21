@@ -1154,19 +1154,22 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	private static function getInheritedValidationRules(): array {
 		return ['type' => API_OBJECT, 'flags' => API_ALLOW_UNEXPECTED, 'fields' => [
-			'host_status' =>		['type' => API_ANY],
-			'uuid' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'itemid' =>				['type' => API_ANY],
-			'name' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'type' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'key_' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'lifetime' =>			['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
-			'description' =>		['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
-			'status' =>				['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
-			'preprocessing' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'lld_macro_paths' =>	['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
-			'filter' =>				self::getFilterValidationRules('items', 'item_condition'),
-			'overrides' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
+			'host_status' =>			['type' => API_ANY],
+			'uuid' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'itemid' =>					['type' => API_ANY],
+			'name' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'type' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'key_' =>					['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'lifetime_type' =>			['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DELETE_AFTER, ZBX_LLD_DELETE_NEVER, ZBX_LLD_DELETE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'lifetime_type')],
+			'lifetime' =>				['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'lifetime')],
+			'enabled_lifetime_type' =>	['type' => API_INT32, 'flags' => API_NOT_EMPTY, 'in' => implode(',', [ZBX_LLD_DISABLE_AFTER, ZBX_LLD_DISABLE_NEVER, ZBX_LLD_DISABLE_IMMEDIATELY]), 'length' => DB::getFieldLength('items', 'enabled_lifetime_type')],
+			'enabled_lifetime' =>		['type' => API_TIME_UNIT, 'flags' => API_NOT_EMPTY | API_ALLOW_USER_MACRO, 'in' => '0,'.implode(':', [SEC_PER_HOUR, 25 * SEC_PER_YEAR]), 'length' => DB::getFieldLength('items', 'enabled_lifetime')],
+			'description' =>			['type' => API_STRING_UTF8, 'length' => DB::getFieldLength('items', 'description')],
+			'status' =>					['type' => API_INT32, 'in' => implode(',', [ITEM_STATUS_ACTIVE, ITEM_STATUS_DISABLED])],
+			'preprocessing' =>			['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'lld_macro_paths' =>		['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED],
+			'filter' =>					self::getFilterValidationRules('items', 'item_condition'),
+			'overrides' =>				['type' => API_UNEXPECTED, 'error_type' => API_ERR_INHERITED]
 		]];
 	}
 
@@ -2519,7 +2522,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	public static function linkTemplateObjects(array $templateids, array $hostids): void {
 		$db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				array_diff(CItemType::FIELD_NAMES, ['interfaceid', 'parameters'])
 			),
 			'filter' => [
@@ -2737,7 +2743,10 @@ class CDiscoveryRule extends CItemGeneral {
 		}
 
 		$options = [
-			'output' => array_merge(['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
+					'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status'
+				],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'itemids' => array_keys($upd_db_items)
@@ -2861,7 +2870,10 @@ class CDiscoveryRule extends CItemGeneral {
 	 */
 	private static function getChildObjectsUsingTemplateid(array $items, array $db_items, array $hostids): array {
 		$upd_db_items = DB::select('items', [
-			'output' => array_merge(['itemid', 'name', 'type', 'key_', 'lifetime', 'description', 'status'],
+			'output' => array_merge(
+				['itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
+				],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),
 			'filter' => [

@@ -2382,7 +2382,9 @@ function getMainItemFieldNames(array $input): array {
 				];
 			}
 			else {
-				$field_names = ['lifetime', 'description', 'status'];
+				$field_names = ['lifetime_type', 'lifetime', 'enabled_lifetime_type', 'enabled_lifetime', 'description',
+					'status'
+				];
 			}
 
 			if (array_key_exists('itemid', $input) || $input['filter']['conditions']) {

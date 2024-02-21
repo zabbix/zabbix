@@ -182,6 +182,13 @@ foreach ($data['items'] as $item) {
 
 	$can_execute = in_array($item['type'], $data['check_now_types']) && $item['status'] == ITEM_STATUS_ACTIVE
 		&& $item['hosts'][0]['status'] == HOST_STATUS_MONITORED;
+
+	$status = (new CLink(itemIndicator($item['status'], $item['state'])))
+		->addClass(ZBX_STYLE_LINK_ACTION)
+		->addClass(itemIndicatorStyle($item['status'], $item['state']))
+		->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
+		->setAttribute('data-itemid', $item['itemid']);
+
 	$row = [
 		(new CCheckBox('itemids['.$item['itemid'].']', $item['itemid']))
 			->setAttribute('data-actions', $can_execute ? 'execute' : null),
@@ -206,14 +213,7 @@ foreach ($data['items'] as $item) {
 		$item['history'],
 		$item['trends'],
 		item_type2str($item['type']),
-		[
-			(new CLink(itemIndicator($item['status'], $item['state'])))
-				->addClass(ZBX_STYLE_LINK_ACTION)
-				->addClass(itemIndicatorStyle($item['status'], $item['state']))
-				->addClass($item['status'] == ITEM_STATUS_DISABLED ? 'js-enable-item' : 'js-disable-item')
-				->setAttribute('data-itemid', $item['itemid']),
-			$lost_lld_info_icon
-		],
+		(new CDiv([$status, $lost_lld_info_icon]))->addClass(ZBX_STYLE_NOWRAP),
 		$data['tags'][$item['itemid']],
 		$info_cell
 	];

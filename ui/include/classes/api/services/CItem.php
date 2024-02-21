@@ -831,6 +831,7 @@ class CItem extends CItemGeneral {
 		$upd_items = [];
 		$upd_itemids = [];
 		$upd_items_rtname = [];
+		$upd_discovered_items = [];
 
 		$internal_fields = array_flip(['itemid', 'type', 'key_', 'value_type', 'hostid', 'flags', 'host_status']);
 		$nested_object_fields = array_flip(['tags', 'preprocessing', 'parameters']);
@@ -864,6 +865,11 @@ class CItem extends CItemGeneral {
 						'where' => ['itemid' => $item['itemid']]
 					];
 				}
+
+				if ($item['flags'] == ZBX_FLAG_DISCOVERY_CREATED && array_key_exists('status', $item)
+						&& $item['status'] == ITEM_STATUS_DISABLED) {
+					$upd_discovered_items[] = $item['itemid'];
+				}
 			}
 			else {
 				$item = array_intersect_key($item, $internal_fields + $nested_object_fields);
@@ -877,6 +883,13 @@ class CItem extends CItemGeneral {
 
 		if ($upd_items_rtname) {
 			DB::update('item_rtname', $upd_items_rtname);
+		}
+
+		if ($upd_discovered_items) {
+			DB::update('item_discovery', [
+				'values' => ['disable_source' => ZBX_DISABLE_DEFAULT],
+				'where' => ['itemid' => $upd_discovered_items]
+			]);
 		}
 
 		self::updateTags($items, $db_items, $upd_itemids);
