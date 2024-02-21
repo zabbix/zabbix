@@ -85,6 +85,8 @@ class CTabFilter extends CBaseComponent {
 
 			index++;
 		}
+
+		this.#updateSeparators();
 	}
 
 	/**
@@ -524,7 +526,7 @@ class CTabFilter extends CBaseComponent {
 			 * @param {Object} ev
 			 */
 			tabsDragStart: (ev) => {
-				this.#updateSeparatorsForDragging(ev.detail.index, ev.detail.index_to);
+				this.#updateSeparatorsForDragging(ev.detail.index, ev.detail.index);
 			},
 
 			/**
