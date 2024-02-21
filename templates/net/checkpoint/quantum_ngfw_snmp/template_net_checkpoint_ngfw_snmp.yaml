@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-21T11:13:56Z'
+  date: '2024-02-21T12:36:19Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1025,14 +1025,12 @@ zabbix_export:
                 - |
                   var items = JSON.parse(value);
                   
-                  // check if Firewall metrics found
                   if (items.length == 0) {
-                      return '[]';
+                  	return '[]';
                   }
                   
-                  // check if Firewall is installed
                   if (items[0]['{#FW.STATE}'] != 'Installed') {
-                      return '[]';
+                  	return '[]';
                   }
                   
                   return JSON.stringify([{"{#SNMPINDEX}": 0, "{#SINGLETON}":""}]);
@@ -1760,7 +1758,7 @@ zabbix_export:
         - uuid: 46d85303a18f48aa81f09278b0d47a35
           name: 'Storage discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#FSNAME},1.3.6.1.4.1.2620.1.6.7.6.1.2]'
+          snmp_oid: 'discovery[{#DISK.NAME},1.3.6.1.4.1.2620.1.6.7.6.1.2]'
           key: vfs.fs.discovery
           delay: 1h
           filter:
@@ -1789,7 +1787,7 @@ zabbix_export:
                 - tag: component
                   value: storage
                 - tag: filesystem
-                  value: '{#FSNAME}'
+                  value: '{#DISK.NAME}'
             - uuid: 811cb45579d94ea2ae3bbe8ee8fbb727
               name: '{#DISK.NAME}: Free disk space'
               type: SNMP_AGENT
@@ -1804,7 +1802,7 @@ zabbix_export:
                 - tag: component
                   value: storage
                 - tag: filesystem
-                  value: '{#FSNAME}'
+                  value: '{#DISK.NAME}'
             - uuid: 42947b9cf263429397e2d2bfb5b7253d
               name: '{#DISK.NAME}: Disk space utilization'
               type: SNMP_AGENT
@@ -1822,7 +1820,7 @@ zabbix_export:
                 - tag: component
                   value: storage
                 - tag: filesystem
-                  value: '{#FSNAME}'
+                  value: '{#DISK.NAME}'
             - uuid: e171f238b9394dbbbc1bf3a80cb1f648
               name: '{#DISK.NAME}: Total disk space'
               type: SNMP_AGENT
@@ -1842,7 +1840,7 @@ zabbix_export:
                 - tag: component
                   value: storage
                 - tag: filesystem
-                  value: '{#FSNAME}'
+                  value: '{#DISK.NAME}'
             - uuid: d59f1f4f508741f0a33c47d61321afb4
               name: '{#DISK.NAME}: Used disk space'
               type: SNMP_AGENT
@@ -1857,21 +1855,21 @@ zabbix_export:
                 - tag: component
                   value: storage
                 - tag: filesystem
-                  value: '{#FSNAME}'
+                  value: '{#DISK.NAME}'
           trigger_prototypes:
             - uuid: d56142259e9b4a778a90f88fad2f5ca7
               expression: |
-                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}
+                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#DISK.NAME}"} and
+                (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#DISK.NAME}"}
               name: '{#DISK.NAME}: Disk space is critically low'
-              event_name: '{#DISK.NAME}: Disk space is critically low (used > {$DISK.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+              event_name: '{#DISK.NAME}: Disk space is critically low (used > {$DISK.PUSED.MAX.CRIT:"{#DISK.NAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"}`.
+                1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.CRIT:"{#DISK.NAME}"}`.
                 2. The second condition should be one of the following:
-                - the disk free space is less than `{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}`;
+                - the disk free space is less than `{$DISK.FREE.MIN.CRIT:"{#DISK.NAME}"}`;
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -1881,24 +1879,24 @@ zabbix_export:
                   value: performance
             - uuid: edb173121bf94dc99e6626743b9ac3ad
               expression: |
-                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.WARN:"{#FSNAME}"} and
-                (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.WARN:"{#FSNAME}"}
+                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.WARN:"{#DISK.NAME}"} and
+                (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.WARN:"{#DISK.NAME}"}
               name: '{#DISK.NAME}: Disk space is low'
-              event_name: '{#DISK.NAME}: Disk space is low (used > {$DISK.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+              event_name: '{#DISK.NAME}: Disk space is low (used > {$DISK.PUSED.MAX.WARN:"{#DISK.NAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.WARN:"{#FSNAME}"}`.
+                1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.WARN:"{#DISK.NAME}"}`.
                 2. The second condition should be one of the following:
-                - the disk free space is less than `{$DISK.FREE.MIN.WARN:"{#FSNAME}"}`;
+                - the disk free space is less than `{$DISK.FREE.MIN.WARN:"{#DISK.NAME}"}`;
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
                 - name: '{#DISK.NAME}: Disk space is critically low'
                   expression: |
-                    last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}
+                    last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#DISK.NAME}"} and
+                    (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#DISK.NAME}"}
               tags:
                 - tag: scope
                   value: capacity
@@ -2264,7 +2262,7 @@ zabbix_export:
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
-          description: 'Filter out loopbacks, nulls and system bridge by default.'
+          description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '.*'
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
