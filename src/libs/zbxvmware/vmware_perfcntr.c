@@ -34,23 +34,10 @@
 #	include <libxml/xpath.h>
 #endif
 
-
-#define ZBX_XML_DATETIME		26
-
 ZBX_VECTOR_IMPL(uint16, uint16_t)
 ZBX_PTR_VECTOR_IMPL(perf_available_ptr, zbx_vmware_perf_available_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_perf_value_ptr, zbx_vmware_perf_value_t *)
 ZBX_PTR_VECTOR_IMPL(vmware_counter_ptr, zbx_vmware_counter_t *)
-
-#define ZBX_XPATH_REFRESHRATE()						\
-	"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
-
-#define ZBX_XPATH_ISAGGREGATE()										\
-	"/*/*/*/*/*[local-name()='entity'][../*[local-name()='summarySupported']='true' and "		\
-	"../*[local-name()='currentSupported']='false']"
-
-#define ZBX_XPATH_COUNTERINFO()										\
-	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
 
 /******************************************************************************
  *                                                                            *
@@ -195,9 +182,7 @@ void	vmware_counters_shared_copy(zbx_hashset_t *dst, const zbx_vector_vmware_cou
  ******************************************************************************/
 void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pairs)
 {
-	int	i;
-
-	for (i = 0; i < pairs->values_num; i++)
+	for (int i = 0; i < pairs->values_num; i++)
 	{
 		zbx_str_uint64_pair_t	*pair = &pairs->values[i];
 
@@ -215,7 +200,6 @@ void	vmware_vector_str_uint64_pair_shared_clean(zbx_vector_str_uint64_pair_t *pa
  ******************************************************************************/
 static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 {
-	int				i;
 	zbx_vmware_perf_entity_t	*entity;
 	zbx_vmware_perf_counter_t	*counter;
 	zbx_hashset_iter_t		iter;
@@ -223,7 +207,7 @@ static void	vmware_entities_shared_clean_stats(zbx_hashset_t *entities)
 	zbx_hashset_iter_reset(entities, &iter);
 	while (NULL != (entity = (zbx_vmware_perf_entity_t *)zbx_hashset_iter_next(&iter)))
 	{
-		for (i = 0; i < entity->counters.values_num; i++)
+		for (int i = 0; i < entity->counters.values_num; i++)
 		{
 			counter = (zbx_vmware_perf_counter_t *)entity->counters.values[i];
 			vmware_vector_str_uint64_pair_shared_clean(&counter->values);
@@ -302,6 +286,9 @@ void	vmware_counter_free(zbx_vmware_counter_t *counter)
 static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *type, const char *id, int *refresh_rate, char **error)
 {
+#	define ZBX_XPATH_REFRESHRATE()						\
+		"/*/*/*/*/*[local-name()='refreshRate' and ../*[local-name()='currentSupported']='true']"
+
 #	define ZBX_POST_VCENTER_PERF_COUNTERS_REFRESH_RATE			\
 		ZBX_POST_VSPHERE_HEADER						\
 		"<ns0:QueryPerfProviderSummary>"				\
@@ -309,6 +296,10 @@ static int	vmware_service_get_perf_counter_refreshrate(zbx_vmware_service_t *ser
 			"<ns0:entity type=\"%s\">%s</ns0:entity>"		\
 		"</ns0:QueryPerfProviderSummary>"				\
 		ZBX_POST_VSPHERE_FOOTER
+
+#	define ZBX_XPATH_ISAGGREGATE()										\
+		"/*/*/*/*/*[local-name()='entity'][../*[local-name()='summarySupported']='true' and "		\
+		"../*[local-name()='currentSupported']='false']"
 
 	char	tmp[MAX_STRING_LEN], *value = NULL, *id_esc;
 	int	ret = FAIL;
@@ -350,6 +341,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_XPATH_REFRESHRATE
+#	undef ZBX_XPATH_ISAGGREGATE
 }
 
 /******************************************************************************
@@ -369,6 +363,9 @@ out:
 int	vmware_service_get_perf_counters(zbx_vmware_service_t *service, CURL *easyhandle,
 		zbx_vector_vmware_counter_ptr_t *counters, char **error)
 {
+#	define ZBX_XPATH_COUNTERINFO()								\
+		"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PerfCounterInfo']"
+
 #	define ZBX_POST_VMWARE_GET_PERFCOUNTER							\
 		ZBX_POST_VSPHERE_HEADER								\
 		"<ns0:RetrievePropertiesEx>"							\
@@ -527,6 +524,7 @@ out:
 
 	return ret;
 
+#	undef ZBX_XPATH_COUNTERINFO
 #	undef STR2UNIT
 #	undef ZBX_POST_VMWARE_GET_PERFCOUNTER
 }
@@ -897,6 +895,8 @@ static void	vmware_service_copy_perf_data(const zbx_vmware_service_t *service,
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#define ZBX_XML_DATETIME		26
+
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves performance counter values from vmware service          *
@@ -1241,6 +1241,8 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 }
 
+#undef ZBX_XML_DATETIME
+
 /******************************************************************************
  *                                                                            *
  * Purpose: updates vmware statistics data                                    *
@@ -1253,8 +1255,7 @@ static void	vmware_perf_counters_availability_check(zbx_vmware_service_t *servic
 int	zbx_vmware_service_update_perf(zbx_vmware_service_t *service, const char *config_source_ip,
 		int config_vmware_timeout)
 {
-#	define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
-
+#define INIT_PERF_XML_SIZE	200 * ZBX_KIBIBYTE
 	CURL					*easyhandle = NULL;
 	CURLoption				opt;
 	CURLcode				err;
@@ -1467,6 +1468,7 @@ out:
 			zbx_result_string(ret), (zbx_fs_size_t)page.alloc);
 
 	return ret;
+#undef INIT_PERF_XML_SIZE
 }
 
 /******************************************************************************

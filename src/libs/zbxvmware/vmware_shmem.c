@@ -184,12 +184,10 @@ void	vmware_shmem_dvswitch_free(zbx_vmware_dvswitch_t *dvswitch)
  ******************************************************************************/
 void	vmware_shmem_props_free(char **props, int props_num)
 {
-	int	i;
-
 	if (NULL == props)
 		return;
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 	{
 		if (NULL != props[i])
 			vmware_shared_strfree(props[i]);
@@ -547,15 +545,12 @@ zbx_vmware_custom_attr_t	*vmware_shmem_attr_dup(const zbx_vmware_custom_attr_t *
  ******************************************************************************/
 static char	**vmware_props_shared_dup(char ** const src, int props_num)
 {
-	char	**props;
-	int	i;
-
 	if (NULL == src)
 		return NULL;
 
-	props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
+	char	**props = (char **)__vm_shmem_malloc_func(NULL, sizeof(char *) * props_num);
 
-	for (i = 0; i < props_num; i++)
+	for (int i = 0; i < props_num; i++)
 		props[i] = vmware_shared_strdup(src[i]);
 
 	return props;
@@ -640,7 +635,6 @@ zbx_vmware_vm_t	*vmware_shmem_vm_dup(const zbx_vmware_vm_t *src)
 static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *src)
 {
 	zbx_vmware_dsname_t	*dsname;
-	int	i;
 
 	dsname = (zbx_vmware_dsname_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_dsname_t));
 
@@ -650,7 +644,7 @@ static zbx_vmware_dsname_t	*vmware_dsname_shared_dup(const zbx_vmware_dsname_t *
 	VMWARE_VECTOR_CREATE(&dsname->hvdisks, vmware_hvdisk);
 	zbx_vector_vmware_hvdisk_reserve(&dsname->hvdisks, (size_t)src->hvdisks.values_num);
 
-	for (i = 0; i < src->hvdisks.values_num; i++)
+	for (int i = 0; i < src->hvdisks.values_num; i++)
 	{
 		zbx_vector_vmware_hvdisk_append(&dsname->hvdisks, src->hvdisks.values[i]);
 	}
@@ -795,6 +789,7 @@ static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src
 
 	return alarm;
 }
+
 /******************************************************************************
  *                                                                            *
  * Purpose: copies vmware datacenter object into shared memory                *
@@ -807,7 +802,6 @@ static zbx_vmware_alarm_t	*vmware_alarm_shared_dup(const zbx_vmware_alarm_t *src
 static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_datacenter_t *src)
 {
 	zbx_vmware_datacenter_t	*datacenter;
-	int			i;
 
 	datacenter = (zbx_vmware_datacenter_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_datacenter_t));
 	datacenter->name = vmware_shared_strdup(src->name);
@@ -815,7 +809,7 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 	vmware_shmem_vector_str_create_ext(&datacenter->alarm_ids);
 	zbx_vector_str_reserve(&datacenter->alarm_ids, (size_t)src->alarm_ids.values_num);
 
-	for (i = 0; i < src->alarm_ids.values_num; i++)
+	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&datacenter->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
 	return datacenter;
@@ -833,7 +827,6 @@ static zbx_vmware_datacenter_t	*vmware_datacenter_shared_dup(const zbx_vmware_da
 static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_t *src)
 {
 	zbx_vmware_cluster_t	*cluster;
-	int			i;
 
 	cluster = (zbx_vmware_cluster_t *)__vm_shmem_malloc_func(NULL, sizeof(zbx_vmware_cluster_t));
 	cluster->id = vmware_shared_strdup(src->id);
@@ -844,10 +837,10 @@ static zbx_vmware_cluster_t	*vmware_cluster_shared_dup(const zbx_vmware_cluster_
 	vmware_shmem_vector_str_create_ext(&cluster->alarm_ids);
 	zbx_vector_str_reserve(&cluster->alarm_ids, (size_t)src->alarm_ids.values_num);
 
-	for (i = 0; i < src->dss_uuid.values_num; i++)
+	for (int i = 0; i < src->dss_uuid.values_num; i++)
 		zbx_vector_str_append(&cluster->dss_uuid, vmware_shared_strdup(src->dss_uuid.values[i]));
 
-	for (i = 0; i < src->alarm_ids.values_num; i++)
+	for (int i = 0; i < src->alarm_ids.values_num; i++)
 		zbx_vector_str_append(&cluster->alarm_ids, vmware_shared_strdup(src->alarm_ids.values[i]));
 
 	return cluster;
@@ -1152,15 +1145,13 @@ zbx_vmware_tag_t	*vmware_shmem_tag_malloc(void)
  ******************************************************************************/
 void	vmware_shmem_evtseverity_copy(zbx_hashset_t *dst, const zbx_vector_vmware_key_value_t *src)
 {
-	int	i;
-
 	if (SUCCEED != zbx_hashset_reserve(dst, src->values_num))
 	{
 		THIS_SHOULD_NEVER_HAPPEN;
 		exit(EXIT_FAILURE);
 	}
 
-	for (i = 0; i < src->values_num; i++)
+	for (int i = 0; i < src->values_num; i++)
 	{
 		zbx_vmware_key_value_t	*es_dst, *es_src = &src->values[i];
 

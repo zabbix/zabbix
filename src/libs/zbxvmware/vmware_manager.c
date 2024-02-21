@@ -31,8 +31,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
-
 /******************************************************************************
  *                                                                            *
  * Purpose: returns string value of vmware job types                          *
@@ -62,13 +60,14 @@ static const char	*vmware_job_type_string(zbx_vmware_job_t *job)
  * Purpose: picks next job from queue and service ttl check                   *
  *                                                                            *
  * Parameters: vmw      - [IN] vmware object                                  *
- *             time_now - [IN] current time                                   *
+ *             time_now - [IN]                                                *
  *                                                                            *
  * Return value: job for object or NULL                                       *
  *                                                                            *
  ******************************************************************************/
 static zbx_vmware_job_t	*vmware_job_get(zbx_vmware_t *vmw, time_t time_now)
 {
+#define ZBX_VMWARE_SERVICE_TTL		SEC_PER_HOUR
 	zbx_binary_heap_elem_t	*elem;
 	zbx_vmware_job_t	*job = NULL;
 
@@ -99,6 +98,7 @@ unlock:
 			NULL == job ? "none" : vmware_job_type_string(job));
 
 	return job;
+#undef ZBX_VMWARE_SERVICE_TTL
 }
 
 /******************************************************************************

@@ -34,21 +34,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_XPATH_VM_GUESTDISKS()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
-	"/*/*[local-name()='GuestDiskInfo']"
-
-#define ZBX_XPATH_VM_UUID()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_INSTANCE_UUID()					\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
-		"/*[local-name()='val']"
-
-#define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()				\
-	ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
-
 #define ZBX_VMPROPMAP(property)										\
 	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_VM) ZBX_XPATH_PROP_NAME_NODE(property), NULL, 0}
 
@@ -87,6 +72,8 @@ static zbx_vmware_propmap_t	vm_propmap[] = {
 	ZBX_VMPROPMAP("guest.toolsRunningStatus"),		/* ZBX_VMWARE_VMPROP_TOOLS_RUNNING_STATUS */
 	ZBX_VMPROPMAP("guest.guestState")			/* ZBX_VMWARE_VMPROP_STATE */
 };
+
+#undef ZBX_VMPROPMAP
 
 #define ZBX_XPATH_GET_OBJECT_NAME(object, id)				\
 		ZBX_XPATH_PROP_OBJECT_ID(object, "[text()='" id "']") "/"				\
@@ -479,6 +466,10 @@ clean:
  ******************************************************************************/
 static void	vmware_vm_get_file_systems(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
+#	define ZBX_XPATH_VM_GUESTDISKS()									\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='guest.disk']]"		\
+		"/*/*[local-name()='GuestDiskInfo']"
+
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
@@ -532,11 +523,13 @@ clean:
 	xmlXPathFreeObject(xpathObj);
 	xmlXPathFreeContext(xpathCtx);
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, vm->file_systems.values_num);
+
+#	undef ZBX_XPATH_VM_GUESTDISKS
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets custom attributes data of the virtual machine                *
+ * Purpose: gets custom attributes data of virtual machine                    *
  *                                                                            *
  * Parameters: vm      - [OUT]                                                *
  *             details - [IN] xml document containing virtual machine data    *
@@ -544,6 +537,9 @@ clean:
  ******************************************************************************/
 static void	vmware_vm_get_custom_attrs(zbx_vmware_vm_t *vm, xmlDoc *details)
 {
+#	define ZBX_XPATH_VM_CUSTOM_FIELD_VALUES()				\
+		ZBX_XPATH_PROP_NAME("customValue") ZBX_XPATH_LN("CustomFieldValue")
+
 	xmlXPathContext			*xpathCtx;
 	xmlXPathObject			*xpathObj;
 	xmlNodeSetPtr			nodeset;
@@ -597,6 +593,8 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() attributes:%d", __func__, vm->custom_attrs.values_num);
+
+#	undef ZBX_XPATH_VM_CUSTOM_FIELD_VALUES
 }
 
 /******************************************************************************
@@ -606,7 +604,7 @@ clean:
  * Parameters: service      - [IN] vmware service                             *
  *             easyhandle   - [IN] CURL handle                                *
  *             vmid         - [IN] virtual machine id                         *
- *             propmap      - [IN] xpaths of the properties to read           *
+ *             propmap      - [IN] xpaths of properties to read               *
  *             props_num    - [IN] number of properties to read               *
  *             cq_prop      - [IN] soap part of query with cq property        *
  *             xdoc         - [OUT] reference to output xml document          *
@@ -692,6 +690,8 @@ static int	vmware_service_get_vm_data(zbx_vmware_service_t *service, CURL *easyh
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_POST_VMWARE_VM_STATUS_EX
 }
 
 /******************************************************************************
@@ -1033,6 +1033,14 @@ zbx_vmware_vm_t	*vmware_service_create_vm(zbx_vmware_service_t *service, CURL *e
 		const char *id, zbx_vector_vmware_resourcepool_ptr_t *rpools, zbx_vector_cq_value_ptr_t *cq_values,
 		zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
+#	define ZBX_XPATH_VM_UUID()										\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.uuid']]"		\
+			"/*[local-name()='val']"
+
+#	define ZBX_XPATH_VM_INSTANCE_UUID()					\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='config.instanceUuid']]"	\
+			"/*[local-name()='val']"
+
 	zbx_vmware_vm_t			*vm;
 	char				*value, *cq_prop;
 	xmlDoc				*details = NULL;
@@ -1131,6 +1139,9 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return vm;
+
+#	undef ZBX_XPATH_VM_UUID
+#	undef ZBX_XPATH_VM_INSTANCE_UUID
 }
 
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */

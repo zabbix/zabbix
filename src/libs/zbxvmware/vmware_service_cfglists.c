@@ -52,7 +52,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 	xmlNodeSetPtr		nodeset;
 	char			*id, *name;
 	zbx_vmware_datacenter_t	*datacenter;
-	int			i, ret = FAIL;
+	int			ret = FAIL;
 
 	if (NULL == doc)
 		return ret;
@@ -74,7 +74,7 @@ static int	vmware_service_get_datacenters_list(const zbx_vmware_service_t *servi
 	nodeset = xpathObj->nodesetval;
 	zbx_vector_vmware_datacenter_ptr_reserve(datacenters, (size_t)nodeset->nodeNr);
 
-	for (i = 0; i < nodeset->nodeNr; i++)
+	for (int i = 0; i < nodeset->nodeNr; i++)
 	{
 		char	*error = NULL;
 
@@ -443,9 +443,6 @@ out:
 #	undef ZBX_POST_VCENTER_HV_DS_LIST
 }
 
-#define ZBX_XPATH_DS_INFO_EXTENT()									\
-		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
-
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves list of vmware service datastore diskextents            *
@@ -459,6 +456,9 @@ out:
  ******************************************************************************/
 int	vmware_service_get_diskextents_list(xmlDoc *doc, zbx_vector_vmware_diskextent_ptr_t *diskextents)
 {
+#	define ZBX_XPATH_DS_INFO_EXTENT()								\
+		ZBX_XPATH_PROP_NAME("info") "/*/*[local-name()='extent']"
+
 	xmlXPathContext		*xpathCtx;
 	xmlXPathObject		*xpathObj;
 	xmlNodeSetPtr		nodeset;
@@ -511,5 +511,7 @@ out:
 	xmlXPathFreeContext(xpathCtx);
 
 	return ret;
+
+#	undef ZBX_XPATH_DS_INFO_EXTENT
 }
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
