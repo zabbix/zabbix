@@ -110,6 +110,7 @@ Additional information about the metrics and used API methods:
 
 |Name|Description|Default|
 |----|-----------|-------|
+|{$AWS.DATA.TIMEOUT}|<p>A response timeout for an API.</p>|`60s`|
 |{$AWS.PROXY}|<p>Sets HTTP proxy value. If this macro is empty then no proxy is used.</p>||
 |{$AWS.ACCESS.KEY.ID}|<p>Access key ID.</p>||
 |{$AWS.SECRET.ACCESS.KEY}|<p>Secret access key.</p>||
