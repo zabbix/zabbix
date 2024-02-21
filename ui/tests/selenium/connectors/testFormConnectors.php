@@ -364,6 +364,24 @@ class testFormConnectors extends CWebTest {
 					]
 				]
 			],
+			// 'Type of information' field validation when all related checkboxes are unchecked.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'Name' => 'Connector with unchecked Type of information checkboxes',
+						'URL' => '{$URL}',
+						'id:item_value_types_8' => false, // Numeric (unsigned).
+						'id:item_value_types_1' => false, // Numeric (float).
+						'id:item_value_types_2' => false, // Character.
+						'id:item_value_types_4' => false, // Log.
+						'id:item_value_types_16' => false // Text.
+					],
+					'error' => [
+						'Field "item_value_types" is mandatory.'
+					]
+				]
+			],
 			// Check validation for 'Concurrent sessions' field.
 			[
 				[
@@ -461,6 +479,112 @@ class testFormConnectors extends CWebTest {
 					],
 					'error' => [
 						'Incorrect value for field "max_attempts": value must be no greater than "5".'
+					]
+				]
+			],
+			// 'Attempt interval' field validation checks.
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with emty attempt interval field',
+						'Attempt interval' => ''
+					],
+					'error' => [
+						'Incorrect value for field "attempt_interval": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with incorrect value for attempt interval field',
+						'Attempt interval' => ' '
+					],
+					'error' => [
+						'Incorrect value for field "attempt_interval": cannot be empty.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with incorrect value for attempt interval field',
+						'Attempt interval' => '🔔'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": a time unit is expected.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '1m'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '-1s'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '11s'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": value must be one of 0-10.'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_BAD,
+					'fields' => [
+						'URL' => '{$URL}',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'Name' => 'Connector with invalid parameter for attempt interval field',
+						'Attempt interval' => '11111111111111111111111111111111'
+					],
+					'error' => [
+						'Invalid parameter "/1/attempt_interval": a number is too large.'
 					]
 				]
 			],
