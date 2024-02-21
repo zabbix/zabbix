@@ -559,18 +559,6 @@ typedef struct
 }
 zbx_vmware_t;
 
-typedef struct
-{
-	time_t			nextcheck;
-#define ZBX_VMWARE_UPDATE_CONF		1
-#define ZBX_VMWARE_UPDATE_PERFCOUNTERS	2
-#define ZBX_VMWARE_UPDATE_REST_TAGS	3
-	int			type;
-	int			expired;
-	zbx_vmware_service_t	*service;
-}
-zbx_vmware_job_t;
-
 /* the vmware collector statistics */
 typedef struct
 {
@@ -702,21 +690,6 @@ zbx_vmware_cust_query_t	*zbx_vmware_service_get_cust_query(zbx_vmware_service_t 
 #define ZBX_VMWARE_UNIT_CELSIUS			14
 #define ZBX_VMWARE_UNIT_NANOSECOND		15
 
-#	define ZBX_XNN(NN)			"*[local-name()='" NN "']"
-#	define ZBX_XPATH_NN(NN)			ZBX_XNN(NN)
-#	define ZBX_XPATH_LN(LN)			"/" ZBX_XPATH_NN(LN)
-#	define ZBX_XPATH_LN1(LN1)		"/" ZBX_XPATH_LN(LN1)
-#	define ZBX_XPATH_LN2(LN1, LN2)		"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2)
-#	define ZBX_XPATH_LN3(LN1, LN2, LN3)	"/" ZBX_XPATH_LN(LN1) ZBX_XPATH_LN(LN2) ZBX_XPATH_LN(LN3)
-
-typedef struct
-{
-	char	*data;
-	size_t	alloc;
-	size_t	offset;
-}
-ZBX_HTTPPAGE;
-
 /*
  * SOAP support
  */
@@ -728,23 +701,6 @@ ZBX_HTTPPAGE;
 /* according to RFC 7231/5.1.1 if xml request is larger than 1k */
 #define ZBX_XML_HEADER3		"Expect:"
 
-typedef struct
-{
-	char	*key;
-	char	*value;
-}
-zbx_vmware_key_value_t;
-ZBX_PTR_VECTOR_DECL(vmware_key_value, zbx_vmware_key_value_t)
-void	zbx_vmware_key_value_free(zbx_vmware_key_value_t value);
-
-char	*vmware_shared_strdup(const char *str);
-void	vmware_shared_strfree(char *str);
-
-int	vmware_service_authenticate(zbx_vmware_service_t *service, CURL *easyhandle, ZBX_HTTPPAGE *page,
-		const char *config_source_ip, int config_vmware_timeout, char **error);
-
-int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char **error);
-
 zbx_vmware_perf_entity_t	*zbx_vmware_service_get_perf_entity(const zbx_vmware_service_t *service,
 		const char *type, const char *id);
 int	zbx_vmware_service_get_counterid(const zbx_vmware_service_t *service, const char *path, zbx_uint64_t *counterid,
@@ -753,7 +709,6 @@ int	zbx_vmware_service_add_perf_counter(zbx_vmware_service_t *service, const cha
 		zbx_uint64_t counterid, const char *instance);
 #endif	/* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
 
-zbx_vmware_t			*zbx_vmware_get_vmware(void);
 int	zbx_vmware_init(zbx_uint64_t *config_vmware_cache_size, char **error);
 
 #endif	/* ZABBIX_VMWARE_H */
