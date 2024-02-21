@@ -338,18 +338,18 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 		"/*[local-name()='RetrievePropertiesExResponse']"	\
 		"/*[local-name()='returnval']/*[local-name()='token'][1]"
 
-#define ZBX_XPATH_FAULT_SLOW(max_len)									\
-	"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
-	"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
-	ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
-	ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
-	"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
+#	define ZBX_XPATH_FAULT_SLOW(max_len)									\
+		"concat(substring(" ZBX_XPATH_FAULT_FAST("faultstring")",1," ZBX_STR(max_len) "),"		\
+		"substring(concat(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]),':',"			\
+		ZBX_XPATH_FAULT_FAST("detail")"//*[local-name()='name']),1,"					\
+		ZBX_STR(max_len) " * number(string-length(" ZBX_XPATH_FAULT_FAST("faultstring") ")=0)"		\
+		"* number(string-length(local-name(" ZBX_XPATH_FAULT_FAST("detail") "/*[1]) )>0)))"
 
-#define ZBX_XPATH_FAULTSTRING(sz)					\
-	(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
+#	define ZBX_XPATH_FAULTSTRING(sz)									\
+		(MAX_STRING_LEN < sz ? ZBX_XPATH_FAULT_FAST("faultstring") : ZBX_XPATH_FAULT_SLOW(MAX_STRING_LEN))
 
-#define ZBX_XPATH_FAULT_FAST(name)					\
-	"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
+#	define	ZBX_XPATH_FAULT_FAST(name)									\
+		"/*/*/*[local-name()='Fault'][1]/*[local-name()='" name "'][1]"
 
 	xmlDoc		*doc;
 	ZBX_HTTPPAGE	*resp;
@@ -407,9 +407,9 @@ int	zbx_soap_post(const char *fn_parent, CURL *easyhandle, const char *request, 
 	return ret;
 
 #	undef ZBX_XPATH_RETRIEVE_PROPERTIES_TOKEN
-#undef ZBX_XPATH_FAULTSTRING
-#undef ZBX_XPATH_FAULT_SLOW
-#undef ZBX_XPATH_FAULT_FAST
+#	undef ZBX_XPATH_FAULTSTRING
+#	undef ZBX_XPATH_FAULT_SLOW
+#	undef ZBX_XPATH_FAULT_FAST
 }
 
 /******************************************************************************
@@ -1007,6 +1007,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef ZBX_POST_VMWARE_AUTH
 }
 
 /******************************************************************************
@@ -1033,6 +1034,7 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 			get_vmware_service_objects()[service->type].session_manager);
 
 	return zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error);
+#	undef ZBX_POST_VMWARE_LOGOUT
 }
 
 int	zbx_property_collection_init(CURL *easyhandle, const char *property_collection_query,
@@ -1121,8 +1123,8 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 		"</ns0:RetrieveServiceContent>"							\
 		ZBX_POST_VSPHERE_FOOTER
 
-#define ZBX_XPATH_VMWARE_ABOUT(property)							\
-	"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
+#	define ZBX_XPATH_VMWARE_ABOUT(property)							\
+		"/*/*/*/*/*[local-name()='about']/*[local-name()='" property "']"
 
 	xmlDoc	*doc = NULL;
 
@@ -1145,18 +1147,18 @@ static	int	vmware_service_get_contents(CURL *easyhandle, char **version, char **
 	return SUCCEED;
 
 #	undef ZBX_POST_VMWARE_CONTENTS
-#undef ZBX_XPATH_VMWARE_ABOUT
+#	undef ZBX_XPATH_VMWARE_ABOUT
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: gets alarm details                                                *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             alarm_id     - [IN] alarm details                              *
- *             details      - [IN/OUT] alarms cache data                      *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             alarm_id   - [IN] alarm details                                *
+ *             details    - [IN/OUT] alarms cache data                        *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: index - element id in vector                                 *
  *               FAIL  - operation has failed                                 *
@@ -1460,9 +1462,9 @@ static int	vmware_service_process_cluster_data(zbx_vmware_service_t *service, CU
 		xmlDoc *cluster_data, zbx_vector_vmware_cluster_ptr_t *clusters,
 		zbx_vector_vmware_rpool_chunk_ptr_t *rp_chunks, zbx_vmware_alarms_data_t *alarms_data, char **error)
 {
-#define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
+#	define ZBX_XPATH_GET_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type='ResourcePool']"
-#define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID								\
+#	define ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID								\
 		ZBX_XPATH_PROP_NAME_NODE("parent") "[@type!='ResourcePool']"
 
 	int			ret;
@@ -1570,19 +1572,19 @@ out:
 
 	return ret;
 
-#undef ZBX_XPATH_GET_RESOURCEPOOL_PARENTID
-#undef ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID
+#	undef ZBX_XPATH_GET_RESOURCEPOOL_PARENTID
+#	undef ZBX_XPATH_GET_NON_RESOURCEPOOL_PARENTID
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: retrieves status of specified vmware cluster                      *
  *                                                                            *
- * Parameters: easyhandle   - [IN] CURL handle                                *
- *             datastores   - [IN] all available Datastores                   *
- *             cluster      - [IN/OUT]                                        *
- *             cq_values    - [IN/OUT] vector with custom query entries       *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: easyhandle - [IN] CURL handle                                  *
+ *             datastores - [IN] all available Datastores                     *
+ *             cluster    - [IN/OUT]                                          *
+ *             cq_values  - [IN/OUT] vector with custom query entries         *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
  * Return value: SUCCEED - operation has completed successfully               *
  *               FAIL    - operation has failed                               *
@@ -2065,7 +2067,6 @@ out:
 	return ret;
 }
 
-
 /*******************************************************************************
  *                                                                             *
  * Purpose: moves custom query response to shared memory                       *
@@ -2236,6 +2237,7 @@ static void	vmware_service_dvswitch_load(CURL *easyhandle, zbx_vector_cq_value_p
 	zbx_xml_free_doc(doc);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() count: %d / %d", __func__, count, cq_values->values_num);
+#	undef	ZBX_POST_FETCH_DV_PORTS
 }
 
 /******************************************************************************
@@ -2300,7 +2302,7 @@ static void	vmware_service_props_load(CURL *easyhandle, const char *collector, z
 #	define ZBX_POST_OBJ_PROP									\
 		ZBX_POST_VSPHERE_HEADER									\
 		"<ns0:RetrievePropertiesEx>"								\
-			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"		\
+			"<ns0:_this type=\"PropertyCollector\">%s</ns0:_this>"				\
 			"<ns0:specSet>"									\
 				"<ns0:propSet>"								\
 					"<ns0:type>%s</ns0:type>"					\
@@ -2911,9 +2913,9 @@ out:
  *             query_params - [IN] array of name and value for custom         *
  *                                 query filter                               *
  *                                                                            *
- * Return value: SUCCEED - entity counter was added to monitoring list.       *
+ * Return value: SUCCEED - entity counter was added to monitoring list        *
  *               FAIL    - custom query of specified entity is already being  *
- *                         monitored.                                         *
+ *                         monitored                                          *
  *                                                                            *
  ******************************************************************************/
 zbx_vmware_cust_query_t	*zbx_vmware_service_add_cust_query(zbx_vmware_service_t *service, const char *soap_type,
