@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-19T11:38:35Z'
+  date: '2024-02-21T11:13:56Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -163,7 +163,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: CHECKPOINT-MIB
-            The time the CPU has spent doing nothing.
+            The average time the CPU has spent doing nothing.
           tags:
             - tag: component
               value: cpu
@@ -262,7 +262,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: CHECKPOINT-MIB
-            The time the CPU has spent running the kernel and its processes.
+            The average time the CPU has spent running the kernel and its processes.
           tags:
             - tag: component
               value: cpu
@@ -301,7 +301,7 @@ zabbix_export:
           units: '%'
           description: |
             MIB: CHECKPOINT-MIB
-            The time the CPU has spent running users' processes that are not niced.
+            The average time the CPU has spent running users' processes that are not niced.
           tags:
             - tag: component
               value: cpu
@@ -384,6 +384,19 @@ zabbix_export:
           tags:
             - tag: component
               value: system
+          triggers:
+            - uuid: 13644b6f980d409c865fab446296791b
+              expression: |
+                last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#2) and
+                length(last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber))>0
+              name: 'Check Point: Device has been replaced'
+              event_name: 'Check Point: Device has been replaced (new serial number received)'
+              priority: INFO
+              description: 'Device serial number has changed. Acknowledge to close the problem manually.'
+              manual_close: 'YES'
+              tags:
+                - tag: scope
+                  value: notice
         - uuid: df1681db47dc40b987f7be51e640974e
           name: 'Check Point: System location'
           type: SNMP_AGENT
@@ -623,12 +636,12 @@ zabbix_export:
                   value: availability
       discovery_rules:
         - uuid: 2457ecd2b2ad4a2a815c11bf37c3f029
-          name: 'CPU cores discovery'
+          name: 'CPU discovery'
           type: SNMP_AGENT
           snmp_oid: 'discovery[{#CPU.ID},1.3.6.1.4.1.2620.1.6.7.5.1.1]'
           key: cpu.discovery
           delay: 1h
-          description: 'Discovering CPU cores from CHECKPOINT-MIB.'
+          description: 'Discovering CPU from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 0d17d7831b954decada6fba5f14f9265
               name: 'CPU Core {#CPU.ID}: CPU idle time'
@@ -640,7 +653,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                The time the core has spent doing nothing.
+                The time the CPU {#CPU.ID} has spent doing nothing.
               tags:
                 - tag: component
                   value: cpu
@@ -654,7 +667,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                The time the core has spent running the kernel and its processes.
+                The time the CPU {#CPU.ID} has spent running the kernel and its processes.
               tags:
                 - tag: component
                   value: cpu
@@ -668,7 +681,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                CPU core utilization in %.
+                CPU {#CPU.ID} utilization in %.
               tags:
                 - tag: component
                   value: cpu
@@ -682,7 +695,7 @@ zabbix_export:
               units: '%'
               description: |
                 MIB: CHECKPOINT-MIB
-                The time the core has spent running users' processes that are not niced.
+                The time the CPU {#CPU.ID} has spent running users' processes that are not niced.
               tags:
                 - tag: component
                   value: cpu
@@ -751,8 +764,10 @@ zabbix_export:
                   value: sensor
               trigger_prototypes:
                 - uuid: 5e4f3ca3b93940adaf3a5f9e19aee9ec
-                  expression: 'count(/Check Point Next Generation Firewall by SNMP/sensor.fan.status[fanSpeedSensorStatus.{#SNMPINDEX}],#1,"ne",0)=1'
-                  name: 'FAN {#SNMPINDEX}: Fan is in critical state'
+                  expression: 'count(/Check Point Next Generation Firewall by SNMP/sensor.fan.status[fanSpeedSensorStatus.{#SNMPINDEX}],#3,"eq",1)=3'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.fan.status[fanSpeedSensorStatus.{#SNMPINDEX}],#3)=0'
+                  name: 'FAN {#SNMPINDEX}: Fan speed is out of range'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'Please check the fan unit.'
@@ -933,11 +948,11 @@ zabbix_export:
                   value: firewall
               trigger_prototypes:
                 - uuid: 424568aded01461bb1fe5583ef373418
-                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/fw.utilized.drops[fwFullyUtilizedDrops.{#SNMPINDEX}],5m)>{$FW.DROPPED.PACKETS.TH:"{#SNMPINDEX}"}'
+                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/fw.utilized.drops[fwFullyUtilizedDrops.{#SNMPINDEX}],5m)>{$FW.DROPPED.PACKETS.TH}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/fw.utilized.drops[fwFullyUtilizedDrops.{#SNMPINDEX}],5m)<={$FW.DROPPED.PACKETS.TH:"{#SNMPINDEX}"}'
+                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/fw.utilized.drops[fwFullyUtilizedDrops.{#SNMPINDEX}],5m)<={$FW.DROPPED.PACKETS.TH}'
                   name: 'Check Point Firewall: Instance is currently fully utilized'
-                  event_name: 'Check Point Firewall: Number of dropped packets has been increased: >{$FW.DROPPED.PACKETS.TH:"{#SNMPINDEX}"}'
+                  event_name: 'Check Point Firewall: Number of dropped packets has been increased: >{$FW.DROPPED.PACKETS.TH}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses utilized drops number, an increase in which indicates if the instance is fully utilized.'
@@ -1345,11 +1360,11 @@ zabbix_export:
             - uuid: af4c27b4c8474728973ea1d3d0a78dff
               expression: |
                 (avg(/Check Point Next Generation Firewall by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)>({$NET.IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) or
-                avg(/Check Point Next Generation Firewall by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$NET.IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and
+                avg(/Check Point Next Generation Firewall by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)>({$NET.IF.UTIL.MAX:"{#IFNAME}"}/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])) and 
                 last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])>0
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                avg(/Check Point Next Generation Firewall by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$NET.IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and
+                avg(/Check Point Next Generation Firewall by SNMP/net.if.in[ifInOctets.{#SNMPINDEX}],15m)<(({$NET.IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}]) and 
                 avg(/Check Point Next Generation Firewall by SNMP/net.if.out[ifOutOctets.{#SNMPINDEX}],15m)<(({$NET.IF.UTIL.MAX:"{#IFNAME}"}-3)/100)*last(/Check Point Next Generation Firewall by SNMP/net.if.speed[ifSpeed.{#SNMPINDEX}])
               name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High bandwidth usage (>{$NET.IF.UTIL.MAX:"{#IFNAME}"}%)'
@@ -1366,12 +1381,12 @@ zabbix_export:
                   value: performance
             - uuid: d0d1f9f90be948c2ac0b3b40676a52bd
               expression: |
-                min(/Check Point Next Generation Firewall by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$NET.IF.ERRORS.WARN:"{#IFNAME}"}
-                or min(/Check Point Next Generation Firewall by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$NET.IF.ERRORS.WARN:"{#IFNAME}"}
+                min(/Check Point Next Generation Firewall by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)>{$NET.IF.ERRORS.WARN:"{#IFNAME}"} or 
+                min(/Check Point Next Generation Firewall by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)>{$NET.IF.ERRORS.WARN:"{#IFNAME}"}
               recovery_mode: RECOVERY_EXPRESSION
               recovery_expression: |
-                max(/Check Point Next Generation Firewall by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$NET.IF.ERRORS.WARN:"{#IFNAME}"}*0.8
-                and max(/Check Point Next Generation Firewall by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$NET.IF.ERRORS.WARN:"{#IFNAME}"}*0.8
+                max(/Check Point Next Generation Firewall by SNMP/net.if.in.errors[ifInErrors.{#SNMPINDEX}],5m)<{$NET.IF.ERRORS.WARN:"{#IFNAME}"}*0.8 and 
+                max(/Check Point Next Generation Firewall by SNMP/net.if.out.errors[ifOutErrors.{#SNMPINDEX}],5m)<{$NET.IF.ERRORS.WARN:"{#IFNAME}"}*0.8
               name: 'Interface {#IFNAME}({#IFALIAS}): High error rate'
               event_name: 'Interface {#IFNAME}({#IFALIAS}): High error rate (>{$NET.IF.ERRORS.WARN:"{#IFNAME}"} for 5m)'
               opdata: 'errors in: {ITEM.LASTVALUE1}, errors out: {ITEM.LASTVALUE2}'
@@ -1456,8 +1471,8 @@ zabbix_export:
                   parameters:
                     - |
                       const idx = [
-                      	'Down',
                       	'Up',
+                      	'Down',
                       	'Unknown'
                       ].indexOf(value);
                       return idx !== -1 ? idx : 2;
@@ -1471,7 +1486,9 @@ zabbix_export:
                   value: sensor
               trigger_prototypes:
                 - uuid: c5fa57ebf5ea40f8a0172f9ed09ca232
-                  expression: 'count(/Check Point Next Generation Firewall by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq",0)=1'
+                  expression: 'count(/Check Point Next Generation Firewall by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#3,"eq",1)=3'
+                  recovery_mode: RECOVERY_EXPRESSION
+                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#3)=0'
                   name: 'PSU {#SNMPINDEX}: Power supply is in down state'
                   opdata: 'Current state: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
@@ -1540,6 +1557,19 @@ zabbix_export:
                     This trigger expression works as follows:
                     1. It can be triggered if the license expires soon.
                     2. `{&#36;LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license expires.
+                  manual_close: 'YES'
+                  tags:
+                    - tag: scope
+                      value: notice
+                - uuid: b50b2374731344a4b5cea5096c5de848
+                  expression: '{$LICENSE.CONTROL:"{#SW.NAME}"}=1 and (last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) - now()) / 86400 < now()'
+                  name: '{#SW.NAME}: License has been expired'
+                  opdata: 'Current expiration date: {ITEM.LASTVALUE1}'
+                  priority: AVERAGE
+                  description: |
+                    This trigger expression works as follows:
+                    1. It can be triggered if the license has been expired.
+                    2. `{&#36;LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license is expired.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -1642,13 +1672,23 @@ zabbix_export:
         - uuid: 6f54b4025d4b47ffa1cf11652cd94e63
           name: 'Temperature discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.1.6.7.8.1.1.2]'
+          snmp_oid: 'discovery[{#SENSOR.NAME},1.3.6.1.4.1.2620.1.6.7.8.1.1.2]'
           key: temperature.discovery
           delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#SENSOR.NAME}'
+                value: '{$TEMP.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#SENSOR.NAME}'
+                value: '{$TEMP.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovering temperature sensors from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: f78ffa1229b746d989899af95c5687b5
-              name: '{#SNMPVALUE}: Temperature'
+              name: '{#SENSOR.NAME}: Temperature'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.8.1.1.3.{#SNMPINDEX}'
               key: 'sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}]'
@@ -1664,11 +1704,11 @@ zabbix_export:
                   value: temperature
               trigger_prototypes:
                 - uuid: 8d99d20265644e11b04811df55ac351e
-                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.CRIT:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)>{$TEMP.VALUE.CRIT:"{#SENSOR.NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)<{$TEMP.VALUE.CRIT:"{#SNMPVALUE}"}-3'
-                  name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                  event_name: '{#SNMPVALUE}: Temperature is above critical threshold: >{$TEMP.VALUE.CRIT:"{#SNMPVALUE}"}'
+                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)<{$TEMP.VALUE.CRIT:"{#SENSOR.NAME}"}-3'
+                  name: '{#SENSOR.NAME}: Temperature is above critical threshold'
+                  event_name: '{#SENSOR.NAME}: Temperature is above critical threshold: >{$TEMP.VALUE.CRIT:"{#SENSOR.NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: HIGH
                   description: 'This trigger uses temperature sensor values.'
@@ -1678,29 +1718,29 @@ zabbix_export:
                     - tag: scope
                       value: performance
                 - uuid: 1bf4c64452754e4e9c2d700a8111c05d
-                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.WARN:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)>{$TEMP.VALUE.WARN:"{#SENSOR.NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)<{$TEMP.VALUE.WARN:"{#SNMPVALUE}"}-3'
-                  name: '{#SNMPVALUE}: Temperature is above warning threshold'
-                  event_name: '{#SNMPVALUE}: Temperature is above warning threshold: >{$TEMP.VALUE.WARN:"{#SNMPVALUE}"}'
+                  recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)<{$TEMP.VALUE.WARN:"{#SENSOR.NAME}"}-3'
+                  name: '{#SENSOR.NAME}: Temperature is above warning threshold'
+                  event_name: '{#SENSOR.NAME}: Temperature is above warning threshold: >{$TEMP.VALUE.WARN:"{#SENSOR.NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: WARNING
                   description: 'This trigger uses temperature sensor values.'
                   dependencies:
-                    - name: '{#SNMPVALUE}: Temperature is above critical threshold'
-                      expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.CRIT:"{#SNMPVALUE}"}'
-                      recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)<{$TEMP.VALUE.CRIT:"{#SNMPVALUE}"}-3'
+                    - name: '{#SENSOR.NAME}: Temperature is above critical threshold'
+                      expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)>{$TEMP.VALUE.CRIT:"{#SENSOR.NAME}"}'
+                      recovery_expression: 'max(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)<{$TEMP.VALUE.CRIT:"{#SENSOR.NAME}"}-3'
                   tags:
                     - tag: scope
                       value: availability
                     - tag: scope
                       value: performance
                 - uuid: c30e7ceef9b64ad1afbd9a08125c1fd8
-                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)<{$TEMP.VALUE.LOW:"{#SNMPVALUE}"}'
+                  expression: 'avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)<{$TEMP.VALUE.LOW:"{#SENSOR.NAME}"}'
                   recovery_mode: RECOVERY_EXPRESSION
-                  recovery_expression: 'min(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.LOW:"{#SNMPVALUE}"}+3'
-                  name: '{#SNMPVALUE}: Temperature is too low'
-                  event_name: '{#SNMPVALUE}: Temperature is too low: <{$TEMP.VALUE.LOW:"{#SNMPVALUE}"}'
+                  recovery_expression: 'min(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)>{$TEMP.VALUE.LOW:"{#SENSOR.NAME}"}+3'
+                  name: '{#SENSOR.NAME}: Temperature is too low'
+                  event_name: '{#SENSOR.NAME}: Temperature is too low: <{$TEMP.VALUE.LOW:"{#SENSOR.NAME}"}'
                   opdata: 'Current value: {ITEM.LASTVALUE1}'
                   priority: AVERAGE
                   description: 'This trigger uses temperature sensor values.'
@@ -1711,7 +1751,7 @@ zabbix_export:
                       value: performance
           graph_prototypes:
             - uuid: 147ecfdde31a4ab88d6fb53a67477dea
-              name: '{#SNMPVALUE}: Temperature'
+              name: '{#SENSOR.NAME}: Temperature'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1726,17 +1766,17 @@ zabbix_export:
           filter:
             evaltype: AND
             conditions:
-              - macro: '{#FSNAME}'
-                value: '{$VFS.FS.FSNAME.MATCHES}'
+              - macro: '{#DISK.NAME}'
+                value: '{$DISK.NAME.MATCHES}'
                 formulaid: A
-              - macro: '{#FSNAME}'
-                value: '{$VFS.FS.FSNAME.NOT_MATCHES}'
+              - macro: '{#DISK.NAME}'
+                value: '{$DISK.NAME.NOT_MATCHES}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: B
           description: 'Discovering storage disks from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: 6a0fded5672b4863a273d39c93962c4e
-              name: '{#FSNAME}: Available disk space'
+              name: '{#DISK.NAME}: Available disk space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.7.{#SNMPINDEX}'
               key: 'vfs.fs.avail[multiDiskFreeAvailableBytes.{#SNMPINDEX}]'
@@ -1751,7 +1791,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: 811cb45579d94ea2ae3bbe8ee8fbb727
-              name: '{#FSNAME}: Free disk space'
+              name: '{#DISK.NAME}: Free disk space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.5.{#SNMPINDEX}'
               key: 'vfs.fs.free[multiDiskFreeTotalBytes.{#SNMPINDEX}]'
@@ -1766,7 +1806,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: 42947b9cf263429397e2d2bfb5b7253d
-              name: '{#FSNAME}: Disk space utilization'
+              name: '{#DISK.NAME}: Disk space utilization'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.6.{#SNMPINDEX}'
               key: 'vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}]'
@@ -1784,7 +1824,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: e171f238b9394dbbbc1bf3a80cb1f648
-              name: '{#FSNAME}: Total disk space'
+              name: '{#DISK.NAME}: Total disk space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.3.{#SNMPINDEX}'
               key: 'vfs.fs.total[multiDiskSize.{#SNMPINDEX}]'
@@ -1804,7 +1844,7 @@ zabbix_export:
                 - tag: filesystem
                   value: '{#FSNAME}'
             - uuid: d59f1f4f508741f0a33c47d61321afb4
-              name: '{#FSNAME}: Used disk space'
+              name: '{#DISK.NAME}: Used disk space'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.6.1.4.{#SNMPINDEX}'
               key: 'vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]'
@@ -1821,18 +1861,17 @@ zabbix_export:
           trigger_prototypes:
             - uuid: d56142259e9b4a778a90f88fad2f5ca7
               expression: |
-                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or 
-                timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is critically low'
-              event_name: '{#FSNAME}: Disk space is critically low (used > {$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
+                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}
+              name: '{#DISK.NAME}: Disk space is critically low'
+              event_name: '{#DISK.NAME}: Disk space is critically low (used > {$DISK.PUSED.MAX.CRIT:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: AVERAGE
               description: |
                 Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.
+                1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"}`.
                 2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;
+                - the disk free space is less than `{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}`;
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               tags:
@@ -1842,26 +1881,24 @@ zabbix_export:
                   value: performance
             - uuid: edb173121bf94dc99e6626743b9ac3ad
               expression: |
-                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and
-                ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or 
-                timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)
-              name: '{#FSNAME}: Disk space is low'
-              event_name: '{#FSNAME}: Disk space is low (used > {$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}%)'
+                last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.WARN:"{#FSNAME}"} and
+                (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.WARN:"{#FSNAME}"}
+              name: '{#DISK.NAME}: Disk space is low'
+              event_name: '{#DISK.NAME}: Disk space is low (used > {$DISK.PUSED.MAX.WARN:"{#FSNAME}"}%)'
               opdata: 'Space used: {ITEM.LASTVALUE3} of {ITEM.LASTVALUE2} ({ITEM.LASTVALUE1})'
               priority: WARNING
               description: |
                 Two conditions should match:
-                1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.
+                1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.WARN:"{#FSNAME}"}`.
                 2. The second condition should be one of the following:
-                - the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;
+                - the disk free space is less than `{$DISK.FREE.MIN.WARN:"{#FSNAME}"}`;
                 - the disk will be full in less than 24 hours.
               manual_close: 'YES'
               dependencies:
-                - name: '{#FSNAME}: Disk space is critically low'
+                - name: '{#DISK.NAME}: Disk space is critically low'
                   expression: |
-                    last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and
-                    ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or 
-                    timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)
+                    last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"} and
+                    (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}
               tags:
                 - tag: scope
                   value: capacity
@@ -1869,7 +1906,7 @@ zabbix_export:
                   value: performance
           graph_prototypes:
             - uuid: 589eef3a19144fb68b32a018d83b3839
-              name: '{#FSNAME}: Disk usage'
+              name: '{#DISK.NAME}: Disk usage'
               graph_items:
                 - color: 199C0D
                   item:
@@ -1888,13 +1925,23 @@ zabbix_export:
         - uuid: 61e3a11989a5424a8d4dd2bf67b97526
           name: 'Voltage discovery'
           type: SNMP_AGENT
-          snmp_oid: 'discovery[{#SNMPVALUE},1.3.6.1.4.1.2620.1.6.7.8.3.1.2]'
+          snmp_oid: 'discovery[{#SENSOR.NAME},1.3.6.1.4.1.2620.1.6.7.8.3.1.2]'
           key: voltage.discovery
           delay: 1h
+          filter:
+            evaltype: AND
+            conditions:
+              - macro: '{#SENSOR.NAME}'
+                value: '{$VOLT.NAME.MATCHES}'
+                formulaid: A
+              - macro: '{#SENSOR.NAME}'
+                value: '{$VOLT.NAME.NOT_MATCHES}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: B
           description: 'Discovering voltage sensors from CHECKPOINT-MIB.'
           item_prototypes:
             - uuid: a302aefd0ea5499ea6d916929b4d45dc
-              name: '{#SNMPVALUE}: Voltage value'
+              name: '{#SENSOR.NAME}: Voltage value'
               type: SNMP_AGENT
               snmp_oid: '1.3.6.1.4.1.2620.1.6.7.8.3.1.3.{#SNMPINDEX}'
               key: 'sensor.volt.value[voltageSensorValue.{#SNMPINDEX}]'
@@ -1911,7 +1958,7 @@ zabbix_export:
                   value: voltage
           graph_prototypes:
             - uuid: d95b5de9111a42a8a52f4876ea888beb
-              name: 'FAN {#SNMPINDEX}: Voltage'
+              name: '{#SENSOR.NAME}: Voltage'
               graph_items:
                 - color: 199C0D
                   item:
@@ -2149,9 +2196,27 @@ zabbix_export:
         - macro: '{$CPU.UTIL.CRIT}'
           value: '90'
           description: 'Threshold of CPU utilization for warning trigger in %.'
+        - macro: '{$DISK.FREE.MIN.CRIT}'
+          value: 5G
+          description: 'The critical threshold of the disk space utilization.'
+        - macro: '{$DISK.FREE.MIN.WARN}'
+          value: 10G
+          description: 'The warning threshold of the disk space utilization.'
+        - macro: '{$DISK.NAME.MATCHES}'
+          value: .+
+          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$DISK.NAME.NOT_MATCHES}'
+          value: ^(/dev|/sys|/run|/proc|.+/shm$)
+          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$DISK.PUSED.MAX.CRIT}'
+          value: '90'
+          description: 'Critical threshold of disk usage for trigger in %.'
+        - macro: '{$DISK.PUSED.MAX.WARN}'
+          value: '80'
+          description: 'Warning threshold of disk usage for trigger in %.'
         - macro: '{$FW.DROPPED.PACKETS.TH}'
           value: '0'
-          description: 'This macro is used in Firewall discovery. Can be overridden on the host or linked template level.'
+          description: 'This macro is used in Firewall discovery.'
         - macro: '{$ICMP_LOSS_WARN}'
           value: '20'
           description: 'Threshold of ICMP packets loss for warning trigger in %.'
@@ -2198,8 +2263,8 @@ zabbix_export:
           value: '.*'
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
         - macro: '{$NET.IF.IFNAME.NOT_MATCHES}'
-          value: '(^Software Loopback Interface|^NULL[0-9.]*$|^[Ll]o[0-9.]*$|^[Ss]ystem$|^Nu[0-9.]*$|^veth[0-9a-z]+$|docker[0-9]+|br-[a-z0-9]{12})'
-          description: 'Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.'
+          value: CHANGE_IF_NEEDED
+          description: 'Filter out loopbacks, nulls and system bridge by default.'
         - macro: '{$NET.IF.IFOPERSTATUS.MATCHES}'
           value: '.*'
           description: 'This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.'
@@ -2224,6 +2289,12 @@ zabbix_export:
         - macro: '{$SW.NAME.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
           description: 'This macro is used in Software blades discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$TEMP.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$TEMP.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
         - macro: '{$TEMP.VALUE.CRIT}'
           value: '75'
           description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
@@ -2233,24 +2304,12 @@ zabbix_export:
         - macro: '{$TEMP.VALUE.WARN}'
           value: '65'
           description: 'This macro is used in Temperature discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$VFS.FS.FREE.MIN.CRIT}'
-          value: 5G
-          description: 'The critical threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FREE.MIN.WARN}'
-          value: 10G
-          description: 'The warning threshold of the filesystem utilization.'
-        - macro: '{$VFS.FS.FSNAME.MATCHES}'
-          value: .+
-          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$VFS.FS.FSNAME.NOT_MATCHES}'
-          value: ^(/dev|/sys|/run|/proc|.+/shm$)
-          description: 'This macro is used in Storage discovery. Can be overridden on the host or linked template level.'
-        - macro: '{$VFS.FS.PUSED.MAX.CRIT}'
-          value: '90'
-          description: 'Critical threshold of disk usage for trigger in %.'
-        - macro: '{$VFS.FS.PUSED.MAX.WARN}'
-          value: '80'
-          description: 'Warning threshold of disk usage for trigger in %.'
+        - macro: '{$VOLT.NAME.MATCHES}'
+          value: '.*'
+          description: 'This macro is used in Voltage discovery. Can be overridden on the host or linked template level.'
+        - macro: '{$VOLT.NAME.NOT_MATCHES}'
+          value: CHANGE_IF_NEEDED
+          description: 'This macro is used in Voltage discovery. Can be overridden on the host or linked template level.'
         - macro: '{$VPN.NAME.MATCHES}'
           value: '.*'
           description: 'This macro is used in VPN discovery. Can be overridden on the host or linked template level.'
@@ -2472,7 +2531,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        name: '{#FSNAME}: Disk usage'
+                        name: '{#DISK.NAME}: Disk usage'
             - name: Sensors
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -2499,7 +2558,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        name: '{#SNMPVALUE}: Temperature'
+                        name: '{#SENSOR.NAME}: Temperature'
                 - type: GRAPH_PROTOTYPE
                   x: '12'
                   width: '12'
@@ -2512,7 +2571,7 @@ zabbix_export:
                       name: graphid
                       value:
                         host: 'Check Point Next Generation Firewall by SNMP'
-                        name: 'FAN {#SNMPINDEX}: Voltage'
+                        name: '{#SENSOR.NAME}: Voltage'
             - name: Firewall
               widgets:
                 - type: GRAPH_PROTOTYPE
@@ -3244,9 +3303,9 @@ zabbix_export:
           name: 'PSU Status'
           mappings:
             - value: '0'
-              newvalue: Down
-            - value: '1'
               newvalue: Up
+            - value: '1'
+              newvalue: Down
             - value: '2'
               newvalue: Unknown
         - uuid: 9bef9869d1b94f78b4a5388d34f84a47

@@ -32,12 +32,13 @@ Refer to the vendor documentation.
 |{$ICMP_RESPONSE_TIME_WARN}|<p>Threshold of average ICMP response time for warning trigger in seconds.</p>|`0.15`|
 |{$SNMP.TIMEOUT}|<p>The time interval for SNMP availability trigger.</p>|`5m`|
 |{$MEMORY.UTIL.MAX}|<p>The warning threshold of the "Physical memory: Memory utilization" item.</p>|`90`|
-|{$VFS.FS.FREE.MIN.CRIT}|<p>The critical threshold of the filesystem utilization.</p>|`5G`|
-|{$VFS.FS.FREE.MIN.WARN}|<p>The warning threshold of the filesystem utilization.</p>|`10G`|
-|{$VFS.FS.PUSED.MAX.WARN}|<p>Warning threshold of disk usage for trigger in %.</p>|`80`|
-|{$VFS.FS.PUSED.MAX.CRIT}|<p>Critical threshold of disk usage for trigger in %.</p>|`90`|
-|{$VFS.FS.FSNAME.MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`.+`|
-|{$VFS.FS.FSNAME.NOT_MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`^(/dev\|/sys\|/run\|/proc\|.+/shm$)`|
+|{$FW.DROPPED.PACKETS.TH}|<p>This macro is used in Firewall discovery.</p>|`0`|
+|{$DISK.FREE.MIN.CRIT}|<p>The critical threshold of the disk space utilization.</p>|`5G`|
+|{$DISK.FREE.MIN.WARN}|<p>The warning threshold of the disk space utilization.</p>|`10G`|
+|{$DISK.PUSED.MAX.WARN}|<p>Warning threshold of disk usage for trigger in %.</p>|`80`|
+|{$DISK.PUSED.MAX.CRIT}|<p>Critical threshold of disk usage for trigger in %.</p>|`90`|
+|{$DISK.NAME.MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`.+`|
+|{$DISK.NAME.NOT_MATCHES}|<p>This macro is used in Storage discovery. Can be overridden on the host or linked template level.</p>|`^(/dev\|/sys\|/run\|/proc\|.+/shm$)`|
 |{$VPN.NAME.MATCHES}|<p>This macro is used in VPN discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$VPN.NAME.NOT_MATCHES}|<p>This macro is used in VPN discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$VPN.STATE.CONTROL}|<p>This macro is used in "Tunnel down" trigger. Can be used with interface name as context.</p>|`1`|
@@ -49,17 +50,20 @@ Refer to the vendor documentation.
 |{$NET.IF.IFDESCR.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFDESCR.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$NET.IF.IFNAME.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
-|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls, docker veth links and docker0 bridge by default.</p>|`Macro too long. Please see the template.`|
+|{$NET.IF.IFNAME.NOT_MATCHES}|<p>Filter out loopbacks, nulls and system bridge by default.</p>|`CHANGE_IF_NEEDED`|
 |{$NET.IF.IFOPERSTATUS.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFOPERSTATUS.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`^6$`|
 |{$NET.IF.IFTYPE.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFTYPE.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$NET.IF.IFALIAS.MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$NET.IF.IFALIAS.NOT_MATCHES}|<p>This macro is used in Network interfaces discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
+|{$TEMP.NAME.MATCHES}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$TEMP.NAME.NOT_MATCHES}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$TEMP.VALUE.LOW}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`5`|
 |{$TEMP.VALUE.CRIT}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`75`|
 |{$TEMP.VALUE.WARN}|<p>This macro is used in Temperature discovery. Can be overridden on the host or linked template level.</p>|`65`|
-|{$FW.DROPPED.PACKETS.TH}|<p>This macro is used in Firewall discovery. Can be overridden on the host or linked template level.</p>|`0`|
+|{$VOLT.NAME.MATCHES}|<p>This macro is used in Voltage discovery. Can be overridden on the host or linked template level.</p>|`.*`|
+|{$VOLT.NAME.NOT_MATCHES}|<p>This macro is used in Voltage discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$SW.NAME.MATCHES}|<p>This macro is used in Software blades discovery. Can be overridden on the host or linked template level.</p>|`.*`|
 |{$SW.NAME.NOT_MATCHES}|<p>This macro is used in Software blades discovery. Can be overridden on the host or linked template level.</p>|`CHANGE_IF_NEEDED`|
 |{$LICENSE.EXPIRY.WARN}|<p>Number of days until the license expires.</p>|`7`|
@@ -84,9 +88,9 @@ Refer to the vendor documentation.
 |Check Point: Load average (1m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The average number of processes being or waiting executed over past 1 minute.</p>|SNMP agent|system.cpu.load.avg1|
 |Check Point: Load average (5m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The average number of processes being or waiting executed over past 5 minute.</p>|SNMP agent|system.cpu.load.avg5|
 |Check Point: Load average (15m avg)|<p>MIB: UCD-SNMP-MIB</p><p>The average number of processes being or waiting executed over past 15 minute.</p>|SNMP agent|system.cpu.load.avg15|
-|Check Point: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU has spent running users' processes that are not niced.</p>|SNMP agent|system.cpu.user|
-|Check Point: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
-|Check Point: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
+|Check Point: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The average time the CPU has spent running users' processes that are not niced.</p>|SNMP agent|system.cpu.user|
+|Check Point: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The average time the CPU has spent running the kernel and its processes.</p>|SNMP agent|system.cpu.system|
+|Check Point: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The average time the CPU has spent doing nothing.</p>|SNMP agent|system.cpu.idle|
 |Check Point: Context switches per second|<p>MIB: UCD-SNMP-MIB</p><p>Number of context switches per second.</p>|SNMP agent|system.cpu.switches<p>**Preprocessing**</p><ul><li>Change per second</li></ul>|
 |Check Point: CPU interrupts per second|<p>MIB: CHECKPOINT-MIB</p><p>Number of interrupts processed per second.</p>|SNMP agent|system.cpu.intr|
 |Check Point: Total memory|<p>MIB: CHECKPOINT-MIB</p><p>Total real memory in bytes. Memory used by applications.</p>|SNMP agent|vm.memory.total|
@@ -106,6 +110,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
+|Check Point: Device has been replaced|<p>Device serial number has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.hw.serialnumber))>0`|Info|**Manual close**: Yes|
 |Check Point: System name has changed|<p>The name of the system has changed. Acknowledge to close the problem manually.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.name,#1)<>last(/Check Point Next Generation Firewall by SNMP/system.name,#2) and length(last(/Check Point Next Generation Firewall by SNMP/system.name))>0`|Info|**Manual close**: Yes|
 |Check Point: Device has been restarted|<p>Uptime is less than 10 minutes.</p>|`last(/Check Point Next Generation Firewall by SNMP/system.uptime)<10m`|Info|**Manual close**: Yes|
 |Check Point: High CPU utilization|<p>The CPU utilization is too high. The system might be slow to respond.</p>|`min(/Check Point Next Generation Firewall by SNMP/system.cpu.usage,5m)>{$CPU.UTIL.CRIT}`|Warning||
@@ -142,7 +147,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|Check Point Firewall: Instance is currently fully utilized|<p>This trigger uses utilized drops number, an increase in which indicates if the instance is fully utilized.</p>|`avg(/Check Point Next Generation Firewall by SNMP/fw.utilized.drops[fwFullyUtilizedDrops.{#SNMPINDEX}],5m)>{$FW.DROPPED.PACKETS.TH:"{#SNMPINDEX}"}`|High||
+|Check Point Firewall: Instance is currently fully utilized|<p>This trigger uses utilized drops number, an increase in which indicates if the instance is fully utilized.</p>|`avg(/Check Point Next Generation Firewall by SNMP/fw.utilized.drops[fwFullyUtilizedDrops.{#SNMPINDEX}],5m)>{$FW.DROPPED.PACKETS.TH}`|High||
 
 ### LLD rule VPN discovery
 
@@ -170,20 +175,20 @@ Refer to the vendor documentation.
 |----|-----------|----------|--------|--------------------------------|
 |VPN {#VPN.NAME}: Tunnel down|<p>This trigger expression works as follows:<br>1. It can be triggered if the current tunnel state is down.<br>2. {$VPN.STATE.CONTROL:"{#VPN.NAME}"}=1 - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this tunnel is down.</p>|`{$VPN.STATE.CONTROL:"{#VPN.NAME}"}=1 and last(/Check Point Next Generation Firewall by SNMP/vpn.tunnel.state[tunnelState.{#SNMPINDEX}])=131`|Average|**Manual close**: Yes|
 
-### LLD rule CPU cores discovery
+### LLD rule CPU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU cores discovery|<p>Discovering CPU cores from CHECKPOINT-MIB.</p>|SNMP agent|cpu.discovery|
+|CPU discovery|<p>Discovering CPU from CHECKPOINT-MIB.</p>|SNMP agent|cpu.discovery|
 
-### Item prototypes for CPU cores discovery
+### Item prototypes for CPU discovery
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|CPU Core {#CPU.ID}: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the core has spent running users' processes that are not niced.</p>|SNMP agent|system.core.user[multiProcUserTime.{#CPU.ID}]|
-|CPU Core {#CPU.ID}: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The time the core has spent running the kernel and its processes.</p>|SNMP agent|system.core.system[multiProcSystemTime.{#CPU.ID}]|
-|CPU Core {#CPU.ID}: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the core has spent doing nothing.</p>|SNMP agent|system.core.idle[multiProcIdleTime.{#CPU.ID}]|
-|CPU Core {#CPU.ID}: CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU core utilization in %.</p>|SNMP agent|system.core.usage[multiProcUsage.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU user time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU {#CPU.ID} has spent running users' processes that are not niced.</p>|SNMP agent|system.core.user[multiProcUserTime.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU system time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU {#CPU.ID} has spent running the kernel and its processes.</p>|SNMP agent|system.core.system[multiProcSystemTime.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU idle time|<p>MIB: CHECKPOINT-MIB</p><p>The time the CPU {#CPU.ID} has spent doing nothing.</p>|SNMP agent|system.core.idle[multiProcIdleTime.{#CPU.ID}]|
+|CPU Core {#CPU.ID}: CPU utilization|<p>MIB: CHECKPOINT-MIB</p><p>CPU {#CPU.ID} utilization in %.</p>|SNMP agent|system.core.usage[multiProcUsage.{#CPU.ID}]|
 
 ### LLD rule Storage discovery
 
@@ -195,18 +200,18 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#FSNAME}: Total disk space|<p>MIB: CHECKPOINT-MIB</p><p>Total partition size in bytes.</p>|SNMP agent|vfs.fs.total[multiDiskSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
-|{#FSNAME}: Used disk space|<p>MIB: CHECKPOINT-MIB</p><p>Disk used in partition in bytes.</p>|SNMP agent|vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]|
-|{#FSNAME}: Free disk space|<p>MIB: CHECKPOINT-MIB</p><p>Free disk capacity in partition in bytes.</p>|SNMP agent|vfs.fs.free[multiDiskFreeTotalBytes.{#SNMPINDEX}]|
-|{#FSNAME}: Available disk space|<p>MIB: CHECKPOINT-MIB</p><p>Available free disk in partition (not reserved by the OS) in bytes.</p>|SNMP agent|vfs.fs.avail[multiDiskFreeAvailableBytes.{#SNMPINDEX}]|
-|{#FSNAME}: Disk space utilization|<p>The space utilization calculated by free percentage (multiDiskFreeTotalPercent) metric, expressed in %</p>|SNMP agent|vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return 100 - Number(value);`</p></li></ul>|
+|{#DISK.NAME}: Total disk space|<p>MIB: CHECKPOINT-MIB</p><p>Total partition size in bytes.</p>|SNMP agent|vfs.fs.total[multiDiskSize.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>Discard unchanged with heartbeat: `6h`</p></li></ul>|
+|{#DISK.NAME}: Used disk space|<p>MIB: CHECKPOINT-MIB</p><p>Disk used in partition in bytes.</p>|SNMP agent|vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]|
+|{#DISK.NAME}: Free disk space|<p>MIB: CHECKPOINT-MIB</p><p>Free disk capacity in partition in bytes.</p>|SNMP agent|vfs.fs.free[multiDiskFreeTotalBytes.{#SNMPINDEX}]|
+|{#DISK.NAME}: Available disk space|<p>MIB: CHECKPOINT-MIB</p><p>Available free disk in partition (not reserved by the OS) in bytes.</p>|SNMP agent|vfs.fs.avail[multiDiskFreeAvailableBytes.{#SNMPINDEX}]|
+|{#DISK.NAME}: Disk space utilization|<p>The space utilization calculated by free percentage (multiDiskFreeTotalPercent) metric, expressed in %</p>|SNMP agent|vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}]<p>**Preprocessing**</p><ul><li><p>JavaScript: `return 100 - Number(value);`</p></li></ul>|
 
 ### Trigger prototypes for Storage discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#FSNAME}: Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.CRIT:"{#FSNAME}"} and ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.CRIT:"{#FSNAME}"} or timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)`|Average|**Manual close**: Yes|
-|{#FSNAME}: Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$VFS.FS.PUSED.MAX.WARN:"{#FSNAME}"} and ((last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$VFS.FS.FREE.MIN.WARN:"{#FSNAME}"} or timeleft(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}],1h,100)<1d)`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#FSNAME}: Disk space is critically low</li></ul>|
+|{#DISK.NAME}: Disk space is critically low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.CRIT:"{#FSNAME}"} and (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.CRIT:"{#FSNAME}"}`|Average|**Manual close**: Yes|
+|{#DISK.NAME}: Disk space is low|<p>Two conditions should match:<br>1. The first condition - utilization of the space should be above `{$DISK.PUSED.MAX.WARN:"{#FSNAME}"}`.<br>2. The second condition should be one of the following:<br>- the disk free space is less than `{$DISK.FREE.MIN.WARN:"{#FSNAME}"}`;<br>- the disk will be full in less than 24 hours.</p>|`last(/Check Point Next Generation Firewall by SNMP/vfs.fs.pused[multiDiskUsagePercent.{#SNMPINDEX}])>{$DISK.PUSED.MAX.WARN:"{#FSNAME}"} and (last(/Check Point Next Generation Firewall by SNMP/vfs.fs.total[multiDiskSize.{#SNMPINDEX}])-last(/Check Point Next Generation Firewall by SNMP/vfs.fs.used[multiDiskUsed.{#SNMPINDEX}]))<{$DISK.FREE.MIN.WARN:"{#FSNAME}"}`|Warning|**Manual close**: Yes<br>**Depends on**:<br><ul><li>{#DISK.NAME}: Disk space is critically low</li></ul>|
 
 ### LLD rule Network interfaces discovery
 
@@ -247,15 +252,15 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#SNMPVALUE}: Temperature|<p>MIB: CHECKPOINT-MIB</p><p>The current temperature reading in degrees celsius from this hardware component's temperature sensor. </p>|SNMP agent|sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}]|
+|{#SENSOR.NAME}: Temperature|<p>MIB: CHECKPOINT-MIB</p><p>The current temperature reading in degrees celsius from this hardware component's temperature sensor. </p>|SNMP agent|sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}]|
 
 ### Trigger prototypes for Temperature discovery
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|{#SNMPVALUE}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.CRIT:"{#SNMPVALUE}"}`|High||
-|{#SNMPVALUE}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)>{$TEMP.VALUE.WARN:"{#SNMPVALUE}"}`|Warning|**Depends on**:<br><ul><li>{#SNMPVALUE}: Temperature is above critical threshold</li></ul>|
-|{#SNMPVALUE}: Temperature is too low|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],5m)<{$TEMP.VALUE.LOW:"{#SNMPVALUE}"}`|Average||
+|{#SENSOR.NAME}: Temperature is above critical threshold|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)>{$TEMP.VALUE.CRIT:"{#SENSOR.NAME}"}`|High||
+|{#SENSOR.NAME}: Temperature is above warning threshold|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)>{$TEMP.VALUE.WARN:"{#SENSOR.NAME}"}`|Warning|**Depends on**:<br><ul><li>{#SENSOR.NAME}: Temperature is above critical threshold</li></ul>|
+|{#SENSOR.NAME}: Temperature is too low|<p>This trigger uses temperature sensor values.</p>|`avg(/Check Point Next Generation Firewall by SNMP/sensor.temp.value[tempertureSensorValue.{#SNMPINDEX}],10m)<{$TEMP.VALUE.LOW:"{#SENSOR.NAME}"}`|Average||
 
 ### LLD rule FAN discovery
 
@@ -274,7 +279,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|FAN {#SNMPINDEX}: Fan is in critical state|<p>Please check the fan unit.</p>|`count(/Check Point Next Generation Firewall by SNMP/sensor.fan.status[fanSpeedSensorStatus.{#SNMPINDEX}],#1,"ne",0)=1`|Average||
+|FAN {#SNMPINDEX}: Fan speed is out of range|<p>Please check the fan unit.</p>|`count(/Check Point Next Generation Firewall by SNMP/sensor.fan.status[fanSpeedSensorStatus.{#SNMPINDEX}],#3,"eq",1)=3`|Average||
 
 ### LLD rule Voltage discovery
 
@@ -286,7 +291,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Type|Key and additional info|
 |----|-----------|----|-----------------------|
-|{#SNMPVALUE}: Voltage value|<p>MIB: CHECKPOINT-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p>|SNMP agent|sensor.volt.value[voltageSensorValue.{#SNMPINDEX}]|
+|{#SENSOR.NAME}: Voltage value|<p>MIB: CHECKPOINT-MIB</p><p>The most recent measurement obtained by the agent for this sensor.</p>|SNMP agent|sensor.volt.value[voltageSensorValue.{#SNMPINDEX}]|
 
 ### LLD rule PSU discovery
 
@@ -304,7 +309,7 @@ Refer to the vendor documentation.
 
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
-|PSU {#SNMPINDEX}: Power supply is in down state|<p>Please check the power supply unit for errors.</p>|`count(/Check Point Next Generation Firewall by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#1,"eq",0)=1`|Average||
+|PSU {#SNMPINDEX}: Power supply is in down state|<p>Please check the power supply unit for errors.</p>|`count(/Check Point Next Generation Firewall by SNMP/sensor.psu.status[powerSupplyStatus.{#SNMPINDEX}],#3,"eq",1)=3`|Average||
 
 ### LLD rule Software blades discovery
 
@@ -327,6 +332,7 @@ Refer to the vendor documentation.
 |Name|Description|Expression|Severity|Dependencies and additional info|
 |----|-----------|----------|--------|--------------------------------|
 |{#SW.NAME}: License expires soon|<p>This trigger expression works as follows:<br>1. It can be triggered if the license expires soon.<br>2. `{$LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license expires.</p>|`{$LICENSE.CONTROL:"{#SW.NAME}"}=1 and (last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) - now()) / 86400 < {$LICENSE.EXPIRY.WARN:"{#SW.NAME}"} and last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) > now()`|Warning|**Manual close**: Yes|
+|{#SW.NAME}: License has been expired|<p>This trigger expression works as follows:<br>1. It can be triggered if the license has been expired.<br>2. `{$LICENSE.CONTROL:"{#SW.NAME}"}=1` - a user can redefine context macro to value - 0. That marks the current license as not important. No new trigger will be fired if this license is expired.</p>|`{$LICENSE.CONTROL:"{#SW.NAME}"}=1 and (last(/Check Point Next Generation Firewall by SNMP/svn.sw.license.exp_date[licensingExpirationDate.{#SNMPINDEX}]) - now()) / 86400 < now()`|Average|**Manual close**: Yes|
 
 ## Feedback
 
