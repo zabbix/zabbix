@@ -802,7 +802,7 @@ class CTabFilter extends CBaseComponent {
 				.on(TABFILTERITEM_EVENT_URLSET, () => this.fire(TABFILTER_EVENT_URLSET));
 		}
 
-		this.#tabs_sortable = new CSortable(this._target.querySelector('.ui-sortable-container'), {
+		this.#tabs_sortable = new CSortable(this._target.querySelector('.tabfilter-tabs'), {
 			is_horizontal: true,
 			freeze_start: 1
 		})

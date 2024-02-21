@@ -3647,7 +3647,7 @@ section {
     border: 1px transparent; }
   .filter-container.tabfilter-container .tabfilter-edit {
     margin: -1px 2px -1px -6px; }
-  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(:first-child) .tabfilter-item-link::before {
+  .filter-container.tabfilter-container .tabfilter-tabs .tabfilter-item-label:not(:first-child) .tabfilter-item-link::before {
     content: ' ';
     position: absolute;
     top: 1px;
@@ -3655,9 +3655,9 @@ section {
     display: inline-block;
     height: 20px;
     border-left: 1px solid transparent; }
-  .filter-container.tabfilter-container .ui-sortable-container .tabfilter-item-label:not(:first-child) .tabfilter-item-link.separated::before {
+  .filter-container.tabfilter-container .tabfilter-tabs .tabfilter-item-label:not(:first-child) .tabfilter-item-link.separated::before {
     border-left: 1px solid #768d99; }
-  .filter-container.tabfilter-container .ui-sortable-container.sortable-dragging .tabfilter-item-label:not(:first-child) .tabfilter-item-link::before {
+  .filter-container.tabfilter-container .tabfilter-tabs.sortable-dragging .tabfilter-item-label:not(:first-child) .tabfilter-item-link::before {
     transition: border-left-color 0.3s; }
   .filter-container.tabfilter-container .tabfilter-tabs-container .filter-container.time-selection-container {
     border: 0 none; }
