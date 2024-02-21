@@ -519,7 +519,7 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Listener for tabs event {CSortable.EVENT_DRAG_START}.
 			 *
-			 * Updates separated state of items.
+			 * Updates separators of items.
 			 *
 			 * @param {Object} ev
 			 */
@@ -530,7 +530,7 @@ class CTabFilter extends CBaseComponent {
 			/**
 			 * Listener for tabs event {CSortable.EVENT_DRAG_OVERTAKE}.
 			 *
-			 * Updates separated state of items.
+			 * Updates separators of items.
 			 *
 			 * @param ev
 			 */
