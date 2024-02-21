@@ -262,7 +262,7 @@ class CSortable {
 		const item = this.#matchItem(element);
 
 		if (item !== null) {
-			if (this.#revealItem(item)) {
+			if (this.#revealItem(item) !== 0) {
 				if (immediate) {
 					this.mutate(() => this.#resetTransitions());
 				}
@@ -972,13 +972,14 @@ class CSortable {
 			this.#cancelDragScrolling();
 
 			if (this.#scrollRel(e.deltaY !== 0 ? e.deltaY : e.deltaX) !== 0
+					|| this.#is_horizontal
 					|| this.#is_dragging
 					|| this.#hasTransitions()) {
 				e.preventDefault();
 			}
 
 			if (this.#is_dragging) {
-				e.stopPropagation();
+				e.stopImmediatePropagation();
 			}
 		},
 
