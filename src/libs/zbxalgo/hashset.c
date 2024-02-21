@@ -204,7 +204,7 @@ void	*zbx_hashset_insert_ext(zbx_hashset_t *hs, const void *data, size_t size, s
 
 	hash = hs->hash_func(data);
 
-	if (ZBX_UNIQ_ENTRY != uniq)
+	if (ZBX_UNIQ_FALSE == uniq)
 	{
 		slot = hash % hs->num_slots;
 		entry = hs->slots[slot];

@@ -426,25 +426,25 @@ static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
  *     size    - [IN] size of element to search for                           *
  *     found   - [OUT flag. 0 - element did not exist, it was created.        *
  *                          1 - existing element was found.                   *
- *     uniq   - [IN] flag.  0 - search if element already exists.             *
- *                          ZBX_UNIQ_ENTRY - skip search                      *
+ *     uniq   - [IN] flag.  ZBX_UNIQ_FALSE - search if already exists.        *
+ *                          ZBX_UNIQ_TRUE  - skip search if already searched. *
  *                                                                            *
  * Return value: pointer to the found or created element                      *
  *                                                                            *
  ******************************************************************************/
-static void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq)
+void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq)
 {
 	void		*ptr = NULL;
 	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
 
-	if (ZBX_UNIQ_ENTRY == uniq || NULL == (ptr = zbx_hashset_search(hashset, &id)))
+	if (ZBX_UNIQ_TRUE == uniq || NULL == (ptr = zbx_hashset_search(hashset, &id)))
 	{
 		*found = 0;
 
 		buffer[0] = id;
 
 		if (NULL == ptr)
-			uniq = ZBX_UNIQ_ENTRY;
+			uniq = ZBX_UNIQ_TRUE;
 
 		ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
 	}
@@ -459,11 +459,6 @@ static void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size,
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
 	return DCfind_id_ext(hashset, id, size, found, 0);
-}
-
-void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
-{
-	return DCfind_id_ext(hashset, id, size, found, ZBX_UNIQ_ENTRY);
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
@@ -537,7 +532,7 @@ static const char	*zbx_strpool_intern(const char *str)
 	if (NULL == record)
 	{
 		record = zbx_hashset_insert_ext(&config->strpool, str - REFCOUNT_FIELD_SIZE,
-				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_ENTRY);
+				REFCOUNT_FIELD_SIZE + strlen(str) + 1, REFCOUNT_FIELD_SIZE, ZBX_UNIQ_TRUE);
 		*(zbx_uint32_t *)record = 0;
 	}
 
@@ -3147,7 +3142,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	time_t			now;
 	unsigned char		status, type, value_type, old_poller_type;
-	int			found, update_index, ret, i,  old_nextcheck, clean_sync = 0;
+	int			found, update_index, ret, i, old_nextcheck, uniq = ZBX_UNIQ_FALSE;
 	zbx_uint64_t		itemid, hostid, interfaceid;
 	zbx_vector_ptr_t	dep_items;
 	zbx_item_value_type_t	old_value_type;
@@ -3165,7 +3160,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 		zbx_hashset_reserve(&config->items, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->items_hk, MAX(row_num, 100));
-		clean_sync = 1;
+		uniq = ZBX_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -3185,10 +3180,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 				continue;
 		}
 
-		if (1 == clean_sync)
-			item = (ZBX_DC_ITEM *)DCinsert_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
-		else
-			item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
+		item = (ZBX_DC_ITEM *)DCfind_id_ext(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found, uniq);
 
 		/* template item */
 		ZBX_DBROW2UINT64(item->templateid, row[48]);
@@ -3329,7 +3321,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 			item_hk_local.key = zbx_strpool_acquire(item->key);
 			item_hk_local.item_ptr = item;
 			zbx_hashset_insert_ext(&config->items_hk, &item_hk_local, sizeof(ZBX_DC_ITEM_HK), 0,
-					ZBX_UNIQ_ENTRY);
+					ZBX_UNIQ_TRUE);
 		}
 
 		/* process item intervals and update item nextcheck */
@@ -3494,7 +3486,7 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid, itemid;
 	unsigned char		tag;
-	int			ret, found, clean_sync = 0;
+	int			ret, found, uniq = ZBX_UNIQ_FALSE;
 	ZBX_DC_ITEM_DISCOVERY	*item_discovery;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3504,7 +3496,7 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->item_discovery, MAX(row_num, 100));
-		clean_sync = 1;
+		uniq = ZBX_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -3514,16 +3506,9 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 			break;
 
 		ZBX_STR2UINT64(itemid, row[0]);
-		if (1 == clean_sync)
-		{
-			item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCinsert_id(&config->item_discovery, itemid,
-					sizeof(ZBX_DC_ITEM_DISCOVERY), &found);
-		}
-		else
-		{
-			item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id(&config->item_discovery, itemid,
-					sizeof(ZBX_DC_ITEM_DISCOVERY), &found);
-		}
+
+		item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCfind_id_ext(&config->item_discovery, itemid,
+				sizeof(ZBX_DC_ITEM_DISCOVERY), &found, uniq);
 
 		/* LLD item prototype */
 		ZBX_STR2UINT64(item_discovery->parent_itemid, row[1]);
@@ -3623,7 +3608,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 	ZBX_DC_TRIGGER	*trigger;
 
-	int		found, ret, clean_sync = 0;
+	int		found, ret, uniq = ZBX_UNIQ_FALSE;
 	zbx_uint64_t	triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -3633,7 +3618,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->triggers, MAX(row_num, 100));
-		clean_sync = 1;
+		uniq = ZBX_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -3644,16 +3629,8 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(triggerid, row[0]);
 
-		if (1 == clean_sync)
-		{
-			trigger = (ZBX_DC_TRIGGER *)DCinsert_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER),
-					&found);
-		}
-		else
-		{
-			trigger = (ZBX_DC_TRIGGER *)DCfind_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER),
-					&found);
-		}
+		trigger = (ZBX_DC_TRIGGER *)DCfind_id_ext(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER),
+				&found, uniq);
 
 		/* store new information in trigger structure */
 
@@ -4195,7 +4172,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 	ZBX_DC_ITEM	*item;
 	ZBX_DC_FUNCTION	*function;
 
-	int		found, ret, clean_sync = 0;
+	int		found, ret, uniq = ZBX_UNIQ_FALSE;
 	zbx_uint64_t	itemid, functionid, triggerid;
 
 	zabbix_log(LOG_LEVEL_DEBUG, "In %s()", __func__);
@@ -4205,7 +4182,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->functions, MAX(row_num, 100));
-		clean_sync = 1;
+		uniq = ZBX_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -4230,17 +4207,8 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 		}
 
 		/* process function information */
-
-		if (1 == clean_sync)
-		{
-			function = (ZBX_DC_FUNCTION *)DCinsert_id(&config->functions, functionid,
-					sizeof(ZBX_DC_FUNCTION), &found);
-		}
-		else
-		{
-			function = (ZBX_DC_FUNCTION *)DCfind_id(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION),
-					&found);
-		}
+		function = (ZBX_DC_FUNCTION *)DCfind_id_ext(&config->functions, functionid, sizeof(ZBX_DC_FUNCTION),
+				&found, uniq);
 
 		if (1 == found)
 		{
@@ -5175,7 +5143,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 	char			**row;
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
-	int			found, ret, index, clean_sync = 0;
+	int			found, ret, index, uniq = ZBX_UNIQ_FALSE;
 	zbx_uint64_t		itemid, itemtagid;
 	ZBX_DC_ITEM		*item;
 	zbx_dc_item_tag_t	*item_tag;
@@ -5187,7 +5155,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->item_tags, MAX(row_num, 100));
-		clean_sync = 1;
+		uniq = ZBX_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -5203,16 +5171,9 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 		ZBX_STR2UINT64(itemtagid, row[0]);
 
-		if (1 == clean_sync)
-		{
-			item_tag = (zbx_dc_item_tag_t *)DCinsert_id(&config->item_tags, itemtagid,
-					sizeof(zbx_dc_item_tag_t), &found);
-		}
-		else
-		{
-			item_tag = (zbx_dc_item_tag_t *)DCfind_id(&config->item_tags, itemtagid,
-					sizeof(zbx_dc_item_tag_t), &found);
-		}
+		item_tag = (zbx_dc_item_tag_t *)DCfind_id_ext(&config->item_tags, itemtagid,
+				sizeof(zbx_dc_item_tag_t), &found, uniq);
+
 		DCstrpool_replace(found, &item_tag->tag, row[2]);
 		DCstrpool_replace(found, &item_tag->value, row[3]);
 
@@ -5410,7 +5371,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 	zbx_uint64_t		rowid;
 	unsigned char		tag;
 	zbx_uint64_t		item_preprocid, itemid;
-	int			found, ret, i, index, clean_sync = 0;
+	int			found, ret, i, index, uniq = ZBX_UNIQ_FALSE;
 	ZBX_DC_PREPROCITEM	*preprocitem = NULL;
 	zbx_dc_preproc_op_t	*op;
 	zbx_vector_ptr_t	items;
@@ -5425,7 +5386,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		zbx_hashset_reserve(&config->preprocitems, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->preprocops, MAX(row_num, 100));
-		clean_sync = 1;
+		uniq = ZBX_UNIQ_TRUE;
 	}
 
 	while (SUCCEED == (ret = zbx_dbsync_next(sync, &rowid, &row, &tag)))
@@ -5445,7 +5406,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 				preprocitem_local.itemid = itemid;
 
 				preprocitem = (ZBX_DC_PREPROCITEM *)zbx_hashset_insert_ext(&config->preprocitems,
-						&preprocitem_local, sizeof(preprocitem_local), 0, ZBX_UNIQ_ENTRY);
+						&preprocitem_local, sizeof(preprocitem_local), 0, ZBX_UNIQ_TRUE);
 
 				zbx_vector_ptr_create_ext(&preprocitem->preproc_ops, __config_mem_malloc_func,
 						__config_mem_realloc_func, __config_mem_free_func);
@@ -5456,16 +5417,9 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		ZBX_STR2UINT64(item_preprocid, row[0]);
 
-		if (1 == clean_sync)
-		{
-			op = (zbx_dc_preproc_op_t *)DCinsert_id(&config->preprocops, item_preprocid,
-					sizeof(zbx_dc_preproc_op_t), &found);
-		}
-		else
-		{
-			op = (zbx_dc_preproc_op_t *)DCfind_id(&config->preprocops, item_preprocid,
-					sizeof(zbx_dc_preproc_op_t), &found);
-		}
+		op = (zbx_dc_preproc_op_t *)DCfind_id_ext(&config->preprocops, item_preprocid,
+				sizeof(zbx_dc_preproc_op_t), &found, uniq);
+
 
 		ZBX_STR2UCHAR(op->type, row[2]);
 		DCstrpool_replace(found, &op->params, row[3]);
