@@ -597,13 +597,13 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 		*alloc_sz += zbx_shmem_required_chunk_size(sz);
 
 	return SUCCEED;
-#undef ZBX_HOSTINFO_NODES_DATACENTER		0x01
-#undef ZBX_HOSTINFO_NODES_COMPRES		0x02
-#undef ZBX_HOSTINFO_NODES_HOST			0x04
-#undef ZBX_HOSTINFO_NODES_VM			0x08
-#undef ZBX_HOSTINFO_NODES_DS			0x10
-#undef ZBX_HOSTINFO_NODES_NET			0x20
-#undef ZBX_HOSTINFO_NODES_DVS			0x40
+#undef ZBX_HOSTINFO_NODES_DATACENTER
+#undef ZBX_HOSTINFO_NODES_COMPRES
+#undef ZBX_HOSTINFO_NODES_HOST
+#undef ZBX_HOSTINFO_NODES_VM
+#undef ZBX_HOSTINFO_NODES_DS
+#undef ZBX_HOSTINFO_NODES_NET
+#undef ZBX_HOSTINFO_NODES_DVS
 #undef ZBX_HOSTINFO_NODES_MASK_ALL
 
 #	undef	ZBX_XPATH_EVT_INFO
