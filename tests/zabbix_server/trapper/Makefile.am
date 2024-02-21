@@ -9,7 +9,6 @@ COMMON_SRC_FILES = \
 TRAPPER_LIBS = \
 	$(top_srcdir)/tests/libzbxmocktest.a \
 	$(top_srcdir)/tests/libzbxmockdata.a \
-	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a
 	$(top_srcdir)/src/zabbix_server/lld/libzbxlld.a \
 	$(top_srcdir)/src/zabbix_server/ha/libzbxha.a \
 	$(top_srcdir)/src/libs/zbxpoller/libzbxpoller.a \
@@ -18,6 +17,7 @@ TRAPPER_LIBS = \
 	$(top_srcdir)/src/libs/zbxversion/libzbxversion.a \
 	$(top_srcdir)/src/libs/zbxdiscovery/libzbxdiscovery.a \
 	$(top_srcdir)/src/libs/zbxstats/libzbxstats.a \
+	$(top_srcdir)/src/libs/zbxproxybuffer/libzbxproxybuffer.a \
 	$(top_srcdir)/src/libs/zbxvmware/libzbxvmware.a \
 	$(top_srcdir)/src/libs/zbxodbc/libzbxodbc.a \
 	$(top_srcdir)/src/libs/zbxtasks/libzbxtasks.a \
