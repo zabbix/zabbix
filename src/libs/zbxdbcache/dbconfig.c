@@ -3100,7 +3100,7 @@ static void	dc_item_value_type_add(unsigned char found, ZBX_DC_ITEM *item, zbx_i
 			if ('\0' == *row[10])
 			{
 				if (1 == found)
-					dc_item_value_type_free(item, item->type);
+					dc_item_value_type_free(item, item->value_type);
 
 				item->itemvaluetype.logitem = NULL;
 				break;
