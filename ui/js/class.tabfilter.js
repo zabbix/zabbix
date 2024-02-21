@@ -567,13 +567,18 @@ class CTabFilter extends CBaseComponent {
 			tabsSort: (ev) => {
 				this._items.splice(ev.detail.index_to, 0, ...this._items.splice(ev.detail.index, 1));
 
-				const value_str = this._items.map(item => item._index).join(',');
-
-				this._items.forEach((item, index) => item._index = index);
-
 				this.#updateSeparators();
 
-				this.profileUpdate('taborder', {value_str});
+				this.#tabs_sortable.enableSorting(false);
+
+				this.profileUpdate('taborder', {
+					value_str: this._items.map(item => item._index).join(',')
+				})
+					.then(() => {
+						this._items.forEach((item, index) => item._index = index);
+
+						this.#tabs_sortable.enableSorting();
+					});
 			},
 
 			/**
