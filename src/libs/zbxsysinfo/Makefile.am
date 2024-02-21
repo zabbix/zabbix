@@ -10,7 +10,6 @@ DIST_SUBDIRS = \
 	linux \
 	netbsd \
 	openbsd \
-	osf \
 	osx \
 	simple \
 	solaris \
