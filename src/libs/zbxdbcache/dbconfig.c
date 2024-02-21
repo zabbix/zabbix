@@ -434,7 +434,7 @@ static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
  ******************************************************************************/
 static void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq)
 {
-	void		*ptr;
+	void		*ptr = NULL;
 	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
 
 	if (ZBX_UNIQ_ENTRY == uniq || NULL == (ptr = zbx_hashset_search(hashset, &id)))
@@ -442,6 +442,10 @@ static void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size,
 		*found = 0;
 
 		buffer[0] = id;
+
+		if (NULL == ptr)
+			uniq = ZBX_UNIQ_ENTRY;
+
 		ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
 	}
 	else
