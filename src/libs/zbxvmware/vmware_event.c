@@ -32,17 +32,6 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
-#define ZBX_HOSTINFO_NODES_COMPRES		0x02
-#define ZBX_HOSTINFO_NODES_HOST			0x04
-#define ZBX_HOSTINFO_NODES_VM			0x08
-#define ZBX_HOSTINFO_NODES_DS			0x10
-#define ZBX_HOSTINFO_NODES_NET			0x20
-#define ZBX_HOSTINFO_NODES_DVS			0x40
-#define ZBX_HOSTINFO_NODES_MASK_ALL									\
-		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST | \
-		ZBX_HOSTINFO_NODES_VM | ZBX_HOSTINFO_NODES_DS | ZBX_HOSTINFO_NODES_NET | ZBX_HOSTINFO_NODES_DVS)
-
 typedef struct
 {
 	zbx_uint64_t	id;
@@ -179,7 +168,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() evt_severities:%d", __func__, evt_severities->values_num);
 
 	return ret;
-#undef ZBX_POST_VMWARE_GET_EVT_SEVERITY
+#	undef ZBX_POST_VMWARE_GET_EVT_SEVERITY
 }
 
 /******************************************************************************
@@ -342,6 +331,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef	ZBX_POST_VMWARE_READ_PREVIOUS_EVENTS
 }
 
 /******************************************************************************
@@ -442,6 +432,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef ZBX_POST_VMWARE_DESTROY_EVENT_COLLECTOR
 }
 
 /******************************************************************************
@@ -461,7 +452,18 @@ out:
 static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, zbx_id_xmlnode_t xml_event,
 		xmlDoc *xdoc, const zbx_hashset_t *evt_severities, zbx_uint64_t *alloc_sz)
 {
-#	define	ZBX_XPATH_EVT_INFO(param)									\
+#define ZBX_HOSTINFO_NODES_DATACENTER		0x01
+#define ZBX_HOSTINFO_NODES_COMPRES		0x02
+#define ZBX_HOSTINFO_NODES_HOST			0x04
+#define ZBX_HOSTINFO_NODES_VM			0x08
+#define ZBX_HOSTINFO_NODES_DS			0x10
+#define ZBX_HOSTINFO_NODES_NET			0x20
+#define ZBX_HOSTINFO_NODES_DVS			0x40
+#define ZBX_HOSTINFO_NODES_MASK_ALL									\
+		(ZBX_HOSTINFO_NODES_DATACENTER | ZBX_HOSTINFO_NODES_COMPRES | ZBX_HOSTINFO_NODES_HOST | \
+		ZBX_HOSTINFO_NODES_VM | ZBX_HOSTINFO_NODES_DS | ZBX_HOSTINFO_NODES_NET | ZBX_HOSTINFO_NODES_DVS)
+
+#	define	ZBX_XPATH_EVT_INFO(param)				\
 		"*[local-name()='" param "']/*[local-name()='name']"
 #	define	ZBX_XPATH_EVT_ARGUMENT(key)									\
 		"*[local-name()='arguments'][*[local-name()='key'][text()='" key "']]/*[local-name()='value']"
@@ -595,6 +597,14 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
 		*alloc_sz += zbx_shmem_required_chunk_size(sz);
 
 	return SUCCEED;
+#undef ZBX_HOSTINFO_NODES_DATACENTER		0x01
+#undef ZBX_HOSTINFO_NODES_COMPRES		0x02
+#undef ZBX_HOSTINFO_NODES_HOST			0x04
+#undef ZBX_HOSTINFO_NODES_VM			0x08
+#undef ZBX_HOSTINFO_NODES_DS			0x10
+#undef ZBX_HOSTINFO_NODES_NET			0x20
+#undef ZBX_HOSTINFO_NODES_DVS			0x40
+#undef ZBX_HOSTINFO_NODES_MASK_ALL
 
 #	undef	ZBX_XPATH_EVT_INFO
 #	undef	ZBX_XPATH_EVT_ARGUMENT
