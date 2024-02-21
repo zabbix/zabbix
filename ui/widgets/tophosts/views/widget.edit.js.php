@@ -29,6 +29,7 @@ window.widget_tophosts_form = new class {
 		this._list_columns = document.getElementById('list_columns');
 
 		new CSortable(this._list_columns.querySelector('tbody'), {
+			selector_handle: 'div.<?= ZBX_STYLE_DRAG_ICON ?>',
 			freeze_end: 1
 		});
 
