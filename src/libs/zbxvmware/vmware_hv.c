@@ -522,7 +522,7 @@ static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *serv
  * Purpose: parses vmware hypervisor internal disks details info              *
  *                                                                            *
  * Parameters: xdoc       - [IN] reference to xml document with disks info    *
- *             dss        - [IN] all known Datastores                         *
+ *             dss        - [IN] all known datastores                         *
  *             disks_info - [OUT]                                             *
  *                                                                            *
  * Return value: count of updated disk objects                                *
@@ -740,8 +740,8 @@ clean:
  *             easyhandle - [IN] CURL handle                                  *
  *             hv_data    - [IN] hv data with scsi topology info              *
  *             hvid       - [IN] vmware hypervisor id                         *
- *             dss        - [IN] all known Datastores                         *
- *             vsan_uuid  - [IN] uuid of vsan Datastore                       *
+ *             dss        - [IN] all known datastores                         *
+ *             vsan_uuid  - [IN] uuid of vsan datastore                       *
  *             disks_info - [OUT]                                             *
  *             error      - [OUT] error message in case of failure            *
  *                                                                            *
@@ -1171,10 +1171,10 @@ clean:
 
 /******************************************************************************
  *                                                                            *
- * Purpose: searches for Datastore uuid with type equal to 'vsan'             *
+ * Purpose: searches for datastore uuid with type equal to 'vsan'             *
  *                                                                            *
- * Parameters: dss    - [IN] vector with all Datastores                       *
- *             hv_dss - [IN] vector with all Datastores attached to HV        *
+ * Parameters: dss    - [IN] vector with all datastores                       *
+ *             hv_dss - [IN] vector with all datastores attached to HV        *
  *                                                                            *
  * Return value: pointer to vsan DS uuid or NULL                              *
  *                                                                            *

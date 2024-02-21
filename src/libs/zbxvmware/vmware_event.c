@@ -616,11 +616,11 @@ static int	vmware_service_put_event_data(zbx_vector_vmware_event_ptr_t *events, 
  *                                                                            *
  * Parameters: events     - [IN/OUT] array of parsed events                   *
  *             last_key   - [IN] key of last parsed event                     *
- *             is_prop    - [IN] read events from RetrieveProperties XML      *
- *             xdoc       - [IN] XML document with eventlog records           *
+ *             is_prop    - [IN] read events from RetrieveProperties xml      *
+ *             xdoc       - [IN] xml document with eventlog records           *
  *             eventlog   - [IN] VMware event log state                       *
  *             alloc_sz   - [OUT] allocated memory size for events            *
- *             node_count - [OUT] count of XML event nodes                    *
+ *             node_count - [OUT] count of xml event nodes                    *
  *                                                                            *
  * Return value: count of events successfully parsed                          *
  *                                                                            *

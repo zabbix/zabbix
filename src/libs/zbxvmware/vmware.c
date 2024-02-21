@@ -696,7 +696,7 @@ static void	vmware_service_shared_free(zbx_vmware_service_t *service)
  *                                                                            *
  * Purpose: frees resources allocated to store datacenter data                *
  *                                                                            *
- * Parameters: datacenter   - [IN]                                            *
+ * Parameters: datacenter - [IN]                                              *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_datacenter_free(zbx_vmware_datacenter_t *datacenter)
@@ -830,7 +830,7 @@ static void	vmware_cluster_free(zbx_vmware_cluster_t *cluster)
  *                                                                            *
  * Purpose: frees resources allocated to store vmware service data            *
  *                                                                            *
- * Parameters: data   - [IN] vmware service data                              *
+ * Parameters: data - [IN] vmware service data                                *
  *                                                                            *
  ******************************************************************************/
 static void	vmware_data_free(zbx_vmware_data_t *data)
@@ -1032,6 +1032,7 @@ int	vmware_service_logout(zbx_vmware_service_t *service, CURL *easyhandle, char 
 			get_vmware_service_objects()[service->type].session_manager);
 
 	return zbx_soap_post(__func__, easyhandle, tmp, NULL, NULL, error);
+
 #	undef ZBX_POST_VMWARE_LOGOUT
 }
 
@@ -1421,7 +1422,7 @@ static int	vmware_cq_instance_id_compare(const void *d1, const void *d2)
 
 /******************************************************************************
  *                                                                            *
- * Purpose: sorting function to sort Datastore names vector by name           *
+ * Purpose: sorting function to sort datastore names vector by name           *
  *                                                                            *
  ******************************************************************************/
 int	zbx_vmware_dsname_compare(const void *d1, const void *d2)
@@ -1579,7 +1580,7 @@ out:
  * Purpose: retrieves status of specified vmware cluster                      *
  *                                                                            *
  * Parameters: easyhandle - [IN] CURL handle                                  *
- *             datastores - [IN] all available Datastores                     *
+ *             datastores - [IN] all available datastores                     *
  *             cluster    - [IN/OUT]                                          *
  *             cq_values  - [IN/OUT] vector with custom query entries         *
  *             error      - [OUT] error message in case of failure            *
@@ -1675,7 +1676,7 @@ out:
  *                                                                             *
  * Parameters: service       - [IN] vmware service                             *
  *             easyhandle    - [IN] CURL handle                                *
- *             datastores    - [IN] all available Datastores                   *
+ *             datastores    - [IN] all available datastores                   *
  *             cq_values     - [IN/OUT] vector with custom query entries       *
  *             clusters      - [OUT] pointer to resulting clusters vector      *
  *             resourcepools - [OUT] pointer to resulting resource pool vector *

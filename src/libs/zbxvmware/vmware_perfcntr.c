@@ -273,7 +273,7 @@ void	vmware_counter_free(zbx_vmware_counter_t *counter)
  *                                                                            *
  * Parameters: service      - [IN] vmware service                             *
  *             easyhandle   - [IN] CURL handle                                *
- *             type         - [IN] entity type (HostSystem, Datastore or      *
+ *             type         - [IN] entity type (HostSystem, datastore or      *
  *                                 VirtualMachine)                            *
  *             id           - [IN] entity id                                  *
  *             refresh_rate - [OUT] pointer to variable to store refresh rate *
@@ -673,9 +673,9 @@ void	vmware_service_update_perf_entities(zbx_vmware_service_t *service)
  * Purpose: updates vmware performance statistics data                        *
  *                                                                            *
  * Parameters: perfdata  - [OUT] performance counter values                   *
- *             xdoc      - [IN] XML document containing performance           *
+ *             xdoc      - [IN] xml document containing performance           *
  *                              counter values for all entities               *
- *             node      - [IN] XML node containing performance counter       *
+ *             node      - [IN] xml node containing performance counter       *
  *                              values for specified entity                   *
  *                                                                            *
  * Return value: SUCCEED - performance entity data was parsed                 *
@@ -953,7 +953,7 @@ static void	vmware_service_retrieve_perf_counters(zbx_vmware_service_t *service,
 				struct	tm st;
 				char	st_str[ZBX_XML_DATETIME];
 
-				/* add startTime for entity performance counter request for decrease XML data load */
+				/* add startTime for entity performance counter request for decrease xml data load */
 				st_raw = time(NULL) - SEC_PER_HOUR;
 				gmtime_r(&st_raw, &st);
 				strftime(st_str, sizeof(st_str), "%Y-%m-%dT%TZ", &st);

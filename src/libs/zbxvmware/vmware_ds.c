@@ -673,10 +673,10 @@ int	vmware_service_get_maxquerymetrics(CURL *easyhandle, zbx_vmware_service_t *s
 		goto out;
 	}
 
-	/* vmware article 2107096                                                                    */
-	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server */
-	/* To disable the limit, set a value to -1                                                   */
-	/* Edit the web.xml file. To disable the limit, set a value 0                                */
+	/* vmware article 2107096                                                                     */
+	/* Edit the config.vpxd.stats.maxQueryMetrics key in the advanced settings of vCenter Server. */
+	/* To disable the limit, set a value to -1.                                                   */
+	/* Edit the web.xml file. To disable the limit, set a value 0.                                */
 	if (-1 == atoi(val))
 	{
 		*max_qm = ZBX_MAXQUERYMETRICS_UNLIMITED;
