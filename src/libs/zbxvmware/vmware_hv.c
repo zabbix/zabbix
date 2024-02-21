@@ -36,40 +36,15 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_XPATH_HV_PNICS()										\
-	"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PhysicalNic']"	\
+#define ZBX_HVPROPMAP_EXT(property, func, ver)								\
+	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
+#define ZBX_HVPROPMAP(property)			\
+	ZBX_HVPROPMAP_EXT(property, NULL, 0)
 
 #define ZBX_XPATH_HV_SENSOR_STATUS(node, sensor)			\
 	ZBX_XPATH_PROP_NAME(node) "/*[local-name()='HostNumericSensorInfo']"				\
 		"[*[local-name()='name'][text()='" sensor "']]"						\
 		"/*[local-name()='healthState']/*[local-name()='key']"
-
-#define ZBX_XPATH_HV_DATASTORES()									\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
-	"/*[local-name()='val']/*[@type='Datastore']"
-
-#define ZBX_XPATH_HV_VMS()										\
-	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
-	"/*[local-name()='val']/*[@type='VirtualMachine']"
-
-#define ZBX_XPATH_HV_SCSI_TOPOLOGY					\
-		ZBX_XPATH_PROP_NAME("config.storageDevice.scsiTopology")				\
-		"/*[local-name()='adapter']/*[local-name()='target']"					\
-		"/*[local-name()='lun']/*[local-name()='scsiLun']"
-
-#define ZBX_XPATH_HV_MULTIPATH(state)					\
-		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"			\
-		"/*[local-name()='lun'][*[local-name()='lun'][text()='%s']][1]"				\
-		"/*[local-name()='path']" state ")"
-
-#define ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
-#define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
-		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
-
-#define ZBX_HVPROPMAP_EXT(property, func, ver)								\
-	{property, ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE(property), func, ver}
-#define ZBX_HVPROPMAP(property)			\
-	ZBX_HVPROPMAP_EXT(property, NULL, 0)
 
 static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP("summary.quickStats.overallCpuUsage"),	/* ZBX_VMWARE_HVPROP_OVERALL_CPU_USAGE */
@@ -101,13 +76,9 @@ static zbx_vmware_propmap_t	hv_propmap[] = {
 	ZBX_HVPROPMAP_EXT("runtime.healthSystemRuntime.hardwareStatusInfo",
 			zbx_xmlnode_to_json, 0)			/* ZBX_VMWARE_HVPROP_HW_SENSOR */
 };
-
-#define ZBX_XPATH_NAME_BY_TYPE(type)									\
-	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"			\
-	"/*[local-name()='val']"
-
-#define ZBX_XPATH_HV_PARENTID										\
-	ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
+#undef ZBX_XPATH_HV_SENSOR_STATUS
+#undef ZBX_HVPROPMAP_EXT
+#undef ZBX_HVPROPMAP
 
 #define ZBX_XPATH_HV_PARENTFOLDERNAME(parent_id)							\
 	"/*/*/*/*/*[local-name()='objects']["								\
@@ -431,6 +402,14 @@ static int	vmware_hv_get_parent_data(const zbx_vmware_service_t *service, CURL *
 			"<ns0:pathSet>name</ns0:pathSet>"							\
 		"</ns0:propSet>"
 
+
+#	define ZBX_XPATH_HV_PARENTID										\
+		ZBX_XPATH_PROP_OBJECT(ZBX_VMWARE_SOAP_HV) ZBX_XPATH_PROP_NAME_NODE("parent")
+
+#define ZBX_XPATH_NAME_BY_TYPE(type)										\
+	ZBX_XPATH_PROP_OBJECT(type) "*[local-name()='propSet'][*[local-name()='name']]"				\
+	"/*[local-name()='val']"
+
 	char	tmp[MAX_STRING_LEN];
 	int	ret = FAIL;
 	xmlDoc	*doc = NULL;
@@ -481,20 +460,21 @@ out:
 #	undef	ZBX_POST_HV_DATACENTER_NAME
 #	undef	ZBX_POST_SOAP_FOLDER
 #	undef	ZBX_POST_SOAP_CUSTER
+#	undef	ZBX_XPATH_HV_PARENTID
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: gets the vmware hypervisor data about ds multipath                *
+ * Purpose: gets vmware hypervisor data about ds multipath                    *
  *                                                                            *
- * Parameters: service      - [IN] the vmware service                         *
- *             easyhandle   - [IN] the CURL handle                            *
- *             hvid         - [IN] the vmware hypervisor id                   *
- *             xdoc         - [OUT] a reference to output xml document        *
- *             error        - [OUT] the error message in the case of failure  *
+ * Parameters: service    - [IN] vmware service                               *
+ *             easyhandle - [IN] CURL handle                                  *
+ *             hvid       - [IN] vmware hypervisor id                         *
+ *             xdoc       - [OUT] reference to output xml document            *
+ *             error      - [OUT] error message in case of failure            *
  *                                                                            *
- * Return value: SUCCEED - the operation has completed successfully           *
- *               FAIL    - the operation has failed                           *
+ * Return value: SUCCEED - operation has completed successfully               *
+ *               FAIL    - operation has failed                               *
  *                                                                            *
  ******************************************************************************/
 static int	vmware_service_hv_get_multipath_data(const zbx_vmware_service_t *service, CURL *easyhandle,
@@ -555,7 +535,6 @@ static int	vmware_service_hv_disks_parse_info(xmlDoc *xdoc, const zbx_vector_vmw
 #	define ZBX_XPATH_PSET		"/*/*/*/*/*/*[local-name()='propSet']"
 #	define ZBX_XPATH_LUN		"substring-before(substring-after(*[local-name()='name'],'\"'),'\"')"
 #	define ZBX_XPATH_LUN_PR_NAME	"substring-after(*[local-name()='name'],'\"].')"
-
 
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
@@ -673,6 +652,7 @@ clean:
 	return created;
 
 #	undef SCSILUN_PROP_NUM
+#	undef ZBX_XPATH_LUN
 #	undef ZBX_XPATH_LUN_PR_NAME
 #	undef ZBX_XPATH_PSET
 }
@@ -681,11 +661,11 @@ static int	vmware_diskinfo_diskname_compare(const void *d1, const void *d2);
 
 /******************************************************************************
  *                                                                            *
- * Purpose: parse the vmware hypervisor vsan disks details info               *
+ * Purpose: parse vmware hypervisor vsan disks details info                   *
  *                                                                            *
- * Parameters: xdoc       - [IN] - a reference to xml document with disks info*
- *             vsan_uuid  - [IN] - uuid of vsan DS                            *
- *             disks_info - [IN/OUT] - collected the hv internal disks        *
+ * Parameters: xdoc       - [IN] reference to xml document with disks info    *
+ *             vsan_uuid  - [IN] uuid of vsan DS                              *
+ *             disks_info - [IN/OUT] collected hv internal disks              *
  *                                                                            *
  * Return value: count of updated vsan disk objects                           *
  *                                                                            *
@@ -800,6 +780,11 @@ static int	vmware_service_hv_disks_get_info(const zbx_vmware_service_t *service,
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].revision</ns0:pathSet>"		\
 		"<ns0:pathSet>config.storageDevice.scsiLun[\"%s\"].serialNumber</ns0:pathSet>"
 
+#	define ZBX_XPATH_HV_SCSI_TOPOLOGY								\
+		ZBX_XPATH_PROP_NAME("config.storageDevice.scsiTopology")				\
+		"/*[local-name()='adapter']/*[local-name()='target']"					\
+		"/*[local-name()='lun']/*[local-name()='scsiLun']"
+
 	zbx_vector_str_t		scsi_luns;
 	xmlDoc				*doc = NULL, *doc_dinfo = NULL;
 	zbx_property_collection_iter	*iter = NULL;
@@ -891,6 +876,7 @@ out:
 
 #	undef	ZBX_POST_SCSI_INFO
 #	undef	ZBX_POST_HV_DISK_INFO
+#	undef	ZBX_XPATH_HV_SCSI_TOPOLOGY
 }
 
 /******************************************************************************
@@ -919,8 +905,7 @@ static int	vmware_diskinfo_diskname_compare(const void *d1, const void *d2)
  ******************************************************************************/
 static int	vmware_v4mask2pefix(const char *mask)
 {
-#	define	V4MASK_MAX	32
-
+#define	V4MASK_MAX	32
 	struct in_addr	inaddr;
 	int		p = 0;
 
@@ -934,15 +919,14 @@ static int	vmware_v4mask2pefix(const char *mask)
 	}
 
 	return p;
-
-#	undef	V4MASK_MAX
+#undef	V4MASK_MAX
 }
 
 /******************************************************************************
  *                                                                            *
- * Purpose: Search HV management interface ip value from an xml data          *
+ * Purpose: searches HV management interface ip value from xml data           *
  *                                                                            *
- * Parameters: xdoc   - [IN] XML document                                     *
+ * Parameters: xdoc - [IN] xml document                                       *
  *                                                                            *
  * Return: Upon successful completion the function return string with ip.     *
  *         Otherwise, NULL is returned.                                       *
@@ -950,24 +934,24 @@ static int	vmware_v4mask2pefix(const char *mask)
  ******************************************************************************/
 static char	*vmware_hv_ip_search(xmlDoc *xdoc)
 {
-#define ZBX_XPATH_HV_IP(nicType, addr)									\
+#	define ZBX_XPATH_HV_IP(nicType, addr)								\
 		ZBX_XNN("VirtualNicManagerNetConfig") "[" ZBX_XNN("nicType") "[text()='"nicType "']]/"	\
 		ZBX_XNN("candidateVnic") "[" ZBX_XNN("key") "=../" ZBX_XNN("selectedVnic") "]//"	\
 		ZBX_XNN("ip") ZBX_XPATH_LN(addr)
 
-#define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
-#define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")				\
+#	define ZBX_XPATH_HV_IPV4(nicType)	ZBX_XPATH_HV_IP(nicType, "ipAddress")
+#	define ZBX_XPATH_HV_IPV6(nicType)	ZBX_XPATH_HV_IP(nicType, "ipV6Config")			\
 		ZBX_XPATH_LN("ipV6Address") ZBX_XPATH_LN("ipAddress")
 
-#define ZBX_XPATH_HV_NIC(nicType, param)								\
+#	define ZBX_XPATH_HV_NIC(nicType, param)								\
 		ZBX_XNN("VirtualNicManagerNetConfig") "[" ZBX_XNN("nicType") "[text()='"nicType "']]/"	\
 		ZBX_XNN("candidateVnic") "[" ZBX_XNN("key") "='%s']//" ZBX_XNN("ip") ZBX_XPATH_LN(param)
 
-#define ZBX_XPATH_HV_NIC_IPV4(nicType)	ZBX_XPATH_HV_NIC(nicType, "ipAddress")
-#define ZBX_XPATH_HV_NIC_IPV6(nicType)	ZBX_XPATH_HV_NIC(nicType, "ipV6Config")				\
+#	define ZBX_XPATH_HV_NIC_IPV4(nicType)	ZBX_XPATH_HV_NIC(nicType, "ipAddress")
+#	define ZBX_XPATH_HV_NIC_IPV6(nicType)	ZBX_XPATH_HV_NIC(nicType, "ipV6Config")			\
 		ZBX_XPATH_LN("ipV6Address") ZBX_XPATH_LN("ipAddress")
-#define ZBX_XPATH_HV_NIC_V4MASK(nicType)	ZBX_XPATH_HV_NIC(nicType, "subnetMask")
-#define ZBX_XPATH_HV_NIC_V6MASK(nicType)	ZBX_XPATH_HV_NIC(nicType, "ipV6Config")			\
+#	define ZBX_XPATH_HV_NIC_V4MASK(nicType)	ZBX_XPATH_HV_NIC(nicType, "subnetMask")
+#	define ZBX_XPATH_HV_NIC_V6MASK(nicType)	ZBX_XPATH_HV_NIC(nicType, "ipV6Config")			\
 		ZBX_XPATH_LN("ipV6Address") ZBX_XPATH_LN("prefixLength")
 
 	xmlXPathContext		*xpathCtx;
@@ -1110,10 +1094,22 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() ip:%s", __func__, ZBX_NULL2EMPTY_STR(value));
 
 	return value;
+
+#	undef ZBX_XPATH_HV_IP
+#	undef ZBX_XPATH_HV_IPV4
+#	undef ZBX_XPATH_HV_IPV6
+#	undef ZBX_XPATH_HV_NIC
+#	undef ZBX_XPATH_HV_NIC_IPV4
+#	undef ZBX_XPATH_HV_NIC_IPV6
+#	undef ZBX_XPATH_HV_NIC_V4MASK
+#	undef ZBX_XPATH_HV_NIC_V6MASK
 }
 
 static void	vmware_service_get_hv_pnics_data(xmlDoc *details, zbx_vector_vmware_pnic_ptr_t *nics)
 {
+#	define ZBX_XPATH_HV_PNICS()										\
+		"/*/*/*/*/*/*[local-name()='propSet']/*[local-name()='val']/*[local-name()='PhysicalNic']"	\
+
 	xmlXPathContext	*xpathCtx;
 	xmlXPathObject	*xpathObj;
 	xmlNodeSetPtr	nodeset;
@@ -1169,6 +1165,8 @@ clean:
 	xmlXPathFreeContext(xpathCtx);
 
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() found:%d", __func__, i);
+
+#	undef ZBX_XPATH_HV_PNICS
 }
 
 /******************************************************************************
@@ -1206,15 +1204,15 @@ static const char	*vmware_hv_vsan_uuid(zbx_vector_vmware_datastore_ptr_t *dss, z
  *                                                                            *
  * Purpose: initializes vmware hypervisor object                              *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             id           - [IN] vmware hypervisor id                       *
- *             dss          - [IN/OUT] vector with all Datastores             *
- *             rpools       - [IN/OUT] vector with all Resource Pools         *
- *             cq_values    - [IN/OUT] vector with custom query entries       *
- *             alarms_data  - [IN/OUT] vector with all alarms                 *
- *             hv           - [OUT] hypervisor object (must be allocated)     *
- *             error        - [OUT] error message in case of failure          *
+ * Parameters: service     - [IN] vmware service                              *
+ *             easyhandle  - [IN] CURL handle                                 *
+ *             id          - [IN] vmware hypervisor id                        *
+ *             dss         - [IN/OUT] vector with all datastores              *
+ *             rpools      - [IN/OUT] vector with all Resource Pools          *
+ *             cq_values   - [IN/OUT] vector with custom query entries        *
+ *             alarms_data - [IN/OUT] vector with all alarms                  *
+ *             hv          - [OUT] hypervisor object (must be allocated)      *
+ *             error       - [OUT] error message in case of failure           *
  *                                                                            *
  * Return value: SUCCEED - hypervisor object was initialized successfully     *
  *               FAIL    - otherwise                                          *
@@ -1225,6 +1223,23 @@ int	vmware_service_init_hv(zbx_vmware_service_t *service, CURL *easyhandle, cons
 		zbx_vector_cq_value_ptr_t *cq_values, zbx_vmware_alarms_data_t *alarms_data, zbx_vmware_hv_t *hv,
 		char **error)
 {
+#	define ZBX_XPATH_HV_DATASTORES()									\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='datastore']]"		\
+		"/*[local-name()='val']/*[@type='Datastore']"
+
+#	define ZBX_XPATH_HV_VMS()										\
+		"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='vm']]"			\
+		"/*[local-name()='val']/*[@type='VirtualMachine']"
+
+#	define ZBX_XPATH_HV_MULTIPATH(state)									\
+		"count(/*/*/*/*/*/*[local-name()='propSet'][1]/*[local-name()='val']"				\
+		"/*[local-name()='lun'][*[local-name()='lun'][text()='%s']][1]"					\
+		"/*[local-name()='path']" state ")"
+
+#	define	ZBX_XPATH_HV_MULTIPATH_PATHS()	ZBX_XPATH_HV_MULTIPATH("")
+#	define ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS()								\
+		ZBX_XPATH_HV_MULTIPATH("[*[local-name()='state'][text()='active']]")
+
 	char				*value, *cq_prop;
 	int				j, ret;
 	xmlDoc				*details = NULL, *multipath_data = NULL;
@@ -1429,6 +1444,12 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+
+#	undef ZBX_XPATH_HV_DATASTORES
+#	undef ZBX_XPATH_HV_VMS
+#	undef ZBX_XPATH_HV_MULTIPATH
+#	undef ZBX_XPATH_HV_MULTIPATH_PATHS
+#	undef ZBX_XPATH_HV_MULTIPATH_ACTIVE_PATHS
 }
 
 #endif /* defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL) */
