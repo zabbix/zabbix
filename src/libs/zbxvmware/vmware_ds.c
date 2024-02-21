@@ -29,14 +29,7 @@
 
 #if defined(HAVE_LIBXML2) && defined(HAVE_LIBCURL)
 
-#define ZBX_VMWARE_DS_REFRESH_VERSION	6
-
 ZBX_PTR_VECTOR_IMPL(vmware_datastore_ptr, zbx_vmware_datastore_t *)
-
-#define ZBX_XPATH_PROP_SUFFIX(property)									\
-	"*[local-name()='propSet'][*[local-name()='name']"						\
-	"[substring(text(),string-length(text())-string-length('" property "')+1)='" property "']]"	\
-	"/*[local-name()='val']"
 
 /******************************************************************************
  *                                                                            *
@@ -204,17 +197,18 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s():%s", __func__, zbx_result_string(ret));
 
 	return ret;
+#	undef ZBX_POST_REFRESH_DATASTORE
 }
 
 /******************************************************************************
  *                                                                            *
  * Purpose: creates vmware hypervisor datastore object                        *
  *                                                                            *
- * Parameters: service      - [IN] vmware service                             *
- *             easyhandle   - [IN] CURL handle                                *
- *             id           - [IN] datastore id                               *
- *             cq_values    - [IN/OUT] custom query values                    *
- *             alarms_data  - [IN/OUT] all alarms with cache                  *
+ * Parameters: service     - [IN] vmware service                              *
+ *             easyhandle  - [IN] CURL handle                                 *
+ *             id          - [IN] datastore id                                *
+ *             cq_values   - [IN/OUT] custom query values                     *
+ *             alarms_data - [IN/OUT] all alarms with cache                   *
  *                                                                            *
  * Return value: The created datastore object or NULL if an error was         *
  *               detected.                                                    *
@@ -223,7 +217,9 @@ out:
 zbx_vmware_datastore_t	*vmware_service_create_datastore(const zbx_vmware_service_t *service, CURL *easyhandle,
 		const char *id, zbx_vector_cq_value_ptr_t *cq_values, zbx_vmware_alarms_data_t *alarms_data)
 {
-#	define ZBX_XPATH_DATASTORE_SUMMARY(property)						\
+#define ZBX_VMWARE_DS_REFRESH_VERSION	6
+
+#	define ZBX_XPATH_DATASTORE_SUMMARY(property)			\
 	"/*/*/*/*/*/*[local-name()='propSet'][*[local-name()='name'][text()='summary']]"	\
 		"/*[local-name()='val']/*[local-name()='" property "']"
 
@@ -364,6 +360,7 @@ out:
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s()", __func__);
 
 	return datastore;
+#undef ZBX_VMWARE_DS_REFRESH_VERSION
 
 #	undef ZBX_XPATH_DATASTORE_SUMMARY
 #	undef ZBX_POST_DATASTORE_GET
@@ -382,6 +379,11 @@ out:
  ******************************************************************************/
 static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, const char *ds_id)
 {
+#	define ZBX_XPATH_PROP_SUFFIX(property)									\
+		"*[local-name()='propSet'][*[local-name()='name']"						\
+		"[substring(text(),string-length(text())-string-length('" property "')+1)='" property "']]"	\
+		"/*[local-name()='val']"
+
 	zbx_uint64_t	mi_access = ZBX_VMWARE_DS_NONE;
 	char		*value;
 
@@ -422,6 +424,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
 	zabbix_log(LOG_LEVEL_DEBUG, "End of %s() mountinfo:" ZBX_FS_UI64, __func__, mi_access);
 
 	return mi_access;
+#	undef ZBX_XPATH_PROP_SUFFIX
 }
 
 /******************************************************************************
@@ -432,7 +435,7 @@ static zbx_uint64_t	vmware_hv_get_ds_access(xmlDoc *xdoc, xmlNode *ds_node, cons
  *             hv_dss  - [IN] vector with all DS connected to HV              *
  *             hv_uuid - [IN] uuid of HV                                      *
  *             hv_id   - [IN] id of HV (for logging)                          *
- *             dss     - [IN/OUT] vector with all Datastores                  *
+ *             dss     - [IN/OUT] vector with all datastores                  *
  *                                                                            *
  * Return value: count of updated DS                                          *
  *                                                                            *
@@ -519,7 +522,7 @@ clean:
  *             hv_uuid      - [IN] vmware hypervisor uuid                     *
  *             hv_id        - [IN] vmware hypervisor id                       *
  *             hv_dss       - [IN] vector with all DS connected to HV         *
- *             dss          - [IN/OUT] vector with all Datastores             *
+ *             dss          - [IN/OUT] vector with all datastores             *
  *             error        - [OUT] error message in case of failure          *
  *                                                                            *
  * Return value: SUCCEED - access state was updated successfully              *
