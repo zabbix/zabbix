@@ -29,7 +29,7 @@ $inline_js = getPagePostJs().$this->readJsFile('popup.condition.edit.js.php');
 $form = (new CForm())
 	->setId('popup.condition')
 	->setName('popup.condition')
-	->setAttribute('aria-labeledby', CHtmlPage::PAGE_TITLE_ID)
+	->setAttribute('aria-labelledby', CHtmlPage::PAGE_TITLE_ID)
 	->addVar('action', $data['action'])
 	->addVar('row_index', $data['row_index'] ? $data['row_index'] : 0)
 	->addVar('type', $data['type']);

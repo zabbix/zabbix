@@ -274,12 +274,6 @@ static int	pb_history_export(struct zbx_json *j, int records_num, const zbx_vect
 		if (HOST_STATUS_MONITORED != dc_items[i].host.status)
 			continue;
 
-		if (ZBX_PROXY_HISTORY_FLAG_NOVALUE == (row->flags & ZBX_PROXY_HISTORY_MASK_NOVALUE))
-		{
-			if (SUCCEED != zbx_is_counted_in_item_queue(dc_items[i].type, dc_items[i].key_orig))
-				continue;
-		}
-
 		if (0 == records_num)
 			zbx_json_addarray(j, ZBX_PROTO_TAG_HISTORY_DATA);
 

@@ -60,7 +60,7 @@ This template has been tested on:
 |{$NET.IFNAME.NOT_MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level. Filter out loopbacks, sup-fc0, nulls, docker veth links and docker0 bridge by default.</p>|`Macro too long. Please see the template.`|
 |{$NET.IFOPERSTATUS.MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level.</p>|`^.*$`|
 |{$NET.IFOPERSTATUS.NOT_MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level. Ignore notPresent(6) by default.</p>|`^6$`|
-|{$NET.IFADMINSTATUS.MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level. Ignore notPresent(6) by default.</p>|`^.*`|
+|{$NET.IFADMINSTATUS.MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level.</p>|`^.*`|
 |{$NET.IFADMINSTATUS.NOT_MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level. Ignore down(2) administrative status by default.</p>|`^2$`|
 |{$NET.IFDESCR.MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level.</p>|`.*`|
 |{$NET.IFDESCR.NOT_MATCHES}|<p>This macro is used in network interface discovery. Can be overridden on the host level.</p>|`CHANGE_IF_NEEDED`|
