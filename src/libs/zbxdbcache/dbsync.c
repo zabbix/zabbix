@@ -332,6 +332,23 @@ void	zbx_dbsync_clear(zbx_dbsync_t *sync)
 
 /******************************************************************************
  *                                                                            *
+ * Purpose: gets the number of rows                                           *
+ *                                                                            *
+ * Parameters: sync - [IN] the changeset                                      *
+ *                                                                            *
+ * Return value: number of rows to sync                                       *
+ *                                                                            *
+ ******************************************************************************/
+int	zbx_dbsync_get_row_num(const zbx_dbsync_t *sync)
+{
+	if (ZBX_DBSYNC_UPDATE == sync->mode)
+		return sync->rows.values_num;
+
+	return zbx_db_get_row_num(sync->dbresult);
+}
+
+/******************************************************************************
+ *                                                                            *
  * Purpose: gets the next row from the changeset                              *
  *                                                                            *
  * Parameters: sync  - [IN] the changeset                                     *

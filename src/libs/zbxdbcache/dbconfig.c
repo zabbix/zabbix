@@ -3154,7 +3154,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 
 	if (0 == config->items.num_slots)
 	{
-		int	row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->items, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->items_hk, MAX(row_num, 100));
@@ -3497,7 +3497,7 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 
 	if (0 == config->items.num_slots)
 	{
-		int	row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->item_discovery, MAX(row_num, 100));
 		clean_sync = 1;
@@ -3626,7 +3626,7 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 	if (0 == config->preprocitems.num_slots)
 	{
-		int	row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->triggers, MAX(row_num, 100));
 		clean_sync = 1;
@@ -4198,7 +4198,7 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 	if (0 == config->functions.num_slots)
 	{
-		int	row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->functions, MAX(row_num, 100));
 		clean_sync = 1;
@@ -5181,7 +5181,7 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 	if (0 == config->item_tags.num_slots)
 	{
-		int	row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->item_tags, MAX(row_num, 100));
 		clean_sync = 1;
@@ -5419,7 +5419,7 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 	if (0 == config->preprocitems.num_slots)
 	{
-		int	row_num = zbx_db_get_row_num(sync->dbresult);
+		int	row_num = zbx_dbsync_get_row_num(sync);
 
 		zbx_hashset_reserve(&config->preprocitems, MAX(row_num, 100));
 		zbx_hashset_reserve(&config->preprocops, MAX(row_num, 100));
