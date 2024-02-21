@@ -1193,7 +1193,7 @@ int	main(int argc, char **argv)
 	zbx_config_tls = zbx_config_tls_new();
 	zbx_config_dbhigh = zbx_config_dbhigh_new();
 
-	/* Warning: initialize libraries here before using. */
+	/* initialize libraries before using */
 	zbx_init_library_common(zbx_log_impl, get_zbx_progname);
 	zbx_init_library_nix(get_zbx_progname);
 	zbx_init_library_dbupgrade(get_zbx_program_type, get_zbx_config_timeout);
