@@ -1601,7 +1601,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (FAIL == dbsync_compare_str(dbrow[17], sshitem->privatekey))
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[13], sshitem->params))
+		if (FAIL == dbsync_compare_str(dbrow[11], sshitem->params))
 			return FAIL;
 	}
 
@@ -1628,7 +1628,7 @@ static int	dbsync_compare_item(const ZBX_DC_ITEM *item, const DB_ROW dbrow)
 		if (NULL == scriptitem)
 			return FAIL;
 
-		if (FAIL == dbsync_compare_str(dbrow[14], scriptitem->timeout))
+		if (FAIL == dbsync_compare_str(dbrow[30], scriptitem->timeout))
 			return FAIL;
 
 		if (FAIL == dbsync_compare_str(dbrow[11], scriptitem->script))
