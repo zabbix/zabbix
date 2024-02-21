@@ -128,18 +128,16 @@ class CTabFilter extends CBaseComponent {
 		let index = this._items.indexOf(item);
 
 		if (index != -1) {
+			item.delete();
+			this._items.splice(index, 1);
+			this._items.forEach((item, index) => item._index = index);
+
 			this.setSelectedItem(this._items[index - 1]);
 
 			if (item._expanded) {
 				this._active_item.setExpanded();
 			}
 
-			item.delete();
-			delete this._items[index];
-			this._items.splice(index, 1);
-			this._items.forEach((item, index) => {
-				item._index = index;
-			});
 			this._active_item.setBrowserLocation(this._active_item.getFilterParams());
 		}
 	}
