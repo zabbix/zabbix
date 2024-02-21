@@ -932,7 +932,7 @@ void	DCdump_configuration(void);
 
 /* utility functions */
 void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
-void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size);
+void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found);
 
 /* string pool */
 void	zbx_strpool_release(const char *str);

@@ -426,21 +426,23 @@ static void	DCincrease_disable_until(ZBX_DC_INTERFACE *interface, int now)
  *     size    - [IN] size of element to search for                           *
  *     found   - [OUT flag. 0 - element did not exist, it was created.        *
  *                          1 - existing element was found.                   *
+ *     uniq   - [IN] flag.  0 - search if element already exists.             *
+ *                          ZBX_UNIQ_ENTRY - skip search                      *
  *                                                                            *
  * Return value: pointer to the found or created element                      *
  *                                                                            *
  ******************************************************************************/
-void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
+static void	*DCfind_id_ext(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found, unsigned char uniq)
 {
 	void		*ptr;
 	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCfind_id() can be called for */
 
-	if (NULL == (ptr = zbx_hashset_search(hashset, &id)))
+	if (ZBX_UNIQ_ENTRY == uniq || NULL == (ptr = zbx_hashset_search(hashset, &id)))
 	{
 		*found = 0;
 
 		buffer[0] = id;
-		ptr = zbx_hashset_insert(hashset, &buffer[0], size);
+		ptr = zbx_hashset_insert_ext(hashset, &buffer[0], size, 0, uniq);
 	}
 	else
 	{
@@ -450,13 +452,14 @@ void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found
 	return ptr;
 }
 
-void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size)
+void	*DCfind_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
 {
-	zbx_uint64_t	buffer[1024];	/* adjust buffer size to accommodate any type DCinsert_id() can be called for */
+	return DCfind_id_ext(hashset, id, size, found, 0);
+}
 
-	buffer[0] = id;
-
-	return zbx_hashset_insert_ext(hashset, buffer, size, 0, ZBX_UNIQ_ENTRY);
+void	*DCinsert_id(zbx_hashset_t *hashset, zbx_uint64_t id, size_t size, int *found)
+{
+	return DCfind_id_ext(hashset, id, size, found, ZBX_UNIQ_ENTRY);
 }
 
 ZBX_DC_ITEM	*DCfind_item(zbx_uint64_t hostid, const char *key)
@@ -3179,10 +3182,7 @@ static void	DCsync_items(zbx_dbsync_t *sync, int flags, zbx_vector_dc_item_ptr_t
 		}
 
 		if (1 == clean_sync)
-		{
-			found = 0;
-			item = (ZBX_DC_ITEM *)DCinsert_id(&config->items, itemid, sizeof(ZBX_DC_ITEM));
-		}
+			item = (ZBX_DC_ITEM *)DCinsert_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 		else
 			item = (ZBX_DC_ITEM *)DCfind_id(&config->items, itemid, sizeof(ZBX_DC_ITEM), &found);
 
@@ -3513,7 +3513,7 @@ static void	DCsync_item_discovery(zbx_dbsync_t *sync)
 		if (1 == clean_sync)
 		{
 			item_discovery = (ZBX_DC_ITEM_DISCOVERY *)DCinsert_id(&config->item_discovery, itemid,
-					sizeof(ZBX_DC_ITEM_DISCOVERY));
+					sizeof(ZBX_DC_ITEM_DISCOVERY), &found);
 		}
 		else
 		{
@@ -3642,8 +3642,8 @@ static void	DCsync_triggers(zbx_dbsync_t *sync)
 
 		if (1 == clean_sync)
 		{
-			found = 0;
-			trigger = (ZBX_DC_TRIGGER *)DCinsert_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER));
+			trigger = (ZBX_DC_TRIGGER *)DCinsert_id(&config->triggers, triggerid, sizeof(ZBX_DC_TRIGGER),
+					&found);
 		}
 		else
 		{
@@ -4229,9 +4229,8 @@ static void	DCsync_functions(zbx_dbsync_t *sync)
 
 		if (1 == clean_sync)
 		{
-			found = 0;
 			function = (ZBX_DC_FUNCTION *)DCinsert_id(&config->functions, functionid,
-					sizeof(ZBX_DC_FUNCTION));
+					sizeof(ZBX_DC_FUNCTION), &found);
 		}
 		else
 		{
@@ -5202,9 +5201,8 @@ static void	DCsync_item_tags(zbx_dbsync_t *sync)
 
 		if (1 == clean_sync)
 		{
-			found = 0;
 			item_tag = (zbx_dc_item_tag_t *)DCinsert_id(&config->item_tags, itemtagid,
-					sizeof(zbx_dc_item_tag_t));
+					sizeof(zbx_dc_item_tag_t), &found);
 		}
 		else
 		{
@@ -5456,9 +5454,8 @@ static void	DCsync_item_preproc(zbx_dbsync_t *sync, int timestamp)
 
 		if (1 == clean_sync)
 		{
-			found = 0;
 			op = (zbx_dc_preproc_op_t *)DCinsert_id(&config->preprocops, item_preprocid,
-					sizeof(zbx_dc_preproc_op_t));
+					sizeof(zbx_dc_preproc_op_t), &found);
 		}
 		else
 		{
