@@ -110,7 +110,7 @@ static void	send_proxy_data(zbx_socket_t *sock, const zbx_timespec_t *ts,
 	struct zbx_json		j;
 	zbx_uint64_t		areg_lastid = 0, history_lastid = 0, discovery_lastid = 0;
 	char			*error = NULL, *buffer = NULL;
-	int			availability_ts, more_history, more_discovery, more_areg, proxy_delay, more;
+	int			availability_ts, more_history = 0, more_discovery = 0, more_areg = 0, proxy_delay, more;
 	zbx_vector_tm_task_t	tasks;
 	struct zbx_json_parse	jp, jp_tasks;
 	size_t			buffer_size, reserved;
