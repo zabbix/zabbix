@@ -334,6 +334,9 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 	{
 		zbx_db_result_t	result;
 		zbx_db_row_t	row;
+		char		*idname;
+
+		idname = zbx_dsprintf(NULL, "o.%s", id_name);
 
 		zbx_snprintf_alloc(&sql, &sql_alloc, &sql_offset,
 				"select o.%s,o.status,d.disable_source"
@@ -341,7 +344,8 @@ void	lld_disable_lost_objects(const char *table_obj, const char *table, const ch
 				" join %s d on o.%s=d.%s"
 				" where",
 				id_name, table_obj, table, id_name, id_name);
-		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, id_name, upd_ids.values, upd_ids.values_num);
+		zbx_db_add_condition_alloc(&sql, &sql_alloc, &sql_offset, idname, upd_ids.values, upd_ids.values_num);
+		zbx_free(idname);
 
 		result = zbx_db_select("%s", sql);
 		sql_offset = 0;
