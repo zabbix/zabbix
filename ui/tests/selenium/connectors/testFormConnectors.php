@@ -1107,9 +1107,7 @@ class testFormConnectors extends CWebTest {
 	 * @param boolean $update	updating is performed
 	 */
 	public function checkConnectorForm($data, $update = false) {
-		$expected = CTestArrayHelper::get($data, 'expected', TEST_GOOD);
-
-		if ($expected === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$old_hash = CDBHelper::getHash(self::CONNECTOR_SQL);
 		}
 
@@ -1126,7 +1124,7 @@ class testFormConnectors extends CWebTest {
 		$form = $dialog->asForm();
 
 		// Add a prefix to the name of the Connector in case of update scenario to avoid duplicate names.
-		if ($update && CTesTArrayHelper::get($data, 'expected', TEST_GOOD) === TEST_GOOD) {
+		if ($update && $data['expected'] === TEST_GOOD) {
 			$data['fields']['Name'] = 'Update: '.$data['fields']['Name'];
 		}
 
@@ -1137,7 +1135,7 @@ class testFormConnectors extends CWebTest {
 		$form->fill($data['fields']);
 		$form->submit();
 
-		if ($expected === TEST_BAD) {
+		if ($data['expected'] === TEST_BAD) {
 			$this->assertMessage(TEST_BAD, ($update ? 'Cannot update connector' : 'Cannot create connector'), $data['error']);
 			$this->assertEquals($old_hash, CDBHelper::getHash(self::CONNECTOR_SQL));
 			$dialog->close();
