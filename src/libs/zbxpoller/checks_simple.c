@@ -179,12 +179,10 @@ static zbx_vmcheck_t	vmchecks[] =
  ******************************************************************************/
 static int	get_vmware_function(const char *key, vmfunc_t *vmfunc)
 {
-	zbx_vmcheck_t	*check;
-
 	if (0 != strncmp(key, ZBX_VMWARE_PREFIX, ZBX_CONST_STRLEN(ZBX_VMWARE_PREFIX)))
 		return FAIL;
 
-	for (check = vmchecks; NULL != check->key; check++)
+	for (zbx_vmcheck_t *check = vmchecks; NULL != check->key; check++)
 	{
 		if (0 == strcmp(key + ZBX_CONST_STRLEN(ZBX_VMWARE_PREFIX), check->key))
 		{

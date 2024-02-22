@@ -24,5 +24,4 @@
 
 int	telnet_run(zbx_dc_item_t *item, AGENT_RESULT *result, const char *encoding, int timeout,
 		const char *config_source_ip);
-
 #endif

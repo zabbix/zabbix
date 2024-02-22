@@ -20,8 +20,7 @@
 #ifndef ZABBIX_SSH_RUN_H
 #define ZABBIX_SSH_RUN_H
 
-#include "config.h"
-#include "module.h"
+#include "zbxcommon.h"
 
 #if defined(HAVE_SSH2) || defined(HAVE_SSH)
 #include "zbxcacheconfig.h"

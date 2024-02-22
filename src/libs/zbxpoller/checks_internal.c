@@ -406,11 +406,10 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		if (0 == strcmp(tmp, "available"))		/* zabbix["host",<type>,"available"] */
 		{
 			zbx_agent_availability_t	agents[ZBX_AGENT_MAX];
-			int				i;
 
 			zbx_get_host_interfaces_availability(item->host.hostid, agents);
 
-			for (i = 0; i < ZBX_AGENT_MAX; i++)
+			for (int i = 0; i < ZBX_AGENT_MAX; i++)
 				zbx_free(agents[i].error);
 
 			tmp = get_rparam(&request, 1);
@@ -643,21 +642,44 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		if (0 == strcmp(tmp, "values"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "all"))
+			{
 				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "float"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_FLOAT_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_FLOAT_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "uint"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_UINT_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_UINT_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "str"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_STR_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_STR_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "log"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_LOG_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "text"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_TEXT_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "bin"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_BIN_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_BIN_COUNTER));
+			}
 			else if (0 == strcmp(tmp1, "not supported"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_NOTSUPPORTED_COUNTER));
+			}
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -709,15 +731,28 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		else if (0 == strcmp(tmp, "index"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
+			{
 				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_PFREE));
+			}
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_TOTAL));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_TOTAL));
+			}
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_USED));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_USED));
+			}
 			else if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_FREE));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_FREE));
+			}
 			else if (0 == strcmp(tmp1, "pused"))
+			{
 				SET_DBL_RESULT(result, *(double *)zbx_dc_get_stats(ZBX_STATS_HISTORY_INDEX_PUSED));
+			}
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));
@@ -744,15 +779,28 @@ int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zb
 		if (0 == strcmp(tmp, "buffer"))
 		{
 			if (NULL == tmp1 || '\0' == *tmp1 || 0 == strcmp(tmp1, "pfree"))
+			{
 				SET_DBL_RESULT(result, *(double *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_PFREE));
+			}
 			else if (0 == strcmp(tmp1, "total"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_TOTAL));
+			}
 			else if (0 == strcmp(tmp1, "used"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_USED));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_USED));
+			}
 			else if (0 == strcmp(tmp1, "free"))
-				SET_UI64_RESULT(result, *(zbx_uint64_t *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
+			{
+				SET_UI64_RESULT(result, *(zbx_uint64_t *)
+						zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_FREE));
+			}
 			else if (0 == strcmp(tmp1, "pused"))
+			{
 				SET_DBL_RESULT(result, *(double *)zbx_dc_config_get_stats(ZBX_CONFSTATS_BUFFER_PUSED));
+			}
 			else
 			{
 				SET_MSG_RESULT(result, zbx_strdup(NULL, "Invalid third parameter."));

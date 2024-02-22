@@ -41,5 +41,6 @@ zbx_async_worker_t;
 int	async_worker_init(zbx_async_worker_t *worker, zbx_async_queue_t *queue, const char *progname, char **error);
 void	async_worker_stop(zbx_async_worker_t *worker);
 void	async_worker_destroy(zbx_async_worker_t *worker);
-void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb, void *finished_data);
+void	async_worker_set_finished_cb(zbx_async_worker_t *worker, zbx_async_notify_cb_t finished_cb,
+		void *finished_data);
 #endif
