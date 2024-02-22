@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-21T01:47:01Z'
+  date: '2024-02-22T10:49:52Z'
   groups:
     - uuid: 36bff6c29af64692839d077febfc7079
       name: 'Templates/Network devices'
@@ -1798,8 +1798,8 @@ zabbix_export:
                 The average jitter of a health check on a specific member link in float number within last 30 probes.
               tags:
                 - tag: component
-                  value: sd_wan
-                - tag: health_check
+                  value: sd-wan
+                - tag: health-check
                   value: '{#HNAME}'
                 - tag: interface
                   value: '{#IFNAME}'
@@ -1816,8 +1816,8 @@ zabbix_export:
                 The average latency of a health check on a specific member link in float number within last 30 probes.
               tags:
                 - tag: component
-                  value: sd_wan
-                - tag: health_check
+                  value: sd-wan
+                - tag: health-check
                   value: '{#HNAME}'
                 - tag: interface
                   value: '{#IFNAME}'
@@ -1834,8 +1834,8 @@ zabbix_export:
                 The packet loss percentage of a health check on a specific member link in float number within last 30 probes.
               tags:
                 - tag: component
-                  value: sd_wan
-                - tag: health_check
+                  value: sd-wan
+                - tag: health-check
                   value: '{#HNAME}'
                 - tag: interface
                   value: '{#IFNAME}'
@@ -1865,8 +1865,8 @@ zabbix_export:
                     - ''
               tags:
                 - tag: component
-                  value: sd_wan
-                - tag: health_check
+                  value: sd-wan
+                - tag: health-check
                   value: '{#HNAME}'
                 - tag: interface
                   value: '{#IFNAME}'
@@ -1886,8 +1886,8 @@ zabbix_export:
                     - ''
               tags:
                 - tag: component
-                  value: sd_wan
-                - tag: health_check
+                  value: sd-wan
+                - tag: health-check
                   value: '{#HNAME}'
                 - tag: interface
                   value: '{#IFNAME}'
@@ -1905,8 +1905,8 @@ zabbix_export:
                 name: 'Health check state'
               tags:
                 - tag: component
-                  value: sd_wan
-                - tag: health_check
+                  value: sd-wan
+                - tag: health-check
                   value: '{#HNAME}'
                 - tag: interface
                   value: '{#IFNAME}'
@@ -1921,7 +1921,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the health check state is dead.
-                    2. `{&#36;SDWAN.HEALTH.IF.CONTROL:"{#HNAME}"}=1` - a user can redefine context macro to value - 0. That marks this health check as not important. No new trigger will be fired if this health check is dead.
+                    2. `{$SDWAN.HEALTH.IF.CONTROL:"{#HNAME}"}=1` - a user can redefine context macro to value - 0. That marks this health check as not important. No new trigger will be fired if this health check is dead.
                     3. `{TEMPLATE_NAME:METRIC.diff()}=1` - the trigger fires only if the health check state was up to (1) sometime before.
                     
                     WARNING: If closed manually, it will not fire again on the next poll because of `diff`.
@@ -2216,7 +2216,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the current tunnel state is down.
-                    2. `{&#36;VPN.STATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this tunnel is down.
+                    2. `{$VPN.STATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this tunnel is down.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2258,7 +2258,7 @@ zabbix_export:
               valuemap:
                 name: 'Wireless admin status'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2275,7 +2275,7 @@ zabbix_export:
               valuemap:
                 name: 'Option state'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2297,7 +2297,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2318,7 +2318,7 @@ zabbix_export:
                   parameters:
                     - 1d
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2332,7 +2332,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the number of clients currently connected to this WTP.
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2356,7 +2356,7 @@ zabbix_export:
               valuemap:
                 name: 'Wireless connection status'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2371,7 +2371,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the current connection status is offLine.
-                    2. `{&#36;WC.STATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this connection is down.
+                    2. `{$WC.STATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this connection is down.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2386,7 +2386,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the current connection status is downloadingImage.
-                    2. `{&#36;WC.UPDATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this it is downloadingImage.
+                    2. `{$WC.UPDATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this it is downloadingImage.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2401,7 +2401,7 @@ zabbix_export:
                   description: |
                     This trigger expression works as follows:
                     1. It can be triggered if the current connection status is connectedImage.
-                    2. `{&#36;WC.UPDATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this it is connectedImage.
+                    2. `{$WC.UPDATE.CONTROL}=1` - a user can redefine context macro to value - 0. That marks this notification as not important. No new trigger will be fired if this it is connectedImage.
                   manual_close: 'YES'
                   tags:
                     - tag: scope
@@ -2418,7 +2418,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the current CPU usage of a WTP (percentage).
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: cpu
@@ -2452,7 +2452,7 @@ zabbix_export:
                   parameters:
                     - '0.01'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2473,7 +2473,7 @@ zabbix_export:
                   parameters:
                     - 1d
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2494,7 +2494,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2516,7 +2516,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2538,7 +2538,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2560,7 +2560,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2581,7 +2581,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2604,7 +2604,7 @@ zabbix_export:
                   parameters:
                     - '1024'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: memory
@@ -2622,7 +2622,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the current memory usage of a WTP (percentage).
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: memory
@@ -2659,7 +2659,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2680,7 +2680,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2696,7 +2696,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the high limit of radio automatic TX power control configured for this WTP, in dBm.
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2712,7 +2712,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the low limit of radio automatic TX power control configured for this WTP, in dBm.
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2734,7 +2734,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2756,7 +2756,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2778,7 +2778,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2795,7 +2795,7 @@ zabbix_export:
                 MIB: FORTINET-FORTIGATE-MIB
                 Represents the radio TX power setting configured for this WTP, in percentage.
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2818,7 +2818,7 @@ zabbix_export:
                   parameters:
                     - '8'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2841,7 +2841,7 @@ zabbix_export:
                   parameters:
                     - '8'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2862,7 +2862,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2881,7 +2881,7 @@ zabbix_export:
                   parameters:
                     - '0.01'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2913,7 +2913,7 @@ zabbix_export:
                   parameters:
                     - 1d
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2932,7 +2932,7 @@ zabbix_export:
                   parameters:
                     - '0.01'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2949,7 +2949,7 @@ zabbix_export:
               valuemap:
                 name: 'Option state'
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
@@ -2970,7 +2970,7 @@ zabbix_export:
                   parameters:
                     - 1h
               tags:
-                - tag: access_point
+                - tag: access-point
                   value: '{#WC.NAME}'
                 - tag: component
                   value: wireless
