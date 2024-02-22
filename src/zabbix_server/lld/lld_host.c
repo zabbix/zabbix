@@ -4386,7 +4386,7 @@ static void	lld_templates_link(const zbx_vector_ptr_t *hosts, char **error)
 
 static int	lld_host_disable_validate(zbx_uint64_t hostid)
 {
-	int		ret = FAIL;
+	int		ret;
 	char		*sql;
 	zbx_db_result_t	result;
 	zbx_db_row_t	row;
@@ -4397,6 +4397,8 @@ static int	lld_host_disable_validate(zbx_uint64_t hostid)
 
 	if (NULL != (row = zbx_db_fetch(result)) && HOST_STATUS_MONITORED == atoi(row[0]))
 		ret = SUCCEED;
+	else
+		ret = FAIL;
 
 	zbx_db_free_result(result);
 
@@ -4471,6 +4473,8 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 
 	zbx_db_begin_multiple_update(&sql, &sql_alloc, &sql_offset);
 
+	zbx_db_begin();
+
 	for (i = 0; i < hosts->values_num; i++)
 	{
 		host = (zbx_lld_host_t *)hosts->values[i];
@@ -4509,23 +4513,10 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 						ts_delete, host->hostid);
 			}
 
-			if (FAIL == lld_host_disable_validate(host->hostid))
-				continue;
-
-			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY == enabled_lifetime->type ||
-					(ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type && lastcheck >
-					(ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration))))
-			{
-				zbx_vector_uint64_append(&dis_hostids, host->hostid);
-				zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE,
-						host->hostid, host->host);
-				zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
-						HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
-				continue;
-			}
-
 			if (ZBX_LLD_LIFETIME_TYPE_NEVER == enabled_lifetime->type)
 				ts_disable = 0;
+			if (ZBX_LLD_LIFETIME_TYPE_AFTER == enabled_lifetime->type)
+				ts_disable = lld_end_of_life(host->lastcheck, enabled_lifetime->duration);
 
 			if (ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type &&
 					host->ts_disable != ts_disable)
@@ -4536,6 +4527,20 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 						" where hostid=" ZBX_FS_UI64 ";\n",
 						ts_disable, host->hostid);
 			}
+
+			if ((ZBX_LLD_LIFETIME_TYPE_IMMEDIATELY != enabled_lifetime->type && lastcheck <= ts_disable) ||
+					HOST_STATUS_NOT_MONITORED == host->status ||
+					SUCCEED != zbx_db_lock_hostid(host->hostid) ||
+					FAIL == lld_host_disable_validate(host->hostid))
+			{
+				continue;
+			}
+
+			zbx_vector_uint64_append(&dis_hostids, host->hostid);
+			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, host->hostid,
+					host->host);
+			zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
+					HOST_STATUS_MONITORED, HOST_STATUS_NOT_MONITORED);
 		}
 		else
 		{
@@ -4544,14 +4549,19 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 			if (ZBX_LLD_DISCOVERY_STATUS_NORMAL != host->discovery_status)
 				zbx_vector_uint64_append(&discovered_hostids, host->hostid);
 
-			if (SUCCEED == lld_host_enable_validate(host->hostid))
+			if (HOST_STATUS_MONITORED == host->status ||
+					ZBX_LLD_DISABLE_SOURCE_LLD_LOST != host->disable_source ||
+					SUCCEED != zbx_db_lock_hostid(host->hostid) ||
+					SUCCEED != lld_host_enable_validate(host->hostid))
 			{
-				zbx_vector_uint64_append(&dis_hostids, host->hostid);
-				zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE,
-						host->hostid, host->host);
-				zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
-						HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED);
+				continue;
 			}
+
+			zbx_vector_uint64_append(&dis_hostids, host->hostid);
+			zbx_audit_host_create_entry(ZBX_AUDIT_LLD_CONTEXT, ZBX_AUDIT_ACTION_UPDATE, host->hostid,
+					host->host);
+			zbx_audit_host_update_json_update_host_status(ZBX_AUDIT_LLD_CONTEXT, host->hostid,
+					HOST_STATUS_NOT_MONITORED, HOST_STATUS_MONITORED);
 		}
 	}
 
@@ -4630,12 +4640,10 @@ static void	lld_hosts_remove(const zbx_vector_ptr_t *hosts, zbx_lld_lifetime_t *
 	{
 		zbx_db_end_multiple_update(&sql, &sql_alloc, &sql_offset);
 
-		zbx_db_begin();
-
 		zbx_db_execute("%s", sql);
-
-		zbx_db_commit();
 	}
+
+	zbx_db_commit();
 
 	zbx_free(sql);
 
