@@ -192,6 +192,7 @@ static char				zbx_snmp_init_bulkwalk_done;
 static pthread_rwlock_t			snmp_exec_rwlock;
 static char				snmp_rwlock_init_done;
 static zbx_hashset_t	engineid_cache;
+static int		engineid_cache_initialized = 0;
 
 #define ZBX_SNMP_GET	0
 #define ZBX_SNMP_WALK	1
@@ -286,6 +287,9 @@ static int	zbx_snmp_cache_handle_engineid(netsnmp_session *session, zbx_dc_item_
 	zbx_snmp_engineid_device_t	d;
 	u_int				current_engineboots = 0;
 	int				ret = SUCCEED;
+
+	if (0 == engineid_cache_initialized)
+		return SUCCEED;
 
 	local_record.engineid_len = session->securityEngineIDLen;
 	memcpy(&local_record.engineid, session->securityEngineID, session->securityEngineIDLen);
@@ -399,6 +403,7 @@ void	zbx_housekeep_snmp_engineid_cache(void)
 void	zbx_init_snmp_engineid_cache(void)
 {
 	zbx_hashset_create(&engineid_cache, 100, snmp_engineid_cache_hash, snmp_engineid_cache_compare);
+	engineid_cache_initialized = 1;
 }
 
 static zbx_hash_t	__snmpidx_main_key_hash(const void *data)
