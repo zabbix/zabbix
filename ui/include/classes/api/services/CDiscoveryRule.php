@@ -2744,8 +2744,8 @@ class CDiscoveryRule extends CItemGeneral {
 
 		$options = [
 			'output' => array_merge(
-				['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime',
-					'enabled_lifetime_type', 'enabled_lifetime', 'description', 'status'
+				['uuid', 'itemid', 'name', 'type', 'key_', 'lifetime_type', 'lifetime', 'enabled_lifetime_type',
+					'enabled_lifetime', 'description', 'status'
 				],
 				array_diff(CItemType::FIELD_NAMES, ['parameters'])
 			),

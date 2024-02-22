@@ -847,7 +847,8 @@ $formgrid
 		)
 	]);
 
-$disabled_by_lld_icon = array_key_exists('disable_source', $item['itemDiscovery'])
+$disabled_by_lld_icon = array_key_exists('itemDiscovery', $item)
+		&& array_key_exists('disable_source', $item['itemDiscovery'])
 		&& $item['itemDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 		&& $item['status'] == ITEM_STATUS_DISABLED
 	? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))->addClass('js-disabled-by-lld')

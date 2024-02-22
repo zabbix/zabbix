@@ -290,7 +290,7 @@ $trigger_form_grid
 		)
 	]);
 
-$disabled_by_lld_icon = array_key_exists('disable_source', $data['triggerDiscovery'])
+$disabled_by_lld_icon = array_key_exists('triggerDiscovery', $data)
 		&& $data['triggerDiscovery']['disable_source'] == ZBX_DISABLE_SOURCE_LLD
 		&& $data['status'] == TRIGGER_STATUS_DISABLED
 	? (new CSpan(makeWarningIcon(_('Disabled automatically by an LLD rule.'))))->addClass('js-disabled-by-lld')

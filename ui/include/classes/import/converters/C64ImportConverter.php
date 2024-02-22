@@ -251,6 +251,17 @@ class C64ImportConverter extends CConverter {
 			if (array_key_exists('trigger_prototypes', $discovery_rule)) {
 				$discovery_rule['trigger_prototypes'] = self::convertTriggers($discovery_rule['trigger_prototypes']);
 			}
+
+			if (array_key_exists('lifetime', $discovery_rule)) {
+				if ($discovery_rule['lifetime'] === '0') {
+					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_IMMEDIATELY;
+				}
+				else {
+					$discovery_rule['lifetime_type'] = CXmlConstantName::LLD_DELETE_AFTER;
+				}
+			}
+
+			$discovery_rule['enabled_lifetime_type'] = CXmlConstantName::LLD_DISABLE_NEVER;
 		}
 		unset($discovery_rule);
 
