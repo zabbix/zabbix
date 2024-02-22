@@ -240,23 +240,24 @@ out:
 	return ret;
 }
 
-/*********************************************************************************
- *                                                                               *
- * Purpose: retrieves data from Zabbix server (internally supported items)       *
- *                                                                               *
- * Parameters: item                     - [IN] item we are interested in         *
- *             result                   - [OUT] value of requested item          *
- *             config_comms             - [IN] Zabbix server/proxy configuration *
- *                                             for communication                 *
- *             config_startup_time      - [IN] program startup time              *
- *             config_java_gateway      - [IN]                                   *
- *             config_java_gateway_port - [IN]                                   *
- *             get_config_forks         - [IN]                                   *
- *                                                                               *
- * Return value: SUCCEED - data successfully retrieved and stored in result      *
- *               NOTSUPPORTED - requested item is not supported                  *
- *                                                                               *
- *********************************************************************************/
+/**********************************************************************************
+ *                                                                                *
+ * Purpose: retrieves data from Zabbix server (internally supported items)        *
+ *                                                                                *
+ * Parameters: item                      - [IN] item we are interested in         *
+ *             result                    - [OUT] value of requested item          *
+ *             config_comms              - [IN] Zabbix server/proxy configuration *
+ *                                              for communication                 *
+ *             config_startup_time       - [IN] program startup time              *
+ *             config_java_gateway       - [IN]                                   *
+ *             config_java_gateway_port  - [IN]                                   *
+ *             get_config_forks          - [IN]                                   *
+ *             get_value_internal_ext_cb - [IN]                                   *
+ *                                                                                *
+ * Return value: SUCCEED - data successfully retrieved and stored in result       *
+ *               NOTSUPPORTED - requested item is not supported                   *
+ *                                                                                *
+ **********************************************************************************/
 int	get_value_internal(const zbx_dc_item_t *item, AGENT_RESULT *result, const zbx_config_comms_args_t *config_comms,
 		int config_startup_time, const char *config_java_gateway, int config_java_gateway_port,
 		zbx_get_config_forks_f get_config_forks, zbx_get_value_internal_ext_f get_value_internal_ext_cb)

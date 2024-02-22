@@ -837,18 +837,18 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 	}
 	else if (SNMP_VERSION_3 == session.version)
 	{
-		/* set the SNMPv3 user name */
+		/* set SNMPv3 user name */
 		session.securityName = snmpv3_securityname;
 		session.securityNameLen = strlen(session.securityName);
 
-		/* set the SNMPv3 context if specified */
+		/* set SNMPv3 context if specified */
 		if ('\0' != *snmpv3_contextname)
 		{
 			session.contextName = snmpv3_contextname;
 			session.contextNameLen = strlen(session.contextName);
 		}
 
-		/* set the security level to authenticated, but not encrypted */
+		/* set security level to authenticated, but not encrypted */
 		switch (snmpv3_securitylevel)
 		{
 			case ZBX_ITEM_SNMPV3_SECURITYLEVEL_NOAUTHNOPRIV:
@@ -902,34 +902,34 @@ static zbx_snmp_sess_t	zbx_snmp_open_session(unsigned char snmp_version, const c
 				{
 #ifdef HAVE_NETSNMP_SESSION_DES
 					case ITEM_SNMPV3_PRIVPROTOCOL_DES:
-						/* set the privacy protocol to DES */
+						/* set privacy protocol to DES */
 						session.securityPrivProto = usmDESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_DES_LEN;
 						break;
 #endif
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES128:
-						/* set the privacy protocol to AES128 */
+						/* set privacy protocol to AES128 */
 						session.securityPrivProto = usmAESPrivProtocol;
 						session.securityPrivProtoLen = USM_PRIV_PROTO_AES_LEN;
 						break;
 #ifdef HAVE_NETSNMP_STRONG_PRIV
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192:
-						/* set the privacy protocol to AES192 */
+						/* set privacy protocol to AES192 */
 						session.securityPrivProto = usmAES192PrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES192PrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256:
-						/* set the privacy protocol to AES256 */
+						/* set privacy protocol to AES256 */
 						session.securityPrivProto = usmAES256PrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES256PrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES192C:
-						/* set the privacy protocol to AES192 (Cisco version) */
+						/* set privacy protocol to AES192 (Cisco version) */
 						session.securityPrivProto = usmAES192CiscoPrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES192CiscoPrivProtocol);
 						break;
 					case ITEM_SNMPV3_PRIVPROTOCOL_AES256C:
-						/* set the privacy protocol to AES256 (Cisco version) */
+						/* set privacy protocol to AES256 (Cisco version) */
 						session.securityPrivProto = usmAES256CiscoPrivProtocol;
 						session.securityPrivProtoLen = OID_LENGTH(usmAES256CiscoPrivProtocol);
 						break;
@@ -2346,13 +2346,14 @@ static int	snmp_get_value_from_var(struct variable_list *var, char **results, si
 
 /******************************************************************************
  *                                                                            *
- * Purpose: quotes string value the same way Net-SNMP library does it         *
+ * Purpose: quotes string value same way Net-SNMP library does it             *
  *                                                                            *
- * Parameters: buffer      - [OUT] the output buffer                          *
- *             buffer_size - [IN] the output buffer size                      *
- *             var         - [IN] SNMP variable                               *
+ * Parameters: buffer      - [OUT] output buffer                              *
+ *             buffer_size - [IN] output buffer size                          *
+ *             str         - [IN] SNMP variable                               *
+ *             len         - [IN]                                             *
  *                                                                            *
- * Return value: SUCCEED - the string was quoted successfully                 *
+ * Return value: SUCCEED - string was quoted successfully                     *
  *               FAIL    - output buffer is too small                         *
  *                                                                            *
  ******************************************************************************/
@@ -2381,11 +2382,11 @@ static int	snmp_native_quote_string_value(char *buffer, size_t buffer_size, char
  *                                                                            *
  * Purpose: quotes string value if Net-SNMP library hasn't quoted it          *
  *                                                                            *
- * Parameters: buffer      - [OUT] the output buffer                          *
- *             buffer_size - [IN] the output buffer size                      *
+ * Parameters: buffer      - [OUT]                                            *
+ *             buffer_size - [IN] output buffer size                          *
  *             var         - [IN] SNMP variable                               *
  *                                                                            *
- * Return value: SUCCEED - the string was quoted successfully                 *
+ * Return value: SUCCEED - string was quoted successfully                     *
  *               FAIL    - output buffer is too small                         *
  *                                                                            *
  * Comments: When producing the output, Net-SNMP library sometimes quotes     *
@@ -3439,8 +3440,12 @@ static void	zbx_init_snmp(const char *progname)
 	zbx_sigmask(SIG_SETMASK, &orig_mask, NULL);
 }
 
-/* Actually this could be called by discoverer, without poller being initialized, */
-/* so cannot call poller_get_progname(), need progname to be passed directly. */
+/*******************************************************************************************
+ *                                                                                         *
+ * Comment: Actually this could be called by discoverer, without poller being initialized, *
+ *          so cannot call poller_get_progname(), need progname to be passed directly.     *
+ *                                                                                         *
+ *******************************************************************************************/
 static void	zbx_shutdown_snmp(const char *progname)
 {
 	sigset_t	mask, orig_mask;

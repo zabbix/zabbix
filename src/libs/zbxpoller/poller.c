@@ -128,6 +128,21 @@ static const char	*item_type_agent_string(zbx_item_type_t item_type)
 	}
 }
 
+/********************************************************************************
+ *                                                                              *
+ * Purpose: activates item interface                                            *
+ *                                                                              *
+ * Parameters: ts          - [IN] timestamp                                     *
+ *             interface   - [IN]                                               *
+ *             itemid      - [IN]                                               *
+ *             type        - [IN]                                               *
+ *             host        - [IN]                                               *
+ *             version     - [IN/OUT] interface version                         *
+ *             data        - [IN/OUT] serialized availability data              *
+ *             data_alloc  - [IN/OUT] serialized availability data size         *
+ *             data_offset - [IN/OUT] serialized availability data offset       *
+ *                                                                              *
+ *******************************************************************************/
 void	zbx_activate_item_interface(zbx_timespec_t *ts, zbx_dc_interface_t *interface, zbx_uint64_t itemid, int type,
 		char *host, int version, unsigned char **data, size_t *data_alloc, size_t *data_offset)
 {
@@ -177,7 +192,7 @@ out:
  * Purpose: deactivates item interface                                             *
  *                                                                                 *
  * Parameters: ts                 - [IN] timestamp                                 *
- *             inteface           - [IN]                                           *
+ *             interface          - [IN]                                           *
  *             itemid             - [IN]                                           *
  *             type               - [IN]                                           *
  *             host               - [IN]                                           *

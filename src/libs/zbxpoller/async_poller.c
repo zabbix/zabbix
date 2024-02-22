@@ -611,7 +611,7 @@ ZBX_THREAD_ENTRY(async_poller_thread, args)
 #undef SNMP_ENGINEID_HK_INTERVAL
 #endif
 	}
-\
+
 	if (ZBX_POLLER_TYPE_HTTPAGENT != poller_type)
 	{
 #ifdef HAVE_NETSNMP
