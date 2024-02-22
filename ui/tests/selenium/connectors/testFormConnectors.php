@@ -805,6 +805,48 @@ class testFormConnectors extends CWebTest {
 				[
 					'expected' => TEST_GOOD,
 					'fields' => [
+						'Name' => 'One type of information',
+						'URL' => '{$URL}',
+						'id:item_value_types_8' => false, // Numeric (unsigned).
+						'id:item_value_types_1' => false, // Numeric (float).
+						'id:item_value_types_2' => false, // Character.
+						'id:item_value_types_4' => true, // Log.
+						'id:item_value_types_16' => false // Text.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'Two types of information',
+						'URL' => '{$URL}',
+						'id:item_value_types_8' => true, // Numeric (unsigned).
+						'id:item_value_types_1' => false, // Numeric (float).
+						'id:item_value_types_2' => false, // Character.
+						'id:item_value_types_4' => true, // Log.
+						'id:item_value_types_16' => false // Text.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => 'All types of information',
+						'URL' => '{$URL}',
+						'id:item_value_types_8' => true, // Numeric (unsigned).
+						'id:item_value_types_1' => true, // Numeric (float).
+						'id:item_value_types_2' => true, // Character.
+						'id:item_value_types_4' => true, // Log.
+						'id:item_value_types_16' => true // Text.
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
 						'Name' => 'Simple create with changed fields and Basic auth',
 						'URL' => '{$URL}',
 						'Data type' => 'Events',
@@ -938,6 +980,67 @@ class testFormConnectors extends CWebTest {
 						'Advanced configuration' => true,
 						'Timeout' => '60s'
 					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 0',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '0'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 0s',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '0s'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 10',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '10'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval => 10s',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '10s'
+					]
+				]
+			],
+			[
+				[
+					'expected' => TEST_GOOD,
+					'fields' => [
+						'Name' => '🚩Advanced configuration🚩 with custom attempt interval and leading and trailing spaces',
+						'Advanced configuration' => true,
+						'Attempts' => '2',
+						'URL' => '{$URL}',
+						'Attempt interval' => '  0s  '
+					],
+					'trim' => true
 				]
 			],
 			[
