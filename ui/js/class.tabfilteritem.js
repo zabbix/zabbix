@@ -211,24 +211,10 @@ class CTabFilterItem extends CBaseComponent {
 	}
 
 	/**
-	 * Get focused state of item.
-	 *
-	 * @return {boolean}
+	 * Set focused state of item.
 	 */
-	isFocused() {
-		return this._target.parentNode.classList.contains(TABFILTERITEM_STYLE_FOCUSED);
-	}
-
-	/**
-	 * Focus or blur the item.
-	 */
-	setFocused(focused = true) {
-		if (focused) {
-			this._target.focus({preventScroll: true});
-		}
-		else {
-			this._target.blur();
-		}
+	setFocused() {
+		this._target.focus({preventScroll: true});
 	}
 
 	/**
@@ -623,7 +609,6 @@ class CTabFilterItem extends CBaseComponent {
 					return;
 				}
 
-				this.setFocused();
 				this.fire(TABFILTERITEM_EVENT_SELECT);
 			},
 

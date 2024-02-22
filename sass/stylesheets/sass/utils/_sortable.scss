@@ -14,7 +14,15 @@
 			&.sortable-item-dragging {
 				opacity: 0.6;
 				z-index: 1;
-				transition: none;
+				transition: left 0s, top 0s;
+			}
+		}
+	}
+
+	&.sortable-transitions-disabled {
+		.sortable-item {
+			@if $ui-transitions {
+				transition: left 0s, top 0s;
 			}
 		}
 	}

@@ -212,13 +212,19 @@
 		}
 
 		&.sortable-dragging {
-			.tabfilter-item-label:not(:first-child) {
-				.tabfilter-item-link {
-					&::before {
-						@if $ui-transitions {
-							transition: border-left-color $ui-transition-duration;
+			.tabfilter-item-label {
+				&:not(:first-child) {
+					.tabfilter-item-link {
+						&::before {
+							@if $ui-transitions {
+								transition: border-left-color $ui-transition-duration;
+							}
 						}
 					}
+				}
+
+				&.focused {
+					box-shadow: none;
 				}
 			}
 		}

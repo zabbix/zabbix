@@ -35,6 +35,13 @@ class CSortable {
 	static ZBX_STYLE_DISABLED = 'sortable-disabled';
 
 	/**
+	 * Class applied to a sortable container while transitions are temporarily disabled.
+	 *
+	 * @type {string}
+	 */
+	static ZBX_STYLE_TRANSITIONS_DISABLED = 'sortable-transitions-disabled';
+
+	/**
 	 * Class applied to a sortable container while item is being dragged.
 	 *
 	 * @type {string}
@@ -270,7 +277,7 @@ class CSortable {
 		if (item !== null) {
 			if (this.#revealItem(item) !== 0) {
 				if (immediate) {
-					this.mutate(() => this.#resetTransitions());
+					this.#enableTransitions(false);
 				}
 			}
 		}
@@ -381,6 +388,14 @@ class CSortable {
 		);
 	}
 
+	#updateItemsOrder() {
+		this.#target.innerHTML = '';
+
+		for (const item of this.#items) {
+			this.#target.append(...item.elements);
+		}
+	}
+
 	#updateItemsLoc() {
 		const target_pos = this.#getTargetLoc().pos;
 
@@ -449,7 +464,13 @@ class CSortable {
 		};
 	}
 
+	#enableTransitions(enable = true) {
+		this.#target.classList.toggle(CSortable.ZBX_STYLE_TRANSITIONS_DISABLED, !enable);
+	}
+
 	#render() {
+		this.#enableTransitions();
+
 		for (const item of this.#items) {
 			if (!this.#is_dragging || item !== this.#drag_item) {
 				this.#applyRel(item, item.rel - this.#scroll_pos);
@@ -674,13 +695,10 @@ class CSortable {
 					element.classList.remove(CSortable.ZBX_STYLE_ITEM_DRAGGING);
 				}
 			}
-
-			if (success) {
-				this.#resetTransitions();
-			}
 		});
 
 		if (success) {
+			this.#updateItemsOrder();
 			this.#updateItemsLoc();
 
 			this.#revealItem(this.#drag_item);
@@ -882,14 +900,6 @@ class CSortable {
 		}
 	}
 
-	#resetTransitions() {
-		this.#target.innerHTML = '';
-
-		for (const item of this.#items) {
-			this.#target.append(...item.elements);
-		}
-	}
-
 	#listeners = {
 		mouseDown: (e) => {
 			if (this.#hasTransitions()) {
@@ -1045,8 +1055,7 @@ class CSortable {
 
 			this.#items.splice(index, 0, ...this.#items.splice(index_to, 1));
 
-			this.mutate(() => this.#resetTransitions());
-
+			this.#updateItemsOrder();
 			this.#updateItemsLoc();
 
 			this.#revealItem(item);

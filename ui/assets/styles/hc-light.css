@@ -703,7 +703,7 @@ svg a {
   .sortable.sortable-dragging .sortable-item.sortable-item-dragging {
     opacity: 0.6;
     z-index: 1;
-    transition: none; }
+    transition: left 0s, top 0s; }
 
 html,
 body {
@@ -1584,9 +1584,9 @@ button {
           margin: -1px -9px -1px 4px; }
         .dashboard-navigation-tabs .sortable li div:not(.selected-tab) button, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li div:not(.selected-tab) button {
           display: none; }
-    .dashboard-navigation-tabs .sortable li:focus:not(:active), .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li:focus:not(:active) {
+    .dashboard-navigation-tabs .sortable li:not(.sortable-item-dragging):focus:not(:active), .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li:not(.sortable-item-dragging):focus:not(:active) {
       padding: 0 3.5px; }
-      .dashboard-navigation-tabs .sortable li:focus:not(:active) div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li:focus:not(:active) div {
+      .dashboard-navigation-tabs .sortable li:not(.sortable-item-dragging):focus:not(:active) div, .host-dashboard-header-navigation .host-dashboard-navigation .host-dashboard-navigation-tabs .sortable li:not(.sortable-item-dragging):focus:not(:active) div {
         padding: 0 8px;
         border: 1px solid transparent;
         box-shadow: 0 0 0 2px #111111; }
@@ -3613,6 +3613,8 @@ section {
     border-left: 1px solid transparent; }
   .filter-container.tabfilter-container .tabfilter-tabs .tabfilter-item-label:not(:first-child) .tabfilter-item-link.separated::before {
     border-left: 1px solid #768d99; }
+  .filter-container.tabfilter-container .tabfilter-tabs.sortable-dragging .tabfilter-item-label.focused {
+    box-shadow: none; }
   .filter-container.tabfilter-container .tabfilter-tabs-container .filter-container.time-selection-container {
     border: 0 none; }
   .filter-container.tabfilter-container .btn-time {

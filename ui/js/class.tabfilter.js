@@ -95,6 +95,7 @@ class CTabFilter extends CBaseComponent {
 	 * @param {CTabFilterItem} item  Filter item object.
 	 */
 	scrollIntoView(item) {
+		console.log('scrollIntoView', item._target);
 		setTimeout(() => this.#tabs_sortable.scrollIntoView(item._target.parentNode, {immediate: true}));
 	}
 
@@ -330,17 +331,6 @@ class CTabFilter extends CBaseComponent {
 	}
 
 	/**
-	 * Focus the specified item and blur all other items.
-	 *
-	 * @param {CTabFilterItem} focus_item
-	 */
-	#setFocusedItem(focus_item) {
-		for (const item of this._items) {
-			item.setFocused(item === focus_item);
-		}
-	}
-
-	/**
 	 * Update separated state of items (whether to visually separate one item from another).
 	 */
 	#updateSeparators() {
@@ -439,6 +429,8 @@ class CTabFilter extends CBaseComponent {
 						|| (item !== this._timeselector && this._active_item === this._timeselector)
 					);
 
+				item.setFocused();
+
 				if (item !== this._timeselector) {
 					if (item.isSelected()) {
 						this.profileUpdate('expanded', {
@@ -448,7 +440,6 @@ class CTabFilter extends CBaseComponent {
 						});
 					}
 					else {
-						this.#setFocusedItem(item);
 						item.initUnsavedState();
 						this.profileUpdate('selected', {
 							value_int: item._index
@@ -463,7 +454,6 @@ class CTabFilter extends CBaseComponent {
 					this.collapseAllItemsExcept(item);
 
 					if (expand) {
-						this.#setFocusedItem(item);
 						item.fire(TABFILTERITEM_EVENT_EXPAND);
 					}
 				}
@@ -524,6 +514,8 @@ class CTabFilter extends CBaseComponent {
 			 * @param {Object} ev
 			 */
 			tabsDragStart: (ev) => {
+				this._items[ev.detail.index].setFocused();
+
 				this.#updateSeparatorsForDragging(ev.detail.index, ev.detail.index);
 			},
 
@@ -546,11 +538,7 @@ class CTabFilter extends CBaseComponent {
 			 * @param ev
 			 */
 			tabsDragEnd: (ev) => {
-				const focus_item = this._items.find(item => item.isFocused());
-
-				if (focus_item !== undefined) {
-					this.#setFocusedItem(focus_item);
-				}
+				this._items[ev.detail.index].setFocused();
 
 				if (ev.detail.index_to == ev.detail.index) {
 					this.#updateSeparators();
@@ -668,7 +656,7 @@ class CTabFilter extends CBaseComponent {
 								if (this._active_item !== this._items[0]) {
 									this._items[0].fire(TABFILTERITEM_EVENT_SELECT);
 									// Set selected item focus after popup menu will focus it opener element (used for ESC).
-									setTimeout(() => this.#setFocusedItem(this._items[0]));
+									setTimeout(() => this._items[0].setFocused());
 								}
 							}
 						}]
@@ -685,7 +673,7 @@ class CTabFilter extends CBaseComponent {
 								if (this._active_item !== item) {
 									item.fire(TABFILTERITEM_EVENT_SELECT);
 									// Set selected item focus after popup menu will focus it opener element (used for ESC).
-									setTimeout(() => this.#setFocusedItem(item));
+									setTimeout(() => item.setFocused());
 								}
 							}
 						});
@@ -786,7 +774,7 @@ class CTabFilter extends CBaseComponent {
 					index = focused_item._index + ((ev.key === 'ArrowRight') ? 1 : -1);
 
 					if (this._items[index] instanceof CTabFilterItem && this._items[index] !== this._timeselector) {
-						this.#setFocusedItem(this._items[index]);
+						this._items[index].setFocused();
 					}
 
 					cancelEvent(ev);

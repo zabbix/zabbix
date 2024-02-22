@@ -115,7 +115,7 @@
 			}
 		}
 
-		li:focus:not(:active) {
+		li:not(.sortable-item-dragging):focus:not(:active) {
 			// Increase padding to accommodate the focused div's shadow.
 			padding: 0 3.5px;
 
